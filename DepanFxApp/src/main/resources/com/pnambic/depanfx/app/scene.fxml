@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+
+<BorderPane
+      maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="400.0" prefWidth="600.0"
+      xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+    <top>
+        <MenuBar>
+            <menus>
+                <Menu text="File">
+                    <items>
+                        <MenuItem text="New"/>
+                        <SeparatorMenuItem />
+                        <MenuItem text="Open"/>
+                        <SeparatorMenuItem />
+                        <MenuItem text="Save"/>
+                        <MenuItem text="Save As .."/>
+                        <MenuItem text="Save All"/>
+                        <SeparatorMenuItem />
+                        <MenuItem text="Import .."/>
+                        <MenuItem text="Export .."/>
+                        <SeparatorMenuItem />
+                        <MenuItem text="Print"/>
+                        <SeparatorMenuItem />
+                        <MenuItem text="Close"/>
+                        <SeparatorMenuItem />
+                        <MenuItem fx:id="fileExitItem" text="Exit"/>
+                    </items>
+                </Menu>
+                <Menu text="Edit">
+                     <items>
+                        <MenuItem text="Undo"/>
+                        <MenuItem text="Redo"/>
+                        <SeparatorMenuItem />
+                        <MenuItem text="Cut"/>
+                        <MenuItem text="Copy"/>
+                        <MenuItem text="Paste"/>
+                     </items>
+                </Menu>
+                <Menu text="Selection">
+                     <items>
+                        <MenuItem text="Select All"/>
+                     </items>
+                </Menu>
+                <Menu text="View"/>
+                <Menu text="Help">
+                     <items>
+                        <MenuItem text="Welcome"/>
+                        <SeparatorMenuItem />
+                        <MenuItem text="About"/>
+                     </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </top>
+    <center>
+        <StackPane
+                maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity">
+             <children>
+                <Label fx:id="label" text="Label" />
+             </children>
+        </StackPane>
+    </center>
+</BorderPane>
