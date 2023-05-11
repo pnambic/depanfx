@@ -1,3 +1,4 @@
 rootProject.name = 'DepanFX'
 
 include 'DepanFxApp'
+include 'DepanFxWorkspace'

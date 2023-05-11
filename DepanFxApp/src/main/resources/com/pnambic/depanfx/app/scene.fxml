@@ -5,6 +5,8 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
 
@@ -20,6 +22,7 @@
                         <MenuItem text="New"/>
                         <SeparatorMenuItem />
                         <MenuItem text="Open"/>
+                        <MenuItem fx:id="fileOpenProjectItem" text="Open Project.."/>
                         <SeparatorMenuItem />
                         <MenuItem text="Save"/>
                         <MenuItem text="Save As .."/>
@@ -62,11 +65,15 @@
         </MenuBar>
     </top>
     <center>
-        <StackPane
-                maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity">
-             <children>
-                <Label fx:id="label" text="Label" />
-             </children>
-        </StackPane>
+        <TabPane
+            fx:id="viewRoot">
+            <tabs>
+                <Tab text="Welcome">
+                    <StackPane>
+                        <Label fx:id="welcomeLabel" text="Welcome to DepanFX!" />
+                    </StackPane>
+                </Tab>
+            </tabs>
+        </TabPane>
     </center>
 </BorderPane>
