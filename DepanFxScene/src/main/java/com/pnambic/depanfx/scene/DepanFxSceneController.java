@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterRegistry;
 
 import javafx.event.ActionEvent;
@@ -15,6 +16,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
 import net.rgielen.fxweaver.core.FxControllerAndView;
@@ -29,6 +31,8 @@ public class DepanFxSceneController {
 
   private final DepanFxSceneStarterRegistry starterRegistry;
 
+  private final DepanFxNewResourceRegistry newResourceRegistry;
+
   private Closeable onClose;
 
   @FXML
@@ -39,6 +43,9 @@ public class DepanFxSceneController {
 
   @FXML
   private MenuItem fileOpenProjectItem;
+
+  @FXML
+  private Menu fileNew;
 
   @FXML
   private MenuItem fileExitItem;
@@ -56,9 +63,12 @@ public class DepanFxSceneController {
   }
 
   @Autowired
-  public DepanFxSceneController(DepanFxSceneStarterRegistry starterRegistry) {
+  public DepanFxSceneController(DepanFxSceneStarterRegistry starterRegistry,
+      DepanFxNewResourceRegistry newResourceRegistry) {
     this.starterRegistry = starterRegistry;
+    this.newResourceRegistry = newResourceRegistry;
   }
+
   @FXML
   public void initialize() {
 
@@ -71,6 +81,7 @@ public class DepanFxSceneController {
 
     // Start any initial tabs
     starterRegistry.addStarterTabs(viewRoot);
+    fileNew.getItems().addAll(newResourceRegistry.buildNewResourceItems());
 
     fileExitItem.setOnAction(new EventHandler<ActionEvent>() {
 

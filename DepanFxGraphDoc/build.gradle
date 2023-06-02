@@ -1,0 +1,9 @@
+plugins {
+  id 'depanfx.base'
+}
+
+dependencies {
+  implementation 'com.thoughtworks.xstream:xstream:1.4.20'
+
+  implementation project(':DepanFxGraph')
+}

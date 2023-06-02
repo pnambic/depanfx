@@ -9,6 +9,10 @@ pluginManagement {
 rootProject.name = 'DepanFX'
 
 include 'DepanFxApp'
+include 'DepanFxFileSystem'
+include 'DepanFxFileSystemGui'
+include 'DepanFxGraph'
+include 'DepanFxGraphDoc'
 include 'DepanFxScene'
 include 'DepanFxWorkspace'
 include 'DepanFxWorkspaceGui'

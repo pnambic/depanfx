@@ -14,6 +14,7 @@ module depanfx.app {
 
     // For Spring @Component discovery
     requires depanfx.workspace.gui;
+    requires depanfx.filesystem.gui;
 
     opens com.pnambic.depanfx to spring.core;
     opens com.pnambic.depanfx.app to spring.core;
