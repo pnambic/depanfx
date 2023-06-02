@@ -1,0 +1,7 @@
+plugins {
+  id 'depanfx.base'
+}
+
+dependencies {
+  implementation project(':DepanFxGraph')
+}

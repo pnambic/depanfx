@@ -1,4 +1,8 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive",
-    "java.compile.nullAnalysis.mode": "disabled"
+    "editor.rulers": [80, 100],
+    "editor.renderWhitespace": "all",
+    "files.eol": "\n",
+    "git.path": "C:\cygwin64\bin\git.exe",
+    "java.compile.nullAnalysis.mode": "disabled",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

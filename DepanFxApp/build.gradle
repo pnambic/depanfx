@@ -13,6 +13,8 @@ dependencies {
   implementation "net.rgielen:javafx-weaver-core:${javafxWeaverVersion}"
   implementation "org.slf4j:slf4j-api:${slf4jVersion}"
 
+  implementation project(':DepanFxFileSystemGui')
+  implementation project(':DepanFxGraph')
   implementation project(':DepanFxScene')
   implementation project(':DepanFxWorkspace')
   implementation project(':DepanFxWorkspaceGui')
