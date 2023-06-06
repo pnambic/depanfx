@@ -2,16 +2,13 @@ package com.pnambic.depanfx.graph.context;
 
 import java.util.Collection;
 
-import com.pnambic.depanfx.graph.api.Node;
-import com.pnambic.depanfx.graph.api.Relation;
-
-public interface ContextModel<N, R> {
+public interface ContextModel<N extends ContextNodeKindId, R extends ContextRelationId> {
 
   ContextModelId getId();
 
   Collection<ContextModel<?, ?>> getIncludedModels();
 
-  Collection<Relation<? extends R>> getRelations();
+  Collection<? extends N> getNodeKindIds();
 
-  Collection<Class<? extends Node<? extends N>>> getNodeKinds();
+  Collection<? extends R> getRelationIds();
 }

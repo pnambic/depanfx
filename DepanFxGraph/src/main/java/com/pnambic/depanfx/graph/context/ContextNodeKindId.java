@@ -1,8 +1,8 @@
 package com.pnambic.depanfx.graph.context;
 
-public interface ContextRelationId {
+public interface ContextNodeKindId {
 
   ContextModelId getContextModelId();
 
-  String getRelationKey();
+  String getNodeKindKey();
 }

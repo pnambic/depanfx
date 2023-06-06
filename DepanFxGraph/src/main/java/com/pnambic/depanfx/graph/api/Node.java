@@ -22,5 +22,5 @@ public interface Node<N> {
 
   N getId();
 
-  void visit(NodeVisitor vistor);
+  void accept(NodeVisitor vistor);
 }

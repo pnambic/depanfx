@@ -32,7 +32,7 @@ public class BasicNode<N> implements Node<N> {
   }
 
   @Override
-  public void visit(NodeVisitor vistor) {
+  public void accept(NodeVisitor vistor) {
     // Ignore unrecognized visitors.
   }
   
