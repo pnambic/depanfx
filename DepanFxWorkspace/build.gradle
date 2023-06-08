@@ -1,27 +1,4 @@
 plugins {
-    id 'java'
-    id 'org.openjfx.javafxplugin' version '0.0.10'
-}
-
-repositories {
-    // Use Maven Central for resolving dependencies.
-    mavenCentral()
-}
-
-javafx {
-    version = "20"
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
-}
-
-dependencies {
-    // Use JUnit Jupiter for testing.
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
-
-    // This dependency is used by the application.
-    implementation 'com.google.guava:guava:31.1-jre'
-}
-
-tasks.named('test') {
-    // Use JUnit Platform for unit tests.
-    useJUnitPlatform()
+  id 'depanfx.fx-component'
+  id 'org.openjfx.javafxplugin'
 }

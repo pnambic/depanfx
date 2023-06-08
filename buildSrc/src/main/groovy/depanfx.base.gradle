@@ -1,0 +1,22 @@
+plugins {
+  // Apply the application plugin to add support for building a CLI application in Java.
+  id 'java'
+}
+
+repositories {
+  // Use Maven Central for resolving dependencies.
+  mavenCentral()
+}
+
+dependencies {
+  // Use JUnit Jupiter for testing.
+  testImplementation "org.junit.jupiter:junit-jupiter:${junitJupiterVersion}"
+
+  // This dependency is used by the application.
+  implementation "com.google.guava:guava:${guavaVersion}"
+}
+
+tasks.named('test') {
+  // Use JUnit Platform for unit tests.
+   useJUnitPlatform()
+}

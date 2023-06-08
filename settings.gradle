@@ -1,3 +1,9 @@
+pluginManagement {
+  plugins {
+    id 'org.openjfx.javafxplugin' version '0.0.10'
+  }
+}
+
 rootProject.name = 'DepanFX'
 
 include 'DepanFxApp'
