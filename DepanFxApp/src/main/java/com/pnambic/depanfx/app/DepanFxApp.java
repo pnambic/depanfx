@@ -1,41 +1,55 @@
 package com.pnambic.depanfx.app;
 
+import java.io.Closeable;
 import java.io.IOException;
 
-import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ConfigurableApplicationContext;
+
+import com.pnambic.depanfx.DepanFxApplication;
+import com.pnambic.depanfx.scene.DepanFxSceneController;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import net.rgielen.fxweaver.core.FxWeaver;
 
-public class DepanFxApp extends Application {
+public class DepanFxApp extends Application implements Closeable {
 
-    public static final String WORKSPACE_NAME = "Depan Workspace";
+  private ConfigurableApplicationContext applicationContext;
 
-    @Override
-    public void start(Stage stage) throws Exception {
-        Parent root = createDepanRoot();
+  /** Get a reusable one up front. */
+  private FxWeaver fxWeaver;
 
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
+  @Override
+  public void init() {
+    String[] args = getParameters().getRaw().toArray(new String[0]);
 
-        stage.setTitle("DepanFX w/ JavaFX and Gradle");
-        stage.setScene(scene);
-        stage.show();
-    }
+    this.applicationContext = new SpringApplicationBuilder()
+        .sources(DepanFxApplication.class)
+        .run(args);
 
-    private Parent createDepanRoot() throws IOException {
-        DepanFxWorkspace workspace = DepanFxWorkspaceFactory.createDepanFxWorkspace(WORKSPACE_NAME);
-        FXMLLoader result = new FXMLLoader();
-        result.setController(new DepanFXMLController(workspace));
-        result.setLocation(getClass().getResource("scene.fxml"));
-        return (Parent) result.load();
-    }
+    this.fxWeaver = applicationContext.getBean(FxWeaver.class);
+  }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+  @Override
+  public void start(Stage stage) throws Exception {
+    Scene scene = DepanFxSceneController.createDepanScene(fxWeaver, this);
+
+    stage.setTitle("DepanFX w/ JavaFX and Gradle");
+    stage.setScene(scene);
+    stage.show();
+  }
+
+  @Override
+  public void stop() {
+    applicationContext.close();
+    Platform.exit();
+  }
+
+  @Override
+  public void close() throws IOException {
+    stop();
+  }
 }

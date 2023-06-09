@@ -1,9 +1,8 @@
 module depanfx.workspace {
-    requires javafx.controls;
-    requires javafx.fxml;
+    requires spring.context;
+    requires spring.beans;
 
-    opens com.pnambic.depanfx.workspace.gui to javafx.fxml;
+    opens com.pnambic.depanfx.workspace.basic to spring.beans;
 
     exports com.pnambic.depanfx.workspace;
-    exports com.pnambic.depanfx.workspace.gui;
 }

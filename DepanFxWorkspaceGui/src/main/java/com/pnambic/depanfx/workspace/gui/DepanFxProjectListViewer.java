@@ -5,8 +5,8 @@ import java.nio.file.Path;
 
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
-import com.pnambic.depanfx.workspace.basic.BasicDepanFxProjectTree;
 
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -50,7 +50,8 @@ public class DepanFxProjectListViewer {
     if (selectedDirectory != null) {
       String projectName = selectedDirectory.getName();
       Path projectPath = selectedDirectory.toPath();
-      DepanFxProjectTree project = new BasicDepanFxProjectTree(projectPath, projectName);
+      DepanFxProjectTree project =
+          DepanFxWorkspaceFactory.createDepanFxProjectTree(projectName, projectPath);
       workspace.addProject(project);
 
       DepanFxProjectTreeItem projectItem = new DepanFxProjectTreeItem(project);
@@ -66,7 +67,8 @@ public class DepanFxProjectListViewer {
     if (selectedDirectory != null) {
       String projectName = selectedDirectory.getName();
       Path projectPath = selectedDirectory.toPath();
-      DepanFxProjectTree project = new BasicDepanFxProjectTree(projectPath, projectName);
+      DepanFxProjectTree project =
+          DepanFxWorkspaceFactory.createDepanFxProjectTree(projectName, projectPath);
       workspace.addProject(project);
 
       DepanFxProjectTreeItem projectItem = new DepanFxProjectTreeItem(project);

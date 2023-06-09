@@ -6,13 +6,14 @@ import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 
 public class BasicDepanFxProjectTree implements DepanFxProjectTree {
 
-  private final Path projectPath;
-
   private final String projectName;
 
-  public BasicDepanFxProjectTree(Path projectPath, String projectName) {
-    this.projectPath = projectPath;
+  private final Path projectPath;
+
+  public BasicDepanFxProjectTree(String projectName, Path projectPath) {
     this.projectName = projectName;
+
+    this.projectPath = projectPath;
   }
 
   @Override

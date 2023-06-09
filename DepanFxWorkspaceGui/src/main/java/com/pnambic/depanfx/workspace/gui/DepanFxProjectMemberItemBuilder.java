@@ -5,14 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
+import com.pnambic.depanfx.workspace.DepanFxProjectBadMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
-import com.pnambic.depanfx.workspace.basic.BasicDepanFxProjectBadMember;
-import com.pnambic.depanfx.workspace.basic.BasicDepanFxProjectContainer;
-import com.pnambic.depanfx.workspace.basic.BasicDepanFxProjectDocument;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -48,7 +47,8 @@ public class DepanFxProjectMemberItemBuilder {
       // TODO: report exception
     }
 
-    BasicDepanFxProjectBadMember badMember = new BasicDepanFxProjectBadMember(getProject(), filePath);
+    DepanFxProjectBadMember badMember =
+        DepanFxWorkspaceFactory.createDepanFxProjectBadMember(getProject(), filePath);
     result.add(new DepanFxProjectBadMemberItem(badMember));
     return result;
   }
@@ -56,15 +56,16 @@ public class DepanFxProjectMemberItemBuilder {
   private TreeItem<DepanFxWorkspaceMember> createNode(Path childPath) {
     if (Files.isDirectory(childPath)) {
       DepanFxProjectContainer container =
-          new BasicDepanFxProjectContainer(getProject(), childPath);
+          DepanFxWorkspaceFactory.createDepanFxProjectContainer(getProject(), childPath);
       return new DepanFxProjectContainerItem(container);
     }
     if (Files.isRegularFile(childPath)) {
       DepanFxProjectDocument document =
-          new BasicDepanFxProjectDocument(getProject(), childPath);
+          DepanFxWorkspaceFactory.createDepanFxProjectDocument(getProject(), childPath);
       return new DepanFxProjectDocumentItem(document);
     }
-    BasicDepanFxProjectBadMember badMember = new BasicDepanFxProjectBadMember(getProject(), childPath);
+    DepanFxProjectBadMember badMember =
+        DepanFxWorkspaceFactory.createDepanFxProjectBadMember(getProject(), childPath);
     return new DepanFxProjectBadMemberItem(badMember);
   }
 
