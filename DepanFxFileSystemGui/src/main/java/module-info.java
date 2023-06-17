@@ -4,10 +4,11 @@ module depanfx.filesystem.gui {
 
     requires spring.context;
     requires spring.beans;
+    requires net.rgielen.fxweaver.core;
 
     requires depanfx.scene;
 
-    opens com.pnambic.depanfx.filesystem.gui to javafx.fxml, spring.beans;
+    opens com.pnambic.depanfx.filesystem.gui to javafx.fxml, net.rgielen.fxweaver.core, spring.beans;
 
     exports com.pnambic.depanfx.filesystem.gui;
 }
