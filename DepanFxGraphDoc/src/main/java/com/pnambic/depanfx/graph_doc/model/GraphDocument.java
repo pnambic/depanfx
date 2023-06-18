@@ -17,6 +17,7 @@
 package com.pnambic.depanfx.graph_doc.model;
 
 import com.pnambic.depanfx.graph.context.ContextModel;
+import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphModel;
 
 /**
@@ -41,7 +42,7 @@ public class GraphDocument {
   /**
    * Collected relation and node type providers.
    */
-  private final ContextModel<?, ?> graphModel;
+  private final ContextModelId contextModelId;
 
   /**
    * The dependency graph provided by this document.
@@ -54,8 +55,8 @@ public class GraphDocument {
    * @param defaultAnalyzer
    * @param graph
    */
-  public GraphDocument(ContextModel<?, ?> graphModel, GraphModel graph) {
-    this.graphModel = graphModel;
+  public GraphDocument(ContextModelId contextModelKey, GraphModel graph) {
+    this.contextModelId = contextModelKey;
     this.graph = graph;
   }
 
@@ -65,8 +66,8 @@ public class GraphDocument {
    * @return list of dependency analyzers for the UI to use when manipulating
    *     this graph model
    */
-  public ContextModel<?, ?> getContextModel() {
-    return graphModel;
+  public ContextModelId getContextModelId() {
+    return contextModelId;
   }
 
   /**

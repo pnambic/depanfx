@@ -2,7 +2,8 @@ package com.pnambic.depanfx.filesystem.graph;
 
 import java.nio.file.Path;
 
-import com.pnambic.depanfx.graph.context.ContextNodeKindId;
+import com.pnambic.depanfx.filesystem.context.FileSystemNodeId;
+import com.pnambic.depanfx.filesystem.context.FileSystemNodeKindId;
 import com.pnambic.depanfx.graph.model.GraphNode;
 
 /**
@@ -10,14 +11,12 @@ import com.pnambic.depanfx.graph.model.GraphNode;
  */
 public abstract class FileSystemNode extends GraphNode {
 
-  private final Path path;
-
-  public FileSystemNode(ContextNodeKindId id, Path path) {
-    super(id);
-    this.path = path;
+  public FileSystemNode(FileSystemNodeKindId id, Path path) {
+    super(new FileSystemNodeId(id, path));
   }
 
   public Path getPath() {
-    return path;
+    FileSystemNode id = (FileSystemNode) getId();
+    return id.getPath();
   }
 }

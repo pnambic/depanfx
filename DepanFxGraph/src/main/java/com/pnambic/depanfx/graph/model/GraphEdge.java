@@ -18,10 +18,10 @@ package com.pnambic.depanfx.graph.model;
 import java.util.Objects;
 
 import com.pnambic.depanfx.graph.basic.BasicEdge;
-import com.pnambic.depanfx.graph.context.ContextNodeKindId;
+import com.pnambic.depanfx.graph.context.ContextNodeId;
 import com.pnambic.depanfx.graph.context.ContextRelationId;
 
-public class GraphEdge extends BasicEdge<ContextNodeKindId, ContextRelationId> {
+public class GraphEdge extends BasicEdge<ContextNodeId, ContextRelationId> {
 
   /**
    * Creates a new instance of GraphEdge representing an edge between the

@@ -6,16 +6,11 @@ import com.pnambic.depanfx.workspace.basic.BasicDepanFxProjectBadMember;
 import com.pnambic.depanfx.workspace.basic.BasicDepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.basic.BasicDepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.basic.BasicDepanFxProjectTree;
-import com.pnambic.depanfx.workspace.basic.BasicDepanFxWorkspace;
 
 public class DepanFxWorkspaceFactory {
 
   private DepanFxWorkspaceFactory() {
     // Prevent instantiation
-  }
-
-  public static DepanFxWorkspace createDepanFxWorkspace(String workspaceName) {
-    return new BasicDepanFxWorkspace(workspaceName);
   }
 
   public static DepanFxProjectTree createDepanFxProjectTree(

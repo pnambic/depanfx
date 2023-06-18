@@ -4,15 +4,23 @@ import java.io.File;
 
 import org.springframework.stereotype.Component;
 
+import com.pnambic.depanfx.filesystem.builder.FileSystemGraphDocBuilder;
+import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
+import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxmlView;
 
 @Component
 @FxmlView("new-file-dialog.fxml")
 public class DepanFxNewFileSystemDialog {
+  AnchorPane pane;
 
   @FXML
   private TextField sourceField;
@@ -39,10 +47,24 @@ public class DepanFxNewFileSystemDialog {
   }
 
   @FXML
-  private void handleConfirm() {
-    System.out.println("Source directory: " + sourceField.getText());
-    System.out.println("Destination file: " + destinationField.getText());
-    // Handle the selected source directory and destination file here
+  private void handleCancel() {
+    closeDialog();
+    System.out.println("cancelled request");
   }
 
+  @FXML
+  private void handleConfirm() {
+    closeDialog();
+
+    System.out.println("Source directory: " + sourceField.getText());
+    System.out.println("Destination file: " + destinationField.getText());
+    DepanFxGraphModelBuilder modelBuilder = new SimpleGraphModelBuilder();
+    FileSystemGraphDocBuilder docBuilder = new FileSystemGraphDocBuilder(modelBuilder);
+    docBuilder.analyzeTree(sourceField.getText());
+    GraphDocument graphDoc = docBuilder.getGraphDocument();
+  }
+
+  private void closeDialog() {
+    ((Stage) sourceField.getScene().getWindow()).close();
+  }
 }

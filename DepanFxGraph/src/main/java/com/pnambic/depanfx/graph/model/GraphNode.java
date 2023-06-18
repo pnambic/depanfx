@@ -16,14 +16,14 @@
 package com.pnambic.depanfx.graph.model;
 
 import com.pnambic.depanfx.graph.basic.BasicNode;
-import com.pnambic.depanfx.graph.context.ContextNodeKindId;
+import com.pnambic.depanfx.graph.context.ContextNodeId;
 
 /**
- * Fix the type of nodes to use a {@link ContextNodeKindId}.
+ * Fix the type of nodes to use a {@link ContextNodeId}.
  */
-public class GraphNode extends BasicNode<ContextNodeKindId> {
+public class GraphNode extends BasicNode<ContextNodeId> {
 
-  public GraphNode(ContextNodeKindId id) {
+  public GraphNode(ContextNodeId id) {
     super(id);
   }
 }

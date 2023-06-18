@@ -8,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxWeaver;
 
@@ -31,7 +32,9 @@ public class DepanFxNewFileSystemContribution
   private void runDialog(ActionEvent event) {
       Parent dialogPane = fxweaver.loadView(DepanFxNewFileSystemDialog.class);
       Stage dialogStage = new Stage();
+      dialogStage.initModality(Modality.APPLICATION_MODAL);
+      dialogStage.setTitle("Create new file system graph");
       dialogStage.setScene(new Scene(dialogPane));
-      dialogStage.show();
+      dialogStage.showAndWait();
   }
 }
