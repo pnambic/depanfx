@@ -6,4 +6,7 @@ plugins {
 
 dependencies {
   implementation 'org.springframework.boot:spring-boot-autoconfigure'
+
+  implementation project(':DepanFxGraph')
+  implementation project(':DepanFxPersistence')
 }

@@ -11,10 +11,12 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter'
   implementation 'org.springframework.boot:spring-boot-autoconfigure'
   implementation "net.rgielen:javafx-weaver-core:${javafxWeaverVersion}"
-  implementation "org.slf4j:slf4j-api:${slf4jVersion}"
 
   implementation project(':DepanFxFileSystemGui')
   implementation project(':DepanFxGraph')
+  implementation project(':DepanFxGraphDoc')
+  implementation project(':DepanFxGraphDocXstream')
+  implementation project(':DepanFxPersistence')
   implementation project(':DepanFxScene')
   implementation project(':DepanFxWorkspace')
   implementation project(':DepanFxWorkspaceGui')

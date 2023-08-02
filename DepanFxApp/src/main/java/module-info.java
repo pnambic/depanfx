@@ -13,8 +13,10 @@ module depanfx.app {
     requires depanfx.scene;
 
     // For Spring @Component discovery
-    requires depanfx.workspace.gui;
     requires depanfx.filesystem.gui;
+    requires depanfx.graph_doc;
+    requires depanfx.graph_doc.xstream;
+    requires depanfx.workspace.gui;
 
     opens com.pnambic.depanfx to spring.core;
     opens com.pnambic.depanfx.app to spring.core;

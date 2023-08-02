@@ -1,5 +1,7 @@
 package com.pnambic.depanfx.workspace;
 
+import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 
 public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
@@ -10,4 +12,6 @@ public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
   List<DepanFxProjectTree> getProjectList();
 
   void addProject(DepanFxProjectTree project);
+
+  void saveDocument(URI uri, Object item) throws IOException;
 }
