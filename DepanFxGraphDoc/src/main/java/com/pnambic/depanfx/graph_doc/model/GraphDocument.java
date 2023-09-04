@@ -16,7 +16,6 @@
 
 package com.pnambic.depanfx.graph_doc.model;
 
-import com.pnambic.depanfx.graph.context.ContextModel;
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphModel;
 
@@ -46,8 +45,8 @@ public class GraphDocument {
   /**
    * Create a graph document from a context model and a graph model.
    */
-  public GraphDocument(ContextModelId contextModelKey, GraphModel graph) {
-    this.contextModelId = contextModelKey;
+  public GraphDocument(ContextModelId contextModelId, GraphModel graph) {
+    this.contextModelId = contextModelId;
     this.graph = graph;
   }
 

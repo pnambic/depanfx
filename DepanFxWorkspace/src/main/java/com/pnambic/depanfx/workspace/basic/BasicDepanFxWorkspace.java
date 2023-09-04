@@ -70,9 +70,16 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
     return workspaceName;
   }
 
-  public ContextModel getContextModel(ContextModelId target) {
+  public ContextModel getContextModel(String modelKey) {
     Optional<ContextModel<?, ?>> result = contextModels.stream()
-        .filter(cm -> cm.getId().equals(target))
+        .filter(cm -> cm.getId().getContextModelKey().equals(modelKey))
+        .findFirst();
+    return result.orElse(EMPTY_CONTEXT_MODEL);
+  }
+
+  public ContextModel getContextModel(ContextModelId modelId) {
+    Optional<ContextModel<?, ?>> result = contextModels.stream()
+        .filter(cm -> cm.getId().equals(modelId))
         .findFirst();
     return result.orElse(EMPTY_CONTEXT_MODEL);
   }

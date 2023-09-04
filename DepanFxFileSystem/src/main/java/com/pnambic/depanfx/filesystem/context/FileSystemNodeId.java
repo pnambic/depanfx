@@ -25,4 +25,8 @@ public class FileSystemNodeId implements ContextNodeId {
   public String getNodeKey() {
     return nodePath.toString();
   }
+
+  public Path getNodePath() {
+    return nodePath;
+  }
 }

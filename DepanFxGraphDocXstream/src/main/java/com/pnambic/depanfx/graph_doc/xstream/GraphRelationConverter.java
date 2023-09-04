@@ -18,6 +18,7 @@ public class GraphRelationConverter
   public Class<?> forType() {
     return GraphRelation.class;
   }
+
   @Override
   public String getTag() {
     return GRAPH_RELATION_TAG;
@@ -27,9 +28,7 @@ public class GraphRelationConverter
   public void marshal(Object source, HierarchicalStreamWriter writer,
       MarshallingContext context, Mapper mapper) {
     GraphRelation relation = (GraphRelation) source;
-    marshalObject(
-      GRAPH_RELATION_TAG, GraphContextKeys.toRelationKey(relation.getId()),
-      writer, context);
+    marshalValue(GraphContextKeys.toRelationKey(relation.getId()), context);
   }
 
   @Override

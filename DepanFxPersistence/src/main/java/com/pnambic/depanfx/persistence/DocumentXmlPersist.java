@@ -16,8 +16,8 @@
 package com.pnambic.depanfx.persistence;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.thoughtworks.xstream.XStream;
@@ -68,7 +68,7 @@ public class DocumentXmlPersist {
    * @return object from location
    * @throws IOException
    */
-  public Object load(InputStreamReader src) throws IOException {
+  public Object load(Reader src) throws IOException {
     return xstream.fromXML(src);
   }
 
@@ -79,7 +79,7 @@ public class DocumentXmlPersist {
    * @param item object to persist
    * @throws IOException
    */
-  public void save(OutputStreamWriter dst, Object item) throws IOException {
+  public void save(Writer dst, Object item) throws IOException {
     xstream.toXML(item, dst);
   }
 }

@@ -17,6 +17,7 @@ public class ContextModelIdConverter
   public Class<?> forType() {
     return ContextModelId.class;
   }
+
   @Override
   public String getTag() {
     return CONTEXT_KEY_TAG;
@@ -26,8 +27,8 @@ public class ContextModelIdConverter
   public void marshal(Object source,
       HierarchicalStreamWriter writer, MarshallingContext context, Mapper mapper) {
 
-        marshalObject(getTag(), ((ContextModelId) source).getContextModelKey(),
-      writer, context);
+    marshalObject(CONTEXT_KEY_TAG, ((ContextModelId) source).getContextModelKey(),
+        writer, context);
   }
 
   @Override

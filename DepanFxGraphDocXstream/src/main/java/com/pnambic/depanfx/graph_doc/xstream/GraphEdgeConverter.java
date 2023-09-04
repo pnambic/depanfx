@@ -36,18 +36,7 @@ public class GraphEdgeConverter
       MarshallingContext context, Mapper mapper) {
     GraphEdge edge = (GraphEdge) source;
 
-    Relation<?> relation = edge.getRelation();
-
-/*
-    Class<?> actualType = relation.getClass();
-    Class<?> defaultType = mapper.defaultImplementationOf(BasicEdge.class);
-    if (!actualType.equals(defaultType)) {
-        writer.addAttribute(
-            mapper.aliasForAttribute("class"),
-            mapper.serializedClass(actualType));
-    }
-*/
-    marshalObject(RELATION_TAG, relation, writer, context);
+    marshalObject(edge.getRelation(), writer, context, mapper);
     marshalObject(HEAD_TAG, getNodeKey(edge.getHead()), writer, context);
     marshalObject(TAIL_TAG, getNodeKey(edge.getTail()), writer, context);
   }
