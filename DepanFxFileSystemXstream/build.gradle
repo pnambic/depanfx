@@ -9,7 +9,9 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-autoconfigure'
 
   implementation project(':DepanFxFileSystem')
+  implementation project(':DepanFxGraph')
   implementation project(':DepanFxGraphDocXstream')
+  implementation project(':DepanFxPersistence')
 
   testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

@@ -1,11 +1,5 @@
 package com.pnambic.depanfx.filesystem.context;
 
-import java.util.Arrays;
-
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-@Configuration
 public class FileSystemContextDefinition {
 
   public static final FileSystemContextModelId MODEL_ID =
@@ -33,14 +27,4 @@ public class FileSystemContextDefinition {
 
   public static final FileSystemRelationId[] RELATION_IDS =
       { DIRECTORY_RELID, DOCUMENT_RELID, LINK_RELID };
-
-  public static final FileSystemContextModel MODEL=
-      new FileSystemContextModel(MODEL_ID,
-          Arrays.asList(NODE_KIND_IDS),
-          Arrays.asList(RELATION_IDS));
-
-  @Bean
-  public FileSystemContextModel fileSystemContextModel() {
-    return MODEL;
-  }
 }

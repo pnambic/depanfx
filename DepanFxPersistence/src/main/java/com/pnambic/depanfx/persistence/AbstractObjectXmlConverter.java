@@ -22,6 +22,13 @@ public abstract class AbstractObjectXmlConverter<T>
     writer.endNode();
   }
 
+  protected void marshalProperty(String propertyTag, Object source,
+      HierarchicalStreamWriter writer, MarshallingContext context, Mapper mapper) {
+    writer.startNode(propertyTag);
+    marshalObject(source, writer, context, mapper);
+    writer.endNode();
+  }
+
   protected void marshalValue(Object value, MarshallingContext context) {
     context.convertAnother(value);
   }

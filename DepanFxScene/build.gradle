@@ -13,6 +13,4 @@ javafx {
 dependencies {
   implementation 'org.springframework.boot:spring-boot-autoconfigure'
   implementation "net.rgielen:javafx-weaver-core:${javafxWeaverVersion}"
-
-  // implementation project(':DepanFxWorkspace')
 }

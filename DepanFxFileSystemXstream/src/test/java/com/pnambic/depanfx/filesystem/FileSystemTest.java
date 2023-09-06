@@ -16,6 +16,7 @@ import com.pnambic.depanfx.filesystem.graph.DirectoryNode;
 import com.pnambic.depanfx.filesystem.graph.DocumentNode;
 import com.pnambic.depanfx.filesystem.graph.FileSystemRelation;
 import com.pnambic.depanfx.filesystem.xstream.FileSystemXstreamPlugin;
+import com.pnambic.depanfx.graph.context.plugins.ContextModelRegistry;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph_doc.xstream.GraphDocPersistenceContribution;
@@ -38,8 +39,7 @@ public class FileSystemTest {
     GraphModel graph = buildTestGraph();
     GraphDocument document = new GraphDocument(FileSystemContextDefinition.MODEL_ID, graph);
 
-    DocumentXmlPersist persist =
-        buildFileSystemPersist().getDocumentPersist(document);
+    DocumentXmlPersist persist = buildFileSystemPersist().getDocumentPersist();
 
     StringWriter output = new StringWriter();
     persist.save(output, document);
@@ -49,10 +49,13 @@ public class FileSystemTest {
   }
 
   public GraphDocPersistenceContribution buildFileSystemPersist() {
+    ContextModelRegistry modelRegistry = null;
+
     FileSystemXstreamPlugin plugin = new FileSystemXstreamPlugin();
     List<GraphDocPluginContribution> extensions = Collections.singletonList(plugin);
-    GraphDocPluginRegistry registry = new GraphDocPluginRegistry(extensions);
-    return new GraphDocPersistenceContribution(registry);
+
+    GraphDocPluginRegistry pluginRegistry = new GraphDocPluginRegistry(extensions);
+    return new GraphDocPersistenceContribution(modelRegistry, pluginRegistry);
   }
 
   public GraphModel buildTestGraph() {

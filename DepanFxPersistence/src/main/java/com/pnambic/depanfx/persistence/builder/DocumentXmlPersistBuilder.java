@@ -26,6 +26,7 @@ public class DocumentXmlPersistBuilder {
 
   public void addConverter(ObjectXmlConverter<?> contrib) {
     addAlias(contrib.getTag(), contrib.forType());
+    xstream.allowTypes(contrib.getAllowTypes());
     xstream.registerConverter(new DelegateObjectXmlConverter(contrib, xstream.getMapper()));
   }
 

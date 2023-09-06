@@ -2,8 +2,6 @@ package com.pnambic.depanfx.graph_doc.xstream;
 
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphModel;
-import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
-import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.persistence.AbstractObjectXmlConverter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -15,14 +13,26 @@ import com.thoughtworks.xstream.mapper.Mapper;
 public class GraphDocumentConverter
     extends AbstractObjectXmlConverter<GraphDocument> {
 
+  private static final Class[] ALLOW_TYPES = new Class[] {
+    GraphDocument.class
+  };
+
   public static final String GRAPH_DOC_TAG = "graph-doc";
 
-  private static final ContextModelIdConverter CONTEXT_KEY_CONVERTER =
-      new ContextModelIdConverter();
+  private final ContextModelIdConverter modelIdConverter;
+
+  public GraphDocumentConverter(ContextModelIdConverter modelIdConverter) {
+    this.modelIdConverter = modelIdConverter;
+  }
 
   @Override
   public Class<?> forType() {
     return GraphDocument.class;
+  }
+
+  @Override
+  public Class[] getAllowTypes() {
+    return ALLOW_TYPES;
   }
 
   @Override
@@ -35,8 +45,7 @@ public class GraphDocumentConverter
       MarshallingContext context, Mapper mapper) {
     GraphDocument doc = (GraphDocument) source;
 
-    CONTEXT_KEY_CONVERTER.marshal(doc.getContextModelId(),
-        writer, context, mapper);
+    modelIdConverter.marshal(doc.getContextModelId(), writer, context, mapper);
 
     marshalObject(doc.getGraph(), writer, context, mapper);
   }
@@ -45,12 +54,12 @@ public class GraphDocumentConverter
   public GraphDocument unmarshal(HierarchicalStreamReader reader,
       UnmarshallingContext context, Mapper mapper) {
 
-    ContextModelId contextModelKey =
+    ContextModelId contextModelId =
         (ContextModelId) unmarshalOne(reader, context, mapper);
 
-    DepanFxGraphModelBuilder builder = new SimpleGraphModelBuilder();
+    GraphModel graph =
+        (GraphModel) unmarshalOne(reader, context, mapper);
 
-    GraphModel graph = builder.createGraphModel();
-    return new GraphDocument(contextModelKey, graph);
+    return new GraphDocument(contextModelId, graph);
   }
 }

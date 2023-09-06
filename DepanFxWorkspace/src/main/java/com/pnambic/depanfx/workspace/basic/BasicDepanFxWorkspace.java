@@ -4,21 +4,20 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.pnambic.depanfx.graph.context.ContextModel;
-import com.pnambic.depanfx.graph.context.ContextModelId;
-import com.pnambic.depanfx.workspace.DepanFxProjectTree;
-import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.context.EmptyContextModel;
+import com.pnambic.depanfx.graph.context.plugins.ContextModelRegistry;
 import com.pnambic.depanfx.persistence.DocumentXmlPersist;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceRegistry;
+import com.pnambic.depanfx.workspace.DepanFxProjectTree;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
 /**
  * A common registry of workspace context.
@@ -28,10 +27,7 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
 
   public static final String WORKSPACE_NAME = "Depan Workspace";
 
-  private static final ContextModel<?, ?> EMPTY_CONTEXT_MODEL =
-      new EmptyContextModel();
-
-  private final List<ContextModel<?, ?>> contextModels;
+  private final ContextModelRegistry modelRegistry;
 
   private final DocumentPersistenceRegistry persistRegistry;
 
@@ -41,17 +37,17 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
 
   @Autowired
   public BasicDepanFxWorkspace(
-      List<ContextModel<?, ?>> contextModels,
+      ContextModelRegistry modelRegistry,
       DocumentPersistenceRegistry resourceModels) {
-    this(WORKSPACE_NAME, contextModels, resourceModels);
+    this(WORKSPACE_NAME, modelRegistry, resourceModels);
   }
 
   public BasicDepanFxWorkspace(String workspaceName,
-      List<ContextModel<?, ?>> contextModels,
+      ContextModelRegistry modelRegistry,
       DocumentPersistenceRegistry persistRegistry) {
     this.projectList = new ArrayList<>();
     this.workspaceName = workspaceName;
-    this.contextModels = contextModels;
+    this.modelRegistry = modelRegistry;
     this.persistRegistry = persistRegistry;
   }
 
@@ -70,20 +66,6 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
     return workspaceName;
   }
 
-  public ContextModel getContextModel(String modelKey) {
-    Optional<ContextModel<?, ?>> result = contextModels.stream()
-        .filter(cm -> cm.getId().getContextModelKey().equals(modelKey))
-        .findFirst();
-    return result.orElse(EMPTY_CONTEXT_MODEL);
-  }
-
-  public ContextModel getContextModel(ContextModelId modelId) {
-    Optional<ContextModel<?, ?>> result = contextModels.stream()
-        .filter(cm -> cm.getId().equals(modelId))
-        .findFirst();
-    return result.orElse(EMPTY_CONTEXT_MODEL);
-  }
-
   @Override
   public void exit() {
   }
@@ -92,9 +74,16 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   public void saveDocument(URI uri, Object document) throws IOException {
     DocumentXmlPersist persist = persistRegistry.getDocumentPersist(document);
 
-    try (FileWriter saver = openForSave(uri)) {
+    try (Writer saver = openForSave(uri)) {
       persist.save(saver, document);
+    }
+  }
 
+  @Override
+  public void importDocument(URI uri) throws IOException {
+    DocumentXmlPersist persist = persistRegistry.getDocumentPersist(uri);
+    try (Reader importer = openForLoad(uri)) {
+      persist.load(importer);
     }
   }
 

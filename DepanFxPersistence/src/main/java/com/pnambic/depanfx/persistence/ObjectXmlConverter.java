@@ -13,6 +13,8 @@ public interface ObjectXmlConverter<T> {
 
   Class<?> forType();
 
+  Class[] getAllowTypes();
+
   String getTag();
 
   void marshal(Object source, HierarchicalStreamWriter writer,

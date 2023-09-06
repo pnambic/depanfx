@@ -1,10 +1,17 @@
 package com.pnambic.depanfx.graph_doc.xstream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pnambic.depanfx.graph.api.Edge;
 import com.pnambic.depanfx.graph.api.Node;
 import com.pnambic.depanfx.graph.context.ContextNodeId;
 import com.pnambic.depanfx.graph.context.ContextRelationId;
+import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphModel;
+import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
+import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
 import com.pnambic.depanfx.persistence.AbstractObjectXmlConverter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -14,6 +21,12 @@ import com.thoughtworks.xstream.mapper.Mapper;
 
 public class GraphModelConverter
     extends AbstractObjectXmlConverter<GraphModel> {
+
+  private static final Logger LOG = LoggerFactory.getLogger(GraphModelConverter.class);
+
+  private static final Class[] ALLOW_TYPES = new Class[] {
+    GraphModel.class
+  };
 
   public static final String GRAPH_MODEL_TAG = "graph-model";
 
@@ -46,6 +59,27 @@ public class GraphModelConverter
   @Override
   public GraphModel unmarshal(HierarchicalStreamReader reader,
       UnmarshallingContext context, Mapper mapper) {
-    return (GraphModel) unmarshalOne(reader, context, mapper);
+
+    DepanFxGraphModelBuilder builder = new SimpleGraphModelBuilder();
+    context.put(DepanFxGraphModelBuilder.class, builder);
+
+    while (reader.hasMoreChildren()) {
+
+      String elementTag = reader.getNodeName();
+      Object element = unmarshalOne(reader, context, mapper);
+      if (element instanceof GraphNode) {
+        builder.mapNode((GraphNode) element);
+      } else if (element instanceof GraphEdge) {
+        builder.addEdge((GraphEdge) element);
+      } else {
+        LOG.warn("Unrecognized graph element {}", elementTag);
+      }
+    }
+    return builder.createGraphModel();
+  }
+
+  @Override
+  public Class[] getAllowTypes() {
+    return ALLOW_TYPES;
   }
 }
