@@ -4,6 +4,7 @@ module depanfx.workspace {
 
     requires depanfx.graph;
     requires depanfx.persistence;
+    requires depanfx.platform;
 
     opens com.pnambic.depanfx.workspace.basic to spring.beans;
 

@@ -13,11 +13,26 @@ import com.thoughtworks.xstream.mapper.Mapper;
 public class GraphDocumentConverter
     extends AbstractObjectXmlConverter<GraphDocument> {
 
+  private static final Class[] ALLOW_TYPES = new Class[] {
+    GraphDocument.class
+  };
+
   public static final String GRAPH_DOC_TAG = "graph-doc";
+
+  private final ContextModelIdConverter modelIdConverter;
+
+  public GraphDocumentConverter(ContextModelIdConverter modelIdConverter) {
+    this.modelIdConverter = modelIdConverter;
+  }
 
   @Override
   public Class<?> forType() {
     return GraphDocument.class;
+  }
+
+  @Override
+  public Class[] getAllowTypes() {
+    return ALLOW_TYPES;
   }
 
   @Override
@@ -30,7 +45,8 @@ public class GraphDocumentConverter
       MarshallingContext context, Mapper mapper) {
     GraphDocument doc = (GraphDocument) source;
 
-    marshalObject(doc.getContextModelId(), writer, context, mapper);
+    modelIdConverter.marshal(doc.getContextModelId(), writer, context, mapper);
+
     marshalObject(doc.getGraph(), writer, context, mapper);
   }
 
@@ -38,11 +54,12 @@ public class GraphDocumentConverter
   public GraphDocument unmarshal(HierarchicalStreamReader reader,
       UnmarshallingContext context, Mapper mapper) {
 
-        ContextModelId contextModelKey =
-       (ContextModelId) unmarshalOne(reader, context, mapper);
+    ContextModelId contextModelId =
+        (ContextModelId) unmarshalOne(reader, context, mapper);
 
     GraphModel graph =
         (GraphModel) unmarshalOne(reader, context, mapper);
-    return new GraphDocument(contextModelKey, graph);
+
+    return new GraphDocument(contextModelId, graph);
   }
 }

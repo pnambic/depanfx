@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
+import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuRegistry;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterRegistry;
 
 import javafx.event.ActionEvent;
@@ -29,9 +30,11 @@ public class DepanFxSceneController {
 
   public static final String WORKSPACE_TAB = "Workspace";
 
-  private final DepanFxSceneStarterRegistry starterRegistry;
+  private final DepanFxSceneMenuRegistry menuRegistry;
 
   private final DepanFxNewResourceRegistry newResourceRegistry;
+
+  private final DepanFxSceneStarterRegistry starterRegistry;
 
   private Closeable onClose;
 
@@ -45,7 +48,10 @@ public class DepanFxSceneController {
   private MenuItem fileOpenProjectItem;
 
   @FXML
-  private Menu fileNew;
+  private MenuItem fileImportItem;
+
+  @FXML
+  private Menu fileNewItem;
 
   @FXML
   private MenuItem fileExitItem;
@@ -63,10 +69,13 @@ public class DepanFxSceneController {
   }
 
   @Autowired
-  public DepanFxSceneController(DepanFxSceneStarterRegistry starterRegistry,
-      DepanFxNewResourceRegistry newResourceRegistry) {
-    this.starterRegistry = starterRegistry;
+  public DepanFxSceneController(
+      DepanFxSceneMenuRegistry menuRegistry,
+      DepanFxNewResourceRegistry newResourceRegistry,
+      DepanFxSceneStarterRegistry starterRegistry) {
+    this.menuRegistry = menuRegistry;
     this.newResourceRegistry = newResourceRegistry;
+    this.starterRegistry = starterRegistry;
   }
 
   @FXML
@@ -81,7 +90,15 @@ public class DepanFxSceneController {
 
     // Start any initial tabs
     starterRegistry.addStarterTabs(viewRoot);
-    fileNew.getItems().addAll(newResourceRegistry.buildNewResourceItems());
+    fileNewItem.getItems().addAll(newResourceRegistry.buildNewResourceItems());
+
+    fileImportItem.setOnAction(new EventHandler<ActionEvent>() {
+
+      @Override
+      public void handle(ActionEvent event) {
+        menuRegistry.dispatch(event);
+      }
+    });
 
     fileExitItem.setOnAction(new EventHandler<ActionEvent>() {
 

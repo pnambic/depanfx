@@ -33,6 +33,8 @@ public class FileSystemDirectoryLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(FileSystemDirectoryLoader.class);
 
+  private static final File[] EMPTY_FILES = new File[0];
+
   private final DepanFxGraphModelBuilder builder;
 
   private final String prefixPath;
@@ -126,7 +128,7 @@ public class FileSystemDirectoryLoader {
 
     // TODO(leeca):  Based on performance, maybe revise to sort into
     // lists of files and directories, and process each type in batches.
-    for (File child : rootFile.listFiles()) {
+    for (File child : getChildMembers(rootFile)) {
       buildChild(rootNode, child);
     }
   }
@@ -168,6 +170,19 @@ public class FileSystemDirectoryLoader {
   private DocumentNode createDocument(File file) throws IOException {
     Path filePath = getElementPath(file);
     return new DocumentNode(filePath);
+  }
+
+  /**
+   * Some Windows directories (synthethic, e.g. My Music) don't have real
+   * entries.
+   */
+  private File[] getChildMembers(File rootFile) {
+
+    File[] result = rootFile.listFiles();
+    if (result != null) {
+      return result;
+    }
+    return EMPTY_FILES;
   }
 
   /**

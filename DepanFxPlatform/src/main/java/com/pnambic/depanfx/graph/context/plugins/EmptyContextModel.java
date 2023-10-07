@@ -1,14 +1,14 @@
-package com.pnambic.depanfx.workspace.context;
+package com.pnambic.depanfx.graph.context.plugins;
 
 import java.util.Collection;
 import java.util.Collections;
 
-import com.pnambic.depanfx.graph.context.ContextModel;
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.context.ContextNodeKindId;
-import com.pnambic.depanfx.graph.context.ContextRelationId;
+import com.pnambic.depanfx.graph.model.GraphContextModel;
+import com.pnambic.depanfx.graph.model.GraphRelation;
 
-public class EmptyContextModel implements ContextModel<ContextNodeKindId, ContextRelationId> {
+public class EmptyContextModel implements GraphContextModel {
 
   private static final String EMPTY_CONTEXT_MODEL = "Empty context model";
 
@@ -26,7 +26,7 @@ public class EmptyContextModel implements ContextModel<ContextNodeKindId, Contex
   }
 
   @Override
-  public Collection<ContextModel<?, ?>> getIncludedModels() {
+  public Collection<GraphContextModel> getIncludedModels() {
     return Collections.emptyList();
   }
 
@@ -36,7 +36,7 @@ public class EmptyContextModel implements ContextModel<ContextNodeKindId, Contex
   }
 
   @Override
-  public Collection<ContextRelationId> getRelationIds() {
+  public Collection<GraphRelation> getRelations() {
     return Collections.emptyList();
   }
 }

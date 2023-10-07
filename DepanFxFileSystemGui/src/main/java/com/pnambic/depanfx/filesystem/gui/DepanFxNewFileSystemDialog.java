@@ -2,6 +2,9 @@ package com.pnambic.depanfx.filesystem.gui;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +15,7 @@ import com.pnambic.depanfx.filesystem.builder.FileSystemGraphDocBuilder;
 import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
 import javafx.fxml.FXML;
@@ -19,6 +23,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.FileChooser.ExtensionFilter;
 import net.rgielen.fxweaver.core.FxmlView;
 
 @Component
@@ -27,6 +32,16 @@ public class DepanFxNewFileSystemDialog {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNewFileSystemDialog.class.getName());
+
+  private static final DateTimeFormatter TIMESTAMP_FORMATTER =
+      DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+
+  private static final String PREFIX = "tree_";
+
+  private static final String EXT = "dgi";
+
+  private static final ExtensionFilter EXT_FILTER =
+      new ExtensionFilter("Graph Info (*.dgi)", "*." + EXT);
 
   private final DepanFxWorkspace workspace;
 
@@ -52,7 +67,7 @@ public class DepanFxNewFileSystemDialog {
 
   @FXML
   private void openFileChooser() {
-    FileChooser fileChooser = new FileChooser();
+    FileChooser fileChooser = prepareFileChooser();
     File selectedFile = fileChooser.showSaveDialog(destinationField.getScene().getWindow());
     if (selectedFile != null) {
       destinationField.setText(selectedFile.getAbsolutePath());
@@ -73,7 +88,7 @@ public class DepanFxNewFileSystemDialog {
     System.out.println("Destination file: " + destinationField.getText());
     DepanFxGraphModelBuilder modelBuilder = new SimpleGraphModelBuilder();
     FileSystemGraphDocBuilder docBuilder = new FileSystemGraphDocBuilder(modelBuilder);
-    docBuilder.analyzeTree(sourceField.getText());
+    analyzeTree(docBuilder, sourceField.getText());
     GraphDocument graphDoc = docBuilder.getGraphDocument();
     File dstFile = new File(destinationField.getText());
 
@@ -84,7 +99,53 @@ public class DepanFxNewFileSystemDialog {
     }
   }
 
+  private FileChooser prepareFileChooser() {
+    FileChooser result = new FileChooser();
+    result.getExtensionFilters().add(EXT_FILTER);
+    result.setSelectedExtensionFilter(EXT_FILTER);
+
+    String destFileName = destinationField.getText();
+    if (destFileName.isBlank()) {
+      result.setInitialFileName(buildTimestampName(PREFIX, EXT));
+      result.setInitialDirectory(getWorkspaceDestination());
+      return result;
+    }
+
+    File location = new File(destFileName);
+    result.setInitialFileName(location.getName());
+    result.setInitialDirectory(location.getParentFile());
+    return result;
+  }
+
+  /**
+   * Ensure analysis failures don't propogate outside of the analysis request.
+   */
+  private void analyzeTree(FileSystemGraphDocBuilder docBuilder, String treeName) {
+    try {
+      docBuilder.analyzeTree(treeName);
+    } catch (RuntimeException errBuild) {
+      LOG.error("unable to build tree from {}", treeName, errBuild);
+    }
+  }
+
   private void closeDialog() {
     ((Stage) sourceField.getScene().getWindow()).close();
+  }
+
+  private File getWorkspaceDestination() {
+    List<DepanFxProjectTree> projectList = workspace.getProjectList();
+    if (projectList.size() >= 1) {
+      return new File(projectList.get(0).getMemberPath().toFile(), "graphs");
+    }
+    return null;
+  }
+
+  private String buildTimestampName(String prefix, String ext) {
+    LocalDateTime now = LocalDateTime.now();
+    StringBuilder result = new StringBuilder(PREFIX);
+    TIMESTAMP_FORMATTER.formatTo(now, result);
+    result.append(".");
+    result.append(EXT);
+    return result.toString();
   }
 }

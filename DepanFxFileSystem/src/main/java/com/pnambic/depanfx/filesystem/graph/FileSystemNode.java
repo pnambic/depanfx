@@ -16,7 +16,7 @@ public abstract class FileSystemNode extends GraphNode {
   }
 
   public Path getPath() {
-    FileSystemNode id = (FileSystemNode) getId();
-    return id.getPath();
+    FileSystemNodeId id = (FileSystemNodeId) getId();
+    return id.getNodePath();
   }
 }

@@ -8,5 +8,7 @@ public interface DocumentPersistenceContribution {
    */
   boolean acceptsDocument(Object document);
 
-  DocumentXmlPersist getDocumentPersist(Object document);
+  boolean acceptsExt(String extText);
+
+  DocumentXmlPersist getDocumentPersist();
 }

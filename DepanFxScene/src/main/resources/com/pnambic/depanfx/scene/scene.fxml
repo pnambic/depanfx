@@ -20,7 +20,7 @@
             <menus>
                 <Menu text="File">
                     <items>
-                        <Menu fx:id="fileNew" text="New"/>
+                        <Menu fx:id="fileNewItem" text="New"/>
                         <SeparatorMenuItem />
                         <MenuItem text="Open"/>
                         <MenuItem fx:id="fileOpenProjectItem" text="Open Project.."/>
@@ -29,7 +29,7 @@
                         <MenuItem text="Save As .."/>
                         <MenuItem text="Save All"/>
                         <SeparatorMenuItem />
-                        <MenuItem text="Import .."/>
+                        <MenuItem fx:id="fileImportItem" text="Import .."/>
                         <MenuItem text="Export .."/>
                         <SeparatorMenuItem />
                         <MenuItem text="Print"/>
