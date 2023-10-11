@@ -18,6 +18,7 @@ import com.pnambic.depanfx.persistence.DocumentXmlPersist;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceRegistry;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.documents.DocumentRegistry;
 
 /**
  * A common registry of workspace context.
@@ -32,6 +33,8 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   private final DocumentPersistenceRegistry persistRegistry;
 
   private final List<DepanFxProjectTree> projectList;
+
+  private final DocumentRegistry documentRegistry = new DocumentRegistry();
 
   private final String workspaceName;
 
@@ -83,8 +86,13 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   public void importDocument(URI uri) throws IOException {
     DocumentXmlPersist persist = persistRegistry.getDocumentPersist(uri);
     try (Reader importer = openForLoad(uri)) {
-      persist.load(importer);
+      Object document = persist.load(importer);
+      registerDocument(document, uri);
     }
+  }
+
+  private void registerDocument(Object document, URI uri) {
+    documentRegistry.registerDocument(document, uri);
   }
 
   private FileReader openForLoad(URI uri) throws IOException {

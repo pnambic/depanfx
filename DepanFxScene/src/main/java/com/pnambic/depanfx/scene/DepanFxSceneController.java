@@ -28,8 +28,6 @@ import net.rgielen.fxweaver.core.FxmlView;
 @FxmlView("scene.fxml")
 public class DepanFxSceneController {
 
-  public static final String WORKSPACE_TAB = "Workspace";
-
   private final DepanFxSceneMenuRegistry menuRegistry;
 
   private final DepanFxNewResourceRegistry newResourceRegistry;

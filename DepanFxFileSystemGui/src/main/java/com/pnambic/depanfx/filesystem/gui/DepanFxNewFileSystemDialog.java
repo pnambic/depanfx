@@ -2,8 +2,6 @@ package com.pnambic.depanfx.filesystem.gui;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -17,13 +15,14 @@ import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxmlView;
 
 @Component
@@ -32,9 +31,6 @@ public class DepanFxNewFileSystemDialog {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNewFileSystemDialog.class.getName());
-
-  private static final DateTimeFormatter TIMESTAMP_FORMATTER =
-      DateTimeFormatter.ofPattern("yyyyMMddHHmm");
 
   private static final String PREFIX = "tree_";
 
@@ -141,11 +137,6 @@ public class DepanFxNewFileSystemDialog {
   }
 
   private String buildTimestampName(String prefix, String ext) {
-    LocalDateTime now = LocalDateTime.now();
-    StringBuilder result = new StringBuilder(PREFIX);
-    TIMESTAMP_FORMATTER.formatTo(now, result);
-    result.append(".");
-    result.append(EXT);
-    return result.toString();
+    return DepanFxWorkspaceFactory.buildDocumentTimestampName(prefix, ext);
   }
 }
