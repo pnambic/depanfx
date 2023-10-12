@@ -1,7 +1,6 @@
 package com.pnambic.depanfx.workspace.gui;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +12,8 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxmlView;
 
 @Component

@@ -16,13 +16,17 @@ public class DepanFxWorkspaceSceneContribution implements DepanFxSceneStarterCon
 
   private final DepanFxWorkspace workspace;
 
+  private final DepanFxDialogRunner dialogRunner;
+
   private final DepanFxNewResourceRegistry newResourceRegistry;
 
   @Autowired
   public DepanFxWorkspaceSceneContribution(
       DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner,
       DepanFxNewResourceRegistry newResourceRegistry) {
     this.workspace = workspace;
+    this.dialogRunner = dialogRunner;
     this.newResourceRegistry = newResourceRegistry;
   }
 
@@ -34,7 +38,7 @@ public class DepanFxWorkspaceSceneContribution implements DepanFxSceneStarterCon
   @Override
   public Tab createStarterTab(String label) {
     DepanFxProjectListViewer workspaceViewer =
-        new DepanFxProjectListViewer(workspace, newResourceRegistry);
+        new DepanFxProjectListViewer(workspace, dialogRunner, newResourceRegistry);
     return workspaceViewer.createWorkspaceTab(WORKSPACE_TAB);
   }
 }

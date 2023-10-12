@@ -8,6 +8,10 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
+import java.util.List;
+
+import com.pnambic.depanfx.workspace.DepanFxProjectTree;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
 public class DepanFxProjects {
   private static LinkOption[] IS_DIRECTORY_LINK_OPTIONS = new LinkOption[0];
@@ -27,6 +31,14 @@ public class DepanFxProjects {
     } catch (Exception err) {
       throw new RuntimeException("Unable to create structure for new project " + projectName, err);
     }
+  }
+
+  public static File getCurrentGraphs(DepanFxWorkspace workspace) {
+    List<DepanFxProjectTree> projectList = workspace.getProjectList();
+    if (projectList.size() >= 1) {
+      return new File(projectList.get(0).getMemberPath().toFile(), GRAPHS_CONTAINER);
+    }
+    return null;
   }
 
   private static void checkProjectForNew(Path projectPath) throws IOException {

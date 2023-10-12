@@ -19,6 +19,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import net.rgielen.fxweaver.core.FxControllerAndView;
 import net.rgielen.fxweaver.core.FxWeaver;
@@ -109,5 +110,9 @@ public class DepanFxSceneController {
         }
       }
     });
+  }
+
+  public void addTab(Tab tab) {
+    viewRoot.getTabs().add(tab);
   }
 }

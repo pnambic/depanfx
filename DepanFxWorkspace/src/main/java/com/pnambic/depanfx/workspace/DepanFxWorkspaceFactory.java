@@ -17,7 +17,7 @@ public class DepanFxWorkspaceFactory {
   private static final DateTimeFormatter DOCUMENT_TIMESTAMP_FORMATTER =
       DateTimeFormatter.ofPattern("yyyyMMddHHmm");
 
-  private DepanFxWorkspaceFactory() {
+      private DepanFxWorkspaceFactory() {
     // Prevent instantiation
   }
 

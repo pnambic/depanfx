@@ -16,6 +16,7 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
@@ -73,7 +74,7 @@ public class DepanFxNewFileSystemDialog {
   @FXML
   private void handleCancel() {
     closeDialog();
-    System.out.println("cancelled request");
+    LOG.info("cancelled request");
   }
 
   @FXML
@@ -129,11 +130,7 @@ public class DepanFxNewFileSystemDialog {
   }
 
   private File getWorkspaceDestination() {
-    List<DepanFxProjectTree> projectList = workspace.getProjectList();
-    if (projectList.size() >= 1) {
-      return new File(projectList.get(0).getMemberPath().toFile(), "graphs");
-    }
-    return null;
+    return DepanFxProjects.getCurrentGraphs(workspace);
   }
 
   private String buildTimestampName(String prefix, String ext) {

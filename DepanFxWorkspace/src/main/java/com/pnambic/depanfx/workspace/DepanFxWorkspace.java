@@ -15,5 +15,5 @@ public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
 
   void saveDocument(URI uri, Object item) throws IOException;
 
-  void importDocument(URI uri) throws IOException;
+  Object importDocument(URI uri) throws IOException;
 }

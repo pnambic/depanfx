@@ -83,11 +83,12 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   }
 
   @Override
-  public void importDocument(URI uri) throws IOException {
+  public Object importDocument(URI uri) throws IOException {
     DocumentXmlPersist persist = persistRegistry.getDocumentPersist(uri);
     try (Reader importer = openForLoad(uri)) {
       Object document = persist.load(importer);
       registerDocument(document, uri);
+      return document;
     }
   }
 
