@@ -12,11 +12,11 @@ import java.nio.file.Path;
 public class DepanFxProjects {
   private static LinkOption[] IS_DIRECTORY_LINK_OPTIONS = new LinkOption[0];
 
-  private static final String ANALYZES_CONTAINER = "Analyzes";
+  public static final String ANALYZES_CONTAINER = "Analyzes";
 
-  private static final String GRAPHS_CONTAINER = "Tools";
+  public static final String GRAPHS_CONTAINER = "Graphs";
 
-  private static final String TOOLS_CONTAINER = "Graphs";
+  public static final String TOOLS_CONTAINER = "Tools";
 
   public static void createProjectStructure(String projectName, Path projectPath) {
     try {

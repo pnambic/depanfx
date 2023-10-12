@@ -3,6 +3,7 @@ package com.pnambic.depanfx.workspace.gui;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterContribution;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
@@ -15,9 +16,14 @@ public class DepanFxWorkspaceSceneContribution implements DepanFxSceneStarterCon
 
   private final DepanFxWorkspace workspace;
 
+  private final DepanFxNewResourceRegistry newResourceRegistry;
+
   @Autowired
-  public DepanFxWorkspaceSceneContribution(DepanFxWorkspace workspace) {
+  public DepanFxWorkspaceSceneContribution(
+      DepanFxWorkspace workspace,
+      DepanFxNewResourceRegistry newResourceRegistry) {
     this.workspace = workspace;
+    this.newResourceRegistry = newResourceRegistry;
   }
 
   @Override
@@ -27,7 +33,8 @@ public class DepanFxWorkspaceSceneContribution implements DepanFxSceneStarterCon
 
   @Override
   public Tab createStarterTab(String label) {
-    DepanFxProjectListViewer workspaceViewer = new DepanFxProjectListViewer(workspace);
+    DepanFxProjectListViewer workspaceViewer =
+        new DepanFxProjectListViewer(workspace, newResourceRegistry);
     return workspaceViewer.createWorkspaceTab(WORKSPACE_TAB);
   }
 }
