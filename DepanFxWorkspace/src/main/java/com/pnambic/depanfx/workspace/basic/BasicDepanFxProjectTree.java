@@ -1,7 +1,9 @@
 package com.pnambic.depanfx.workspace.basic;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 
 public class BasicDepanFxProjectTree implements DepanFxProjectTree {
@@ -29,5 +31,14 @@ public class BasicDepanFxProjectTree implements DepanFxProjectTree {
   @Override
   public DepanFxProjectTree getProject() {
     return this;
+  }
+
+  @Override
+  public Optional<DepanFxProjectDocument> asProjectDocument(Path docPath) {
+    if (docPath.startsWith(projectPath)) {
+      BasicDepanFxProjectDocument result = new BasicDepanFxProjectDocument(this, docPath);
+      return Optional.of(result);
+    }
+    return Optional.empty();
   }
 }

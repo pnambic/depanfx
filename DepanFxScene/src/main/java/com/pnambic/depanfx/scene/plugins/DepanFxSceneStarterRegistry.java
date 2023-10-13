@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import com.pnambic.depanfx.scene.DepanFxSceneController;
 
 @Component
 public class DepanFxSceneStarterRegistry {
@@ -18,10 +18,10 @@ public class DepanFxSceneStarterRegistry {
     this.contributions = contributions;
   }
 
-  public void addStarterTabs(TabPane container) {
+  public void addStarterTabs(DepanFxSceneController scene) {
     for (DepanFxSceneStarterContribution contribution : contributions) {
-      Tab contributionTab = contribution.createStarterTab(contribution.getLabel());
-      container.getTabs().add(contributionTab);
+      Tab contributionTab = contribution.createStarterTab(contribution.getLabel(), scene);
+      scene.addTab(contributionTab);
     }
   }
 }

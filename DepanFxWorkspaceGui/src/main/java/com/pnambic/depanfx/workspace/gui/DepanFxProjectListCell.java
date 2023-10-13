@@ -3,8 +3,16 @@ package com.pnambic.depanfx.workspace.gui;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
 
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSection;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSections;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
+import com.pnambic.depanfx.scene.DepanFxSceneController;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
@@ -17,6 +25,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TreeCell;
 
 /**
@@ -36,13 +45,17 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
 
   private final DepanFxNewResourceRegistry newResourceRegistry;
 
+  private final DepanFxSceneController scene;
+
   public DepanFxProjectListCell(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
-      DepanFxNewResourceRegistry newResourceRegistry) {
+      DepanFxNewResourceRegistry newResourceRegistry,
+      DepanFxSceneController scene) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
     this.newResourceRegistry = newResourceRegistry;
+    this.scene = scene;
   }
 
   @Override
@@ -80,11 +93,13 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
     if (member instanceof DepanFxProjectDocument) {
       DepanFxProjectDocument document = (DepanFxProjectDocument) member;
       Path path = document.getMemberPath();
-      String ext = getExtension(path.getFileName().toString());
-      switch (ext) {
-        case "dgi":
-          setContextMenu(graghDocContextMenu(document));
-          break;
+      Optional<String> optExt = getExtension(path.getFileName().toString());
+      if (optExt.isPresent()) {
+        switch (optExt.get()) {
+          case "dgi":
+            setContextMenu(graghDocContextMenu(document));
+            break;
+        }
       }
       return;
     }
@@ -117,18 +132,37 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
   private void runOpenAsListAction(URI graphDocUri) {
     try {
       GraphDocument graphDoc = (GraphDocument) workspace.importDocument(graphDocUri);
-      // NodeListViewDocument = NodeListViewDocument.to(graphDoc);
+      DepanFxProjectDocument workspaceDoc = workspace.asProjectDocument(graphDocUri).get();
+      String tabTitle = getTabTitle(workspaceDoc);
+      DepanFxNodeList nodeList = DepanFxNodeLists.buildNodeList(workspaceDoc, graphDoc);
+      List<DepanFxNodeListSection> sections = DepanFxNodeListSections.getFinalSection();
+      DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(nodeList, sections);
+      Tab viewerTab = viewer.createWorkspaceTab(tabTitle);
+      scene.addTab(viewerTab);
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
 
-  private static String getExtension(String filename) {
+  private static String getTabTitle(DepanFxProjectDocument workspaceDoc) {
+    String fullName = workspaceDoc.getMemberPath().getFileName().toString();
+    String baseName = getExtension(fullName)
+        .map(e -> chopExtension(fullName, e.length() + 1))
+        .orElse(fullName);
+    return baseName + " nodes";
+  }
+
+  private static String chopExtension(String filename, int extSize) {
+    int length = filename.length();
+    return filename.substring(0, length - extSize);
+  }
+
+  private static Optional<String> getExtension(String filename) {
       int dotIndex = filename.lastIndexOf(EXT_DOT);
       if (dotIndex > 0 && dotIndex < filename.length() - 1) {
-          return filename.substring(dotIndex + 1);
+          return Optional.of(filename.substring(dotIndex + 1));
       }
-      return "";
+      return Optional.empty();
   }
 }

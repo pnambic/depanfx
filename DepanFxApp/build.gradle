@@ -23,6 +23,7 @@ dependencies {
   implementation project(':DepanFxGraph')
   implementation project(':DepanFxGraphDoc')
   implementation project(':DepanFxGraphDocXstream')
+  implementation project(':DepanFxNodeListGui')
   implementation project(':DepanFxPersistence')
   implementation project(':DepanFxPlatform')
   implementation project(':DepanFxScene')

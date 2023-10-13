@@ -88,7 +88,7 @@ public class DepanFxSceneController {
         + "\nRunning on Java " + javaVersion + ".");
 
     // Start any initial tabs
-    starterRegistry.addStarterTabs(viewRoot);
+    starterRegistry.addStarterTabs(this);
     fileNewItem.getItems().addAll(newResourceRegistry.buildNewResourceItems());
 
     fileImportItem.setOnAction(new EventHandler<ActionEvent>() {

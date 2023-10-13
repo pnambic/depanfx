@@ -35,5 +35,5 @@ public class BasicNode<N> implements Node<N> {
   public void accept(NodeVisitor vistor) {
     // Ignore unrecognized visitors.
   }
-  
+
 }

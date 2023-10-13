@@ -6,9 +6,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Component;
 import com.pnambic.depanfx.graph.context.plugins.ContextModelRegistry;
 import com.pnambic.depanfx.persistence.DocumentXmlPersist;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceRegistry;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.documents.DocumentRegistry;
@@ -90,6 +94,18 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
       registerDocument(document, uri);
       return document;
     }
+  }
+
+  @Override
+  public Optional<DepanFxProjectDocument> asProjectDocument(URI uri) {
+    Path uriPath = Paths.get(uri);
+    for (DepanFxProjectTree project : projectList) {
+      Optional<DepanFxProjectDocument> result = project.asProjectDocument(uriPath);
+      if (result.isPresent()) {
+        return result;
+      }
+    }
+    return Optional.empty();
   }
 
   private void registerDocument(Object document, URI uri) {
