@@ -9,7 +9,8 @@ import java.util.stream.Collectors;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 
 public class DocumentRegistry {
-  private final Map<URI, Object> registry = new HashMap();
+
+  private final Map<URI, Object> registry = new HashMap<>();
 
   public void registerDocument(Object document, URI uri) {
     registry.put(uri, document);

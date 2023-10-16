@@ -1,6 +1,5 @@
 package com.pnambic.depanfx.graph_doc.xstream;
 
-import com.pnambic.depanfx.graph.context.ContextRelationId;
 import com.pnambic.depanfx.graph.context.GraphContextKeys;
 import com.pnambic.depanfx.graph.context.plugins.ContextModelRegistry;
 import com.pnambic.depanfx.graph.model.GraphRelation;

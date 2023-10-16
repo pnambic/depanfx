@@ -1,7 +1,6 @@
 package com.pnambic.depanfx.filesystem;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,12 +18,12 @@ import com.pnambic.depanfx.filesystem.xstream.FileSystemXstreamPlugin;
 import com.pnambic.depanfx.graph.context.plugins.ContextModelRegistry;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphModel;
-import com.pnambic.depanfx.graph_doc.xstream.GraphDocPersistenceContribution;
-import com.pnambic.depanfx.graph_doc.xstream.plugins.GraphDocPluginContribution;
-import com.pnambic.depanfx.graph_doc.xstream.plugins.GraphDocPluginRegistry;
 import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.graph_doc.xstream.GraphDocPersistenceContribution;
+import com.pnambic.depanfx.graph_doc.xstream.plugins.GraphDocPluginContribution;
+import com.pnambic.depanfx.graph_doc.xstream.plugins.GraphDocPluginRegistry;
 import com.pnambic.depanfx.persistence.DocumentXmlPersist;
 
 public class FileSystemTest {

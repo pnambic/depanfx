@@ -1,6 +1,5 @@
 package com.pnambic.depanfx.nodelist.gui;
 
-import com.pnambic.depanfx.graph.context.ContextNodeId;
 import com.pnambic.depanfx.graph.model.GraphNode;
 
 public class DepanFxNodeListLeafNode extends DepanFxNodeListMember {

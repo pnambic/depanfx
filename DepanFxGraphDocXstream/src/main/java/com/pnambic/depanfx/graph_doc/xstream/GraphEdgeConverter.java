@@ -32,7 +32,7 @@ public class GraphEdgeConverter
   private ContextModelRegistry modelRegistry;
 
   public GraphEdgeConverter(ContextModelRegistry modelRegistry) {
-    modelRegistry = modelRegistry;
+    this.modelRegistry = modelRegistry;
   }
 
   @Override

@@ -1,7 +1,5 @@
 package com.pnambic.depanfx.nodelist.gui;
 
-import com.pnambic.depanfx.graph.model.GraphNode;
-
 import javafx.scene.control.TreeItem;
 
 public class DepanFxNodeListLeafNodeItem extends TreeItem<DepanFxNodeListMember> {

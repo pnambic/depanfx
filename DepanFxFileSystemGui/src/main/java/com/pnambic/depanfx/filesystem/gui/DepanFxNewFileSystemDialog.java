@@ -2,7 +2,6 @@ package com.pnambic.depanfx.filesystem.gui;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,6 @@ import com.pnambic.depanfx.filesystem.builder.FileSystemGraphDocBuilder;
 import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
-import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
