@@ -40,7 +40,7 @@ public class DepanFxProjectMemberItemBuilder {
     ObservableList<TreeItem<DepanFxWorkspaceMember>> result =
         FXCollections.observableArrayList();
 
-        try (Stream<Path> paths = Files.list(filePath)) {
+    try (Stream<Path> paths = Files.list(filePath)) {
       paths.forEach(childPath -> result.add(createNode(childPath)));
       return result;
     } catch (IOException e) {

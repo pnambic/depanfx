@@ -6,6 +6,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
@@ -38,6 +41,9 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
   private static final char EXT_DOT = '.';
 
   private static final String OPEN_AS_LIST = "Open as ListView";
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxProjectListCell.class);
 
   private final DepanFxWorkspace workspace;
 
@@ -133,15 +139,16 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
     try {
       GraphDocument graphDoc = (GraphDocument) workspace.importDocument(graphDocUri);
       DepanFxProjectDocument workspaceDoc = workspace.asProjectDocument(graphDocUri).get();
-      String tabTitle = getTabTitle(workspaceDoc);
       DepanFxNodeList nodeList = DepanFxNodeLists.buildNodeList(workspaceDoc, graphDoc);
+
       List<DepanFxNodeListSection> sections = DepanFxNodeListSections.getFinalSection();
       DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(nodeList, sections);
+      String tabTitle = getTabTitle(workspaceDoc);
       Tab viewerTab = viewer.createWorkspaceTab(tabTitle);
+
       scene.addTab(viewerTab);
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    } catch (IOException errIo) {
+      LOG.error("Unable to open list view for {}", errIo);
     }
   }
 

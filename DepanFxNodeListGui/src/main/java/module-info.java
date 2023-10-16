@@ -9,6 +9,7 @@ module depanfx.nodelist.gui {
   requires spring.context;
   requires spring.beans;
 
+  requires depanfx.graph;
   requires depanfx.nodelist;
   requires depanfx.workspace;
 

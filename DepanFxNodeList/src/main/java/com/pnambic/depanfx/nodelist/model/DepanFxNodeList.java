@@ -18,4 +18,12 @@ public class DepanFxNodeList {
     this.nodes = nodes;
   }
 
+  public DepanFxProjectDocument getDocRef() {
+    return docRef;
+  }
+
+  public Collection<GraphNode> getNodes() {
+    return nodes;
+  }
+
 }

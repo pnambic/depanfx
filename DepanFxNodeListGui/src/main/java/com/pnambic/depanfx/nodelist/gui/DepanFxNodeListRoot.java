@@ -7,15 +7,19 @@ import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 
 public class DepanFxNodeListRoot extends DepanFxNodeListMember {
 
-  private final DepanFxNodeList nodes;
+  private final DepanFxNodeList nodeList;
 
   private List<DepanFxNodeListSection> sections;
 
   public DepanFxNodeListRoot(
-      DepanFxNodeList nodes,
+      DepanFxNodeList nodeList,
       List<DepanFxNodeListSection> sections) {
-    this.nodes = nodes;
+    this.nodeList = nodeList;
     this.sections = sections;
+  }
+
+  public DepanFxNodeList getNodeList() {
+    return nodeList;
   }
 
   public List<DepanFxNodeListSection> getSections() {
