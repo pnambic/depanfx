@@ -1,9 +1,12 @@
 package com.pnambic.depanfx.nodelist.gui;
 
-import java.util.Collection;
-
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -39,16 +42,33 @@ public class DepanFxNodeListSectionItem extends TreeItem<DepanFxNodeListMember> 
 
   private ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
 
-    ObservableList<TreeItem<DepanFxNodeListMember>> result =
-        FXCollections.observableArrayList();
-    
+    DepanFxNodeListSection section = (DepanFxNodeListSection) getValue();
+
     Collection<GraphNode> nodes = nodeList.getNodes();
-    for (GraphNode node : nodes) {
-      DepanFxNodeListLeafNode nodeView = new DepanFxNodeListLeafNode(node);
+    List<TreeItem<DepanFxNodeListMember>> result =
+        new ArrayList<>(nodes.size());
+
+    for (GraphNode node : nodeList.getNodes()) {
+      DepanFxNodeListLeafNode nodeView =
+          new DepanFxNodeListLeafNode(node, section);
       DepanFxNodeListLeafNodeItem nodeItem =
           new DepanFxNodeListLeafNodeItem(nodeView);
       result.add(nodeItem);
     }
-    return result;
+    result.sort(new ItemSorter());
+
+    return FXCollections.observableArrayList(result);
+  }
+
+  private static class ItemSorter
+      implements Comparator<TreeItem<DepanFxNodeListMember>> {
+
+    @Override
+    public int compare(TreeItem<DepanFxNodeListMember> one,
+        TreeItem<DepanFxNodeListMember> two) {
+      String oneKey = ((DepanFxNodeListLeafNode) one.getValue()).getSortKey();
+      String twoKey = ((DepanFxNodeListLeafNode) two.getValue()).getSortKey();
+      return oneKey.compareTo(twoKey);
+    }
   }
 }

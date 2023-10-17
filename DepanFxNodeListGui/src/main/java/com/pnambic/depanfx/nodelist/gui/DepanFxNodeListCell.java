@@ -16,7 +16,7 @@ public class DepanFxNodeListCell extends TreeCell<DepanFxNodeListMember> {
     }
     // The normal case.
     if (member != null) {
-      setText(member.getMemberName());
+      setText(member.getDisplayName());
       setGraphic(null);
       stylizeCell(member);
       return;
