@@ -15,7 +15,7 @@ import com.thoughtworks.xstream.mapper.Mapper;
 public class DocumentNodeConverter
     extends AbstractObjectXmlConverter<DocumentNode> {
 
-  private static final Class[] ALLOW_TYPES = new Class[] {
+  private static final Class<?>[] ALLOW_TYPES = new Class[] {
     DocumentNode.class
   };
 
@@ -25,6 +25,11 @@ public class DocumentNodeConverter
   @Override
   public Class<?> forType() {
     return DocumentNode.class;
+  }
+
+  @Override
+  public Class<?>[] getAllowTypes() {
+    return ALLOW_TYPES;
   }
 
   @Override
@@ -46,10 +51,5 @@ public class DocumentNodeConverter
     String pathText = reader.getValue();
     Path nodePath = Path.of(pathText);
     return new DocumentNode(nodePath);
-  }
-
-  @Override
-  public Class[] getAllowTypes() {
-    return ALLOW_TYPES;
   }
 }

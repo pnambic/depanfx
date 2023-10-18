@@ -24,7 +24,7 @@ public class GraphModelConverter
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphModelConverter.class);
 
-  private static final Class[] ALLOW_TYPES = new Class[] {
+  private static final Class<?>[] ALLOW_TYPES = new Class[] {
     GraphModel.class
   };
 
@@ -33,6 +33,11 @@ public class GraphModelConverter
   @Override
   public Class<?> forType() {
     return GraphModel.class;
+  }
+
+  @Override
+  public Class<?>[] getAllowTypes() {
+    return ALLOW_TYPES;
   }
 
   @Override
@@ -76,10 +81,5 @@ public class GraphModelConverter
       }
     }
     return builder.createGraphModel();
-  }
-
-  @Override
-  public Class[] getAllowTypes() {
-    return ALLOW_TYPES;
   }
 }

@@ -13,7 +13,7 @@ import com.thoughtworks.xstream.mapper.Mapper;
 public class GraphDocumentConverter
     extends AbstractObjectXmlConverter<GraphDocument> {
 
-  private static final Class[] ALLOW_TYPES = new Class[] {
+  private static final Class<?>[] ALLOW_TYPES = new Class[] {
     GraphDocument.class
   };
 
@@ -31,7 +31,7 @@ public class GraphDocumentConverter
   }
 
   @Override
-  public Class[] getAllowTypes() {
+  public Class<?>[] getAllowTypes() {
     return ALLOW_TYPES;
   }
 

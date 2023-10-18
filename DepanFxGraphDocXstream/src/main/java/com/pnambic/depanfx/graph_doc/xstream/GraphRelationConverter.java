@@ -13,7 +13,7 @@ import com.thoughtworks.xstream.mapper.Mapper;
 public class GraphRelationConverter
     extends AbstractObjectXmlConverter<GraphRelation> {
 
-  private static final Class[] ALLOW_TYPES = new Class[] {
+  private static final Class<?>[] ALLOW_TYPES = new Class[] {
     GraphRelation.class
   };
 
@@ -31,7 +31,7 @@ public class GraphRelationConverter
   }
 
   @Override
-  public Class[] getAllowTypes() {
+  public Class<?>[] getAllowTypes() {
     return ALLOW_TYPES;
   }
 

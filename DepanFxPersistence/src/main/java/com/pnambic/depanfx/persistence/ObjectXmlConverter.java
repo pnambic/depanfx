@@ -13,7 +13,7 @@ public interface ObjectXmlConverter<T> {
 
   Class<?> forType();
 
-  Class[] getAllowTypes();
+  Class<?>[] getAllowTypes();
 
   String getTag();
 

@@ -15,7 +15,7 @@ import com.thoughtworks.xstream.mapper.Mapper;
 public class DirectoryNodeConverter
     extends AbstractObjectXmlConverter<DirectoryNode> {
 
-  private static final Class[] ALLOW_TYPES = new Class[] {
+  private static final Class<?>[] ALLOW_TYPES = new Class[] {
     DirectoryNode.class
   };
 
@@ -28,7 +28,7 @@ public class DirectoryNodeConverter
   }
 
   @Override
-  public Class[] getAllowTypes() {
+  public Class<?>[] getAllowTypes() {
     return ALLOW_TYPES;
   }
 

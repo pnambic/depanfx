@@ -12,7 +12,7 @@ import com.thoughtworks.xstream.mapper.Mapper;
 public class ContextModelIdConverter
     extends AbstractObjectXmlConverter<ContextModelId> {
 
-  private static final Class[] ALLOW_TYPES = new Class[] {
+  private static final Class<?>[] ALLOW_TYPES = new Class[] {
     ContextModelId.class
   };
 
@@ -27,6 +27,11 @@ public class ContextModelIdConverter
   @Override
   public Class<?> forType() {
     return ContextModelId.class;
+  }
+
+  @Override
+  public Class<?>[] getAllowTypes() {
+    return ALLOW_TYPES;
   }
 
   @Override
@@ -48,10 +53,5 @@ public class ContextModelIdConverter
 
     String modelKey = reader.getValue();
     return modelRegistry.getContextModel(modelKey).getId();
-  }
-
-  @Override
-  public Class[] getAllowTypes() {
-    return ALLOW_TYPES;
   }
 }

@@ -1,6 +1,5 @@
 package com.pnambic.depanfx.graph_doc.xstream;
 
-import com.pnambic.depanfx.graph.context.plugins.ContextModelRegistry;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.model.GraphRelation;
@@ -15,7 +14,7 @@ import com.thoughtworks.xstream.mapper.Mapper;
 public class GraphEdgeConverter
     extends AbstractObjectXmlConverter<GraphEdge> {
 
-  private static final Class[] ALLOW_TYPES = new Class[] {
+  private static final Class<?>[] ALLOW_TYPES = new Class[] {
     GraphEdge.class
   };
 
@@ -27,21 +26,13 @@ public class GraphEdgeConverter
 
   private static final String TAIL_TAG = "tail";
 
-  private static DepanFxGraphModelBuilder builder;
-
-  private ContextModelRegistry modelRegistry;
-
-  public GraphEdgeConverter(ContextModelRegistry modelRegistry) {
-    this.modelRegistry = modelRegistry;
-  }
-
   @Override
   public Class<?> forType() {
     return GraphEdge.class;
   }
 
   @Override
-  public Class[] getAllowTypes() {
+  public Class<?>[] getAllowTypes() {
     return ALLOW_TYPES;
   }
 

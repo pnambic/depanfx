@@ -12,7 +12,7 @@ import com.thoughtworks.xstream.mapper.Mapper;
 public class GraphNodeConverter
     extends AbstractObjectXmlConverter<GraphNode> {
 
-  private static final Class[] ALLOW_TYPES = new Class[] {
+  private static final Class<?>[] ALLOW_TYPES = new Class[] {
     GraphNode.class
   };
 
@@ -21,6 +21,11 @@ public class GraphNodeConverter
   @Override
   public Class<?> forType() {
     return GraphNode.class;
+  }
+
+  @Override
+  public Class<?>[] getAllowTypes() {
+    return ALLOW_TYPES;
   }
 
   @Override
@@ -43,10 +48,5 @@ public class GraphNodeConverter
 
   private String getNodeKey(GraphNode node) {
     return GraphContextKeys.toNodeKey(node.getId());
-  }
-
-  @Override
-  public Class[] getAllowTypes() {
-    return ALLOW_TYPES;
   }
 }

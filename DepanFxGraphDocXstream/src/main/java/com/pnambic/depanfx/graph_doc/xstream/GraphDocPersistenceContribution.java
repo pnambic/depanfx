@@ -52,7 +52,7 @@ public class GraphDocPersistenceContribution implements DocumentPersistenceContr
     builder.setNoReferences();
     builder.addConverter(modelIdConverter);
     builder.addConverter(new GraphDocumentConverter(modelIdConverter));
-    builder.addConverter(new GraphEdgeConverter(modelRegistry));
+    builder.addConverter(new GraphEdgeConverter());
     builder.addConverter(new GraphModelConverter());
     builder.addConverter(new GraphNodeConverter());
     builder.addConverter(new GraphRelationConverter(modelRegistry));
