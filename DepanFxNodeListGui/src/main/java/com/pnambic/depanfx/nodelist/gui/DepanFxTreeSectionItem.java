@@ -5,7 +5,6 @@ import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 
 import javafx.collections.FXCollections;

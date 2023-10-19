@@ -26,7 +26,6 @@ public class DepanFxLinkMatchers {
       }
       return Optional.empty();
     }
-
   }
 
   public static class DepanFxReverseLinkMatcher implements DepanFxLinkMatcher {

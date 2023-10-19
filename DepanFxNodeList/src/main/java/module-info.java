@@ -8,6 +8,7 @@ module depanfx.nodelist {
   requires depanfx.graph_doc;
   requires depanfx.workspace;
 
+  exports com.pnambic.depanfx.nodelist.link;
   exports com.pnambic.depanfx.nodelist.model;
   exports com.pnambic.depanfx.nodelist.tree;
 }

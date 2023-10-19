@@ -22,6 +22,7 @@ import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceRegistry;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.documents.DocumentRegistry;
 
 /**
@@ -108,6 +109,13 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
     return Optional.empty();
   }
 
+  @Override
+  public Optional<DepanFxWorkspaceResource> asWorkspaceResource(
+      URI uri, Object resource) {
+    return asProjectDocument(uri)
+        .map(doc -> new WorkspaceResource(doc, resource));
+  }
+
   private void registerDocument(Object document, URI uri) {
     documentRegistry.registerDocument(document, uri);
   }
@@ -118,5 +126,32 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
 
   private FileWriter openForSave(URI uri) throws IOException {
     return new FileWriter(new File(uri));
+  }
+
+  private class WorkspaceResource implements DepanFxWorkspaceResource {
+
+    private DepanFxProjectDocument document;
+
+    private Object resource;
+
+    public WorkspaceResource(DepanFxProjectDocument document, Object resource) {
+      this.document = document;
+      this.resource = resource;
+    }
+
+    @Override
+    public DepanFxWorkspace getWorkspace() {
+      return BasicDepanFxWorkspace.this;
+    }
+
+    @Override
+    public DepanFxProjectDocument getDocument() {
+      return document;
+    }
+
+    @Override
+    public Object getResource() {
+      return resource;
+    }
   }
 }

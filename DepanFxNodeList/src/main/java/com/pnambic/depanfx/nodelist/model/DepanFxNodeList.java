@@ -1,25 +1,25 @@
 package com.pnambic.depanfx.nodelist.model;
 
-import java.util.Collection;
-
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+
+import java.util.Collection;
 
 public class DepanFxNodeList {
 
-  private final DepanFxProjectDocument docRef;
+  private final DepanFxWorkspaceResource wkspRsrc;
 
   private final Collection<GraphNode> nodes;
 
   public DepanFxNodeList(
-      DepanFxProjectDocument docRef,
+      DepanFxWorkspaceResource wkspRsrc,
       Collection<GraphNode> nodes) {
-    this.docRef = docRef;
+    this.wkspRsrc = wkspRsrc;
     this.nodes = nodes;
   }
 
-  public DepanFxProjectDocument getDocRef() {
-    return docRef;
+  public DepanFxWorkspaceResource getWorkspaceResource() {
+    return wkspRsrc;
   }
 
   public Collection<GraphNode> getNodes() {

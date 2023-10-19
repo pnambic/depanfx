@@ -2,6 +2,7 @@ package com.pnambic.depanfx.nodelist.gui;
 
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 
 import javafx.scene.control.Tab;
@@ -14,9 +15,9 @@ public class DepanFxNodeListViewer {
 
   private DepanFxNodeList nodeList;
 
-  private TreeView<DepanFxNodeListMember> nodeListView;
-
   private List<DepanFxNodeListSection> sections;
+
+  private TreeView<DepanFxNodeListMember> nodeListView;
 
   public DepanFxNodeListViewer(
       DepanFxNodeList nodeList,
@@ -31,11 +32,29 @@ public class DepanFxNodeListViewer {
     return result;
   }
 
-  private TreeView<DepanFxNodeListMember> createView() {
-    DepanFxNodeListRoot rootMember = new DepanFxNodeListRoot(nodeList, sections);
-    TreeItem<DepanFxNodeListMember> treeRoot = new DepanFxNodeListRootItem(rootMember);
+  public void insertSection(
+      DepanFxNodeListSection before, DepanFxNodeListSection insert) {
 
-    TreeView<DepanFxNodeListMember> result = new TreeView<>(treeRoot);
+    // Don't default to after the last slot, 'cuz that's the catch-all section
+    int index = Integer.max(0, sections.indexOf(before));
+    sections.add(index, insert);
+
+    TreeItem<DepanFxNodeListMember> treeRoot = createTreeRoot();
+    nodeListView.setRoot(treeRoot);
+  }
+
+  private List<DepanFxNodeListSection> isolateSections() {
+    return ImmutableList.copyOf(sections);
+  }
+
+  private TreeItem<DepanFxNodeListMember> createTreeRoot() {
+    DepanFxNodeListRoot rootMember =
+        new DepanFxNodeListRoot(nodeList, isolateSections());
+    return new DepanFxNodeListRootItem(rootMember);
+  }
+
+  private TreeView<DepanFxNodeListMember> createView() {
+    TreeView<DepanFxNodeListMember> result = new TreeView<>(createTreeRoot());
     result.setShowRoot(false);
     result.setCellFactory(new NodeListCellFactory());
     return result;
@@ -47,7 +66,7 @@ public class DepanFxNodeListViewer {
     @Override
     public TreeCell<DepanFxNodeListMember> call(TreeView<DepanFxNodeListMember> param) {
 
-      return new DepanFxNodeListCell();
+      return new DepanFxNodeListCell(DepanFxNodeListViewer.this);
     }
   }
 }

@@ -12,6 +12,7 @@ module depanfx.nodelist.gui {
   requires depanfx.graph;
   requires depanfx.nodelist;
   requires depanfx.workspace;
+  requires depanfx.graph_doc;
 
   exports com.pnambic.depanfx.nodelist.gui;
 }

@@ -1,27 +1,28 @@
 package com.pnambic.depanfx.workspace.gui;
 
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
-import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
-import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSections;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -138,12 +139,13 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
   private void runOpenAsListAction(URI graphDocUri) {
     try {
       GraphDocument graphDoc = (GraphDocument) workspace.importDocument(graphDocUri);
-      DepanFxProjectDocument workspaceDoc = workspace.asProjectDocument(graphDocUri).get();
-      DepanFxNodeList nodeList = DepanFxNodeLists.buildNodeList(workspaceDoc, graphDoc);
+      DepanFxWorkspaceResource wkspRsrc =
+          workspace.asWorkspaceResource(graphDocUri, graphDoc).get();
+      DepanFxNodeList nodeList = DepanFxNodeLists.buildNodeList(wkspRsrc);
 
       List<DepanFxNodeListSection> sections = DepanFxNodeListSections.getFinalSection();
       DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(nodeList, sections);
-      String tabTitle = getTabTitle(workspaceDoc);
+      String tabTitle = getTabTitle(wkspRsrc.getDocument());
       Tab viewerTab = viewer.createWorkspaceTab(tabTitle);
 
       scene.addTab(viewerTab);
