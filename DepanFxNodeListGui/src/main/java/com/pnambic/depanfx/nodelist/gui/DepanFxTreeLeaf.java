@@ -2,13 +2,13 @@ package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
 
-public class DepanFxNodeListLeafNode extends DepanFxNodeListMember {
+public class DepanFxTreeLeaf extends DepanFxNodeListMember {
 
   private final GraphNode node;
 
-  private final DepanFxNodeListSection section;
+  private final DepanFxTreeSection section;
 
-  public DepanFxNodeListLeafNode(GraphNode node, DepanFxNodeListSection section) {
+  public DepanFxTreeLeaf(GraphNode node, DepanFxTreeSection section) {
     this.node = node;
     this.section = section;
   }

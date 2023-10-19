@@ -5,7 +5,6 @@ import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 
 import javafx.collections.FXCollections;
@@ -55,20 +54,8 @@ public class DepanFxNodeListSectionItem extends TreeItem<DepanFxNodeListMember> 
           new DepanFxNodeListLeafNodeItem(nodeView);
       result.add(nodeItem);
     }
-    result.sort(new ItemSorter());
+    result.sort(DepanFxNodeListSections.COMPARE_BY_SORT_KEY);
 
-    return FXCollections.observableArrayList(result);
-  }
-
-  private static class ItemSorter
-      implements Comparator<TreeItem<DepanFxNodeListMember>> {
-
-    @Override
-    public int compare(TreeItem<DepanFxNodeListMember> one,
-        TreeItem<DepanFxNodeListMember> two) {
-      String oneKey = ((DepanFxNodeListLeafNode) one.getValue()).getSortKey();
-      String twoKey = ((DepanFxNodeListLeafNode) two.getValue()).getSortKey();
-      return oneKey.compareTo(twoKey);
-    }
+    return FXCollections.observableList(result);
   }
 }

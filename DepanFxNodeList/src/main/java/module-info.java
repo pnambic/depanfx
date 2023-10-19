@@ -9,4 +9,5 @@ module depanfx.nodelist {
   requires depanfx.workspace;
 
   exports com.pnambic.depanfx.nodelist.model;
+  exports com.pnambic.depanfx.nodelist.tree;
 }
