@@ -1,8 +1,14 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.google.common.collect.ImmutableList;
+import com.pnambic.depanfx.graph.context.ContextModelId;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
+import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
+import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherRegistry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 
 import javafx.scene.control.Tab;
@@ -13,6 +19,8 @@ import javafx.util.Callback;
 
 public class DepanFxNodeListViewer {
 
+  private final DepanFxLinkMatcherRegistry linkMatcherRegistry;
+
   private DepanFxNodeList nodeList;
 
   private List<DepanFxNodeListSection> sections;
@@ -20,8 +28,10 @@ public class DepanFxNodeListViewer {
   private TreeView<DepanFxNodeListMember> nodeListView;
 
   public DepanFxNodeListViewer(
+      DepanFxLinkMatcherRegistry linkMatcherRegistry,
       DepanFxNodeList nodeList,
       List<DepanFxNodeListSection> sections) {
+    this.linkMatcherRegistry = linkMatcherRegistry;
     this.nodeList = nodeList;
     this.sections = sections;
     this.nodeListView = createView();
@@ -68,5 +78,13 @@ public class DepanFxNodeListViewer {
 
       return new DepanFxNodeListCell(DepanFxNodeListViewer.this);
     }
+  }
+
+  public Optional<DepanFxLinkMatcher> getMemberLinkMatcher() {
+    ContextModelId modelId =
+        ((GraphDocument) nodeList.getWorkspaceResource().getResource())
+        .getContextModelId();
+    return linkMatcherRegistry.getMatcherByGroup(
+        modelId, DepanFxLinkMatcherGroup.MEMBER);
   }
 }

@@ -41,4 +41,10 @@ public class DepanFxNodeLists {
     return new DepanFxNodeList(
         base.getWorkspaceResource(), Collections.emptyList());
   }
+
+  public static DepanFxNodeList buildRelatedNodeList(
+      DepanFxNodeList baseNodes, Collection<GraphNode> relatedList) {
+    return new DepanFxNodeList(
+        baseNodes.getWorkspaceResource(), relatedList);
+  }
 }

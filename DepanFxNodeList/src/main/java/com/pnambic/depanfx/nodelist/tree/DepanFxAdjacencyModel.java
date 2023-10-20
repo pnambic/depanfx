@@ -1,4 +1,4 @@
-package com.pnambic.depanfx.nodelist.adjacency;
+package com.pnambic.depanfx.nodelist.tree;
 
 import com.pnambic.depanfx.graph.api.Edge;
 import com.pnambic.depanfx.graph.context.ContextNodeId;
@@ -10,8 +10,9 @@ import com.pnambic.depanfx.nodelist.link.DepanFxLink;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -19,7 +20,8 @@ public class DepanFxAdjacencyModel {
 
   private final DepanFxLinkMatcher linkMatcher;
 
-  private final Map<GraphNode, List<GraphNode>> adjacencyData = new HashMap<>();
+  private final Map<GraphNode, Collection<GraphNode>> adjacencyData =
+      new HashMap<>();
 
   public DepanFxAdjacencyModel(DepanFxLinkMatcher linkMatcher) {
     this.linkMatcher = linkMatcher;
@@ -33,19 +35,18 @@ public class DepanFxAdjacencyModel {
     }
   }
 
-  private void addAdjacency(DepanFxLink link) {
-    GraphNode source = link.getSource();
-    GraphNode target = link.getTarget();
-    List<GraphNode> links = adjacencyData.get(source);
-
-    if (links == null) {
-      links = new ArrayList<>();
-      adjacencyData.put(source, links);
+  public Collection<GraphNode> getAdjacentNodes(GraphNode node) {
+    Collection<GraphNode> result = adjacencyData.get(node);
+    if (result != null) {
+      return result;
     }
-    links.add(target);
+    return Collections.emptyList();
   }
 
-  public Map<GraphNode, List<GraphNode>> getAdjacencyData() {
-    return adjacencyData;
+
+  private void addAdjacency(DepanFxLink link) {
+    adjacencyData
+        .computeIfAbsent(link.getSource(), k-> new ArrayList<>())
+        .add(link.getTarget());
   }
 }

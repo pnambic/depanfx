@@ -40,17 +40,19 @@ public class DepanFxNodeListRootItem extends TreeItem<DepanFxNodeListMember> {
     DepanFxNodeList baseNodes = root.getNodeList();
 
     for (DepanFxNodeListSection section : root.getSections()) {
-        DepanFxNodeList sectionNodes = section.pickNodes(baseNodes);
-        baseNodes = DepanFxNodeLists.remove(baseNodes, sectionNodes);
         DepanFxNodeListSectionItem sectionItem =
-            new DepanFxNodeListSectionItem(section, sectionNodes);
+            section.buildTreeItem(baseNodes);
         result.add(sectionItem);
+
+        DepanFxNodeList sectionNodes = sectionItem.getSectionNodes();
+        baseNodes = DepanFxNodeLists.remove(baseNodes, sectionNodes);
     }
+
 
     // If there are any left, drop them in a special section.
     if (!baseNodes.getNodes().isEmpty()) {
-      DepanFxNodeListSectionItem sectionItem =
-          new DepanFxNodeListSectionItem(null, baseNodes);
+      DepanFxNodeListFlatSectionItem sectionItem =
+          new DepanFxNodeListFlatSectionItem(null, baseNodes);
       result.add(sectionItem);
     }
     return result;

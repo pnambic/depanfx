@@ -12,13 +12,12 @@ public class DepanFxNodeListSections {
       new CompareBySortKey();
 
   private DepanFxNodeListSections() {
-    // Prevent instatiation.
+    // Prevent instantiation.
   }
 
   public static List<DepanFxNodeListSection> getFinalSection() {
-    DepanFxNodeListSection section = new DepanFxNodeListSection();
     List<DepanFxNodeListSection> result = new ArrayList<>();
-    result.add(section);
+    result.add(new DepanFxNodeListFlatSection());
     return result;
   }
 

@@ -10,8 +10,10 @@ module depanfx.filesystem {
   requires depanfx.graph_doc;
 
   opens com.pnambic.depanfx.filesystem.graph to spring.core;
+  opens com.pnambic.depanfx.filesystem.nodelist.link to spring.core;
 
   exports com.pnambic.depanfx.filesystem.builder;
   exports com.pnambic.depanfx.filesystem.context;
   exports com.pnambic.depanfx.filesystem.graph;
+  exports com.pnambic.depanfx.filesystem.nodelist.link;
 }

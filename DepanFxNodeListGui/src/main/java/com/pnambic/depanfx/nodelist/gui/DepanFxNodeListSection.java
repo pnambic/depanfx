@@ -1,27 +1,15 @@
 package com.pnambic.depanfx.nodelist.gui;
 
-import com.pnambic.depanfx.graph.context.GraphContextKeys;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 
-public class DepanFxNodeListSection extends DepanFxNodeListMember {
+public abstract class DepanFxNodeListSection extends DepanFxNodeListMember {
 
-  @Override
-  public String getDisplayName() {
-    return "Section";
-  }
+  public abstract String getDisplayName(GraphNode node);
 
-  public DepanFxNodeList pickNodes(DepanFxNodeList baseNodes) {
-    // Simple for now [Oct-2023] - take them all
-    // Future derived types could build trees, etc.
-    return baseNodes;
-  }
+  public abstract String getSortKey(GraphNode node);
 
-  public String getDisplayName(GraphNode node) {
-    return node.getId().getNodeKey();
-  }
+  public abstract DepanFxNodeListSectionItem buildTreeItem(
+      DepanFxNodeList baseNodes);
 
-  public String getSortKey(GraphNode node) {
-    return GraphContextKeys.toNodeKey(node.getId());
-  }
 }

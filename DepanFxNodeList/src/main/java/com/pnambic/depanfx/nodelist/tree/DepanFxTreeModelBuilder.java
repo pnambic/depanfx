@@ -2,36 +2,44 @@ package com.pnambic.depanfx.nodelist.tree;
 
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.nodelist.adjacency.DepanFxAdjacencyModel;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
-import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel.TreeMode;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DepanFxTreeModelBuilder {
 
   private final DepanFxLinkMatcher linkMatcher;
 
-  private Map<GraphNode, Collection<GraphNode>> nodeMembers;
-
-  private Collection<GraphNode> roots;
-
-  private Map<GraphNode, TreeMode> treeModes;
-
   public DepanFxTreeModelBuilder(DepanFxLinkMatcher linkMatcher) {
     this.linkMatcher = linkMatcher;
   }
 
-  public void traverseGraph(GraphModel model) {
+  public DepanFxTreeModel traverseGraph(GraphModel model, DepanFxNodeList nodeList) {
     DepanFxAdjacencyModel adjModel = new DepanFxAdjacencyModel(linkMatcher);
-
     adjModel.withGraphModel(model);
-    Map<GraphNode, List<GraphNode>> adjData = adjModel.getAdjacencyData();
+
+    DepanFxDepthFirstTree dfsTree = new DepanFxDepthFirstTree(adjModel);
+    dfsTree.buildFromNodeList(nodeList);
+    Collection<GraphNode> roots = dfsTree.getRoots();
+    Map<GraphNode, Collection<GraphNode>> nodeMembers = dfsTree.getNodeMembers();
+
+    Collection<GraphNode> nonEmpty = roots.stream()
+        .filter(n -> hasNoMembers(nodeMembers, n))
+        .collect(Collectors.toList());
+
+    return new DepanFxSimpleTreeModel(
+        nodeList.getWorkspaceResource(), nodeMembers, nonEmpty);
   }
 
-  public DepanFxTreeModel buildTreeModel() {
-    return new DepanFxSimpleTreeModel(nodeMembers, roots, treeModes);
+  private static boolean hasNoMembers(
+      Map<GraphNode, Collection<GraphNode>> nodeMembers, GraphNode node) {
+    Collection<GraphNode> members = nodeMembers.get(node);
+    if (members != null) {
+      return members.isEmpty();
+    }
+    return true;
   }
 }

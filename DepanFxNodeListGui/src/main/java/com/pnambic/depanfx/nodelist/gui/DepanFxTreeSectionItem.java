@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import javafx.scene.control.TreeItem;
  * the section's {@link DepanFxTreeModel}.
  */
 public class DepanFxTreeSectionItem
-    extends TreeItem<DepanFxNodeListMember> {
+    extends DepanFxNodeListSectionItem {
 
   private final DepanFxTreeModel treeModel;
 
@@ -77,4 +78,8 @@ public class DepanFxTreeSectionItem
     return null;
   }
 
+  @Override
+  public DepanFxNodeList getSectionNodes() {
+    return treeModel.getReachableGraphNodes(treeModel.getRoots());
+  }
 }

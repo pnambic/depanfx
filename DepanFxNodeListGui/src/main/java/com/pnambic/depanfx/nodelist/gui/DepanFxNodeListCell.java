@@ -1,10 +1,5 @@
 package com.pnambic.depanfx.nodelist.gui;
 
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatchers;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatchers.Composite;
-
-import java.util.Collections;
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
@@ -45,13 +40,13 @@ public class DepanFxNodeListCell extends TreeCell<DepanFxNodeListMember> {
   }
 
   private void stylizeCell(DepanFxNodeListMember member) {
-    if (member instanceof DepanFxNodeListSection) {
-      setContextMenu(nodeListSectionMenu((DepanFxNodeListSection) member));
+    if (member instanceof DepanFxNodeListFlatSection) {
+      setContextMenu(nodeListSectionMenu((DepanFxNodeListFlatSection) member));
       return;
     }
   }
 
-  private ContextMenu nodeListSectionMenu(DepanFxNodeListSection member) {
+  private ContextMenu nodeListSectionMenu(DepanFxNodeListFlatSection member) {
     MenuItem insertTreeSectionMenuItem = new MenuItem(INSERT_ABOVE_TREE_SECTION);
     insertTreeSectionMenuItem.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -67,10 +62,8 @@ public class DepanFxNodeListCell extends TreeCell<DepanFxNodeListMember> {
   }
 
   private void runInsertTreeSectionAction(DepanFxNodeListSection before) {
-    Composite linkMatcher =
-        new DepanFxLinkMatchers.Composite(Collections.emptyList());
-    DepanFxTreeSection insert =
-        new DepanFxTreeSection(before.getGraphDoc(), linkMatcher);
-    listViewer.insertSection(before, insert);
+    listViewer.getMemberLinkMatcher().ifPresent(m -> {
+        DepanFxTreeSection insert = new DepanFxTreeSection(m);
+        listViewer.insertSection(before, insert);});
   }
 }
