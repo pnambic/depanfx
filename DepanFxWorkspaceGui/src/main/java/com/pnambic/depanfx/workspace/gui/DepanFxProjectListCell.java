@@ -138,13 +138,16 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
 
   private void runOpenAsListAction(URI graphDocUri) {
     try {
-      GraphDocument graphDoc = (GraphDocument) workspace.importDocument(graphDocUri);
+      GraphDocument graphDoc =
+          (GraphDocument) workspace.importDocument(graphDocUri);
       DepanFxWorkspaceResource wkspRsrc =
           workspace.asWorkspaceResource(graphDocUri, graphDoc).get();
       DepanFxNodeList nodeList = DepanFxNodeLists.buildNodeList(wkspRsrc);
 
-      List<DepanFxNodeListSection> sections = DepanFxNodeListSections.getFinalSection();
-      DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(nodeList, sections);
+      List<DepanFxNodeListSection> sections =
+          DepanFxNodeListSections.getFinalSection(graphDoc);
+      DepanFxNodeListViewer viewer =
+          new DepanFxNodeListViewer(nodeList, sections);
       String tabTitle = getTabTitle(wkspRsrc.getDocument());
       Tab viewerTab = viewer.createWorkspaceTab(tabTitle);
 

@@ -9,11 +9,15 @@ import java.util.Optional;
 
 public class DepanFxLinkMatchers {
 
-  public static class DepanFxForwardLinkMatcher implements DepanFxLinkMatcher {
+  DepanFxLinkMatchers() {
+    // Prevent instantiation.
+  }
+
+  public static class ForwardRelation implements DepanFxLinkMatcher {
 
     private final Relation<? extends ContextRelationId> forwardRelation;
 
-    public DepanFxForwardLinkMatcher(
+    public ForwardRelation(
         Relation<? extends ContextRelationId> forwardRelation) {
       this.forwardRelation = forwardRelation;
     }
@@ -28,11 +32,11 @@ public class DepanFxLinkMatchers {
     }
   }
 
-  public static class DepanFxReverseLinkMatcher implements DepanFxLinkMatcher {
+  public static class ReverseRelation implements DepanFxLinkMatcher {
 
     private final Relation<? extends ContextRelationId> reverseRelation;
 
-    public DepanFxReverseLinkMatcher(
+    public ReverseRelation(
         Relation<? extends ContextRelationId> reverseRelation) {
       this.reverseRelation = reverseRelation;
     }
@@ -47,12 +51,12 @@ public class DepanFxLinkMatchers {
     }
   }
 
-  public static class DepanFxCompositeLinkMatcher
+  public static class Composite
       implements DepanFxLinkMatcher {
 
     private final List<DepanFxLinkMatcher> matchers;
 
-    public DepanFxCompositeLinkMatcher(List<DepanFxLinkMatcher> matchers) {
+    public Composite(List<DepanFxLinkMatcher> matchers) {
       this.matchers = matchers;
     }
 

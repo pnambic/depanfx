@@ -1,7 +1,7 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatchers;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatchers.DepanFxCompositeLinkMatcher;
+import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatchers.Composite;
 
 import java.util.Collections;
 
@@ -67,9 +67,10 @@ public class DepanFxNodeListCell extends TreeCell<DepanFxNodeListMember> {
   }
 
   private void runInsertTreeSectionAction(DepanFxNodeListSection before) {
-    DepanFxCompositeLinkMatcher linkMatcher =
-        new DepanFxLinkMatchers.DepanFxCompositeLinkMatcher(Collections.emptyList());
-    DepanFxTreeSection insert = new DepanFxTreeSection(linkMatcher);
+    Composite linkMatcher =
+        new DepanFxLinkMatchers.Composite(Collections.emptyList());
+    DepanFxTreeSection insert =
+        new DepanFxTreeSection(before.getGraphDoc(), linkMatcher);
     listViewer.insertSection(before, insert);
   }
 }
