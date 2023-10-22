@@ -85,8 +85,11 @@ public class DepanFxDepthFirstTree {
     for (GraphNode memberNode : members) {
       NodeStatus memberStatus = nodeInfo.get(memberNode);
       memberStatus.setMember();
+
+      // Add all members for this visit node, even if they have been separately
+      // visited.  Often, that is a self visit.
+      addMember(visitNode, memberNode);
       if (NodeState.PENDING == memberStatus.state) {
-        addMember(visitNode, memberNode);
         visit(memberNode, memberStatus);
       }
     }

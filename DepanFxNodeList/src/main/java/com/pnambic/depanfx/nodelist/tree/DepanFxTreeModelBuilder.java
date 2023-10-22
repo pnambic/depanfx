@@ -27,19 +27,19 @@ public class DepanFxTreeModelBuilder {
     Map<GraphNode, Collection<GraphNode>> nodeMembers = dfsTree.getNodeMembers();
 
     Collection<GraphNode> nonEmpty = roots.stream()
-        .filter(n -> hasNoMembers(nodeMembers, n))
+        .filter(n -> hasMembers(nodeMembers, n))
         .collect(Collectors.toList());
 
     return new DepanFxSimpleTreeModel(
         nodeList.getWorkspaceResource(), nodeMembers, nonEmpty);
   }
 
-  private static boolean hasNoMembers(
+  private static boolean hasMembers(
       Map<GraphNode, Collection<GraphNode>> nodeMembers, GraphNode node) {
     Collection<GraphNode> members = nodeMembers.get(node);
     if (members != null) {
-      return members.isEmpty();
+      return !members.isEmpty();
     }
-    return true;
+    return false;
   }
 }

@@ -14,7 +14,6 @@ public class DepanFxTreeDepthFirstTraversal {
     ROOT, MEMBER
   };
 
-
   public enum NodeState {
     PENDING, EXPLORING, COMPLETE
   };
@@ -81,7 +80,8 @@ public class DepanFxTreeDepthFirstTraversal {
 
     Collection<GraphNode> members = treeModel.getMembers(visitNode);
     for (GraphNode memberNode : members) {
-      NodeStatus memberStatus = nodeInfo.get(memberNode);
+      NodeStatus memberStatus = nodeInfo.computeIfAbsent(
+          memberNode, k -> new NodeStatus());
       memberStatus.setMember();
       if (NodeState.PENDING == memberStatus.state) {
         addMember(visitNode, memberNode);
@@ -92,14 +92,8 @@ public class DepanFxTreeDepthFirstTraversal {
     visitStatus.leave();
   }
 
-  private void addMember(GraphNode container, GraphNode member) {
-    nodeMembers
-        .computeIfAbsent(container, k-> new ArrayList<>())
-        .add(member);
-  }
-
-  private int timeTick() {
-    return time++;
+  public Collection<GraphNode> getTreeMembers() {
+    return nodeInfo.keySet();
   }
 
   public Map<GraphNode, Collection<GraphNode>> getNodeMembers() {
@@ -111,5 +105,15 @@ public class DepanFxTreeDepthFirstTraversal {
         .filter(e -> e.getValue().role == NodeRole.ROOT)
         .map(Map.Entry::getKey)
         .collect(Collectors.toList());
+  }
+
+  private void addMember(GraphNode container, GraphNode member) {
+    nodeMembers
+        .computeIfAbsent(container, k-> new ArrayList<>())
+        .add(member);
+  }
+
+  private int timeTick() {
+    return time++;
   }
 }

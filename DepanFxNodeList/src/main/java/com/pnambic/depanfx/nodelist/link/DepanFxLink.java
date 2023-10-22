@@ -10,13 +10,13 @@ public interface DepanFxLink {
 
   static class Simple implements DepanFxLink {
 
-    private final GraphNode targret;
-
     private final GraphNode source;
 
-    public Simple(GraphNode targret, GraphNode source) {
-      this.targret = targret;
+    private final GraphNode target;
+
+    public Simple(GraphNode source, GraphNode target) {
       this.source = source;
+      this.target = target;
     }
 
     @Override
@@ -26,7 +26,7 @@ public interface DepanFxLink {
 
     @Override
     public GraphNode getTarget() {
-      return targret;
+      return target;
     }
   }
 }

@@ -58,6 +58,6 @@ public class DepanFxSimpleTreeModel implements DepanFxTreeModel {
         new DepanFxTreeDepthFirstTraversal(this);
     treeDft.buildFromNodes(start);
     return new DepanFxNodeList(
-        workspaceResource, treeDft.getNodeMembers().keySet());
+        workspaceResource, treeDft.getTreeMembers());
   }
 }
