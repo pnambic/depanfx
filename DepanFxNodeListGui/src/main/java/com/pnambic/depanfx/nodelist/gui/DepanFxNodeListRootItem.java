@@ -7,7 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
-public class DepanFxNodeListRootItem extends TreeItem<DepanFxNodeListMember> {
+public class DepanFxNodeListRootItem extends DepanFxNodeListItem {
 
   private boolean freshSections = false;
 

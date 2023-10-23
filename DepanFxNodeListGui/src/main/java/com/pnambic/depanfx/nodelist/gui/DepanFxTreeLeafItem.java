@@ -1,8 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui;
 
-import javafx.scene.control.TreeItem;
-
-public class DepanFxTreeLeafItem extends TreeItem<DepanFxNodeListMember> {
+public class DepanFxTreeLeafItem extends DepanFxNodeListItem {
 
   public DepanFxTreeLeafItem(DepanFxTreeLeaf leaf) {
     super(leaf);

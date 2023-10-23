@@ -1,9 +1,7 @@
 package com.pnambic.depanfx.nodelist.tree;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,18 +9,11 @@ import java.util.stream.Collectors;
 
 public class DepanFxDepthFirstTree {
 
-  public enum NodeRole {
-    ROOT, MEMBER
-  };
-
-
   public enum NodeState {
     PENDING, EXPLORING, COMPLETE
   };
 
   public class NodeStatus {
-
-    public NodeRole role;
 
     public NodeState state;
 
@@ -30,11 +21,13 @@ public class DepanFxDepthFirstTree {
 
     public int leaveTime;
 
+    public int memberCount;
+
     public NodeStatus() {
-      this.role = NodeRole.ROOT;
       this.state = NodeState.PENDING;
       this.enterTime = -1;
       this.leaveTime = -1;
+      this.memberCount = 0;
     }
 
     public void enter() {
@@ -48,7 +41,7 @@ public class DepanFxDepthFirstTree {
     }
 
     public void setMember() {
-      role = NodeRole.MEMBER;
+      memberCount++;
     }
   }
 
@@ -56,7 +49,8 @@ public class DepanFxDepthFirstTree {
 
   private final Map<GraphNode, NodeStatus> nodeInfo = new HashMap<>();
 
-  private final Map<GraphNode, Collection<GraphNode>> nodeMembers = new HashMap<>();
+  private final DepanFxSimpleAdjacencyModel nodeMembers =
+      new DepanFxSimpleAdjacencyModel();
 
   private int time;
 
@@ -64,8 +58,7 @@ public class DepanFxDepthFirstTree {
     this.adjModel = adjModel;
   }
 
-  public void buildFromNodeList(DepanFxNodeList nodeList) {
-    Collection<GraphNode> nodes = nodeList.getNodes();
+  public void buildFromNodes(Collection<GraphNode> nodes) {
     for (GraphNode node : nodes) {
       nodeInfo.put(node, new NodeStatus());
     }
@@ -78,17 +71,37 @@ public class DepanFxDepthFirstTree {
     }
   }
 
+  public DepanFxAdjacencyModel getNodeMembers() {
+    return nodeMembers;
+  }
+
+  public Collection<GraphNode> getTreeMembers() {
+    return nodeInfo.keySet();
+  }
+
+  public Collection<GraphNode> getRoots() {
+    return nodeInfo.entrySet().stream()
+        .filter(e -> e.getValue().memberCount == 0)
+        .map(Map.Entry::getKey)
+        .collect(Collectors.toList());
+  }
+
   private void visit(GraphNode visitNode, NodeStatus visitStatus) {
     visitStatus.enter();
 
     Collection<GraphNode> members = adjModel.getAdjacentNodes(visitNode);
     for (GraphNode memberNode : members) {
-      NodeStatus memberStatus = nodeInfo.get(memberNode);
+      // May need to generalize, with customizable NodeStatus strategies.
+      NodeStatus memberStatus = nodeInfo.computeIfAbsent(
+          memberNode, k -> new NodeStatus());
+
       memberStatus.setMember();
 
+      // May need to generalize, with customizable add member strategies.
       // Add all members for this visit node, even if they have been separately
       // visited.  Often, that is a self visit.
-      addMember(visitNode, memberNode);
+      nodeMembers.addAdjacency(visitNode, memberNode);
+
       if (NodeState.PENDING == memberStatus.state) {
         visit(memberNode, memberStatus);
       }
@@ -97,25 +110,7 @@ public class DepanFxDepthFirstTree {
     visitStatus.leave();
   }
 
-  private void addMember(GraphNode container, GraphNode member) {
-    nodeMembers
-        .computeIfAbsent(container, k-> new ArrayList<>())
-        .add(member);
-    Collection<GraphNode> locate = nodeMembers.get(container);
-  }
-
   private int timeTick() {
     return time++;
-  }
-
-  public Map<GraphNode, Collection<GraphNode>> getNodeMembers() {
-    return nodeMembers;
-  }
-
-  public Collection<GraphNode> getRoots() {
-    return nodeInfo.entrySet().stream()
-        .filter(e -> e.getValue().role == NodeRole.ROOT)
-        .map(Map.Entry::getKey)
-        .collect(Collectors.toList());
   }
 }

@@ -4,9 +4,11 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TreeCell;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.cell.CheckBoxTreeCell;
+import javafx.util.StringConverter;
 
-public class DepanFxNodeListCell extends TreeCell<DepanFxNodeListMember> {
+public class DepanFxNodeListCell extends CheckBoxTreeCell<DepanFxNodeListMember> {
 
   private static final String INSERT_ABOVE_TREE_SECTION = "Insert Tree Section";
 
@@ -15,22 +17,19 @@ public class DepanFxNodeListCell extends TreeCell<DepanFxNodeListMember> {
 
   public DepanFxNodeListCell(DepanFxNodeListViewer listViewer) {
     this.listViewer = listViewer;
+    setConverter(new NameConverter());
   }
 
   @Override
-  protected void updateItem(DepanFxNodeListMember member, boolean empty) {
+  public void updateItem(DepanFxNodeListMember member, boolean empty) {
     super.updateItem(member, empty);
 
     // Visual space reserved for future use.
     if (empty) {
-      setText(null);
-      setGraphic(null);
       return;
     }
     // The normal case.
     if (member != null) {
-      setText(member.getDisplayName());
-      setGraphic(null);
       stylizeCell(member);
       return;
     }
@@ -47,7 +46,8 @@ public class DepanFxNodeListCell extends TreeCell<DepanFxNodeListMember> {
   }
 
   private ContextMenu nodeListSectionMenu(DepanFxNodeListFlatSection member) {
-    MenuItem insertTreeSectionMenuItem = new MenuItem(INSERT_ABOVE_TREE_SECTION);
+    MenuItem insertTreeSectionMenuItem =
+        new MenuItem(INSERT_ABOVE_TREE_SECTION);
     insertTreeSectionMenuItem.setOnAction(new EventHandler<ActionEvent>() {
 
       @Override
@@ -65,5 +65,18 @@ public class DepanFxNodeListCell extends TreeCell<DepanFxNodeListMember> {
     listViewer.getMemberLinkMatcher().ifPresent(m -> {
         DepanFxTreeSection insert = new DepanFxTreeSection(m);
         listViewer.insertSection(before, insert);});
+  }
+
+  private static class NameConverter extends StringConverter<TreeItem<DepanFxNodeListMember>> {
+
+    @Override
+    public String toString(TreeItem<DepanFxNodeListMember> object) {
+      return object.getValue().getDisplayName();
+    }
+
+    @Override
+    public TreeItem<DepanFxNodeListMember> fromString(String string) {
+      throw new UnsupportedOperationException();
+    }
   }
 }

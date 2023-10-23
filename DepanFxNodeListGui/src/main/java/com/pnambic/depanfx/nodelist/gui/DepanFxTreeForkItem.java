@@ -10,7 +10,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
-public class DepanFxTreeForkItem extends TreeItem<DepanFxNodeListMember> {
+public class DepanFxTreeForkItem extends DepanFxNodeListItem {
 
   private boolean freshTree = false;
 

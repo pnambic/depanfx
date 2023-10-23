@@ -1,12 +1,15 @@
 package com.pnambic.depanfx.nodelist.tree;
 
+import com.pnambic.depanfx.graph.api.Edge;
+import com.pnambic.depanfx.graph.context.ContextNodeId;
+import com.pnambic.depanfx.graph.context.ContextRelationId;
+import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DepanFxTreeModelBuilder {
@@ -18,13 +21,12 @@ public class DepanFxTreeModelBuilder {
   }
 
   public DepanFxTreeModel traverseGraph(GraphModel model, DepanFxNodeList nodeList) {
-    DepanFxAdjacencyModel adjModel = new DepanFxAdjacencyModel(linkMatcher);
-    adjModel.withGraphModel(model);
+    DepanFxAdjacencyModel adjModel = buildAdjacencyModel(model);
 
     DepanFxDepthFirstTree dfsTree = new DepanFxDepthFirstTree(adjModel);
-    dfsTree.buildFromNodeList(nodeList);
+    dfsTree.buildFromNodes(nodeList.getNodes());
     Collection<GraphNode> roots = dfsTree.getRoots();
-    Map<GraphNode, Collection<GraphNode>> nodeMembers = dfsTree.getNodeMembers();
+    DepanFxAdjacencyModel nodeMembers = dfsTree.getNodeMembers();
 
     Collection<GraphNode> nonEmpty = roots.stream()
         .filter(n -> hasMembers(nodeMembers, n))
@@ -35,11 +37,17 @@ public class DepanFxTreeModelBuilder {
   }
 
   private static boolean hasMembers(
-      Map<GraphNode, Collection<GraphNode>> nodeMembers, GraphNode node) {
-    Collection<GraphNode> members = nodeMembers.get(node);
-    if (members != null) {
-      return !members.isEmpty();
+      DepanFxAdjacencyModel nodeMembers, GraphNode node) {
+    return !nodeMembers.getAdjacentNodes(node).isEmpty();
+  }
+
+  public DepanFxAdjacencyModel buildAdjacencyModel(GraphModel model) {
+
+    DepanFxSimpleAdjacencyModel result = new DepanFxSimpleAdjacencyModel();
+    for (Edge<? extends ContextNodeId, ? extends ContextRelationId> edge : model.getEdges()) {
+      linkMatcher.match((GraphEdge) edge)
+          .ifPresent(result::addAdjacency);
     }
-    return false;
+    return result;
   }
 }
