@@ -1,13 +1,12 @@
 package com.pnambic.depanfx.workspace.gui;
 
-import com.pnambic.depanfx.graph_doc.model.GraphDocument;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListFlatSection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSections;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherRegistry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
@@ -20,7 +19,6 @@ import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
@@ -144,22 +142,27 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
 
   private void runOpenAsListAction(URI graphDocUri) {
     try {
-      GraphDocument graphDoc =
-          (GraphDocument) workspace.importDocument(graphDocUri);
-      DepanFxWorkspaceResource wkspRsrc =
-          workspace.asWorkspaceResource(graphDocUri, graphDoc).get();
-      DepanFxNodeList nodeList = DepanFxNodeLists.buildNodeList(wkspRsrc);
+      Optional<DepanFxProjectDocument> optProjDoc =
+          workspace.toProjectDocument(graphDocUri);
+      Optional<DepanFxWorkspaceResource> optWkspRsrc =
+          optProjDoc.flatMap(workspace::getWorkspaceResource);
+      Optional<DepanFxNodeList> optNodeList =
+          optWkspRsrc.map(DepanFxNodeLists::buildNodeList);
 
+      // Prepare the view
+      DepanFxNodeList nodeList = optNodeList.get();
       List<DepanFxNodeListSection> sections =
           DepanFxNodeListSections.getFinalSection();
       DepanFxNodeListViewer viewer =
-          new DepanFxNodeListViewer(linkMatcherRegistry, nodeList, sections);
-      String tabTitle = getTabTitle(wkspRsrc.getDocument());
+          new DepanFxNodeListViewer(
+              dialogRunner, linkMatcherRegistry, nodeList, sections);
+      viewer.prependMemberTree();
+      String tabTitle = getTabTitle(optWkspRsrc.get().getDocument());
       Tab viewerTab = viewer.createWorkspaceTab(tabTitle);
 
       scene.addTab(viewerTab);
-    } catch (IOException errIo) {
-      LOG.error("Unable to open list view for {}", errIo);
+    } catch (RuntimeException errCaught) {
+      LOG.error("Unable to open list view for {}", errCaught);
     }
   }
 

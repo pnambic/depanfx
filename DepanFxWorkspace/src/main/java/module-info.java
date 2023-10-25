@@ -1,6 +1,7 @@
 module depanfx.workspace {
     requires spring.context;
     requires spring.beans;
+    requires org.slf4j;
 
     requires depanfx.graph;
     requires depanfx.graph_doc;

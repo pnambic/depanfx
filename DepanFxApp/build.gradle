@@ -24,11 +24,13 @@ dependencies {
   implementation project(':DepanFxGraphDoc')
   implementation project(':DepanFxGraphDocXstream')
   implementation project(':DepanFxNodeListGui')
+  implementation project(':DepanFxNodeListXstream')
   implementation project(':DepanFxPersistence')
   implementation project(':DepanFxPlatform')
   implementation project(':DepanFxScene')
   implementation project(':DepanFxWorkspace')
   implementation project(':DepanFxWorkspaceGui')
+  implementation project(':DepanFxWorkspaceXstream')
 
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

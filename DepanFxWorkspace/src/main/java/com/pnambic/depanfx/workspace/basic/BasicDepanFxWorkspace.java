@@ -1,21 +1,5 @@
 package com.pnambic.depanfx.workspace.basic;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.file.Paths;
-import java.nio.file.Path;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.pnambic.depanfx.graph.context.plugins.ContextModelRegistry;
 import com.pnambic.depanfx.persistence.DocumentXmlPersist;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceRegistry;
@@ -25,6 +9,24 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.documents.DocumentRegistry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 /**
  * A common registry of workspace context.
  */
@@ -33,11 +35,14 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
 
   public static final String WORKSPACE_NAME = "Depan Workspace";
 
+  private static final Logger LOG =
+      LoggerFactory.getLogger(BasicDepanFxWorkspace.class);
+
   private final ContextModelRegistry modelRegistry;
 
   private final DocumentPersistenceRegistry persistRegistry;
 
-  private final List<DepanFxProjectTree> projectList;
+  private final List<DepanFxProjectTree> projectList = new ArrayList<>();
 
   private final DocumentRegistry documentRegistry = new DocumentRegistry();
 
@@ -53,7 +58,6 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   public BasicDepanFxWorkspace(String workspaceName,
       ContextModelRegistry modelRegistry,
       DocumentPersistenceRegistry persistRegistry) {
-    this.projectList = new ArrayList<>();
     this.workspaceName = workspaceName;
     this.modelRegistry = modelRegistry;
     this.persistRegistry = persistRegistry;
@@ -98,7 +102,7 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   }
 
   @Override
-  public Optional<DepanFxProjectDocument> asProjectDocument(URI uri) {
+  public Optional<DepanFxProjectDocument> toProjectDocument(URI uri) {
     Path uriPath = Paths.get(uri);
     for (DepanFxProjectTree project : projectList) {
       Optional<DepanFxProjectDocument> result = project.asProjectDocument(uriPath);
@@ -110,10 +114,50 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   }
 
   @Override
-  public Optional<DepanFxWorkspaceResource> asWorkspaceResource(
+  public Optional<DepanFxProjectDocument> toProjectDocument(
+      String projectName, String resourcePath) {
+
+    return findProjectByName(projectName)
+        .map(t -> buildProjectDocument(t, resourcePath));
+  }
+
+  @Override
+  public Optional<DepanFxWorkspaceResource> toWorkspaceResource(
       URI uri, Object resource) {
-    return asProjectDocument(uri)
+    return toProjectDocument(uri)
         .map(doc -> new WorkspaceResource(doc, resource));
+  }
+
+  @Override
+  public Optional<DepanFxWorkspaceResource> getWorkspaceResource(
+      DepanFxProjectDocument resourceDoc) {
+    URI resourceUri = resourceDoc.getMemberPath().toUri();
+    Optional<Object> optResource = documentRegistry.findResource(resourceUri);
+    if (optResource.isPresent()) {
+      return toWorkspaceResource(resourceUri, optResource.get());
+    }
+
+    try {
+      Object resource = importDocument(resourceUri);
+      return toWorkspaceResource(resourceUri, resource);
+    } catch (IOException errIo) {
+      LOG.error("Unable to aquire resource {}", resourceUri, errIo);
+      throw new RuntimeException(
+          "Unable to aquire resource " + resourceDoc.toString(), errIo);
+    }
+  }
+
+  private Optional<DepanFxProjectTree> findProjectByName(String projectName) {
+    return projectList.stream()
+        .filter(t -> projectName.equals(t.getMemberName()))
+        .findFirst();
+  }
+
+  private DepanFxProjectDocument buildProjectDocument(
+      DepanFxProjectTree projectTree, String resourcePath) {
+    Path projectRoot = projectTree.getMemberPath();
+    Path resource = projectRoot.resolve(resourcePath);
+    return new BasicDepanFxProjectDocument(projectTree, resource);
   }
 
   private void registerDocument(Object document, URI uri) {

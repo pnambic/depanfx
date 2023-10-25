@@ -22,9 +22,9 @@ import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.graph_doc.xstream.GraphDocPersistenceContribution;
-import com.pnambic.depanfx.graph_doc.xstream.plugins.GraphDocPluginContribution;
-import com.pnambic.depanfx.graph_doc.xstream.plugins.GraphDocPluginRegistry;
 import com.pnambic.depanfx.persistence.DocumentXmlPersist;
+import com.pnambic.depanfx.persistence.plugins.GraphNodePersistencePluginContribution;
+import com.pnambic.depanfx.persistence.plugins.GraphNodePersistencePluginRegistry;
 
 public class FileSystemTest {
   private static final String EXPECTED_STRING =
@@ -51,9 +51,9 @@ public class FileSystemTest {
     ContextModelRegistry modelRegistry = null;
 
     FileSystemXstreamPlugin plugin = new FileSystemXstreamPlugin();
-    List<GraphDocPluginContribution> extensions = Collections.singletonList(plugin);
+    List<GraphNodePersistencePluginContribution> extensions = Collections.singletonList(plugin);
 
-    GraphDocPluginRegistry pluginRegistry = new GraphDocPluginRegistry(extensions);
+    GraphNodePersistencePluginRegistry pluginRegistry = new GraphNodePersistencePluginRegistry(extensions);
     return new GraphDocPersistenceContribution(modelRegistry, pluginRegistry);
   }
 

@@ -25,5 +25,4 @@ public class DepanFxNodeList {
   public Collection<GraphNode> getNodes() {
     return nodes;
   }
-
 }

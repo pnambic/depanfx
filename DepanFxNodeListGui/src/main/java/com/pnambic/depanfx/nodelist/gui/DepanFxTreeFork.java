@@ -6,7 +6,8 @@ import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel.TreeMode;
 
 import java.util.Collection;
 
-public class DepanFxTreeFork extends DepanFxNodeListMember {
+public class DepanFxTreeFork extends DepanFxNodeListMember
+    implements DepanFxGraphNodeProvider {
 
   private final GraphNode node;
 
@@ -28,6 +29,11 @@ public class DepanFxTreeFork extends DepanFxNodeListMember {
   @Override
   public String getSortKey() {
     return section.getSortKey(node);
+  }
+
+  @Override // DepanFxGraphNodeProvider
+  public GraphNode getGraphNode() {
+    return node;
   }
 
   public Collection<GraphNode> getMembers() {

@@ -34,9 +34,17 @@ public class DepanFxProjects {
   }
 
   public static File getCurrentGraphs(DepanFxWorkspace workspace) {
+    return getCurrent(workspace, GRAPHS_CONTAINER);
+  }
+
+  public static File getCurrentAnalyzes(DepanFxWorkspace workspace) {
+    return getCurrent(workspace, ANALYZES_CONTAINER);
+  }
+
+  public static File getCurrent(DepanFxWorkspace workspace, String container) {
     List<DepanFxProjectTree> projectList = workspace.getProjectList();
     if (projectList.size() >= 1) {
-      return new File(projectList.get(0).getMemberPath().toFile(), GRAPHS_CONTAINER);
+      return new File(projectList.get(0).getMemberPath().toFile(), container);
     }
     return null;
   }

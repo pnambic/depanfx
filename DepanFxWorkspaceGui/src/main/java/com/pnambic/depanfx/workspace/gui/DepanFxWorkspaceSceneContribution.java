@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherRegistry;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterContribution;

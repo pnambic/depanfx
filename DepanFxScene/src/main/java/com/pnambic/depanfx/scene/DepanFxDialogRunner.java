@@ -1,4 +1,4 @@
-package com.pnambic.depanfx.workspace.gui;
+package com.pnambic.depanfx.scene;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,12 +19,15 @@ public class DepanFxDialogRunner {
     this.fxweaver = fxweaver;
   }
 
-  public void runDialog(Class<?> type, String title) {
-    Parent dialogPane = fxweaver.loadView(type);
+  public void runDialog(Parent dialogPane, String title) {
     Stage dialogStage = new Stage();
     dialogStage.initModality(Modality.APPLICATION_MODAL);
     dialogStage.setTitle(title);
     dialogStage.setScene(new Scene(dialogPane));
     dialogStage.showAndWait();
+  }
+
+  public void runDialog(Class<?> type, String title) {
+    runDialog(fxweaver.loadView(type), title);
   }
 }

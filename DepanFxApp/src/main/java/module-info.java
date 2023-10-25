@@ -18,7 +18,9 @@ module depanfx.app {
     requires depanfx.graph_doc;
     requires depanfx.graph_doc.xstream;
     requires depanfx.nodelist.gui;
+    requires depanfx.nodelist.xstream;
     requires depanfx.workspace.gui;
+    requires depanfx.workspace.xstream;
 
     opens com.pnambic.depanfx to spring.core;
     opens com.pnambic.depanfx.app to spring.core;

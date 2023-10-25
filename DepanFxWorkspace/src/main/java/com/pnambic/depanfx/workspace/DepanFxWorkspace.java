@@ -18,7 +18,13 @@ public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
 
   Object importDocument(URI uri) throws IOException;
 
-  Optional<DepanFxProjectDocument> asProjectDocument(URI uri);
+  Optional<DepanFxProjectDocument> toProjectDocument(URI uri);
 
-  Optional<DepanFxWorkspaceResource> asWorkspaceResource(URI uri, Object resource);
+  Optional<DepanFxProjectDocument> toProjectDocument(String projectName,
+      String resourcePath);
+
+  Optional<DepanFxWorkspaceResource> toWorkspaceResource(URI uri, Object resource);
+
+  Optional<DepanFxWorkspaceResource> getWorkspaceResource(
+      DepanFxProjectDocument resourceDoc);
 }

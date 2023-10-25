@@ -1,16 +1,20 @@
 package com.pnambic.depanfx.nodelist.gui;
 
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.cell.CheckBoxTreeCell;
+import javafx.scene.control.cell.CheckBoxTreeTableCell;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 
-public class DepanFxNodeListCell extends CheckBoxTreeCell<DepanFxNodeListMember> {
+public class DepanFxNodeListCell
+    extends CheckBoxTreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember> {
 
-  private static final String INSERT_ABOVE_TREE_SECTION = "Insert Tree Section";
+  private static final String INSERT_ABOVE_MEMBER_TREE_SECTION =
+      "Insert Member Tree Section";
 
   // Allow cells to act on viewer (e.g. change sections, etc.)
   private final DepanFxNodeListViewer listViewer;
@@ -18,6 +22,7 @@ public class DepanFxNodeListCell extends CheckBoxTreeCell<DepanFxNodeListMember>
   public DepanFxNodeListCell(DepanFxNodeListViewer listViewer) {
     this.listViewer = listViewer;
     setConverter(new NameConverter());
+    setSelectedStateCallback(new SelectionState());
   }
 
   @Override
@@ -39,6 +44,7 @@ public class DepanFxNodeListCell extends CheckBoxTreeCell<DepanFxNodeListMember>
   }
 
   private void stylizeCell(DepanFxNodeListMember member) {
+
     if (member instanceof DepanFxNodeListFlatSection) {
       setContextMenu(nodeListSectionMenu((DepanFxNodeListFlatSection) member));
       return;
@@ -47,12 +53,12 @@ public class DepanFxNodeListCell extends CheckBoxTreeCell<DepanFxNodeListMember>
 
   private ContextMenu nodeListSectionMenu(DepanFxNodeListFlatSection member) {
     MenuItem insertTreeSectionMenuItem =
-        new MenuItem(INSERT_ABOVE_TREE_SECTION);
+        new MenuItem(INSERT_ABOVE_MEMBER_TREE_SECTION);
     insertTreeSectionMenuItem.setOnAction(new EventHandler<ActionEvent>() {
 
       @Override
       public void handle(ActionEvent event) {
-        runInsertTreeSectionAction(member);
+        runInsertMemberTreeSectionAction(member);
       }
     });
 
@@ -61,21 +67,33 @@ public class DepanFxNodeListCell extends CheckBoxTreeCell<DepanFxNodeListMember>
     return result;
   }
 
-  private void runInsertTreeSectionAction(DepanFxNodeListSection before) {
-    listViewer.getMemberLinkMatcher().ifPresent(m -> {
-        DepanFxTreeSection insert = new DepanFxTreeSection(m);
-        listViewer.insertSection(before, insert);});
+  private void runInsertMemberTreeSectionAction(DepanFxNodeListSection before) {
+    listViewer.insertMemberTreeSection(before);
   }
 
-  private static class NameConverter extends StringConverter<TreeItem<DepanFxNodeListMember>> {
+  private class SelectionState
+      implements Callback<Integer, ObservableValue<Boolean>> {
 
     @Override
-    public String toString(TreeItem<DepanFxNodeListMember> object) {
-      return object.getValue().getDisplayName();
+    public ObservableValue<Boolean> call(Integer param) {
+      TreeItem<DepanFxNodeListMember> item = listViewer.getTreeItem(param.intValue());
+      return listViewer.getCheckbooxObservable(item.getValue());
+    }
+  }
+
+  private static class NameConverter
+      extends StringConverter<DepanFxNodeListMember> {
+
+    @Override
+    public String toString(DepanFxNodeListMember member) {
+      if (member != null) {
+        return member.getDisplayName();
+      }
+      return "<empty>";
     }
 
     @Override
-    public TreeItem<DepanFxNodeListMember> fromString(String string) {
+    public DepanFxNodeListMember fromString(String string) {
       throw new UnsupportedOperationException();
     }
   }

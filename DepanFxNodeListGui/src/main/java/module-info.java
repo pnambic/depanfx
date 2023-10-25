@@ -13,6 +13,9 @@ module depanfx.nodelist.gui {
   requires depanfx.nodelist;
   requires depanfx.workspace;
   requires depanfx.graph_doc;
+  requires depanfx.scene;
+
+  opens com.pnambic.depanfx.nodelist.gui to javafx.fxml, net.rgielen.fxweaver.core, spring.beans;
 
   exports com.pnambic.depanfx.nodelist.gui;
 }

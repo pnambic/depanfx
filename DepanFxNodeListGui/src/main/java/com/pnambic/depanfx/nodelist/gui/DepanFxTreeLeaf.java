@@ -2,7 +2,8 @@ package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
 
-public class DepanFxTreeLeaf extends DepanFxNodeListMember {
+public class DepanFxTreeLeaf extends DepanFxNodeListMember
+    implements DepanFxGraphNodeProvider {
 
   private final GraphNode node;
 
@@ -21,5 +22,10 @@ public class DepanFxTreeLeaf extends DepanFxNodeListMember {
   @Override
   public String getSortKey() {
     return section.getSortKey(node);
+  }
+
+  @Override // DepanFxGraphNodeProvider
+  public GraphNode getGraphNode() {
+    return node;
   }
 }

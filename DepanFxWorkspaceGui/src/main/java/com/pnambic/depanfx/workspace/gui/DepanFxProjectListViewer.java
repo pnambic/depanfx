@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherRegistry;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;

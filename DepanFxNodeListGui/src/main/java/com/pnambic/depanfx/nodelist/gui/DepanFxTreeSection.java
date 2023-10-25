@@ -8,6 +8,8 @@ import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModelBuilder;
 
+import java.nio.file.Path;
+
 public class DepanFxTreeSection extends DepanFxNodeListSection {
 
   private final DepanFxLinkMatcher linkMatcher;
@@ -23,7 +25,12 @@ public class DepanFxTreeSection extends DepanFxNodeListSection {
 
   @Override
   public String getDisplayName(GraphNode node) {
-    return node.getId().getNodeKey();
+    // Node registry may need to parse node to deliver best display name.
+    // For example, Java method name would be better than full signature.
+    // This works for current simple paths from FileSystem objects.
+    Path nodePath = Path.of(node.getId().getNodeKey());
+    String result = nodePath.getFileName().toString();
+    return result;
   }
 
   @Override

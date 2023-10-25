@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
@@ -14,6 +15,10 @@ public class DocumentRegistry {
 
   public void registerDocument(Object document, URI uri) {
     registry.put(uri, document);
+  }
+
+  public Optional<Object> findResource(URI uri) {
+    return Optional.ofNullable(registry.get(uri));
   }
 
   public List<GraphDocument> getGraphDocuments() {
