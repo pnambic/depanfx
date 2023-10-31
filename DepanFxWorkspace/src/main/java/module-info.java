@@ -8,6 +8,7 @@ module depanfx.workspace {
     requires depanfx.persistence;
     requires depanfx.platform;
 
+    // Instantiate a workspace
     opens com.pnambic.depanfx.workspace.basic to spring.beans;
 
     exports com.pnambic.depanfx.workspace;

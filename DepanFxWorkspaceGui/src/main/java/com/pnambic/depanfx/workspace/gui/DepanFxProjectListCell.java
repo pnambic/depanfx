@@ -108,7 +108,10 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
       if (optExt.isPresent()) {
         switch (optExt.get()) {
           case "dgi":
-            setContextMenu(graghDocContextMenu(document));
+            setContextMenu(graphDocContextMenu(document));
+            break;
+          case "dnli":
+            setContextMenu(nodeListContextMenu(document));
             break;
         }
       }
@@ -125,13 +128,28 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
     return result;
   }
 
-  private ContextMenu graghDocContextMenu(DepanFxProjectDocument document) {
+  private ContextMenu graphDocContextMenu(DepanFxProjectDocument document) {
     MenuItem openAsListMenuItem = new MenuItem(OPEN_AS_LIST);
     openAsListMenuItem.setOnAction(new EventHandler<ActionEvent>() {
 
       @Override
       public void handle(ActionEvent event) {
         runOpenAsListAction(document.getMemberPath().toUri());
+      }
+    });
+
+    ContextMenu result = new ContextMenu();
+    result.getItems().add(openAsListMenuItem);
+    return result;
+  }
+
+  private ContextMenu nodeListContextMenu(DepanFxProjectDocument document) {
+    MenuItem openAsListMenuItem = new MenuItem(OPEN_AS_LIST);
+    openAsListMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+
+      @Override
+      public void handle(ActionEvent event) {
+        runOpenNodeListAction(document.getMemberPath().toUri());
       }
     });
 
@@ -148,30 +166,54 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
           optProjDoc.flatMap(workspace::getWorkspaceResource);
       Optional<DepanFxNodeList> optNodeList =
           optWkspRsrc.map(DepanFxNodeLists::buildNodeList);
-
-      // Prepare the view
-      DepanFxNodeList nodeList = optNodeList.get();
-      List<DepanFxNodeListSection> sections =
-          DepanFxNodeListSections.getFinalSection();
-      DepanFxNodeListViewer viewer =
-          new DepanFxNodeListViewer(
-              dialogRunner, linkMatcherRegistry, nodeList, sections);
-      viewer.prependMemberTree();
-      String tabTitle = getTabTitle(optWkspRsrc.get().getDocument());
-      Tab viewerTab = viewer.createWorkspaceTab(tabTitle);
-
-      scene.addTab(viewerTab);
+      optNodeList.ifPresent(nl -> {
+        String title = getGraphTabTitle(optWkspRsrc.get().getDocument());
+        addNodeListViewToScene(nl, title);
+      });
     } catch (RuntimeException errCaught) {
-      LOG.error("Unable to open list view for {}", errCaught);
+      LOG.error("Unable to open list view for {}", graphDocUri, errCaught);
     }
   }
 
-  private static String getTabTitle(DepanFxProjectDocument workspaceDoc) {
-    String fullName = workspaceDoc.getMemberPath().getFileName().toString();
-    String baseName = getExtension(fullName)
+  private void runOpenNodeListAction(URI nodeListUri) {
+    try {
+      Optional<DepanFxProjectDocument> optProjDoc =
+          workspace.toProjectDocument(nodeListUri);
+      Optional<DepanFxWorkspaceResource> optWkspRsrc =
+          optProjDoc.flatMap(workspace::getWorkspaceResource);
+      Optional<DepanFxNodeList> optNodeList =
+          optWkspRsrc.map(r -> (DepanFxNodeList) r.getResource());
+      optNodeList.ifPresent(nl -> {
+            String title = buildNodeListTabTitle(optWkspRsrc.get().getDocument());
+            addNodeListViewToScene(nl, title);
+          });
+    } catch (RuntimeException errCaught) {
+      LOG.error("Unable to open list view for {}", nodeListUri, errCaught);
+    }
+  }
+
+  private void addNodeListViewToScene(
+      DepanFxNodeList nodeList, String tabTitle) {
+    List<DepanFxNodeListSection> sections =
+        DepanFxNodeListSections.getFinalSection();
+    DepanFxNodeListViewer viewer =
+        new DepanFxNodeListViewer(
+            dialogRunner, linkMatcherRegistry, nodeList, sections);
+
+    viewer.prependMemberTree();
+    Tab viewerTab = viewer.createWorkspaceTab(tabTitle);
+    scene.addTab(viewerTab);
+  }
+
+  private static String buildNodeListTabTitle(DepanFxProjectDocument projDoc) {
+    String fullName = projDoc.getMemberPath().getFileName().toString();
+    return getExtension(fullName)
         .map(e -> chopExtension(fullName, e.length() + 1))
         .orElse(fullName);
-    return baseName + " nodes";
+  }
+
+  private static String getGraphTabTitle(DepanFxProjectDocument projDoc) {
+    return buildNodeListTabTitle(projDoc) + " nodes";
   }
 
   private static String chopExtension(String filename, int extSize) {

@@ -23,7 +23,8 @@ public class NodeListXstreamPlugin implements DocumentPersistenceContribution {
 
   private final GraphNodePersistencePluginRegistry graphNodeRegistry;
 
-  public NodeListXstreamPlugin(GraphNodePersistencePluginRegistry graphNodeRegistry) {
+  public NodeListXstreamPlugin(
+      GraphNodePersistencePluginRegistry graphNodeRegistry) {
     this.graphNodeRegistry = graphNodeRegistry;
   }
 

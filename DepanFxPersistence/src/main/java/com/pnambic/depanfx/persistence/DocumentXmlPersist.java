@@ -21,6 +21,9 @@ import java.io.Writer;
 
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.DataHolder;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.xml.XppDriver;
 
 /**
  * Handle persistence of a document object to and from XML files.
@@ -43,6 +46,8 @@ public class DocumentXmlPersist {
    */
   protected final XStream xstream;
 
+  private DataHolder context;
+
   /**
    * Create a serializer using the provided XStream.
    * The best sources for the XStream are:
@@ -62,6 +67,18 @@ public class DocumentXmlPersist {
   }
 
   /**
+   * Install a well-known value as the context for persistence operations.
+   * @param key typically the value's {@code .class} constant
+   * @param value useful data
+   */
+  public void addContextValue(Object key, Object value) {
+    if (context == null) {
+      context = xstream.newDataHolder();
+    }
+    context.put(key, value);
+  }
+
+  /**
    * Load an object from the provided URI.
    *
    * @param uri location of persistent object
@@ -69,7 +86,13 @@ public class DocumentXmlPersist {
    * @throws IOException
    */
   public Object load(Reader src) throws IOException {
-    return xstream.fromXML(src);
+    // 'cuz no XStream.fromXml() method allows for supplied context.
+    HierarchicalStreamReader reader = new XppDriver().createReader(src);
+    try {
+      return xstream.unmarshal(reader, null, context);
+    } finally {
+      reader.close();
+    }
   }
 
   /**

@@ -20,6 +20,8 @@ public class DelegateObjectXmlConverter implements Converter {
     this.mapper = mapper;
   }
 
+  // The raw Class type is required to match the API defined in the base types.
+  @SuppressWarnings("rawtypes")
   @Override
   public boolean canConvert(Class type) {
     return delegate.forType().isAssignableFrom(type);

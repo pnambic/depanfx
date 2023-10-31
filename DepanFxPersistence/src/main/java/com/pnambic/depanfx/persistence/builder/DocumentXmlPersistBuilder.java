@@ -9,7 +9,6 @@ public class DocumentXmlPersistBuilder {
   private XStream xstream;
 
   public DocumentXmlPersistBuilder() {
-
   }
 
   public void setXStream() {
@@ -24,10 +23,20 @@ public class DocumentXmlPersistBuilder {
     xstream.alias(alias, type);
   }
 
+  public void addAliasField(
+      String alias, Class<?> fieldType, String fieldName) {
+    xstream.aliasField(alias, fieldType, fieldName);
+  }
+
+  public void addAllowedType(Class<?>[] allowedTypes) {
+    xstream.allowTypes(allowedTypes);
+  }
+
   public void addConverter(ObjectXmlConverter<?> contrib) {
     addAlias(contrib.getTag(), contrib.forType());
-    xstream.allowTypes(contrib.getAllowTypes());
-    xstream.registerConverter(new DelegateObjectXmlConverter(contrib, xstream.getMapper()));
+    addAllowedType(contrib.getAllowTypes());
+    xstream.registerConverter(
+        new DelegateObjectXmlConverter(contrib, xstream.getMapper()));
   }
 
   public DocumentXmlPersist buildDocumentXmlPersist() {

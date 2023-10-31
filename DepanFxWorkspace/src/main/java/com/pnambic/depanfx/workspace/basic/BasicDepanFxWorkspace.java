@@ -85,6 +85,7 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   @Override
   public void saveDocument(URI uri, Object document) throws IOException {
     DocumentXmlPersist persist = persistRegistry.getDocumentPersist(document);
+    persist.addContextValue(DepanFxWorkspace.class, this);
 
     try (Writer saver = openForSave(uri)) {
       persist.save(saver, document);
@@ -94,6 +95,8 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   @Override
   public Object importDocument(URI uri) throws IOException {
     DocumentXmlPersist persist = persistRegistry.getDocumentPersist(uri);
+    persist.addContextValue(DepanFxWorkspace.class, this);
+
     try (Reader importer = openForLoad(uri)) {
       Object document = persist.load(importer);
       registerDocument(document, uri);

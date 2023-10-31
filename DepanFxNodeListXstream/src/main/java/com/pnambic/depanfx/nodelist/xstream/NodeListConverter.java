@@ -2,9 +2,12 @@ package com.pnambic.depanfx.nodelist.xstream;
 
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.persistence.AbstractObjectXmlConverter;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.xstream.XstreamWorkspaceResource;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
@@ -22,6 +25,9 @@ public class NodeListConverter
   };
 
   public static final String NODE_LIST_TAG = "node-list";
+
+  public NodeListConverter() {
+  }
 
   @Override
   public Class<?> forType() {
@@ -43,8 +49,9 @@ public class NodeListConverter
       MarshallingContext context, Mapper mapper) {
     DepanFxNodeList nodeList = (DepanFxNodeList) source;
 
-    DepanFxWorkspaceResource graphRef = nodeList.getWorkspaceResource();
-    marshalObject(graphRef, writer, context, mapper);
+    XstreamWorkspaceResource xstreamWkspRsrc =
+        XstreamWorkspaceResource.of(nodeList.getWorkspaceResource());
+    marshalObject(xstreamWkspRsrc, writer, context, mapper);
 
     for (GraphNode node : nodeList.getNodes()) {
       marshalObject(node, writer, context, mapper);
@@ -54,10 +61,17 @@ public class NodeListConverter
   @Override
   public DepanFxNodeList unmarshal(HierarchicalStreamReader reader,
       UnmarshallingContext context, Mapper mapper) {
-    DepanFxWorkspaceResource graphRef =
-        (DepanFxWorkspaceResource) unmarshalOne(reader, context, mapper);
 
-    GraphModel model = (GraphModel) graphRef.getResource();
+    XstreamWorkspaceResource xstreamWkspRsrc =
+        (XstreamWorkspaceResource) unmarshalOne(reader, context, mapper);
+    DepanFxWorkspace workspace =
+        (DepanFxWorkspace) context.get(DepanFxWorkspace.class);
+    DepanFxWorkspaceResource graphRef =
+        XstreamWorkspaceResource.forWksp(workspace, xstreamWkspRsrc)
+        .get();
+
+    GraphDocument graphDoc = (GraphDocument) graphRef.getResource();
+    GraphModel model = graphDoc.getGraph();
     Collection<GraphNode> nodes = new ArrayList<>();
     while (reader.hasMoreChildren()) {
       GraphNode node = (GraphNode) unmarshalOne(reader, context, mapper);

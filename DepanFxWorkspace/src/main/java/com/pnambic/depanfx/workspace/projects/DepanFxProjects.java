@@ -16,7 +16,7 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 public class DepanFxProjects {
   private static LinkOption[] IS_DIRECTORY_LINK_OPTIONS = new LinkOption[0];
 
-  public static final String ANALYZES_CONTAINER = "Analyzes";
+  public static final String ANALYSES_CONTAINER = "Analyses";
 
   public static final String GRAPHS_CONTAINER = "Graphs";
 
@@ -25,7 +25,7 @@ public class DepanFxProjects {
   public static void createProjectStructure(String projectName, Path projectPath) {
     try {
       checkProjectForNew(projectPath);
-      createChildDirectory(projectPath, ANALYZES_CONTAINER);
+      createChildDirectory(projectPath, ANALYSES_CONTAINER);
       createChildDirectory(projectPath, GRAPHS_CONTAINER);
       createChildDirectory(projectPath, TOOLS_CONTAINER);
     } catch (Exception err) {
@@ -38,7 +38,7 @@ public class DepanFxProjects {
   }
 
   public static File getCurrentAnalyzes(DepanFxWorkspace workspace) {
-    return getCurrent(workspace, ANALYZES_CONTAINER);
+    return getCurrent(workspace, ANALYSES_CONTAINER);
   }
 
   public static File getCurrent(DepanFxWorkspace workspace, String container) {
