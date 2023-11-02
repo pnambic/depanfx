@@ -27,6 +27,10 @@ public class DepanFxDialogRunner {
     dialogStage.showAndWait();
   }
 
+  /**
+   * Resolution of controller and dialog elements uses both the
+   * FxWeaver and Spring injection capabilities.e
+   */
   public void runDialog(Class<?> type, String title) {
     runDialog(fxweaver.loadView(type), title);
   }

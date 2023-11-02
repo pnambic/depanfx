@@ -54,7 +54,8 @@ public class DepanFxNewFileSystemDialog {
   @FXML
   private void openDirectoryChooser() {
     DirectoryChooser directoryChooser = new DirectoryChooser();
-    File selectedDirectory = directoryChooser.showDialog(sourceField.getScene().getWindow());
+    File selectedDirectory =
+        directoryChooser.showDialog(sourceField.getScene().getWindow());
     if (selectedDirectory != null) {
       sourceField.setText(selectedDirectory.getAbsolutePath());
     }
@@ -63,7 +64,8 @@ public class DepanFxNewFileSystemDialog {
   @FXML
   private void openFileChooser() {
     FileChooser fileChooser = prepareFileChooser();
-    File selectedFile = fileChooser.showSaveDialog(destinationField.getScene().getWindow());
+    File selectedFile =
+        fileChooser.showSaveDialog(destinationField.getScene().getWindow());
     if (selectedFile != null) {
       destinationField.setText(selectedFile.getAbsolutePath());
     }
@@ -82,7 +84,8 @@ public class DepanFxNewFileSystemDialog {
     System.out.println("Source directory: " + sourceField.getText());
     System.out.println("Destination file: " + destinationField.getText());
     DepanFxGraphModelBuilder modelBuilder = new SimpleGraphModelBuilder();
-    FileSystemGraphDocBuilder docBuilder = new FileSystemGraphDocBuilder(modelBuilder);
+    FileSystemGraphDocBuilder docBuilder =
+        new FileSystemGraphDocBuilder(modelBuilder);
     analyzeTree(docBuilder, sourceField.getText());
     GraphDocument graphDoc = docBuilder.getGraphDocument();
     File dstFile = new File(destinationField.getText());
@@ -115,7 +118,8 @@ public class DepanFxNewFileSystemDialog {
   /**
    * Ensure analysis failures don't propogate outside of the analysis request.
    */
-  private void analyzeTree(FileSystemGraphDocBuilder docBuilder, String treeName) {
+  private void analyzeTree(
+      FileSystemGraphDocBuilder docBuilder, String treeName) {
     try {
       docBuilder.analyzeTree(treeName);
     } catch (RuntimeException errBuild) {

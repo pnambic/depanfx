@@ -9,7 +9,9 @@ import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherRegistry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
 import java.io.File;
@@ -21,26 +23,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.CellDataFeatures;
 import javafx.scene.control.TreeTableView;
-import javafx.scene.text.Text;
 import javafx.util.Callback;
 
 public class DepanFxNodeListViewer {
@@ -79,6 +75,7 @@ public class DepanFxNodeListViewer {
     this.sections = sections;
     this.nodeListTable = createTable();
 
+    // After createTable(), or there are stack overflow problems.
     nodesCheckboxStates = new HashMap<>(nodeList.getNodes().size());
   }
 
@@ -220,7 +217,7 @@ public class DepanFxNodeListViewer {
         new TreeTableColumn<>("Node Name");
     nameColumn.setCellFactory(new NodeListTableCellFactory());
     nameColumn.setCellValueFactory(new NodeListTableValueFactory());
-    nameColumn.setPrefWidth(layoutWidthMs(30));
+    nameColumn.setPrefWidth(DepanFxSceneControls.layoutWidthMs(30));
 
     result.getColumns().add(nameColumn);
     return result;
@@ -230,51 +227,18 @@ public class DepanFxNodeListViewer {
   // Tab Context Menu
 
   private ContextMenu buildViewContextMenu() {
-    ContextMenu contextMenu = new ContextMenu();
-    ObservableList<MenuItem> contextList = contextMenu.getItems();
-
-    contextList.add(createActionItem(SELECT_ALL_ITEM, new EventHandler<ActionEvent>() {
-      @Override
-      public void handle(ActionEvent event) {
-        doSelectAllAction();
-      }
-    }));
-
-    contextList.add(createActionItem(CLEAR_SELECTION_ITEM, new EventHandler<ActionEvent>() {
-      @Override
-      public void handle(ActionEvent event) {
-        doClearSelectionAction();
-      }
-    }));
-
-    contextList.add(createActionItem(INVERT_SELECTION_ITEM, new EventHandler<ActionEvent>() {
-      @Override
-      public void handle(ActionEvent event) {
-        doInvertSelectionAction();
-      }
-    }));
-    contextList.add(new SeparatorMenuItem());
-    contextList.add(createActionItem(SAVE_NODE_LIST_ITEM, new EventHandler<ActionEvent>() {
-      @Override
-      public void handle(ActionEvent event) {
-        runSaveNodeListDialog();
-      }
-    }));
-    return contextMenu;
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem(
+        SELECT_ALL_ITEM, e -> doSelectAllAction());
+    builder.appendActionItem(
+        CLEAR_SELECTION_ITEM, e -> doClearSelectionAction());
+    builder.appendActionItem(
+        INVERT_SELECTION_ITEM, e -> doInvertSelectionAction());
+    builder.appendSeparator();
+    builder.appendActionItem(
+        SAVE_NODE_LIST_ITEM, e -> runSaveNodeListDialog());
+    return builder.build();
   }
-
-  private MenuItem createActionItem(
-      String label, EventHandler<ActionEvent> handler) {
-    MenuItem result = new MenuItem(label);
-
-    result.setOnAction(handler);
-    return result;
-  }
-
-  private double layoutWidthMs(double scale) {
-     Text render = new Text("m");
-     return scale * render.getLayoutBounds().getWidth();
-   }
 
   /////////////////////////////////////
   // Internal Types

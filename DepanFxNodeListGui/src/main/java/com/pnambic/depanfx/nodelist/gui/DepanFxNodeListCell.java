@@ -1,10 +1,9 @@
 package com.pnambic.depanfx.nodelist.gui;
 
+import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
+
 import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.cell.CheckBoxTreeTableCell;
 import javafx.util.Callback;
@@ -52,19 +51,11 @@ public class DepanFxNodeListCell
   }
 
   private ContextMenu nodeListSectionMenu(DepanFxNodeListFlatSection member) {
-    MenuItem insertTreeSectionMenuItem =
-        new MenuItem(INSERT_ABOVE_MEMBER_TREE_SECTION);
-    insertTreeSectionMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-
-      @Override
-      public void handle(ActionEvent event) {
-        runInsertMemberTreeSectionAction(member);
-      }
-    });
-
-    ContextMenu result = new ContextMenu();
-    result.getItems().add(insertTreeSectionMenuItem);
-    return result;
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem(
+        INSERT_ABOVE_MEMBER_TREE_SECTION,
+        e -> runInsertMemberTreeSectionAction(member));
+    return builder.build();
   }
 
   private void runInsertMemberTreeSectionAction(DepanFxNodeListSection before) {

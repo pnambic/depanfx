@@ -1,17 +1,19 @@
 package com.pnambic.depanfx.scene;
 
-import java.io.Closeable;
-import java.io.IOException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuRegistry;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterRegistry;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import net.rgielen.fxweaver.core.FxControllerAndView;
+import net.rgielen.fxweaver.core.FxWeaver;
+import net.rgielen.fxweaver.core.FxmlView;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.io.Closeable;
+import java.io.IOException;
+
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -21,9 +23,6 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import net.rgielen.fxweaver.core.FxControllerAndView;
-import net.rgielen.fxweaver.core.FxWeaver;
-import net.rgielen.fxweaver.core.FxmlView;
 
 @Component
 @FxmlView("scene.fxml")
@@ -91,28 +90,20 @@ public class DepanFxSceneController {
     starterRegistry.addStarterTabs(this);
     fileNewItem.getItems().addAll(newResourceRegistry.buildNewResourceItems());
 
-    fileImportItem.setOnAction(new EventHandler<ActionEvent>() {
+    fileImportItem.setOnAction(menuRegistry::dispatch);
 
-      @Override
-      public void handle(ActionEvent event) {
-        menuRegistry.dispatch(event);
-      }
-    });
-
-    fileExitItem.setOnAction(new EventHandler<ActionEvent>() {
-
-      @Override
-      public void handle(ActionEvent event) {
-        try {
-          onClose.close();
-        } catch (IOException errIo) {
-          throw new RuntimeException("Unable to shutdown", errIo);
-        }
-      }
-    });
+    fileExitItem.setOnAction(e -> handleClose());
   }
 
   public void addTab(Tab tab) {
     viewRoot.getTabs().add(tab);
+  }
+
+  private void handleClose() {
+    try {
+      onClose.close();
+    } catch (IOException errIo) {
+      throw new RuntimeException("Unable to shutdown", errIo);
+    }
   }
 }

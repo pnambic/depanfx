@@ -50,7 +50,7 @@ public class DepanFxFileImportDialog {
   @FXML
   private void handleCancel() {
     closeDialog();
-    System.out.println("cancelled request");
+    LOG.info("cancelled graph import request");
   }
 
   @FXML

@@ -6,6 +6,7 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherRegistry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
@@ -24,11 +25,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TreeCell;
 
@@ -123,39 +121,25 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
     Menu newGraphMenu = new Menu(NEW_GRAPH_MENU);
     newGraphMenu.getItems().addAll(newResourceRegistry.buildNewResourceItems());
 
-    ContextMenu result = new ContextMenu();
-    result.getItems().add(newGraphMenu);
-    return result;
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendSubMenu(newGraphMenu);
+    return builder.build();
   }
 
   private ContextMenu graphDocContextMenu(DepanFxProjectDocument document) {
-    MenuItem openAsListMenuItem = new MenuItem(OPEN_AS_LIST);
-    openAsListMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-
-      @Override
-      public void handle(ActionEvent event) {
-        runOpenAsListAction(document.getMemberPath().toUri());
-      }
-    });
-
-    ContextMenu result = new ContextMenu();
-    result.getItems().add(openAsListMenuItem);
-    return result;
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem(
+        OPEN_AS_LIST,
+        e -> runOpenAsListAction(document.getMemberPath().toUri()));
+    return builder.build();
   }
 
   private ContextMenu nodeListContextMenu(DepanFxProjectDocument document) {
-    MenuItem openAsListMenuItem = new MenuItem(OPEN_AS_LIST);
-    openAsListMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-
-      @Override
-      public void handle(ActionEvent event) {
-        runOpenNodeListAction(document.getMemberPath().toUri());
-      }
-    });
-
-    ContextMenu result = new ContextMenu();
-    result.getItems().add(openAsListMenuItem);
-    return result;
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem(
+        OPEN_AS_LIST,
+        e -> runOpenNodeListAction(document.getMemberPath().toUri()));
+    return builder.build();
   }
 
   private void runOpenAsListAction(URI graphDocUri) {

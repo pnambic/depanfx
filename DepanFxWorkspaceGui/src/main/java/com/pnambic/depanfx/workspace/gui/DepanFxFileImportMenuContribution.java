@@ -1,27 +1,23 @@
 package com.pnambic.depanfx.workspace.gui;
 
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuContribution;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuContribution;
-
 import javafx.event.ActionEvent;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import net.rgielen.fxweaver.core.FxWeaver;
 
 @Component
 public class DepanFxFileImportMenuContribution
     implements DepanFxSceneMenuContribution {
 
-  private final FxWeaver fxweaver;
+  private final DepanFxDialogRunner dialogRunner;
 
   @Autowired
-  public DepanFxFileImportMenuContribution(FxWeaver fxweaver) {
-    this.fxweaver = fxweaver;
+  public DepanFxFileImportMenuContribution(DepanFxDialogRunner dialogRunner) {
+    this.dialogRunner = dialogRunner;
   }
 
   @Override
@@ -32,15 +28,10 @@ public class DepanFxFileImportMenuContribution
 
   @Override
   public void handleEvent(ActionEvent event) {
-    runImportDialog(event);
+    runImportDialog();
   }
 
-  private void runImportDialog(ActionEvent event) {
-      Parent dialogPane = fxweaver.loadView(DepanFxFileImportDialog.class);
-      Stage dialogStage = new Stage();
-      dialogStage.initModality(Modality.APPLICATION_MODAL);
-      dialogStage.setTitle("Import context");
-      dialogStage.setScene(new Scene(dialogPane));
-      dialogStage.showAndWait();
+  private void runImportDialog() {
+    dialogRunner.runDialog(DepanFxFileImportDialog.class, "Import context");
   }
 }

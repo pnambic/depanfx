@@ -4,6 +4,5 @@ import javafx.scene.control.MenuItem;
 
 public interface DepanFxNewResourceContribution {
 
-	MenuItem createNewResourceMenuItem();
-  
+  MenuItem createNewResourceMenuItem();
 }

@@ -1,9 +1,7 @@
 package com.pnambic.depanfx.workspace.gui;
 
-import java.io.File;
-import java.nio.file.Path;
-
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherRegistry;
+import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
@@ -13,12 +11,9 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
+import java.io.File;
+import java.nio.file.Path;
+
 import javafx.scene.control.Tab;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
@@ -105,13 +100,18 @@ public class DepanFxProjectListViewer {
 
   public Tab createWorkspaceTab(String tabName) {
     Tab result = new Tab(tabName, workspaceView);
-    ContextMenu contextMenu = new ContextMenu();
-    ObservableList<MenuItem> contextList = contextMenu.getItems();
-    contextList.add(createNewProjectItem());
-    contextList.add(createOpenProjectItem());
-    contextList.add(new SeparatorMenuItem());
-    contextList.add(createRefreshItem());
-    result.setContextMenu(contextMenu);
+    DepanFxContextMenuBuilder menuBuilder = new DepanFxContextMenuBuilder();
+
+    menuBuilder.appendActionItem(
+        NEW_PROJECT_CONTEXT_ITEM, e -> newProject());
+    menuBuilder.appendActionItem(
+        OPEN_PROJECT_CONTEXT_ITEM, e -> openProject());
+
+    menuBuilder.appendSeparator();
+    menuBuilder.appendActionItem(
+        REFRESH_CONTEXT_ITEM, e -> refreshView());
+
+    result.setContextMenu(menuBuilder.build());
     return result;
   }
 
@@ -121,45 +121,6 @@ public class DepanFxProjectListViewer {
     TreeView<DepanFxWorkspaceMember> result = new TreeView<>(treeRoot);
     result.setShowRoot(false);
     result.setCellFactory(new WorkspaceCellFactory());
-    return result;
-  }
-
-  private MenuItem createNewProjectItem() {
-    MenuItem result = new MenuItem(NEW_PROJECT_CONTEXT_ITEM);
-
-    result.setOnAction(new EventHandler<ActionEvent>() {
-
-      @Override
-      public void handle(ActionEvent event) {
-        newProject();
-      }
-    });
-    return result;
-  }
-
-  private MenuItem createOpenProjectItem() {
-    MenuItem result = new MenuItem(OPEN_PROJECT_CONTEXT_ITEM);
-
-    result.setOnAction(new EventHandler<ActionEvent>() {
-
-      @Override
-      public void handle(ActionEvent event) {
-        openProject();
-      }
-    });
-    return result;
-  }
-
-  private MenuItem createRefreshItem() {
-    MenuItem result = new MenuItem(REFRESH_CONTEXT_ITEM);
-
-    result.setOnAction(new EventHandler<ActionEvent>() {
-
-      @Override
-      public void handle(ActionEvent event) {
-        refreshView();
-      }
-    });
     return result;
   }
 
