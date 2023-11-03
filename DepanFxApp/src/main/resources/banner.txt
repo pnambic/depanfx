@@ -1,0 +1,1 @@
+DepanFX ${application.title}
