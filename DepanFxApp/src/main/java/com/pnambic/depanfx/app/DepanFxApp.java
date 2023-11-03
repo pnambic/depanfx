@@ -27,6 +27,7 @@ public class DepanFxApp extends Application implements Closeable {
     String[] args = getParameters().getRaw().toArray(new String[0]);
 
     this.applicationContext = new SpringApplicationBuilder()
+        // .main(getClass())
         .sources(DepanFxApplication.class)
         .run(args);
 

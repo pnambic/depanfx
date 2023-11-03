@@ -25,6 +25,6 @@ module depanfx.app {
     opens com.pnambic.depanfx to spring.core;
     opens com.pnambic.depanfx.app to spring.core;
 
-    exports com.pnambic.depanfx.app;
     exports com.pnambic.depanfx;
+    exports com.pnambic.depanfx.app;
 }

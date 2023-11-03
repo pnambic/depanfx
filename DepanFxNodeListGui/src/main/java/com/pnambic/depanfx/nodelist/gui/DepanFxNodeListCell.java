@@ -1,6 +1,11 @@
 package com.pnambic.depanfx.nodelist.gui;
 
+import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ContextMenu;
@@ -14,6 +19,10 @@ public class DepanFxNodeListCell
 
   private static final String INSERT_ABOVE_MEMBER_TREE_SECTION =
       "Insert Member Tree Section";
+
+  private static final String SELECT_RECURSIVE = "Select Recursive";
+
+  private static final String CLEAR_RECURSIVE = "Clear Recursive";
 
   // Allow cells to act on viewer (e.g. change sections, etc.)
   private final DepanFxNodeListViewer listViewer;
@@ -48,8 +57,15 @@ public class DepanFxNodeListCell
       setContextMenu(nodeListSectionMenu((DepanFxNodeListFlatSection) member));
       return;
     }
-  }
 
+    if (member instanceof DepanFxTreeFork) {
+      setContextMenu(treeForkMenu((DepanFxTreeFork) member));
+      return;
+    }
+
+    // Otherwise clear the context menu
+    setContextMenu(null);
+  }
   private ContextMenu nodeListSectionMenu(DepanFxNodeListFlatSection member) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
     builder.appendActionItem(
@@ -58,8 +74,31 @@ public class DepanFxNodeListCell
     return builder.build();
   }
 
+  private ContextMenu treeForkMenu(DepanFxTreeFork fork) {
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem(
+        SELECT_RECURSIVE,
+        e -> runSelectRecursiveAction(fork, true));
+    builder.appendActionItem(
+        CLEAR_RECURSIVE,
+        e -> runSelectRecursiveAction(fork, false));
+    return builder.build();
+  }
+
   private void runInsertMemberTreeSectionAction(DepanFxNodeListSection before) {
     listViewer.insertMemberTreeSection(before);
+  }
+
+  private void runSelectRecursiveAction(DepanFxTreeFork fork, boolean value) {
+    // Do the root
+    GraphNode selectNode = fork.getGraphNode();
+    listViewer.doSelectGraphNodeAction(selectNode, value);
+
+    // Then all the reachable nodes.
+    Set<GraphNode> roots = Collections.singleton(selectNode);
+    Collection<GraphNode> nodes =
+        fork.getTreeModel().getReachableGraphNodes(roots).getNodes();
+    listViewer.doSelectGraphNodesAction(nodes, value);
   }
 
   private class SelectionState
@@ -68,7 +107,7 @@ public class DepanFxNodeListCell
     @Override
     public ObservableValue<Boolean> call(Integer param) {
       TreeItem<DepanFxNodeListMember> item = listViewer.getTreeItem(param.intValue());
-      return listViewer.getCheckbooxObservable(item.getValue());
+      return listViewer.getCheckBoxObservable(item.getValue());
     }
   }
 

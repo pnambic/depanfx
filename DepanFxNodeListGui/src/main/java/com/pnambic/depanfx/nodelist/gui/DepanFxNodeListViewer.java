@@ -60,9 +60,9 @@ public class DepanFxNodeListViewer {
   private TreeTableView<DepanFxNodeListMember> nodeListTable;
 
   private Map<DepanFxNodeListSection, BooleanProperty>
-      sectionsCheckboxStates = new HashMap<>();
+      sectionsCheckBoxStates = new HashMap<>();
 
-  private Map<GraphNode, BooleanProperty> nodesCheckboxStates;
+  private Map<GraphNode, BooleanProperty> nodesCheckBoxStates;
 
   public DepanFxNodeListViewer(
       DepanFxDialogRunner dialogRunner,
@@ -73,10 +73,9 @@ public class DepanFxNodeListViewer {
     this.linkMatcherRegistry = linkMatcherRegistry;
     this.nodeList = nodeList;
     this.sections = sections;
-    this.nodeListTable = createTable();
 
-    // After createTable(), or there are stack overflow problems.
-    nodesCheckboxStates = new HashMap<>(nodeList.getNodes().size());
+    nodesCheckBoxStates = buildNodesCheckBoxStates(nodeList.getNodes());
+    nodeListTable = createTable();
   }
 
   public Tab createWorkspaceTab(String tabName) {
@@ -105,34 +104,48 @@ public class DepanFxNodeListViewer {
     return item;
   }
 
-  public ObservableValue<Boolean> getCheckbooxObservable(
+  public ObservableValue<Boolean> getCheckBoxObservable(
       DepanFxNodeListMember member) {
     if (member instanceof DepanFxNodeListSection) {
-      return sectionsCheckboxStates.computeIfAbsent(
+      return sectionsCheckBoxStates.computeIfAbsent(
           (DepanFxNodeListSection) member,
           s -> new SimpleBooleanProperty(false));
     }
     if (member instanceof DepanFxGraphNodeProvider) {
-      return nodesCheckboxStates.computeIfAbsent(
-          ((DepanFxGraphNodeProvider) member).getGraphNode(),
-          n -> new SimpleBooleanProperty(false));
+      return nodesCheckBoxStates
+          .get(((DepanFxGraphNodeProvider) member).getGraphNode());
     }
     return null;
   }
 
   public void doSelectAllAction() {
-    nodesCheckboxStates.values().stream()
-    .forEach(s -> s.set(true));
+    doSelectGraphNodesAction(nodeList.getNodes(), true);
   }
 
   public void doClearSelectionAction() {
-    nodesCheckboxStates.values().stream()
-        .forEach(s -> s.set(false));
+    doSelectGraphNodesAction(nodeList.getNodes(), false);
   }
 
   public void doInvertSelectionAction() {
-    nodesCheckboxStates.values().stream()
-        .forEach(s -> s.set(!s.get()));
+    nodeList.getNodes().stream()
+        .forEach(this::doInvertGraphNodeAction);
+  }
+
+  public void doSelectGraphNodesAction(
+      Collection<GraphNode> nodes, boolean value) {
+    nodes.stream().forEach(n -> setSelectGraphNode(n, value));
+  }
+
+  public void doSelectGraphNodeAction(GraphNode node, boolean value) {
+    setSelectGraphNode(node, value);
+  }
+
+  /**
+   * Since the previous state may have been unknown, provide the final
+   * state for interested parties.
+   */
+  public boolean doInvertGraphNodeAction(GraphNode node) {
+    return invertSelectGraphNode(node);
   }
 
   public void insertSection(
@@ -170,13 +183,6 @@ public class DepanFxNodeListViewer {
     } catch (IOException errIo) {
       throw new RuntimeException("Unable to load save node list dialog", errIo);
     }
-  }
-
-  private Collection<GraphNode> getSelectedNodes() {
-    return nodesCheckboxStates.entrySet().stream()
-        .filter(e -> e.getValue().getValue().booleanValue())
-        .map(e -> e.getKey())
-        .collect(Collectors.toList());
   }
 
   private Optional<DepanFxLinkMatcher> getMemberLinkMatcher() {
@@ -223,9 +229,6 @@ public class DepanFxNodeListViewer {
     return result;
   }
 
-  /////////////////////////////////////
-  // Tab Context Menu
-
   private ContextMenu buildViewContextMenu() {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
     builder.appendActionItem(
@@ -238,6 +241,40 @@ public class DepanFxNodeListViewer {
     builder.appendActionItem(
         SAVE_NODE_LIST_ITEM, e -> runSaveNodeListDialog());
     return builder.build();
+  }
+
+  /////////////////////////////////////
+  // Selected nodes
+
+  private Map<GraphNode, BooleanProperty>
+      buildNodesCheckBoxStates(Collection<GraphNode> nodes) {
+    Map<GraphNode, BooleanProperty> result = new HashMap<>();
+    nodes.forEach(
+      n -> result.put(n, new SimpleBooleanProperty(false)));
+    return result;
+  }
+
+  private Collection<GraphNode> getSelectedNodes() {
+    return nodesCheckBoxStates.entrySet().stream()
+        .filter(e -> e.getValue().getValue().booleanValue())
+        .map(e -> e.getKey())
+        .collect(Collectors.toList());
+  }
+
+  private BooleanProperty setSelectGraphNode(GraphNode node, boolean value) {
+    BooleanProperty result = nodesCheckBoxStates.get(node);
+    result.set(value);
+    return result;
+  }
+    /**
+   * Since the previous state may have been unknown, provide the final
+   * state for interested parties.
+   */
+  private boolean invertSelectGraphNode(GraphNode node) {
+    BooleanProperty checkedProperty = nodesCheckBoxStates.get(node);
+    boolean result = !checkedProperty.get();
+    checkedProperty.set(result);
+    return result;
   }
 
   /////////////////////////////////////
