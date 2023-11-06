@@ -15,7 +15,6 @@ public class DepanFxProjectContainerItem extends TreeItem<DepanFxWorkspaceMember
     super(container);
   }
 
-
   @Override
   public boolean isLeaf() {
     return false;

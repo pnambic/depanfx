@@ -56,7 +56,8 @@ public class DepanFxProjectListViewer {
     this.linkMatcherRegistry = linkMatcherRegistry;
     this.newResourceRegistry = newResourceRegistry;
     this.scene = scene;
-    this.workspaceView = createView(workspace);
+
+    workspaceView = createView();
   }
 
   public void newProject() {
@@ -69,7 +70,8 @@ public class DepanFxProjectListViewer {
       Path projectPath = selectedDirectory.toPath();
       DepanFxProjects.createProjectStructure(projectName, projectPath);
       DepanFxProjectTree project =
-          DepanFxWorkspaceFactory.createDepanFxProjectTree(projectName, projectPath);
+          DepanFxWorkspaceFactory.createDepanFxProjectTree(
+              projectName, projectPath);
       workspace.addProject(project);
 
       DepanFxProjectTreeItem projectItem = new DepanFxProjectTreeItem(project);
@@ -86,7 +88,8 @@ public class DepanFxProjectListViewer {
       String projectName = selectedDirectory.getName();
       Path projectPath = selectedDirectory.toPath();
       DepanFxProjectTree project =
-          DepanFxWorkspaceFactory.createDepanFxProjectTree(projectName, projectPath);
+          DepanFxWorkspaceFactory.createDepanFxProjectTree(
+              projectName, projectPath);
       workspace.addProject(project);
 
       DepanFxProjectTreeItem projectItem = new DepanFxProjectTreeItem(project);
@@ -94,8 +97,8 @@ public class DepanFxProjectListViewer {
     }
   }
 
-  public void refreshView() {
-    workspaceView.refresh();
+  public void resetView() {
+    workspaceView.setRoot(buildWorkspaceRoot());
   }
 
   public Tab createWorkspaceTab(String tabName) {
@@ -109,18 +112,33 @@ public class DepanFxProjectListViewer {
 
     menuBuilder.appendSeparator();
     menuBuilder.appendActionItem(
-        REFRESH_CONTEXT_ITEM, e -> refreshView());
+        REFRESH_CONTEXT_ITEM, e -> resetView());
 
     result.setContextMenu(menuBuilder.build());
     return result;
   }
 
-  private TreeView<DepanFxWorkspaceMember> createView(DepanFxWorkspace workspace) {
-    TreeItem<DepanFxWorkspaceMember> treeRoot = new DepanFxWorkspaceItem(workspace);
-
-    TreeView<DepanFxWorkspaceMember> result = new TreeView<>(treeRoot);
+  private TreeView<DepanFxWorkspaceMember> createView() {
+    TreeView<DepanFxWorkspaceMember> result =
+        new TreeView<>(buildWorkspaceRoot());
     result.setShowRoot(false);
     result.setCellFactory(new WorkspaceCellFactory());
+    return result;
+  }
+
+  private TreeItem<DepanFxWorkspaceMember> buildWorkspaceRoot() {
+    TreeItem<DepanFxWorkspaceMember> result =
+        new DepanFxWorkspaceItem(workspace);
+
+    // Since the root is not shown, the root should be expanded so it's
+    // children are shown.
+    result.setExpanded(true);
+
+    // Populate with current projects.
+    for (DepanFxProjectTree project : workspace.getProjectList()) {
+      DepanFxProjectTreeItem projectItem = new DepanFxProjectTreeItem(project);
+      result.getChildren().add(projectItem);
+    }
     return result;
   }
 
