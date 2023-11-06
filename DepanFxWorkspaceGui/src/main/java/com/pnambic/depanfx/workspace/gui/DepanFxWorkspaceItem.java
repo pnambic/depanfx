@@ -12,7 +12,7 @@ import javafx.scene.control.TreeItem;
 
 public class DepanFxWorkspaceItem extends TreeItem<DepanFxWorkspaceMember> {
 
-  private boolean isFirstTimeChildren = false;
+  private boolean isFirstTimeChildren = true;
 
   public DepanFxWorkspaceItem(DepanFxWorkspace workspace) {
     super(workspace);
