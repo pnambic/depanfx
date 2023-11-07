@@ -20,6 +20,8 @@ dependencies {
   implementation project(':DepanFxFileSystem')
   implementation project(':DepanFxFileSystemGui')
   implementation project(':DepanFxFileSystemXstream')
+  implementation project(':DepanFxGit')
+  implementation project(':DepanFxGitGui')
   implementation project(':DepanFxGraph')
   implementation project(':DepanFxGraphDoc')
   implementation project(':DepanFxGraphDocXstream')
@@ -38,6 +40,7 @@ dependencies {
 application {
   mainClass = "com.pnambic.depanfx.DepanFxApplication"
   mainModule = "depanfx.app"
+  applicationDefaultJvmArgs = [ '-Xmx1G' ]
 }
 
 jlink {

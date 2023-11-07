@@ -126,7 +126,6 @@ public class DepanFxProjectListViewer {
     return result;
   }
 
-
   private TreeItem<DepanFxWorkspaceMember> buildWorkspaceRoot() {
     TreeItem<DepanFxWorkspaceMember> result =
         new DepanFxWorkspaceItem(workspace);
@@ -134,22 +133,6 @@ public class DepanFxProjectListViewer {
     // Since the root is not shown, the root should be expanded so it's
     // children are shown.
     result.setExpanded(true);
-    return result;
-  }
-
-  private TreeItem<DepanFxWorkspaceMember> XbuildWorkspaceRoot() {
-    TreeItem<DepanFxWorkspaceMember> result =
-        new DepanFxWorkspaceItem(workspace);
-
-    // Since the root is not shown, the root should be expanded so it's
-    // children are shown.
-    result.setExpanded(true);
-
-    // Populate with current projects.
-    for (DepanFxProjectTree project : workspace.getProjectList()) {
-      DepanFxProjectTreeItem projectItem = new DepanFxProjectTreeItem(project);
-      result.getChildren().add(projectItem);
-    }
     return result;
   }
 
