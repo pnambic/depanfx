@@ -16,6 +16,7 @@ public class DepanFxWorkspaceItem extends TreeItem<DepanFxWorkspaceMember> {
 
   public DepanFxWorkspaceItem(DepanFxWorkspace workspace) {
     super(workspace);
+    setExpanded(true);
   }
 
   @Override

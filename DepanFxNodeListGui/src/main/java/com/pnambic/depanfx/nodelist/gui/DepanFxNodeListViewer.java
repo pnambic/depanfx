@@ -12,9 +12,10 @@ import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -84,14 +85,15 @@ public class DepanFxNodeListViewer {
     return result;
   }
 
-  public void saveNodeList(File dstFile) {
+  public Optional<DepanFxWorkspaceResource> saveNodeList(
+      DepanFxProjectDocument projDoc) {
     DepanFxNodeList saveList =
         DepanFxNodeLists.buildRelatedNodeList(nodeList, getSelectedNodes());
     try {
-      getWorkspace().saveDocument(dstFile.toURI(), saveList);
-    } catch (IOException errIo) {
+      return getWorkspace().saveDocument(projDoc, saveList);
+    } catch (Exception errAny) {
       throw new RuntimeException(
-          "Unable to save nodelist " + dstFile.toString(), errIo);
+          "Unable to save nodelist " + projDoc.getMemberPath(), errAny);
     }
   }
 
@@ -175,7 +177,8 @@ public class DepanFxNodeListViewer {
   // Internal
 
   private void runSaveNodeListDialog() {
-    FXMLLoader loader = new FXMLLoader(getClass().getResource("save-node-list-dialog.fxml"));
+    FXMLLoader loader =
+        new FXMLLoader(getClass().getResource("save-node-list-dialog.fxml"));
     loader.setController(new DepanFxSaveNodeListDialog(this));
     try {
       Parent dialog = loader.load();

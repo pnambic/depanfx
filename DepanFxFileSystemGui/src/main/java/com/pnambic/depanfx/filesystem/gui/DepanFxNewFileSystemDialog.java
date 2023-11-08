@@ -1,20 +1,23 @@
 package com.pnambic.depanfx.filesystem.gui;
 
-import java.io.File;
-import java.io.IOException;
+import com.pnambic.depanfx.filesystem.builder.FileSystemGraphDocBuilder;
+import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
+import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
+
+import net.rgielen.fxweaver.core.FxmlView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.pnambic.depanfx.filesystem.builder.FileSystemGraphDocBuilder;
-import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
-import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
-import com.pnambic.depanfx.graph_doc.model.GraphDocument;
-import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
-import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
+import java.io.File;
+import java.io.IOException;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
@@ -22,7 +25,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import net.rgielen.fxweaver.core.FxmlView;
 
 @Component
 @FxmlView("new-file-dialog.fxml")
@@ -31,7 +33,7 @@ public class DepanFxNewFileSystemDialog {
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNewFileSystemDialog.class.getName());
 
-  private static final String PREFIX = "tree_";
+  private static final String PREFIX = "tree";
 
   private static final String EXT = "dgi";
 
@@ -89,9 +91,11 @@ public class DepanFxNewFileSystemDialog {
     analyzeTree(docBuilder, sourceField.getText());
     GraphDocument graphDoc = docBuilder.getGraphDocument();
     File dstFile = new File(destinationField.getText());
+    DepanFxProjectDocument projDoc =
+        workspace.toProjectDocument(dstFile.toURI()).get();
 
     try {
-      workspace.saveDocument(dstFile.toURI(), graphDoc);
+      workspace.saveDocument(projDoc, graphDoc);
     } catch (IOException errIo) {
       LOG.error("Unable to save " + dstFile, errIo);
     }

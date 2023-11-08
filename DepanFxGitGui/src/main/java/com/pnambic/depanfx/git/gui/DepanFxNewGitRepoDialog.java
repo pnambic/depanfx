@@ -1,24 +1,27 @@
 package com.pnambic.depanfx.git.gui;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.pnambic.depanfx.filesystem.builder.FileSystemGraphDocBuilder;
 import com.pnambic.depanfx.git.builder.GitCommandRunner;
 import com.pnambic.depanfx.git.builder.GitLsFileLoader;
 import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
+
+import net.rgielen.fxweaver.core.FxmlView;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
@@ -28,7 +31,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import net.rgielen.fxweaver.core.FxmlView;
 
 @Component
 @FxmlView("new-git-repo-dialog.fxml")
@@ -137,9 +139,11 @@ public class DepanFxNewGitRepoDialog implements Initializable {
     GraphDocument graphDoc = new FileSystemGraphDocBuilder(modelBuilder)
         .getGraphDocument();
     File dstFile = new File(destinationField.getText());
+    DepanFxProjectDocument projDoc =
+        workspace.toProjectDocument(dstFile.toURI()).get();
 
     try {
-      workspace.saveDocument(dstFile.toURI(), graphDoc);
+      workspace.saveDocument(projDoc, graphDoc);
     } catch (IOException errIo) {
       LOG.error("Unable to save " + dstFile, errIo);
     }
@@ -192,17 +196,14 @@ public class DepanFxNewGitRepoDialog implements Initializable {
   private String buildDestinationName() {
     String repoName = repoNameField.textProperty().get();
     if (!repoName.isBlank()) {
-      return buildTimestampName(repoName, DGI_EXT);
+      return DepanFxWorkspaceFactory.buildDocumentTimestampName(
+          repoName, DGI_EXT);
     }
-    return buildTimestampName(DEFAULT_REPO_LABEL, DGI_EXT);
+    return DepanFxWorkspaceFactory.buildDocumentTimestampName(
+        DEFAULT_REPO_LABEL, DGI_EXT);
   }
 
   private File getWorkspaceDestination() {
     return DepanFxProjects.getCurrentGraphs(workspace);
-  }
-
-  private String buildTimestampName(String prefix, String ext) {
-    return DepanFxWorkspaceFactory.buildDocumentTimestampName(
-        prefix + " ", ext);
   }
 }

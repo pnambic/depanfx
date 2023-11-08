@@ -115,7 +115,7 @@ public class FileSystemDirectoryLoader {
 
     // If it's a directory, traverse the full tree
     if (treeFile.isDirectory()) {
-      DirectoryNode parentNode = visitDirectory(treeFile);
+      DirectoryNode parentNode = createRootNode(treeFile);
       traverseTree(parentNode, treeFile);
       return;
     }
@@ -159,6 +159,17 @@ public class FileSystemDirectoryLoader {
     } catch (IOException e) {
       LOG.error("Unable to access tree entity {}", child.getPath());
     }
+  }
+
+  private DirectoryNode createRootNode(File rootFile) throws IOException {
+    if (prefixPath.equals(rootFile.getCanonicalPath())) {
+      String rootPath = File.separatorChar + rootFile.getName();
+      DirectoryNode rootDir = createDirectory(new File(rootPath));
+
+      return (DirectoryNode) builder.mapNode(rootDir);
+    }
+
+    return visitDirectory(rootFile);
   }
 
   private DirectoryNode createDirectory(File directory)

@@ -14,6 +14,7 @@ import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 import java.io.File;
 import java.nio.file.Path;
 
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
@@ -122,6 +123,7 @@ public class DepanFxProjectListViewer {
     TreeView<DepanFxWorkspaceMember> result =
         new TreeView<>(buildWorkspaceRoot());
     result.setShowRoot(false);
+    result.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     result.setCellFactory(new WorkspaceCellFactory());
     return result;
   }
@@ -129,10 +131,6 @@ public class DepanFxProjectListViewer {
   private TreeItem<DepanFxWorkspaceMember> buildWorkspaceRoot() {
     TreeItem<DepanFxWorkspaceMember> result =
         new DepanFxWorkspaceItem(workspace);
-
-    // Since the root is not shown, the root should be expanded so it's
-    // children are shown.
-    result.setExpanded(true);
     return result;
   }
 

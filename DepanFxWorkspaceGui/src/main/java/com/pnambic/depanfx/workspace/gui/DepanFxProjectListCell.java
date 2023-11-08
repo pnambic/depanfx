@@ -35,14 +35,20 @@ import javafx.scene.control.TreeCell;
  */
 public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
 
-  private static final String NEW_GRAPH_MENU = "New Graph";
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxProjectListCell.class);
 
-  private static final char EXT_DOT = '.';
+  // Menu texts
+  private static final String NEW_GRAPH_MENU = "New Graph";
 
   private static final String OPEN_AS_LIST = "Open as ListView";
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(DepanFxProjectListCell.class);
+  private static final String DELETE_DOCUMENT = "Delete Document";
+
+  private static final String DELETE_CONTAINER = "Delete Container";
+
+  // Our state
+  private static final char EXTENSION_DOT = '.';
 
   private final DepanFxWorkspace workspace;
 
@@ -75,29 +81,36 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
     if (empty) {
       setText(null);
       setGraphic(null);
+      setContextMenu(null);
       return;
     }
     // The normal case.
     if (member != null) {
       setText(member.getMemberName());
       setGraphic(null);
-      stylizeCell(member);
+      setContextMenu(buildMemberContextMenu(member));
       return;
     }
     // Something unexpected.
     setText("<null>");
     setGraphic(null);
+    setContextMenu(null);
   }
 
-  private void stylizeCell(DepanFxWorkspaceMember member) {
+  private ContextMenu buildMemberContextMenu(DepanFxWorkspaceMember member) {
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+
     if (member instanceof DepanFxProjectContainer) {
       String name = ((DepanFxProjectContainer) member).getMemberName();
       switch (name) {
         case DepanFxProjects.GRAPHS_CONTAINER:
-          setContextMenu(graphsContextMenu());
+          builder.appendSubMenu(graphsContextMenu());
+          break;
+
+        case DepanFxProjects.ANALYSES_CONTAINER:
+          builder.appendActionItem("Create Theory", null);
           break;
       }
-      return;
     }
     if (member instanceof DepanFxProjectDocument) {
       DepanFxProjectDocument document = (DepanFxProjectDocument) member;
@@ -106,40 +119,34 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
       if (optExt.isPresent()) {
         switch (optExt.get()) {
           case "dgi":
-            setContextMenu(graphDocContextMenu(document));
+            builder.appendActionItem(
+                OPEN_AS_LIST,
+                e -> runOpenAsListAction(document.getMemberPath().toUri()));
             break;
           case "dnli":
-            setContextMenu(nodeListContextMenu(document));
+            builder.appendActionItem(
+                OPEN_AS_LIST,
+                e -> runOpenNodeListAction(document.getMemberPath().toUri()));
             break;
         }
       }
-      return;
+      // All documents are deletable
+      appendDeleteDocument(builder, document);
     }
+
+    return builder.build();
   }
 
-  private ContextMenu graphsContextMenu() {
+  private Menu graphsContextMenu() {
     Menu newGraphMenu = new Menu(NEW_GRAPH_MENU);
     newGraphMenu.getItems().addAll(newResourceRegistry.buildNewResourceItems());
-
-    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendSubMenu(newGraphMenu);
-    return builder.build();
+    return newGraphMenu;
   }
 
-  private ContextMenu graphDocContextMenu(DepanFxProjectDocument document) {
-    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem(
-        OPEN_AS_LIST,
-        e -> runOpenAsListAction(document.getMemberPath().toUri()));
-    return builder.build();
-  }
-
-  private ContextMenu nodeListContextMenu(DepanFxProjectDocument document) {
-    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem(
-        OPEN_AS_LIST,
-        e -> runOpenNodeListAction(document.getMemberPath().toUri()));
-    return builder.build();
+  private void appendDeleteDocument(
+      DepanFxContextMenuBuilder builder, DepanFxProjectDocument projDoc) {
+    builder.appendActionItem(DELETE_DOCUMENT,
+        e -> projDoc.getProject().deleteDocument(projDoc));
   }
 
   private void runOpenAsListAction(URI graphDocUri) {
@@ -206,7 +213,7 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
   }
 
   private static Optional<String> getExtension(String filename) {
-      int dotIndex = filename.lastIndexOf(EXT_DOT);
+      int dotIndex = filename.lastIndexOf(EXTENSION_DOT);
       if (dotIndex > 0 && dotIndex < filename.length() - 1) {
           return Optional.of(filename.substring(dotIndex + 1));
       }

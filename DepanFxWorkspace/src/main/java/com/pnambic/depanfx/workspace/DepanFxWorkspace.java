@@ -14,17 +14,26 @@ public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
 
   void addProject(DepanFxProjectTree project);
 
-  void saveDocument(URI uri, Object item) throws IOException;
+  Optional<DepanFxWorkspaceResource> saveDocument(
+      DepanFxProjectDocument projDoc, Object item)
+      throws IOException;
 
-  Object importDocument(URI uri) throws IOException;
+  Optional<DepanFxWorkspaceResource> importDocument(
+      DepanFxProjectDocument projDoc)
+      throws IOException;
+
+  Optional<DepanFxWorkspaceResource> toWorkspaceResource(
+      DepanFxProjectDocument projDoc, Object resource);
+
+  /**
+   * Provide the resource identified by the project document.
+   * The contents may be loaded from storage or provided by the cache.
+   */
+  Optional<DepanFxWorkspaceResource> getWorkspaceResource(
+      DepanFxProjectDocument resourceDoc);
 
   Optional<DepanFxProjectDocument> toProjectDocument(URI uri);
 
-  Optional<DepanFxProjectDocument> toProjectDocument(String projectName,
-      String resourcePath);
-
-  Optional<DepanFxWorkspaceResource> toWorkspaceResource(URI uri, Object resource);
-
-  Optional<DepanFxWorkspaceResource> getWorkspaceResource(
-      DepanFxProjectDocument resourceDoc);
+  Optional<DepanFxProjectDocument> toProjectDocument(
+      String projectName, String resourcePath);
 }

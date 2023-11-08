@@ -4,6 +4,7 @@ import com.pnambic.depanfx.graph.context.plugins.ContextModelRegistry;
 import com.pnambic.depanfx.persistence.DocumentXmlPersist;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceRegistry;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
+import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -83,24 +84,28 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   }
 
   @Override
-  public void saveDocument(URI uri, Object document) throws IOException {
+  public Optional<DepanFxWorkspaceResource> saveDocument(
+      DepanFxProjectDocument projDoc, Object document)
+      throws IOException {
     DocumentXmlPersist persist = persistRegistry.getDocumentPersist(document);
     persist.addContextValue(DepanFxWorkspace.class, this);
 
-    try (Writer saver = openForSave(uri)) {
+    try (Writer saver = openForSave(projDoc)) {
       persist.save(saver, document);
+      return registerDocumentSave(projDoc, document);
     }
   }
 
   @Override
-  public Object importDocument(URI uri) throws IOException {
-    DocumentXmlPersist persist = persistRegistry.getDocumentPersist(uri);
+  public Optional<DepanFxWorkspaceResource> importDocument(DepanFxProjectDocument projDoc)
+      throws IOException {
+    DocumentXmlPersist persist =
+        persistRegistry.getDocumentPersist(getMemberUri(projDoc));
     persist.addContextValue(DepanFxWorkspace.class, this);
 
-    try (Reader importer = openForLoad(uri)) {
+    try (Reader importer = openForLoad(projDoc)) {
       Object document = persist.load(importer);
-      registerDocument(document, uri);
-      return document;
+      return registerDocumentLoad(projDoc, document);
     }
   }
 
@@ -126,27 +131,26 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
 
   @Override
   public Optional<DepanFxWorkspaceResource> toWorkspaceResource(
-      URI uri, Object resource) {
-    return toProjectDocument(uri)
-        .map(doc -> new WorkspaceResource(doc, resource));
+      DepanFxProjectDocument projDoc, Object resource) {
+    return Optional.of(new WorkspaceResource(projDoc, resource));
   }
 
   @Override
   public Optional<DepanFxWorkspaceResource> getWorkspaceResource(
       DepanFxProjectDocument resourceDoc) {
-    URI resourceUri = resourceDoc.getMemberPath().toUri();
-    Optional<Object> optResource = documentRegistry.findResource(resourceUri);
+    Optional<Object> optResource =
+        documentRegistry.findResource(getMemberUri(resourceDoc));
     if (optResource.isPresent()) {
-      return toWorkspaceResource(resourceUri, optResource.get());
+      return toWorkspaceResource(resourceDoc, optResource.get());
     }
 
     try {
-      Object resource = importDocument(resourceUri);
-      return toWorkspaceResource(resourceUri, resource);
+      return importDocument(resourceDoc);
     } catch (IOException errIo) {
-      LOG.error("Unable to aquire resource {}", resourceUri, errIo);
+      LOG.error("Unable to aquire resource {}",
+          resourceDoc, errIo);
       throw new RuntimeException(
-          "Unable to aquire resource " + resourceDoc.toString(), errIo);
+          "Unable to aquire resource " + resourceDoc, errIo);
     }
   }
 
@@ -163,16 +167,46 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
     return new BasicDepanFxProjectDocument(projectTree, resource);
   }
 
-  private void registerDocument(Object document, URI uri) {
-    documentRegistry.registerDocument(document, uri);
+  private Optional<DepanFxWorkspaceResource> registerDocumentSave(
+      DepanFxProjectDocument projDoc, Object document) {
+    Optional<DepanFxWorkspaceResource> result =
+        registerDocumentLoad(projDoc, document);
+
+    // Register new documents with their project, so the UI gets a chance
+    // to update.
+    result.ifPresent(r ->
+        r.getDocument().getProject().registerDocument(
+            r.getDocument()));
+    return result;
   }
 
-  private FileReader openForLoad(URI uri) throws IOException {
-    return new FileReader(new File(uri));
+  /**
+   * All loaded/known documents are saved in the cache.
+   */
+  private Optional<DepanFxWorkspaceResource> registerDocumentLoad(
+      DepanFxProjectDocument projDoc, Object document) {
+    Optional<DepanFxWorkspaceResource> result =
+        toWorkspaceResource(projDoc, document);
+    result.ifPresent(r ->
+        documentRegistry.registerDocument(r.getResource(),
+            getMemberUri(r.getDocument())));
+    return result;
   }
 
-  private FileWriter openForSave(URI uri) throws IOException {
-    return new FileWriter(new File(uri));
+  private FileReader openForLoad(DepanFxProjectDocument projDoc) throws IOException {
+    return new FileReader(buildDocumentFile(projDoc));
+  }
+
+  private FileWriter openForSave(DepanFxProjectDocument projDoc) throws IOException {
+    return new FileWriter(buildDocumentFile(projDoc));
+  }
+
+  private File buildDocumentFile(DepanFxProjectDocument projDoc) {
+    return new File(getMemberUri(projDoc));
+  }
+
+  private URI getMemberUri( DepanFxProjectMember member) {
+    return member.getMemberPath().toUri();
   }
 
   private class WorkspaceResource implements DepanFxWorkspaceResource {

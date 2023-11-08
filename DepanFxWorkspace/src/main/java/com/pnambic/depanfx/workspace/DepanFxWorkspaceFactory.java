@@ -51,6 +51,7 @@ public class DepanFxWorkspaceFactory {
   public static String buildDocumentTimestampName(String prefix, String ext) {
     LocalDateTime now = LocalDateTime.now();
     StringBuilder result = new StringBuilder(prefix);
+    result.append(" ");
     DOCUMENT_TIMESTAMP_FORMATTER.formatTo(now, result);
     result.append(".");
     result.append(ext);

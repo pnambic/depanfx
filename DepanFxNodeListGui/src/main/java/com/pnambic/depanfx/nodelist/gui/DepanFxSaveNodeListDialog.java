@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui;
 
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
@@ -19,7 +20,7 @@ public class DepanFxSaveNodeListDialog {
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxSaveNodeListDialog.class.getName());
 
-  private static final String PREFIX = "nodes ";
+  private static final String PREFIX = "nodes";
 
   private static final String EXT = "dnli";
 
@@ -56,7 +57,9 @@ public class DepanFxSaveNodeListDialog {
 
     System.out.println("Destination file: " + destinationField.getText());
     File dstFile = new File(destinationField.getText());
-    viewer.saveNodeList(dstFile);
+    DepanFxProjectDocument projDoc =
+        viewer.getWorkspace().toProjectDocument(dstFile.toURI()).get();
+    viewer.saveNodeList(projDoc);
   }
 
   private FileChooser prepareFileChooser() {

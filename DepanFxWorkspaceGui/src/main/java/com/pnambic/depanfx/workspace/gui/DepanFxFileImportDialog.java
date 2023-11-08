@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
 import javafx.fxml.FXML;
@@ -59,8 +60,10 @@ public class DepanFxFileImportDialog {
 
     System.out.println("Import source: " + sourceField.getText());
     File srcFile = new File(sourceField.getText());
+    DepanFxProjectDocument projDoc =
+        workspace.toProjectDocument(srcFile.toURI()).get();
     try {
-      workspace.importDocument(srcFile.toURI());
+      workspace.importDocument(projDoc);
     } catch (Exception errAny) {
       LOG.error("Unable to load {}", srcFile, errAny);
     }
