@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui;
 
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
@@ -22,7 +23,7 @@ public class DepanFxSaveNodeListDialog {
 
   private static final String PREFIX = "nodes";
 
-  private static final String EXT = "dnli";
+  private static final String EXT = DepanFxNodeLists.EXT;
 
   private static final ExtensionFilter EXT_FILTER =
       new ExtensionFilter("Node List (*.dnli)", "*." + EXT);

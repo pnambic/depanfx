@@ -9,7 +9,6 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
-import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -19,17 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 @Component
@@ -38,20 +33,6 @@ public class DepanFxNewGitRepoDialog implements Initializable {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNewGitRepoDialog.class.getName());
-
-  // For executables (on Windows)
-  private static final String EXE_EXT = "exe";
-
-  private static final ExtensionFilter EXE_FILTER =
-      new ExtensionFilter("Executabe (*.exe)", "*." + EXE_EXT);
-
-  // For Graph documents
-  private static final String DGI_EXT = "dgi";
-
-  private static final ExtensionFilter DGI_FILTER =
-      new ExtensionFilter("Graph Info (*.dgi)", "*." + DGI_EXT);
-
-  private static final String DEFAULT_REPO_LABEL = "Git Repo";
 
   private final DepanFxWorkspace workspace;
 
@@ -74,39 +55,23 @@ public class DepanFxNewGitRepoDialog implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    if (gitExeField.getText().isBlank()) {
-      gitExeField.setText(GitCommandRunner.DEFAULT_GIT_EXE);
-    }
+    DepanFxGitDialogUtils.initializeGitExit(gitExeField);
   }
 
   @FXML
   private void openGitExeChooser() {
-    FileChooser fileChooser = prepareGitExeChooser();
-    File selectedFile =
-        fileChooser.showSaveDialog(gitExeField.getScene().getWindow());
-    if (selectedFile != null) {
-      gitExeField.setText(selectedFile.getAbsolutePath());
-    }
+    DepanFxGitDialogUtils.runGitExeChooser(gitExeField);
   }
 
   @FXML
   private void openDirectoryChooser() {
-    DirectoryChooser directoryChooser = new DirectoryChooser();
-    File selectedDirectory =
-        directoryChooser.showDialog(repoDirectoryField.getScene().getWindow());
-    if (selectedDirectory != null) {
-      repoDirectoryField.setText(selectedDirectory.getAbsolutePath());
-
-      StringProperty repoNameProp = repoNameField.textProperty();
-      if (repoNameProp.get().isBlank()) {
-        repoNameProp.set(selectedDirectory.getName());
-      }
-    }
+    DepanFxGitDialogUtils.runRepoDirectoryChooser(
+        repoDirectoryField, repoNameField);
   }
 
   @FXML
   private void openFileChooser() {
-    FileChooser fileChooser = prepareFileChooser();
+    FileChooser fileChooser = prepareSaveGraphDocFileChooser();
     File selectedFile =
         fileChooser.showSaveDialog(destinationField.getScene().getWindow());
     if (selectedFile != null) {
@@ -130,22 +95,23 @@ public class DepanFxNewGitRepoDialog implements Initializable {
     LOG.info("Destination file: {}", destinationField.getText());
 
     DepanFxGraphModelBuilder modelBuilder = new SimpleGraphModelBuilder();
-    GitCommandRunner cmdRunner = new GitCommandRunner(
-        gitExeField.getText(),
-        repoNameField.getText(),
-        repoDirectoryField.getText());
-    analyzeRepo(modelBuilder, cmdRunner);
+    GitCommandRunner cmdRunner =
+        DepanFxGitDialogUtils.createCommandRunner(
+            gitExeField, repoNameField, repoDirectoryField);
 
-    GraphDocument graphDoc = new FileSystemGraphDocBuilder(modelBuilder)
-        .getGraphDocument();
     File dstFile = new File(destinationField.getText());
     DepanFxProjectDocument projDoc =
         workspace.toProjectDocument(dstFile.toURI()).get();
 
     try {
+      analyzeRepo(modelBuilder, cmdRunner);
+
+      GraphDocument graphDoc = new FileSystemGraphDocBuilder(modelBuilder)
+          .getGraphDocument();
+
       workspace.saveDocument(projDoc, graphDoc);
-    } catch (IOException errIo) {
-      LOG.error("Unable to save " + dstFile, errIo);
+    } catch (Exception errAny) {
+      LOG.error("Unable to save " + dstFile, errAny);
     }
   }
 
@@ -167,43 +133,21 @@ public class DepanFxNewGitRepoDialog implements Initializable {
     }
   }
 
-  private FileChooser prepareGitExeChooser() {
-    FileChooser result = new FileChooser();
-    result.getExtensionFilters().add(EXE_FILTER);
-    result.setSelectedExtensionFilter(EXE_FILTER);
+  private FileChooser prepareSaveGraphDocFileChooser() {
+    FileChooser result =
+        DepanFxGitDialogUtils.prepareGraphDocChooser(
+            destinationField, workspace);
 
-    return result;
-  }
-
-  private FileChooser prepareFileChooser() {
-    FileChooser result = new FileChooser();
-    result.getExtensionFilters().add(DGI_FILTER);
-    result.setSelectedExtensionFilter(DGI_FILTER);
-
-    String destFileName = destinationField.getText();
-    if (destFileName.isBlank()) {
+    if (destinationField.getText().isBlank()) {
       result.setInitialFileName(buildDestinationName());
-      result.setInitialDirectory(getWorkspaceDestination());
-      return result;
     }
 
-    File location = new File(destFileName);
-    result.setInitialFileName(location.getName());
-    result.setInitialDirectory(location.getParentFile());
     return result;
   }
 
   private String buildDestinationName() {
-    String repoName = repoNameField.textProperty().get();
-    if (!repoName.isBlank()) {
-      return DepanFxWorkspaceFactory.buildDocumentTimestampName(
-          repoName, DGI_EXT);
-    }
     return DepanFxWorkspaceFactory.buildDocumentTimestampName(
-        DEFAULT_REPO_LABEL, DGI_EXT);
-  }
-
-  private File getWorkspaceDestination() {
-    return DepanFxProjects.getCurrentGraphs(workspace);
+          DepanFxGitDialogUtils.getRepoName(repoNameField),
+          DepanFxGitDialogUtils.DGI_EXT);
   }
 }

@@ -68,10 +68,17 @@ public class DepanFxProjectTreeItem extends TreeItem<DepanFxWorkspaceMember> {
     }
 
     public void onDocumentAdded(DepanFxProjectDocument projDoc) {
-      projDoc.getParent()
-          .map(c -> findContainerItem(DepanFxProjectTreeItem.this, c))
-          .ifPresent(c -> c.getChildren().add(
-              new DepanFxProjectDocumentItem(projDoc)));
+      Optional<TreeItem<DepanFxWorkspaceMember>> optParentItem =
+          projDoc.getParent()
+            .map(c -> findContainerItem(DepanFxProjectTreeItem.this, c));
+      Optional<Object> optDocItem =
+          optParentItem .map(i -> findMemberItem(i, projDoc));
+
+      // Sometimes there are two notifications
+      if (optDocItem.isEmpty()) {
+        optParentItem.get().getChildren().add(
+            new DepanFxProjectDocumentItem(projDoc));
+      }
     }
 
     @Override
@@ -85,6 +92,43 @@ public class DepanFxProjectTreeItem extends TreeItem<DepanFxWorkspaceMember> {
         optParentItem.get().getChildren().remove(optMemberItem.get());
       }
     }
+
+    @Override
+    public void onContainerRegistered(DepanFxProjectContainer projDir) {
+      TreeItem<DepanFxWorkspaceMember> projItem =
+          findContainerItem(DepanFxProjectTreeItem.this, projDir);
+
+      // Easy, peasey - the projDir is already in the tree.
+      if (projItem != null) {
+        return;
+      }
+
+      buildContainerItem(projDir);
+    }
+
+    private TreeItem<DepanFxWorkspaceMember> buildContainerItem(
+        DepanFxProjectContainer projDir) {
+
+      TreeItem<DepanFxWorkspaceMember> parentItem =
+          findParentItem(projDir);
+
+      TreeItem<DepanFxWorkspaceMember> dirItem =
+          findMemberItem(parentItem, projDir);
+      if (dirItem != null) {
+        return dirItem;
+      }
+      dirItem = new DepanFxProjectContainerItem(projDir);
+      parentItem.getChildren().add(dirItem);
+      return dirItem;
+    }
+  }
+
+  private TreeItem<DepanFxWorkspaceMember> findParentItem(
+      DepanFxProjectMember projDir) {
+
+    return projDir.getParent()
+        .map(p -> findContainerItem(DepanFxProjectTreeItem.this, p))
+        .orElse(DepanFxProjectTreeItem.this);
   }
 
   private TreeItem<DepanFxWorkspaceMember> findMemberItem(

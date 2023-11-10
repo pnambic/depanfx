@@ -3,6 +3,7 @@ package com.pnambic.depanfx.workspace.basic;
 import com.pnambic.depanfx.graph.context.plugins.ContextModelRegistry;
 import com.pnambic.depanfx.persistence.DocumentXmlPersist;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceRegistry;
+import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
@@ -107,6 +108,18 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
       Object document = persist.load(importer);
       return registerDocumentLoad(projDoc, document);
     }
+  }
+
+  @Override
+  public Optional<DepanFxProjectContainer> toProjectContainer(URI uri) {
+    Path uriPath = Paths.get(uri);
+    for (DepanFxProjectTree project : projectList) {
+      Optional<DepanFxProjectContainer> result = project.asProjectContainer(uriPath);
+      if (result.isPresent()) {
+        return result;
+      }
+    }
+    return Optional.empty();
   }
 
   @Override

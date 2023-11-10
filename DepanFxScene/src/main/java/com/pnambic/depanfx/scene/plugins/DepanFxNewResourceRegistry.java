@@ -11,20 +11,39 @@ import javafx.scene.control.MenuItem;
 
 @Component
 public class DepanFxNewResourceRegistry {
-  
-  private final List<DepanFxNewResourceContribution> contributions;
 
-  public DepanFxNewResourceRegistry(List<DepanFxNewResourceContribution> contributions) {
-    this.contributions = contributions;
+  private final List<DepanFxNewResourceContribution> resourceContribs;
+
+  private final List<DepanFxNewAnalysisContribution> analysisContribs;
+
+  public DepanFxNewResourceRegistry(
+      List<DepanFxNewResourceContribution> resourceContribs,
+      List<DepanFxNewAnalysisContribution> analysisContribs) {
+    this.resourceContribs = resourceContribs;
+    this.analysisContribs = analysisContribs;
   }
 
   public Collection<MenuItem> buildNewResourceItems() {
-    int contribCnt = contributions.size();
+    int contribCnt = resourceContribs.size();
     if (contribCnt > 0) {
       List<MenuItem> result = new ArrayList<>(contribCnt);
-      for (DepanFxNewResourceContribution contribution : contributions) {
+      for (DepanFxNewResourceContribution contribution : resourceContribs) {
         result.add(contribution.createNewResourceMenuItem());
       }
+      result.sort((a,b) -> a.getText().compareTo(b.getText()));
+      return result;
+    }
+    return Collections.emptyList();
+  };
+
+  public Collection<MenuItem> buildNewAnalysisItems() {
+    int contribCnt = analysisContribs.size();
+    if (contribCnt > 0) {
+      List<MenuItem> result = new ArrayList<>(contribCnt);
+      for (DepanFxNewAnalysisContribution contribution : analysisContribs) {
+        result.add(contribution.createNewResourceMenuItem());
+      }
+      result.sort((a,b) -> a.getText().compareTo(b.getText()));
       return result;
     }
     return Collections.emptyList();

@@ -41,6 +41,8 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
   // Menu texts
   private static final String NEW_GRAPH_MENU = "New Graph";
 
+  private static final String NEW_THEORY_MENU = "New Theory";
+
   private static final String OPEN_AS_LIST = "Open as ListView";
 
   private static final String DELETE_DOCUMENT = "Delete Document";
@@ -108,7 +110,7 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
           break;
 
         case DepanFxProjects.ANALYSES_CONTAINER:
-          builder.appendActionItem("Create Theory", null);
+          builder.appendSubMenu(analysisContextMenu());
           break;
       }
     }
@@ -140,6 +142,12 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
   private Menu graphsContextMenu() {
     Menu newGraphMenu = new Menu(NEW_GRAPH_MENU);
     newGraphMenu.getItems().addAll(newResourceRegistry.buildNewResourceItems());
+    return newGraphMenu;
+  }
+
+  private Menu analysisContextMenu() {
+    Menu newGraphMenu = new Menu(NEW_THEORY_MENU);
+    newGraphMenu.getItems().addAll(newResourceRegistry.buildNewAnalysisItems());
     return newGraphMenu;
   }
 

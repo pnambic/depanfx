@@ -13,6 +13,8 @@ public interface DepanFxProjectTree extends DepanFxProjectMember {
   public static interface ProjectTreeListener {
     void onContainerAdded(DepanFxProjectContainer projDir);
 
+    void onContainerRegistered(DepanFxProjectContainer projDir);
+
     void onContainerDeleted(DepanFxProjectContainer projDir);
 
     void onDocumentAdded(DepanFxProjectDocument projDoc);
@@ -27,6 +29,9 @@ public interface DepanFxProjectTree extends DepanFxProjectMember {
   void createContainer(DepanFxProjectContainer projDir);
 
   void deleteContainer(DepanFxProjectContainer projDir);
+
+  /** Ensure externally created paths are known */
+  void registerContainer(DepanFxProjectContainer dstDir);
 
   void deleteDocument(DepanFxProjectDocument projDoc);
 

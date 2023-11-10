@@ -12,8 +12,17 @@ import java.util.stream.Collectors;
 
 public class DepanFxNodeLists {
 
+  /** Common extension for any workspace persisted node list. */
+  public static final String EXT = "dnli";
+
   private DepanFxNodeLists() {
     // Prevent instantiation.
+  }
+
+  public static DepanFxNodeList buildNodeList(
+      DepanFxWorkspaceResource wkspRsrc, Collection<GraphNode> nodes) {
+
+    return new DepanFxNodeList(wkspRsrc, nodes);
   }
 
   public static DepanFxNodeList buildNodeList(
@@ -23,7 +32,7 @@ public class DepanFxNodeLists {
     Collection<GraphNode> nodes = graphDoc.getGraph().getNodes().stream()
         .map(GraphNode.class::cast)
         .collect(Collectors.toList());
-    return new DepanFxNodeList(wkspRsrc, nodes);
+    return buildNodeList(wkspRsrc, nodes);
   }
 
   public static DepanFxNodeList remove(
@@ -34,17 +43,17 @@ public class DepanFxNodeLists {
         .filter(n -> !omitSet.contains(n))
         .collect(Collectors.toList());
 
-    return new DepanFxNodeList(base.getWorkspaceResource(), nodes);
+    return buildNodeList(base.getWorkspaceResource(), nodes);
   }
 
   public static DepanFxNodeList buildEmptyNodeList(DepanFxNodeList base) {
-    return new DepanFxNodeList(
+    return buildNodeList(
         base.getWorkspaceResource(), Collections.emptyList());
   }
 
   public static DepanFxNodeList buildRelatedNodeList(
       DepanFxNodeList baseNodes, Collection<GraphNode> relatedList) {
-    return new DepanFxNodeList(
+    return buildNodeList(
         baseNodes.getWorkspaceResource(), relatedList);
   }
 }

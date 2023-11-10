@@ -6,6 +6,7 @@ module depanfx.git {
   requires depanfx.nodelist;
   requires depanfx.filesystem;
   requires depanfx.graph_doc;
+  requires depanfx.workspace;
 
   exports com.pnambic.depanfx.git.builder;
 }

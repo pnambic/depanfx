@@ -77,6 +77,11 @@ public class BasicDepanFxProjectTree implements DepanFxProjectTree {
   }
 
   @Override
+  public void registerContainer(DepanFxProjectContainer projDir) {
+    notifyContainerRegistered(projDir);
+  }
+
+  @Override
   public void deleteContainer(DepanFxProjectContainer projDir) {
     Path dirPath = projDir.getMemberPath();
     dirPath.toFile().delete();
@@ -109,6 +114,10 @@ public class BasicDepanFxProjectTree implements DepanFxProjectTree {
     listeners.forEach(l -> l.onContainerAdded(projDir));
   }
 
+  private void notifyContainerRegistered(DepanFxProjectContainer projDir) {
+    listeners.forEach(l -> l.onContainerRegistered(projDir));
+  }
+
   private void notifyContainerDeleted(DepanFxProjectContainer projDir) {
     listeners.forEach(l -> l.onContainerDeleted(projDir));
   }
@@ -120,5 +129,4 @@ public class BasicDepanFxProjectTree implements DepanFxProjectTree {
   private void notifyDocumentDeleted(DepanFxProjectDocument projDoc) {
     listeners.forEach(l -> l.onDocumentDeleted(projDoc));
   }
-
 }

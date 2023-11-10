@@ -23,7 +23,6 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
 
 import java.io.File;
-import java.nio.file.Path;
 
 public class GitLsFileLoader {
 
@@ -40,8 +39,8 @@ public class GitLsFileLoader {
   }
 
   public void analyzeRepo() {
-    String rootPath = File.separatorChar + cmdRunner.getGitRepoName();
-    DirectoryNode rootNode = createDirectory(new File(rootPath));
+    String rootPath = cmdRunner.getGitRepoName();
+    DirectoryNode rootNode = GitUtils.createDirectory(rootPath);
     repoRoot = (DirectoryNode) builder.mapNode(rootNode);
 
     cmdRunner.runGitCommand("ls-files")
@@ -50,7 +49,7 @@ public class GitLsFileLoader {
 
   private void addFile(String fileName) {
     File baseFile = new File(fileName);
-    DocumentNode baseDoc = createDocument(baseFile);
+    DocumentNode baseDoc = GitUtils.createDocument(fileName);
     GraphNode mappedDoc = builder.mapNode(baseDoc);
 
     DirectoryNode mappedDir = getDirectory(baseFile.getParentFile());
@@ -70,7 +69,7 @@ public class GitLsFileLoader {
     if (dirFile.getPath().isEmpty()) {
       return repoRoot;
     }
-    DirectoryNode selfNode = createDirectory(dirFile);
+    DirectoryNode selfNode = GitUtils.createDirectory(dirFile);
     DirectoryNode mappedNode = (DirectoryNode) builder.mapNode(selfNode);
     if (mappedNode != selfNode) {
       return mappedNode;
@@ -82,19 +81,5 @@ public class GitLsFileLoader {
     builder.addEdge(edge);
 
     return mappedNode;
-  }
-
-  private DirectoryNode createDirectory(File directory) {
-    Path dirPath = getElementPath(directory);
-    return new DirectoryNode(dirPath);
-  }
-
-  private DocumentNode createDocument(File file) {
-    Path filePath = getElementPath(file);
-    return new DocumentNode(filePath);
-  }
-
-  private Path getElementPath(File elementPath) {
-    return Path.of(elementPath.toURI());
   }
 }
