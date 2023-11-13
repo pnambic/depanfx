@@ -3,6 +3,7 @@ package com.pnambic.depanfx.workspace;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Interact directly with the underlying storage for the project.
@@ -31,4 +32,6 @@ public interface DepanFxProjectSpi {
   void deleteContainer(DepanFxProjectContainer projDir);
 
   void deleteDocument(DepanFxProjectDocument projDoc);
+
+  Stream<DepanFxProjectMember> getMembers(DepanFxProjectMember projDoc);
 }

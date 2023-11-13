@@ -2,13 +2,14 @@ package com.pnambic.depanfx.workspace;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * The project tree provides an abstraction for the storage of project
  * resources.  The project's storage is partitioned into a hierarchy of
  * containers.  Container members may be other containers or docu ments.
  */
-public interface DepanFxProjectTree extends DepanFxProjectMember {
+public interface DepanFxProjectTree extends DepanFxProjectContainer {
 
   public static interface ProjectTreeListener {
     void onContainerAdded(DepanFxProjectContainer projDir);
@@ -42,4 +43,10 @@ public interface DepanFxProjectTree extends DepanFxProjectMember {
   void addListener(ProjectTreeListener listener);
 
   void removeListener(ProjectTreeListener listener);
+
+  /**
+   * Provide the children, if any, for any descendant member. 
+   */
+  Stream<DepanFxProjectMember> getMembers(
+      DepanFxProjectMember basicDepanFxProjectContainer);
 }

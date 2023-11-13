@@ -3,14 +3,7 @@ package com.pnambic.depanfx.workspace.gui;
 import com.pnambic.depanfx.workspace.DepanFxProjectBadMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
-import com.pnambic.depanfx.workspace.DepanFxProjectMember;
-import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,55 +11,29 @@ import javafx.scene.control.TreeItem;
 
 public class DepanFxProjectMemberItemBuilder {
 
-  private final DepanFxProjectMember member;
+  private final DepanFxProjectContainer member;
 
-  public DepanFxProjectMemberItemBuilder(DepanFxProjectMember member) {
+  public DepanFxProjectMemberItemBuilder(DepanFxProjectContainer member) {
     this.member = member;
   }
 
   public ObservableList<TreeItem<DepanFxWorkspaceMember>> buildChildren() {
-
-    Path filePath = member.getMemberPath();
-
-    if (Files.isDirectory(filePath)) {
-      return buildChildren(filePath);
-    }
-
-    return FXCollections.emptyObservableList();
-  }
-
-  private ObservableList<TreeItem<DepanFxWorkspaceMember>> buildChildren(Path filePath) {
     ObservableList<TreeItem<DepanFxWorkspaceMember>> result =
         FXCollections.observableArrayList();
 
-    try (Stream<Path> paths = Files.list(filePath)) {
-      paths.forEach(childPath -> result.add(createNode(childPath)));
-      return result;
-    } catch (IOException e) {
-      // TODO: report exception
-    }
-
-    DepanFxProjectBadMember badMember = getProject().asBadMember(filePath);
-    result.add(new DepanFxProjectBadMemberItem(badMember));
+    member.getMembers()
+        .forEach(c -> result.add(createNode(c)));
     return result;
   }
 
-  private TreeItem<DepanFxWorkspaceMember> createNode(Path childPath) {
-    if (Files.isDirectory(childPath)) {
-      DepanFxProjectContainer container =
-          getProject().asProjectContainer(childPath).get();
-      return new DepanFxProjectContainerItem(container);
+  private TreeItem<DepanFxWorkspaceMember> createNode(
+      DepanFxWorkspaceMember member) {
+    if (member instanceof DepanFxProjectContainer) {
+      return new DepanFxProjectContainerItem((DepanFxProjectContainer) member);
     }
-    if (Files.isRegularFile(childPath)) {
-      DepanFxProjectDocument document =
-          getProject().asProjectDocument(childPath).get();
-      return new DepanFxProjectDocumentItem(document);
+    if (member instanceof DepanFxProjectDocument) {
+      return new DepanFxProjectDocumentItem((DepanFxProjectDocument) member);
     }
-    DepanFxProjectBadMember badMember = getProject().asBadMember(childPath);
-    return new DepanFxProjectBadMemberItem(badMember);
-  }
-
-  private DepanFxProjectTree getProject() {
-    return member.getProject();
+    return new DepanFxProjectBadMemberItem((DepanFxProjectBadMember) member);
   }
 }

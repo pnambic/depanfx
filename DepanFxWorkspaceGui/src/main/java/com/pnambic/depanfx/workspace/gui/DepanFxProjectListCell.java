@@ -3,7 +3,6 @@ package com.pnambic.depanfx.workspace.gui;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSections;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherRegistry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -56,8 +55,6 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
 
   private final DepanFxDialogRunner dialogRunner;
 
-  private final DepanFxLinkMatcherRegistry linkMatcherRegistry;
-
   private final DepanFxNewResourceRegistry newResourceRegistry;
 
   private final DepanFxSceneController scene;
@@ -65,13 +62,11 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
   public DepanFxProjectListCell(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
-      DepanFxLinkMatcherRegistry linkMatcherRegistry,
       DepanFxNewResourceRegistry newResourceRegistry,
       DepanFxSceneController scene) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
     this.newResourceRegistry = newResourceRegistry;
-    this.linkMatcherRegistry = linkMatcherRegistry;
     this.scene = scene;
   }
 
@@ -197,7 +192,7 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
         DepanFxNodeListSections.getFinalSection();
     DepanFxNodeListViewer viewer =
         new DepanFxNodeListViewer(
-            dialogRunner, linkMatcherRegistry, nodeList, sections);
+            dialogRunner, nodeList, sections);
 
     viewer.prependMemberTree();
     Tab viewerTab = viewer.createWorkspaceTab(tabTitle);

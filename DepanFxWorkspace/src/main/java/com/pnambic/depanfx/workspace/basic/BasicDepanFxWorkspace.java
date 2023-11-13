@@ -6,14 +6,17 @@ import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceRegistry;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
+import com.pnambic.depanfx.workspace.DepanFxProjectSpi;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.documents.DocumentRegistry;
+import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -44,6 +47,8 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
 
   private final DocumentPersistenceRegistry persistRegistry;
 
+  private final DepanFxProjectSpi builtInProj;
+
   private final List<DepanFxProjectTree> projectList = new ArrayList<>();
 
   private final DocumentRegistry documentRegistry = new DocumentRegistry();
@@ -53,21 +58,33 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   @Autowired
   public BasicDepanFxWorkspace(
       ContextModelRegistry modelRegistry,
-      DocumentPersistenceRegistry resourceModels) {
-    this(WORKSPACE_NAME, modelRegistry, resourceModels);
+      DocumentPersistenceRegistry persistRegistry,
+      @Qualifier("BuiltIn Workspace")
+      DepanFxProjectSpi builtInProj) {
+    this(WORKSPACE_NAME, modelRegistry, persistRegistry, builtInProj);
   }
 
   public BasicDepanFxWorkspace(String workspaceName,
       ContextModelRegistry modelRegistry,
-      DocumentPersistenceRegistry persistRegistry) {
+      DocumentPersistenceRegistry persistRegistry,
+      DepanFxProjectSpi builtInProj) {
     this.workspaceName = workspaceName;
     this.modelRegistry = modelRegistry;
     this.persistRegistry = persistRegistry;
+    this.builtInProj = builtInProj;
   }
 
   @Override
   public List<DepanFxProjectTree> getProjectList() {
-    return projectList;
+    List<DepanFxProjectTree> result = new ArrayList<>(projectList.size() + 1);
+    result.addAll(projectList);
+    result.add(((DepanFxBuiltInProject) builtInProj).getProjectTree());
+    return result;
+  }
+
+  @Override
+  public DepanFxProjectSpi getBuiltInProject() {
+    return builtInProj;
   }
 
   @Override

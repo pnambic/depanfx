@@ -7,9 +7,11 @@ module depanfx.workspace {
     requires depanfx.graph_doc;
     requires depanfx.persistence;
     requires depanfx.platform;
+    requires com.google.common;
 
     // Instantiate a workspace
     opens com.pnambic.depanfx.workspace.basic to spring.beans;
+    opens com.pnambic.depanfx.workspace.projects to spring.core;
 
     exports com.pnambic.depanfx.workspace;
     exports com.pnambic.depanfx.workspace.documents;

@@ -3,6 +3,7 @@ package com.pnambic.depanfx.workspace.basic;
 import com.pnambic.depanfx.workspace.DepanFxProjectBadMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
+import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectSpi;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 
@@ -10,6 +11,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class BasicDepanFxProjectTree implements DepanFxProjectTree {
 
@@ -120,5 +122,16 @@ public class BasicDepanFxProjectTree implements DepanFxProjectTree {
 
   private void notifyDocumentDeleted(DepanFxProjectDocument projDoc) {
     listeners.forEach(l -> l.onDocumentDeleted(projDoc));
+  }
+
+  @Override // DepanFxProjectContainer
+  public Stream<DepanFxProjectMember> getMembers() {
+    return getMembers(this);
+  }
+
+  @Override // DepanFxProjectTree
+  public Stream<DepanFxProjectMember> getMembers(
+      DepanFxProjectMember basicDepanFxProjectContainer) {
+    return projectSpi.getMembers(basicDepanFxProjectContainer);
   }
 }

@@ -32,10 +32,10 @@ public class DepanFxProjectTreeItem extends TreeItem<DepanFxWorkspaceMember> {
     if (isFirstTimeChildren) {
       isFirstTimeChildren = false;
       DepanFxProjectMemberItemBuilder builder =
-          new DepanFxProjectMemberItemBuilder((DepanFxProjectMember) getValue());
+          new DepanFxProjectMemberItemBuilder(
+              (DepanFxProjectTree) getValue());
       super.getChildren().setAll(builder.buildChildren());
     }
-
     return super.getChildren();
   }
 

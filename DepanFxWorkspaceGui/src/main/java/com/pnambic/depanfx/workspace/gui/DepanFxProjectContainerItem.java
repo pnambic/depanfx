@@ -1,7 +1,6 @@
 package com.pnambic.depanfx.workspace.gui;
 
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
-import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 
 import javafx.collections.ObservableList;
@@ -25,7 +24,8 @@ public class DepanFxProjectContainerItem extends TreeItem<DepanFxWorkspaceMember
     if (isFirstTimeChildren) {
       isFirstTimeChildren = false;
       DepanFxProjectMemberItemBuilder builder =
-          new DepanFxProjectMemberItemBuilder((DepanFxProjectMember) getValue());
+          new DepanFxProjectMemberItemBuilder(
+              (DepanFxProjectContainer) getValue());
       super.getChildren().setAll(builder.buildChildren());
     }
 

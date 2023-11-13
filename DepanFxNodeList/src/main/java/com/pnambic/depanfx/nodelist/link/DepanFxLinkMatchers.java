@@ -25,8 +25,7 @@ public class DepanFxLinkMatchers {
     @Override
     public Optional<DepanFxLink> match(GraphEdge edge) {
       if (edge.getRelation() == forwardRelation) {
-        return Optional.of(
-            new DepanFxLink.Simple(edge.getHead(), edge.getTail()));
+        return Optional.of(new DepanFxLink.Forward(edge));
       }
       return Optional.empty();
     }
@@ -44,8 +43,7 @@ public class DepanFxLinkMatchers {
     @Override
     public Optional<DepanFxLink> match(GraphEdge edge) {
       if (edge.getRelation() == reverseRelation) {
-        return Optional.of(
-            new DepanFxLink.Simple(edge.getTail(), edge.getHead()));
+        return Optional.of(new DepanFxLink.Reverse(edge));
       }
       return Optional.empty();
     }

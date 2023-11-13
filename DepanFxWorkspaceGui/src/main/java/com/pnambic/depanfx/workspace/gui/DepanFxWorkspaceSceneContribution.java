@@ -1,14 +1,13 @@
 package com.pnambic.depanfx.workspace.gui;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherRegistry;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterContribution;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javafx.scene.control.Tab;
 
@@ -21,19 +20,15 @@ public class DepanFxWorkspaceSceneContribution implements DepanFxSceneStarterCon
 
   private final DepanFxDialogRunner dialogRunner;
 
-  private final DepanFxLinkMatcherRegistry linkMatcherRegistry;
-
   private final DepanFxNewResourceRegistry newResourceRegistry;
 
   @Autowired
   public DepanFxWorkspaceSceneContribution(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
-      DepanFxLinkMatcherRegistry linkMatcherRegistry,
       DepanFxNewResourceRegistry newResourceRegistry) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
-    this.linkMatcherRegistry = linkMatcherRegistry;
     this.newResourceRegistry = newResourceRegistry;
   }
 
@@ -46,7 +41,7 @@ public class DepanFxWorkspaceSceneContribution implements DepanFxSceneStarterCon
   public Tab createStarterTab(String label, DepanFxSceneController scene) {
     DepanFxProjectListViewer workspaceViewer =
         new DepanFxProjectListViewer(
-          workspace, dialogRunner, linkMatcherRegistry, newResourceRegistry, scene);
+          workspace, dialogRunner, newResourceRegistry, scene);
     return workspaceViewer.createWorkspaceTab(WORKSPACE_TAB);
   }
 }

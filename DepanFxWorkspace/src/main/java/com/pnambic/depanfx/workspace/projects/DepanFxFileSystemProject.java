@@ -2,7 +2,9 @@ package com.pnambic.depanfx.workspace.projects;
 
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
+import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectSpi;
+import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 
 import java.io.IOException;
 import java.nio.file.DirectoryNotEmptyException;
@@ -11,7 +13,9 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Perform Project storage operations on folder in a file system.
@@ -19,7 +23,6 @@ import java.util.Optional;
  * Container and document operations are performed with file system
  * directories and files.
  */
-
 public class DepanFxFileSystemProject implements DepanFxProjectSpi {
 
   private static LinkOption[] IS_DIRECTORY_LINK_OPTIONS = new LinkOption[0];
@@ -88,5 +91,37 @@ public class DepanFxFileSystemProject implements DepanFxProjectSpi {
   public void deleteDocument(DepanFxProjectDocument projDoc) {
     Path docPath = projDoc.getMemberPath();
     docPath.toFile().delete();
+  }
+
+  public Stream<DepanFxProjectMember> getMembers(DepanFxProjectMember projDoc) {
+    if (projDoc instanceof DepanFxProjectContainer) {
+      return scanDirectory((DepanFxProjectContainer) projDoc);
+    }
+
+    return Collections.<DepanFxProjectMember>emptyList().stream();
+  }
+
+  private Stream<DepanFxProjectMember> scanDirectory(
+      DepanFxProjectContainer parentDoc) {
+    DepanFxProjectTree project = parentDoc.getProject();
+    try {
+      return Files.list(parentDoc.getMemberPath())
+          .map(p -> createProjectMember(project, p));
+    } catch (IOException errIo) {
+      throw new RuntimeException(
+          "Unable to build children for " + parentDoc.getMemberName(),
+          errIo);
+    }
+  }
+
+  private DepanFxProjectMember createProjectMember(
+      DepanFxProjectTree project, Path memberPath) {
+    if (Files.isDirectory(memberPath)) {
+      return project.asProjectContainer(memberPath).get();
+    }
+    if (Files.isRegularFile(memberPath)) {
+      return project.asProjectDocument(memberPath).get();
+    }
+    return project.asBadMember(memberPath);
   }
 }

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javafx.scene.control.MenuItem;
@@ -16,6 +17,7 @@ public class DepanFxNewResourceRegistry {
 
   private final List<DepanFxNewAnalysisContribution> analysisContribs;
 
+  @Autowired
   public DepanFxNewResourceRegistry(
       List<DepanFxNewResourceContribution> resourceContribs,
       List<DepanFxNewAnalysisContribution> analysisContribs) {

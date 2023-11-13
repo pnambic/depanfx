@@ -5,8 +5,8 @@ import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
+import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherRegistry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -15,6 +15,7 @@ import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -52,8 +53,6 @@ public class DepanFxNodeListViewer {
 
   private final DepanFxDialogRunner dialogRunner;
 
-  private final DepanFxLinkMatcherRegistry linkMatcherRegistry;
-
   private DepanFxNodeList nodeList;
 
   private List<DepanFxNodeListSection> sections;
@@ -67,11 +66,9 @@ public class DepanFxNodeListViewer {
 
   public DepanFxNodeListViewer(
       DepanFxDialogRunner dialogRunner,
-      DepanFxLinkMatcherRegistry linkMatcherRegistry,
       DepanFxNodeList nodeList,
       List<DepanFxNodeListSection> sections) {
     this.dialogRunner = dialogRunner;
-    this.linkMatcherRegistry = linkMatcherRegistry;
     this.nodeList = nodeList;
     this.sections = sections;
 
@@ -189,11 +186,19 @@ public class DepanFxNodeListViewer {
   }
 
   private Optional<DepanFxLinkMatcher> getMemberLinkMatcher() {
+    DepanFxWorkspace workspace = nodeList.getWorkspaceResource().getWorkspace();
     ContextModelId modelId =
         ((GraphDocument) nodeList.getWorkspaceResource().getResource())
         .getContextModelId();
-    return linkMatcherRegistry.getMatcherByGroup(
-        modelId, DepanFxLinkMatcherGroup.MEMBER);
+
+    return ((DepanFxBuiltInProject) workspace.getBuiltInProject())
+        .getContributions(DepanFxLinkMatcherDocument.class)
+        .map(c -> (DepanFxLinkMatcherDocument) c.getDocument())
+        .filter(d -> d.getModelId().equals(modelId))
+        .filter(d -> d.getMatchGroups().contains(
+            DepanFxLinkMatcherGroup.MEMBER))
+        .map(d -> d.getMatcher())
+        .findFirst();
   }
 
   private List<DepanFxNodeListSection> isolateSections() {

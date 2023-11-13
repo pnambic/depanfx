@@ -1,6 +1,5 @@
 package com.pnambic.depanfx.workspace.gui;
 
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
@@ -39,8 +38,6 @@ public class DepanFxProjectListViewer {
 
   private final DepanFxDialogRunner dialogRunner;
 
-  private final DepanFxLinkMatcherRegistry linkMatcherRegistry;
-
   private final DepanFxNewResourceRegistry newResourceRegistry;
 
   private final DepanFxSceneController scene;
@@ -50,12 +47,10 @@ public class DepanFxProjectListViewer {
   public DepanFxProjectListViewer(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
-      DepanFxLinkMatcherRegistry linkMatcherRegistry,
       DepanFxNewResourceRegistry newResourceRegistry,
       DepanFxSceneController scene) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
-    this.linkMatcherRegistry = linkMatcherRegistry;
     this.newResourceRegistry = newResourceRegistry;
     this.scene = scene;
 
@@ -144,7 +139,7 @@ public class DepanFxProjectListViewer {
     public TreeCell<DepanFxWorkspaceMember> call(TreeView<DepanFxWorkspaceMember> param) {
 
       return new DepanFxProjectListCell(
-        workspace, dialogRunner, linkMatcherRegistry, newResourceRegistry, scene);
+        workspace, dialogRunner, newResourceRegistry, scene);
     }
   }
 }

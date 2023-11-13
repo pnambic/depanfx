@@ -12,6 +12,8 @@ public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
 
   List<DepanFxProjectTree> getProjectList();
 
+  DepanFxProjectSpi getBuiltInProject();
+
   void addProject(DepanFxProjectTree project);
 
   Optional<DepanFxWorkspaceResource> saveDocument(
