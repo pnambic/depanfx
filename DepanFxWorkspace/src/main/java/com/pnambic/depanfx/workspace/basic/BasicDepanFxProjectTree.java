@@ -1,7 +1,9 @@
 package com.pnambic.depanfx.workspace.basic;
 
+import com.pnambic.depanfx.workspace.DepanFxProjectBadMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
+import com.pnambic.depanfx.workspace.DepanFxProjectSpi;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 
 import java.nio.file.Path;
@@ -11,33 +13,29 @@ import java.util.Optional;
 
 public class BasicDepanFxProjectTree implements DepanFxProjectTree {
 
-  private final String projectName;
-
-  private final Path projectPath;
+  private DepanFxProjectSpi projectSpi;
 
   private final List<ProjectTreeListener> listeners =
       new ArrayList<>();
 
-  public BasicDepanFxProjectTree(String projectName, Path projectPath) {
-    this.projectName = projectName;
-
-    this.projectPath = projectPath;
+  public BasicDepanFxProjectTree(DepanFxProjectSpi projectSpi) {
+    this.projectSpi = projectSpi;
   }
 
   @Override
   public String getMemberName() {
-    return projectName;
+    return projectSpi.getProjectName();
   }
 
   @Override
   public Path getMemberPath() {
-    return projectPath;
+    return projectSpi.getProjectPath();
   }
+
   @Override
   public DepanFxProjectTree getProject() {
     return this;
   }
-
 
   /**
    * Projects have no project parent.  Projects may be associated with a
@@ -50,29 +48,25 @@ public class BasicDepanFxProjectTree implements DepanFxProjectTree {
   }
 
   @Override
+  public DepanFxProjectBadMember asBadMember(Path childPath) {
+    return new BasicDepanFxProjectBadMember(this, childPath);
+  }
+
+  @Override
   public Optional<DepanFxProjectContainer> asProjectContainer(Path dirPath) {
-    if (dirPath.startsWith(projectPath)) {
-      BasicDepanFxProjectContainer result =
-          new BasicDepanFxProjectContainer(this, dirPath);
-      return Optional.of(result);
-    }
-    return Optional.empty();
+    return projectSpi.getMemberPath(dirPath)
+        .map(p -> new BasicDepanFxProjectContainer(this, p));
   }
 
   @Override
   public Optional<DepanFxProjectDocument> asProjectDocument(Path docPath) {
-    if (docPath.startsWith(projectPath)) {
-      BasicDepanFxProjectDocument result =
-          new BasicDepanFxProjectDocument(this, docPath);
-      return Optional.of(result);
-    }
-    return Optional.empty();
+    return projectSpi.getMemberPath(docPath)
+        .map(p -> new BasicDepanFxProjectDocument(this, p));
   }
 
   @Override
   public void createContainer(DepanFxProjectContainer projDir) {
-    Path dirPath = projDir.getMemberPath();
-    dirPath.toFile().mkdirs();
+    projectSpi.createContainer(projDir);
     notifyContainerAdded(projDir);
   }
 
@@ -83,15 +77,13 @@ public class BasicDepanFxProjectTree implements DepanFxProjectTree {
 
   @Override
   public void deleteContainer(DepanFxProjectContainer projDir) {
-    Path dirPath = projDir.getMemberPath();
-    dirPath.toFile().delete();
+    projectSpi.deleteContainer(projDir);
     notifyContainerDeleted(projDir);
   }
 
   @Override
   public void deleteDocument(DepanFxProjectDocument projDoc) {
-    Path dirPath = projDoc.getMemberPath();
-    dirPath.toFile().delete();
+    projectSpi.deleteDocument(projDoc);
     notifyDocumentDeleted(projDoc);
   }
 

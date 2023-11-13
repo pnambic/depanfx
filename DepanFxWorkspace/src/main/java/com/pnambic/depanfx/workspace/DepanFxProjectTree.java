@@ -22,6 +22,8 @@ public interface DepanFxProjectTree extends DepanFxProjectMember {
     void onDocumentDeleted(DepanFxProjectDocument projDoc);
   }
 
+  DepanFxProjectBadMember asBadMember(Path childPath);
+
   Optional<DepanFxProjectContainer> asProjectContainer(Path path);
 
   Optional<DepanFxProjectDocument> asProjectDocument(Path path);

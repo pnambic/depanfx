@@ -1,20 +1,19 @@
 package com.pnambic.depanfx.workspace.projects;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.NotDirectoryException;
-import java.nio.file.Path;
-import java.util.List;
-
+import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
+import com.pnambic.depanfx.workspace.DepanFxProjectSpi;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+
 public class DepanFxProjects {
-  private static LinkOption[] IS_DIRECTORY_LINK_OPTIONS = new LinkOption[0];
+
+  public static final String BUILT_IN = "Built-in";
 
   public static final String ANALYSES_CONTAINER = "Analyses";
 
@@ -22,14 +21,21 @@ public class DepanFxProjects {
 
   public static final String TOOLS_CONTAINER = "Tools";
 
-  public static void createProjectStructure(String projectName, Path projectPath) {
+  /**
+   * Use the project spi during initial project construction to avoid any
+   * possible listeners.
+   */
+  public static void createProjectStructure(
+      DepanFxProjectTree projectTree, DepanFxProjectSpi projectSpi) {
     try {
-      checkProjectForNew(projectPath);
-      createChildDirectory(projectPath, ANALYSES_CONTAINER);
-      createChildDirectory(projectPath, GRAPHS_CONTAINER);
-      createChildDirectory(projectPath, TOOLS_CONTAINER);
-    } catch (Exception err) {
-      throw new RuntimeException("Unable to create structure for new project " + projectName, err);
+      projectSpi.checkProjectForNew();
+      createChildContainer(projectTree, projectSpi, ANALYSES_CONTAINER);
+      createChildContainer(projectTree, projectSpi, GRAPHS_CONTAINER);
+      createChildContainer(projectTree, projectSpi, TOOLS_CONTAINER);
+    } catch (Exception errAny) {
+      throw new RuntimeException(
+          "Unable to create structure for new project "
+              + projectSpi.getProjectName(), errAny);
     }
   }
 
@@ -49,23 +55,17 @@ public class DepanFxProjects {
     return null;
   }
 
-  private static void checkProjectForNew(Path projectPath) throws IOException {
-    if (!Files.isDirectory(projectPath, IS_DIRECTORY_LINK_OPTIONS)) {
-      throw new NotDirectoryException(projectPath.toString());
-    }
-    if (!isDirectoryEmpty(projectPath)) {
-      throw new DirectoryNotEmptyException(projectPath.toString());
-    }
+  private static void createChildContainer(
+      DepanFxProjectTree projectTree,
+      DepanFxProjectSpi projectSpi,
+      String dirName) {
+    buildChildContainer(projectTree, dirName)
+        .ifPresent(projectSpi::createContainer);
   }
 
-  private static boolean isDirectoryEmpty(Path path) throws IOException {
-    try (DirectoryStream<Path> directory = Files.newDirectoryStream(path)) {
-        return !directory.iterator().hasNext();
-    }
-  }
-
-  private static void createChildDirectory(Path dirPath, String childDir) {
-    File childFile = new File(dirPath.toFile(), childDir);
-    boolean result = childFile.mkdirs();
+  private static Optional<DepanFxProjectContainer> buildChildContainer(
+      DepanFxProjectTree projectTree, String dirName) {
+    Path dirPath = Paths.get(dirName);
+    return projectTree.asProjectContainer(dirPath);
   }
 }

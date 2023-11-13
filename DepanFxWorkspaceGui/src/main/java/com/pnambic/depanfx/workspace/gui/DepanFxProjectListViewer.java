@@ -9,6 +9,7 @@ import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
+import com.pnambic.depanfx.workspace.projects.DepanFxFileSystemProject;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import java.io.File;
@@ -69,13 +70,14 @@ public class DepanFxProjectListViewer {
     if (selectedDirectory != null) {
       String projectName = selectedDirectory.getName();
       Path projectPath = selectedDirectory.toPath();
-      DepanFxProjects.createProjectStructure(projectName, projectPath);
-      DepanFxProjectTree project =
-          DepanFxWorkspaceFactory.createDepanFxProjectTree(
-              projectName, projectPath);
-      workspace.addProject(project);
+      DepanFxFileSystemProject projectSpi =
+          new DepanFxFileSystemProject(projectName, projectPath);
+      DepanFxProjectTree projectTree =
+          DepanFxWorkspaceFactory.createDepanFxProjectTree(projectSpi);
+      DepanFxProjects.createProjectStructure(projectTree, projectSpi);
+      workspace.addProject(projectTree);
 
-      DepanFxProjectTreeItem projectItem = new DepanFxProjectTreeItem(project);
+      DepanFxProjectTreeItem projectItem = new DepanFxProjectTreeItem(projectTree);
       workspaceView.getRoot().getChildren().add(projectItem);
     }
   }
@@ -88,9 +90,10 @@ public class DepanFxProjectListViewer {
     if (selectedDirectory != null) {
       String projectName = selectedDirectory.getName();
       Path projectPath = selectedDirectory.toPath();
+      DepanFxFileSystemProject projectSpi =
+          new DepanFxFileSystemProject(projectName, projectPath);
       DepanFxProjectTree project =
-          DepanFxWorkspaceFactory.createDepanFxProjectTree(
-              projectName, projectPath);
+          DepanFxWorkspaceFactory.createDepanFxProjectTree(projectSpi);
       workspace.addProject(project);
 
       DepanFxProjectTreeItem projectItem = new DepanFxProjectTreeItem(project);
