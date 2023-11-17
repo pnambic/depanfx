@@ -50,16 +50,6 @@ public class DepanFxTreeForkItem extends DepanFxNodeListItem {
 
   private TreeItem<DepanFxNodeListMember> buildNodeItem(
       GraphNode node, DepanFxTreeFork fork) {
-    switch (fork.getMemberTreeMode(node)) {
-
-    case FORK:
-      DepanFxTreeFork treeFork = fork.buildMemberTreeFork(node);
-      return new DepanFxTreeForkItem(treeFork);
-
-    case LEAF:
-      DepanFxTreeLeaf treeLeaf = fork.buildMemberTreeLeaf(node);
-      return new DepanFxTreeLeafItem(treeLeaf);
-    }
-    return null;
+    return fork.buildTreeMember(node);
   }
 }

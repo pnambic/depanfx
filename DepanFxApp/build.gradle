@@ -40,7 +40,7 @@ dependencies {
 application {
   mainClass = "com.pnambic.depanfx.DepanFxApplication"
   mainModule = "depanfx.app"
-  applicationDefaultJvmArgs = [ '-Xmx1G' ]
+  applicationDefaultJvmArgs = [ '-Xmx4G', '-Xss2m' ]
 }
 
 jlink {

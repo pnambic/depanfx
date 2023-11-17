@@ -8,6 +8,9 @@ import javafx.scene.control.TreeItem;
 
 public class DepanFxNodeListSections {
 
+  /**
+   * Only use with graph node members.  Should not be used with sections, etc.
+   */
   public static Comparator<TreeItem<DepanFxNodeListMember>> COMPARE_BY_SORT_KEY =
       new CompareBySortKey();
 
@@ -29,9 +32,8 @@ public class DepanFxNodeListSections {
         TreeItem<DepanFxNodeListMember> one,
         TreeItem<DepanFxNodeListMember> two) {
 
-      // Better to sort by TreeItem type, then name, but this works ok.
-      String oneKey = ((DepanFxNodeListMember) one.getValue()).getSortKey();
-      String twoKey = ((DepanFxNodeListMember) two.getValue()).getSortKey();
+      String oneKey = ((DepanFxNodeListGraphNode) one.getValue()).getSortKey();
+      String twoKey = ((DepanFxNodeListGraphNode) two.getValue()).getSortKey();
       return oneKey.compareTo(twoKey);
     }
   }

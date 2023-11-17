@@ -4,7 +4,7 @@ import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 
 import java.util.List;
 
-public class DepanFxNodeListRoot extends DepanFxNodeListMember {
+public class DepanFxNodeListRoot implements DepanFxNodeListMember {
 
   private final DepanFxNodeList nodeList;
 
@@ -22,5 +22,10 @@ public class DepanFxNodeListRoot extends DepanFxNodeListMember {
 
   public DepanFxNodeList getNodeList() {
     return nodeList;
+  }
+
+  @Override
+  public String getDisplayName() {
+    return "<root>";
   }
 }

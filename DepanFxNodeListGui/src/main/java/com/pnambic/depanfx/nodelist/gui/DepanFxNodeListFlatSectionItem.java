@@ -36,7 +36,8 @@ public class DepanFxNodeListFlatSectionItem extends DepanFxNodeListSectionItem {
 
   private ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
 
-    DepanFxNodeListFlatSection section = (DepanFxNodeListFlatSection) getValue();
+    DepanFxNodeListFlatSection section =
+        (DepanFxNodeListFlatSection) getValue();
 
     Collection<GraphNode> nodes = nodeList.getNodes();
     List<TreeItem<DepanFxNodeListMember>> result =

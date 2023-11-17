@@ -49,10 +49,17 @@ public class DepanFxProjectTreeItem extends TreeItem<DepanFxWorkspaceMember> {
 
     @Override
     public void onContainerAdded(DepanFxProjectContainer projDir) {
-      projDir.getParent()
-          .map(c -> findContainerItem(DepanFxProjectTreeItem.this, c))
-          .ifPresent(c -> c.getChildren().add(
-                new DepanFxProjectContainerItem(projDir)));
+      Optional<TreeItem<DepanFxWorkspaceMember>> optParentItem =
+          projDir.getParent()
+            .map(c -> findContainerItem(DepanFxProjectTreeItem.this, c));
+
+      Optional<TreeItem<DepanFxWorkspaceMember>> optDirItem =
+          optParentItem .map(i -> findMemberItem(i, projDir));
+      if (optDirItem.isEmpty()) {
+        optParentItem.ifPresent(p ->
+            p.getChildren().add(new DepanFxProjectContainerItem(projDir)));
+      }
+      // should refresh if project directory is present
     }
 
     @Override
@@ -76,8 +83,8 @@ public class DepanFxProjectTreeItem extends TreeItem<DepanFxWorkspaceMember> {
 
       // Sometimes there are two notifications
       if (optDocItem.isEmpty()) {
-        optParentItem.get().getChildren().add(
-            new DepanFxProjectDocumentItem(projDoc));
+        optParentItem.ifPresent(p ->
+            p.getChildren().add(new DepanFxProjectDocumentItem(projDoc)));
       }
     }
 
@@ -103,7 +110,7 @@ public class DepanFxProjectTreeItem extends TreeItem<DepanFxWorkspaceMember> {
         return;
       }
 
-      buildContainerItem(projDir);
+      projItem = buildContainerItem(projDir);
     }
 
     private TreeItem<DepanFxWorkspaceMember> buildContainerItem(

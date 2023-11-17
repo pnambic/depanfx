@@ -20,15 +20,10 @@ import javafx.scene.control.TreeItem;
 public class DepanFxTreeSectionItem
     extends DepanFxNodeListSectionItem {
 
-  private final DepanFxTreeModel treeModel;
-
   private boolean freshTree = false;
 
-  public DepanFxTreeSectionItem(
-      DepanFxTreeSection section,
-      DepanFxTreeModel treeModel) {
+  public DepanFxTreeSectionItem(DepanFxTreeSection section) {
     super(section);
-    this.treeModel = treeModel;
   }
 
   @Override
@@ -49,7 +44,9 @@ public class DepanFxTreeSectionItem
   private ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
     DepanFxTreeSection section = (DepanFxTreeSection) getValue();
 
+    DepanFxTreeModel treeModel = section.getTreeModel();
     Collection<GraphNode> nodes = treeModel.getRoots();
+
     List<TreeItem<DepanFxNodeListMember>> result =
         new ArrayList<>(nodes.size());
 
@@ -63,23 +60,12 @@ public class DepanFxTreeSectionItem
 
   private TreeItem<DepanFxNodeListMember> buildNodeItem(
       GraphNode node, DepanFxTreeSection section) {
-    switch (treeModel.getTreeMode(node)) {
-
-    case FORK:
-      DepanFxTreeFork treeFork =
-          new DepanFxTreeFork(node, section, treeModel);
-      return new DepanFxTreeForkItem(treeFork);
-
-    case LEAF:
-      DepanFxTreeLeaf treeLeaf =
-          new DepanFxTreeLeaf(node, section);
-      return new DepanFxTreeLeafItem(treeLeaf);
-    }
-    return null;
+    return section.buildNodeItem(node);
   }
 
   @Override
   public DepanFxNodeList getSectionNodes() {
-    return treeModel.getReachableGraphNodes(treeModel.getRoots());
+    DepanFxTreeSection section = (DepanFxTreeSection) getValue();
+    return section.getSectionNodes();
   }
 }

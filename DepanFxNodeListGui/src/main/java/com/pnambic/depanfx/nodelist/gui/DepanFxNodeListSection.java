@@ -3,13 +3,16 @@ package com.pnambic.depanfx.nodelist.gui;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 
-public abstract class DepanFxNodeListSection extends DepanFxNodeListMember {
+public interface DepanFxNodeListSection extends DepanFxNodeListMember {
 
-  public abstract String getDisplayName(GraphNode node);
+  String getSectionLabel();
 
-  public abstract String getSortKey(GraphNode node);
+  /** Provide the display name for a constituent graph node. */
+  String getDisplayName(GraphNode node);
 
-  public abstract DepanFxNodeListSectionItem buildTreeItem(
-      DepanFxNodeList baseNodes);
+  /** Provide the display name for a constituent graph node. */
+  String getSortKey(GraphNode node);
 
+  /** Build the section list member (root) for the supplied node list. */
+  DepanFxNodeListSectionItem buildTreeItem(DepanFxNodeList baseNodes);
 }

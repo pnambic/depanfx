@@ -9,18 +9,30 @@ import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModelBuilder;
 
 import java.nio.file.Path;
+import java.text.MessageFormat;
 
-public class DepanFxTreeSection extends DepanFxNodeListSection {
+import javafx.scene.control.TreeItem;
+
+public class DepanFxTreeSection implements DepanFxNodeListSection {
 
   private final DepanFxLinkMatcher linkMatcher;
+
+  private DepanFxTreeModel treeModel;
+
+  private DepanFxNodeList sectionNodes;
 
   public DepanFxTreeSection(DepanFxLinkMatcher linkMatcher) {
     this.linkMatcher = linkMatcher;
   }
 
   @Override
-  public String getDisplayName() {
+  public String getSectionLabel() {
     return "Tree";
+  }
+
+  @Override
+  public String getDisplayName() {
+    return fmtDisplayName();
   }
 
   @Override
@@ -42,9 +54,51 @@ public class DepanFxTreeSection extends DepanFxNodeListSection {
     DepanFxTreeModelBuilder builder = new DepanFxTreeModelBuilder(linkMatcher);
     GraphDocument graphModel =
         (GraphDocument) baseNodes.getWorkspaceResource().getResource();
-    DepanFxTreeModel treeModel =
+    treeModel =
         builder.traverseGraph(graphModel.getGraph(), baseNodes);
+    sectionNodes = treeModel.getReachableGraphNodes(treeModel.getRoots());
 
-    return new DepanFxTreeSectionItem(this, treeModel);
+    return new DepanFxTreeSectionItem(this);
+  }
+
+  public TreeItem<DepanFxNodeListMember> buildNodeItem(GraphNode node) {
+    switch (treeModel.getTreeMode(node)) {
+
+    case FORK:
+      DepanFxTreeFork treeFork = buildMemberTreeFork(node);
+      return new DepanFxTreeForkItem(treeFork);
+
+    case LEAF:
+      DepanFxTreeLeaf treeLeaf = buildMemberTreeLeaf(node);
+      return new DepanFxTreeLeafItem(treeLeaf);
+    }
+    return null;
+  }
+
+  public DepanFxTreeModel getTreeModel() {
+    return treeModel;
+  }
+
+  public DepanFxNodeList getSectionNodes() {
+    return sectionNodes;
+  }
+
+  private DepanFxTreeFork buildMemberTreeFork(GraphNode fork) {
+    return new DepanFxTreeFork(fork, this);
+  }
+
+  private DepanFxTreeLeaf buildMemberTreeLeaf(GraphNode leaf) {
+    return new DepanFxTreeLeaf(leaf, this);
+  }
+
+  private String fmtDisplayName() {
+    int listSize = getSectionNodes().getNodes().size();
+    if (listSize == 1) {
+      return MessageFormat.format(
+          "{0} ({1} node)", getSectionLabel(), listSize);
+
+    }
+    return MessageFormat.format(
+        "{0} ({1} nodes)", getSectionLabel(), listSize);
   }
 }

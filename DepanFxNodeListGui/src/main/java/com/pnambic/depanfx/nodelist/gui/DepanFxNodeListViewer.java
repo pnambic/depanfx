@@ -110,9 +110,9 @@ public class DepanFxNodeListViewer {
           (DepanFxNodeListSection) member,
           s -> new SimpleBooleanProperty(false));
     }
-    if (member instanceof DepanFxGraphNodeProvider) {
+    if (member instanceof DepanFxNodeListGraphNode) {
       return nodesCheckBoxStates
-          .get(((DepanFxGraphNodeProvider) member).getGraphNode());
+          .get(((DepanFxNodeListGraphNode) member).getGraphNode());
     }
     return null;
   }
