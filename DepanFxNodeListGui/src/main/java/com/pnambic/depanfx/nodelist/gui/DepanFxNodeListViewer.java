@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
@@ -15,6 +14,7 @@ import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 
 import java.io.IOException;
@@ -159,13 +159,13 @@ public class DepanFxNodeListViewer {
   // Support for built-in member tree sections
 
   public void prependMemberTree() {
-    getMemberLinkMatcher().ifPresent(m -> {
+    getMemberLinkMatcherResource().ifPresent(m -> {
         DepanFxTreeSection insert = new DepanFxTreeSection(m);
         insertSection(0, insert);});
   }
 
   public void insertMemberTreeSection(DepanFxNodeListSection before) {
-    getMemberLinkMatcher().ifPresent(m -> {
+    getMemberLinkMatcherResource().ifPresent(m -> {
         DepanFxTreeSection insert = new DepanFxTreeSection(m);
         insertSection(before, insert);});
   }
@@ -185,20 +185,36 @@ public class DepanFxNodeListViewer {
     }
   }
 
-  private Optional<DepanFxLinkMatcher> getMemberLinkMatcher() {
+  private Optional<DepanFxWorkspaceResource> getMemberLinkMatcherResource() {
     DepanFxWorkspace workspace = nodeList.getWorkspaceResource().getWorkspace();
     ContextModelId modelId =
         ((GraphDocument) nodeList.getWorkspaceResource().getResource())
         .getContextModelId();
 
-    return ((DepanFxBuiltInProject) workspace.getBuiltInProject())
-        .getContributions(DepanFxLinkMatcherDocument.class)
-        .map(c -> (DepanFxLinkMatcherDocument) c.getDocument())
-        .filter(d -> d.getModelId().equals(modelId))
-        .filter(d -> d.getMatchGroups().contains(
-            DepanFxLinkMatcherGroup.MEMBER))
-        .map(d -> d.getMatcher())
-        .findFirst();
+    DepanFxBuiltInProject project = (DepanFxBuiltInProject) workspace.getBuiltInProject();
+    return
+        project.getContributions(DepanFxLinkMatcherDocument.class)
+            .filter(c -> byMemberLinkMatcherDoc(c, modelId))
+            .findFirst()
+            .flatMap(c -> contribToWorkspaceResource(c, workspace, project));
+  }
+
+  private boolean byMemberLinkMatcherDoc(
+      DepanFxBuiltInContribution contrib, Object modelId) {
+    DepanFxLinkMatcherDocument doc =
+        (DepanFxLinkMatcherDocument) contrib.getDocument();
+    if (!doc.getModelId().equals(modelId)) {
+      return false;
+    }
+    return doc.getMatchGroups().contains(DepanFxLinkMatcherGroup.MEMBER);
+  }
+
+  private Optional<DepanFxWorkspaceResource> contribToWorkspaceResource(
+      DepanFxBuiltInContribution contrib,
+      DepanFxWorkspace workspace,
+      DepanFxBuiltInProject project) {
+    return project.getProjectTree().asProjectDocument(contrib.getPath())
+        .flatMap(d -> workspace.toWorkspaceResource(d, contrib.getDocument()));
   }
 
   private List<DepanFxNodeListSection> isolateSections() {

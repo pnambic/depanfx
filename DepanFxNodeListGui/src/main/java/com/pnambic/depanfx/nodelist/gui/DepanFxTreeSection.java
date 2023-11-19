@@ -4,9 +4,11 @@ import com.pnambic.depanfx.graph.context.GraphContextKeys;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
+import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModelBuilder;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.nio.file.Path;
 import java.text.MessageFormat;
@@ -15,14 +17,14 @@ import javafx.scene.control.TreeItem;
 
 public class DepanFxTreeSection implements DepanFxNodeListSection {
 
-  private final DepanFxLinkMatcher linkMatcher;
+  private final DepanFxWorkspaceResource linkMatcherRsrc;
 
   private DepanFxTreeModel treeModel;
 
   private DepanFxNodeList sectionNodes;
 
-  public DepanFxTreeSection(DepanFxLinkMatcher linkMatcher) {
-    this.linkMatcher = linkMatcher;
+  public DepanFxTreeSection(DepanFxWorkspaceResource linkMatcherRsrc) {
+    this.linkMatcherRsrc = linkMatcherRsrc;
   }
 
   @Override
@@ -51,6 +53,8 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
   }
 
   public DepanFxNodeListSectionItem buildTreeItem(DepanFxNodeList baseNodes) {
+    DepanFxLinkMatcher linkMatcher =
+        ((DepanFxLinkMatcherDocument) linkMatcherRsrc.getResource()).getMatcher();
     DepanFxTreeModelBuilder builder = new DepanFxTreeModelBuilder(linkMatcher);
     GraphDocument graphModel =
         (GraphDocument) baseNodes.getWorkspaceResource().getResource();
