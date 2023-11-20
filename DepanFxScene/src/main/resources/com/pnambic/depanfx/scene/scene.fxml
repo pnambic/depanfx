@@ -7,8 +7,9 @@
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
 <BorderPane
       maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
@@ -23,20 +24,21 @@
                         <Menu fx:id="fileNewItem" text="New"/>
                         <SeparatorMenuItem />
                         <MenuItem text="Open"/>
-                        <MenuItem fx:id="fileOpenProjectItem" text="Open Project.."/>
+                        <MenuItem fx:id="fileOpenProjectItem" text="Open Project..."/>
                         <SeparatorMenuItem />
                         <MenuItem text="Save"/>
-                        <MenuItem text="Save As .."/>
+                        <MenuItem text="Save As..."/>
                         <MenuItem text="Save All"/>
                         <SeparatorMenuItem />
-                        <MenuItem fx:id="fileImportItem" text="Import .."/>
-                        <MenuItem text="Export .."/>
+                        <MenuItem fx:id="fileImportItem" text="Import..."
+                            onAction="#handleImportItem"/>
+                        <MenuItem text="Export..."/>
                         <SeparatorMenuItem />
                         <MenuItem text="Print"/>
                         <SeparatorMenuItem />
                         <MenuItem text="Close"/>
                         <SeparatorMenuItem />
-                        <MenuItem fx:id="fileExitItem" text="Exit"/>
+                        <MenuItem text="Exit" onAction="#handleClose"/>
                     </items>
                 </Menu>
                 <Menu text="Edit">
@@ -57,9 +59,9 @@
                 <Menu text="View"/>
                 <Menu text="Help">
                      <items>
-                        <MenuItem text="Welcome"/>
+                        <MenuItem text="Welcome..." onAction="#handleWelcome"/>
                         <SeparatorMenuItem />
-                        <MenuItem text="About"/>
+                        <MenuItem text="About..." onAction="#handleAbout" />
                      </items>
                 </Menu>
             </menus>
@@ -70,9 +72,12 @@
             fx:id="viewRoot">
             <tabs>
                 <Tab text="Welcome">
-                    <StackPane>
+                    <VBox fillWidth="true" alignment="CENTER">
                         <Label fx:id="welcomeLabel" text="Welcome to DepanFX!" />
-                    </StackPane>
+                        <ImageView fx:id="welcomeImage"
+                            fitHeight="256" fitWidth="256">
+                        </ImageView>
+                    </VBox>
                 </Tab>
             </tabs>
         </TabPane>

@@ -1,5 +1,7 @@
 package com.pnambic.depanfx.scene;
 
+import net.rgielen.fxweaver.core.FxWeaver;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -7,7 +9,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import net.rgielen.fxweaver.core.FxWeaver;
 
 @Component
 public class DepanFxDialogRunner {
@@ -23,6 +24,7 @@ public class DepanFxDialogRunner {
     Stage dialogStage = new Stage();
     dialogStage.initModality(Modality.APPLICATION_MODAL);
     dialogStage.setTitle(title);
+    DepanFxAppIcons.installDepanIcons(dialogStage.getIcons());
     dialogStage.setScene(new Scene(dialogPane));
     dialogStage.showAndWait();
   }

@@ -1,19 +1,21 @@
 package com.pnambic.depanfx.app;
 
-import java.io.Closeable;
-import java.io.IOException;
+import com.pnambic.depanfx.DepanFxApplication;
+import com.pnambic.depanfx.scene.DepanFxAppIcons;
+import com.pnambic.depanfx.scene.DepanFxSceneController;
+
+import net.rgielen.fxweaver.core.FxWeaver;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import com.pnambic.depanfx.DepanFxApplication;
-import com.pnambic.depanfx.scene.DepanFxSceneController;
+import java.io.Closeable;
+import java.io.IOException;
 
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import net.rgielen.fxweaver.core.FxWeaver;
 
 public class DepanFxApp extends Application implements Closeable {
 
@@ -38,7 +40,8 @@ public class DepanFxApp extends Application implements Closeable {
   public void start(Stage stage) throws Exception {
     Scene scene = DepanFxSceneController.createDepanScene(fxWeaver, this);
 
-    stage.setTitle("DepanFX w/ JavaFX and Gradle");
+    stage.setTitle("DepanFX");
+    DepanFxAppIcons.installDepanIcons(stage.getIcons());
     stage.setScene(scene);
     stage.show();
   }

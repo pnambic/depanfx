@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.scene;
 
+import com.pnambic.depanfx.scene.DepanFxAppIcons.IconSize;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuRegistry;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterRegistry;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.io.Closeable;
 import java.io.IOException;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -23,6 +25,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.image.ImageView;
 
 @Component
 @FxmlView("scene.fxml")
@@ -34,6 +37,8 @@ public class DepanFxSceneController {
 
   private final DepanFxSceneStarterRegistry starterRegistry;
 
+  private final DepanFxDialogRunner dialogRunner;
+
   private Closeable onClose;
 
   @FXML
@@ -43,6 +48,9 @@ public class DepanFxSceneController {
   private Label welcomeLabel;
 
   @FXML
+  private ImageView welcomeImage;
+
+  @FXML
   private MenuItem fileOpenProjectItem;
 
   @FXML
@@ -50,9 +58,6 @@ public class DepanFxSceneController {
 
   @FXML
   private Menu fileNewItem;
-
-  @FXML
-  private MenuItem fileExitItem;
 
   public static Scene createDepanScene(FxWeaver fxWeaver, Closeable onClose) throws IOException {
 
@@ -70,40 +75,49 @@ public class DepanFxSceneController {
   public DepanFxSceneController(
       DepanFxSceneMenuRegistry menuRegistry,
       DepanFxNewResourceRegistry newResourceRegistry,
-      DepanFxSceneStarterRegistry starterRegistry) {
+      DepanFxSceneStarterRegistry starterRegistry,
+      DepanFxDialogRunner dialogRunner) {
     this.menuRegistry = menuRegistry;
     this.newResourceRegistry = newResourceRegistry;
     this.starterRegistry = starterRegistry;
+    this.dialogRunner = dialogRunner;
   }
 
   @FXML
   public void initialize() {
-
-    // Tweak welcome tab
-    String javaVersion = System.getProperty("java.version");
-    String javafxVersion = System.getProperty("javafx.version");
-    welcomeLabel.setText("* Welcome to DepanFX *"
-        + "\nBuilt with JavaFX " + javafxVersion
-        + "\nRunning on Java " + javaVersion + ".");
+    DepanFxAppIcons.loadDepanIcon(IconSize.ICON_256x256)
+        .ifPresent(welcomeImage::setImage);
 
     // Start any initial tabs
     starterRegistry.addStarterTabs(this);
     fileNewItem.getItems().addAll(newResourceRegistry.buildNewResourceItems());
-
-    fileImportItem.setOnAction(menuRegistry::dispatch);
-
-    fileExitItem.setOnAction(e -> handleClose());
   }
 
-  public void addTab(Tab tab) {
-    viewRoot.getTabs().add(tab);
-  }
-
-  private void handleClose() {
+  @FXML
+  public void handleClose() {
     try {
       onClose.close();
     } catch (IOException errIo) {
       throw new RuntimeException("Unable to shutdown", errIo);
     }
+  }
+
+  @FXML
+  public void handleImportItem(ActionEvent event) {
+    menuRegistry.dispatch(event);
+  }
+
+  @FXML
+  public void handleWelcome() {
+    dialogRunner.runDialog(DepanFxWelcomeDialog.class, "Welcome To DepanFX");
+  }
+
+  @FXML
+  public void handleAbout() {
+    dialogRunner.runDialog(DepanFxAboutDialog.class, "About DepanFX");
+  }
+
+  public void addTab(Tab tab) {
+    viewRoot.getTabs().add(tab);
   }
 }

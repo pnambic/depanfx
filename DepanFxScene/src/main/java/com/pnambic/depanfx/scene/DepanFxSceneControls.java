@@ -16,12 +16,22 @@
 
 package com.pnambic.depanfx.scene;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.util.Optional;
+
+import javafx.scene.image.Image;
 import javafx.scene.text.Text;
 
 /**
  * Utility methods for common scene components and behaviors.
  */
 public class DepanFxSceneControls {
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxSceneControls.class);
 
   private DepanFxSceneControls() {
     // Prevent instantiation.
@@ -31,4 +41,22 @@ public class DepanFxSceneControls {
      Text render = new Text("m");
      return scale * render.getLayoutBounds().getWidth();
    }
+
+  public static Optional<Image> loadResourceImage(
+      Class<?> type, String rsrcName) {
+    try {
+      InputStream rsrcStream = type.getResourceAsStream(rsrcName);
+      if (rsrcStream != null) {
+        return Optional.of(new Image(rsrcStream));
+      }
+      LOG.warn(
+          "Unable to load image resource {} for type {}",
+          rsrcName, type.getName());
+    } catch (Exception errAny) {
+      LOG.warn(
+          "Unable to load image {} for type {}",
+          rsrcName, type.getName(), errAny);
+    }
+    return Optional.empty();
+  }
 }
