@@ -7,8 +7,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
@@ -58,19 +61,15 @@ public class DepanFxFileImportDialog {
   private void handleConfirm() {
     closeDialog();
 
-    System.out.println("Import source: " + sourceField.getText());
     File srcFile = new File(sourceField.getText());
     DepanFxProjectDocument projDoc =
         workspace.toProjectDocument(srcFile.toURI()).get();
-    try {
-      workspace.importDocument(projDoc);
-    } catch (Exception errAny) {
-      LOG.error("Unable to load {}", srcFile, errAny);
-    }
+    DepanFxWorkspaceFactory.loadDocument(
+        workspace, projDoc, GraphDocument.class);
   }
 
   private FileChooser prepareFileChooser() {
-    FileChooser result = new FileChooser();
+    FileChooser result = DepanFxSceneControls.prepareFileChooser(sourceField);
     result.getExtensionFilters().add(EXT_FILTER);
     result.setSelectedExtensionFilter(EXT_FILTER);
 

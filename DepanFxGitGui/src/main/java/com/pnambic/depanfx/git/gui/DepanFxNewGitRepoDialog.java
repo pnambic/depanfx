@@ -3,12 +3,13 @@ package com.pnambic.depanfx.git.gui;
 import com.pnambic.depanfx.filesystem.builder.FileSystemGraphDocBuilder;
 import com.pnambic.depanfx.git.builder.GitCommandRunner;
 import com.pnambic.depanfx.git.builder.GitLsFileLoader;
+import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
 import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -18,65 +19,65 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.net.URL;
-import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 @Component
 @FxmlView("new-git-repo-dialog.fxml")
-public class DepanFxNewGitRepoDialog implements Initializable {
+public class DepanFxNewGitRepoDialog
+    implements DepanFxGitRepoToolDialog.Aware {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNewGitRepoDialog.class.getName());
 
   private final DepanFxWorkspace workspace;
 
-  @FXML
-  private TextField gitExeField;
+  private final DepanFxDialogRunner dialogRunner;
+
+  private DepanFxGitRepoData repoData;
 
   @FXML
-  private TextField repoDirectoryField;
-
-  @FXML
-  private TextField repoNameField;
+  private TextField gitRepoNameField;
 
   @FXML
   private TextField destinationField;
 
   @Autowired
-  public DepanFxNewGitRepoDialog(DepanFxWorkspace workspace) {
+  public DepanFxNewGitRepoDialog(
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
     this.workspace = workspace;
+    this.dialogRunner = dialogRunner;
   }
 
-  @Override
-  public void initialize(URL location, ResourceBundle resources) {
-    DepanFxGitDialogUtils.initializeGitExit(gitExeField);
+  @Override // DepanFxGitRepoToolDialog.Aware
+  public DepanFxGitRepoData getTooldata() {
+    return repoData;
+  }
+
+  @Override // DepanFxGitRepoToolDialog.Aware
+  public void setTooldata(DepanFxGitRepoData repoData) {
+    this.repoData = repoData;
+    gitRepoNameField.setText(repoData.getToolName());
+  }
+
+  @Override // DepanFxGitRepoToolDialog.Aware
+  public Window getChooserWindow() {
+    return gitRepoNameField.getScene().getWindow();
   }
 
   @FXML
-  private void openGitExeChooser() {
-    DepanFxGitDialogUtils.runGitExeChooser(gitExeField);
+  public void initialize() {
+    gitRepoNameField.setContextMenu(
+        DepanFxGitRepoMenu.buildRepoChoiceMenu(this, workspace, dialogRunner));
   }
 
   @FXML
-  private void openDirectoryChooser() {
-    DepanFxGitDialogUtils.runRepoDirectoryChooser(
-        repoDirectoryField, repoNameField);
-  }
-
-  @FXML
-  private void openFileChooser() {
-    FileChooser fileChooser = prepareSaveGraphDocFileChooser();
-    File selectedFile =
-        fileChooser.showSaveDialog(destinationField.getScene().getWindow());
-    if (selectedFile != null) {
-      destinationField.setText(selectedFile.getAbsolutePath());
-    }
+  private void openDestinationChooser() {
+    DepanFxGraphDocDialogs.runSaveGraphDocFileChooser(
+        destinationField, repoData.getToolName(), workspace);
   }
 
   @FXML
@@ -89,15 +90,8 @@ public class DepanFxNewGitRepoDialog implements Initializable {
   private void handleConfirm() {
     closeDialog();
 
-    LOG.info("git executable: {}", gitExeField.getText());
-    LOG.info("Repo directory: {}", repoDirectoryField.getText());
-    LOG.info("Repo name: {}", repoNameField.getText());
-    LOG.info("Destination file: {}", destinationField.getText());
-
     DepanFxGraphModelBuilder modelBuilder = new SimpleGraphModelBuilder();
-    GitCommandRunner cmdRunner =
-        DepanFxGitDialogUtils.createCommandRunner(
-            gitExeField, repoNameField, repoDirectoryField);
+    GitCommandRunner cmdRunner = new GitCommandRunner(repoData);
 
     File dstFile = new File(destinationField.getText());
     DepanFxProjectDocument projDoc =
@@ -131,23 +125,5 @@ public class DepanFxNewGitRepoDialog implements Initializable {
       LOG.error("unable to build graph from git repo {} at {}",
           cmdRunner.getGitRepoName(), cmdRunner.getGitRepoPath());
     }
-  }
-
-  private FileChooser prepareSaveGraphDocFileChooser() {
-    FileChooser result =
-        DepanFxGitDialogUtils.prepareGraphDocChooser(
-            destinationField, workspace);
-
-    if (destinationField.getText().isBlank()) {
-      result.setInitialFileName(buildDestinationName());
-    }
-
-    return result;
-  }
-
-  private String buildDestinationName() {
-    return DepanFxWorkspaceFactory.buildDocumentTimestampName(
-          DepanFxGitDialogUtils.getRepoName(repoNameField),
-          DepanFxGitDialogUtils.DGI_EXT);
   }
 }

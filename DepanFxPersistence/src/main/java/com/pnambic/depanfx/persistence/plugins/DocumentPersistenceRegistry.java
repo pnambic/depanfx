@@ -1,16 +1,46 @@
 package com.pnambic.depanfx.persistence.plugins;
 
-import java.io.File;
-import java.net.URI;
-import java.util.List;
+import com.pnambic.depanfx.persistence.DocumentXmlPersist;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.pnambic.depanfx.persistence.DocumentXmlPersist;
+import java.io.File;
+import java.net.URI;
+import java.util.List;
 
 @Component
 public class DocumentPersistenceRegistry {
+
+  @SuppressWarnings("serial")
+  public class UnknownExtensionException extends RuntimeException {
+
+    private String extText;
+
+    public UnknownExtensionException(String extText) {
+      this.extText = extText;
+    }
+
+    @Override
+    public String getMessage() {
+      return "No contribution for extension " + extText;
+    }
+  }
+
+  @SuppressWarnings("serial")
+  public class UnknownDocumentException extends RuntimeException {
+
+    private Object document;
+
+    public UnknownDocumentException(Object document) {
+      this.document = document;
+    }
+
+    @Override
+    public String getMessage() {
+      return "No contribution for document " + document.getClass().getName();
+    }
+  }
 
   private static final String EXT_PERIOD = ".";
 
@@ -34,14 +64,14 @@ public class DocumentPersistenceRegistry {
     return persistModels.stream()
         .filter(c -> c.acceptsExt(extText))
         .findFirst()
-        .get();
+        .orElseThrow(() -> new UnknownExtensionException(extText));
   }
 
   private DocumentPersistenceContribution findContribution(Object document) {
     return persistModels.stream()
         .filter(c -> c.acceptsDocument(document))
         .findFirst()
-        .get();
+        .orElseThrow(() -> new UnknownDocumentException(document));
   }
 
   private String getExtText(URI uri) {

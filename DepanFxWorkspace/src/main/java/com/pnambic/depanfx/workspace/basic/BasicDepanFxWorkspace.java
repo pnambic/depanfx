@@ -9,6 +9,7 @@ import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectSpi;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.documents.DocumentRegistry;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
@@ -208,15 +209,7 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
     if (optResource.isPresent()) {
       return toWorkspaceResource(resourceDoc, optResource.get());
     }
-
-    try {
-      return importDocument(resourceDoc);
-    } catch (IOException errIo) {
-      LOG.error("Unable to aquire resource {}",
-          resourceDoc, errIo);
-      throw new RuntimeException(
-          "Unable to aquire resource " + resourceDoc, errIo);
-    }
+    return DepanFxWorkspaceFactory.loadDocument(this, resourceDoc, "resource");
   }
 
   @Override

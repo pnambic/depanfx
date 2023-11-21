@@ -46,6 +46,10 @@ public class DepanFxProjects {
     return getCurrent(workspace, ANALYSES_CONTAINER);
   }
 
+  public static File getCurrentTools(DepanFxWorkspace workspace) {
+    return getCurrent(workspace, TOOLS_CONTAINER);
+  }
+
   public static File getCurrent(DepanFxWorkspace workspace, String container) {
     return workspace.getCurrentProject()
         .map(p -> new File(p.getMemberPath().toFile(), container))

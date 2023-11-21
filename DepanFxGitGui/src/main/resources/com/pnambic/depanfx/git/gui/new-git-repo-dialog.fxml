@@ -17,31 +17,11 @@
          AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"
          AnchorPane.topAnchor="10" AnchorPane.bottomAnchor="10">
 
-         <Label text="Select git Executable"/>
+         <Label text="Select git repository"/>
 
          <HBox spacing="10">
-            <TextField fx:id="gitExeField" editable="true"
-                  promptText="No git executableselected"
-                  HBox.hgrow="ALWAYS"/>
-            <Button text="Browse" onAction="#openGitExeChooser"
-                  HBox.hgrow="ALWAYS"/>
-         </HBox>
-
-         <Label text="Select Repository Directory"/>
-
-         <HBox spacing="10">
-            <TextField fx:id="repoDirectoryField" editable="false"
-                  promptText="No directory selected"
-                  HBox.hgrow="ALWAYS"/>
-            <Button text="Browse" onAction="#openDirectoryChooser"
-                  HBox.hgrow="ALWAYS"/>
-         </HBox>
-
-         <Label text="Select Repository Name"/>
-
-         <HBox spacing="10">
-            <TextField fx:id="repoNameField" editable="true"
-                  promptText="No directory selected"
+            <TextField fx:id="gitRepoNameField" editable="false"
+                  promptText="No git repository selected"
                   HBox.hgrow="ALWAYS"/>
          </HBox>
 
@@ -50,7 +30,7 @@
          <HBox spacing="10">
             <TextField fx:id="destinationField" editable="false" promptText="No file selected"
                   HBox.hgrow="ALWAYS"/>
-            <Button text="Browse" onAction="#openFileChooser"
+            <Button text="Browse" onAction="#openDestinationChooser"
                   HBox.hgrow="ALWAYS"/>
          </HBox>
 

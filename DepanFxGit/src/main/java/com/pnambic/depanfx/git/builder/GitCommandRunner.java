@@ -15,6 +15,8 @@
  */
 package com.pnambic.depanfx.git.builder;
 
+import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +52,6 @@ public class GitCommandRunner {
 
   @SuppressWarnings("serial")
   public static class GitCommandException extends GitRunnerException {
-
 
     private final int exitCode;
 
@@ -88,25 +89,18 @@ public class GitCommandRunner {
   private static final Logger LOG =
       LoggerFactory.getLogger(GitCommandRunner.class);
 
-  private final String gitExe;
+  private final DepanFxGitRepoData repoData;
 
-  private final String gitRepoName;
-
-  private final String gitRepoPath;
-
-  public GitCommandRunner(
-      String gitExe, String gitRepoName, String gitRepoPath) {
-    this.gitExe = gitExe;
-    this.gitRepoName = gitRepoName;
-    this.gitRepoPath = gitRepoPath;
+  public GitCommandRunner(DepanFxGitRepoData repoData) {
+    this.repoData = repoData;
   }
 
   public String getGitRepoName() {
-    return gitRepoName;
+    return repoData.getGitRepoName();
   }
 
   public String getGitRepoPath() {
-    return gitRepoPath;
+    return repoData.getGitRepoPath();
   }
 
   public List<String> runGitCommand(String command) {
@@ -116,7 +110,7 @@ public class GitCommandRunner {
   public List<String> runGitCommand(List<String> command) {
     List<String> runCommand = buildRunCommand(command);
     ProcessBuilder processBuilder = new ProcessBuilder(runCommand);
-    processBuilder.directory(new java.io.File(gitRepoPath));
+    processBuilder.directory(new java.io.File(getGitRepoPath()));
 
     try {
       Process process = processBuilder.start();
@@ -147,7 +141,7 @@ public class GitCommandRunner {
 
   private List<String> buildRunCommand(List<String> command) {
     List<String> result = new ArrayList<>(command.size() + 1);
-    result.add(gitExe);
+    result.add(repoData.getGitExe());
     result.addAll(command);
     return result;
   }

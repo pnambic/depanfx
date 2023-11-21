@@ -11,48 +11,61 @@
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             prefWidth="400" prefHeight="200"
-            fx:controller="com.pnambic.depanfx.git.gui.DepanFxNewGitLogsDialog">
-
+            fx:controller="com.pnambic.depanfx.git.gui.DepanFxGitRepoToolDialog" >
    <VBox spacing="10" layoutX="10" layoutY="10"
          AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"
          AnchorPane.topAnchor="10" AnchorPane.bottomAnchor="10">
 
-         <Label text="Select git repository"/>
+         <Label text="Select git Executable"/>
 
          <HBox spacing="10">
-            <TextField fx:id="gitRepoNameField" editable="false"
-                  promptText="No git repository selected"
+            <TextField fx:id="gitExeField" editable="true"
+                  promptText="No git executableselected"
+                  HBox.hgrow="ALWAYS"/>
+            <Button text="Browse" onAction="#openGitExeChooser"
                   HBox.hgrow="ALWAYS"/>
          </HBox>
 
-         <Label text="Select Branch Details"/>
+         <Label text="Select Repository Directory"/>
 
          <HBox spacing="10">
-            <TextField fx:id="branchNameField" editable="true"
+            <TextField fx:id="repoDirectoryField" editable="false"
                   promptText="No directory selected"
                   HBox.hgrow="ALWAYS"/>
-            <TextField fx:id="logCountField" editable="true"
-                  promptText="No number of logs"
+            <Button text="Browse" onAction="#openRepoDirectoryChooser"
                   HBox.hgrow="ALWAYS"/>
          </HBox>
 
-         <Label text="Select Base Graph"/>
+         <Label text="Select Repository Name"/>
 
          <HBox spacing="10">
-            <TextField fx:id="graphDocumentField" editable="false"
+            <TextField fx:id="repoNameField" editable="true"
                   promptText="No directory selected"
                   HBox.hgrow="ALWAYS"/>
-            <Button text="Browse" onAction="#openGraphDocChooser"
+         </HBox>
+
+         <Label text="Tool Name"/>
+
+         <HBox spacing="10">
+            <TextField fx:id="toolNameField" editable="true"
+                  promptText="Display label for data source"
                   HBox.hgrow="ALWAYS"/>
          </HBox>
 
-         <Label text="Select Destination Directory"/>
+         <Label text="Description"/>
 
          <HBox spacing="10">
-            <TextField fx:id="dstDirectoryField" editable="false"
-                  promptText="No file selected"
+            <TextField fx:id="toolDescriptionField" editable="true"
+                  promptText="Description"
                   HBox.hgrow="ALWAYS"/>
-            <Button text="Browse" onAction="#openDestinationChooser"
+         </HBox>
+
+         <Label text="Select Destination File"/>
+
+         <HBox spacing="10">
+            <TextField fx:id="destinationField" editable="false" promptText="No file selected"
+                  HBox.hgrow="ALWAYS"/>
+            <Button text="Browse" onAction="#openFileChooser"
                   HBox.hgrow="ALWAYS"/>
          </HBox>
 

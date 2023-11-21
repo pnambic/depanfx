@@ -19,11 +19,16 @@ package com.pnambic.depanfx.scene;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.Optional;
+import java.util.function.Supplier;
 
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 
 /**
  * Utility methods for common scene components and behaviors.
@@ -58,5 +63,58 @@ public class DepanFxSceneControls {
           rsrcName, type.getName(), errAny);
     }
     return Optional.empty();
+  }
+
+  public static void updateBlankField(TextField updateField, String newValue) {
+    if (updateField.getText().isBlank()) {
+      updateField.setText(newValue);
+    }
+  }
+
+  public static DirectoryChooser prepareDirectoryChooser(TextField dirField) {
+    DirectoryChooser result = new DirectoryChooser();
+    String dirName = dirField.getText();
+    if (!dirName.isBlank()) {
+      File location = new File(dirName);
+      result.setInitialDirectory(location.getParentFile());
+    }
+    return result;
+  }
+
+  public static FileChooser prepareFileChooser(TextField fileField) {
+    FileChooser result = new FileChooser();
+    String fileName = fileField.getText();
+    if (!fileName.isBlank()) {
+      initializeFileChooser(result, new File(fileName));
+    }
+    return result;
+  }
+
+  public static FileChooser prepareFileChooser(File location) {
+    FileChooser result = new FileChooser();
+    initializeFileChooser(result, location);
+    return result;
+  }
+
+  public static FileChooser prepareFileChooser(
+      TextField fileField, Supplier<File> onBlank) {
+    FileChooser result = new FileChooser();
+    initializeFileChooser(result, buildLocationFile(fileField, onBlank));
+    return result;
+  }
+
+  private static void initializeFileChooser(
+      FileChooser result, File location) {
+    result.setInitialFileName(location.getName());
+    result.setInitialDirectory(location.getParentFile());
+  }
+
+  private static File buildLocationFile(
+      TextField fileField, Supplier<File> onBlank) {
+    String fileName = fileField.getText();
+    if (!fileName.isBlank()) {
+      return new File(fileName);
+    }
+    return onBlank.get();
   }
 }

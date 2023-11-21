@@ -10,6 +10,8 @@ module depanfx.workspace.gui {
 
     // requires depanfx.graph;
     requires depanfx.graph_doc;
+    requires depanfx.git;
+    requires depanfx.git.gui;
     requires depanfx.nodelist;
     requires depanfx.nodelist.gui;
     requires depanfx.scene;

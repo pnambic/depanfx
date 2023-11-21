@@ -1,7 +1,9 @@
 package com.pnambic.depanfx.git.gui;
 
+import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewAnalysisContribution;
 
 import org.springframework.stereotype.Component;
@@ -21,11 +23,15 @@ public class DepanFxNewLogsAnalysisContribution
   @Override
   public MenuItem createNewResourceMenuItem() {
     return DepanFxContextMenuBuilder.createActionItem(
-        "Git Logs", e -> runDialog());
+        "Git Logs", e -> runGitLogsDialog());
   }
 
-  private void runDialog() {
-    dialogRunner.runDialog(
-        DepanFxNewGitLogsDialog.class, "Create new theory from git logs");
+  private void runGitLogsDialog() {
+    Dialog<DepanFxNewGitLogsDialog> newLogsDialog =
+        dialogRunner.createDialogAndParent(DepanFxNewGitLogsDialog.class);
+    DepanFxGitRepoData repoData =
+        DepanFxGitRepoToolDialogs.buildInitialGitRepoData();
+    newLogsDialog.getController().setTooldata(repoData);
+    newLogsDialog.runDialog("Create new theory from git logs");
   }
 }

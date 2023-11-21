@@ -6,7 +6,12 @@ module depanfx.git {
   requires depanfx.nodelist;
   requires depanfx.filesystem;
   requires depanfx.graph_doc;
+  requires depanfx.persistence;
   requires depanfx.workspace;
+  requires spring.context;
+
+  opens com.pnambic.depanfx.git.tooldata;
 
   exports com.pnambic.depanfx.git.builder;
+  exports com.pnambic.depanfx.git.tooldata;
 }

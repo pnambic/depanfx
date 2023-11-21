@@ -1,5 +1,8 @@
 package com.pnambic.depanfx.workspace.gui;
 
+import com.pnambic.depanfx.git.gui.DepanFxGitRepoToolDialog;
+import com.pnambic.depanfx.git.gui.DepanFxGitRepoToolDialogs;
+import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSections;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
@@ -31,6 +34,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TreeCell;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Window;
 
 /**
  * 'cuz {@code DepanFxWorkspace} doesn't know anything about menus.
@@ -52,6 +56,10 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
   private static final String DELETE_CONTAINER = "Delete Container";
 
   private static final String SET_AS_CURRENT_PROJECT = "Set As Current Project";
+
+  private static final String EDIT_GIT_REPO = "Edit git Repo Data";
+
+  private static final String NEW_GIT_REPO = "New git Repo Data";
 
   // Our state
   private static final char EXTENSION_DOT = '.';
@@ -139,6 +147,10 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
         case DepanFxProjects.ANALYSES_CONTAINER:
           builder.appendSubMenu(analysisContextMenu());
           break;
+        case DepanFxGitRepoToolDialogs.GIT_REPOS_TOOL_DIR:
+          builder.appendActionItem(NEW_GIT_REPO,
+              e -> runNewGitRepoAction());
+          break;
       }
       if (member instanceof DepanFxProjectTree) {
         appendProjectContextMenu(builder, (DepanFxProjectTree) member);
@@ -160,10 +172,17 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
                 OPEN_AS_LIST,
                 e -> runOpenNodeListAction(document.getMemberPath().toUri()));
             break;
+          case DepanFxGitRepoData.GIT_REPO_TOOL_EXT:
+            builder.appendActionItem(
+                EDIT_GIT_REPO,
+                e -> runEditGitRepoAction(document.getMemberPath().toUri()));
+            break;
         }
       }
-      // All documents are deletable
-      appendDeleteDocument(builder, document);
+      // Don't offer delete for documents in the built-in project.
+      if (!document.getProject().equals(workspace.getBuiltInProjectTree())) {
+        appendDeleteDocument(builder, document);
+      }
     }
 
     return builder.build();
@@ -230,6 +249,43 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
           });
     } catch (RuntimeException errCaught) {
       LOG.error("Unable to open list view for {}", nodeListUri, errCaught);
+    }
+  }
+
+  private void runNewGitRepoAction() {
+
+    DepanFxGitRepoToolDialog.Aware srcDlg =
+        new DepanFxGitRepoToolDialog.Aware() {
+
+          @Override
+          public Window getChooserWindow() {
+            return DepanFxProjectListCell.this.getScene().getWindow();
+          }
+
+          @Override
+          public DepanFxGitRepoData getTooldata() {
+            return DepanFxGitRepoToolDialogs.buildInitialGitRepoData();
+          }
+
+          @Override
+          public void setTooldata(DepanFxGitRepoData repoData) {
+            // Not used.
+          }
+        };
+    DepanFxGitRepoToolDialogs.runGitRepoCreate(srcDlg , dialogRunner);
+  }
+
+  private void runEditGitRepoAction(URI gitRepouri) {
+    try {
+      Optional<DepanFxProjectDocument> optProjDoc =
+          workspace.toProjectDocument(gitRepouri);
+
+      optProjDoc
+          .flatMap(workspace::getWorkspaceResource)
+          .ifPresent(
+                r -> DepanFxGitRepoToolDialogs.runGitRepoEdit(r, dialogRunner));
+    } catch (RuntimeException errCaught) {
+      LOG.error("Unable to open git repository data {} for edit", gitRepouri, errCaught);
     }
   }
 
