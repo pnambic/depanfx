@@ -40,13 +40,13 @@ public interface DepanFxProjectTree extends DepanFxProjectContainer {
 
   void registerDocument(DepanFxProjectDocument projDoc);
 
-  void addListener(ProjectTreeListener listener);
-
-  void removeListener(ProjectTreeListener listener);
-
   /**
    * Provide the children, if any, for any descendant member. 
    */
   Stream<DepanFxProjectMember> getMembers(
       DepanFxProjectMember basicDepanFxProjectContainer);
+
+  void addListener(ProjectTreeListener listener);
+
+  void removeListener(ProjectTreeListener listener);
 }

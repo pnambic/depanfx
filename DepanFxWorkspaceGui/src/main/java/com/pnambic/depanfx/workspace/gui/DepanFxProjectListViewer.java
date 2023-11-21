@@ -14,6 +14,7 @@ import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 import java.io.File;
 import java.nio.file.Path;
 
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TreeCell;
@@ -71,9 +72,7 @@ public class DepanFxProjectListViewer {
           DepanFxWorkspaceFactory.createDepanFxProjectTree(projectSpi);
       DepanFxProjects.createProjectStructure(projectTree, projectSpi);
       workspace.addProject(projectTree);
-
-      DepanFxProjectTreeItem projectItem = new DepanFxProjectTreeItem(projectTree);
-      workspaceView.getRoot().getChildren().add(projectItem);
+      workspace.setCurrentProject(projectTree);
     }
   }
 
@@ -90,9 +89,7 @@ public class DepanFxProjectListViewer {
       DepanFxProjectTree project =
           DepanFxWorkspaceFactory.createDepanFxProjectTree(projectSpi);
       workspace.addProject(project);
-
-      DepanFxProjectTreeItem projectItem = new DepanFxProjectTreeItem(project);
-      workspaceView.getRoot().getChildren().add(projectItem);
+      workspace.setCurrentProject(project);
     }
   }
 
@@ -102,6 +99,21 @@ public class DepanFxProjectListViewer {
 
   public Tab createWorkspaceTab(String tabName) {
     Tab result = new Tab(tabName, workspaceView);
+    result.setContextMenu(buildWorkspaceMenu());
+    return result;
+  }
+
+  private TreeView<DepanFxWorkspaceMember> createView() {
+    TreeView<DepanFxWorkspaceMember> result =
+        new TreeView<>(buildWorkspaceRoot());
+    result.setShowRoot(false);
+    result.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    result.setCellFactory(new WorkspaceCellFactory());
+    result.setContextMenu(buildWorkspaceMenu());
+    return result;
+  }
+
+  private ContextMenu buildWorkspaceMenu() {
     DepanFxContextMenuBuilder menuBuilder = new DepanFxContextMenuBuilder();
 
     menuBuilder.appendActionItem(
@@ -112,18 +124,7 @@ public class DepanFxProjectListViewer {
     menuBuilder.appendSeparator();
     menuBuilder.appendActionItem(
         REFRESH_CONTEXT_ITEM, e -> resetView());
-
-    result.setContextMenu(menuBuilder.build());
-    return result;
-  }
-
-  private TreeView<DepanFxWorkspaceMember> createView() {
-    TreeView<DepanFxWorkspaceMember> result =
-        new TreeView<>(buildWorkspaceRoot());
-    result.setShowRoot(false);
-    result.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    result.setCellFactory(new WorkspaceCellFactory());
-    return result;
+    return menuBuilder.build();
   }
 
   private TreeItem<DepanFxWorkspaceMember> buildWorkspaceRoot() {

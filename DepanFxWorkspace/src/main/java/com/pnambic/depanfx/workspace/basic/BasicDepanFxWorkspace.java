@@ -43,6 +43,8 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   private static final Logger LOG =
       LoggerFactory.getLogger(BasicDepanFxWorkspace.class);
 
+  private final String workspaceName;
+
   private final ContextModelRegistry modelRegistry;
 
   private final DocumentPersistenceRegistry persistRegistry;
@@ -53,7 +55,9 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
 
   private final DocumentRegistry documentRegistry = new DocumentRegistry();
 
-  private final String workspaceName;
+  private final List<WorkspaceListener> listeners = new ArrayList<>();
+
+  private DepanFxProjectTree currentProject;
 
   @Autowired
   public BasicDepanFxWorkspace(
@@ -75,6 +79,25 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   }
 
   @Override
+  public Optional<DepanFxProjectTree> getCurrentProject() {
+    return Optional.ofNullable(currentProject);
+  }
+
+  @Override
+  public void setCurrentProject(DepanFxProjectTree currentProject) {
+    if (currentProject == null) {
+      updateCurrentProject(null);
+      return;
+    }
+    if (projectList.contains(currentProject)) {
+      updateCurrentProject(currentProject);
+      return;
+    }
+    LOG.warn("Unknown project {} cannot be current project",
+        currentProject.getMemberName());
+  }
+
+  @Override
   public List<DepanFxProjectTree> getProjectList() {
     List<DepanFxProjectTree> result = new ArrayList<>(projectList.size() + 1);
     result.addAll(projectList);
@@ -83,13 +106,24 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   }
 
   @Override
+  public void addProject(DepanFxProjectTree project) {
+    if (!projectList.contains(project)) {
+      projectList.add(project);
+      notifyProjectAdded(project);
+      return;
+    }
+    LOG.warn("Cannot add a known project {} to workspace",
+        project.getMemberName());
+  }
+
+  @Override
   public DepanFxProjectSpi getBuiltInProject() {
     return builtInProj;
   }
 
   @Override
-  public void addProject(DepanFxProjectTree project) {
-    projectList.add(project);
+  public DepanFxProjectTree getBuiltInProjectTree() {
+    return ((DepanFxBuiltInProject) builtInProj).getProjectTree();
   }
 
   @Override
@@ -115,7 +149,8 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   }
 
   @Override
-  public Optional<DepanFxWorkspaceResource> importDocument(DepanFxProjectDocument projDoc)
+  public Optional<DepanFxWorkspaceResource> importDocument(
+      DepanFxProjectDocument projDoc)
       throws IOException {
     DocumentXmlPersist persist =
         persistRegistry.getDocumentPersist(getMemberUri(projDoc));
@@ -184,6 +219,27 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
     }
   }
 
+  @Override
+  public void addListener(WorkspaceListener listener) {
+    listeners .add(listener);
+  }
+
+  @Override
+  public void removeListener(WorkspaceListener listener) {
+    listeners.remove(listener);
+  }
+
+  private void updateCurrentProject(DepanFxProjectTree currentProject) {
+    DepanFxProjectTree changedProject = this.currentProject;
+    this.currentProject = currentProject;
+    if (changedProject != null) {
+      notifyProjectChanged(changedProject);
+    }
+    if (currentProject != null) {
+      notifyProjectChanged(currentProject);
+    }
+  }
+
   private Optional<DepanFxProjectTree> findProjectByName(String projectName) {
     return projectList.stream()
         .filter(t -> projectName.equals(t.getMemberName()))
@@ -233,6 +289,18 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
 
   private File buildDocumentFile(DepanFxProjectDocument projDoc) {
     return new File(getMemberUri(projDoc));
+  }
+
+  private void notifyProjectAdded(DepanFxProjectTree project) {
+    listeners.forEach(l -> l.onProjectAdded(project));
+  }
+
+  private void notifyProjectDeleted(DepanFxProjectTree project) {
+    listeners.forEach(l -> l.onProjectDeleted(project));
+  }
+
+  private void notifyProjectChanged(DepanFxProjectTree project) {
+    listeners.forEach(l -> l.onProjectChanged(project));
   }
 
   private URI getMemberUri( DepanFxProjectMember member) {

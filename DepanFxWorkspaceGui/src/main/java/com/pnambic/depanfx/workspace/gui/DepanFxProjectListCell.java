@@ -11,6 +11,7 @@ import com.pnambic.depanfx.scene.DepanFxSceneController;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
+import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -28,6 +29,8 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TreeCell;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 /**
  * 'cuz {@code DepanFxWorkspace} doesn't know anything about menus.
@@ -48,6 +51,8 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
 
   private static final String DELETE_CONTAINER = "Delete Container";
 
+  private static final String SET_AS_CURRENT_PROJECT = "Set As Current Project";
+
   // Our state
   private static final char EXTENSION_DOT = '.';
 
@@ -58,6 +63,9 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
   private final DepanFxNewResourceRegistry newResourceRegistry;
 
   private final DepanFxSceneController scene;
+
+  // Manage Font tweeks (e.g. embolden).
+  private Font previousFont;
 
   public DepanFxProjectListCell(
       DepanFxWorkspace workspace,
@@ -73,6 +81,7 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
   @Override
   protected void updateItem(DepanFxWorkspaceMember member, boolean empty) {
     super.updateItem(member, empty);
+    restoreFont();
 
     // Visual space reserved for future use.
     if (empty) {
@@ -83,7 +92,7 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
     }
     // The normal case.
     if (member != null) {
-      setText(member.getMemberName());
+      setText(getCellText(member));
       setGraphic(null);
       setContextMenu(buildMemberContextMenu(member));
       return;
@@ -92,6 +101,29 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
     setText("<null>");
     setGraphic(null);
     setContextMenu(null);
+  }
+
+  private String getCellText(DepanFxWorkspaceMember member) {
+    if (isCurrentProject(member)) {
+      embolden();
+      return member.getMemberName() + " [curr]";
+    }
+    return member.getMemberName();
+  }
+
+  private void restoreFont() {
+    if (previousFont != null) {
+      setFont(previousFont);
+      previousFont = null;
+    }
+  }
+
+  private void embolden() {
+    previousFont = getFont();
+    setFont(
+        Font.font(previousFont.getFamily(),
+            FontWeight.BOLD,
+            previousFont.getSize()));
   }
 
   private ContextMenu buildMemberContextMenu(DepanFxWorkspaceMember member) {
@@ -107,6 +139,9 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
         case DepanFxProjects.ANALYSES_CONTAINER:
           builder.appendSubMenu(analysisContextMenu());
           break;
+      }
+      if (member instanceof DepanFxProjectTree) {
+        appendProjectContextMenu(builder, (DepanFxProjectTree) member);
       }
     }
     if (member instanceof DepanFxProjectDocument) {
@@ -144,6 +179,18 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
     Menu newGraphMenu = new Menu(NEW_THEORY_MENU);
     newGraphMenu.getItems().addAll(newResourceRegistry.buildNewAnalysisItems());
     return newGraphMenu;
+  }
+
+  private void appendProjectContextMenu(
+      DepanFxContextMenuBuilder builder, DepanFxProjectTree project) {
+
+    // Built-in project is never a candidate for the current project
+    // Show, but disable for current project
+    if (project != workspace.getBuiltInProjectTree()) {
+      builder.appendActionItem(SET_AS_CURRENT_PROJECT,
+          e -> workspace.setCurrentProject(project))
+          .setDisable(isCurrentProject(project));
+    }
   }
 
   private void appendDeleteDocument(
@@ -197,6 +244,13 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
     viewer.prependMemberTree();
     Tab viewerTab = viewer.createWorkspaceTab(tabTitle);
     scene.addTab(viewerTab);
+  }
+
+  private boolean isCurrentProject(DepanFxWorkspaceMember member) {
+    if (member instanceof DepanFxProjectTree) {
+      return workspace.getCurrentProject().filter(member::equals).isPresent();
+    }
+    return false;
   }
 
   private static String buildNodeListTabTitle(DepanFxProjectDocument projDoc) {

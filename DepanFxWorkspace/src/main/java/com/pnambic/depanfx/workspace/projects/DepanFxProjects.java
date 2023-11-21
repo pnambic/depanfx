@@ -8,7 +8,6 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Optional;
 
 public class DepanFxProjects {
@@ -48,11 +47,9 @@ public class DepanFxProjects {
   }
 
   public static File getCurrent(DepanFxWorkspace workspace, String container) {
-    List<DepanFxProjectTree> projectList = workspace.getProjectList();
-    if (projectList.size() >= 1) {
-      return new File(projectList.get(0).getMemberPath().toFile(), container);
-    }
-    return null;
+    return workspace.getCurrentProject()
+        .map(p -> new File(p.getMemberPath().toFile(), container))
+        .orElse(null);
   }
 
   private static void createChildContainer(

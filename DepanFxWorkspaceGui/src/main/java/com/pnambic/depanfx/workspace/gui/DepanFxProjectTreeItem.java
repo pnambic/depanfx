@@ -95,9 +95,8 @@ public class DepanFxProjectTreeItem extends TreeItem<DepanFxWorkspaceMember> {
               .map(c -> findContainerItem(DepanFxProjectTreeItem.this, c));
       Optional<TreeItem<DepanFxWorkspaceMember>> optMemberItem =
           optParentItem .map(i -> findMemberItem(i, projDoc));
-      if (optMemberItem.isPresent()) {
-        optParentItem.get().getChildren().remove(optMemberItem.get());
-      }
+      optMemberItem.ifPresent(
+          optParentItem.get().getChildren()::remove);
     }
 
     @Override

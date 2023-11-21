@@ -7,12 +7,26 @@ import java.util.Optional;
 
 public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
 
+  public static interface WorkspaceListener {
+    void onProjectAdded(DepanFxProjectTree project);
+
+    void onProjectDeleted(DepanFxProjectTree project);
+
+    void onProjectChanged(DepanFxProjectTree project);
+  }
+
   // Shutdown the workspace.
   void exit();
+
+  Optional<DepanFxProjectTree> getCurrentProject();
+
+  void setCurrentProject(DepanFxProjectTree currentProject);
 
   List<DepanFxProjectTree> getProjectList();
 
   DepanFxProjectSpi getBuiltInProject();
+
+  DepanFxProjectTree getBuiltInProjectTree();
 
   void addProject(DepanFxProjectTree project);
 
@@ -40,4 +54,8 @@ public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
 
   Optional<DepanFxProjectDocument> toProjectDocument(
       String projectName, String resourcePath);
+
+  void addListener(WorkspaceListener listener);
+
+  void removeListener(WorkspaceListener listener);
 }
