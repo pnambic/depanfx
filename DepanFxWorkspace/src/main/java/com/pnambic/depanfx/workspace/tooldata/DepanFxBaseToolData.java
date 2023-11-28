@@ -1,4 +1,4 @@
-package com.pnambic.depanfx.git.tooldata;
+package com.pnambic.depanfx.workspace.tooldata;
 
 /**
  * The minimal expectations for any tool data.

@@ -6,8 +6,11 @@ import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSections;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
+import com.pnambic.depanfx.nodelist.gui.DepanFxTreeSectionToolDialog;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionConfiguration;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
@@ -23,15 +26,17 @@ import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TreeCell;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Window;
@@ -57,9 +62,17 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
 
   private static final String SET_AS_CURRENT_PROJECT = "Set As Current Project";
 
-  private static final String EDIT_GIT_REPO = "Edit git Repo Data";
+  private static final String EDIT_GIT_REPO = "Edit git Repo Data...";
 
-  private static final String NEW_GIT_REPO = "New git Repo Data";
+  private static final String NEW_GIT_REPO = "New git Repo Data...";
+
+  private static final String EDIT_TREE_SECTION_DATA = "Edit Tree Section Data...";
+
+  private static final String NEW_TREE_SECTION_DATA = "New Tree Section Data...";
+
+  private static final String NEW_TREE_SECTION_NAME = "New Tree Section";
+
+  private static final String NEW_TREE_SECTION_DESCR = "New tree section.";
 
   // Our state
   private static final char EXTENSION_DOT = '.';
@@ -70,6 +83,8 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
 
   private final DepanFxNewResourceRegistry newResourceRegistry;
 
+  private final DepanFxTreeSectionConfiguration treeSectionConfig;
+
   private final DepanFxSceneController scene;
 
   // Manage Font tweeks (e.g. embolden).
@@ -79,10 +94,12 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxNewResourceRegistry newResourceRegistry,
+      DepanFxTreeSectionConfiguration treeSectionConfig,
       DepanFxSceneController scene) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
     this.newResourceRegistry = newResourceRegistry;
+    this.treeSectionConfig = treeSectionConfig;
     this.scene = scene;
   }
 
@@ -151,6 +168,10 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
           builder.appendActionItem(NEW_GIT_REPO,
               e -> runNewGitRepoAction());
           break;
+        case DepanFxTreeSectionData.TREE_SECTIONS_TOOL_DIR:
+          builder.appendActionItem(NEW_TREE_SECTION_DATA,
+              e -> runNewTreeSectionDataAction());
+          break;
       }
       if (member instanceof DepanFxProjectTree) {
         appendProjectContextMenu(builder, (DepanFxProjectTree) member);
@@ -158,24 +179,40 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
     }
     if (member instanceof DepanFxProjectDocument) {
       DepanFxProjectDocument document = (DepanFxProjectDocument) member;
-      Path path = document.getMemberPath();
-      Optional<String> optExt = getExtension(path.getFileName().toString());
+      Path docPath = document.getMemberPath();
+      Optional<String> optExt = getExtension(docPath.getFileName().toString());
       if (optExt.isPresent()) {
         switch (optExt.get()) {
           case "dgi":
+            setOnMouseClicked(
+                e -> handleMouseClick(e, docPath, this::runOpenAsListAction));
             builder.appendActionItem(
                 OPEN_AS_LIST,
-                e -> runOpenAsListAction(document.getMemberPath().toUri()));
+                e -> runOpenAsListAction(docPath));
             break;
           case "dnli":
+            setOnMouseClicked(
+                e -> handleMouseClick(e, docPath,
+                    this::runOpenNodeListAction));
             builder.appendActionItem(
                 OPEN_AS_LIST,
-                e -> runOpenNodeListAction(document.getMemberPath().toUri()));
+                e -> runOpenNodeListAction(docPath));
             break;
           case DepanFxGitRepoData.GIT_REPO_TOOL_EXT:
+            setOnMouseClicked(
+                e -> handleMouseClick(e, docPath,
+                    this::runEditGitRepoAction));
             builder.appendActionItem(
                 EDIT_GIT_REPO,
-                e -> runEditGitRepoAction(document.getMemberPath().toUri()));
+                e -> runEditGitRepoAction(docPath));
+            break;
+          case DepanFxTreeSectionData.TREE_SECTION_TOOL_EXT:
+            setOnMouseClicked(
+                e -> handleMouseClick(e, docPath,
+                    this::runEditTreeSectionDataAction));
+            builder.appendActionItem(
+                EDIT_TREE_SECTION_DATA,
+                e -> runEditTreeSectionDataAction(docPath));
             break;
         }
       }
@@ -186,6 +223,13 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
     }
 
     return builder.build();
+  }
+
+  private void handleMouseClick(
+      MouseEvent event, Path path, Consumer<Path> onDoubleClick) {
+    if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+      onDoubleClick.accept(path);
+    }
   }
 
   private Menu graphsContextMenu() {
@@ -218,10 +262,10 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
         e -> projDoc.getProject().deleteDocument(projDoc));
   }
 
-  private void runOpenAsListAction(URI graphDocUri) {
+  private void runOpenAsListAction(Path graphDocPath) {
     try {
       Optional<DepanFxProjectDocument> optProjDoc =
-          workspace.toProjectDocument(graphDocUri);
+          workspace.toProjectDocument(graphDocPath.toUri());
       Optional<DepanFxWorkspaceResource> optWkspRsrc =
           optProjDoc.flatMap(workspace::getWorkspaceResource);
       Optional<DepanFxNodeList> optNodeList =
@@ -231,14 +275,15 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
         addNodeListViewToScene(nl, title);
       });
     } catch (RuntimeException errCaught) {
-      LOG.error("Unable to open list view for {}", graphDocUri, errCaught);
+      LOG.error("Unable to open list view for {}",
+          graphDocPath.toUri(), errCaught);
     }
   }
 
-  private void runOpenNodeListAction(URI nodeListUri) {
+  private void runOpenNodeListAction(Path graphDocPath) {
     try {
       Optional<DepanFxProjectDocument> optProjDoc =
-          workspace.toProjectDocument(nodeListUri);
+          workspace.toProjectDocument(graphDocPath.toUri());
       Optional<DepanFxWorkspaceResource> optWkspRsrc =
           optProjDoc.flatMap(workspace::getWorkspaceResource);
       Optional<DepanFxNodeList> optNodeList =
@@ -248,7 +293,8 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
             addNodeListViewToScene(nl, title);
           });
     } catch (RuntimeException errCaught) {
-      LOG.error("Unable to open list view for {}", nodeListUri, errCaught);
+      LOG.error("Unable to open list view for {}",
+          graphDocPath.toUri(), errCaught);
     }
   }
 
@@ -275,10 +321,10 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
     DepanFxGitRepoToolDialogs.runGitRepoCreate(srcDlg , dialogRunner);
   }
 
-  private void runEditGitRepoAction(URI gitRepouri) {
+  private void runEditGitRepoAction(Path gitRepoPath) {
     try {
       Optional<DepanFxProjectDocument> optProjDoc =
-          workspace.toProjectDocument(gitRepouri);
+          workspace.toProjectDocument(gitRepoPath.toUri());
 
       optProjDoc
           .flatMap(workspace::getWorkspaceResource)
@@ -286,7 +332,31 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
                 r -> DepanFxGitRepoToolDialogs.runGitRepoEdit(r, dialogRunner));
     } catch (RuntimeException errCaught) {
       LOG.error("Unable to open git repository data {} for edit",
-          gitRepouri, errCaught);
+          gitRepoPath.toUri(), errCaught);
+    }
+  }
+
+  private void runNewTreeSectionDataAction() {
+    try {
+      DepanFxTreeSectionData sectionData =
+          treeSectionConfig.buildInitialTreeSection(
+              NEW_TREE_SECTION_NAME, NEW_TREE_SECTION_DESCR);
+      DepanFxTreeSectionToolDialog.runCreateDialog(
+          sectionData, dialogRunner, NEW_TREE_SECTION_DATA);
+    } catch (RuntimeException errCaught) {
+      LOG.error("Unable to create tree section data", errCaught);
+    }
+  }
+
+  private void runEditTreeSectionDataAction(Path docPath) {
+    try {
+      workspace.toProjectDocument(docPath.toUri())
+          .flatMap(workspace::getWorkspaceResource)
+          .ifPresent(r -> DepanFxTreeSectionToolDialog.runEditDialog(
+              r, dialogRunner, EDIT_TREE_SECTION_DATA));
+    } catch (RuntimeException errCaught) {
+      LOG.error("Unable to open git repository data {} for edit",
+          docPath, errCaught);
     }
   }
 

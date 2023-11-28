@@ -19,6 +19,8 @@ public interface DepanFxProjectSpi {
 
   boolean isDirectoryEmpty() throws IOException;
 
+  Path getRelativePath(Path memberPath);
+
   /**
    * Provide a path for the member.  If the path is absent, the proposed path is
    * not a member of the project.

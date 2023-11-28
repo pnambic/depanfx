@@ -1,12 +1,17 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
+import net.rgielen.fxweaver.core.FxmlView;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 
@@ -16,6 +21,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
+@Component
+@FxmlView("save-node-list-dialog.fxml")
 public class DepanFxSaveNodeListDialog {
 
   private static final Logger LOG =
@@ -26,11 +33,15 @@ public class DepanFxSaveNodeListDialog {
   private static final String EXT = DepanFxNodeLists.EXT;
 
   private static final ExtensionFilter EXT_FILTER =
-      new ExtensionFilter("Node List (*.dnli)", "*." + EXT);
+      DepanFxSceneControls.buildExtFilter("Node List", EXT);
 
-  private final DepanFxNodeListViewer viewer;
+  private DepanFxNodeListViewer viewer;
 
-  public DepanFxSaveNodeListDialog(DepanFxNodeListViewer viewer) {
+  @Autowired
+  public DepanFxSaveNodeListDialog() {
+  }
+
+  public void setNodeListView(DepanFxNodeListViewer viewer) {
     this.viewer = viewer;
   }
 
@@ -56,7 +67,6 @@ public class DepanFxSaveNodeListDialog {
   private void handleConfirm() {
     closeDialog();
 
-    System.out.println("Destination file: " + destinationField.getText());
     File dstFile = new File(destinationField.getText());
     DepanFxProjectDocument projDoc =
         viewer.getWorkspace().toProjectDocument(dstFile.toURI()).get();
@@ -64,20 +74,15 @@ public class DepanFxSaveNodeListDialog {
   }
 
   private FileChooser prepareFileChooser() {
-    FileChooser result = new FileChooser();
+    FileChooser result =
+        DepanFxSceneControls.prepareFileChooser(
+            destinationField,
+            () -> new File(
+                getWorkspaceDestination(),
+                buildTimestampName(PREFIX, EXT)));
     result.getExtensionFilters().add(EXT_FILTER);
     result.setSelectedExtensionFilter(EXT_FILTER);
 
-    String destFileName = destinationField.getText();
-    if (destFileName.isBlank()) {
-      result.setInitialFileName(buildTimestampName(PREFIX, EXT));
-      result.setInitialDirectory(getWorkspaceDestination());
-      return result;
-    }
-
-    File location = new File(destFileName);
-    result.setInitialFileName(location.getName());
-    result.setInitialDirectory(location.getParentFile());
     return result;
   }
 

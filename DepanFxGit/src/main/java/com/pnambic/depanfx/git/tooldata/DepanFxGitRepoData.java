@@ -3,6 +3,7 @@ package com.pnambic.depanfx.git.tooldata;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
+import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import java.io.File;
 
@@ -43,7 +44,8 @@ public class DepanFxGitRepoData extends DepanFxBaseToolData{
     return new File(toolsDir, GIT_REPOS_TOOL_PATH);
   }
 
-  public static File buildCurrentToolFile(DepanFxWorkspace workspace, String dataLabel) {
+  public static File buildCurrentToolFile(
+      DepanFxWorkspace workspace, String dataLabel) {
     String toolName = DepanFxWorkspaceFactory.buildDocumentTimestampName(
         dataLabel, GIT_REPO_TOOL_EXT);
     return new File(buildCurrentToolDir(workspace), toolName);

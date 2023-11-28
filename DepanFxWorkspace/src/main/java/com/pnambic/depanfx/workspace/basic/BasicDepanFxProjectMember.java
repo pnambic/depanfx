@@ -53,12 +53,8 @@ public class BasicDepanFxProjectMember implements DepanFxProjectMember {
   public String toString() {
     StringBuilder result = new StringBuilder(project.getMemberName());
     result.append(':');
-    result.append(getRelativePath().toString());
+    result.append(project.getRelativePath(path).toString());
     return result.toString();
-  }
-
-  private Path getRelativePath() {
-    return project.getMemberPath().relativize(path);
   }
 
   @Override

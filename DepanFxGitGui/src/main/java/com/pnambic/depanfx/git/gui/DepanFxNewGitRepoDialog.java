@@ -71,7 +71,7 @@ public class DepanFxNewGitRepoDialog
   @FXML
   public void initialize() {
     gitRepoNameField.setContextMenu(
-        DepanFxGitRepoMenu.buildRepoChoiceMenu(this, workspace, dialogRunner));
+        DepanFxGitRepoToolDialogs.buildRepoChoiceMenu(this, workspace, dialogRunner));
   }
 
   @FXML

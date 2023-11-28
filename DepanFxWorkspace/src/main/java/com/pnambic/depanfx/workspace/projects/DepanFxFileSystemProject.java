@@ -71,6 +71,14 @@ public class DepanFxFileSystemProject implements DepanFxProjectSpi {
   }
 
   @Override
+  public Path getRelativePath(Path memberPath) {
+    if (memberPath.isAbsolute()) {
+      return projectPath.relativize(memberPath);
+    }
+    return memberPath;
+  }
+
+  @Override
   public Optional<Path> getMemberPath(Path memberPath) {
     if (!memberPath.isAbsolute()) {
       return Optional.of(projectPath.resolve(memberPath));

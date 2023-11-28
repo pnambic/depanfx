@@ -91,7 +91,7 @@ public class DepanFxNewGitLogsDialog
       logCountField.setText(Integer.toString(DEFAULT_LOG_COUNT));
     }
     gitRepoNameField.setContextMenu(
-        DepanFxGitRepoMenu.buildRepoChoiceMenu(this, workspace, dialogRunner));
+        DepanFxGitRepoToolDialogs.buildRepoChoiceMenu(this, workspace, dialogRunner));
   }
 
   @FXML

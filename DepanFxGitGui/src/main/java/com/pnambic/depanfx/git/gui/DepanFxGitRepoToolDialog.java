@@ -51,7 +51,7 @@ public class DepanFxGitRepoToolDialog {
   private static final String EXE_EXT = "exe";
 
   private static final ExtensionFilter EXE_FILTER =
-      DepanFxGitRepoToolDialogs.buildExtFiler("Executable", EXE_EXT);
+      DepanFxSceneControls.buildExtFilter("Executable", EXE_EXT);
 
   private static final String DEFAULT_REPO_DESCRIPTION = "Git repository ";
 

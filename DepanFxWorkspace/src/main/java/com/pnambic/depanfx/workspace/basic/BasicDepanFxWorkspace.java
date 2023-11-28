@@ -213,6 +213,21 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   }
 
   @Override
+  public Optional<DepanFxWorkspaceResource> getWorkspaceResource(
+      DepanFxProjectDocument resourceDoc, Class<?> type) {
+    if (resourceDoc.getProject().equals(getBuiltInProjectTree())) {
+      return ((DepanFxBuiltInProject) getBuiltInProject())
+          .getResource(resourceDoc);
+    }
+    Optional<Object> optResource =
+        documentRegistry.findResource(getMemberUri(resourceDoc));
+    if (optResource.isPresent()) {
+      return toWorkspaceResource(resourceDoc, optResource.get());
+    }
+    return DepanFxWorkspaceFactory.loadDocument(this, resourceDoc, type);
+  }
+
+  @Override
   public void addListener(WorkspaceListener listener) {
     listeners .add(listener);
   }

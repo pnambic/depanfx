@@ -2,6 +2,7 @@ package com.pnambic.depanfx.git.gui;
 
 import com.pnambic.depanfx.git.builder.GitCommandRunner;
 import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
+import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
+import javafx.scene.control.ContextMenu;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
@@ -26,7 +28,7 @@ public class DepanFxGitRepoToolDialogs {
       LoggerFactory.getLogger(DepanFxGitRepoToolDialogs.class.getName());
 
   private static final ExtensionFilter GIT_REPO_TOOL_FILTER =
-      DepanFxGitRepoToolDialogs.buildExtFiler(
+      DepanFxSceneControls.buildExtFilter(
           "Git Repo Tool", DepanFxGitRepoData.GIT_REPO_TOOL_EXT);
 
   private DepanFxGitRepoToolDialogs() {
@@ -34,11 +36,17 @@ public class DepanFxGitRepoToolDialogs {
   }
 
   /////////////////////////////////////
-  // Global ?
+  // Context menu for creation or selection
 
-  public static ExtensionFilter buildExtFiler(String label, String ext) {
-    String matchRe = "*." + ext;
-    return new ExtensionFilter(label + "(" + matchRe + ")", matchRe);
+  public static ContextMenu buildRepoChoiceMenu(
+      DepanFxGitRepoToolDialog.Aware srcDlg,
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem("New git Repo...",
+        e -> runGitRepoCreate(srcDlg, dialogRunner));
+    builder.appendActionItem("Select git Repo...",
+        e -> runGitRepoFinder(srcDlg, workspace));
+    return builder.build();
   }
 
   /////////////////////////////////////
@@ -90,15 +98,13 @@ public class DepanFxGitRepoToolDialogs {
   }
 
   /**
-   * Obtain an existing git repo tooldata with file chooser.
+   * Modify an existing git repo tooldata with the git repo tool dialog.
    */
   public static void runGitRepoEdit(
       DepanFxWorkspaceResource wkspRsrc,
       DepanFxDialogRunner dialogRunner) {
     Dialog<DepanFxGitRepoToolDialog> repoChooser =
         dialogRunner.createDialogAndParent(DepanFxGitRepoToolDialog.class);
-    
-
     repoChooser.getController().setWorkspaceResource(wkspRsrc);
     repoChooser.runDialog("Edit git Repository");
   }

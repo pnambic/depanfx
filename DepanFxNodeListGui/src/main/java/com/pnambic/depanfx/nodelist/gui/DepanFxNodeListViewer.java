@@ -8,16 +8,17 @@ import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
-import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -29,8 +30,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
@@ -102,6 +101,19 @@ public class DepanFxNodeListViewer {
     return workspace;
   }
 
+  public GraphDocument getGraphDoc() {
+    return (GraphDocument) nodeList.getWorkspaceResource().getResource();
+  }
+
+  public ContextModelId getContextModelId() {
+    return getGraphDoc()
+        .getContextModelId();
+  }
+
+  public <T> Dialog<T> buildDialog(Class<T> controllerType) {
+    return dialogRunner.createDialogAndParent(controllerType);
+  }
+
   public TreeItem<DepanFxNodeListMember> getTreeItem(int intValue) {
     TreeItem<DepanFxNodeListMember> item = nodeListTable.getTreeItem(intValue);
     return item;
@@ -151,6 +163,14 @@ public class DepanFxNodeListViewer {
     return invertSelectGraphNode(node);
   }
 
+  /////////////////////////////////////
+  // Tree sections
+
+  public void resetView() {
+    TreeItem<DepanFxNodeListMember> treeRoot = createTreeRoot();
+    nodeListTable.setRoot(treeRoot);
+  }
+
   public void insertSection(
       DepanFxNodeListSection before, DepanFxNodeListSection insert) {
 
@@ -159,65 +179,54 @@ public class DepanFxNodeListViewer {
     insertSection(index, insert);
   }
 
-  /////////////////////////////////////
-  // Support for built-in member tree sections
-
   public void prependMemberTree() {
-    getMemberLinkMatcherResource().ifPresent(m -> {
-        DepanFxTreeSection insert = new DepanFxTreeSection(m);
-        insertSection(0, insert);});
+    getInitialTreeSectionResource().ifPresent(m -> {
+        DepanFxTreeSection insert = new DepanFxTreeSection(this, m);
+        insertSection(0, insert);
+    });
   }
 
   public void insertMemberTreeSection(DepanFxNodeListSection before) {
-    getMemberLinkMatcherResource().ifPresent(m -> {
-        DepanFxTreeSection insert = new DepanFxTreeSection(m);
-        insertSection(before, insert);});
+    getInitialTreeSectionResource().ifPresent(m -> {
+        DepanFxTreeSection insert = new DepanFxTreeSection(this, m);
+        insertSection(before, insert);
+    });
   }
 
   /////////////////////////////////////
   // Internal
 
   private void runSaveNodeListDialog() {
-    FXMLLoader loader =
-        new FXMLLoader(getClass().getResource("save-node-list-dialog.fxml"));
-    loader.setController(new DepanFxSaveNodeListDialog(this));
-    try {
-      Parent dialog = loader.load();
-      DepanFxDialogRunner.runDialog(dialog, "Save selection as node list");
-    } catch (IOException errIo) {
-      throw new RuntimeException("Unable to load save node list dialog", errIo);
-    }
+    Dialog<DepanFxSaveNodeListDialog> saveDlg =
+        dialogRunner.createDialogAndParent(DepanFxSaveNodeListDialog.class);
+    saveDlg.getController().setNodeListView(this);
+    saveDlg.runDialog("Save selection as node list");
   }
 
-  private Optional<DepanFxWorkspaceResource> getMemberLinkMatcherResource() {
-    ContextModelId modelId =
-        ((GraphDocument) nodeList.getWorkspaceResource().getResource())
-        .getContextModelId();
+  private Optional<DepanFxWorkspaceResource> getInitialTreeSectionResource() {
+    ContextModelId modelId = getGraphDoc().getContextModelId();
 
-    DepanFxBuiltInProject project = (DepanFxBuiltInProject) workspace.getBuiltInProject();
-    return
-        project.getContributions(DepanFxLinkMatcherDocument.class)
-            .filter(c -> byMemberLinkMatcherDoc(c, modelId))
-            .findFirst()
-            .flatMap(c -> contribToWorkspaceResource(c, workspace, project));
+    return DepanFxProjects.getBuiltIn(
+        workspace, DepanFxTreeSectionData.class,
+        c -> this.byMemberLinkMatcherDoc(c, modelId));
   }
 
   private boolean byMemberLinkMatcherDoc(
       DepanFxBuiltInContribution contrib, Object modelId) {
-    DepanFxLinkMatcherDocument doc =
-        (DepanFxLinkMatcherDocument) contrib.getDocument();
-    if (!doc.getModelId().equals(modelId)) {
+    DepanFxTreeSectionData doc =
+        (DepanFxTreeSectionData) contrib.getDocument();
+    DepanFxLinkMatcherDocument linkMatchDoc =
+        ((DepanFxLinkMatcherDocument) doc.getLinkMatcherRsrc(workspace)
+            .getResource());
+    if (!linkMatchDoc.getMatchGroups()
+        .contains(DepanFxLinkMatcherGroup.MEMBER)) {
       return false;
     }
-    return doc.getMatchGroups().contains(DepanFxLinkMatcherGroup.MEMBER);
-  }
-
-  private Optional<DepanFxWorkspaceResource> contribToWorkspaceResource(
-      DepanFxBuiltInContribution contrib,
-      DepanFxWorkspace workspace,
-      DepanFxBuiltInProject project) {
-    return project.getProjectTree().asProjectDocument(contrib.getPath())
-        .flatMap(d -> workspace.toWorkspaceResource(d, contrib.getDocument()));
+    // [29-Nov-2023] Kludge for matches any, actual matcher provided later.
+    if (linkMatchDoc.getModelId() == null) {
+      return true;
+    }
+    return linkMatchDoc.getModelId().equals(modelId);
   }
 
   private List<DepanFxNodeListSection> isolateSections() {
@@ -229,8 +238,7 @@ public class DepanFxNodeListViewer {
     // Don't default to after the last slot, 'cuz that's the catch-all section
     sections.add(index, insert);
 
-    TreeItem<DepanFxNodeListMember> treeRoot = createTreeRoot();
-    nodeListTable.setRoot(treeRoot);
+    resetView();
   }
 
   private TreeItem<DepanFxNodeListMember> createTreeRoot() {
@@ -293,7 +301,8 @@ public class DepanFxNodeListViewer {
     result.set(value);
     return result;
   }
-    /**
+
+  /**
    * Since the previous state may have been unknown, provide the final
    * state for interested parties.
    */

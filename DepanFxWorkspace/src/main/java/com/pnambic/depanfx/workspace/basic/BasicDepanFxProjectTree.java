@@ -39,6 +39,17 @@ public class BasicDepanFxProjectTree implements DepanFxProjectTree {
     return this;
   }
 
+  @Override // DepanFxProjectContainer
+  public Stream<DepanFxProjectMember> getMembers() {
+    return getMembers(this);
+  }
+
+  @Override // DepanFxProjectTree
+  public Stream<DepanFxProjectMember> getMembers(
+      DepanFxProjectMember basicDepanFxProjectContainer) {
+    return projectSpi.getMembers(basicDepanFxProjectContainer);
+  }
+
   /**
    * Projects have no project parent.  Projects may be associated with a
    * workspace, but that relationship is controlled from the other workspace
@@ -52,6 +63,11 @@ public class BasicDepanFxProjectTree implements DepanFxProjectTree {
   @Override
   public DepanFxProjectBadMember asBadMember(Path childPath) {
     return new BasicDepanFxProjectBadMember(this, childPath);
+  }
+
+  @Override
+  public Path getRelativePath(Path memberPath) {
+    return projectSpi.getRelativePath(memberPath);
   }
 
   @Override
@@ -122,16 +138,5 @@ public class BasicDepanFxProjectTree implements DepanFxProjectTree {
 
   private void notifyDocumentDeleted(DepanFxProjectDocument projDoc) {
     listeners.forEach(l -> l.onDocumentDeleted(projDoc));
-  }
-
-  @Override // DepanFxProjectContainer
-  public Stream<DepanFxProjectMember> getMembers() {
-    return getMembers(this);
-  }
-
-  @Override // DepanFxProjectTree
-  public Stream<DepanFxProjectMember> getMembers(
-      DepanFxProjectMember basicDepanFxProjectContainer) {
-    return projectSpi.getMembers(basicDepanFxProjectContainer);
   }
 }

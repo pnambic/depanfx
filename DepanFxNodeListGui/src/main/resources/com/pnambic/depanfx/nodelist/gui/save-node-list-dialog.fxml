@@ -10,7 +10,8 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            prefWidth="400" prefHeight="200">
+            prefWidth="400" prefHeight="200"
+            fx:controller="com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog" >
 
    <VBox spacing="10" layoutX="10" layoutY="10"
          AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"

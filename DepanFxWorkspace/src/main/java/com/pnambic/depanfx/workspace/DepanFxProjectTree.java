@@ -25,6 +25,8 @@ public interface DepanFxProjectTree extends DepanFxProjectContainer {
 
   DepanFxProjectBadMember asBadMember(Path childPath);
 
+  Path getRelativePath(Path memberPath);
+
   Optional<DepanFxProjectContainer> asProjectContainer(Path path);
 
   Optional<DepanFxProjectDocument> asProjectDocument(Path path);

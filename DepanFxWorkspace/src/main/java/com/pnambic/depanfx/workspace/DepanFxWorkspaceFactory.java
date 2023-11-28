@@ -5,6 +5,7 @@ import com.pnambic.depanfx.workspace.basic.BasicDepanFxProjectTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -51,6 +52,22 @@ public class DepanFxWorkspaceFactory {
     return result.toString();
   }
 
+  public static File bestDirectory(File baseFile, File fallbackFile) {
+    File containerFile = baseFile.getParentFile();
+    if (containerFile.isDirectory()) {
+      return baseFile;
+    }
+
+    while (containerFile.compareTo(fallbackFile) > 0) {
+      File testFile = containerFile.getParentFile();
+      if (testFile.isDirectory()) {
+        return new File(testFile, baseFile.getName());
+      }
+      containerFile = testFile;
+    }
+    return fallbackFile;
+  }
+
   /**
    * Documents that do not match the supplied {@code docType} are quietly
    * dropped.
@@ -79,11 +96,11 @@ public class DepanFxWorkspaceFactory {
   private static boolean expectType(
       Class<?> expectedType, DepanFxWorkspaceResource wrkspRsrc) {
     Class<? extends Object> rsrcType = wrkspRsrc.getResource().getClass();
-    boolean result = expectedType.isAssignableFrom(rsrcType);
-    if (!result) {
-      LOG.warn("Expected type {}, but document is {}",
-          expectedType.getName(), rsrcType.getName());
+    if (expectedType.isAssignableFrom(rsrcType)) {
+      return true;
     }
-    return result;
+    LOG.warn("Expected type {}, but document is {}",
+        expectedType.getName(), rsrcType.getName());
+    return false;
   }
 }

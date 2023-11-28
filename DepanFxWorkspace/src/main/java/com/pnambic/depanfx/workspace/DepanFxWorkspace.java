@@ -48,6 +48,9 @@ public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
   Optional<DepanFxWorkspaceResource> getWorkspaceResource(
       DepanFxProjectDocument resourceDoc);
 
+  Optional<DepanFxWorkspaceResource> getWorkspaceResource(
+      DepanFxProjectDocument resourceDoc, Class<?> type);
+
   Optional<DepanFxProjectContainer> toProjectContainer(URI uri);
 
   Optional<DepanFxProjectDocument> toProjectDocument(URI uri);

@@ -29,6 +29,7 @@ import javafx.scene.image.Image;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
  * Utility methods for common scene components and behaviors.
@@ -46,6 +47,11 @@ public class DepanFxSceneControls {
      Text render = new Text("m");
      return scale * render.getLayoutBounds().getWidth();
    }
+
+  public static ExtensionFilter buildExtFilter(String label, String ext) {
+    String matchRe = "*." + ext;
+    return new ExtensionFilter(label + "(" + matchRe + ")", matchRe);
+  }
 
   public static Optional<Image> loadResourceImage(
       Class<?> type, String rsrcName) {

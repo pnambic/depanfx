@@ -6,15 +6,16 @@ import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.File;
 import java.nio.file.Path;
 
 @Configuration
 public class FileSystemLinkMatcherBuiltIns {
 
-  public static final String BASE_PATH_NAME =
-      DepanFxLinkMatcherDocument.BUILT_IN_LINK_MATCHER_PATH
-      + "/File System";
+  public static final String FILE_SYSTEM_LINK_MATCHER_DIR = "File System";
+
+  public static final Path FILE_SYSTEM_LINK_MATCHER_PATH =
+      DepanFxLinkMatcherDocument.LINK_MATCHER_TOOL_PATH
+          .resolve(FILE_SYSTEM_LINK_MATCHER_DIR);
 
   private static final String MEMBER_NAME = "Member";
 
@@ -39,7 +40,7 @@ public class FileSystemLinkMatcherBuiltIns {
 
   private DepanFxBuiltInContribution createBuiltIn(
       String docName, DepanFxLinkMatcherDocument doc) {
-    Path docPath = new File(BASE_PATH_NAME).toPath().resolve(docName);
+    Path docPath = FILE_SYSTEM_LINK_MATCHER_PATH.resolve(docName);
     return new DepanFxBuiltInContribution.Simple(docPath, doc);
   }
 }

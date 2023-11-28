@@ -1,13 +1,18 @@
 package com.pnambic.depanfx.nodelist.link;
 
 import com.pnambic.depanfx.graph.context.ContextModelId;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
+import java.nio.file.Path;
 import java.util.List;
 
 public class DepanFxLinkMatcherDocument {
 
-  public final static String BUILT_IN_LINK_MATCHER_PATH =
-      "Tools/Link Matchers";
+  public final static String LINK_MATCHER_TOOL_DIR =
+      "Link Matchers";
+
+  public static final Path LINK_MATCHER_TOOL_PATH =
+      DepanFxProjects.TOOLS_PATH.resolve(LINK_MATCHER_TOOL_DIR);
 
   private final ContextModelId contextModelId;
 

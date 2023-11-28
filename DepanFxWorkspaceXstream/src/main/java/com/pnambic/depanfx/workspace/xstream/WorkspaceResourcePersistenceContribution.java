@@ -2,6 +2,7 @@ package com.pnambic.depanfx.workspace.xstream;
 
 import com.pnambic.depanfx.persistence.builder.DocumentXmlPersistBuilder;
 import com.pnambic.depanfx.persistence.plugins.GraphNodePersistencePluginContribution;
+import com.pnambic.depanfx.workspace.DepanFxProjectResource;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,9 @@ public class WorkspaceResourcePersistenceContribution
       builder.addAliasField(
           RESOURCE_PATH_TAG, XstreamWorkspaceResource.class, "resourcePath");
       builder.addAllowedType(ALLOWED_TYPES);
+    }
+    if (DepanFxProjectResource.class.isAssignableFrom(withType)) {
+      builder.addConverter(new DepanFxBuiltInProjectResourceConverter());
     }
   }
 }

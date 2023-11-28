@@ -43,7 +43,8 @@ public class DepanFxTreeForkItem extends DepanFxNodeListItem {
     for (GraphNode node : nodes) {
       result.add(buildNodeItem(node, folder));
     }
-    result.sort(DepanFxNodeListSections.COMPARE_BY_SORT_KEY);
+    result.sort(folder.getOrderBy());
+    // result.sort(folder.getOrderBy()DepanFxNodeListSections.COMPARE_BY_SORT_KEY);
 
     return FXCollections.observableList(result);
   }

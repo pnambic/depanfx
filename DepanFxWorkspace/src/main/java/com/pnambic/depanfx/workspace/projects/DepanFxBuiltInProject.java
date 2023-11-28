@@ -7,6 +7,7 @@ import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectSpi;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.basic.BasicDepanFxProjectTree;
 
 import java.io.File;
@@ -27,9 +28,11 @@ import java.util.stream.Stream;
  */
 public class DepanFxBuiltInProject implements DepanFxProjectSpi {
 
-  public static final String BUILT_IN_LABEL = "Built In";
-  
   private static final String BUILT_IN_ROOT_PATH = "/";
+
+  public static final String BUILT_IN_LABEL = "Built In";
+
+  public static final Path BUILT_IN_PROJECT_PATH = buildProjectPath();
 
   private final String projectName;
 
@@ -64,7 +67,7 @@ public class DepanFxBuiltInProject implements DepanFxProjectSpi {
 
   @Override
   public Path getProjectPath() {
-    return new File(BUILT_IN_ROOT_PATH).toPath();
+    return BUILT_IN_PROJECT_PATH;
   }
 
   @Override
@@ -82,6 +85,11 @@ public class DepanFxBuiltInProject implements DepanFxProjectSpi {
   @Override
   public void createContainer(DepanFxProjectContainer projDir) {
     installProjectContainer(projDir.getMemberPath());
+  }
+
+  @Override
+  public Path getRelativePath(Path memberPath) {
+    return memberPath;
   }
 
   @Override
@@ -120,6 +128,17 @@ public class DepanFxBuiltInProject implements DepanFxProjectSpi {
       Class<?> targetType) {
     return builtIns.getContribs()
         .filter(c -> targetType.isAssignableFrom(c.getDocument().getClass()));
+  }
+
+  public Optional<DepanFxWorkspaceResource> getResource(
+      DepanFxProjectDocument projDoc) {
+    return Optional.ofNullable(documents.get(projDoc))
+        .map(c -> c.getDocument())
+        .map(d -> new DepanFxWorkspaceResource.Simple(projDoc, d));
+  }
+
+  private static Path buildProjectPath() {
+    return new File(BUILT_IN_ROOT_PATH).toPath();
   }
 
   public DepanFxProjectTree getProjectTree() {

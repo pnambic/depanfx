@@ -14,9 +14,6 @@ import java.util.List;
 
 public class FileSystemLinkMatchers {
 
-  private static final List<DepanFxLinkMatcher> MEMBER_MATCHER_GROUP =
-      Arrays.asList(new DepanFxLinkMatcher[] { DepanFxLinkMatcherGroup.MEMBER });
-
   public FileSystemLinkMatchers() {
     // Prevent instantiation.
   }
@@ -39,7 +36,7 @@ public class FileSystemLinkMatchers {
 
   public static final DepanFxLinkMatcherDocument MEMBER_DOC =
       new DepanFxLinkMatcherDocument(FileSystemContextDefinition.MODEL_ID,
-          MEMBER_MATCHER_GROUP, MEMBER);
+          DepanFxLinkMatcherGroup.MEMBER_MATCHER_GROUP, MEMBER);
 
   public static final DepanFxLinkMatcherDocument DIRECTORY_DOC =
       new DepanFxLinkMatcherDocument(FileSystemContextDefinition.MODEL_ID,

@@ -1,0 +1,62 @@
+package com.pnambic.depanfx.workspace;
+
+import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
+
+import java.nio.file.Path;
+import java.util.Optional;
+
+public interface DepanFxProjectResource {
+
+  Path BUILT_IN_PROJECT_PATH = null;
+
+  Optional<DepanFxWorkspaceResource> getResource(
+      DepanFxWorkspace workspace, Class<?> docType);
+
+  public static class BuiltIn implements DepanFxProjectResource {
+
+    private Path builtInPath;
+
+    public BuiltIn(Path builtInPath) {
+      this.builtInPath = builtInPath;
+    }
+
+    @Override
+    public Optional<DepanFxWorkspaceResource> getResource(
+        DepanFxWorkspace workspace, Class<?> docType) {
+      return
+          workspace.getBuiltInProjectTree().asProjectDocument(builtInPath)
+          .flatMap(d ->
+              ((DepanFxBuiltInProject) workspace.getBuiltInProject())
+                  .getResource(d));
+    }
+
+    public Path getBuiltInPath() {
+      return builtInPath;
+    }
+  }
+
+  public static class FileSystem implements DepanFxProjectResource {
+
+    private DepanFxProjectDocument projDoc;
+
+    public FileSystem(DepanFxProjectDocument projDoc) {
+      this.projDoc = projDoc;
+    }
+
+    @Override
+    public Optional<DepanFxWorkspaceResource> getResource(
+        DepanFxWorkspace workspace, Class<?> docType) {
+      return DepanFxWorkspaceFactory.loadDocument(workspace, projDoc, docType);
+    }
+  }
+
+  public static DepanFxProjectResource fromWorkspaceResource(
+      DepanFxWorkspaceResource wkspRsrc) {
+    DepanFxProjectDocument rsrcDoc = wkspRsrc.getDocument();
+    if (rsrcDoc.getProject().getMemberPath().equals(
+        DepanFxBuiltInProject.BUILT_IN_PROJECT_PATH)) {
+      return new BuiltIn(rsrcDoc.getMemberPath());
+    }
+    return new FileSystem(rsrcDoc);
+  }
+}

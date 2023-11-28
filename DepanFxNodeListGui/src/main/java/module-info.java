@@ -11,11 +11,14 @@ module depanfx.nodelist.gui {
 
   requires depanfx.graph;
   requires depanfx.nodelist;
+  requires depanfx.persistence;
   requires depanfx.workspace;
   requires depanfx.graph_doc;
   requires depanfx.scene;
 
   opens com.pnambic.depanfx.nodelist.gui to javafx.fxml, net.rgielen.fxweaver.core, spring.beans;
+  opens com.pnambic.depanfx.nodelist.tooldata;
 
   exports com.pnambic.depanfx.nodelist.gui;
+  exports com.pnambic.depanfx.nodelist.tooldata;
 }

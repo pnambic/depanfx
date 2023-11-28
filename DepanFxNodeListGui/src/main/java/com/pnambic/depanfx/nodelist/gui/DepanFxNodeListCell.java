@@ -1,19 +1,23 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
+import java.io.File;
 import java.util.Collection;
 
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.cell.CheckBoxTreeTableCell;
+import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
@@ -66,9 +70,24 @@ public class DepanFxNodeListCell
       return;
     }
 
+    if (member instanceof DepanFxTreeSection) {
+      setContextMenu(treeSectionMenu((DepanFxTreeSection) member));
+      return;
+    }
+
     // Otherwise clear the context menu
     setContextMenu(null);
   }
+
+  private ContextMenu treeSectionMenu(DepanFxTreeSection member) {
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem("Edit Tree Section...",
+        e -> openTreeSectionEditor(member));
+    builder.appendActionItem("Select Tree Section...",
+        e -> openTreeSectionFinder(member));
+    return builder.build();
+  }
+
   private ContextMenu nodeListSectionMenu(DepanFxNodeListFlatSection member) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
     builder.appendActionItem(
@@ -88,6 +107,36 @@ public class DepanFxNodeListCell
     return builder.build();
   }
 
+  private void openTreeSectionEditor(DepanFxTreeSection member) {
+    Dialog<DepanFxTreeSectionToolDialog> treeSectionEditor =
+        listViewer.buildDialog(DepanFxTreeSectionToolDialog.class);
+
+    treeSectionEditor.getController().setTooldata(member.getSectionData());
+    treeSectionEditor.runDialog("Update Tree Section");
+    treeSectionEditor.getController().getWorkspaceResource()
+        .ifPresent(d -> updateSectionDataRsrc(member, d));
+  }
+
+  private void openTreeSectionFinder(DepanFxTreeSection member) {
+    DepanFxWorkspace workspace = listViewer.getWorkspace();
+    FileChooser fileChooser = prepareTreeSectionFinder(workspace);
+    File selectedFile =
+        fileChooser.showOpenDialog(getScene().getWindow());
+    if (selectedFile != null) {
+       workspace
+          .toProjectDocument(selectedFile.getAbsoluteFile().toURI())
+          .flatMap(p -> DepanFxWorkspaceFactory.loadDocument(
+              workspace, p, DepanFxTreeSectionData.class))
+          .ifPresent(d -> updateSectionDataRsrc(member, d));
+    }
+  }
+
+  private void updateSectionDataRsrc(
+      DepanFxTreeSection member, DepanFxWorkspaceResource dataRsrc) {
+    member.setSectionDataRsrc(dataRsrc);
+    listViewer.resetView();
+  }
+
   private void runInsertMemberTreeSectionAction(DepanFxNodeListSection before) {
     listViewer.insertMemberTreeSection(before);
   }
@@ -100,6 +149,22 @@ public class DepanFxNodeListCell
     // Then all the reachable nodes.
     Collection<GraphNode> nodes = fork.getDecendants();
     listViewer.doSelectGraphNodesAction(nodes, value);
+  }
+
+  private FileChooser prepareTreeSectionFinder(DepanFxWorkspace workspace) {
+
+    File toolsDir = DepanFxProjects.getCurrentTools(workspace);
+    File nodeListDir = new File(toolsDir, DepanFxTreeSectionData.NODE_LIST_DIR);
+    File sectionsDir =
+        new File(nodeListDir, DepanFxTreeSectionData.TREE_SECTIONS_TOOL_DIR );
+    File dstDataFile = DepanFxWorkspaceFactory.bestDirectory(
+        new File(sectionsDir, DepanFxTreeSectionData.BASE_SECTION_LABEL),
+        toolsDir);
+    FileChooser result =
+        DepanFxSceneControls.prepareFileChooser(dstDataFile);
+    result.setInitialFileName("");
+    DepanFxTreeSectionToolDialog.setTreeSectionTooldataFilters(result);
+    return result;
   }
 
   private class SelectionState
