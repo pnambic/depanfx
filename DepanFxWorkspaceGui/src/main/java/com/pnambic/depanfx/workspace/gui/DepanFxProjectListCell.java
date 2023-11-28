@@ -285,7 +285,8 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
           .ifPresent(
                 r -> DepanFxGitRepoToolDialogs.runGitRepoEdit(r, dialogRunner));
     } catch (RuntimeException errCaught) {
-      LOG.error("Unable to open git repository data {} for edit", gitRepouri, errCaught);
+      LOG.error("Unable to open git repository data {} for edit",
+          gitRepouri, errCaught);
     }
   }
 
@@ -295,7 +296,7 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
         DepanFxNodeListSections.getFinalSection();
     DepanFxNodeListViewer viewer =
         new DepanFxNodeListViewer(
-            dialogRunner, nodeList, sections);
+            workspace, dialogRunner, nodeList, sections);
 
     viewer.prependMemberTree();
     Tab viewerTab = viewer.createWorkspaceTab(tabTitle);

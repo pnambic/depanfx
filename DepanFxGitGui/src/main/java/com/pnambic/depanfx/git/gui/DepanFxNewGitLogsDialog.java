@@ -138,7 +138,7 @@ public class DepanFxNewGitLogsDialog
 
       DepanFxProjectContainer dstDir = optDstDir.get();
       GitLogLoader logLoader =
-          new GitLogLoader(dstDir, optGraphRsrc.get(), cmdRunner);
+          new GitLogLoader(workspace, dstDir, optGraphRsrc.get(), cmdRunner);
       dstDir.getProject().registerContainer(dstDir);
 
       logLoader.loadBranchCommits(branchNameField.getText(), logCount);

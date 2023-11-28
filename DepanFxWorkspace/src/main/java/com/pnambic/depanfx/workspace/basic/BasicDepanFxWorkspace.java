@@ -312,11 +312,6 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
     }
 
     @Override
-    public DepanFxWorkspace getWorkspace() {
-      return BasicDepanFxWorkspace.this;
-    }
-
-    @Override
     public DepanFxProjectDocument getDocument() {
       return document;
     }

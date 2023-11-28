@@ -51,6 +51,8 @@ public class DepanFxNodeListViewer {
 
   private static final String INVERT_SELECTION_ITEM = "Invert Selection";
 
+  private final DepanFxWorkspace workspace;
+
   private final DepanFxDialogRunner dialogRunner;
 
   private DepanFxNodeList nodeList;
@@ -65,9 +67,11 @@ public class DepanFxNodeListViewer {
   private Map<GraphNode, BooleanProperty> nodesCheckBoxStates;
 
   public DepanFxNodeListViewer(
+      DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxNodeList nodeList,
       List<DepanFxNodeListSection> sections) {
+    this.workspace = workspace;
     this.dialogRunner = dialogRunner;
     this.nodeList = nodeList;
     this.sections = sections;
@@ -95,7 +99,7 @@ public class DepanFxNodeListViewer {
   }
 
   public DepanFxWorkspace getWorkspace() {
-    return nodeList.getWorkspaceResource().getWorkspace();
+    return workspace;
   }
 
   public TreeItem<DepanFxNodeListMember> getTreeItem(int intValue) {
@@ -179,14 +183,13 @@ public class DepanFxNodeListViewer {
     loader.setController(new DepanFxSaveNodeListDialog(this));
     try {
       Parent dialog = loader.load();
-      dialogRunner.runDialog(dialog, "Save selection as node list");
+      DepanFxDialogRunner.runDialog(dialog, "Save selection as node list");
     } catch (IOException errIo) {
       throw new RuntimeException("Unable to load save node list dialog", errIo);
     }
   }
 
   private Optional<DepanFxWorkspaceResource> getMemberLinkMatcherResource() {
-    DepanFxWorkspace workspace = nodeList.getWorkspaceResource().getWorkspace();
     ContextModelId modelId =
         ((GraphDocument) nodeList.getWorkspaceResource().getResource())
         .getContextModelId();

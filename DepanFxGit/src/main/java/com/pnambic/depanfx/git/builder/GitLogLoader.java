@@ -47,6 +47,8 @@ public class GitLogLoader {
 
   private final GitLogParser parser = new GitLogParser();
 
+  private final DepanFxWorkspace workspace;
+
   private final DepanFxProjectContainer dstDir;
 
   private final DepanFxWorkspaceResource graphRsrc;
@@ -63,8 +65,10 @@ public class GitLogLoader {
 
   private String commitId;
 
-  public GitLogLoader(DepanFxProjectContainer dstDir,
+  public GitLogLoader(
+      DepanFxWorkspace workspace, DepanFxProjectContainer dstDir,
       DepanFxWorkspaceResource graphRsrc, GitCommandRunner cmdRunner) {
+    this.workspace = workspace;
     this.dstDir = dstDir;
     this.graphRsrc = graphRsrc;
     this.cmdRunner = cmdRunner;
@@ -108,7 +112,6 @@ public class GitLogLoader {
   }
 
   private Optional<DepanFxWorkspaceResource> saveNodeList() {
-    DepanFxWorkspace workspace = graphRsrc.getWorkspace();
     Optional<DepanFxProjectDocument> optProjDoc = buildProjectDocument();
     if (optProjDoc.isEmpty()) {
       throw new RuntimeException(
