@@ -60,7 +60,8 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
         (GraphDocument) baseNodes.getWorkspaceResource().getResource();
     treeModel =
         builder.traverseGraph(graphModel.getGraph(), baseNodes);
-    sectionNodes = treeModel.getReachableGraphNodes(treeModel.getRoots());
+    sectionNodes = treeModel.getReachableGraphNodes(
+        treeModel.getRoots(), baseNodes.getNodes());
 
     return new DepanFxTreeSectionItem(this);
   }

@@ -2,10 +2,13 @@ package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
+import com.pnambic.depanfx.scene.DepanFxSceneControls;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
 
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ContextMenu;
@@ -95,9 +98,7 @@ public class DepanFxNodeListCell
     listViewer.doSelectGraphNodeAction(selectNode, value);
 
     // Then all the reachable nodes.
-    Set<GraphNode> roots = Collections.singleton(selectNode);
-    Collection<GraphNode> nodes =
-        fork.getTreeModel().getReachableGraphNodes(roots).getNodes();
+    Collection<GraphNode> nodes = fork.getDecendants();
     listViewer.doSelectGraphNodesAction(nodes, value);
   }
 

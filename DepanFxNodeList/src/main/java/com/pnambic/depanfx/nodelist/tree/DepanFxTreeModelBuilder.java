@@ -23,8 +23,9 @@ public class DepanFxTreeModelBuilder {
   public DepanFxTreeModel traverseGraph(GraphModel model, DepanFxNodeList nodeList) {
     DepanFxAdjacencyModel adjModel = buildAdjacencyModel(model);
 
-    DepanFxDepthFirstTree dfsTree = new DepanFxDepthFirstTree(adjModel);
-    dfsTree.buildFromNodes(nodeList.getNodes());
+    Collection<GraphNode> nodes = nodeList.getNodes();
+    DepanFxDepthFirstTree dfsTree = new DepanFxDepthFirstTree(adjModel, nodes);
+    dfsTree.buildFromNodes(nodes);
     Collection<GraphNode> roots = dfsTree.getRoots();
     DepanFxAdjacencyModel nodeMembers = dfsTree.getNodeMembers();
 

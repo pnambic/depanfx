@@ -46,10 +46,11 @@ public class DepanFxSimpleTreeModel implements DepanFxTreeModel, DepanFxAdjacenc
   }
 
   @Override
-  public DepanFxNodeList getReachableGraphNodes(Collection<GraphNode> start) {
+  public DepanFxNodeList getReachableGraphNodes(
+      Collection<GraphNode> startNodes, Collection<GraphNode> filterNodes) {
 
-    DepanFxDepthFirstTree treeDft = new DepanFxDepthFirstTree(this);
-    treeDft.buildFromNodes(start);
+    DepanFxDepthFirstTree treeDft = new DepanFxDepthFirstTree(this, filterNodes);
+    treeDft.buildFromNodes(startNodes);
     return new DepanFxNodeList(
         workspaceResource, treeDft.getTreeMembers());
   }

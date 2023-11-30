@@ -15,11 +15,30 @@ public interface DepanFxTreeModel {
 
   DepanFxWorkspaceResource getWorkspaceResource();
 
+  /**
+   * Provide the {@link TreeMode} for the supplied graph node.
+   */
   TreeMode getTreeMode(GraphNode node);
 
+  /**
+   * Provides the collection of graph nodes that have no containers.
+   * 
+   * These graph nodes may not have any members.
+   */
   Collection<GraphNode> getRoots();
 
+  /**
+   * Direct members of the supplied graph node.
+   */
   Collection<GraphNode> getMembers(GraphNode node);
 
-  DepanFxNodeList getReachableGraphNodes(Collection<GraphNode> start);
+  /**
+   * Transitively reachable nodes from a start group.  The start nodes are
+   * the roots of disjoint trees, none of them will be included in the result.
+   *
+   * The collection of filter nodes should include the set of start nodes.
+   * This is enforced via {@code DepanFxDepthFirstTree.buildFromNodes()}.
+   */
+  DepanFxNodeList getReachableGraphNodes(
+      Collection<GraphNode> startNodes, Collection<GraphNode> filterNodes);
 }
