@@ -5,7 +5,7 @@ import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 
 import javafx.scene.control.TreeItem;
@@ -32,7 +32,7 @@ public class DepanFxTreeFork extends DepanFxNodeListGraphNode {
 
     Set<GraphNode> roots = Collections.singleton(getGraphNode());
     Collection<GraphNode> filter =
-        ((DepanFxTreeSection) getSection()).getSectionNodes().getNodes();
+        getSection().getSectionNodes().getNodes();
     return getTreeModel()
         .getReachableGraphNodes(roots, filter)
         .getNodes();
@@ -42,11 +42,12 @@ public class DepanFxTreeFork extends DepanFxNodeListGraphNode {
     return ((DepanFxTreeSection) getSection()).getTreeModel();
   }
 
-  public Comparator<? super TreeItem<DepanFxNodeListMember>> getOrderBy() {
-    return ((DepanFxTreeSection) getSection()).getOrderBy();
+  public void sortTreeItems(
+      List<TreeItem<DepanFxNodeListMember>> items) {
+    getSection().sortTreeItems(items);
   }
 
   public TreeItem<DepanFxNodeListMember> buildTreeMember(GraphNode node) {
-    return ((DepanFxTreeSection) getSection()).buildNodeItem(node);
+    return getSection().buildNodeItem(node);
   }
 }

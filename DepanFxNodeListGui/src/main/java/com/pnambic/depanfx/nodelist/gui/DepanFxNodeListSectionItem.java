@@ -1,11 +1,12 @@
 package com.pnambic.depanfx.nodelist.gui;
 
-import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
-
+/**
+ * Common behavior for all node list section items.
+ */
 public abstract class DepanFxNodeListSectionItem extends DepanFxNodeListItem {
 
-  public DepanFxNodeListSectionItem(DepanFxNodeListMember value) {
-    super(value);
+  public DepanFxNodeListSectionItem(DepanFxNodeListSection section) {
+    super(section);
   }
 
   @Override
@@ -13,5 +14,7 @@ public abstract class DepanFxNodeListSectionItem extends DepanFxNodeListItem {
     return false;
   }
 
-  public abstract DepanFxNodeList getSectionNodes();
+  protected DepanFxNodeListSection getSection() {
+    return (DepanFxNodeListSection) getValue();
+  }
 }

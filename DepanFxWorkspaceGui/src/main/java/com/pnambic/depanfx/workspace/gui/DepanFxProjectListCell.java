@@ -3,13 +3,19 @@ package com.pnambic.depanfx.workspace.gui;
 import com.pnambic.depanfx.git.gui.DepanFxGitRepoToolDialog;
 import com.pnambic.depanfx.git.gui.DepanFxGitRepoToolDialogs;
 import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
+import com.pnambic.depanfx.nodelist.gui.DepanFxFlatSectionToolDialog;
+import com.pnambic.depanfx.nodelist.gui.DepanFxFlatSection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSection;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSectionConfiguration;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSections;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
 import com.pnambic.depanfx.nodelist.gui.DepanFxTreeSectionToolDialog;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionConfiguration;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -27,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -74,6 +81,14 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
 
   private static final String NEW_TREE_SECTION_DESCR = "New tree section.";
 
+  private static final String EDIT_FLAT_SECTION_DATA = "Edit Flat Section Data...";
+
+  private static final String NEW_FLAT_SECTION_DATA = "New Flat Section Data...";
+
+  private static final String NEW_FLAT_SECTION_NAME = "New Flat Section";
+
+  private static final String NEW_FLAT_SECTION_DESCR = "New flat section.";
+
   // Our state
   private static final char EXTENSION_DOT = '.';
 
@@ -83,7 +98,7 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
 
   private final DepanFxNewResourceRegistry newResourceRegistry;
 
-  private final DepanFxTreeSectionConfiguration treeSectionConfig;
+  private final DepanFxNodeListSectionConfiguration sectionConfig;
 
   private final DepanFxSceneController scene;
 
@@ -94,12 +109,12 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxNewResourceRegistry newResourceRegistry,
-      DepanFxTreeSectionConfiguration treeSectionConfig,
+      DepanFxNodeListSectionConfiguration sectionConfig,
       DepanFxSceneController scene) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
     this.newResourceRegistry = newResourceRegistry;
-    this.treeSectionConfig = treeSectionConfig;
+    this.sectionConfig = sectionConfig;
     this.scene = scene;
   }
 
@@ -168,7 +183,9 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
           builder.appendActionItem(NEW_GIT_REPO,
               e -> runNewGitRepoAction());
           break;
-        case DepanFxTreeSectionData.TREE_SECTIONS_TOOL_DIR:
+        case DepanFxNodeListSectionData.SECTIONS_TOOL_DIR:
+          builder.appendActionItem(NEW_FLAT_SECTION_DATA,
+              e -> runNewFlatSectionDataAction());
           builder.appendActionItem(NEW_TREE_SECTION_DATA,
               e -> runNewTreeSectionDataAction());
           break;
@@ -205,6 +222,14 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
             builder.appendActionItem(
                 EDIT_GIT_REPO,
                 e -> runEditGitRepoAction(docPath));
+            break;
+          case DepanFxFlatSectionData.FLAT_SECTION_TOOL_EXT:
+            setOnMouseClicked(
+                e -> handleMouseClick(e, docPath,
+                    this::runEditFlatSectionDataAction));
+            builder.appendActionItem(
+                EDIT_TREE_SECTION_DATA,
+                e -> runEditFlatSectionDataAction(docPath));
             break;
           case DepanFxTreeSectionData.TREE_SECTION_TOOL_EXT:
             setOnMouseClicked(
@@ -336,15 +361,42 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
     }
   }
 
+  private void runNewFlatSectionDataAction() {
+    try {
+      DepanFxFlatSectionData sectionData =
+          new DepanFxFlatSectionData(
+              NEW_FLAT_SECTION_NAME, NEW_FLAT_SECTION_DESCR,
+              DepanFxFlatSectionData.BASE_SECTION_LABEL, true,
+              OrderBy.NODE_KEY, OrderDirection.FORWARD);
+
+      DepanFxFlatSectionToolDialog.runCreateDialog(
+          sectionData, dialogRunner, NEW_FLAT_SECTION_DATA);
+    } catch (RuntimeException errCaught) {
+      LOG.error("Unable to create tree section data", errCaught);
+    }
+  }
+
   private void runNewTreeSectionDataAction() {
     try {
       DepanFxTreeSectionData sectionData =
-          treeSectionConfig.buildInitialTreeSection(
+          sectionConfig.buildInitialTreeSection(
               NEW_TREE_SECTION_NAME, NEW_TREE_SECTION_DESCR);
       DepanFxTreeSectionToolDialog.runCreateDialog(
           sectionData, dialogRunner, NEW_TREE_SECTION_DATA);
     } catch (RuntimeException errCaught) {
       LOG.error("Unable to create tree section data", errCaught);
+    }
+  }
+
+  private void runEditFlatSectionDataAction(Path docPath) {
+    try {
+      workspace.toProjectDocument(docPath.toUri())
+          .flatMap(workspace::getWorkspaceResource)
+          .ifPresent(r -> DepanFxFlatSectionToolDialog.runEditDialog(
+              r, dialogRunner, EDIT_FLAT_SECTION_DATA));
+    } catch (RuntimeException errCaught) {
+      LOG.error("Unable to open flat section data {} for edit",
+          docPath, errCaught);
     }
   }
 
@@ -355,15 +407,17 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
           .ifPresent(r -> DepanFxTreeSectionToolDialog.runEditDialog(
               r, dialogRunner, EDIT_TREE_SECTION_DATA));
     } catch (RuntimeException errCaught) {
-      LOG.error("Unable to open git repository data {} for edit",
+      LOG.error("Unable to open tree section data {} for edit",
           docPath, errCaught);
     }
   }
 
   private void addNodeListViewToScene(
       DepanFxNodeList nodeList, String tabTitle) {
-    List<DepanFxNodeListSection> sections =
-        DepanFxNodeListSections.getFinalSection();
+    List<DepanFxNodeListSection> sections = new ArrayList<>();
+    DepanFxNodeListSectionData.getBuiltinSimpleSectionResource(workspace)
+        .ifPresent(r -> sections.add(new DepanFxFlatSection(r)));
+
     DepanFxNodeListViewer viewer =
         new DepanFxNodeListViewer(
             workspace, dialogRunner, nodeList, sections);

@@ -1,40 +1,29 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
-/**
- * Provides top-level rendering of a tree section.
- * Used as the mechanism to provide {@link DepanFxTreeFork} elements with
- * the section's {@link DepanFxTreeModel}.
- */
-public class DepanFxTreeSectionItem
-    extends DepanFxNodeListSectionItem {
+public class DepanFxFlatSectionItem extends DepanFxNodeListSectionItem {
 
-  private boolean freshTree = false;
+  private boolean freshSections = false;
 
-  public DepanFxTreeSectionItem(DepanFxTreeSection section) {
+  public DepanFxFlatSectionItem(DepanFxFlatSection section) {
     super(section);
   }
 
   @Override
-  public boolean isLeaf() {
-    return false;
-  }
-
-  @Override
   public ObservableList<TreeItem<DepanFxNodeListMember>> getChildren() {
-    if (!freshTree) {
+    if (!freshSections) {
       super.getChildren().setAll(buildChildren());
-      freshTree = true;
+      freshSections = true;
     }
 
     return super.getChildren();
@@ -43,12 +32,12 @@ public class DepanFxTreeSectionItem
   private ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
     DepanFxNodeListSection section = getSection();
 
-    DepanFxTreeModel treeModel = ((DepanFxTreeSection) section).getTreeModel();
-    Collection<GraphNode> nodes = treeModel.getRoots();
+    Collection<GraphNode> nodes = section.getSectionNodes().getNodes();
 
     List<TreeItem<DepanFxNodeListMember>> result =
         new ArrayList<>(nodes.size());
     nodes.stream()
+        .filter(Objects::nonNull)  // [9-Dec-2023] should not happen, but avoids a crash
         .map(section::buildNodeItem)
         .forEach(result::add);
     section.sortTreeItems(result);

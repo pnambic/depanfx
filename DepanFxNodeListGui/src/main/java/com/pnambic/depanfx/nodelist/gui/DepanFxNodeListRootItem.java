@@ -2,6 +2,7 @@ package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -41,18 +42,23 @@ public class DepanFxNodeListRootItem extends DepanFxNodeListItem {
 
     for (DepanFxNodeListSection section : root.getSections()) {
       DepanFxNodeListSectionItem sectionItem =
-          section.buildTreeItem(baseNodes);
+          section.buildSectionItem(baseNodes);
       result.add(sectionItem);
 
-      DepanFxNodeList sectionNodes = sectionItem.getSectionNodes();
+      DepanFxNodeList sectionNodes = section.getSectionNodes();
       baseNodes = DepanFxNodeLists.remove(baseNodes, sectionNodes);
     }
 
-    // If there are any left, drop them in a special section.
+    // If any nodes are left, drop them in a special section.
     if (!baseNodes.getNodes().isEmpty()) {
-      DepanFxNodeListFlatSectionItem sectionItem =
-          new DepanFxNodeListFlatSectionItem(null, baseNodes);
-      result.add(sectionItem);
+
+      // Capture a snapshot of baseNodes.
+      DepanFxNodeList remainer = baseNodes;
+      DepanFxNodeListSectionData
+          .getBuiltinSimpleSectionResource(root.getWorkspace())
+          .map(r -> new DepanFxFlatSection(r))
+          .map(s -> s.buildSectionItem(remainer))
+          .ifPresent(result::add);;
     }
     return result;
   }

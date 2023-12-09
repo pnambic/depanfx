@@ -14,8 +14,8 @@ public class DepanFxTreeForkItem extends DepanFxNodeListItem {
 
   private boolean freshTree = false;
 
-  public DepanFxTreeForkItem(DepanFxTreeFork folder) {
-    super(folder);
+  public DepanFxTreeForkItem(DepanFxTreeFork fork) {
+    super(fork);
   }
 
   @Override
@@ -37,20 +37,14 @@ public class DepanFxTreeForkItem extends DepanFxNodeListItem {
     DepanFxTreeFork folder = (DepanFxTreeFork) getValue();
 
     Collection<GraphNode> nodes = folder.getMembers();
+
     List<TreeItem<DepanFxNodeListMember>> result =
         new ArrayList<>(nodes.size());
-
-    for (GraphNode node : nodes) {
-      result.add(buildNodeItem(node, folder));
-    }
-    result.sort(folder.getOrderBy());
-    // result.sort(folder.getOrderBy()DepanFxNodeListSections.COMPARE_BY_SORT_KEY);
+    nodes.stream()
+      .map(folder::buildTreeMember)
+      .forEach(result::add);
+    folder.sortTreeItems(result);
 
     return FXCollections.observableList(result);
-  }
-
-  private TreeItem<DepanFxNodeListMember> buildNodeItem(
-      GraphNode node, DepanFxTreeFork fork) {
-    return fork.buildTreeMember(node);
   }
 }

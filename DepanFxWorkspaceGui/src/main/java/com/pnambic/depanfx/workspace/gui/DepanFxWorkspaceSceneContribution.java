@@ -1,6 +1,6 @@
 package com.pnambic.depanfx.workspace.gui;
 
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionConfiguration;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSectionConfiguration;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
@@ -23,14 +23,14 @@ public class DepanFxWorkspaceSceneContribution implements DepanFxSceneStarterCon
 
   private final DepanFxNewResourceRegistry newResourceRegistry;
 
-  private final DepanFxTreeSectionConfiguration treeSectionConfig;
+  private final DepanFxNodeListSectionConfiguration treeSectionConfig;
 
   @Autowired
   public DepanFxWorkspaceSceneContribution(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxNewResourceRegistry newResourceRegistry,
-      DepanFxTreeSectionConfiguration treeSectionConfig) {
+      DepanFxNodeListSectionConfiguration treeSectionConfig) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
     this.newResourceRegistry = newResourceRegistry;

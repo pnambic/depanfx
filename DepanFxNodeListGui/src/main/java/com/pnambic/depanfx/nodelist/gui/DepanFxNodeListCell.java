@@ -1,6 +1,8 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -60,8 +62,8 @@ public class DepanFxNodeListCell
 
   private void stylizeCell(DepanFxNodeListMember member) {
 
-    if (member instanceof DepanFxNodeListFlatSection) {
-      setContextMenu(nodeListSectionMenu((DepanFxNodeListFlatSection) member));
+    if (member instanceof DepanFxFlatSection) {
+      setContextMenu(nodeListSectionMenu((DepanFxFlatSection) member));
       return;
     }
 
@@ -88,8 +90,13 @@ public class DepanFxNodeListCell
     return builder.build();
   }
 
-  private ContextMenu nodeListSectionMenu(DepanFxNodeListFlatSection member) {
+  private ContextMenu nodeListSectionMenu(DepanFxFlatSection member) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem("Edit Flat Section...",
+        e -> openFlatSectionEditor(member));
+    builder.appendActionItem("Select Flat Section...",
+        e -> openFlatSectionFinder(member));
+
     builder.appendActionItem(
         INSERT_ABOVE_MEMBER_TREE_SECTION,
         e -> runInsertMemberTreeSectionAction(member));
@@ -131,6 +138,36 @@ public class DepanFxNodeListCell
     }
   }
 
+  private void openFlatSectionEditor(DepanFxFlatSection member) {
+    Dialog<DepanFxFlatSectionToolDialog> flatSectionEditor =
+        listViewer.buildDialog(DepanFxFlatSectionToolDialog.class);
+
+    flatSectionEditor.getController().setTooldata(member.getSectionData());
+    flatSectionEditor.runDialog("Update Tree Section");
+    flatSectionEditor.getController().getWorkspaceResource()
+        .ifPresent(d -> updateSectionDataRsrc(member, d));
+  }
+
+  private void openFlatSectionFinder(DepanFxFlatSection member) {
+    DepanFxWorkspace workspace = listViewer.getWorkspace();
+    FileChooser fileChooser = prepareFlatSectionFinder(workspace);
+    File selectedFile =
+        fileChooser.showOpenDialog(getScene().getWindow());
+    if (selectedFile != null) {
+       workspace
+          .toProjectDocument(selectedFile.getAbsoluteFile().toURI())
+          .flatMap(p -> DepanFxWorkspaceFactory.loadDocument(
+              workspace, p, DepanFxFlatSectionData.class))
+          .ifPresent(d -> updateSectionDataRsrc(member, d));
+    }
+  }
+
+  private void updateSectionDataRsrc(
+      DepanFxFlatSection member, DepanFxWorkspaceResource dataRsrc) {
+    member.setSectionDataRsrc(dataRsrc);
+    listViewer.resetView();
+  }
+
   private void updateSectionDataRsrc(
       DepanFxTreeSection member, DepanFxWorkspaceResource dataRsrc) {
     member.setSectionDataRsrc(dataRsrc);
@@ -154,16 +191,35 @@ public class DepanFxNodeListCell
   private FileChooser prepareTreeSectionFinder(DepanFxWorkspace workspace) {
 
     File toolsDir = DepanFxProjects.getCurrentTools(workspace);
-    File nodeListDir = new File(toolsDir, DepanFxTreeSectionData.NODE_LIST_DIR);
-    File sectionsDir =
-        new File(nodeListDir, DepanFxTreeSectionData.TREE_SECTIONS_TOOL_DIR );
-    File dstDataFile = DepanFxWorkspaceFactory.bestDirectory(
-        new File(sectionsDir, DepanFxTreeSectionData.BASE_SECTION_LABEL),
-        toolsDir);
+    File dstDataFile = workspace.getCurrentProject()
+        .map(t -> t.getMemberPath())
+        .map(p -> p.resolve(DepanFxNodeListSectionData.SECTIONS_TOOL_PATH))
+        .map(p -> p.resolve(DepanFxTreeSectionData.BASE_SECTION_LABEL))
+        .map(p -> p.toFile())
+        .map(f -> DepanFxWorkspaceFactory.bestDirectory(f, toolsDir))
+        .get();
+
     FileChooser result =
         DepanFxSceneControls.prepareFileChooser(dstDataFile);
     result.setInitialFileName("");
     DepanFxTreeSectionToolDialog.setTreeSectionTooldataFilters(result);
+    return result;
+  }
+
+  private FileChooser prepareFlatSectionFinder(DepanFxWorkspace workspace) {
+
+    File toolsDir = DepanFxProjects.getCurrentTools(workspace);
+    File dstDataFile = workspace.getCurrentProject()
+      .map(t -> t.getMemberPath())
+      .map(p -> p.resolve(DepanFxNodeListSectionData.SIMPLE_SECTION_TOOL_PATH))
+      .map(p -> p.toFile())
+      .map(f -> DepanFxWorkspaceFactory.bestDirectory(f, toolsDir))
+      .get();
+
+    FileChooser result =
+        DepanFxSceneControls.prepareFileChooser(dstDataFile);
+    result.setInitialFileName("");
+    DepanFxFlatSectionToolDialog.setFlatSectionTooldataFilters(result);
     return result;
   }
 

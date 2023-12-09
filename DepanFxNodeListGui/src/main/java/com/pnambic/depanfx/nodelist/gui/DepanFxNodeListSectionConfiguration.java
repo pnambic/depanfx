@@ -1,25 +1,30 @@
-package com.pnambic.depanfx.nodelist.tooldata;
+package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData.ContainerOrder;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData.OrderBy;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData.OrderDirection;
 import com.pnambic.depanfx.workspace.DepanFxProjectResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
 
 @Configuration
-public class DepanFxTreeSectionConfiguration {
+public class DepanFxNodeListSectionConfiguration {
 
   private final DepanFxBuiltInContribution memberFinderlinkMatcherContrib =
       buildMemberFinderLinkMatcher();
 
-  public DepanFxTreeSectionConfiguration() {
+  @Autowired
+  public DepanFxNodeListSectionConfiguration() {
   }
 
   @Bean
@@ -28,6 +33,17 @@ public class DepanFxTreeSectionConfiguration {
         "Member Tree Section",
         "Tree section based on a link matcher for membership");
     return createBuiltIn("Member Tree", toolData);
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution flatSection() {
+    DepanFxFlatSectionData toolData =
+        new DepanFxFlatSectionData(
+            "Built-in Flat Section", "Built-in flat section.",
+            DepanFxFlatSectionData.BASE_SECTION_LABEL, true,
+            OrderBy.NODE_KEY, OrderDirection.FORWARD);
+    return new DepanFxBuiltInContribution.Simple(
+        DepanFxNodeListSectionData.SIMPLE_SECTION_TOOL_PATH, toolData);
   }
 
   @Bean
@@ -57,7 +73,8 @@ public class DepanFxTreeSectionConfiguration {
 
   private DepanFxBuiltInContribution createBuiltIn(
       String docName, Object doc) {
-    Path docPath = DepanFxTreeSectionData.SECTIONS_TOOL_PATH.resolve(docName);
+    Path docPath =
+        DepanFxNodeListSectionData.SECTIONS_TOOL_PATH.resolve(docName);
     return new DepanFxBuiltInContribution.Simple(docPath, doc);
   }
 }

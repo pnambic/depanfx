@@ -1,48 +1,41 @@
 package com.pnambic.depanfx.nodelist.xstream;
 
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.persistence.DocumentXmlPersist;
 import com.pnambic.depanfx.persistence.builder.DocumentXmlPersistBuilder;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
-import com.pnambic.depanfx.persistence.plugins.GraphNodePersistencePluginRegistry;
-import com.pnambic.depanfx.workspace.DepanFxProjectResource;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TreeSectionDataPersistenceContribution
+public class FlatSectionDataPersistenceContribution
     implements DocumentPersistenceContribution {
 
   public static final String EXTENSION =
-      DepanFxTreeSectionData.TREE_SECTION_TOOL_EXT;
+      DepanFxFlatSectionData.FLAT_SECTION_TOOL_EXT;
 
-  public static final String TREE_SECTION_INFO_TAG = "tree-section-info";
+  public static final String FLAT_SECTION_INFO_TAG = "flat-section-info";
 
   public static final String ORDER_BY_TAG = "order-by-info";
-
-  public static final String CONTAINER_ORDER_TAG = "container-order-info";
 
   public static final String ORDER_DIRECTION_TAG = "order-direction-info";
 
   private static final Class<?>[] ALLOW_TYPES = new Class[] {
+      DepanFxFlatSectionData.class,
       DepanFxNodeListSectionData.class,
       DepanFxNodeListSectionData.OrderBy.class,
-      DepanFxTreeSectionData.ContainerOrder.class,
       DepanFxNodeListSectionData.OrderDirection.class
   };
 
-  private final GraphNodePersistencePluginRegistry graphNodeRegistry;
-
-  public TreeSectionDataPersistenceContribution(
-      GraphNodePersistencePluginRegistry graphNodeRegistry) {
-    this.graphNodeRegistry = graphNodeRegistry;
+  @Autowired
+  public FlatSectionDataPersistenceContribution() {
   }
 
   @Override
   public boolean acceptsDocument(Object document) {
-    return DepanFxTreeSectionData.class.isAssignableFrom(document.getClass());
+    return DepanFxFlatSectionData.class.isAssignableFrom(document.getClass());
   }
 
   @Override
@@ -57,19 +50,12 @@ public class TreeSectionDataPersistenceContribution
     builder.setXStream();
     builder.setNoReferences();
 
-    builder.addAlias(TREE_SECTION_INFO_TAG, DepanFxTreeSectionData.class);
-    builder.addAlias(
-        CONTAINER_ORDER_TAG, DepanFxTreeSectionData.ContainerOrder.class);
-
+    builder.addAlias(FLAT_SECTION_INFO_TAG, DepanFxFlatSectionData.class);
     builder.addAlias(ORDER_BY_TAG, DepanFxNodeListSectionData.OrderBy.class);
     builder.addAlias(
         ORDER_DIRECTION_TAG, DepanFxNodeListSectionData.OrderDirection.class);
 
     builder.addAllowedType(ALLOW_TYPES);
-
-    // Apply plugins for document elements.
-    graphNodeRegistry.applyExtensions(builder, DepanFxProjectResource.class);
-    graphNodeRegistry.applyExtensions(builder, DepanFxWorkspaceResource.class);
     return builder.buildDocumentXmlPersist();
   }
 }

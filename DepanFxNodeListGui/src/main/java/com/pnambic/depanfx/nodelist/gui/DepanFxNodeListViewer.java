@@ -243,7 +243,7 @@ public class DepanFxNodeListViewer {
 
   private TreeItem<DepanFxNodeListMember> createTreeRoot() {
     DepanFxNodeListRoot rootMember =
-        new DepanFxNodeListRoot(nodeList, isolateSections());
+        new DepanFxNodeListRoot(workspace, nodeList, isolateSections());
     return new DepanFxNodeListRootItem(rootMember);
   }
 

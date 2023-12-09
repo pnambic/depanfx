@@ -67,8 +67,7 @@ public class DepanFxProjects {
 
     DepanFxBuiltInProject project =
         (DepanFxBuiltInProject) workspace.getBuiltInProject();
-    return
-        project.getContributions(type)
+    return project.getContributions(type)
         .filter(contribFilter)
         .findFirst()
         .flatMap(c ->

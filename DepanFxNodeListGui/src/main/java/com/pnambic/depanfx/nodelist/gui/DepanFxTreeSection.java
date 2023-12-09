@@ -1,8 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.context.ContextModelId;
-import com.pnambic.depanfx.graph.context.ContextNodeId;
-import com.pnambic.depanfx.graph.context.GraphContextKeys;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
@@ -11,9 +9,10 @@ import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData.ContainerOrder;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData.OrderDirection;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModelBuilder;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -23,10 +22,9 @@ import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.scene.control.TreeItem;
@@ -49,6 +47,9 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
 
   private DepanFxWorkspaceResource sectionDataRsrc;
 
+  // Update this whenever sectionDataRsrc is revised.
+  private Comparator<TreeItem<DepanFxNodeListMember>> treeMemberCompare;
+
   private DepanFxTreeModel treeModel;
 
   private DepanFxNodeList sectionNodes;
@@ -58,14 +59,21 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
       DepanFxWorkspaceResource sectionDataRsrc) {
     this.listViewer = listViewer;
     this.sectionDataRsrc = sectionDataRsrc;
+
+    this.treeMemberCompare = updateCompare();
   }
 
   public void setSectionDataRsrc(DepanFxWorkspaceResource sectionDataRsrc) {
     this.sectionDataRsrc = sectionDataRsrc;
+    this.treeMemberCompare = updateCompare();
   }
 
   public DepanFxTreeSectionData getSectionData() {
     return (DepanFxTreeSectionData) sectionDataRsrc.getResource();
+  }
+
+  public DepanFxTreeModel getTreeModel() {
+    return treeModel;
   }
 
   @Override
@@ -75,7 +83,10 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
 
   @Override
   public String getDisplayName() {
-    return fmtDisplayName();
+    return DepanFxNodeListSections.fmtDisplayName(
+        getSectionData().getSectionLabel(),
+        sectionNodes.getNodes().size(),
+        getSectionData().displayNodeCount());
   }
 
   @Override
@@ -90,22 +101,13 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
 
   @Override
   public String getSortKey(GraphNode node) {
-    DepanFxTreeSectionData sectionData = getSectionData();
-    ContextNodeId nodeId = node.getId();
-    switch (sectionData.getOrderBy()) {
-    case NODE_ID:
-      return GraphContextKeys.toNodeKey(nodeId);
-    case NODE_KEY:
-      return nodeId.getNodeKey();
-    case NODE_LEAF:
-      return getLeafSortKey(nodeId.getNodeKey());
-    }
-    // Use the full node key the orderBy value is not known.
-    LOG.warn("Unrecognized order by criteria {}", sectionData.getOrderBy());
-    return GraphContextKeys.toNodeKey(nodeId);
+    OrderBy orderBy = getSectionData().getOrderBy();
+    return DepanFxNodeListSections.getSortKey(node, orderBy);
   }
 
-  public DepanFxNodeListSectionItem buildTreeItem(DepanFxNodeList baseNodes) {
+  @Override
+  public DepanFxNodeListSectionItem buildSectionItem(
+      DepanFxNodeList baseNodes) {
     DepanFxTreeModelBuilder builder =
         new DepanFxTreeModelBuilder(getLinkMatcher());
     GraphDocument graphModel =
@@ -118,6 +120,7 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
     return new DepanFxTreeSectionItem(this);
   }
 
+  @Override
   public TreeItem<DepanFxNodeListMember> buildNodeItem(GraphNode node) {
     switch (treeModel.getTreeMode(node)) {
 
@@ -132,24 +135,12 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
     return null;
   }
 
-  public DepanFxTreeModel getTreeModel() {
-    return treeModel;
+  @Override
+  public void sortTreeItems(List<TreeItem<DepanFxNodeListMember>> items) {
+    items.sort(treeMemberCompare);
   }
 
-  public Comparator<TreeItem<DepanFxNodeListMember>> getOrderBy() {
-    return new Comparator<TreeItem<DepanFxNodeListMember>>() {
-
-      @Override
-      public int compare(
-          TreeItem<DepanFxNodeListMember> itemOne,
-          TreeItem<DepanFxNodeListMember> itemTwo) {
-        DepanFxNodeListMember memberOne = itemOne.getValue();
-        DepanFxNodeListMember memberTwo = itemTwo.getValue();
-        return orderMembers(memberOne, memberTwo);
-      }
-    };
-  }
-
+  @Override
   public DepanFxNodeList getSectionNodes() {
     return sectionNodes;
   }
@@ -160,10 +151,6 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
 
   private DepanFxTreeLeaf buildMemberTreeLeaf(GraphNode leaf) {
     return new DepanFxTreeLeaf(leaf, this);
-  }
-
-  private String getLeafSortKey(String nodeKey) {
-    return new File(nodeKey).getName();
   }
 
   private DepanFxLinkMatcher getLinkMatcher() {
@@ -212,84 +199,77 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
     return linkMatchDoc.getModelId().equals(modelId);
   }
 
-  private int orderMembers(
-      DepanFxNodeListMember memberOne, DepanFxNodeListMember memberTwo ) {
-    OrderDirection direction = getSectionData().getOrderDirection();
-    switch (direction) {
-    case FORWARD:
-      return compareMembers(memberOne, memberTwo);
-    case REVERSE:
-      return - compareMembers(memberOne, memberTwo);
-    }
-    LOG.warn(
-        "Unrecognize direction for section ordering {}", direction);
-    return 0;
+  /////////////////////////////////////
+  // Sorting and ordering
+
+  private Comparator<TreeItem<DepanFxNodeListMember>> updateCompare() {
+    DepanFxTreeSectionData sectionData = getSectionData();
+    return new TreeMemberCompare(
+        sectionData.getOrderDirection(), sectionData.getContainerOrder());
   }
 
-  private int compareMembers(
-      DepanFxNodeListMember memberOne, DepanFxNodeListMember memberTwo) {
-    switch (getSectionData().getContainerOrder()) {
-    case FIRST:
-      return compareByMemberKind(memberOne, memberTwo);
-    case LAST:
-      return compareByMemberKind(memberOne, memberTwo);
-    case MIXED:
-      return compareBySortKey(memberOne, memberTwo);
-    }
-    return 0;
-  }
+  private static class TreeMemberCompare
+      extends DepanFxNodeListSections.CompareMembers {
 
-  private int compareByMemberKind(
-      DepanFxNodeListMember memberOne, DepanFxNodeListMember memberTwo) {
-    if (memberOne instanceof DepanFxTreeFork) {
-      if (memberTwo instanceof DepanFxTreeFork) {
-        // Both members are forks.
+    private final ContainerOrder containerOrder;
+
+    private TreeMemberCompare(
+        OrderDirection direction, ContainerOrder containerOrder) {
+      super(direction);
+      this.containerOrder = containerOrder;
+    }
+
+    @Override
+    protected int compareMembers(
+        DepanFxNodeListMember memberOne, DepanFxNodeListMember memberTwo) {
+      switch (containerOrder) {
+      case FIRST:
+        return compareByMemberKind(memberOne, memberTwo);
+      case LAST:
+        return compareByMemberKind(memberOne, memberTwo);
+      case MIXED:
         return compareBySortKey(memberOne, memberTwo);
       }
-      // Only memberOne is a fork.
-      return compareContainerOrder();
+      return 0;
     }
-    // Only memberTwo is a fork.
-    if (memberTwo instanceof DepanFxTreeFork) {
-      return - compareContainerOrder();
-    }
-    // Both members are leafs.
-    return compareBySortKey(memberOne, memberTwo);
-  }
 
-  private int compareBySortKey(
-      DepanFxNodeListMember memberOne, DepanFxNodeListMember memberTwo) {
-    String oneKey = ((DepanFxNodeListGraphNode) memberOne).getSortKey();
-    String twoKey = ((DepanFxNodeListGraphNode) memberTwo).getSortKey();
-    return oneKey.compareTo(twoKey);
-  }
-
-  private int compareContainerOrder() {
-    ContainerOrder forkOrder = getSectionData().getContainerOrder();
-    if (forkOrder.equals(ContainerOrder.FIRST)) {
-      return -1; // Containers are before documents.
-    }
-    if (forkOrder.equals(ContainerOrder.LAST)) {
-      return 1; // Containers are after documents
-    }
-    LOG.warn(
-        "Misuse of compareContainerOrder with bad value for fork ordering {}",
-        forkOrder);
-    return 0;
-  }
-
-  private String fmtDisplayName() {
-    int listSize = getSectionNodes().getNodes().size();
-    String sectionLabel = getSectionLabel();
-    if (getSectionData().displayNodeCount()) {
-      if (listSize == 1) {
-        return MessageFormat.format(
-            "{0} ({1} node)", sectionLabel, listSize);
-
+    private int compareByMemberKind(
+        DepanFxNodeListMember memberOne, DepanFxNodeListMember memberTwo) {
+      if (memberOne instanceof DepanFxTreeFork) {
+        if (memberTwo instanceof DepanFxTreeFork) {
+          // Both members are forks.
+          return compareBySortKey(memberOne, memberTwo);
+        }
+        // Only memberOne is a fork.
+        return compareContainerOrder();
       }
-      return MessageFormat.format(
-          "{0} ({1} nodes)", sectionLabel, listSize);
+      // Only memberTwo is a fork.
+      if (memberTwo instanceof DepanFxTreeFork) {
+        return - compareContainerOrder();
+      }
+      // Both members are leafs.
+      return compareBySortKey(memberOne, memberTwo);
     }
-    return sectionLabel;
+
+    private int compareBySortKey(
+        DepanFxNodeListMember memberOne, DepanFxNodeListMember memberTwo) {
+      String oneKey = ((DepanFxNodeListGraphNode) memberOne).getSortKey();
+      String twoKey = ((DepanFxNodeListGraphNode) memberTwo).getSortKey();
+      return oneKey.compareTo(twoKey);
+    }
+
+    private int compareContainerOrder() {
+      ContainerOrder forkOrder = containerOrder;
+      if (forkOrder.equals(ContainerOrder.FIRST)) {
+        return -1; // Containers are before documents.
+      }
+      if (forkOrder.equals(ContainerOrder.LAST)) {
+        return 1; // Containers are after documents
+      }
+      LOG.warn(
+          "Misuse of compareContainerOrder with bad value for fork ordering {}",
+          forkOrder);
+      return 0;
+    }
   }
 }

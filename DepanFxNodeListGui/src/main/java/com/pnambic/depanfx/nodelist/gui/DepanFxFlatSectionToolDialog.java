@@ -1,15 +1,13 @@
 package com.pnambic.depanfx.nodelist.gui;
 
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData.ContainerOrder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
-import com.pnambic.depanfx.workspace.DepanFxProjectResource;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -35,24 +33,19 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 @Component
-@FxmlView("tree-section-tool-dialog.fxml")
-public class DepanFxTreeSectionToolDialog {
+@FxmlView("flat-section-tool-dialog.fxml")
+public class DepanFxFlatSectionToolDialog {
 
   private static final Logger LOG =
-      LoggerFactory.getLogger(DepanFxTreeSectionToolDialog.class.getName());
+      LoggerFactory.getLogger(DepanFxFlatSectionToolDialog.class.getName());
 
-  private static final ExtensionFilter TREE_SECTION_FILTER =
+  private static final ExtensionFilter FLAT_SECTION_FILTER =
       DepanFxSceneControls.buildExtFilter(
-          "Tree Sections", DepanFxTreeSectionData.TREE_SECTION_TOOL_EXT);
-
-  private static final ExtensionFilter LINK_MATCHER_FILTER = null;
+          "Flat Sections", DepanFxFlatSectionData.FLAT_SECTION_TOOL_EXT);
 
   private final DepanFxWorkspace workspace;
 
-  // Holds the link matcher reference.
-  private DepanFxTreeSectionData sectionData;
-
-  private Optional<DepanFxWorkspaceResource> optTreeSectionRsrc;
+  private Optional<DepanFxWorkspaceResource> optFlatSectionRsrc;
 
   @FXML
   private TextField sectionLabelField;
@@ -61,19 +54,10 @@ public class DepanFxTreeSectionToolDialog {
   private CheckBox displayNodeCountField;
 
   @FXML
-  private CheckBox inferMissingParentsField;
-
-  @FXML
   private ComboBox<OrderBy> orderByField;
 
   @FXML
-  private ComboBox<ContainerOrder> containerOrderField;
-
-  @FXML
   private ComboBox<OrderDirection> orderDirectionField;
-
-  @FXML
-  private TextField linkMatcherResourceField;
 
   @FXML
   private TextField toolNameField;
@@ -85,24 +69,24 @@ public class DepanFxTreeSectionToolDialog {
   private TextField destinationField;
 
   @Autowired
-  public DepanFxTreeSectionToolDialog(DepanFxWorkspace workspace) {
+  public DepanFxFlatSectionToolDialog(DepanFxWorkspace workspace) {
     this.workspace = workspace;
   }
 
   public static void runEditDialog(
       DepanFxWorkspaceResource wkspRsrc,
       DepanFxDialogRunner dialogRunner, String title) {
-    Dialog<DepanFxTreeSectionToolDialog> dlg =
-        dialogRunner.createDialogAndParent(DepanFxTreeSectionToolDialog.class);
+    Dialog<DepanFxFlatSectionToolDialog> dlg =
+        dialogRunner.createDialogAndParent(DepanFxFlatSectionToolDialog.class);
     dlg.getController().setWorkspaceResource(wkspRsrc);
     dlg.runDialog(title);
   }
 
   public static void runCreateDialog(
-      DepanFxTreeSectionData toolData,
+      DepanFxFlatSectionData toolData,
       DepanFxDialogRunner dialogRunner, String title) {
-    Dialog<DepanFxTreeSectionToolDialog> dlg =
-        dialogRunner.createDialogAndParent(DepanFxTreeSectionToolDialog.class);
+    Dialog<DepanFxFlatSectionToolDialog> dlg =
+        dialogRunner.createDialogAndParent(DepanFxFlatSectionToolDialog.class);
     dlg.getController().setTooldata(toolData);
     dlg.runDialog(title);
   }
@@ -113,76 +97,61 @@ public class DepanFxTreeSectionToolDialog {
     orderByField.getItems().add(OrderBy.NODE_KEY);
     orderByField.getItems().add(OrderBy.NODE_ID);
 
-    containerOrderField.getItems().add(ContainerOrder.FIRST);
-    containerOrderField.getItems().add(ContainerOrder.LAST);
-    containerOrderField.getItems().add(ContainerOrder.MIXED);
-
     orderDirectionField.getItems().add(OrderDirection.FORWARD);
     orderDirectionField.getItems().add(OrderDirection.REVERSE);
   }
 
-  public void setTooldata(DepanFxTreeSectionData sectionData) {
+  public void setTooldata(DepanFxFlatSectionData sectionData) {
     toolNameField.setText(sectionData.getToolName());
     toolDescriptionField.setText(sectionData.getToolDescription());
 
     sectionLabelField.setText(sectionData.getSectionLabel());
     displayNodeCountField.setSelected(sectionData.displayNodeCount());
 
-    linkMatcherResourceField.setText(
-        sectionData.getLinkMatcherRsrc(workspace).getDocument().toString());
-    inferMissingParentsField.setSelected(sectionData.inferMissingParents());
-
     orderByField.setValue(sectionData.getOrderBy());
-    containerOrderField.setValue(sectionData.getContainerOrder());
     orderDirectionField.setValue(sectionData.getOrderDirection());
-
-    this.sectionData = sectionData;
   }
 
-  public Optional<DepanFxTreeSectionData> getTooldata() {
-    return optTreeSectionRsrc.map(DepanFxWorkspaceResource::getResource)
-      .map(DepanFxTreeSectionData.class::cast);
+  public Optional<DepanFxFlatSectionData> getTooldata() {
+    return optFlatSectionRsrc
+        .map(DepanFxWorkspaceResource::getResource)
+        .map(DepanFxFlatSectionData.class::cast);
   }
 
-  public void setWorkspaceResource(DepanFxWorkspaceResource treeSectionRsrc) {
-    this.optTreeSectionRsrc = Optional.of(treeSectionRsrc);
-    setTooldata(((DepanFxTreeSectionData) treeSectionRsrc.getResource()));
+  public void setWorkspaceResource(DepanFxWorkspaceResource flatSectionRsrc) {
+    this.optFlatSectionRsrc = Optional.of(flatSectionRsrc);
+    setTooldata(((DepanFxFlatSectionData) flatSectionRsrc.getResource()));
     destinationField.setText(
-        treeSectionRsrc.getDocument().getMemberPath().toString());
+        flatSectionRsrc.getDocument().getMemberPath().toString());
   }
 
   public Optional<DepanFxWorkspaceResource> getWorkspaceResource() {
-    return optTreeSectionRsrc;
+    return optFlatSectionRsrc;
   }
 
-  public static void setTreeSectionTooldataFilters(FileChooser result) {
-    result.getExtensionFilters().add(TREE_SECTION_FILTER);
-    result.setSelectedExtensionFilter(TREE_SECTION_FILTER);
+  public static void setFlatSectionTooldataFilters(FileChooser result) {
+    result.getExtensionFilters().add(FLAT_SECTION_FILTER);
+    result.setSelectedExtensionFilter(FLAT_SECTION_FILTER);
   }
 
   @FXML
   private void handleCancel() {
     closeDialog();
-    optTreeSectionRsrc = Optional.empty();
+    optFlatSectionRsrc = Optional.empty();
   }
 
   @FXML
   private void handleConfirm() {
     closeDialog();
 
-    DepanFxProjectResource linkMatcherRsrc =
-        DepanFxProjectResource.fromWorkspaceResource(
-            sectionData.getLinkMatcherRsrc(workspace));
-    DepanFxTreeSectionData treeSectionData = new DepanFxTreeSectionData(
+    DepanFxFlatSectionData flatSectionData = new DepanFxFlatSectionData(
         toolNameField.getText(), toolDescriptionField.getText(),
         sectionLabelField.getText(), displayNodeCountField.isSelected(),
-        linkMatcherRsrc , inferMissingParentsField.isSelected(),
-        orderByField.getValue(), containerOrderField.getValue(),
-        orderDirectionField.getValue());
+        orderByField.getValue(), orderDirectionField.getValue());
 
     File dstDocFile = new File(destinationField.getText());
-    optTreeSectionRsrc = workspace.toProjectDocument(dstDocFile.toURI())
-        .flatMap(d -> saveDocument(d, treeSectionData));
+    optFlatSectionRsrc = workspace.toProjectDocument(dstDocFile.toURI())
+        .flatMap(d -> saveDocument(d, flatSectionData));
   }
 
   @FXML
@@ -213,19 +182,11 @@ public class DepanFxTreeSectionToolDialog {
     ((Stage) destinationField.getScene().getWindow()).close();
   }
 
-  private FileChooser prepareLinkMatcherChooser() {
-    FileChooser result =
-        DepanFxSceneControls.prepareFileChooser(linkMatcherResourceField);
-    result.getExtensionFilters().add(LINK_MATCHER_FILTER);
-    result.setSelectedExtensionFilter(LINK_MATCHER_FILTER);
-    return result;
-  }
-
   private FileChooser prepareDestinationFileChooser() {
     FileChooser result =
         DepanFxSceneControls.prepareFileChooser(
             destinationField, () -> buildInitialDestinationFile());
-    setTreeSectionTooldataFilters(result);
+    setFlatSectionTooldataFilters(result);
     return result;
   }
 
@@ -233,7 +194,7 @@ public class DepanFxTreeSectionToolDialog {
     return workspace.getCurrentProject()
       .map(t -> t.getMemberPath())
       .map(p -> p.resolve(DepanFxNodeListSectionData.SECTIONS_TOOL_PATH))
-      .map(p -> DepanFxTreeSectionData.buildCurrentToolFile(
+      .map(p -> DepanFxFlatSectionData.buildCurrentToolFile(
           p, toolNameField.getText()))
       .map(f -> DepanFxWorkspaceFactory.bestDirectory(
           f, DepanFxProjects.getCurrentTools(workspace)))
