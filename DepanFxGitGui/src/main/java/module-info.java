@@ -11,6 +11,7 @@ module depanfx.git.gui {
     requires depanfx.git;
     requires depanfx.filesystem;
     requires depanfx.graph_doc;
+    requires depanfx.perspective;
     requires depanfx.workspace;
     requires javafx.graphics;
 

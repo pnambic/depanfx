@@ -1,10 +1,14 @@
 package com.pnambic.depanfx.git.gui;
 
 import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -47,6 +51,10 @@ public class DepanFxGitRepoToolDialog {
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxGitRepoToolDialog.class.getName());
 
+  private static final ExtensionFilter GIT_REPO_TOOL_FILTER =
+      DepanFxSceneControls.buildExtFilter(
+          "Git Repo Tool", DepanFxGitRepoData.GIT_REPO_TOOL_EXT);
+
   // For executables (on Windows)
   private static final String EXE_EXT = "exe";
 
@@ -80,6 +88,38 @@ public class DepanFxGitRepoToolDialog {
   @Autowired
   public DepanFxGitRepoToolDialog(DepanFxWorkspace workspace) {
     this.workspace = workspace;
+  }
+
+  /**
+   * Modify an existing git repo tooldata with the git repo tool dialog.
+   */
+  public static void runEditDialog(
+      DepanFxWorkspaceResource wkspRsrc,
+      DepanFxDialogRunner dialogRunner) {
+    Dialog<DepanFxGitRepoToolDialog> repoChooser =
+        dialogRunner.createDialogAndParent(DepanFxGitRepoToolDialog.class);
+    repoChooser.getController().setWorkspaceResource(wkspRsrc);
+    repoChooser.runDialog("Edit git Repository");
+  }
+
+  /**
+   * Create a new git repo tooldata with the git repo tool dialog.
+   */
+  public static void runCreateDialog(
+      DepanFxGitRepoToolDialog.Aware srcDlg,
+      DepanFxDialogRunner dialogRunner) {
+    Dialog<DepanFxGitRepoToolDialog> repoChooser =
+        dialogRunner.createDialogAndParent(DepanFxGitRepoToolDialog.class);
+
+    repoChooser.getController().setTooldata(srcDlg.getTooldata());
+    repoChooser.runDialog("Create git Repository");
+    repoChooser.getController().getTooldata()
+        .ifPresent(d -> srcDlg.setTooldata(d));
+  }
+
+  public static void setGitRepoTooldataFilters(FileChooser result) {
+    result.getExtensionFilters().add(GIT_REPO_TOOL_FILTER);
+    result.setSelectedExtensionFilter(GIT_REPO_TOOL_FILTER);
   }
 
   @FXML
@@ -223,7 +263,7 @@ public class DepanFxGitRepoToolDialog {
     FileChooser result =
         DepanFxSceneControls.prepareFileChooser(
             destinationField, () -> buildInitialDestinationFile());
-    DepanFxGitRepoToolDialogs.setGitRepoTooldataFilters(result);
+    setGitRepoTooldataFilters(result);
     return result;
   }
 
@@ -232,7 +272,9 @@ public class DepanFxGitRepoToolDialog {
   }
 
   private File buildInitialDestinationFile() {
-    return DepanFxGitRepoData.buildCurrentToolFile(
-        workspace, toolNameField.getText());
+    return DepanFxWorkspaceFactory.bestDocumentFile(
+        DEFAULT_REPO_DESCRIPTION, DepanFxGitRepoData.GIT_REPO_TOOL_EXT,
+        workspace, DepanFxGitRepoData.GIT_REPOS_TOOL_PATH,
+        DepanFxProjects.getCurrentTools(workspace));
   }
 }

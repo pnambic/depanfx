@@ -22,6 +22,12 @@ public class DepanFxProjects {
 
   public static final String TOOLS_CONTAINER = "Tools";
 
+  public static final Path ANALYSES_PATH =
+      new File(ANALYSES_CONTAINER).toPath();
+
+  public static final Path GRAPHS_PATH =
+      new File(GRAPHS_CONTAINER).toPath();
+
   public static final Path TOOLS_PATH =
       new File(TOOLS_CONTAINER).toPath();
 

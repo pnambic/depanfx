@@ -21,11 +21,17 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import javafx.scene.Node;
+import javafx.scene.control.Cell;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -74,6 +80,14 @@ public class DepanFxSceneControls {
   public static void updateBlankField(TextField updateField, String newValue) {
     if (updateField.getText().isBlank()) {
       updateField.setText(newValue);
+    }
+  }
+
+  public static void handleDoubleClickOpenPath(
+      MouseEvent event, Path path, Consumer<Path> onOpenPath) {
+    if (event.getButton() == MouseButton.PRIMARY
+        && event.getClickCount() == 2) {
+      onOpenPath.accept(path);
     }
   }
 

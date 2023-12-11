@@ -39,7 +39,7 @@ public class GitLogLoader {
 
   public static final String DEFAULT_BRANCH_NAME = "HEAD";
 
-  private static final String EXT = DepanFxNodeLists.EXT;
+  private static final String EXT = DepanFxNodeList.NODE_LIST_EXT;
 
   private final String[] LOG_COMMAND = new String[] {
       "log", "--name-only", "--oneline", "-n"

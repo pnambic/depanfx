@@ -8,7 +8,7 @@ import java.util.List;
 
 public class DepanFxLinkMatcherDocument {
 
-  public final static String LINK_MATCHER_TOOL_DIR =
+  public static final String LINK_MATCHER_TOOL_DIR =
       "Link Matchers";
 
   public static final Path LINK_MATCHER_TOOL_PATH =

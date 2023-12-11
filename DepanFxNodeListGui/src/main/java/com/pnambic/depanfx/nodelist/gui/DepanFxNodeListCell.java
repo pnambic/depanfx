@@ -4,13 +4,12 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
-import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import java.io.File;
 import java.util.Collection;
@@ -188,38 +187,17 @@ public class DepanFxNodeListCell
     listViewer.doSelectGraphNodesAction(nodes, value);
   }
 
-  private FileChooser prepareTreeSectionFinder(DepanFxWorkspace workspace) {
-
-    File toolsDir = DepanFxProjects.getCurrentTools(workspace);
-    File dstDataFile = workspace.getCurrentProject()
-        .map(t -> t.getMemberPath())
-        .map(p -> p.resolve(DepanFxNodeListSectionData.SECTIONS_TOOL_PATH))
-        .map(p -> p.resolve(DepanFxTreeSectionData.BASE_SECTION_LABEL))
-        .map(p -> p.toFile())
-        .map(f -> DepanFxWorkspaceFactory.bestDirectory(f, toolsDir))
-        .get();
-
-    FileChooser result =
-        DepanFxSceneControls.prepareFileChooser(dstDataFile);
-    result.setInitialFileName("");
-    DepanFxTreeSectionToolDialog.setTreeSectionTooldataFilters(result);
+  private FileChooser prepareFlatSectionFinder(DepanFxWorkspace workspace) {
+    FileChooser result = DepanFxResourcePerspectives.prepareToolFinder(
+        workspace, DepanFxNodeListSectionData.SECTIONS_TOOL_PATH);
+    DepanFxFlatSectionToolDialog.setFlatSectionTooldataFilters(result);
     return result;
   }
 
-  private FileChooser prepareFlatSectionFinder(DepanFxWorkspace workspace) {
-
-    File toolsDir = DepanFxProjects.getCurrentTools(workspace);
-    File dstDataFile = workspace.getCurrentProject()
-      .map(t -> t.getMemberPath())
-      .map(p -> p.resolve(DepanFxNodeListSectionData.SIMPLE_SECTION_TOOL_PATH))
-      .map(p -> p.toFile())
-      .map(f -> DepanFxWorkspaceFactory.bestDirectory(f, toolsDir))
-      .get();
-
-    FileChooser result =
-        DepanFxSceneControls.prepareFileChooser(dstDataFile);
-    result.setInitialFileName("");
-    DepanFxFlatSectionToolDialog.setFlatSectionTooldataFilters(result);
+  private FileChooser prepareTreeSectionFinder(DepanFxWorkspace workspace) {
+    FileChooser result = DepanFxResourcePerspectives.prepareToolFinder(
+        workspace, DepanFxNodeListSectionData.SECTIONS_TOOL_PATH);
+    DepanFxTreeSectionToolDialog.setTreeSectionTooldataFilters(result);
     return result;
   }
 
@@ -228,7 +206,8 @@ public class DepanFxNodeListCell
 
     @Override
     public ObservableValue<Boolean> call(Integer param) {
-      TreeItem<DepanFxNodeListMember> item = listViewer.getTreeItem(param.intValue());
+      TreeItem<DepanFxNodeListMember> item =
+          listViewer.getTreeItem(param.intValue());
       return listViewer.getCheckBoxObservable(item.getValue());
     }
   }

@@ -7,6 +7,9 @@ import java.util.Collection;
 
 public class DepanFxNodeList {
 
+  /** Common extension for any workspace persisted node list. */
+  public static final String NODE_LIST_EXT = "dnli";
+
   private final DepanFxWorkspaceResource wkspRsrc;
 
   private final Collection<GraphNode> nodes;

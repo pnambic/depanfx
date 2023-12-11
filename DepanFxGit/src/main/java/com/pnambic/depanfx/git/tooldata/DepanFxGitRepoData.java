@@ -6,12 +6,16 @@ import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import java.io.File;
+import java.nio.file.Path;
 
 public class DepanFxGitRepoData extends DepanFxBaseToolData{
 
-  public static final String GIT_REPOS_TOOL_PATH = "Git Repos";
+  public static final String GIT_REPOS_TOOL_DIR = "Git Repos";
 
   public static final String GIT_REPO_TOOL_EXT = "dgrti";
+
+  public static final Path GIT_REPOS_TOOL_PATH =
+      DepanFxProjects.TOOLS_PATH.resolve(GIT_REPOS_TOOL_DIR);
 
   private final String gitExe;
 
@@ -40,8 +44,11 @@ public class DepanFxGitRepoData extends DepanFxBaseToolData{
   }
 
   public static File buildCurrentToolDir(DepanFxWorkspace workspace) {
-    File toolsDir = DepanFxProjects.getCurrentTools(workspace);
-    return new File(toolsDir, GIT_REPOS_TOOL_PATH);
+     return workspace.getCurrentProject()
+        .map(t -> t.getMemberPath())
+        .map(p -> p.resolve(GIT_REPOS_TOOL_PATH))
+        .map(p -> p.toFile())
+        .get();
   }
 
   public static File buildCurrentToolFile(

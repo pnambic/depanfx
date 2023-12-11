@@ -107,6 +107,11 @@ public class DepanFxTreeSectionToolDialog {
     dlg.runDialog(title);
   }
 
+  public static void setTreeSectionTooldataFilters(FileChooser result) {
+    result.getExtensionFilters().add(TREE_SECTION_FILTER);
+    result.setSelectedExtensionFilter(TREE_SECTION_FILTER);
+  }
+
   @FXML
   public void initialize() {
     orderByField.getItems().add(OrderBy.NODE_LEAF);
@@ -153,11 +158,6 @@ public class DepanFxTreeSectionToolDialog {
 
   public Optional<DepanFxWorkspaceResource> getWorkspaceResource() {
     return optTreeSectionRsrc;
-  }
-
-  public static void setTreeSectionTooldataFilters(FileChooser result) {
-    result.getExtensionFilters().add(TREE_SECTION_FILTER);
-    result.setSelectedExtensionFilter(TREE_SECTION_FILTER);
   }
 
   @FXML
@@ -230,13 +230,9 @@ public class DepanFxTreeSectionToolDialog {
   }
 
   private File buildInitialDestinationFile() {
-    return workspace.getCurrentProject()
-      .map(t -> t.getMemberPath())
-      .map(p -> p.resolve(DepanFxNodeListSectionData.SECTIONS_TOOL_PATH))
-      .map(p -> DepanFxTreeSectionData.buildCurrentToolFile(
-          p, toolNameField.getText()))
-      .map(f -> DepanFxWorkspaceFactory.bestDirectory(
-          f, DepanFxProjects.getCurrentTools(workspace)))
-      .get();
+    return DepanFxWorkspaceFactory.bestDocumentFile(
+        toolNameField.getText(), DepanFxTreeSectionData.TREE_SECTION_TOOL_EXT,
+        workspace, DepanFxNodeListSectionData.SECTIONS_TOOL_PATH,
+        DepanFxProjects.getCurrentTools(workspace));
   }
 }

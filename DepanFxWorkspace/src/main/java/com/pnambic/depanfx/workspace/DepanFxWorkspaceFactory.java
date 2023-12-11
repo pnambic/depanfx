@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -30,6 +31,9 @@ public class DepanFxWorkspaceFactory {
     // Prevent instantiation
   }
 
+  public static final char EXTENSION_DOT = '.';
+
+
   public static DepanFxProjectTree createDepanFxProjectTree(
       DepanFxProjectSpi projSpi) {
     return new BasicDepanFxProjectTree(projSpi);
@@ -52,20 +56,24 @@ public class DepanFxWorkspaceFactory {
     return result.toString();
   }
 
-  public static File bestDirectory(File baseFile, File fallbackFile) {
-    File containerFile = baseFile.getParentFile();
-    if (containerFile.isDirectory()) {
-      return baseFile;
-    }
+  public static File bestDocumentFile(String baseName, String ext,
+      DepanFxWorkspace workspace, Path targetPath, File fallbackFile) {
 
-    while (containerFile.compareTo(fallbackFile) > 0) {
-      File testFile = containerFile.getParentFile();
-      if (testFile.isDirectory()) {
-        return new File(testFile, baseFile.getName());
-      }
-      containerFile = testFile;
-    }
-    return fallbackFile;
+    String toolName =
+        DepanFxWorkspaceFactory.buildDocumentTimestampName(baseName, ext);
+    return bestDocumentFile(toolName, workspace, targetPath, fallbackFile);
+  }
+
+  public static File bestDocumentFile(String documentName,
+      DepanFxWorkspace workspace, Path targetPath, File fallbackFile) {
+
+    File buildCurrentToolDir =  workspace.getCurrentProject()
+        .map(t -> t.getMemberPath())
+        .map(p -> p.resolve(targetPath))
+        .map(p -> p.toFile())
+        .map(f -> DepanFxWorkspaceFactory.bestDirectory(f, fallbackFile))
+        .get();
+    return new File(buildCurrentToolDir, documentName);
   }
 
   /**
@@ -91,6 +99,42 @@ public class DepanFxWorkspaceFactory {
       throw new RuntimeException(
           "Unable to open " + typeName + " at " + projDoc, errIo);
     }
+  }
+
+  public static Optional<String> getExtension(String filename) {
+      int dotIndex = filename.lastIndexOf(EXTENSION_DOT);
+      if (dotIndex > 0 && dotIndex < filename.length() - 1) {
+          return Optional.of(filename.substring(dotIndex + 1));
+      }
+      return Optional.empty();
+  }
+
+  public static String buildDocTitle(DepanFxProjectDocument projDoc) {
+    String fullName = projDoc.getMemberPath().getFileName().toString();
+    return DepanFxWorkspaceFactory.getExtension(fullName)
+        .map(e -> chopExtension(fullName, e.length() + 1))
+        .orElse(fullName);
+  }
+
+  private static File bestDirectory(File baseFile, File fallbackFile) {
+    File containerFile = baseFile.getParentFile();
+    if (containerFile.isDirectory()) {
+      return baseFile;
+    }
+
+    while (containerFile.compareTo(fallbackFile) > 0) {
+      File testFile = containerFile.getParentFile();
+      if (testFile.isDirectory()) {
+        return new File(testFile, baseFile.getName());
+      }
+      containerFile = testFile;
+    }
+    return fallbackFile;
+  }
+
+  private static String chopExtension(String filename, int extSize) {
+    int length = filename.length();
+    return filename.substring(0, Integer.max(0, length - extSize));
   }
 
   private static boolean expectType(

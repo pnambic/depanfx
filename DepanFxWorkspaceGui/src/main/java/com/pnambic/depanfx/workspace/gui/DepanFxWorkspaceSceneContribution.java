@@ -1,9 +1,8 @@
 package com.pnambic.depanfx.workspace.gui;
 
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSectionConfiguration;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceMenuRegistry;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
-import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterContribution;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
@@ -21,20 +20,16 @@ public class DepanFxWorkspaceSceneContribution implements DepanFxSceneStarterCon
 
   private final DepanFxDialogRunner dialogRunner;
 
-  private final DepanFxNewResourceRegistry newResourceRegistry;
-
-  private final DepanFxNodeListSectionConfiguration treeSectionConfig;
+  private final DepanFxResourceMenuRegistry rsrcMenuRegistry;
 
   @Autowired
   public DepanFxWorkspaceSceneContribution(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
-      DepanFxNewResourceRegistry newResourceRegistry,
-      DepanFxNodeListSectionConfiguration treeSectionConfig) {
+      DepanFxResourceMenuRegistry rsrcMenuRegistry) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
-    this.newResourceRegistry = newResourceRegistry;
-    this.treeSectionConfig = treeSectionConfig;
+    this.rsrcMenuRegistry = rsrcMenuRegistry;
   }
 
   @Override
@@ -46,7 +41,7 @@ public class DepanFxWorkspaceSceneContribution implements DepanFxSceneStarterCon
   public Tab createStarterTab(String label, DepanFxSceneController scene) {
     DepanFxProjectListViewer workspaceViewer =
         new DepanFxProjectListViewer(
-          workspace, dialogRunner, newResourceRegistry, treeSectionConfig, scene);
+          workspace, dialogRunner, rsrcMenuRegistry, scene);
     return workspaceViewer.createWorkspaceTab(WORKSPACE_TAB);
   }
 }

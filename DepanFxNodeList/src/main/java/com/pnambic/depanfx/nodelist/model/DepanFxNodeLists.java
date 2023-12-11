@@ -12,9 +12,6 @@ import java.util.stream.Collectors;
 
 public class DepanFxNodeLists {
 
-  /** Common extension for any workspace persisted node list. */
-  public static final String EXT = "dnli";
-
   private DepanFxNodeLists() {
     // Prevent instantiation.
   }

@@ -21,6 +21,7 @@ module depanfx.app {
     requires depanfx.graph_doc.xstream;
     requires depanfx.nodelist.gui;
     requires depanfx.nodelist.xstream;
+    requires depanfx.perspective;
     requires depanfx.workspace.gui;
     requires depanfx.workspace.xstream;
 

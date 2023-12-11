@@ -91,6 +91,11 @@ public class DepanFxFlatSectionToolDialog {
     dlg.runDialog(title);
   }
 
+  public static void setFlatSectionTooldataFilters(FileChooser result) {
+    result.getExtensionFilters().add(FLAT_SECTION_FILTER);
+    result.setSelectedExtensionFilter(FLAT_SECTION_FILTER);
+  }
+
   @FXML
   public void initialize() {
     orderByField.getItems().add(OrderBy.NODE_LEAF);
@@ -127,11 +132,6 @@ public class DepanFxFlatSectionToolDialog {
 
   public Optional<DepanFxWorkspaceResource> getWorkspaceResource() {
     return optFlatSectionRsrc;
-  }
-
-  public static void setFlatSectionTooldataFilters(FileChooser result) {
-    result.getExtensionFilters().add(FLAT_SECTION_FILTER);
-    result.setSelectedExtensionFilter(FLAT_SECTION_FILTER);
   }
 
   @FXML
@@ -191,13 +191,9 @@ public class DepanFxFlatSectionToolDialog {
   }
 
   private File buildInitialDestinationFile() {
-    return workspace.getCurrentProject()
-      .map(t -> t.getMemberPath())
-      .map(p -> p.resolve(DepanFxNodeListSectionData.SECTIONS_TOOL_PATH))
-      .map(p -> DepanFxFlatSectionData.buildCurrentToolFile(
-          p, toolNameField.getText()))
-      .map(f -> DepanFxWorkspaceFactory.bestDirectory(
-          f, DepanFxProjects.getCurrentTools(workspace)))
-      .get();
+    return DepanFxWorkspaceFactory.bestDocumentFile(
+        toolNameField.getText(), DepanFxFlatSectionData.FLAT_SECTION_TOOL_EXT,
+        workspace, DepanFxNodeListSectionData.SECTIONS_TOOL_PATH,
+        DepanFxProjects.getCurrentTools(workspace));
   }
 }
