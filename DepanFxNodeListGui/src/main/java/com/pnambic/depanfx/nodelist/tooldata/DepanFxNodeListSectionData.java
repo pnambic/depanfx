@@ -17,11 +17,9 @@
 package com.pnambic.depanfx.nodelist.tooldata;
 
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -32,17 +30,12 @@ import java.util.Optional;
  */
 public class DepanFxNodeListSectionData {
 
-  public static final String NODE_LIST_DIR = "Node List";
-
   public static final String SECTIONS_TOOL_DIR = "Sections";
 
   public static final String SIMPLE_SECTION_NAME = "Simple Section";
 
-  public static final Path NODE_LIST_TOOL_PATH =
-      DepanFxProjects.TOOLS_PATH.resolve(NODE_LIST_DIR);
-
   public static final Path SECTIONS_TOOL_PATH =
-      NODE_LIST_TOOL_PATH.resolve(SECTIONS_TOOL_DIR);
+      DepanFxNodeListData.NODE_LIST_TOOL_PATH.resolve(SECTIONS_TOOL_DIR);
 
   public static final Path SIMPLE_SECTION_TOOL_PATH =
       SECTIONS_TOOL_PATH.resolve(SIMPLE_SECTION_NAME);
@@ -50,13 +43,6 @@ public class DepanFxNodeListSectionData {
   public enum OrderBy { NODE_ID, NODE_KEY, NODE_LEAF };
 
   public enum OrderDirection { FORWARD, REVERSE };
-
-  public static File buildCurrentToolFile(
-      Path parentPath, String dataLabel, String ext) {
-    String toolName = DepanFxWorkspaceFactory.buildDocumentTimestampName(
-        dataLabel, ext);
-    return parentPath.resolve(toolName).toFile();
-  }
 
   public static Optional<DepanFxWorkspaceResource> getBuiltinSimpleSectionResource(
       DepanFxWorkspace workspace) {

@@ -19,8 +19,10 @@ module depanfx.nodelist.gui {
 
   opens com.pnambic.depanfx.nodelist.gui
       to javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;
+  opens com.pnambic.depanfx.nodelist.gui.columns to spring.core;
   opens com.pnambic.depanfx.nodelist.tooldata;
 
   exports com.pnambic.depanfx.nodelist.gui;
+  exports com.pnambic.depanfx.nodelist.gui.columns;
   exports com.pnambic.depanfx.nodelist.tooldata;
 }

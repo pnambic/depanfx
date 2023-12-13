@@ -41,7 +41,8 @@ public class DepanFxFlatSectionData extends DepanFxBaseToolData {
 
   private final OrderDirection orderDirection;
 
-  public DepanFxFlatSectionData(String toolName, String toolDescription,
+  public DepanFxFlatSectionData(
+      String toolName, String toolDescription,
       String sectionLabel, boolean displayNodeCount,
       OrderBy orderBy, OrderDirection orderDirection) {
     super(toolName, toolDescription);

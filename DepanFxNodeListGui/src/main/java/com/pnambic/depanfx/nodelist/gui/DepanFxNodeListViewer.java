@@ -4,10 +4,14 @@ import com.google.common.collect.ImmutableList;
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumn;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxSimpleColumn;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData.KeyChoice;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -30,7 +34,10 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TreeItem;
@@ -42,13 +49,15 @@ import javafx.util.Callback;
 
 public class DepanFxNodeListViewer {
 
-  private static final String SAVE_NODE_LIST_ITEM = "Save as node list...";
-
   private static final String SELECT_ALL_ITEM = "Select All";
 
   private static final String CLEAR_SELECTION_ITEM = "Clear Selection";
 
   private static final String INVERT_SELECTION_ITEM = "Invert Selection";
+
+  private static final String ADD_COLUMN = "Add Column";
+
+  private static final String SAVE_NODE_LIST_ITEM = "Save as node list...";
 
   private final DepanFxWorkspace workspace;
 
@@ -274,8 +283,41 @@ public class DepanFxNodeListViewer {
         INVERT_SELECTION_ITEM, e -> doInvertSelectionAction());
     builder.appendSeparator();
     builder.appendActionItem(
+        ADD_COLUMN, e -> doAddSimpleColumnAction());
+    builder.appendSubMenu(newColumnMenu());
+    builder.appendSeparator();
+    builder.appendActionItem(
         SAVE_NODE_LIST_ITEM, e -> runSaveNodeListDialog());
     return builder.build();
+  }
+
+  private Menu newColumnMenu() {
+    Menu result = new Menu(ADD_COLUMN);
+    ObservableList<MenuItem> items = result.getItems();
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        "Simple Column", e -> doAddSimpleColumnAction()));
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        "Model Column", e -> doAddNodeKeyColumnAction(KeyChoice.MODEL_KEY)));
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        "Kind Column", e -> doAddNodeKeyColumnAction(KeyChoice.KIND_KEY)));
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        "Id Column", e -> doAddNodeKeyColumnAction(KeyChoice.NODE_KEY)));
+    return result;
+  }
+
+  private void doAddSimpleColumnAction() {
+    DepanFxNodeListColumnData.getBuiltinSimpleColumnResource(workspace)
+        .map(r -> new DepanFxSimpleColumn(this, r))
+        .ifPresent(c -> nodeListTable.getColumns()
+            .add(c.prepareColumn()));
+  }
+
+  private void doAddNodeKeyColumnAction(KeyChoice keyChoice) {
+    DepanFxNodeListColumnData
+        .getBuiltinNodeKeyColumnResource(workspace, keyChoice)
+        .map(r -> new DepanFxNodeKeyColumn(this, r))
+        .ifPresent(c -> nodeListTable.getColumns()
+            .add(c.prepareColumn()));
   }
 
   /////////////////////////////////////
