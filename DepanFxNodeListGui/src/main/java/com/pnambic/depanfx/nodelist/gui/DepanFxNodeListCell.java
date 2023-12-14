@@ -25,6 +25,14 @@ import javafx.util.StringConverter;
 public class DepanFxNodeListCell
     extends CheckBoxTreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember> {
 
+  private static final String SELECT_FLAT_SECTION = "Select Flat Section...";
+
+  private static final String EDIT_FLAT_SECTION = "Edit Flat Section...";
+
+  private static final String SELECT_TREE_SECTION = "Select Tree Section...";
+
+  private static final String EDIT_TREE_SECTION = "Edit Tree Section...";
+
   private static final String INSERT_ABOVE_MEMBER_TREE_SECTION =
       "Insert Member Tree Section";
 
@@ -80,25 +88,25 @@ public class DepanFxNodeListCell
     setContextMenu(null);
   }
 
-  private ContextMenu treeSectionMenu(DepanFxTreeSection member) {
-    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem("Edit Tree Section...",
-        e -> openTreeSectionEditor(member));
-    builder.appendActionItem("Select Tree Section...",
-        e -> openTreeSectionFinder(member));
-    return builder.build();
-  }
-
   private ContextMenu nodeListSectionMenu(DepanFxFlatSection member) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem("Edit Flat Section...",
+    builder.appendActionItem(EDIT_FLAT_SECTION,
         e -> openFlatSectionEditor(member));
-    builder.appendActionItem("Select Flat Section...",
+    builder.appendActionItem(SELECT_FLAT_SECTION,
         e -> openFlatSectionFinder(member));
 
     builder.appendActionItem(
         INSERT_ABOVE_MEMBER_TREE_SECTION,
         e -> runInsertMemberTreeSectionAction(member));
+    return builder.build();
+  }
+
+  private ContextMenu treeSectionMenu(DepanFxTreeSection member) {
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem(EDIT_TREE_SECTION,
+        e -> openTreeSectionEditor(member));
+    builder.appendActionItem(SELECT_TREE_SECTION,
+        e -> openTreeSectionFinder(member));
     return builder.build();
   }
 
@@ -139,10 +147,10 @@ public class DepanFxNodeListCell
 
   private void openFlatSectionEditor(DepanFxFlatSection member) {
     Dialog<DepanFxFlatSectionToolDialog> flatSectionEditor =
-        listViewer.buildDialog(DepanFxFlatSectionToolDialog.class);
+        DepanFxFlatSectionToolDialog.runEditDialog(
+            member.getSectionDataRsrc(), listViewer.getDialogRunner(),
+            "Update Tree Section");
 
-    flatSectionEditor.getController().setTooldata(member.getSectionData());
-    flatSectionEditor.runDialog("Update Tree Section");
     flatSectionEditor.getController().getWorkspaceResource()
         .ifPresent(d -> updateSectionDataRsrc(member, d));
   }

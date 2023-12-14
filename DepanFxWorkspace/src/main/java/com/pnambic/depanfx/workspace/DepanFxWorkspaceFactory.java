@@ -72,7 +72,7 @@ public class DepanFxWorkspaceFactory {
         .map(p -> p.resolve(targetPath))
         .map(p -> p.toFile())
         .map(f -> DepanFxWorkspaceFactory.bestDirectory(f, fallbackFile))
-        .get();
+        .orElse(fallbackFile);
     return new File(buildCurrentToolDir, documentName);
   }
 
@@ -117,15 +117,15 @@ public class DepanFxWorkspaceFactory {
   }
 
   private static File bestDirectory(File baseFile, File fallbackFile) {
-    File containerFile = baseFile.getParentFile();
-    if (containerFile.isDirectory()) {
+    if (baseFile.isDirectory()) {
       return baseFile;
     }
 
+    File containerFile = baseFile;
     while (containerFile.compareTo(fallbackFile) > 0) {
       File testFile = containerFile.getParentFile();
       if (testFile.isDirectory()) {
-        return new File(testFile, baseFile.getName());
+        return testFile;
       }
       containerFile = testFile;
     }

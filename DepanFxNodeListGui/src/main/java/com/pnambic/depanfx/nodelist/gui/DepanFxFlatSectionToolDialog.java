@@ -73,22 +73,24 @@ public class DepanFxFlatSectionToolDialog {
     this.workspace = workspace;
   }
 
-  public static void runEditDialog(
-      DepanFxWorkspaceResource wkspRsrc,
+  public static Dialog<DepanFxFlatSectionToolDialog> runEditDialog(
+      DepanFxWorkspaceResource sectionDataRsrc,
       DepanFxDialogRunner dialogRunner, String title) {
     Dialog<DepanFxFlatSectionToolDialog> dlg =
         dialogRunner.createDialogAndParent(DepanFxFlatSectionToolDialog.class);
-    dlg.getController().setWorkspaceResource(wkspRsrc);
+    dlg.getController().setWorkspaceResource(sectionDataRsrc);
     dlg.runDialog(title);
+    return dlg;
   }
 
-  public static void runCreateDialog(
-      DepanFxFlatSectionData toolData,
+  public static Dialog<DepanFxFlatSectionToolDialog> runCreateDialog(
+      DepanFxFlatSectionData sectionData,
       DepanFxDialogRunner dialogRunner, String title) {
     Dialog<DepanFxFlatSectionToolDialog> dlg =
         dialogRunner.createDialogAndParent(DepanFxFlatSectionToolDialog.class);
-    dlg.getController().setTooldata(toolData);
+    dlg.getController().setTooldata(sectionData);
     dlg.runDialog(title);
+    return dlg;
   }
 
   public static void setFlatSectionTooldataFilters(FileChooser result) {

@@ -32,6 +32,10 @@ public class DepanFxFlatSection implements DepanFxNodeListSection {
     this.flatMemberCompare = updateCompare();
   }
 
+  public DepanFxWorkspaceResource getSectionDataRsrc() {
+    return sectionDataRsrc;
+  }
+
   public DepanFxFlatSectionData getSectionData() {
     return (DepanFxFlatSectionData) sectionDataRsrc.getResource();
   }

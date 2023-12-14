@@ -337,7 +337,7 @@ public class DepanFxNodeListSectionConfiguration {
         DepanFxFlatSectionToolDialog.runCreateDialog(
             sectionData, dialogRunner, NEW_FLAT_SECTION_DATA);
       } catch (RuntimeException errCaught) {
-        LOG.error("Unable to create tree section data", errCaught);
+        LOG.error("Unable to create flat section data", errCaught);
       }
     }
   }

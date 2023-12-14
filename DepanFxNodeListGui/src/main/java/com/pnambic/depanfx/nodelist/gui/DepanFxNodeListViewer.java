@@ -5,12 +5,13 @@ import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumn;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumnToolDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxSimpleColumn;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData.KeyChoice;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -123,6 +124,10 @@ public class DepanFxNodeListViewer {
     return dialogRunner.createDialogAndParent(controllerType);
   }
 
+  public DepanFxDialogRunner getDialogRunner() {
+    return dialogRunner;
+  }
+
   public TreeItem<DepanFxNodeListMember> getTreeItem(int intValue) {
     TreeItem<DepanFxNodeListMember> item = nodeListTable.getTreeItem(intValue);
     return item;
@@ -174,6 +179,10 @@ public class DepanFxNodeListViewer {
 
   /////////////////////////////////////
   // Tree sections
+
+  public void refreshView() {
+    nodeListTable.refresh();
+  }
 
   public void resetView() {
     TreeItem<DepanFxNodeListMember> treeRoot = createTreeRoot();
@@ -282,8 +291,6 @@ public class DepanFxNodeListViewer {
     builder.appendActionItem(
         INVERT_SELECTION_ITEM, e -> doInvertSelectionAction());
     builder.appendSeparator();
-    builder.appendActionItem(
-        ADD_COLUMN, e -> doAddSimpleColumnAction());
     builder.appendSubMenu(newColumnMenu());
     builder.appendSeparator();
     builder.appendActionItem(
@@ -297,11 +304,8 @@ public class DepanFxNodeListViewer {
     items.add(DepanFxContextMenuBuilder.createActionItem(
         "Simple Column", e -> doAddSimpleColumnAction()));
     items.add(DepanFxContextMenuBuilder.createActionItem(
-        "Model Column", e -> doAddNodeKeyColumnAction(KeyChoice.MODEL_KEY)));
-    items.add(DepanFxContextMenuBuilder.createActionItem(
-        "Kind Column", e -> doAddNodeKeyColumnAction(KeyChoice.KIND_KEY)));
-    items.add(DepanFxContextMenuBuilder.createActionItem(
-        "Id Column", e -> doAddNodeKeyColumnAction(KeyChoice.NODE_KEY)));
+        DepanFxNodeKeyColumn.NEW_NODE_KEY_COLUMN,
+        e -> doNewNodeKeyColumnAction()));
     return result;
   }
 
@@ -312,9 +316,13 @@ public class DepanFxNodeListViewer {
             .add(c.prepareColumn()));
   }
 
-  private void doAddNodeKeyColumnAction(KeyChoice keyChoice) {
-    DepanFxNodeListColumnData
-        .getBuiltinNodeKeyColumnResource(workspace, keyChoice)
+  private void doNewNodeKeyColumnAction() {
+    DepanFxNodeKeyColumnData initialData =
+        DepanFxNodeKeyColumn.buildInitialColumnData();
+    Dialog<DepanFxNodeKeyColumnToolDialog> createDlg =
+        DepanFxNodeKeyColumnToolDialog.runCreateDialog(
+            initialData, dialogRunner, DepanFxNodeKeyColumn.NEW_NODE_KEY_COLUMN);
+    createDlg.getController().getWorkspaceResource()
         .map(r -> new DepanFxNodeKeyColumn(this, r))
         .ifPresent(c -> nodeListTable.getColumns()
             .add(c.prepareColumn()));

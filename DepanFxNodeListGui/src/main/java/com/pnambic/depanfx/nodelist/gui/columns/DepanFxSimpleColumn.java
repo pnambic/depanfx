@@ -3,7 +3,10 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxSimpleColumnData;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+
+import javafx.scene.control.ContextMenu;
 
 public class DepanFxSimpleColumn extends DepanFxAbstractColumn {
 
@@ -35,5 +38,11 @@ public class DepanFxSimpleColumn extends DepanFxAbstractColumn {
 
   public DepanFxSimpleColumnData getColumnData() {
     return (DepanFxSimpleColumnData) columnDataRsrc.getResource();
+  }
+
+  @Override
+  protected ContextMenu buildColumnContextMenu(
+      DepanFxDialogRunner depanFxDialogRunner) {
+    return null;
   }
 }

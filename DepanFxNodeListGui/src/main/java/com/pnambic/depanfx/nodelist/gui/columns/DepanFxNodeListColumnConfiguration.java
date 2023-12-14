@@ -4,12 +4,25 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData.KeyChoice;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxSimpleColumnData;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
+import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.workspace.DepanFxProjectMember;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.nio.file.Path;
 import java.text.MessageFormat;
+
+import javafx.scene.control.Cell;
 
 @Configuration
 public class DepanFxNodeListColumnConfiguration {
@@ -63,6 +76,16 @@ public class DepanFxNodeListColumnConfiguration {
         DepanFxNodeListColumnData.NODE_KEY_COLUMN_TOOL_PATH, toolData);
   }
 
+  @Bean
+  public DepanFxResourceExtMenuContribution nodeKeyColumnExtMenu() {
+    return new NodeKeyColumnExtContribution();
+  }
+
+  @Bean
+  public DepanFxResourcePathMenuContribution nodeKeyColumnPathMenu() {
+    return new NodeKeyColumnPathContribution();
+  }
+
   private DepanFxNodeKeyColumnData buildNodeKeyColumnData(
       KeyChoice keyChoice, String keyLabel) {
     String columnName = fmtNodeKeyName(keyLabel);
@@ -77,5 +100,62 @@ public class DepanFxNodeListColumnConfiguration {
 
   private String fmtNodeKeyDescr(String keyLabel) {
     return MessageFormat.format("Built-in {0} column.", keyLabel.toLowerCase());
+  }
+
+  private static class NodeKeyColumnExtContribution
+      implements DepanFxResourceExtMenuContribution {
+
+    private static Logger LOG =
+        LoggerFactory.getLogger(NodeKeyColumnExtContribution.class);
+
+    @Override
+    public boolean acceptsExt(String ext) {
+      return DepanFxNodeKeyColumnData.NODE_KEY_COLUMN_TOOL_EXT.equals(ext);
+    }
+
+    @Override
+    public void prepareCell(DepanFxDialogRunner dialogRunner,
+        DepanFxWorkspace workspace, Cell<DepanFxWorkspaceMember> cell,
+        String ext, DepanFxProjectMember member,
+        DepanFxContextMenuBuilder builder) {
+      Path docPath = member.getMemberPath();
+      DepanFxResourcePerspectives.installOnOpen(cell, docPath,
+          p -> runNodeKeyColumnDataAction(dialogRunner, workspace, p));
+      builder.appendActionItem(
+          DepanFxNodeKeyColumn.EDIT_NODE_KEY_COLUMN,
+          e -> runNodeKeyColumnDataAction(dialogRunner, workspace, docPath));
+    }
+
+    private void runNodeKeyColumnDataAction(
+        DepanFxDialogRunner dialogRunner,
+        DepanFxWorkspace workspace,
+        Path docPath) {
+      try {
+        workspace.toProjectDocument(docPath.toUri())
+            .flatMap(workspace::getWorkspaceResource)
+            .ifPresent(r -> DepanFxNodeKeyColumnToolDialog.runEditDialog(
+                r, dialogRunner, DepanFxNodeKeyColumn.EDIT_NODE_KEY_COLUMN));
+      } catch (RuntimeException errCaught) {
+        LOG.error("Unable to open node key column data {} for edit",
+            docPath, errCaught);
+      }
+    }
+  }
+
+  private static class NodeKeyColumnPathContribution
+      implements DepanFxResourcePathMenuContribution {
+
+    @Override
+    public boolean acceptsPath(Path rsrcPath) {
+      return DepanFxNodeListColumnData.COLUMNS_TOOL_PATH.equals(rsrcPath);
+    }
+
+    @Override
+    public void prepareCell(
+        DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace,
+        Cell<DepanFxWorkspaceMember> cell,
+        DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
+      DepanFxNodeKeyColumn.addNewColumnAction(builder, dialogRunner);
+    }
   }
 }
