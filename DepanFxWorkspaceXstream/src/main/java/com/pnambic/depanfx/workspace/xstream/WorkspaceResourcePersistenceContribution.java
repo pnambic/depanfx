@@ -32,7 +32,10 @@ public class WorkspaceResourcePersistenceContribution
           PROJECT_NAME_TAG, XstreamWorkspaceResource.class, "projectName");
       builder.addAliasField(
           RESOURCE_PATH_TAG, XstreamWorkspaceResource.class, "resourcePath");
-      builder.addConverter(new WorkspaceResourceConverter());
+
+      WorkspaceResourceConverter converter = new WorkspaceResourceConverter();
+      builder.addAliasType(converter.getTag(), converter.forType());
+      builder.addConverter(converter);
     }
     if (DepanFxProjectResource.class.isAssignableFrom(withType)) {
       builder.addConverter(new DepanFxBuiltInProjectResourceConverter());

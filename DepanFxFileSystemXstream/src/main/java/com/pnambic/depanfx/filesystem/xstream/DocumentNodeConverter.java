@@ -1,7 +1,5 @@
 package com.pnambic.depanfx.filesystem.xstream;
 
-import java.nio.file.Path;
-
 import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
 import com.pnambic.depanfx.filesystem.graph.DocumentNode;
 import com.pnambic.depanfx.graph.context.GraphContextKeys;
@@ -11,6 +9,8 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
+
+import java.nio.file.Path;
 
 public class DocumentNodeConverter
     extends AbstractObjectXmlConverter<DocumentNode> {

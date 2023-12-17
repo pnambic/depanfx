@@ -23,6 +23,10 @@ public class DocumentXmlPersistBuilder {
     xstream.alias(alias, type);
   }
 
+  public void addAliasType(String alias, Class<?> type) {
+    xstream.aliasType(alias, type);
+  }
+
   public void addAliasField(
       String alias, Class<?> fieldType, String fieldName) {
     xstream.aliasField(alias, fieldType, fieldName);

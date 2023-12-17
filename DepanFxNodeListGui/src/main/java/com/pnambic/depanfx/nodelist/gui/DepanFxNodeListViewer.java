@@ -4,26 +4,33 @@ import com.google.common.collect.ImmutableList;
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxFocusColumn;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxFocusColumnToolDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumnToolDialog;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxSimpleColumn;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -40,11 +47,14 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.CellDataFeatures;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.scene.control.TreeTableView;
 import javafx.util.Callback;
 
@@ -57,6 +67,8 @@ public class DepanFxNodeListViewer {
   private static final String INVERT_SELECTION_ITEM = "Invert Selection";
 
   private static final String ADD_COLUMN = "Add Column";
+
+  private static final String SELECT_COLUMN = "Select Column...";
 
   private static final String SAVE_NODE_LIST_ITEM = "Save as node list...";
 
@@ -306,7 +318,45 @@ public class DepanFxNodeListViewer {
     items.add(DepanFxContextMenuBuilder.createActionItem(
         DepanFxNodeKeyColumn.NEW_NODE_KEY_COLUMN,
         e -> doNewNodeKeyColumnAction()));
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        DepanFxFocusColumn.NEW_FOCUS_COLUMN,
+        e -> doNewFocusColumnAction()));
+    items.add(new SeparatorMenuItem());
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        SELECT_COLUMN,
+        e -> doSelectColumnAction()));
     return result;
+  }
+
+  private void doSelectColumnAction() {
+    FileChooser fileChooser = DepanFxResourcePerspectives.prepareToolFinder(
+        workspace, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
+    ObservableList<ExtensionFilter> filters = fileChooser.getExtensionFilters();
+    filters.add(DepanFxFocusColumnToolDialog.FOCUS_COLUMN_FILTER);
+    filters.add(DepanFxNodeKeyColumnToolDialog.NODE_KEY_COLUMN_FILTER);
+
+    File selectedFile =
+        fileChooser.showOpenDialog(nodeListTable.getScene().getWindow());
+    if (selectedFile != null) {
+       workspace
+          .toProjectDocument(selectedFile.getAbsoluteFile().toURI())
+          .flatMap(p -> DepanFxWorkspaceFactory.loadDocument(
+              workspace, p, DepanFxFocusColumnData.class))
+          .flatMap(this::toColumn)
+          .ifPresent(c -> nodeListTable.getColumns()
+              .add(c.prepareColumn()));
+    }
+  }
+
+  private Optional<DepanFxNodeListColumn> toColumn(DepanFxWorkspaceResource columnRsrc) {
+    Class<?> type = columnRsrc.getResource().getClass();
+    if (DepanFxNodeKeyColumnData.class.isAssignableFrom(type)) {
+      return Optional.of(new DepanFxNodeKeyColumn(this, columnRsrc));
+    }
+    if (DepanFxFocusColumnData.class.isAssignableFrom(type)) {
+      return Optional.of(new DepanFxFocusColumn(this, columnRsrc));
+    }
+    return Optional.empty();
   }
 
   private void doAddSimpleColumnAction() {
@@ -324,6 +374,18 @@ public class DepanFxNodeListViewer {
             initialData, dialogRunner, DepanFxNodeKeyColumn.NEW_NODE_KEY_COLUMN);
     createDlg.getController().getWorkspaceResource()
         .map(r -> new DepanFxNodeKeyColumn(this, r))
+        .ifPresent(c -> nodeListTable.getColumns()
+            .add(c.prepareColumn()));
+  }
+
+  private void doNewFocusColumnAction() {
+    DepanFxFocusColumnData initialData =
+        DepanFxFocusColumnData.buildInitialFocusColumnData(null);
+    Dialog<DepanFxFocusColumnToolDialog> createDlg =
+        DepanFxFocusColumnToolDialog.runCreateDialog(
+            initialData, dialogRunner, DepanFxFocusColumn.NEW_FOCUS_COLUMN);
+    createDlg.getController().getWorkspaceResource()
+        .map(r -> new DepanFxFocusColumn(this, r))
         .ifPresent(c -> nodeListTable.getColumns()
             .add(c.prepareColumn()));
   }

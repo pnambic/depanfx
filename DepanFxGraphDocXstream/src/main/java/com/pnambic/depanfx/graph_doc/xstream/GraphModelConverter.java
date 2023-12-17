@@ -1,8 +1,5 @@
 package com.pnambic.depanfx.graph_doc.xstream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.pnambic.depanfx.graph.api.Edge;
 import com.pnambic.depanfx.graph.api.Node;
 import com.pnambic.depanfx.graph.context.ContextNodeId;
@@ -18,6 +15,9 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GraphModelConverter
     extends AbstractObjectXmlConverter<GraphModel> {

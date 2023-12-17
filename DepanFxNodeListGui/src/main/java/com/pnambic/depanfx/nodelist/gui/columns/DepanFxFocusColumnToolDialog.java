@@ -1,8 +1,10 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData.KeyChoice;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
+import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
@@ -24,26 +26,26 @@ import java.io.IOException;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 @Component
-@FxmlView("node-key-column-tool-dialog.fxml")
-public class DepanFxNodeKeyColumnToolDialog {
+@FxmlView("focus-column-tool-dialog.fxml")
+public class DepanFxFocusColumnToolDialog {
 
   private static final Logger LOG =
-      LoggerFactory.getLogger(DepanFxNodeKeyColumnToolDialog.class.getName());
+      LoggerFactory.getLogger(DepanFxFocusColumnToolDialog.class.getName());
 
-  public static final ExtensionFilter NODE_KEY_COLUMN_FILTER =
+  public static final ExtensionFilter FOCUS_COLUMN_FILTER =
       DepanFxSceneControls.buildExtFilter(
-          "Node Key Columns", DepanFxNodeKeyColumnData.NODE_KEY_COLUMN_TOOL_EXT);
+          "Focus Columns", DepanFxFocusColumnData.FOCUS_COLUMN_TOOL_EXT);
 
   private final DepanFxWorkspace workspace;
 
-  private Optional<DepanFxWorkspaceResource> optNodeKeyColumnRsrc;
+  private Optional<DepanFxWorkspaceResource> optFocusColumnRsrc;
 
   @FXML
   private TextField columnLabelField;
@@ -52,7 +54,10 @@ public class DepanFxNodeKeyColumnToolDialog {
   private TextField widthMsField;
 
   @FXML
-  private ComboBox<KeyChoice> keyChoiceField;
+  private TextField focusLabelField;
+
+  @FXML
+  private TextField focusNodeListRsrcField;
 
   @FXML
   private TextField toolNameField;
@@ -64,88 +69,100 @@ public class DepanFxNodeKeyColumnToolDialog {
   private TextField destinationField;
 
   @Autowired
-  public DepanFxNodeKeyColumnToolDialog(DepanFxWorkspace workspace) {
+  public DepanFxFocusColumnToolDialog(DepanFxWorkspace workspace) {
     this.workspace = workspace;
   }
 
-  public static Dialog<DepanFxNodeKeyColumnToolDialog> runEditDialog(
-      DepanFxWorkspaceResource nodeKeyColumnRsrc,
+  public static Dialog<DepanFxFocusColumnToolDialog> runEditDialog(
+      DepanFxWorkspaceResource focusColumnRsrc,
       DepanFxDialogRunner dialogRunner, String title) {
-    Dialog<DepanFxNodeKeyColumnToolDialog> dlg =
-        dialogRunner.createDialogAndParent(DepanFxNodeKeyColumnToolDialog.class);
-    dlg.getController().setNodeKeyColumnResource(nodeKeyColumnRsrc);
+    Dialog<DepanFxFocusColumnToolDialog> dlg =
+        dialogRunner.createDialogAndParent(DepanFxFocusColumnToolDialog.class);
+    dlg.getController().setFocusColumnResource(focusColumnRsrc);
     dlg.runDialog(title);
     return dlg;
   }
 
-  public static Dialog<DepanFxNodeKeyColumnToolDialog> runCreateDialog(
-      DepanFxNodeKeyColumnData columnData,
+  public static Dialog<DepanFxFocusColumnToolDialog> runCreateDialog(
+      DepanFxFocusColumnData columnData,
       DepanFxDialogRunner dialogRunner, String title) {
-    Dialog<DepanFxNodeKeyColumnToolDialog> dlg =
-        dialogRunner.createDialogAndParent(DepanFxNodeKeyColumnToolDialog.class);
+    Dialog<DepanFxFocusColumnToolDialog> dlg =
+        dialogRunner.createDialogAndParent(DepanFxFocusColumnToolDialog.class);
     dlg.getController().setTooldata(columnData);
     dlg.runDialog(title);
     return dlg;
   }
 
-  public static void setNodeKeyColumnTooldataFilters(FileChooser result) {
-    result.getExtensionFilters().add(NODE_KEY_COLUMN_FILTER);
-    result.setSelectedExtensionFilter(NODE_KEY_COLUMN_FILTER);
+  public static void setFocusColumnTooldataFilters(FileChooser result) {
+    result.getExtensionFilters().add(FOCUS_COLUMN_FILTER);
+    result.setSelectedExtensionFilter(FOCUS_COLUMN_FILTER);
   }
 
   @FXML
   public void initialize() {
-    keyChoiceField.getItems().add(KeyChoice.MODEL_KEY);
-    keyChoiceField.getItems().add(KeyChoice.KIND_KEY);
-    keyChoiceField.getItems().add(KeyChoice.NODE_KEY);
+    focusNodeListRsrcField.setContextMenu(buildRepoChoiceMenu());
   }
 
-  public void setTooldata(DepanFxNodeKeyColumnData columnData) {
+  public void setTooldata(DepanFxFocusColumnData columnData) {
     toolNameField.setText(columnData.getToolName());
     toolDescriptionField.setText(columnData.getToolDescription());
 
     columnLabelField.setText(columnData.getColumnLabel());
     widthMsField.setText(Integer.toString(columnData.getWidthMs()));
 
-    keyChoiceField.setValue(columnData.getKeyChoice());
+    focusLabelField.setText(columnData.getFocusLabel());
+    focusNodeListRsrcField.setText(getNodeListRsrcName(columnData));
   }
 
-  public Optional<DepanFxNodeKeyColumnData> getTooldata() {
-    return optNodeKeyColumnRsrc
+  private String getNodeListRsrcName(DepanFxFocusColumnData columnData) {
+    if (columnData.getNodeListRsrc() != null) {
+      return columnData.getNodeListRsrc().getDocument()
+          .getMemberPath().toString();
+    }
+    // Let field show prompt value
+    return null;
+  }
+
+  public Optional<DepanFxFocusColumnData> getTooldata() {
+    return optFocusColumnRsrc
         .map(DepanFxWorkspaceResource::getResource)
-        .map(DepanFxNodeKeyColumnData.class::cast);
+        .map(DepanFxFocusColumnData.class::cast);
   }
 
-  public void setNodeKeyColumnResource(
-      DepanFxWorkspaceResource nodeKeyColumnRsrc) {
-    this.optNodeKeyColumnRsrc = Optional.of(nodeKeyColumnRsrc);
-    setTooldata(((DepanFxNodeKeyColumnData) nodeKeyColumnRsrc.getResource()));
+  public void setFocusColumnResource(
+      DepanFxWorkspaceResource focusColumnRsrc) {
+    this.optFocusColumnRsrc = Optional.of(focusColumnRsrc);
+    setTooldata(((DepanFxFocusColumnData) focusColumnRsrc.getResource()));
     destinationField.setText(
-        nodeKeyColumnRsrc.getDocument().getMemberPath().toString());
+        focusColumnRsrc.getDocument().getMemberPath().toString());
   }
 
   public Optional<DepanFxWorkspaceResource> getWorkspaceResource() {
-    return optNodeKeyColumnRsrc;
+    return optFocusColumnRsrc;
   }
 
   @FXML
   private void handleCancel() {
     closeDialog();
-    optNodeKeyColumnRsrc = Optional.empty();
+    optFocusColumnRsrc = Optional.empty();
   }
 
   @FXML
   private void handleConfirm() {
     closeDialog();
+    File nodeListFile = new File(focusNodeListRsrcField.getText());
+    Optional<DepanFxWorkspaceResource> optNodeListRsrc = workspace
+        .toProjectDocument(nodeListFile.toURI())
+        .flatMap(p -> workspace.getWorkspaceResource(p, DepanFxNodeList.class));
 
-    DepanFxNodeKeyColumnData nodeKeyColumnData = new DepanFxNodeKeyColumnData(
+    DepanFxFocusColumnData focusColumnData = new DepanFxFocusColumnData(
         toolNameField.getText(), toolDescriptionField.getText(),
         columnLabelField.getText(), parseWidthMs(widthMsField.getText()),
-        keyChoiceField.getValue());
+        focusLabelField.getText(), optNodeListRsrc.get());
 
     File dstDocFile = new File(destinationField.getText());
-    optNodeKeyColumnRsrc = workspace.toProjectDocument(dstDocFile.toURI())
-        .flatMap(d -> saveDocument(d, nodeKeyColumnData));
+    optFocusColumnRsrc = workspace.toProjectDocument(dstDocFile.toURI())
+        .flatMap(d -> saveDocument(d, focusColumnData));
   }
 
   @FXML
@@ -156,6 +173,20 @@ public class DepanFxNodeKeyColumnToolDialog {
     if (selectedFile != null) {
       destinationField.setText(selectedFile.getAbsolutePath());
     }
+  }
+
+  public ContextMenu buildRepoChoiceMenu() {
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem("Select Node List...",
+        e -> runNodeListFinder());
+    return builder.build();
+  }
+
+  private void runNodeListFinder() {
+    DepanFxNodeListChooser.runNodeListFinder(
+        workspace, focusNodeListRsrcField.getScene().getWindow())
+        .ifPresent(r -> focusNodeListRsrcField.setText(
+            r.getDocument().getMemberPath().toString()));
   }
 
   private Optional<DepanFxWorkspaceResource> saveDocument(
@@ -190,13 +221,13 @@ public class DepanFxNodeKeyColumnToolDialog {
     FileChooser result =
         DepanFxSceneControls.prepareFileChooser(
             destinationField, () -> buildInitialDestinationFile());
-    setNodeKeyColumnTooldataFilters(result);
+    setFocusColumnTooldataFilters(result);
     return result;
   }
 
   private File buildInitialDestinationFile() {
     return DepanFxWorkspaceFactory.bestDocumentFile(
-        toolNameField.getText(), DepanFxNodeKeyColumnData.NODE_KEY_COLUMN_TOOL_EXT,
+        toolNameField.getText(), DepanFxFocusColumnData.FOCUS_COLUMN_TOOL_EXT,
         workspace, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH,
         DepanFxProjects.getCurrentTools(workspace));
   }
