@@ -44,7 +44,7 @@ public class DepanFxBuiltInProjectResourceConverter
         (DepanFxProjectResource.BuiltIn) source;
 
     String builtInName = projRsrc.getBuiltInPath().toString();
-    context.convertAnother(builtInName);
+    marshalValue(builtInName, context);
   }
 
   @Override
@@ -53,7 +53,7 @@ public class DepanFxBuiltInProjectResourceConverter
       UnmarshallingContext context,
       Mapper mapper) {
 
-    String builtInPath = reader.getValue();
+    String builtInPath = (String) unmarshalValue(context, String.class);
     return new DepanFxProjectResource.BuiltIn(
         new File((String) builtInPath).toPath());
   }

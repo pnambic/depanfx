@@ -16,15 +16,9 @@ import org.springframework.stereotype.Component;
 public class WorkspaceResourcePersistenceContribution
     implements GraphNodePersistencePluginContribution {
 
-  public static final String WORKSPACE_RESOURCE_TAG = "workspace-resource";
-
   public static final String PROJECT_NAME_TAG = "project-name";
 
   public static final String RESOURCE_PATH_TAG = "resource-path";
-
-  private static final Class<?>[] ALLOWED_TYPES = new Class[] {
-      XstreamWorkspaceResource.class
-  };
 
   @Autowired
   public WorkspaceResourcePersistenceContribution() {
@@ -34,12 +28,11 @@ public class WorkspaceResourcePersistenceContribution
   public void extendPersist(
       DocumentXmlPersistBuilder builder, Class<?> withType) {
     if (DepanFxWorkspaceResource.class.isAssignableFrom(withType)) {
-      builder.addAlias(WORKSPACE_RESOURCE_TAG, XstreamWorkspaceResource.class);
       builder.addAliasField(
           PROJECT_NAME_TAG, XstreamWorkspaceResource.class, "projectName");
       builder.addAliasField(
           RESOURCE_PATH_TAG, XstreamWorkspaceResource.class, "resourcePath");
-      builder.addAllowedType(ALLOWED_TYPES);
+      builder.addConverter(new WorkspaceResourceConverter());
     }
     if (DepanFxProjectResource.class.isAssignableFrom(withType)) {
       builder.addConverter(new DepanFxBuiltInProjectResourceConverter());

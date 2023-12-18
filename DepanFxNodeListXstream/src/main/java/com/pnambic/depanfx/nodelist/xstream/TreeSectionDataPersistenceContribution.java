@@ -27,9 +27,10 @@ public class TreeSectionDataPersistenceContribution
   public static final String ORDER_DIRECTION_TAG = "order-direction-info";
 
   private static final Class<?>[] ALLOW_TYPES = new Class[] {
+      DepanFxTreeSectionData.class,
+      DepanFxTreeSectionData.ContainerOrder.class,
       DepanFxNodeListSectionData.class,
       DepanFxNodeListSectionData.OrderBy.class,
-      DepanFxTreeSectionData.ContainerOrder.class,
       DepanFxNodeListSectionData.OrderDirection.class
   };
 

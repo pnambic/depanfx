@@ -5,9 +5,7 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.persistence.AbstractObjectXmlConverter;
-import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.xstream.XstreamWorkspaceResource;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
@@ -49,9 +47,9 @@ public class NodeListConverter
       MarshallingContext context, Mapper mapper) {
     DepanFxNodeList nodeList = (DepanFxNodeList) source;
 
-    XstreamWorkspaceResource xstreamWkspRsrc =
-        XstreamWorkspaceResource.of(nodeList.getWorkspaceResource());
-    marshalObject(xstreamWkspRsrc, writer, context, mapper);
+    // Should use field (e.g. graphDocRef) as tag, not object type.
+    String classTag = mapper.serializedClass(DepanFxWorkspaceResource.class);
+    marshalObject(classTag, nodeList.getWorkspaceResource(), writer, context);
 
     for (GraphNode node : nodeList.getNodes()) {
       marshalObject(node, writer, context, mapper);
@@ -62,13 +60,9 @@ public class NodeListConverter
   public DepanFxNodeList unmarshal(HierarchicalStreamReader reader,
       UnmarshallingContext context, Mapper mapper) {
 
-    XstreamWorkspaceResource xstreamWkspRsrc =
-        (XstreamWorkspaceResource) unmarshalOne(reader, context, mapper);
-    DepanFxWorkspace workspace =
-        (DepanFxWorkspace) context.get(DepanFxWorkspace.class);
+    // Should validate expected tag.
     DepanFxWorkspaceResource graphRef =
-        XstreamWorkspaceResource.forWksp(workspace, xstreamWkspRsrc)
-        .get();
+        (DepanFxWorkspaceResource) unmarshalOne(reader, context, mapper);
 
     GraphDocument graphDoc = (GraphDocument) graphRef.getResource();
     GraphModel model = graphDoc.getGraph();

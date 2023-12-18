@@ -39,11 +39,16 @@ public abstract class AbstractObjectXmlConverter<T>
 
     String childName = reader.getNodeName();
     Class<?> childClass = mapChildName(childName, mapper);
-    Object result = context.convertAnother(null, childClass);
+    Object result = unmarshalValue(context, childClass);
 
     reader.moveUp();
 
     return result;
+  }
+
+  protected Object unmarshalValue(
+      UnmarshallingContext context, Class<?> childClass) {
+    return childClass.cast(context.convertAnother(null, childClass));
   }
 
   protected Class<?> mapChildName(String childName, Mapper mapper) {
