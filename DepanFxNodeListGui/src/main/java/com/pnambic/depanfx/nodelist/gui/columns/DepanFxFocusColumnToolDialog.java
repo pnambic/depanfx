@@ -119,7 +119,7 @@ public class DepanFxFocusColumnToolDialog {
       return columnData.getNodeListRsrc().getDocument()
           .getMemberPath().toString();
     }
-    // Let field show prompt value
+    // Let the text input field show a prompt text.
     return null;
   }
 

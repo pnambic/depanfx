@@ -23,7 +23,6 @@ import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -53,9 +52,9 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.CellDataFeatures;
+import javafx.scene.control.TreeTableView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.scene.control.TreeTableView;
 import javafx.util.Callback;
 
 public class DepanFxNodeListViewer {
@@ -105,18 +104,6 @@ public class DepanFxNodeListViewer {
     Tab result = new Tab(tabName, nodeListTable);
     result.setContextMenu(buildViewContextMenu());
     return result;
-  }
-
-  public Optional<DepanFxWorkspaceResource> saveNodeList(
-      DepanFxProjectDocument projDoc) {
-    DepanFxNodeList saveList =
-        DepanFxNodeLists.buildRelatedNodeList(nodeList, getSelectedNodes());
-    try {
-      return getWorkspace().saveDocument(projDoc, saveList);
-    } catch (Exception errAny) {
-      throw new RuntimeException(
-          "Unable to save nodelist " + projDoc.getMemberPath(), errAny);
-    }
   }
 
   public DepanFxWorkspace getWorkspace() {
@@ -229,7 +216,9 @@ public class DepanFxNodeListViewer {
   private void runSaveNodeListDialog() {
     Dialog<DepanFxSaveNodeListDialog> saveDlg =
         dialogRunner.createDialogAndParent(DepanFxSaveNodeListDialog.class);
-    saveDlg.getController().setNodeListView(this);
+    DepanFxNodeList saveList =
+        DepanFxNodeLists.buildRelatedNodeList(nodeList, getSelectedNodes());
+    saveDlg.getController().setNodeListDoc(saveList);
     saveDlg.runDialog("Save selection as node list");
   }
 

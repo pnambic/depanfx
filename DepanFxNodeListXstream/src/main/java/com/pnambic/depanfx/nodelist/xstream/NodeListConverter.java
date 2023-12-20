@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodelist.xstream;
 
 import com.pnambic.depanfx.graph.model.GraphModel;
+import com.pnambic.depanfx.graph.model.GraphModels;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
@@ -65,11 +66,12 @@ public class NodeListConverter
         (DepanFxWorkspaceResource) unmarshalOne(reader, context, mapper);
 
     GraphDocument graphDoc = (GraphDocument) graphRef.getResource();
-    GraphModel model = graphDoc.getGraph();
+    GraphModel graphModel = graphDoc.getGraph();
     Collection<GraphNode> nodes = new ArrayList<>();
     while (reader.hasMoreChildren()) {
-      GraphNode node = (GraphNode) unmarshalOne(reader, context, mapper);
-      GraphNode mapped = (GraphNode) model.findNode(node.getId());
+      GraphNode baseNode = (GraphNode) unmarshalOne(reader, context, mapper);
+      GraphNode mapped = GraphModels.mapGraphNode(baseNode, graphModel);
+
       nodes.add(mapped);
     }
     return new DepanFxNodeList(graphRef, nodes);

@@ -4,6 +4,11 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+
+import java.io.IOException;
+import java.util.Optional;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
@@ -32,8 +37,9 @@ public abstract class DepanFxAbstractColumn
     result.setPrefWidth(getWidthPx());
     result.setContextMenu(buildColumnContextMenu(listViewer.getDialogRunner()));
 
-    result.setCellFactory(new ColumnCellFactory());
+    result.setCellFactory(buildCellFactory());
     result.setCellValueFactory(new ColumnValueFactory());
+    result.setSortable(false);
     column = result;
     return result;
   }
@@ -59,7 +65,22 @@ public abstract class DepanFxAbstractColumn
       DepanFxDialogRunner depanFxDialogRunner);
 
   /////////////////////////////////////
+  // Useful methods for derived types
+
+  protected Optional<DepanFxWorkspaceResource> saveDocument(
+      DepanFxProjectDocument projDoc, Object item) throws IOException {
+
+      return listViewer.getWorkspace().saveDocument(projDoc, item);
+  }
+
+  /////////////////////////////////////
   // Internal Types
+
+  protected Callback<TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember>,
+      TreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember>>
+      buildCellFactory() {
+    return new ColumnCellFactory();
+  }
 
   class ColumnCellFactory implements
       Callback<TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember>,

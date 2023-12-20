@@ -14,6 +14,10 @@ public class DepanFxSimpleColumnCell
     this.nodeListColumn = nodeListColumn;
   }
 
+  public DepanFxNodeListColumn getColumn() {
+    return nodeListColumn;
+  }
+
   @Override
   protected void updateItem(DepanFxNodeListMember member, boolean empty) {
     // TODO Auto-generated method stub
@@ -35,7 +39,7 @@ public class DepanFxSimpleColumnCell
     setGraphic(null);
   }
 
-  private void stylizeCell(DepanFxNodeListMember member) {
+  protected void stylizeCell(DepanFxNodeListMember member) {
     if (member instanceof DepanFxNodeListGraphNode) {
       String modelKey =
           nodeListColumn.toString((DepanFxNodeListGraphNode) member);
@@ -43,5 +47,9 @@ public class DepanFxSimpleColumnCell
       return;
     }
     setText("");
+  }
+
+  protected void restoreState() {
+    // Hook for embolden/restoreFont and similar.
   }
 }

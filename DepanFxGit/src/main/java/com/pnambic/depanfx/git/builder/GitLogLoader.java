@@ -17,6 +17,7 @@ package com.pnambic.depanfx.git.builder;
 
 import com.pnambic.depanfx.filesystem.graph.DocumentNode;
 import com.pnambic.depanfx.graph.model.GraphModel;
+import com.pnambic.depanfx.graph.model.GraphModels;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
@@ -106,7 +107,7 @@ public class GitLogLoader {
     }
     if (parser.isFileName()) {
       DocumentNode baseNode = GitUtils.createDocument(parser.getFileName());
-      DocumentNode addNode = GitUtils.mapGraphNode(baseNode, graphModel);
+      DocumentNode addNode = GraphModels.mapGraphNode(baseNode, graphModel);
       nodes.add(addNode);
     }
   }

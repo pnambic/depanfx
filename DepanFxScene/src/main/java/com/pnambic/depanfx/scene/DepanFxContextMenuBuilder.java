@@ -30,7 +30,7 @@ public class DepanFxContextMenuBuilder {
       String label,
       EventHandler<ActionEvent> handler) {
     MenuItem result = createActionItem(label, handler);
-    contextList.add(createActionItem(label, handler));
+    contextList.add(result);
     return result;
   }
 
