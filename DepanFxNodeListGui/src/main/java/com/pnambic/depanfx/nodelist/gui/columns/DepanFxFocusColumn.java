@@ -24,8 +24,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
@@ -89,7 +87,14 @@ public class DepanFxFocusColumn extends DepanFxAbstractColumn {
         e -> openColumnEditor(dialogRunner));
     builder.appendActionItem(SELECT_FOCUS_COLUMN,
         e -> openColumnFinder());
-    addSaveNodeListActionItem(builder);
+
+    // These actions are hidden if the node list is unchanged.
+    saveSeparator = builder.appendSeparator();
+    saveAction = builder.appendActionItem(
+        SAVE_NODE_LIST, e1 -> runSaveNodeList());
+
+    // Ensure initial visibility is correct.
+    updateActions();
     return builder.build();
   }
 
@@ -132,37 +137,6 @@ public class DepanFxFocusColumn extends DepanFxAbstractColumn {
     return new FocusCellFactory();
   }
 
-  private void updateNodeListRsrc(DepanFxWorkspaceResource nodeListRsrc) {
-    this.nodeListRsrc = nodeListRsrc;
-    refreshFocusNodes();
-  }
-
-  private void addSaveNodeListActionItem(DepanFxContextMenuBuilder builder) {
-    saveSeparator = builder.appendSeparator();
-    saveAction = builder.appendActionItem(
-        SAVE_NODE_LIST, e -> runSaveNodeList());
-
-    // Ensure initial visibility is correct.
-    updateActions();
-  }
-
-  private void runSaveNodeList() {
-    DepanFxNodeList nodeList = (DepanFxNodeList) nodeListRsrc.getResource();
-    DepanFxNodeList saveList =
-        DepanFxNodeLists.buildRelatedNodeList(nodeList, editNodes);
-
-    Dialog<DepanFxSaveNodeListDialog> saveDlg =
-        listViewer.buildDialog(DepanFxSaveNodeListDialog.class);
-    saveDlg.getController().setNodeListDoc(saveList);
-    saveDlg.getController().setInitialDest(nodeListRsrc.getDocument());
-    saveDlg.runDialog("Save changes to node list");
-    saveDlg.getController().getSavedResource()
-        .ifPresent(r -> {
-            updateNodeListRsrc(r);
-            refreshColumn();
-        });
-  }
-
   private void updateActions() {
     boolean hasEdits = hasNodeListEdits();
     saveSeparator.setVisible(hasEdits);
@@ -180,10 +154,21 @@ public class DepanFxFocusColumn extends DepanFxAbstractColumn {
     return !saveNodes.containsAll(editNodes);
   }
 
-  private void refreshFocusNodes() {
+  private void runSaveNodeList() {
     DepanFxNodeList nodeList = (DepanFxNodeList) nodeListRsrc.getResource();
-    saveNodes = nodeList.getNodes();
-    editNodes = new HashSet<>(saveNodes);
+    DepanFxNodeList saveList =
+        DepanFxNodeLists.buildRelatedNodeList(nodeList, editNodes);
+
+    Dialog<DepanFxSaveNodeListDialog> saveDlg =
+        listViewer.buildDialog(DepanFxSaveNodeListDialog.class);
+    saveDlg.getController().setNodeListDoc(saveList);
+    saveDlg.getController().setInitialDest(nodeListRsrc.getDocument());
+    saveDlg.runDialog("Save changes to node list");
+    saveDlg.getController().getSavedResource()
+        .ifPresent(r -> {
+            updateNodeListRsrc(r);
+            refreshColumn();
+        });
   }
 
   private static void openColumnCreate(DepanFxDialogRunner dialogRunner) {
@@ -235,6 +220,13 @@ public class DepanFxFocusColumn extends DepanFxAbstractColumn {
     this.columnDataRsrc = columnDataRsrc;
     updateNodeListRsrc(getColumnData().getNodeListRsrc());
     refreshColumn();
+  }
+
+  private void updateNodeListRsrc(DepanFxWorkspaceResource nodeListRsrc) {
+    this.nodeListRsrc = nodeListRsrc;
+    DepanFxNodeList nodeList = (DepanFxNodeList) nodeListRsrc.getResource();
+    saveNodes = nodeList.getNodes();
+    editNodes = new HashSet<>(saveNodes);
   }
 
   private FileChooser prepareFocusColumnFinder(DepanFxWorkspace workspace) {

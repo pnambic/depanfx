@@ -3,7 +3,6 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData.KeyChoice;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxSimpleColumnData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
@@ -12,7 +11,9 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,19 +22,27 @@ import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
 import java.text.MessageFormat;
+import java.util.Optional;
 
 import javafx.scene.control.Cell;
 
 @Configuration
-public class DepanFxNodeListColumnConfiguration {
+public class DepanFxNodeKeyColumnConfiguration {
 
-  private static final String BUILT_IN_SIMPLE_COLUMN_NAME =
-      "Built-in Simple Column";
+  public static final String MODEL_KEY_COLUMN_NAME = "Model Key Column";
 
-  private static final String BUILT_IN_SIMPLE_COLUMN_DESCR =
-      "Built-in simple column.";
+  public static final String KIND_KEY_COLUMN_NAME = "Kind Key Column";
 
-  private static final String SIMPLE_COLUMN_LABEL = "Context Model";
+  public static final String NODE_KEY_COLUMN_NAME = "Node Column";
+
+  public static final Path MODEL_KEY_COLUMN_TOOL_PATH =
+      DepanFxNodeListColumnData.COLUMNS_TOOL_PATH.resolve(MODEL_KEY_COLUMN_NAME);
+
+  public static final Path KIND_KEY_COLUMN_TOOL_PATH =
+      DepanFxNodeListColumnData.COLUMNS_TOOL_PATH.resolve(KIND_KEY_COLUMN_NAME);
+
+  public static final Path NODE_KEY_COLUMN_TOOL_PATH =
+      DepanFxNodeListColumnData.COLUMNS_TOOL_PATH.resolve(NODE_KEY_COLUMN_NAME);
 
   private static final String MODEL_KEY_COLUMN_LABEL = "Model Key";
 
@@ -43,13 +52,18 @@ public class DepanFxNodeListColumnConfiguration {
 
   private static final int COLUMN_WIDTH = 15;
 
-  @Bean
-  public DepanFxBuiltInContribution simpleColumn() {
-    DepanFxSimpleColumnData toolData = new DepanFxSimpleColumnData(
-        BUILT_IN_SIMPLE_COLUMN_NAME, BUILT_IN_SIMPLE_COLUMN_DESCR,
-        SIMPLE_COLUMN_LABEL, COLUMN_WIDTH);
-    return new DepanFxBuiltInContribution.Simple(
-        DepanFxNodeListColumnData.SIMPLE_COLUMN_TOOL_PATH, toolData);
+  public static Optional<DepanFxWorkspaceResource> getBuiltinNodeKeyColumnResource(
+      DepanFxWorkspace workspace, KeyChoice keyChoice) {
+    switch (keyChoice) {
+    case MODEL_KEY:
+      return getBuiltinNodeKeyColumnResource(workspace, MODEL_KEY_COLUMN_TOOL_PATH);
+    case KIND_KEY:
+      return getBuiltinNodeKeyColumnResource(workspace, KIND_KEY_COLUMN_TOOL_PATH);
+    case NODE_KEY:
+      return getBuiltinNodeKeyColumnResource(workspace, NODE_KEY_COLUMN_TOOL_PATH);
+    default:
+      throw new IllegalArgumentException("Unexpected value: " + keyChoice);
+    }
   }
 
   @Bean
@@ -57,7 +71,7 @@ public class DepanFxNodeListColumnConfiguration {
     DepanFxNodeKeyColumnData toolData = buildNodeKeyColumnData(
         KeyChoice.MODEL_KEY, MODEL_KEY_COLUMN_LABEL);
     return new DepanFxBuiltInContribution.Simple(
-        DepanFxNodeListColumnData.MODEL_KEY_COLUMN_TOOL_PATH, toolData);
+        MODEL_KEY_COLUMN_TOOL_PATH, toolData);
   }
 
   @Bean
@@ -65,7 +79,7 @@ public class DepanFxNodeListColumnConfiguration {
     DepanFxNodeKeyColumnData toolData = buildNodeKeyColumnData(
         KeyChoice.KIND_KEY, KIND_KEY_COLUMN_LABEL);
     return new DepanFxBuiltInContribution.Simple(
-        DepanFxNodeListColumnData.KIND_KEY_COLUMN_TOOL_PATH, toolData);
+        KIND_KEY_COLUMN_TOOL_PATH, toolData);
   }
 
   @Bean
@@ -73,7 +87,7 @@ public class DepanFxNodeListColumnConfiguration {
     DepanFxNodeKeyColumnData toolData = buildNodeKeyColumnData(
         KeyChoice.NODE_KEY, NODE_KEY_COLUMN_LABEL);
     return new DepanFxBuiltInContribution.Simple(
-        DepanFxNodeListColumnData.NODE_KEY_COLUMN_TOOL_PATH, toolData);
+        NODE_KEY_COLUMN_TOOL_PATH, toolData);
   }
 
   @Bean
@@ -84,6 +98,13 @@ public class DepanFxNodeListColumnConfiguration {
   @Bean
   public DepanFxResourcePathMenuContribution nodeKeyColumnPathMenu() {
     return new NodeKeyColumnPathContribution();
+  }
+
+  private static Optional<DepanFxWorkspaceResource> getBuiltinNodeKeyColumnResource(
+      DepanFxWorkspace workspace, Path toolPath) {
+    return DepanFxProjects.getBuiltIn(
+        workspace, DepanFxNodeKeyColumnData.class,
+        c -> c.getPath().equals(toolPath));
   }
 
   private DepanFxNodeKeyColumnData buildNodeKeyColumnData(

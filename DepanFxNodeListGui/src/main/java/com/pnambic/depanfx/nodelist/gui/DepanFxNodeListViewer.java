@@ -10,6 +10,7 @@ import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumnToolDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxSimpleColumn;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxSimpleColumnConfiguration;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
@@ -349,7 +350,7 @@ public class DepanFxNodeListViewer {
   }
 
   private void doAddSimpleColumnAction() {
-    DepanFxNodeListColumnData.getBuiltinSimpleColumnResource(workspace)
+    DepanFxSimpleColumnConfiguration.getBuiltinSimpleColumnResource(workspace)
         .map(r -> new DepanFxSimpleColumn(this, r))
         .ifPresent(c -> nodeListTable.getColumns()
             .add(c.prepareColumn()));
