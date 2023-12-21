@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableList;
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxCategoryColumn;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxCategoryColumnToolDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxFocusColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxFocusColumnToolDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumn;
@@ -15,9 +17,12 @@ import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxSimpleColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -29,6 +34,9 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Collection;
@@ -71,6 +79,14 @@ public class DepanFxNodeListViewer {
   private static final String SELECT_COLUMN = "Select Column...";
 
   private static final String SAVE_NODE_LIST_ITEM = "Save as node list...";
+
+  private static final String COLUMN_TOOL_EXT = "d*cti";
+
+  public static final ExtensionFilter NODE_KEY_COLUMN_FILTER =
+      DepanFxSceneControls.buildExtFilter("Any Column", COLUMN_TOOL_EXT);
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxNodeListViewer.class);
 
   private final DepanFxWorkspace workspace;
 
@@ -304,6 +320,10 @@ public class DepanFxNodeListViewer {
     Menu result = new Menu(ADD_COLUMN);
     ObservableList<MenuItem> items = result.getItems();
     items.add(DepanFxContextMenuBuilder.createActionItem(
+        SELECT_COLUMN,
+        e -> doSelectColumnAction()));
+    items.add(new SeparatorMenuItem());
+    items.add(DepanFxContextMenuBuilder.createActionItem(
         "Simple Column", e -> doAddSimpleColumnAction()));
     items.add(DepanFxContextMenuBuilder.createActionItem(
         DepanFxNodeKeyColumn.NEW_NODE_KEY_COLUMN,
@@ -311,10 +331,9 @@ public class DepanFxNodeListViewer {
     items.add(DepanFxContextMenuBuilder.createActionItem(
         DepanFxFocusColumn.NEW_FOCUS_COLUMN,
         e -> doNewFocusColumnAction()));
-    items.add(new SeparatorMenuItem());
     items.add(DepanFxContextMenuBuilder.createActionItem(
-        SELECT_COLUMN,
-        e -> doSelectColumnAction()));
+        DepanFxCategoryColumn.NEW_CATEGORY_COLUMN,
+        e -> doNewCategoryColumnAction()));
     return result;
   }
 
@@ -322,8 +341,11 @@ public class DepanFxNodeListViewer {
     FileChooser fileChooser = DepanFxResourcePerspectives.prepareToolFinder(
         workspace, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
     ObservableList<ExtensionFilter> filters = fileChooser.getExtensionFilters();
+    filters.add(DepanFxCategoryColumnToolDialog.CATEGORY_COLUMN_FILTER);
     filters.add(DepanFxFocusColumnToolDialog.FOCUS_COLUMN_FILTER);
     filters.add(DepanFxNodeKeyColumnToolDialog.NODE_KEY_COLUMN_FILTER);
+    filters.add(NODE_KEY_COLUMN_FILTER);
+    fileChooser.setSelectedExtensionFilter(NODE_KEY_COLUMN_FILTER);
 
     File selectedFile =
         fileChooser.showOpenDialog(nodeListTable.getScene().getWindow());
@@ -331,21 +353,29 @@ public class DepanFxNodeListViewer {
        workspace
           .toProjectDocument(selectedFile.getAbsoluteFile().toURI())
           .flatMap(p -> DepanFxWorkspaceFactory.loadDocument(
-              workspace, p, DepanFxFocusColumnData.class))
+              workspace, p, DepanFxBaseColumnData.class))
           .flatMap(this::toColumn)
           .ifPresent(c -> nodeListTable.getColumns()
               .add(c.prepareColumn()));
     }
   }
 
-  private Optional<DepanFxNodeListColumn> toColumn(DepanFxWorkspaceResource columnRsrc) {
+  private Optional<DepanFxNodeListColumn> toColumn(
+      DepanFxWorkspaceResource columnRsrc) {
     Class<?> type = columnRsrc.getResource().getClass();
-    if (DepanFxNodeKeyColumnData.class.isAssignableFrom(type)) {
-      return Optional.of(new DepanFxNodeKeyColumn(this, columnRsrc));
+    if (DepanFxCategoryColumnData.class.isAssignableFrom(type)) {
+      return Optional.of(new DepanFxCategoryColumn(this, columnRsrc));
     }
     if (DepanFxFocusColumnData.class.isAssignableFrom(type)) {
       return Optional.of(new DepanFxFocusColumn(this, columnRsrc));
     }
+    if (DepanFxNodeKeyColumnData.class.isAssignableFrom(type)) {
+      return Optional.of(new DepanFxNodeKeyColumn(this, columnRsrc));
+    }
+    if (DepanFxSimpleColumnData.class.isAssignableFrom(type)) {
+      return Optional.of(new DepanFxSimpleColumn(this, columnRsrc));
+    }
+    LOG.warn("Unknown type {} for column construction", type.getName());
     return Optional.empty();
   }
 
@@ -361,11 +391,11 @@ public class DepanFxNodeListViewer {
         DepanFxNodeKeyColumn.buildInitialColumnData();
     Dialog<DepanFxNodeKeyColumnToolDialog> createDlg =
         DepanFxNodeKeyColumnToolDialog.runCreateDialog(
-            initialData, dialogRunner, DepanFxNodeKeyColumn.NEW_NODE_KEY_COLUMN);
+            initialData, dialogRunner,
+            DepanFxNodeKeyColumn.NEW_NODE_KEY_COLUMN);
     createDlg.getController().getWorkspaceResource()
         .map(r -> new DepanFxNodeKeyColumn(this, r))
-        .ifPresent(c -> nodeListTable.getColumns()
-            .add(c.prepareColumn()));
+        .ifPresent(this::addColumn);
   }
 
   private void doNewFocusColumnAction() {
@@ -376,8 +406,23 @@ public class DepanFxNodeListViewer {
             initialData, dialogRunner, DepanFxFocusColumn.NEW_FOCUS_COLUMN);
     createDlg.getController().getWorkspaceResource()
         .map(r -> new DepanFxFocusColumn(this, r))
-        .ifPresent(c -> nodeListTable.getColumns()
-            .add(c.prepareColumn()));
+        .ifPresent(this::addColumn);
+  }
+
+  private void doNewCategoryColumnAction() {
+    DepanFxCategoryColumnData initialData =
+        DepanFxCategoryColumnData.buildInitialCategoryColumnData();
+    Dialog<DepanFxCategoryColumnToolDialog> createDlg =
+        DepanFxCategoryColumnToolDialog.runCreateDialog(
+            initialData, dialogRunner,
+            DepanFxCategoryColumn.NEW_CATEGORY_COLUMN);
+    createDlg.getController().getWorkspaceResource()
+        .map(r -> new DepanFxCategoryColumn(this, r))
+        .ifPresent(this::addColumn);
+  }
+
+  private void addColumn(DepanFxNodeListColumn column) {
+    nodeListTable.getColumns().add(column.prepareColumn());
   }
 
   /////////////////////////////////////
