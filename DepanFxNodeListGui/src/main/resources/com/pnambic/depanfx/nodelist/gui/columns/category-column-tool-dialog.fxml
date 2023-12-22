@@ -37,21 +37,22 @@
 
          <Label text="Categories"/>
 
-         <TableView fx:id="categoriesTable"
-            editable="true">
+         <TableView fx:id="categoriesTable" editable="true">
             <columns>
                 <TableColumn text="Label"
                     editable="true"
-                    prefWidth="80">
+                    prefWidth="80" minWidth="50">
                 </TableColumn>
                 <TableColumn text="Node List"
                     editable="false"
-                    prefWidth="160">
+                    prefWidth="160" minWidth="80">
                 </TableColumn>
                 <TableColumn
+                    prefWidth="60"
                     editable="false" resizable="false" sortable="false">
                 </TableColumn>
                 <TableColumn
+                    prefWidth="60"
                     editable="false" resizable="false" sortable="false">
                 </TableColumn>
             </columns>

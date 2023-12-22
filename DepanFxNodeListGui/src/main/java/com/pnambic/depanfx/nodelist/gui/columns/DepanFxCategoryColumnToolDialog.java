@@ -140,6 +140,14 @@ public class DepanFxCategoryColumnToolDialog {
     deleteActionColumn.setCellFactory(
         p -> new ButtonActionCell<EditCategory, String>(
             "Delete", this::onDeleteEntryLabelEvent));
+
+    // Size filePath to remaining room
+    filePathColumn.prefWidthProperty().bind(
+        categoriesTable.widthProperty()
+            .subtract(labelColumn.widthProperty())
+            .subtract(findActionColumn.widthProperty())
+            .subtract(deleteActionColumn.widthProperty())
+            .subtract(2));
   }
 
   public void setTooldata(DepanFxCategoryColumnData columnData) {
