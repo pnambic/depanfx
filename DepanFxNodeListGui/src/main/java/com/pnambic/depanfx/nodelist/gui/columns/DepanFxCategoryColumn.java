@@ -4,6 +4,9 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
+import com.pnambic.depanfx.nodelist.gui.DepanFxTreeFork;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxCategoryColumnData.CategoryEntry;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
@@ -21,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import javafx.scene.control.ContextMenu;
@@ -50,7 +55,7 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
 
   private DepanFxWorkspaceResource columnDataRsrc;
 
-  private CategoryHandler categories;
+  private CategoryEditor categories;
 
   private SeparatorMenuItem saveSeparator;
 
@@ -66,6 +71,10 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
 
   public DepanFxCategoryColumnData getColumnData() {
     return (DepanFxCategoryColumnData) columnDataRsrc.getResource();
+  }
+
+  public CategoryEditor getCategories() {
+    return categories;
   }
 
   @Override
@@ -91,9 +100,9 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
     saveAction = builder.appendActionItem(
         SAVE_NODE_LISTS, e1 -> runSaveNodeList());
 
-    // Ensure initial visibility is correct.
-    updateActions();
-    return builder.build();
+    ContextMenu result = builder.build();
+    result.setOnShowing(e -> onColumnMenuShowing());
+    return result;
   }
 
   public static void addNewColumnAction(
@@ -105,18 +114,21 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
   @Override
   public String toString(DepanFxNodeListGraphNode member) {
     GraphNode graphNode = member.getGraphNode();
-    List<CategoryEntry> nodeCategories =
-        categories.getCurrentCategories(graphNode);
+    Collection<CategoryEntry> nodeCategories = getCurrentCategories(graphNode);
     int categoryCount = nodeCategories.size();
     if (categoryCount > 1) {
       return String.valueOf(categoryCount);
     }
 
     if (categoryCount == 1) {
-      return nodeCategories.get(0).getCategoryLabel();
+      return nodeCategories.iterator().next().getCategoryLabel();
     }
     // Not in any collections.
     return "";
+  }
+
+  public Collection<CategoryEntry> getCurrentCategories(GraphNode graphNode) {
+    return categories.getCurrentCategories(graphNode);
   }
 
   @Override
@@ -126,6 +138,39 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
     return new CategoryCellFactory();
   }
 
+  public void setListMembership(GraphNode graphNode, CategoryEntry entry) {
+    categories.setListMembership(graphNode, entry);
+  }
+
+  public void setListMembership(
+      GraphNode graphNode, Collection<CategoryEntry> entries) {
+    categories.setListMembership(graphNode, entries);
+  }
+
+  public void setDecendantsCategories(
+      DepanFxNodeListGraphNode nodeItem,
+      List<CategoryEntry> updateCategories) {
+    if (nodeItem instanceof DepanFxTreeFork) {
+      ((DepanFxTreeFork) nodeItem).getDecendants().stream()
+          .forEach(n -> categories.setListMembership(n, updateCategories));
+      listViewer.refreshView();
+    }
+  }
+
+  public void addDecendantsCategories(
+      DepanFxNodeListGraphNode nodeItem,
+      List<CategoryEntry> updateCategories) {
+    if (nodeItem instanceof DepanFxTreeFork) {
+      ((DepanFxTreeFork) nodeItem).getDecendants().stream()
+          .forEach(n -> categories.adddListMembership(n, updateCategories));
+      listViewer.refreshView();
+    }
+  }
+
+  private void onColumnMenuShowing() {
+    updateActions();
+  }
+
   private void updateActions() {
     boolean hasEdits = hasNodeListEdits();
     saveSeparator.setVisible(hasEdits);
@@ -133,11 +178,12 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
   }
 
   private boolean hasNodeListEdits() {
-    return false;
+    return categories.hasEdits();
   }
 
   private void runSaveNodeList() {
-    LOG.info("save node lists not implemented");
+    categories.getChangedCategories().stream()
+        .forEach(this::saveCategory);
   }
 
   private static void openColumnCreate(DepanFxDialogRunner dialogRunner) {
@@ -184,6 +230,21 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
     }
   }
 
+  private void saveCategory(CategoryEntry entry) {
+    DepanFxWorkspaceResource nodeListRsrc = entry.getNodeListRsrc();
+    DepanFxProjectDocument dstDoc = nodeListRsrc.getDocument();
+    DepanFxNodeList updateRsrc = DepanFxNodeLists.buildRelatedNodeList(
+        (DepanFxNodeList) nodeListRsrc.getResource(),
+        categories.getCurrentNodes(entry));
+
+    try {
+      saveDocument(dstDoc, updateRsrc);
+    } catch (IOException errIo) {
+      LOG.error("Unable to save updated node list for {}",
+          entry.getCategoryLabel(), errIo);
+    }
+  }
+
   private void updateColumnDataRsrc(DepanFxWorkspaceResource columnDataRsrc) {
     this.columnDataRsrc = columnDataRsrc;
     updateCategories(getColumnData().getCategories());
@@ -191,7 +252,7 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
   }
 
   private void updateCategories(List<CategoryEntry> categories) {
-    this.categories = new CategoryHandler(categories);
+    this.categories = new CategoryEditor(categories);
   }
 
   private FileChooser prepareCategoryColumnFinder(DepanFxWorkspace workspace) {
