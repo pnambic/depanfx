@@ -1,6 +1,8 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
+import com.google.common.base.Strings;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxCategoryColumnData.CategoryEntry;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
@@ -345,13 +347,14 @@ public class DepanFxCategoryColumnToolDialog {
       return categoryLabelProp;
     }
 
+    public StringProperty nodeListNameProperty() {
+      return nodeListNameProp;
+    }
+
     public void setNodeListResource(DepanFxWorkspaceResource nodeListRsrc) {
       this.nodeListRsrc = nodeListRsrc;
       updateNodeNameProp();
-    }
-
-    public StringProperty nodeListNameProperty() {
-      return nodeListNameProp;
+      updateCategoryLabelProp();
     }
 
     private void updateNodeNameProp() {
@@ -361,6 +364,15 @@ public class DepanFxCategoryColumnToolDialog {
         return;
       }
       nodeListNameProp.setValue("");
+    }
+
+    private void updateCategoryLabelProp() {
+      if (Strings.isNullOrEmpty(categoryLabelProp.getValue())) {
+        if (nodeListRsrc != null) {
+          categoryLabelProp.setValue(
+              ((DepanFxNodeList) nodeListRsrc.getResource()).getNodeListName());
+        }
+      }
     }
   }
 }

@@ -51,7 +51,7 @@ public class DepanFxWorkspaceFactory {
     StringBuilder result = new StringBuilder(prefix);
     result.append(" ");
     DOCUMENT_TIMESTAMP_FORMATTER.formatTo(now, result);
-    result.append(".");
+    result.append(EXTENSION_DOT);
     result.append(ext);
     return result.toString();
   }

@@ -52,6 +52,7 @@ public class DepanFxSimpleTreeModel implements DepanFxTreeModel, DepanFxAdjacenc
     DepanFxDepthFirstTree treeDft = new DepanFxDepthFirstTree(this, filterNodes);
     treeDft.buildFromNodes(startNodes);
     return new DepanFxNodeList(
+        "Reachable nodes", "Reachable nodes",
         workspaceResource, treeDft.getTreeMembers());
   }
 

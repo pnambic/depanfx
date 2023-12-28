@@ -37,7 +37,8 @@
 
          <Label text="Categories"/>
 
-         <TableView fx:id="categoriesTable" editable="true">
+         <TableView fx:id="categoriesTable" editable="true"
+            VBox.vgrow="ALWAYS">
             <columns>
                 <TableColumn text="Label"
                     editable="true"
@@ -86,8 +87,6 @@
             <Button text="Browse" onAction="#openDestinationChooser"
                   HBox.hgrow="ALWAYS"/>
          </HBox>
-
-         <Region VBox.vgrow="ALWAYS" />
 
          <HBox spacing="10">
             <Button text="Cancel" onAction="#handleCancel"/>

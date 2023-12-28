@@ -2,6 +2,7 @@ package com.pnambic.depanfx.nodelist.gui;
 
 import com.google.common.base.Strings;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -15,11 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -29,12 +32,19 @@ import javafx.stage.Stage;
 @FxmlView("save-node-list-dialog.fxml")
 public class DepanFxSaveNodeListDialog {
 
-  private static final String PREFIX = "nodes";
-
   private static final String EXT = DepanFxNodeList.NODE_LIST_EXT;
 
   private static final ExtensionFilter EXT_FILTER =
       DepanFxSceneControls.buildExtFilter("Node List", EXT);
+
+  @FXML
+  private Label nodeListDetailsLabel;
+
+  @FXML
+  private TextField nodeListNameField;
+
+  @FXML
+  private TextField nodeListDescriptionField;
 
   @FXML
   private TextField destinationField;
@@ -52,6 +62,17 @@ public class DepanFxSaveNodeListDialog {
 
   public void setNodeListDoc(DepanFxNodeList nodeList) {
     this.nodeList = nodeList;
+    nodeListNameField.setText(nodeList.getNodeListName());
+    nodeListDescriptionField.setText(nodeList.getNodeListDescription());
+    nodeListDetailsLabel.setText(buildDetailsLabel(nodeList));
+  }
+
+  private String buildDetailsLabel(DepanFxNodeList nodeList) {
+    String graphSource =
+        nodeList.getGraphDocResource().getDocument().getMemberName();
+    int nodeCount = nodeList.getNodes().size();
+    return MessageFormat.format("Node list from {0} with {1} nodes.",
+        graphSource, nodeCount);
   }
 
   public void setInitialDest(DepanFxProjectDocument document) {
@@ -93,9 +114,13 @@ public class DepanFxSaveNodeListDialog {
 
     DepanFxProjectDocument projDoc =
         workspace.toProjectDocument(dstFile.toURI()).get();
+    DepanFxNodeList saveDoc = DepanFxNodeLists.buildNodeList(
+        nodeListNameField.getText(), nodeListDescriptionField.getText(),
+        nodeList.getGraphDocResource(), nodeList.getNodes());
 
     try {
-      savedRsrc = workspace.saveDocument(projDoc, nodeList);
+      savedRsrc = workspace.saveDocument(projDoc, saveDoc);
+      setNodeListDoc(saveDoc);
     } catch (Exception errAny) {
       throw new RuntimeException(
           "Unable to save nodelist " + projDoc.getMemberPath(), errAny);
@@ -103,12 +128,13 @@ public class DepanFxSaveNodeListDialog {
   }
 
   private FileChooser prepareFileChooser() {
+    String baseName = nodeListNameField.getText();
     FileChooser result =
         DepanFxSceneControls.prepareFileChooser(
             destinationField,
             () -> new File(
                 getWorkspaceDestination(),
-                buildTimestampName(PREFIX, EXT)));
+                buildTimestampName(baseName, EXT)));
     result.getExtensionFilters().add(EXT_FILTER);
     result.setSelectedExtensionFilter(EXT_FILTER);
 

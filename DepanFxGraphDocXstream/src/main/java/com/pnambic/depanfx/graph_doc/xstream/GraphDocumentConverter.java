@@ -19,6 +19,9 @@ public class GraphDocumentConverter
 
   public static final String GRAPH_DOC_TAG = "graph-doc";
 
+  public static final String CONTEXT_KEY_TAG =
+      ContextModelIdConverter.CONTEXT_KEY_TAG;
+
   private final ContextModelIdConverter modelIdConverter;
 
   public GraphDocumentConverter(ContextModelIdConverter modelIdConverter) {

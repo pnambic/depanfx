@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.git.builder;
 
+import com.google.common.base.Strings;
 import com.pnambic.depanfx.filesystem.graph.DocumentNode;
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphModels;
@@ -30,6 +31,7 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -59,12 +61,12 @@ public class GitLogLoader {
   // Unpacked for easy node lookup.
   private GraphModel graphModel;
 
-  private String branchName;
-
   // First time through #processLog(), this value is null.
   private Collection<GraphNode> nodes;
 
   private String commitId;
+
+  private NodeListContext loaderContext;
 
   public GitLogLoader(
       DepanFxWorkspace workspace, DepanFxProjectContainer dstDir,
@@ -76,8 +78,11 @@ public class GitLogLoader {
   }
 
   public void loadBranchCommits(String branchName, int logCount) {
-    this.branchName = branchName != null ? branchName : DEFAULT_BRANCH_NAME;
+    String loadBranchName =
+        Strings.isNullOrEmpty(branchName) ? DEFAULT_BRANCH_NAME : branchName;
     graphModel = ((GraphDocument) graphRsrc.getResource()).getGraph();
+    loaderContext =
+        new NodeListContext(graphRsrc, dstDir, loadBranchName, logCount);
 
     runLogCommand(logCount)
         .forEach(this::processLog);
@@ -92,7 +97,7 @@ public class GitLogLoader {
     List<String> command = new ArrayList<>(LOG_COMMAND.length + 2);
     command.addAll(Arrays.asList(LOG_COMMAND));
     command.add(Integer.toString(logCount));
-    command.add(branchName);
+    command.add(loaderContext.getBranchName());
     return cmdRunner.runGitCommand(command);
   }
 
@@ -113,15 +118,17 @@ public class GitLogLoader {
   }
 
   private Optional<DepanFxWorkspaceResource> saveNodeList() {
-    Optional<DepanFxProjectDocument> optProjDoc = buildProjectDocument();
+    Optional<DepanFxProjectDocument> optProjDoc =
+        loaderContext.buildProjectDocument(commitId);
     if (optProjDoc.isEmpty()) {
       throw new RuntimeException(
           "Unable to save commit " + commitId);
     }
-    DepanFxProjectDocument projDoc = optProjDoc.get();
 
-    DepanFxNodeList saveList =
-        DepanFxNodeLists.buildNodeList(graphRsrc, nodes);
+    DepanFxNodeList saveList = loaderContext.buildNodeList(commitId, nodes);
+    loaderContext.bump();
+
+    DepanFxProjectDocument projDoc = optProjDoc.get();
     try {
       return workspace.saveDocument(projDoc, saveList);
     } catch (Exception errAny) {
@@ -130,10 +137,65 @@ public class GitLogLoader {
     }
   }
 
-  private Optional<DepanFxProjectDocument> buildProjectDocument() {
-    String docName = DepanFxWorkspaceFactory.buildDocumentTimestampName(
-        branchName + " " + commitId, EXT);
-    Path destPath = dstDir.getMemberPath().resolve(Paths.get(docName));
-    return graphRsrc.getDocument().getProject().asProjectDocument(destPath);
+  private static class NodeListContext {
+
+    private final DepanFxWorkspaceResource graphRsrc;
+
+    private final DepanFxProjectContainer dstDir;
+
+    private final String branchName;
+
+    private final int logMax;
+
+    private final int digits;
+
+    private int count = 0;
+
+    public NodeListContext(
+        DepanFxWorkspaceResource graphRsrc,
+        DepanFxProjectContainer dstDir,
+        String branchName, int logMax) {
+      this.graphRsrc = graphRsrc;
+      this.dstDir = dstDir;
+      this.branchName = branchName;
+      this.logMax = logMax;
+      this.digits = 1 + (int) Math.floor(Math.log10(logMax - 1));
+    }
+
+    public String getBranchName() {
+      return branchName;
+    }
+
+    private Optional<DepanFxProjectDocument> buildProjectDocument(
+        String commitId) {
+      String baseName = getDocBaseName(commitId);
+      String docName =
+          DepanFxWorkspaceFactory.buildDocumentTimestampName(baseName, EXT);
+      Path destPath = dstDir.getMemberPath().resolve(Paths.get(docName));
+      return graphRsrc.getDocument().getProject().asProjectDocument(destPath);
+    }
+
+    public DepanFxNodeList buildNodeList(
+        String commitId, Collection<GraphNode> nodes) {
+
+      String baseName = getDocBaseName(commitId);
+      String listDescr = MessageFormat.format("Node list from {0}", baseName);
+      return  DepanFxNodeLists.buildNodeList(
+          baseName, listDescr, graphRsrc, nodes);
+    }
+
+    public void bump() {
+      count += 1;
+    }
+
+    public String getDocBaseName(String commitId) {
+
+      return MessageFormat.format("{0}-{1} {2}",
+          branchName, getDigits(), commitId);
+    }
+
+    private String getDigits() {
+      return Strings.padStart(String.valueOf(count), digits, '0');
+    }
   }
 }
