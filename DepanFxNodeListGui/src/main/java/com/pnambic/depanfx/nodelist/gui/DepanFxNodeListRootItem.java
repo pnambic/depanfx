@@ -10,7 +10,7 @@ import javafx.scene.control.TreeItem;
 
 public class DepanFxNodeListRootItem extends DepanFxNodeListItem {
 
-  private boolean freshSections = false;
+  private boolean freshSection = true;
 
   public DepanFxNodeListRootItem(DepanFxNodeListRoot rootInfo) {
     super(rootInfo);
@@ -23,9 +23,9 @@ public class DepanFxNodeListRootItem extends DepanFxNodeListItem {
 
   @Override
   public ObservableList<TreeItem<DepanFxNodeListMember>> getChildren() {
-    if (!freshSections) {
+    if (freshSection) {
+      freshSection = false;
       super.getChildren().setAll(buildChildren());
-      freshSections = true;
     }
 
     return super.getChildren();

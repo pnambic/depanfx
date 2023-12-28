@@ -2,6 +2,9 @@ package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -12,7 +15,10 @@ import javafx.scene.control.TreeItem;
 
 public class DepanFxTreeForkItem extends DepanFxNodeListItem {
 
-  private boolean freshTree = false;
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxTreeForkItem.class);
+
+  private boolean freshTree = true;
 
   public DepanFxTreeForkItem(DepanFxTreeFork fork) {
     super(fork);
@@ -25,9 +31,9 @@ public class DepanFxTreeForkItem extends DepanFxNodeListItem {
 
   @Override
   public ObservableList<TreeItem<DepanFxNodeListMember>> getChildren() {
-    if (!freshTree) {
+    if (freshTree) {
+      freshTree = false;
       super.getChildren().setAll(buildChildren());
-      freshTree = true;
     }
 
     return super.getChildren();
@@ -35,6 +41,7 @@ public class DepanFxTreeForkItem extends DepanFxNodeListItem {
 
   private ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
     DepanFxTreeFork folder = (DepanFxTreeFork) getValue();
+    LOG.info("building children for {}", folder.getDisplayName());
 
     Collection<GraphNode> nodes = folder.getMembers();
 
