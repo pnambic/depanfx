@@ -34,7 +34,7 @@ public class DepanFxTreeModelBuilder {
         .collect(Collectors.toList());
 
     return new DepanFxSimpleTreeModel(
-        nodeList.getWorkspaceResource(), nodeMembers, nonEmpty);
+        nodeList.getGraphDocResource(), nodeMembers, nonEmpty);
   }
 
   private static boolean hasMembers(

@@ -17,19 +17,19 @@ public class DepanFxNodeLists {
   }
 
   public static DepanFxNodeList buildNodeList(
-      DepanFxWorkspaceResource wkspRsrc, Collection<GraphNode> nodes) {
+      DepanFxWorkspaceResource graphDocRsrc, Collection<GraphNode> nodes) {
 
-    return new DepanFxNodeList(wkspRsrc, nodes);
+    return new DepanFxNodeList(graphDocRsrc, nodes);
   }
 
   public static DepanFxNodeList buildNodeList(
-      DepanFxWorkspaceResource wkspRsrc) {
+      DepanFxWorkspaceResource graphDocRsrc) {
 
-    GraphDocument graphDoc = (GraphDocument) wkspRsrc.getResource();
+    GraphDocument graphDoc = (GraphDocument) graphDocRsrc.getResource();
     Collection<GraphNode> nodes = graphDoc.getGraph().getNodes().stream()
         .map(GraphNode.class::cast)
         .collect(Collectors.toList());
-    return buildNodeList(wkspRsrc, nodes);
+    return buildNodeList(graphDocRsrc, nodes);
   }
 
   public static DepanFxNodeList remove(
@@ -40,17 +40,17 @@ public class DepanFxNodeLists {
         .filter(n -> !omitSet.contains(n))
         .collect(Collectors.toList());
 
-    return buildNodeList(base.getWorkspaceResource(), nodes);
+    return buildNodeList(base.getGraphDocResource(), nodes);
   }
 
   public static DepanFxNodeList buildEmptyNodeList(DepanFxNodeList base) {
     return buildNodeList(
-        base.getWorkspaceResource(), Collections.emptyList());
+        base.getGraphDocResource(), Collections.emptyList());
   }
 
   public static DepanFxNodeList buildRelatedNodeList(
       DepanFxNodeList baseNodes, Collection<GraphNode> relatedList) {
     return buildNodeList(
-        baseNodes.getWorkspaceResource(), relatedList);
+        baseNodes.getGraphDocResource(), relatedList);
   }
 }

@@ -10,19 +10,19 @@ public class DepanFxNodeList {
   /** Common extension for any workspace persisted node list. */
   public static final String NODE_LIST_EXT = "dnli";
 
-  private final DepanFxWorkspaceResource wkspRsrc;
+  private final DepanFxWorkspaceResource graphDocRsrc;
 
   private final Collection<GraphNode> nodes;
 
   public DepanFxNodeList(
-      DepanFxWorkspaceResource wkspRsrc,
+      DepanFxWorkspaceResource graphDocRsrc,
       Collection<GraphNode> nodes) {
-    this.wkspRsrc = wkspRsrc;
+    this.graphDocRsrc = graphDocRsrc;
     this.nodes = nodes;
   }
 
-  public DepanFxWorkspaceResource getWorkspaceResource() {
-    return wkspRsrc;
+  public DepanFxWorkspaceResource getGraphDocResource() {
+    return graphDocRsrc;
   }
 
   public Collection<GraphNode> getNodes() {

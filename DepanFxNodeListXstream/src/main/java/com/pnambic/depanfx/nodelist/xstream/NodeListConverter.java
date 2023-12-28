@@ -50,7 +50,7 @@ public class NodeListConverter
 
     // Should use field (e.g. graphDocRef) as tag, not object type.
     String classTag = mapper.serializedClass(DepanFxWorkspaceResource.class);
-    marshalObject(classTag, nodeList.getWorkspaceResource(), writer, context);
+    marshalObject(classTag, nodeList.getGraphDocResource(), writer, context);
 
     for (GraphNode node : nodeList.getNodes()) {
       marshalObject(node, writer, context, mapper);

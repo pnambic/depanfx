@@ -128,7 +128,7 @@ public class DepanFxNodeListViewer {
   }
 
   public GraphDocument getGraphDoc() {
-    return (GraphDocument) nodeList.getWorkspaceResource().getResource();
+    return (GraphDocument) nodeList.getGraphDocResource().getResource();
   }
 
   public ContextModelId getContextModelId() {
