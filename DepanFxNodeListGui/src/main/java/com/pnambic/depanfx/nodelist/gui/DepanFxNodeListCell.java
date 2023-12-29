@@ -12,9 +12,12 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.cell.CheckBoxTreeTableCell;
@@ -39,6 +42,8 @@ public class DepanFxNodeListCell
   private static final String SELECT_RECURSIVE = "Select Recursive";
 
   private static final String CLEAR_RECURSIVE = "Clear Recursive";
+
+  private static final String EXPAND_CHILDREN = "Expand Children";
 
   // Allow cells to act on viewer (e.g. change sections, etc.)
   private final DepanFxNodeListViewer listViewer;
@@ -118,7 +123,19 @@ public class DepanFxNodeListCell
     builder.appendActionItem(
         CLEAR_RECURSIVE,
         e -> runSelectRecursiveAction(fork, false));
+    builder.appendSeparator();
+    builder.appendActionItem(
+        EXPAND_CHILDREN,
+        e -> runExpandChildrenAction());
     return builder.build();
+  }
+
+  private void runExpandChildrenAction() {
+    TreeItem<DepanFxNodeListMember> tree = this.getTableRow().getTreeItem();
+    BreadthExpander expander = new BreadthExpander(100);
+    expander.addBreadthItems(tree.getChildren());
+    expander.expandChildren();
+    tree.setExpanded(true);
   }
 
   private void openTreeSectionEditor(DepanFxTreeSection member) {
@@ -207,6 +224,39 @@ public class DepanFxNodeListCell
         workspace, DepanFxNodeListSectionData.SECTIONS_TOOL_PATH);
     DepanFxTreeSectionToolDialog.setTreeSectionTooldataFilters(result);
     return result;
+  }
+
+  private static class BreadthExpander {
+
+    private int expandLimit;
+
+    private List<TreeItem<DepanFxNodeListMember>> breadthItems =
+        new ArrayList<>();
+
+    public BreadthExpander(int expandLimit) {
+      this.expandLimit = expandLimit;
+    }
+
+    public void addBreadthItems(
+        List<TreeItem<DepanFxNodeListMember>> moreItems) {
+      breadthItems.addAll(moreItems);
+    }
+
+    public void expandChildren() {
+      for (int next = 0; next < breadthItems.size(); next++) {
+        if (expandLimit <= 0) {
+          return;
+        }
+        TreeItem<DepanFxNodeListMember> currItem = breadthItems.get(next);
+        ObservableList<TreeItem<DepanFxNodeListMember>> children =
+            currItem.getChildren();
+        addBreadthItems(children);
+        if (!currItem.isExpanded()) {
+          expandLimit -= children.size();
+          currItem.setExpanded(true);
+        }
+      }
+    }
   }
 
   private class SelectionState
