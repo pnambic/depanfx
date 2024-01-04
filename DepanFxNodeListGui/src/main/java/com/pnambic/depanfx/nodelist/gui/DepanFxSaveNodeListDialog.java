@@ -75,9 +75,8 @@ public class DepanFxSaveNodeListDialog {
         graphSource, nodeCount);
   }
 
-  public void setInitialDest(DepanFxProjectDocument document) {
-    destinationField.setText(
-        document.getMemberPath().toAbsolutePath().toString());
+  public void setDestination(DepanFxProjectDocument document) {
+    destinationField.setText(document.getMemberPath().toString());
   }
 
   public Optional<DepanFxWorkspaceResource> getSavedResource() {
@@ -96,6 +95,7 @@ public class DepanFxSaveNodeListDialog {
   @FXML
   private void handleCancel() {
     closeDialog();
+    savedRsrc = Optional.empty();
   }
 
   @FXML

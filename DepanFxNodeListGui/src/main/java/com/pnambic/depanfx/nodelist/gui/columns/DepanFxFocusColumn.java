@@ -160,7 +160,7 @@ public class DepanFxFocusColumn extends DepanFxAbstractColumn {
     Dialog<DepanFxSaveNodeListDialog> saveDlg =
         listViewer.buildDialog(DepanFxSaveNodeListDialog.class);
     saveDlg.getController().setNodeListDoc(saveList);
-    saveDlg.getController().setInitialDest(nodeListRsrc.getDocument());
+    saveDlg.getController().setDestination(nodeListRsrc.getDocument());
     saveDlg.runDialog("Save changes to node list");
     saveDlg.getController().getSavedResource()
         .ifPresent(r -> {

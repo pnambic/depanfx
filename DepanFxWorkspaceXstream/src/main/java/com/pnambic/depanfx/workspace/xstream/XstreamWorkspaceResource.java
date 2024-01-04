@@ -1,7 +1,7 @@
 package com.pnambic.depanfx.workspace.xstream;
 
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
-import com.pnambic.depanfx.workspace.DepanFxProjectMember;
+import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -26,11 +26,8 @@ public class XstreamWorkspaceResource {
   public static XstreamWorkspaceResource of(
       DepanFxWorkspaceResource wkspRsrc) {
     DepanFxProjectDocument projectDoc = wkspRsrc.getDocument();
-    Path rsrcPath = projectDoc.getMemberPath();
-
-    DepanFxProjectMember rsrcProj = projectDoc.getProject();
-    Path projPath = rsrcProj.getMemberPath();
-    Path pathValue = projPath.relativize(rsrcPath);
+    DepanFxProjectTree rsrcProj = projectDoc.getProject();
+    Path pathValue = rsrcProj.getRelativePath(projectDoc.getMemberPath());
     String projectName = rsrcProj.getMemberName();
     String resourcePath = pathValue.toString();
 

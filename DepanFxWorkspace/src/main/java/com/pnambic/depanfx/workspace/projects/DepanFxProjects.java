@@ -64,7 +64,9 @@ public class DepanFxProjects {
 
   public static File getCurrent(DepanFxWorkspace workspace, String container) {
     return workspace.getCurrentProject()
-        .map(p -> new File(p.getMemberPath().toFile(), container))
+        .map(t -> t.getMemberPath())
+        .map(p -> p.resolve(container))
+        .map(p -> p.toFile())
         .orElse(null);
   }
 

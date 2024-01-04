@@ -22,14 +22,6 @@ public class DocumentRegistry {
     return Optional.ofNullable(registry.get(getUri(projDoc)));
   }
 
-  private void registerDocument(Object document, URI uri) {
-    registry.put(uri, document);
-  }
-
-  private Optional<Object> findResource(URI uri) {
-    return Optional.ofNullable(registry.get(uri));
-  }
-
   public List<GraphDocument> getGraphDocuments() {
     return registry.values().stream()
         .filter(d -> GraphDocument.class.isAssignableFrom(d.getClass()))
