@@ -124,44 +124,21 @@ public class DepanFxNodeKeyColumnConfiguration {
   }
 
   private static class NodeKeyColumnExtContribution
-      implements DepanFxResourceExtMenuContribution {
+      extends DepanFxResourceExtMenuContribution.Basic {
 
-    private static Logger LOG =
-        LoggerFactory.getLogger(NodeKeyColumnExtContribution.class);
-
-    @Override
-    public boolean acceptsExt(String ext) {
-      return DepanFxNodeKeyColumnData.NODE_KEY_COLUMN_TOOL_EXT.equals(ext);
-    }
-
-    @Override
-    public void prepareCell(DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspace workspace, Cell<DepanFxWorkspaceMember> cell,
-        String ext, DepanFxProjectMember member,
-        DepanFxContextMenuBuilder builder) {
-      Path docPath = member.getMemberPath();
-      DepanFxResourcePerspectives.installOnOpen(cell, docPath,
-          p -> runNodeKeyColumnDataAction(dialogRunner, workspace, p));
-      builder.appendActionItem(
+    public NodeKeyColumnExtContribution() {
+      super(DepanFxNodeKeyColumnData.class,
           DepanFxNodeKeyColumn.EDIT_NODE_KEY_COLUMN,
-          e -> runNodeKeyColumnDataAction(dialogRunner, workspace, docPath));
+          DepanFxNodeKeyColumnData.NODE_KEY_COLUMN_TOOL_EXT);
     }
 
-    private void runNodeKeyColumnDataAction(
-        DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspace workspace,
-        Path docPath) {
-      try {
-        workspace.toProjectDocument(docPath.toUri())
-            .flatMap(r -> workspace.getWorkspaceResource(
-                r, DepanFxNodeKeyColumnData.class))
-            .ifPresent(r -> DepanFxNodeKeyColumnToolDialog.runEditDialog(
-                r.getDocument(), (DepanFxNodeKeyColumnData) r.getResource(),
-                dialogRunner));
-      } catch (RuntimeException errCaught) {
-        LOG.error("Unable to open node key column data {} for edit",
-            docPath, errCaught);
-      }
+    @Override
+    protected void runDialog(
+        DepanFxWorkspaceResource wkspRsrc, DepanFxDialogRunner dialogRunner) {
+      DepanFxNodeKeyColumnToolDialog.runEditDialog(
+          wkspRsrc.getDocument(),
+          (DepanFxNodeKeyColumnData) wkspRsrc.getResource(),
+          dialogRunner);
     }
   }
 

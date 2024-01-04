@@ -2,7 +2,6 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
-import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -10,9 +9,8 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -34,44 +32,21 @@ public class DepanFxCategoryColumnConfiguration {
   }
 
   private static class CategoryColumnExtContribution
-      implements DepanFxResourceExtMenuContribution {
+      extends DepanFxResourceExtMenuContribution.Basic {
 
-    private static Logger LOG =
-        LoggerFactory.getLogger(CategoryColumnExtContribution.class);
-
-    @Override
-    public boolean acceptsExt(String ext) {
-      return DepanFxCategoryColumnData.CATEGORY_COLUMN_TOOL_EXT.equals(ext);
-    }
-
-    @Override
-    public void prepareCell(DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspace workspace, Cell<DepanFxWorkspaceMember> cell,
-        String ext, DepanFxProjectMember member,
-        DepanFxContextMenuBuilder builder) {
-      Path docPath = member.getMemberPath();
-      DepanFxResourcePerspectives.installOnOpen(cell, docPath,
-          p -> runCategoryColumnDataAction(dialogRunner, workspace, p));
-      builder.appendActionItem(
+    public CategoryColumnExtContribution() {
+      super(DepanFxCategoryColumnData.class,
           DepanFxCategoryColumn.EDIT_CATEGORY_COLUMN,
-          e -> runCategoryColumnDataAction(dialogRunner, workspace, docPath));
+          DepanFxCategoryColumnData.CATEGORY_COLUMN_TOOL_EXT);
     }
 
-    private void runCategoryColumnDataAction(
-        DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspace workspace,
-        Path docPath) {
-      try {
-        workspace.toProjectDocument(docPath.toUri())
-            .flatMap(r -> workspace.getWorkspaceResource(
-                r, DepanFxCategoryColumnData.class))
-            .ifPresent(r -> DepanFxCategoryColumnToolDialog.runEditDialog(
-                r.getDocument(), (DepanFxCategoryColumnData) r.getResource(),
-                dialogRunner));
-      } catch (RuntimeException errCaught) {
-        LOG.error("Unable to open category column data {} for edit",
-            docPath, errCaught);
-      }
+    @Override
+    protected void runDialog(
+        DepanFxWorkspaceResource wkspRsrc, DepanFxDialogRunner dialogRunner) {
+      DepanFxCategoryColumnToolDialog.runEditDialog(
+          wkspRsrc.getDocument(),
+          (DepanFxCategoryColumnData) wkspRsrc.getResource(),
+          dialogRunner);
     }
   }
 

@@ -248,44 +248,21 @@ public class DepanFxNodeListSectionConfiguration {
   }
 
   private static class FlatSectionExtContribution
-      implements DepanFxResourceExtMenuContribution {
+      extends DepanFxResourceExtMenuContribution.Basic {
 
-    private static Logger LOG =
-        LoggerFactory.getLogger(FlatSectionExtContribution.class);
-
-    @Override
-    public boolean acceptsExt(String ext) {
-      return DepanFxFlatSectionData.FLAT_SECTION_TOOL_EXT.equals(ext);
-    }
-
-    @Override
-    public void prepareCell(
-        DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace,
-        Cell<DepanFxWorkspaceMember> cell, String ext,
-        DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
-      Path docPath = member.getMemberPath();
-      DepanFxResourcePerspectives.installOnOpen(cell, docPath,
-          p -> runEditFlatSectionDataAction(dialogRunner, workspace, p));
-      builder.appendActionItem(
+    public FlatSectionExtContribution() {
+      super(DepanFxFlatSectionData.class,
           DepanFxFlatSection.EDIT_FLAT_SECTION_DATA,
-          e -> runEditFlatSectionDataAction(dialogRunner, workspace, docPath));
+          DepanFxFlatSectionData.FLAT_SECTION_TOOL_EXT);
     }
 
-    private void runEditFlatSectionDataAction(
-        DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspace workspace,
-        Path docPath) {
-      try {
-        workspace.toProjectDocument(docPath.toUri())
-            .flatMap(r -> workspace.getWorkspaceResource(
-                r, DepanFxFlatSectionData.class))
-            .ifPresent(r -> DepanFxFlatSectionToolDialog.runEditDialog(
-                r.getDocument(), (DepanFxFlatSectionData) r.getResource(),
-                dialogRunner));
-      } catch (RuntimeException errCaught) {
-        LOG.error("Unable to open flat section data {} for edit",
-            docPath, errCaught);
-      }
+    @Override
+    protected void runDialog(
+        DepanFxWorkspaceResource wkspRsrc, DepanFxDialogRunner dialogRunner) {
+      DepanFxFlatSectionToolDialog.runEditDialog(
+          wkspRsrc.getDocument(),
+          (DepanFxFlatSectionData) wkspRsrc.getResource(),
+          dialogRunner);
     }
   }
 
@@ -331,44 +308,21 @@ public class DepanFxNodeListSectionConfiguration {
   }
 
   private static class TreeSectionExtContribution
-      implements DepanFxResourceExtMenuContribution {
+      extends DepanFxResourceExtMenuContribution.Basic {
 
-    private static Logger LOG =
-        LoggerFactory.getLogger(TreeSectionExtContribution.class);
-
-    @Override
-    public boolean acceptsExt(String ext) {
-      return DepanFxTreeSectionData.TREE_SECTION_TOOL_EXT.equals(ext);
-    }
-
-    @Override
-    public void prepareCell(DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspace workspace, Cell<DepanFxWorkspaceMember> cell,
-        String ext, DepanFxProjectMember member,
-        DepanFxContextMenuBuilder builder) {
-      Path docPath = member.getMemberPath();
-      DepanFxResourcePerspectives.installOnOpen(cell, docPath,
-          p -> runEditTreeSectionDataAction(dialogRunner, workspace, p));
-      builder.appendActionItem(
+    public TreeSectionExtContribution() {
+      super(DepanFxTreeSectionData.class,
           DepanFxTreeSection.EDIT_TREE_SECTION_DATA,
-          e -> runEditTreeSectionDataAction(dialogRunner, workspace, docPath));
+          DepanFxTreeSectionData.TREE_SECTION_TOOL_EXT);
     }
 
-    private void runEditTreeSectionDataAction(
-        DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspace workspace,
-        Path docPath) {
-      try {
-        workspace.toProjectDocument(docPath.toUri())
-            .flatMap(r -> workspace.getWorkspaceResource(
-                r, DepanFxTreeSectionData.class))
-            .ifPresent(r -> DepanFxTreeSectionToolDialog.runEditDialog(
-                r.getDocument(), (DepanFxTreeSectionData) r.getResource(),
-                dialogRunner));
-      } catch (RuntimeException errCaught) {
-        LOG.error("Unable to open tree section data {} for edit",
-            docPath, errCaught);
-      }
+    @Override
+    protected void runDialog(
+        DepanFxWorkspaceResource wkspRsrc, DepanFxDialogRunner dialogRunner) {
+      DepanFxTreeSectionToolDialog.runEditDialog(
+          wkspRsrc.getDocument(),
+          (DepanFxTreeSectionData) wkspRsrc.getResource(),
+          dialogRunner);
     }
   }
 
