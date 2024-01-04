@@ -8,7 +8,6 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
@@ -133,12 +132,13 @@ public class DepanFxNewGitLogsDialog
     int logCount = Integer.parseInt(logCountField.getText());
 
     try {
-      Optional<DepanFxWorkspaceResource> optGraphRsrc = optGraphDoc
-          .flatMap(this::importGraphResource);
+      DepanFxWorkspaceResource graphRsrc = optGraphDoc
+          .flatMap(d -> workspace.getWorkspaceResource(d, GraphDocument.class))
+          .get();
 
       DepanFxProjectContainer dstDir = optDstDir.get();
       GitLogLoader logLoader =
-          new GitLogLoader(workspace, dstDir, optGraphRsrc.get(), cmdRunner);
+          new GitLogLoader(workspace, dstDir, graphRsrc, cmdRunner);
       dstDir.getProject().registerContainer(dstDir);
 
       logLoader.loadBranchCommits(branchNameField.getText(), logCount);
@@ -150,12 +150,6 @@ public class DepanFxNewGitLogsDialog
 
   private void closeDialog() {
     ((Stage) dstDirectoryField.getScene().getWindow()).close();
-  }
-
-  private Optional<DepanFxWorkspaceResource> importGraphResource(
-      DepanFxProjectDocument graphDoc) {
-    return DepanFxWorkspaceFactory.loadDocument(
-        workspace, graphDoc, GraphDocument.class);
   }
 
   private DirectoryChooser prepareDstDirectoryChooser() {

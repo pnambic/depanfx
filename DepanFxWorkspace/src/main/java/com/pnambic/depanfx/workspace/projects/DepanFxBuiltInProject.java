@@ -134,7 +134,7 @@ public class DepanFxBuiltInProject implements DepanFxProjectSpi {
       DepanFxProjectDocument projDoc) {
     return Optional.ofNullable(documents.get(projDoc))
         .map(c -> c.getDocument())
-        .map(d -> new DepanFxWorkspaceResource.Simple(projDoc, d));
+        .map(d -> new DepanFxWorkspaceResource.StaticWorkspaceResource(projDoc, d));
   }
 
   private static Path buildProjectPath() {

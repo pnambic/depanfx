@@ -1,24 +1,24 @@
 package com.pnambic.depanfx.workspace.gui;
 
-import java.io.File;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.scene.DepanFxSceneControls;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+
+import net.rgielen.fxweaver.core.FxmlView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.pnambic.depanfx.graph_doc.model.GraphDocument;
-import com.pnambic.depanfx.scene.DepanFxSceneControls;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
-import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
+import java.io.File;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import net.rgielen.fxweaver.core.FxmlView;
 
 @Component
 @FxmlView("file-import-dialog.fxml")
@@ -63,9 +63,8 @@ public class DepanFxFileImportDialog {
 
     File srcFile = new File(sourceField.getText());
     DepanFxProjectDocument projDoc =
-        workspace.toProjectDocument(srcFile.toURI()).get();
-    DepanFxWorkspaceFactory.loadDocument(
-        workspace, projDoc, GraphDocument.class);
+        workspace.toProjectDocument(srcFile.getAbsoluteFile().toURI()).get();
+    workspace.getWorkspaceResource(projDoc, GraphDocument.class);
   }
 
   private FileChooser prepareFileChooser() {

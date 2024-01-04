@@ -61,6 +61,7 @@ public class DepanFxCategoryColumnToolDialog {
 
   private final DepanFxWorkspace workspace;
 
+  // Only valid after a successful handle confirm.
   private Optional<DepanFxWorkspaceResource> optCategoryColumnRsrc;
 
   @FXML
@@ -89,24 +90,25 @@ public class DepanFxCategoryColumnToolDialog {
   }
 
   public static Dialog<DepanFxCategoryColumnToolDialog> runEditDialog(
-      DepanFxWorkspaceResource categoryColumnRsrc,
-      DepanFxDialogRunner dialogRunner, String title) {
+      DepanFxProjectDocument projDoc,
+      DepanFxCategoryColumnData categoryColumnData,
+      DepanFxDialogRunner dialogRunner) {
     Dialog<DepanFxCategoryColumnToolDialog> dlg =
         dialogRunner.createDialogAndParent(
             DepanFxCategoryColumnToolDialog.class);
-    dlg.getController().setCategoryColumnResource(categoryColumnRsrc);
-    dlg.runDialog(title);
+    dlg.getController().setTooldata(categoryColumnData);
+    dlg.getController().setDestination(projDoc);
+    dlg.runDialog(DepanFxCategoryColumn.EDIT_CATEGORY_COLUMN);
     return dlg;
   }
 
   public static Dialog<DepanFxCategoryColumnToolDialog> runCreateDialog(
-      DepanFxCategoryColumnData columnData,
-      DepanFxDialogRunner dialogRunner, String title) {
+      DepanFxCategoryColumnData columnData, DepanFxDialogRunner dialogRunner) {
     Dialog<DepanFxCategoryColumnToolDialog> dlg =
         dialogRunner.createDialogAndParent(
             DepanFxCategoryColumnToolDialog.class);
     dlg.getController().setTooldata(columnData);
-    dlg.runDialog(title);
+    dlg.runDialog(DepanFxCategoryColumn.NEW_CATEGORY_COLUMN);
     return dlg;
   }
 
@@ -167,18 +169,8 @@ public class DepanFxCategoryColumnToolDialog {
     categoriesTable.setItems(categoryTableData);
   }
 
-  public Optional<DepanFxCategoryColumnData> getTooldata() {
-    return optCategoryColumnRsrc
-        .map(DepanFxWorkspaceResource::getResource)
-        .map(DepanFxCategoryColumnData.class::cast);
-  }
-
-  public void setCategoryColumnResource(
-      DepanFxWorkspaceResource categoryColumnRsrc) {
-    this.optCategoryColumnRsrc = Optional.of(categoryColumnRsrc);
-    setTooldata(((DepanFxCategoryColumnData) categoryColumnRsrc.getResource()));
-    destinationField.setText(
-        categoryColumnRsrc.getDocument().getMemberPath().toString());
+  public void setDestination(DepanFxProjectDocument projDoc) {
+    destinationField.setText(projDoc.getMemberPath().toString());
   }
 
   public Optional<DepanFxWorkspaceResource> getWorkspaceResource() {

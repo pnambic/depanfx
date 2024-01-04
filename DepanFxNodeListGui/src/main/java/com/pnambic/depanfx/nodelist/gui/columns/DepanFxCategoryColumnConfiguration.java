@@ -63,9 +63,11 @@ public class DepanFxCategoryColumnConfiguration {
         Path docPath) {
       try {
         workspace.toProjectDocument(docPath.toUri())
-            .flatMap(workspace::getWorkspaceResource)
+            .flatMap(r -> workspace.getWorkspaceResource(
+                r, DepanFxCategoryColumnData.class))
             .ifPresent(r -> DepanFxCategoryColumnToolDialog.runEditDialog(
-                r, dialogRunner, DepanFxCategoryColumn.EDIT_CATEGORY_COLUMN));
+                r.getDocument(), (DepanFxCategoryColumnData) r.getResource(),
+                dialogRunner));
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to open category column data {} for edit",
             docPath, errCaught);

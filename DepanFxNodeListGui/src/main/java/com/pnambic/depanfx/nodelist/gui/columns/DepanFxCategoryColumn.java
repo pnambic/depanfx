@@ -17,7 +17,6 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.slf4j.Logger;
@@ -77,6 +76,12 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
     return categories;
   }
 
+  public static void addNewColumnAction(
+      DepanFxContextMenuBuilder builder, DepanFxDialogRunner dialogRunner) {
+    builder.appendActionItem(NEW_CATEGORY_COLUMN,
+        e -> openColumnCreate(dialogRunner));
+  }
+
   @Override
   public String getColumnLabel() {
     return getColumnData().getColumnLabel();
@@ -105,12 +110,6 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
     return result;
   }
 
-  public static void addNewColumnAction(
-      DepanFxContextMenuBuilder builder, DepanFxDialogRunner dialogRunner) {
-    builder.appendActionItem(NEW_CATEGORY_COLUMN,
-        e -> openColumnCreate(dialogRunner));
-  }
-
   @Override
   public String toString(DepanFxNodeListGraphNode member) {
     GraphNode graphNode = member.getGraphNode();
@@ -127,15 +126,15 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
     return "";
   }
 
-  public Collection<CategoryEntry> getCurrentCategories(GraphNode graphNode) {
-    return categories.getCurrentCategories(graphNode);
-  }
-
   @Override
   protected Callback<TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember>,
       TreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember>>
       buildCellFactory() {
     return new CategoryCellFactory();
+  }
+
+  public Collection<CategoryEntry> getCurrentCategories(GraphNode graphNode) {
+    return categories.getCurrentCategories(graphNode);
   }
 
   public void setListMembership(GraphNode graphNode, CategoryEntry entry) {
@@ -189,31 +188,26 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
   private static void openColumnCreate(DepanFxDialogRunner dialogRunner) {
     DepanFxCategoryColumnData initialData =
         DepanFxCategoryColumnData.buildInitialCategoryColumnData();
-    DepanFxCategoryColumnToolDialog.runCreateDialog(
-        initialData, dialogRunner, DepanFxCategoryColumn.NEW_CATEGORY_COLUMN);
+    DepanFxCategoryColumnToolDialog.runCreateDialog(initialData, dialogRunner);
   }
 
   private void openColumnEditor(DepanFxDialogRunner dialogRunner) {
-    DepanFxWorkspaceResource editRsrc = buildEditResource();
     Dialog<DepanFxCategoryColumnToolDialog> categoryColumnEditor =
           DepanFxCategoryColumnToolDialog.runEditDialog(
-              editRsrc, dialogRunner,
-              DepanFxCategoryColumn.NEW_CATEGORY_COLUMN);
+              columnDataRsrc.getDocument(), buildEditData(),
+              dialogRunner);
 
     categoryColumnEditor.getController().getWorkspaceResource()
         .ifPresent(this::updateColumnDataRsrc);
   }
 
-  private DepanFxWorkspaceResource buildEditResource() {
+  private DepanFxCategoryColumnData buildEditData() {
     DepanFxCategoryColumnData columnData = getColumnData();
     int widthMs = (int) Math.round(
         column.getWidth() / DepanFxSceneControls.layoutWidthMs(1));
-    DepanFxCategoryColumnData editColumn = new DepanFxCategoryColumnData(
+    return new DepanFxCategoryColumnData(
         columnData.getToolName(), columnData.getToolDescription(),
         columnData.getColumnLabel(), widthMs, categories.getCategoryList());
-
-    DepanFxProjectDocument editDoc = columnDataRsrc.getDocument();
-    return new DepanFxWorkspaceResource.Simple(editDoc, editColumn);
   }
 
   private void openColumnFinder() {
@@ -222,10 +216,9 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
     File selectedFile =
         fileChooser.showOpenDialog(getScene().getWindow());
     if (selectedFile != null) {
-       workspace
-          .toProjectDocument(selectedFile.getAbsoluteFile().toURI())
-          .flatMap(p -> DepanFxWorkspaceFactory.loadDocument(
-              workspace, p, DepanFxCategoryColumnData.class))
+       workspace.toProjectDocument(selectedFile.getAbsoluteFile().toURI())
+          .flatMap(p -> workspace.getWorkspaceResource(
+              p, DepanFxCategoryColumnData.class))
           .ifPresent(this::updateColumnDataRsrc);
     }
   }

@@ -30,7 +30,6 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
@@ -352,8 +351,8 @@ public class DepanFxNodeListViewer {
     if (selectedFile != null) {
        workspace
           .toProjectDocument(selectedFile.getAbsoluteFile().toURI())
-          .flatMap(p -> DepanFxWorkspaceFactory.loadDocument(
-              workspace, p, DepanFxBaseColumnData.class))
+          .flatMap(p -> workspace.getWorkspaceResource(
+              p, DepanFxBaseColumnData.class))
           .flatMap(this::toColumn)
           .ifPresent(c -> nodeListTable.getColumns()
               .add(c.prepareColumn()));
@@ -388,11 +387,10 @@ public class DepanFxNodeListViewer {
 
   private void doNewNodeKeyColumnAction() {
     DepanFxNodeKeyColumnData initialData =
-        DepanFxNodeKeyColumn.buildInitialColumnData();
+        DepanFxNodeKeyColumn.buildInitialNodeKeyColumnData();
     Dialog<DepanFxNodeKeyColumnToolDialog> createDlg =
         DepanFxNodeKeyColumnToolDialog.runCreateDialog(
-            initialData, dialogRunner,
-            DepanFxNodeKeyColumn.NEW_NODE_KEY_COLUMN);
+            initialData, dialogRunner);
     createDlg.getController().getWorkspaceResource()
         .map(r -> new DepanFxNodeKeyColumn(this, r))
         .ifPresent(this::addColumn);
@@ -403,7 +401,7 @@ public class DepanFxNodeListViewer {
         DepanFxFocusColumnData.buildInitialFocusColumnData(null);
     Dialog<DepanFxFocusColumnToolDialog> createDlg =
         DepanFxFocusColumnToolDialog.runCreateDialog(
-            initialData, dialogRunner, DepanFxFocusColumn.NEW_FOCUS_COLUMN);
+            initialData, dialogRunner);
     createDlg.getController().getWorkspaceResource()
         .map(r -> new DepanFxFocusColumn(this, r))
         .ifPresent(this::addColumn);
@@ -414,8 +412,7 @@ public class DepanFxNodeListViewer {
         DepanFxCategoryColumnData.buildInitialCategoryColumnData();
     Dialog<DepanFxCategoryColumnToolDialog> createDlg =
         DepanFxCategoryColumnToolDialog.runCreateDialog(
-            initialData, dialogRunner,
-            DepanFxCategoryColumn.NEW_CATEGORY_COLUMN);
+            initialData, dialogRunner);
     createDlg.getController().getWorkspaceResource()
         .map(r -> new DepanFxCategoryColumn(this, r))
         .ifPresent(this::addColumn);

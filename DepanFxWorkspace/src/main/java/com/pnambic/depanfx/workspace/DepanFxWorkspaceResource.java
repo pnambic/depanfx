@@ -6,13 +6,20 @@ public interface DepanFxWorkspaceResource {
 
   Object getResource();
 
-  public static class Simple implements DepanFxWorkspaceResource {
+  /**
+   * This implementation is suitable for resource that reference static content,
+   * such as resource in the built-in project.  This implementation may also
+   * be useful for transitory resource, such as temporary compositions used to
+   * initialize editor dialogs.
+   */
+  public static class StaticWorkspaceResource
+      implements DepanFxWorkspaceResource {
 
     private final DepanFxProjectDocument rsrcDoc;
 
     private final Object rsrcData;
 
-    public Simple(DepanFxProjectDocument rsrcDoc, Object rsrcData) {
+    public StaticWorkspaceResource(DepanFxProjectDocument rsrcDoc, Object rsrcData) {
       this.rsrcDoc = rsrcDoc;
       this.rsrcData = rsrcData;
     }

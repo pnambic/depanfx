@@ -153,9 +153,11 @@ public class DepanFxNodeKeyColumnConfiguration {
         Path docPath) {
       try {
         workspace.toProjectDocument(docPath.toUri())
-            .flatMap(workspace::getWorkspaceResource)
+            .flatMap(r -> workspace.getWorkspaceResource(
+                r, DepanFxNodeKeyColumnData.class))
             .ifPresent(r -> DepanFxNodeKeyColumnToolDialog.runEditDialog(
-                r, dialogRunner, DepanFxNodeKeyColumn.EDIT_NODE_KEY_COLUMN));
+                r.getDocument(), (DepanFxNodeKeyColumnData) r.getResource(),
+                dialogRunner));
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to open node key column data {} for edit",
             docPath, errCaught);

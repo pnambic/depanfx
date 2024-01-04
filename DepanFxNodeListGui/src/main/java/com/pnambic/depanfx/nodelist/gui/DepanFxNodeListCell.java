@@ -8,7 +8,6 @@ import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.io.File;
@@ -154,19 +153,19 @@ public class DepanFxNodeListCell
     File selectedFile =
         fileChooser.showOpenDialog(getScene().getWindow());
     if (selectedFile != null) {
-       workspace
-          .toProjectDocument(selectedFile.getAbsoluteFile().toURI())
-          .flatMap(p -> DepanFxWorkspaceFactory.loadDocument(
-              workspace, p, DepanFxTreeSectionData.class))
+       workspace.toProjectDocument(selectedFile.getAbsoluteFile().toURI())
+          .flatMap(p -> workspace.getWorkspaceResource(
+              p, DepanFxTreeSectionData.class))
           .ifPresent(d -> updateSectionDataRsrc(member, d));
     }
   }
 
   private void openFlatSectionEditor(DepanFxFlatSection member) {
+    DepanFxFlatSectionData sectionData = member.getSectionData();
     Dialog<DepanFxFlatSectionToolDialog> flatSectionEditor =
         DepanFxFlatSectionToolDialog.runEditDialog(
-            member.getSectionDataRsrc(), listViewer.getDialogRunner(),
-            "Update Tree Section");
+            member.getSectionDataRsrc().getDocument(), sectionData,
+            listViewer.getDialogRunner());
 
     flatSectionEditor.getController().getWorkspaceResource()
         .ifPresent(d -> updateSectionDataRsrc(member, d));
@@ -180,8 +179,8 @@ public class DepanFxNodeListCell
     if (selectedFile != null) {
        workspace
           .toProjectDocument(selectedFile.getAbsoluteFile().toURI())
-          .flatMap(p -> DepanFxWorkspaceFactory.loadDocument(
-              workspace, p, DepanFxFlatSectionData.class))
+          .flatMap(p -> workspace.getWorkspaceResource(
+              p, DepanFxFlatSectionData.class))
           .ifPresent(d -> updateSectionDataRsrc(member, d));
     }
   }

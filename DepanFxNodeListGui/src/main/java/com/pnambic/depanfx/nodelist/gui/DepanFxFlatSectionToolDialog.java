@@ -74,22 +74,23 @@ public class DepanFxFlatSectionToolDialog {
   }
 
   public static Dialog<DepanFxFlatSectionToolDialog> runEditDialog(
-      DepanFxWorkspaceResource sectionDataRsrc,
-      DepanFxDialogRunner dialogRunner, String title) {
+      DepanFxProjectDocument projDoc,
+      DepanFxFlatSectionData sectionDataData,
+      DepanFxDialogRunner dialogRunner) {
     Dialog<DepanFxFlatSectionToolDialog> dlg =
         dialogRunner.createDialogAndParent(DepanFxFlatSectionToolDialog.class);
-    dlg.getController().setWorkspaceResource(sectionDataRsrc);
-    dlg.runDialog(title);
+    dlg.getController().setDestination(projDoc);
+    dlg.getController().setTooldata(sectionDataData);
+    dlg.runDialog(DepanFxFlatSection.EDIT_FLAT_SECTION_DATA);
     return dlg;
   }
 
   public static Dialog<DepanFxFlatSectionToolDialog> runCreateDialog(
-      DepanFxFlatSectionData sectionData,
-      DepanFxDialogRunner dialogRunner, String title) {
+      DepanFxFlatSectionData sectionData, DepanFxDialogRunner dialogRunner) {
     Dialog<DepanFxFlatSectionToolDialog> dlg =
         dialogRunner.createDialogAndParent(DepanFxFlatSectionToolDialog.class);
     dlg.getController().setTooldata(sectionData);
-    dlg.runDialog(title);
+    dlg.runDialog(DepanFxFlatSection.NEW_FLAT_SECTION_DATA);
     return dlg;
   }
 
@@ -108,6 +109,10 @@ public class DepanFxFlatSectionToolDialog {
     orderDirectionField.getItems().add(OrderDirection.REVERSE);
   }
 
+  public void setDestination(DepanFxProjectDocument projDoc) {
+    destinationField.setText(projDoc.getMemberPath().toString());
+  }
+
   public void setTooldata(DepanFxFlatSectionData sectionData) {
     toolNameField.setText(sectionData.getToolName());
     toolDescriptionField.setText(sectionData.getToolDescription());
@@ -117,19 +122,6 @@ public class DepanFxFlatSectionToolDialog {
 
     orderByField.setValue(sectionData.getOrderBy());
     orderDirectionField.setValue(sectionData.getOrderDirection());
-  }
-
-  public Optional<DepanFxFlatSectionData> getTooldata() {
-    return optFlatSectionRsrc
-        .map(DepanFxWorkspaceResource::getResource)
-        .map(DepanFxFlatSectionData.class::cast);
-  }
-
-  public void setWorkspaceResource(DepanFxWorkspaceResource flatSectionRsrc) {
-    this.optFlatSectionRsrc = Optional.of(flatSectionRsrc);
-    setTooldata(((DepanFxFlatSectionData) flatSectionRsrc.getResource()));
-    destinationField.setText(
-        flatSectionRsrc.getDocument().getMemberPath().toString());
   }
 
   public Optional<DepanFxWorkspaceResource> getWorkspaceResource() {

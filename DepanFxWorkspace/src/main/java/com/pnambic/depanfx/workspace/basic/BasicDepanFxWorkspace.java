@@ -9,7 +9,6 @@ import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectSpi;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.documents.DocumentRegistry;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
@@ -145,21 +144,27 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
 
     try (Writer saver = openForSave(projDoc)) {
       persist.save(saver, document);
-      return registerDocumentSave(projDoc, document);
+      Optional<DepanFxWorkspaceResource> result =
+          toWorkspaceResource(projDoc, document);
+      result.ifPresent(this::registerProjectDocument);
+      return result;
     }
   }
 
   @Override
-  public Optional<DepanFxWorkspaceResource> importDocument(
-      DepanFxProjectDocument projDoc)
-      throws IOException {
+  public Optional<DepanFxWorkspaceResource> loadDocument(
+      DepanFxProjectDocument projDoc, String expectedLabel) {
     DocumentXmlPersist persist =
         persistRegistry.getDocumentPersist(getMemberUri(projDoc));
     persist.addContextValue(DepanFxWorkspace.class, this);
 
     try (Reader importer = openForLoad(projDoc)) {
       Object document = persist.load(importer);
-      return registerDocumentLoad(projDoc, document);
+      return toWorkspaceResource(projDoc, document);
+    } catch (IOException errIo) {
+      LOG.error("Unable to open {} at {}", expectedLabel, projDoc, errIo);
+      throw new RuntimeException(
+          "Unable to open " + expectedLabel + " at " + projDoc, errIo);
     }
   }
 
@@ -192,39 +197,30 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
       String projectName, String resourcePath) {
 
     return findProjectByName(projectName)
-        .map(t -> buildProjectDocument(t, resourcePath));
+        .map(p -> buildProjectDocument(p, resourcePath));
   }
 
-  @Override
-  public Optional<DepanFxWorkspaceResource> toWorkspaceResource(
-      DepanFxProjectDocument projDoc, Object resource) {
-    return Optional.of(new WorkspaceResource(projDoc, resource));
-  }
 
   @Override
   public Optional<DepanFxWorkspaceResource> getWorkspaceResource(
-      DepanFxProjectDocument resourceDoc) {
-    Optional<Object> optResource =
-        documentRegistry.findResource(getMemberUri(resourceDoc));
-    if (optResource.isPresent()) {
-      return toWorkspaceResource(resourceDoc, optResource.get());
+      DepanFxProjectDocument resourceDoc, String expectedContent) {
+    if (resourceDoc.getProject().equals(getBuiltInProjectTree())) {
+      return ((DepanFxBuiltInProject) getBuiltInProject())
+          .getResource(resourceDoc);
     }
-    return DepanFxWorkspaceFactory.loadDocument(this, resourceDoc, "resource");
+    return findResource(resourceDoc)
+        // No need to re-register if it was found.
+        .map(r -> new WorkspaceResource(resourceDoc))
+        .map(DepanFxWorkspaceResource.class::cast)
+        .map(Optional::of)
+        .orElseGet(() -> loadDocument(resourceDoc, expectedContent));
   }
 
   @Override
   public Optional<DepanFxWorkspaceResource> getWorkspaceResource(
       DepanFxProjectDocument resourceDoc, Class<?> type) {
-    if (resourceDoc.getProject().equals(getBuiltInProjectTree())) {
-      return ((DepanFxBuiltInProject) getBuiltInProject())
-          .getResource(resourceDoc);
-    }
-    Optional<Object> optResource =
-        documentRegistry.findResource(getMemberUri(resourceDoc));
-    if (optResource.isPresent()) {
-      return toWorkspaceResource(resourceDoc, optResource.get());
-    }
-    return DepanFxWorkspaceFactory.loadDocument(this, resourceDoc, type);
+    return getWorkspaceResource(resourceDoc, type.getName())
+        .filter(d -> expectType(type, d));
   }
 
   @Override
@@ -261,30 +257,33 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
     return new BasicDepanFxProjectDocument(projectTree, resource);
   }
 
-  private Optional<DepanFxWorkspaceResource> registerDocumentSave(
-      DepanFxProjectDocument projDoc, Object document) {
-    Optional<DepanFxWorkspaceResource> result =
-        registerDocumentLoad(projDoc, document);
-
-    // Register new documents with their project, so the UI gets a chance
-    // to update.
-    result.ifPresent(r ->
-        r.getDocument().getProject().registerDocument(
-            r.getDocument()));
-    return result;
+  private void registerProjectDocument(DepanFxWorkspaceResource wkspRsrc) {
+    wkspRsrc.getDocument().getProject()
+        .registerDocument(wkspRsrc.getDocument());
   }
 
   /**
    * All loaded/known documents are saved in the cache.
    */
-  private Optional<DepanFxWorkspaceResource> registerDocumentLoad(
-      DepanFxProjectDocument projDoc, Object document) {
-    Optional<DepanFxWorkspaceResource> result =
-        toWorkspaceResource(projDoc, document);
-    result.ifPresent(r ->
-        documentRegistry.registerDocument(r.getResource(),
-            getMemberUri(r.getDocument())));
-    return result;
+  private Optional<DepanFxWorkspaceResource> toWorkspaceResource(
+      DepanFxProjectDocument projDoc, Object resource) {
+    documentRegistry.registerDocument(projDoc, resource);
+    return Optional.of(new WorkspaceResource(projDoc));
+  }
+
+  private Optional<Object> findResource(DepanFxProjectDocument resourceUri) {
+    return documentRegistry.findResource(resourceUri);
+  }
+
+  private static boolean expectType(
+      Class<?> expectedType, DepanFxWorkspaceResource wrkspRsrc) {
+    Class<? extends Object> rsrcType = wrkspRsrc.getResource().getClass();
+    if (expectedType.isAssignableFrom(rsrcType)) {
+      return true;
+    }
+    LOG.warn("Expected type {}, but document is {}",
+        expectedType.getName(), rsrcType.getName());
+    return false;
   }
 
   private FileReader openForLoad(DepanFxProjectDocument projDoc) throws IOException {
@@ -319,11 +318,8 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
 
     private DepanFxProjectDocument document;
 
-    private Object resource;
-
-    public WorkspaceResource(DepanFxProjectDocument document, Object resource) {
+    public WorkspaceResource(DepanFxProjectDocument document) {
       this.document = document;
-      this.resource = resource;
     }
 
     @Override
@@ -331,9 +327,13 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
       return document;
     }
 
+    /**
+     * Any workspace resource should have already been loaded into the
+     * document registry.
+     */
     @Override
     public Object getResource() {
-      return resource;
+      return findResource(document).get();
     }
   }
 }

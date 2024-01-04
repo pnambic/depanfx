@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.workspace.projects;
 
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxProjectSpi;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -76,16 +77,7 @@ public class DepanFxProjects {
     return project.getContributions(type)
         .filter(contribFilter)
         .findFirst()
-        .flatMap(c ->
-            DepanFxProjects.contribToWorkspaceResource(c, workspace, project));
-  }
-
-  public static Optional<DepanFxWorkspaceResource> contribToWorkspaceResource(
-      DepanFxBuiltInContribution contrib,
-      DepanFxWorkspace workspace,
-      DepanFxBuiltInProject project) {
-    return project.getProjectTree().asProjectDocument(contrib.getPath())
-        .flatMap(d -> workspace.toWorkspaceResource(d, contrib.getDocument()));
+        .flatMap(c -> buildContributionRsrc(c, project));
   }
 
   private static void createChildContainer(
@@ -100,5 +92,14 @@ public class DepanFxProjects {
       DepanFxProjectTree projectTree, String dirName) {
     Path dirPath = Paths.get(dirName);
     return projectTree.asProjectContainer(dirPath);
+  }
+
+  private static Optional<DepanFxWorkspaceResource> buildContributionRsrc(
+      DepanFxBuiltInContribution contrib, DepanFxBuiltInProject project) {
+    Optional<DepanFxProjectDocument> optProjDoc =
+        project.getProjectTree().asProjectDocument(contrib.getPath());
+    return optProjDoc
+        .map(p -> new DepanFxWorkspaceResource.StaticWorkspaceResource(
+            p, contrib.getDocument()));
   }
 }

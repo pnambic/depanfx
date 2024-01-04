@@ -30,24 +30,38 @@ public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
 
   void addProject(DepanFxProjectTree project);
 
+  /**
+   * Save the document in the persistent store.  The saved document is added
+   * to the document cache.
+   *
+   */
   Optional<DepanFxWorkspaceResource> saveDocument(
       DepanFxProjectDocument projDoc, Object item)
       throws IOException;
 
-  Optional<DepanFxWorkspaceResource> importDocument(
-      DepanFxProjectDocument projDoc)
-      throws IOException;
-
-  Optional<DepanFxWorkspaceResource> toWorkspaceResource(
-      DepanFxProjectDocument projDoc, Object resource);
+  /**
+   * Load the document without checking the document cache.  The loaded
+   * document is added to the document cache.
+   *
+   * @param expectedLabel - a label describing the expected content if the
+   *    resource cannot be loaded.  Used in error messages.
+   * @throws RuntimeException rethrowing a wrapped {@link IOException} after
+   *    logging the failure.
+   */
+  Optional<DepanFxWorkspaceResource> loadDocument(
+      DepanFxProjectDocument projDoc, String expectedLabel);
 
   /**
    * Provide the resource identified by the project document.
    * The contents may be loaded from storage or provided by the cache.
    */
   Optional<DepanFxWorkspaceResource> getWorkspaceResource(
-      DepanFxProjectDocument resourceDoc);
+      DepanFxProjectDocument resourceDoc, String expectedContent);
 
+  /**
+   * Documents that do not match the supplied {@code docType} are quietly
+   * dropped.
+   */
   Optional<DepanFxWorkspaceResource> getWorkspaceResource(
       DepanFxProjectDocument resourceDoc, Class<?> type);
 

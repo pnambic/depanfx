@@ -14,9 +14,7 @@ import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.io.File;
@@ -174,32 +172,27 @@ public class DepanFxFocusColumn extends DepanFxAbstractColumn {
   private static void openColumnCreate(DepanFxDialogRunner dialogRunner) {
     DepanFxFocusColumnData initialData =
         DepanFxFocusColumnData.buildInitialFocusColumnData(null);
-    DepanFxFocusColumnToolDialog.runCreateDialog(
-        initialData, dialogRunner, DepanFxFocusColumn.NEW_FOCUS_COLUMN);
+    DepanFxFocusColumnToolDialog.runCreateDialog(initialData, dialogRunner);
   }
 
   private void openColumnEditor(DepanFxDialogRunner dialogRunner) {
-    DepanFxWorkspaceResource editRsrc = buildEditResource();
     Dialog<DepanFxFocusColumnToolDialog> focusColumnEditor =
           DepanFxFocusColumnToolDialog.runEditDialog(
-              editRsrc, dialogRunner,
-              DepanFxFocusColumn.NEW_FOCUS_COLUMN);
+              columnDataRsrc.getDocument(), buildEditData(),
+              dialogRunner);
 
     focusColumnEditor.getController().getWorkspaceResource()
         .ifPresent(this::updateColumnDataRsrc);
   }
 
-  private DepanFxWorkspaceResource buildEditResource() {
+  private DepanFxFocusColumnData buildEditData() {
     DepanFxFocusColumnData columnData = getColumnData();
     int widthMs = (int) Math.round(
         column.getWidth() / DepanFxSceneControls.layoutWidthMs(1));
-    DepanFxFocusColumnData editColumn = new DepanFxFocusColumnData(
+    return new DepanFxFocusColumnData(
         columnData.getToolName(), columnData.getToolDescription(),
         columnData.getColumnLabel(), widthMs,
         columnData.getFocusLabel(), nodeListRsrc);
-
-    DepanFxProjectDocument editDoc = columnDataRsrc.getDocument();
-    return new DepanFxWorkspaceResource.Simple(editDoc, editColumn);
   }
 
   private void openColumnFinder() {
@@ -210,8 +203,8 @@ public class DepanFxFocusColumn extends DepanFxAbstractColumn {
     if (selectedFile != null) {
        workspace
           .toProjectDocument(selectedFile.getAbsoluteFile().toURI())
-          .flatMap(p -> DepanFxWorkspaceFactory.loadDocument(
-              workspace, p, DepanFxFocusColumnData.class))
+          .flatMap(p -> workspace.getWorkspaceResource(
+              p, DepanFxFocusColumnData.class))
           .ifPresent(this::updateColumnDataRsrc);
     }
   }

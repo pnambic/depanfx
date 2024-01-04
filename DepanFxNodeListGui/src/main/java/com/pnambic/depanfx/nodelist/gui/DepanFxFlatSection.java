@@ -14,6 +14,12 @@ import javafx.scene.control.TreeItem;
 
 public class DepanFxFlatSection implements DepanFxNodeListSection {
 
+  public static final String EDIT_FLAT_SECTION_DATA =
+      "Edit Flat Section Data...";
+
+  public static final String NEW_FLAT_SECTION_DATA =
+      "New Flat Section Data...";
+
   private DepanFxWorkspaceResource sectionDataRsrc;
 
   // Update this whenever sectionDataRsrc is revised.

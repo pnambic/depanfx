@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui;
 
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
@@ -10,14 +11,13 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData.ContainerOrder;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.plugins.DepanFxAnalysisExtMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
-import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectResource;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -44,18 +44,6 @@ import javafx.scene.control.Tab;
 public class DepanFxNodeListSectionConfiguration {
 
   private static final String OPEN_AS_LIST = "Open as ListView";
-
-  private static final String EDIT_FLAT_SECTION_DATA =
-      "Edit Flat Section Data...";
-
-  private static final String NEW_FLAT_SECTION_DATA =
-      "New Flat Section Data...";
-
-  private static final String EDIT_TREE_SECTION_DATA =
-      "Edit Tree Section Data...";
-
-  private static final String NEW_TREE_SECTION_DATA =
-      "New Tree Section Data...";
 
   private final DepanFxBuiltInContribution memberFinderlinkMatcherContrib =
       buildMemberFinderLinkMatcher();
@@ -176,13 +164,12 @@ public class DepanFxNodeListSectionConfiguration {
         DepanFxWorkspace workspace,
         Path docPath) {
       try {
-        Optional<DepanFxProjectDocument> optProjDoc =
-            workspace.toProjectDocument(docPath.toUri());
         Optional<DepanFxWorkspaceResource> optWkspRsrc =
-            optProjDoc.flatMap(workspace::getWorkspaceResource);
-        Optional<DepanFxNodeList> optNodeList =
-            optWkspRsrc.map(DepanFxNodeLists::buildNodeList);
-        optNodeList.ifPresent(nl -> {
+            workspace.toProjectDocument(docPath.toUri())
+                .flatMap(r -> workspace.getWorkspaceResource(
+                      r, GraphDocument.class));
+        optWkspRsrc.map(DepanFxNodeLists::buildNodeList)
+            .ifPresent(nl -> {
               String title = DepanFxWorkspaceFactory.buildDocTitle(
                   optWkspRsrc.get().getDocument()) + " nodes";
               addNodeListViewToScene(scene, dialogRunner, workspace, nl, title);
@@ -225,13 +212,13 @@ public class DepanFxNodeListSectionConfiguration {
         DepanFxWorkspace workspace,
         Path docPath) {
       try {
-        Optional<DepanFxProjectDocument> optProjDoc =
-            workspace.toProjectDocument(docPath.toUri());
         Optional<DepanFxWorkspaceResource> optWkspRsrc =
-            optProjDoc.flatMap(workspace::getWorkspaceResource);
-        Optional<DepanFxNodeList> optNodeList =
-            optWkspRsrc.map(r -> (DepanFxNodeList) r.getResource());
-        optNodeList.ifPresent(nl -> {
+            workspace.toProjectDocument(docPath.toUri())
+                .flatMap(r -> workspace.getWorkspaceResource(
+                      r, DepanFxNodeList.class));
+        optWkspRsrc.map(r -> r.getResource())
+            .map(DepanFxNodeList.class::cast)
+            .ifPresent(nl -> {
               String title = DepanFxWorkspaceFactory.buildDocTitle(
                   optWkspRsrc.get().getDocument());
               addNodeListViewToScene(scene, dialogRunner, workspace, nl, title);
@@ -280,7 +267,7 @@ public class DepanFxNodeListSectionConfiguration {
       DepanFxResourcePerspectives.installOnOpen(cell, docPath,
           p -> runEditFlatSectionDataAction(dialogRunner, workspace, p));
       builder.appendActionItem(
-          EDIT_FLAT_SECTION_DATA,
+          DepanFxFlatSection.EDIT_FLAT_SECTION_DATA,
           e -> runEditFlatSectionDataAction(dialogRunner, workspace, docPath));
     }
 
@@ -290,9 +277,11 @@ public class DepanFxNodeListSectionConfiguration {
         Path docPath) {
       try {
         workspace.toProjectDocument(docPath.toUri())
-            .flatMap(workspace::getWorkspaceResource)
+            .flatMap(r -> workspace.getWorkspaceResource(
+                r, DepanFxFlatSectionData.class))
             .ifPresent(r -> DepanFxFlatSectionToolDialog.runEditDialog(
-                r, dialogRunner, EDIT_FLAT_SECTION_DATA));
+                r.getDocument(), (DepanFxFlatSectionData) r.getResource(),
+                dialogRunner));
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to open flat section data {} for edit",
             docPath, errCaught);
@@ -321,7 +310,7 @@ public class DepanFxNodeListSectionConfiguration {
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       builder.appendActionItem(
-          NEW_FLAT_SECTION_DATA,
+          DepanFxFlatSection.NEW_FLAT_SECTION_DATA,
           e -> runNewFlatSectionDataAction(dialogRunner));
     }
 
@@ -334,8 +323,7 @@ public class DepanFxNodeListSectionConfiguration {
                 DepanFxFlatSectionData.BASE_SECTION_LABEL, true,
                 OrderBy.NODE_KEY, OrderDirection.FORWARD);
 
-        DepanFxFlatSectionToolDialog.runCreateDialog(
-            sectionData, dialogRunner, NEW_FLAT_SECTION_DATA);
+        DepanFxFlatSectionToolDialog.runCreateDialog(sectionData, dialogRunner);
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to create flat section data", errCaught);
       }
@@ -362,7 +350,7 @@ public class DepanFxNodeListSectionConfiguration {
       DepanFxResourcePerspectives.installOnOpen(cell, docPath,
           p -> runEditTreeSectionDataAction(dialogRunner, workspace, p));
       builder.appendActionItem(
-          EDIT_TREE_SECTION_DATA,
+          DepanFxTreeSection.EDIT_TREE_SECTION_DATA,
           e -> runEditTreeSectionDataAction(dialogRunner, workspace, docPath));
     }
 
@@ -372,9 +360,11 @@ public class DepanFxNodeListSectionConfiguration {
         Path docPath) {
       try {
         workspace.toProjectDocument(docPath.toUri())
-            .flatMap(workspace::getWorkspaceResource)
+            .flatMap(r -> workspace.getWorkspaceResource(
+                r, DepanFxTreeSectionData.class))
             .ifPresent(r -> DepanFxTreeSectionToolDialog.runEditDialog(
-                r, dialogRunner, EDIT_TREE_SECTION_DATA));
+                r.getDocument(), (DepanFxTreeSectionData) r.getResource(),
+                dialogRunner));
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to open tree section data {} for edit",
             docPath, errCaught);
@@ -411,7 +401,7 @@ public class DepanFxNodeListSectionConfiguration {
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       builder.appendActionItem(
-          NEW_TREE_SECTION_DATA,
+          DepanFxTreeSection.NEW_TREE_SECTION_DATA,
           e -> runNewTreeSectionDataAction(dialogRunner));
     }
 
@@ -419,8 +409,7 @@ public class DepanFxNodeListSectionConfiguration {
         DepanFxDialogRunner dialogRunner) {
       try {
         DepanFxTreeSectionData sectionData = buildInitialTreeSection();
-        DepanFxTreeSectionToolDialog.runCreateDialog(
-            sectionData, dialogRunner, NEW_TREE_SECTION_DATA);
+        DepanFxTreeSectionToolDialog.runCreateDialog(sectionData, dialogRunner);
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to create tree section data", errCaught);
       }

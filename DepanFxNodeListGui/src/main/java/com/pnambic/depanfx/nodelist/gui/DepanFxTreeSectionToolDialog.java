@@ -89,22 +89,25 @@ public class DepanFxTreeSectionToolDialog {
     this.workspace = workspace;
   }
 
-  public static void runEditDialog(
-      DepanFxWorkspaceResource wkspRsrc,
-      DepanFxDialogRunner dialogRunner, String title) {
+  public static Dialog<DepanFxTreeSectionToolDialog> runEditDialog(
+      DepanFxProjectDocument projDoc,
+      DepanFxTreeSectionData sectionData,
+      DepanFxDialogRunner dialogRunner) {
     Dialog<DepanFxTreeSectionToolDialog> dlg =
         dialogRunner.createDialogAndParent(DepanFxTreeSectionToolDialog.class);
-    dlg.getController().setWorkspaceResource(wkspRsrc);
-    dlg.runDialog(title);
+    dlg.getController().setDestination(projDoc);
+    dlg.getController().setTooldata(sectionData);
+    dlg.runDialog(DepanFxTreeSection.EDIT_TREE_SECTION_DATA);
+    return dlg;
   }
 
-  public static void runCreateDialog(
-      DepanFxTreeSectionData toolData,
-      DepanFxDialogRunner dialogRunner, String title) {
+  public static Dialog<DepanFxTreeSectionToolDialog> runCreateDialog(
+      DepanFxTreeSectionData toolData, DepanFxDialogRunner dialogRunner) {
     Dialog<DepanFxTreeSectionToolDialog> dlg =
         dialogRunner.createDialogAndParent(DepanFxTreeSectionToolDialog.class);
     dlg.getController().setTooldata(toolData);
-    dlg.runDialog(title);
+    dlg.runDialog(DepanFxTreeSection.NEW_TREE_SECTION_DATA);
+    return dlg;
   }
 
   public static void setTreeSectionTooldataFilters(FileChooser result) {
@@ -126,6 +129,10 @@ public class DepanFxTreeSectionToolDialog {
     orderDirectionField.getItems().add(OrderDirection.REVERSE);
   }
 
+  public void setDestination(DepanFxProjectDocument projDoc) {
+    destinationField.setText(projDoc.getMemberPath().toString());
+  }
+
   public void setTooldata(DepanFxTreeSectionData sectionData) {
     toolNameField.setText(sectionData.getToolName());
     toolDescriptionField.setText(sectionData.getToolDescription());
@@ -144,18 +151,6 @@ public class DepanFxTreeSectionToolDialog {
     this.sectionData = sectionData;
   }
 
-  public Optional<DepanFxTreeSectionData> getTooldata() {
-    return optTreeSectionRsrc.map(DepanFxWorkspaceResource::getResource)
-      .map(DepanFxTreeSectionData.class::cast);
-  }
-
-  public void setWorkspaceResource(DepanFxWorkspaceResource treeSectionRsrc) {
-    this.optTreeSectionRsrc = Optional.of(treeSectionRsrc);
-    setTooldata(((DepanFxTreeSectionData) treeSectionRsrc.getResource()));
-    destinationField.setText(
-        treeSectionRsrc.getDocument().getMemberPath().toString());
-  }
-
   public Optional<DepanFxWorkspaceResource> getWorkspaceResource() {
     return optTreeSectionRsrc;
   }
@@ -170,15 +165,7 @@ public class DepanFxTreeSectionToolDialog {
   private void handleConfirm() {
     closeDialog();
 
-    DepanFxProjectResource linkMatcherRsrc =
-        DepanFxProjectResource.fromWorkspaceResource(
-            sectionData.getLinkMatcherRsrc(workspace));
-    DepanFxTreeSectionData treeSectionData = new DepanFxTreeSectionData(
-        toolNameField.getText(), toolDescriptionField.getText(),
-        sectionLabelField.getText(), displayNodeCountField.isSelected(),
-        linkMatcherRsrc , inferMissingParentsField.isSelected(),
-        orderByField.getValue(), containerOrderField.getValue(),
-        orderDirectionField.getValue());
+    DepanFxTreeSectionData treeSectionData = buildEditData();
 
     File dstDocFile = new File(destinationField.getText());
     optTreeSectionRsrc = workspace.toProjectDocument(dstDocFile.toURI())
@@ -193,6 +180,20 @@ public class DepanFxTreeSectionToolDialog {
     if (selectedFile != null) {
       destinationField.setText(selectedFile.getAbsolutePath());
     }
+  }
+
+  private DepanFxTreeSectionData buildEditData() {
+
+    DepanFxProjectResource linkMatcherRsrc =
+        DepanFxProjectResource.fromWorkspaceResource(
+            sectionData.getLinkMatcherRsrc(workspace));
+    return new DepanFxTreeSectionData(
+        toolNameField.getText(), toolDescriptionField.getText(),
+        sectionLabelField.getText(), displayNodeCountField.isSelected(),
+        linkMatcherRsrc , inferMissingParentsField.isSelected(),
+        orderByField.getValue(), containerOrderField.getValue(),
+        orderDirectionField.getValue());
+
   }
 
   private Optional<DepanFxWorkspaceResource> saveDocument(

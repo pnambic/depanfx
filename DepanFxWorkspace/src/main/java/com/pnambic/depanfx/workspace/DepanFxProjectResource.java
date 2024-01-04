@@ -46,7 +46,7 @@ public interface DepanFxProjectResource {
     @Override
     public Optional<DepanFxWorkspaceResource> getResource(
         DepanFxWorkspace workspace, Class<?> docType) {
-      return DepanFxWorkspaceFactory.loadDocument(workspace, projDoc, docType);
+      return workspace.getWorkspaceResource(projDoc, docType);
     }
   }
 

@@ -94,27 +94,27 @@ public class DepanFxGitRepoToolDialog {
    * Modify an existing git repo tooldata with the git repo tool dialog.
    */
   public static void runEditDialog(
-      DepanFxWorkspaceResource wkspRsrc,
+      DepanFxProjectDocument projDoc,
+      DepanFxGitRepoData repoData,
       DepanFxDialogRunner dialogRunner) {
     Dialog<DepanFxGitRepoToolDialog> repoChooser =
         dialogRunner.createDialogAndParent(DepanFxGitRepoToolDialog.class);
-    repoChooser.getController().setWorkspaceResource(wkspRsrc);
+    repoChooser.getController().setTooldata(repoData);
+    repoChooser.getController().setDestination(projDoc);
     repoChooser.runDialog("Edit git Repository");
   }
 
   /**
    * Create a new git repo tooldata with the git repo tool dialog.
    */
-  public static void runCreateDialog(
-      DepanFxGitRepoToolDialog.Aware srcDlg,
-      DepanFxDialogRunner dialogRunner) {
-    Dialog<DepanFxGitRepoToolDialog> repoChooser =
+  public static Dialog<DepanFxGitRepoToolDialog> runCreateDialog(
+      DepanFxGitRepoData repoData, DepanFxDialogRunner dialogRunner) {
+    Dialog<DepanFxGitRepoToolDialog> result =
         dialogRunner.createDialogAndParent(DepanFxGitRepoToolDialog.class);
 
-    repoChooser.getController().setTooldata(srcDlg.getTooldata());
-    repoChooser.runDialog("Create git Repository");
-    repoChooser.getController().getTooldata()
-        .ifPresent(d -> srcDlg.setTooldata(d));
+    result.getController().setTooldata(repoData);
+    result.runDialog("Create git Repository");
+    return result;
   }
 
   public static void setGitRepoTooldataFilters(FileChooser result) {
@@ -141,16 +141,8 @@ public class DepanFxGitRepoToolDialog {
     gitExeField.setText(repoData.getGitExe());
   }
 
-  public Optional<DepanFxGitRepoData> getTooldata() {
-    return optGitRepoRsrc.map(DepanFxWorkspaceResource::getResource)
-      .map(DepanFxGitRepoData.class::cast);
-  }
-
-  public void setWorkspaceResource(DepanFxWorkspaceResource gitRepoRsrc) {
-    this.optGitRepoRsrc = Optional.of(gitRepoRsrc);
-    setTooldata(((DepanFxGitRepoData) gitRepoRsrc.getResource()));
-    destinationField.setText(
-        gitRepoRsrc.getDocument().getMemberPath().toString());
+  public void setDestination(DepanFxProjectDocument projDoc) {
+    destinationField.setText(projDoc.getMemberPath().toString());
   }
 
   public Optional<DepanFxWorkspaceResource> getWorkspaceResource() {

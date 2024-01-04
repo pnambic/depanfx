@@ -4,7 +4,6 @@ import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
@@ -33,8 +32,8 @@ public class DepanFxNodeListChooser {
     if (selectedFile != null) {
       return workspace
           .toProjectDocument(selectedFile.getAbsoluteFile().toURI())
-          .flatMap(p -> DepanFxWorkspaceFactory.loadDocument(
-              workspace, p, DepanFxNodeList.class));
+          .flatMap(p -> workspace.getWorkspaceResource(
+              p, DepanFxNodeList.class));
     }
     return Optional.empty();
   }

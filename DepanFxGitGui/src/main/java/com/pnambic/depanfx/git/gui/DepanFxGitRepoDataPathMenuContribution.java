@@ -15,11 +15,10 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Path;
 
 import javafx.scene.control.Cell;
-import javafx.stage.Window;
 
 @Component
 public class DepanFxGitRepoDataPathMenuContribution
-implements DepanFxResourcePathMenuContribution {
+    implements DepanFxResourcePathMenuContribution {
 
   private static final String NEW_GIT_REPO = "New git Repo Data...";
 
@@ -37,35 +36,16 @@ implements DepanFxResourcePathMenuContribution {
       Cell<DepanFxWorkspaceMember> cell,
       DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
 
-    DepanFxGitRepoToolDialog.Aware srcDlg =
-        new DepanFxGitRepoToolDialog.Aware() {
-
-      @Override
-      public Window getChooserWindow() {
-        return cell.getScene().getWindow();
-      }
-
-      @Override
-      public DepanFxGitRepoData getTooldata() {
-        return DepanFxGitRepoToolDialogs.buildInitialGitRepoData();
-      }
-
-      @Override
-      public void setTooldata(DepanFxGitRepoData repoData) {
-        // Not used.
-      }
-    };
-
     builder.appendActionItem(
         NEW_GIT_REPO,
-        e -> runNewGitRepoAction(dialogRunner, srcDlg));
+        e -> runNewGitRepoAction(dialogRunner));
   }
 
-  private void runNewGitRepoAction(
-      DepanFxDialogRunner dialogRunner,
-      DepanFxGitRepoToolDialog.Aware srcDlg) {
+  private void runNewGitRepoAction(DepanFxDialogRunner dialogRunner) {
     try {
-      DepanFxGitRepoToolDialog.runCreateDialog(srcDlg , dialogRunner);
+      DepanFxGitRepoData baseData =
+          DepanFxGitRepoToolDialogs.buildInitialGitRepoData();
+      DepanFxGitRepoToolDialog.runCreateDialog(baseData, dialogRunner);
     } catch (RuntimeException errCaught) {
       LOG.error("Unable to create git repo data", errCaught);
     }

@@ -5,8 +5,8 @@ import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 
 import java.io.File;
 
@@ -27,7 +27,7 @@ public class DepanFxGitRepoToolDialogs {
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
     builder.appendActionItem("New git Repo...",
-        e -> DepanFxGitRepoToolDialog.runCreateDialog(srcDlg, dialogRunner));
+        e -> runCreateDialog(srcDlg, dialogRunner));
     builder.appendActionItem("Select git Repo...",
         e -> runGitRepoFinder(srcDlg, workspace));
     return builder.build();
@@ -56,14 +56,24 @@ public class DepanFxGitRepoToolDialogs {
     File selectedFile =
         fileChooser.showOpenDialog(srcDlg.getChooserWindow());
     if (selectedFile != null) {
-       workspace
-          .toProjectDocument(selectedFile.getAbsoluteFile().toURI())
-          .flatMap(p -> DepanFxWorkspaceFactory.loadDocument(
-              workspace, p, DepanFxGitRepoData.class))
+       workspace.toProjectDocument(selectedFile.getAbsoluteFile().toURI())
+          .flatMap(p -> workspace.getWorkspaceResource(
+              p, DepanFxGitRepoData.class))
           .map(d -> d.getResource())
           .map(DepanFxGitRepoData.class::cast)
           .ifPresent(d -> srcDlg.setTooldata(d));
     }
+  }
+
+  private static void runCreateDialog(
+      DepanFxGitRepoToolDialog.Aware srcDlg, DepanFxDialogRunner dialogRunner) {
+    DepanFxGitRepoData repoData = srcDlg.getTooldata();
+    Dialog<DepanFxGitRepoToolDialog> repoDlg =
+        DepanFxGitRepoToolDialog.runCreateDialog(repoData, dialogRunner);
+    repoDlg.getController().getWorkspaceResource()
+        .map(r -> r.getResource())
+        .map(DepanFxGitRepoData.class::cast)
+        .ifPresent(d -> srcDlg.setTooldata(d));
   }
 
   private static FileChooser prepareGitRepoFinder(DepanFxWorkspace workspace) {

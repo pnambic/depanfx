@@ -5,14 +5,14 @@ import com.pnambic.depanfx.graph.context.ContextNodeKindId;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData.KeyChoice;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
+import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.io.File;
@@ -72,7 +72,7 @@ public class DepanFxNodeKeyColumn extends DepanFxAbstractColumn {
     return builder.build();
   }
 
-  public static DepanFxNodeKeyColumnData buildInitialColumnData() {
+  public static DepanFxNodeKeyColumnData buildInitialNodeKeyColumnData() {
     return new DepanFxNodeKeyColumnData(
         NEW_NODE_KEY_COLUMN_NAME, NEW_NODE_KEY_COLUMN_DESCR,
         NEW_NODE_KEY_COLUMN_LABEL, COLUMN_WIDTH_MS, KeyChoice.KIND_KEY);
@@ -85,19 +85,28 @@ public class DepanFxNodeKeyColumn extends DepanFxAbstractColumn {
   }
 
   private static void openColumnCreate(DepanFxDialogRunner dialogRunner) {
-    DepanFxNodeKeyColumnData initialData = buildInitialColumnData();
-    DepanFxNodeKeyColumnToolDialog.runCreateDialog(
-        initialData, dialogRunner, DepanFxNodeKeyColumn.NEW_NODE_KEY_COLUMN);
+    DepanFxNodeKeyColumnData initialData = buildInitialNodeKeyColumnData();
+    DepanFxNodeKeyColumnToolDialog.runCreateDialog(initialData, dialogRunner);
   }
 
   private void openColumnEditor(DepanFxDialogRunner dialogRunner) {
     Dialog<DepanFxNodeKeyColumnToolDialog> nodeKeyColumnEditor =
           DepanFxNodeKeyColumnToolDialog.runEditDialog(
-              columnDataRsrc, dialogRunner,
-              DepanFxNodeKeyColumn.NEW_NODE_KEY_COLUMN);
+              columnDataRsrc.getDocument(), buildEditResource(),
+              dialogRunner);
 
     nodeKeyColumnEditor.getController().getWorkspaceResource()
         .ifPresent(this::updateColumnDataRsrc);
+  }
+
+  private DepanFxNodeKeyColumnData buildEditResource() {
+    DepanFxNodeKeyColumnData columnData = getColumnData();
+
+    int widthMs = (int) Math.round(
+        column.getWidth() / DepanFxSceneControls.layoutWidthMs(1));
+    return new DepanFxNodeKeyColumnData(
+        columnData.getToolName(), columnData.getToolDescription(),
+        columnData.getColumnLabel(), widthMs, columnData.getKeyChoice());
   }
 
   private void openColumnFinder() {
@@ -106,10 +115,9 @@ public class DepanFxNodeKeyColumn extends DepanFxAbstractColumn {
     File selectedFile =
         fileChooser.showOpenDialog(getScene().getWindow());
     if (selectedFile != null) {
-       workspace
-          .toProjectDocument(selectedFile.getAbsoluteFile().toURI())
-          .flatMap(p -> DepanFxWorkspaceFactory.loadDocument(
-              workspace, p, DepanFxNodeKeyColumnData.class))
+       workspace.toProjectDocument(selectedFile.getAbsoluteFile().toURI())
+          .flatMap(p -> workspace.getWorkspaceResource(
+              p, DepanFxNodeKeyColumnData.class))
           .ifPresent(this::updateColumnDataRsrc);
     }
   }

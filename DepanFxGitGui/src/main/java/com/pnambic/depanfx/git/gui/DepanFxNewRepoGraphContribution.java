@@ -2,6 +2,7 @@ package com.pnambic.depanfx.git.gui;
 
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceContribution;
 
 import org.springframework.stereotype.Component;
@@ -25,7 +26,11 @@ public class DepanFxNewRepoGraphContribution
   }
 
   private void runDialog() {
-    dialogRunner.runDialog(
-        DepanFxNewGitRepoDialog.class, "Create new graph from git repository");
+    Dialog<DepanFxNewGitRepoDialog> newRepoDlg =
+        dialogRunner.createDialogAndParent(DepanFxNewGitRepoDialog.class);
+
+    newRepoDlg.getController().setTooldata(
+        DepanFxGitRepoToolDialogs.buildInitialGitRepoData());
+    newRepoDlg.runDialog("Create new graph from git repository");
   }
 }

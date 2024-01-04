@@ -8,16 +8,25 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 
 public class DocumentRegistry {
 
   private final Map<URI, Object> registry = new HashMap<>();
 
-  public void registerDocument(Object document, URI uri) {
+  public void registerDocument(DepanFxProjectDocument projDoc, Object document) {
+    registry.put(getUri(projDoc), document);
+  }
+
+  public Optional<Object> findResource(DepanFxProjectDocument projDoc) {
+    return Optional.ofNullable(registry.get(getUri(projDoc)));
+  }
+
+  private void registerDocument(Object document, URI uri) {
     registry.put(uri, document);
   }
 
-  public Optional<Object> findResource(URI uri) {
+  private Optional<Object> findResource(URI uri) {
     return Optional.ofNullable(registry.get(uri));
   }
 
@@ -26,5 +35,9 @@ public class DocumentRegistry {
         .filter(d -> GraphDocument.class.isAssignableFrom(d.getClass()))
         .map(GraphDocument.class::cast)
         .collect(Collectors.toList());
+  }
+
+  private URI getUri(DepanFxProjectDocument projDoc) {
+    return projDoc.getMemberPath().toAbsolutePath().toUri();
   }
 }

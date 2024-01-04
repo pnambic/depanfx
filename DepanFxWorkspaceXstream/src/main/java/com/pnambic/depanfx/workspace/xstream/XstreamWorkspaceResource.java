@@ -42,6 +42,7 @@ public class XstreamWorkspaceResource {
     Optional<DepanFxProjectDocument> optProjDoc =
         workspace.toProjectDocument(
             xstreamWkspRsrc.projectName, xstreamWkspRsrc.resourcePath);
-    return optProjDoc.flatMap(workspace::getWorkspaceResource);
+    return optProjDoc.flatMap(d ->
+        workspace.getWorkspaceResource(d, "XstreamWorkspaceResource"));
   }
 }

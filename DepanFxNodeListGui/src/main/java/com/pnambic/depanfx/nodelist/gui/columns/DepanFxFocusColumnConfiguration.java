@@ -63,9 +63,11 @@ public class DepanFxFocusColumnConfiguration {
         Path docPath) {
       try {
         workspace.toProjectDocument(docPath.toUri())
-            .flatMap(workspace::getWorkspaceResource)
+            .flatMap(r -> workspace.getWorkspaceResource(
+                r, DepanFxFocusColumnData.class))
             .ifPresent(r -> DepanFxFocusColumnToolDialog.runEditDialog(
-                r, dialogRunner, DepanFxFocusColumn.EDIT_FOCUS_COLUMN));
+                r.getDocument(), (DepanFxFocusColumnData) r.getResource(),
+                dialogRunner));
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to open focus column data {} for edit",
             docPath, errCaught);

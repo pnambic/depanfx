@@ -74,22 +74,23 @@ public class DepanFxFocusColumnToolDialog {
   }
 
   public static Dialog<DepanFxFocusColumnToolDialog> runEditDialog(
-      DepanFxWorkspaceResource focusColumnRsrc,
-      DepanFxDialogRunner dialogRunner, String title) {
+      DepanFxProjectDocument projDoc,
+      DepanFxFocusColumnData focusColumnData,
+      DepanFxDialogRunner dialogRunner) {
     Dialog<DepanFxFocusColumnToolDialog> dlg =
         dialogRunner.createDialogAndParent(DepanFxFocusColumnToolDialog.class);
-    dlg.getController().setFocusColumnResource(focusColumnRsrc);
-    dlg.runDialog(title);
+    dlg.getController().setDestination(projDoc);
+    dlg.getController().setTooldata(focusColumnData);
+    dlg.runDialog(DepanFxFocusColumn.EDIT_FOCUS_COLUMN);
     return dlg;
   }
 
   public static Dialog<DepanFxFocusColumnToolDialog> runCreateDialog(
-      DepanFxFocusColumnData columnData,
-      DepanFxDialogRunner dialogRunner, String title) {
+      DepanFxFocusColumnData columnData, DepanFxDialogRunner dialogRunner) {
     Dialog<DepanFxFocusColumnToolDialog> dlg =
         dialogRunner.createDialogAndParent(DepanFxFocusColumnToolDialog.class);
     dlg.getController().setTooldata(columnData);
-    dlg.runDialog(title);
+    dlg.runDialog(DepanFxFocusColumn.NEW_FOCUS_COLUMN);
     return dlg;
   }
 
@@ -101,6 +102,10 @@ public class DepanFxFocusColumnToolDialog {
   @FXML
   public void initialize() {
     focusNodeListRsrcField.setContextMenu(buildRepoChoiceMenu());
+  }
+
+  public void setDestination(DepanFxProjectDocument projDoc) {
+    destinationField.setText(projDoc.getMemberPath().toString());
   }
 
   public void setTooldata(DepanFxFocusColumnData columnData) {
@@ -121,20 +126,6 @@ public class DepanFxFocusColumnToolDialog {
     }
     // Let the text input field show a prompt text.
     return null;
-  }
-
-  public Optional<DepanFxFocusColumnData> getTooldata() {
-    return optFocusColumnRsrc
-        .map(DepanFxWorkspaceResource::getResource)
-        .map(DepanFxFocusColumnData.class::cast);
-  }
-
-  public void setFocusColumnResource(
-      DepanFxWorkspaceResource focusColumnRsrc) {
-    this.optFocusColumnRsrc = Optional.of(focusColumnRsrc);
-    setTooldata(((DepanFxFocusColumnData) focusColumnRsrc.getResource()));
-    destinationField.setText(
-        focusColumnRsrc.getDocument().getMemberPath().toString());
   }
 
   public Optional<DepanFxWorkspaceResource> getWorkspaceResource() {

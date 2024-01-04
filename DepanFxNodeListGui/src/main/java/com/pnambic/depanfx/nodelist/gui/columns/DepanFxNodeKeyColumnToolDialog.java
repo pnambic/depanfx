@@ -69,22 +69,25 @@ public class DepanFxNodeKeyColumnToolDialog {
   }
 
   public static Dialog<DepanFxNodeKeyColumnToolDialog> runEditDialog(
-      DepanFxWorkspaceResource nodeKeyColumnRsrc,
-      DepanFxDialogRunner dialogRunner, String title) {
+      DepanFxProjectDocument projDoc,
+      DepanFxNodeKeyColumnData columnData,
+      DepanFxDialogRunner dialogRunner) {
     Dialog<DepanFxNodeKeyColumnToolDialog> dlg =
-        dialogRunner.createDialogAndParent(DepanFxNodeKeyColumnToolDialog.class);
-    dlg.getController().setNodeKeyColumnResource(nodeKeyColumnRsrc);
-    dlg.runDialog(title);
+        dialogRunner.createDialogAndParent(
+            DepanFxNodeKeyColumnToolDialog.class);
+    dlg.getController().setDestination(projDoc);
+    dlg.getController().setTooldata(columnData);
+    dlg.runDialog(DepanFxNodeKeyColumn.EDIT_NODE_KEY_COLUMN);
     return dlg;
   }
 
   public static Dialog<DepanFxNodeKeyColumnToolDialog> runCreateDialog(
-      DepanFxNodeKeyColumnData columnData,
-      DepanFxDialogRunner dialogRunner, String title) {
+      DepanFxNodeKeyColumnData columnData, DepanFxDialogRunner dialogRunner) {
     Dialog<DepanFxNodeKeyColumnToolDialog> dlg =
-        dialogRunner.createDialogAndParent(DepanFxNodeKeyColumnToolDialog.class);
+        dialogRunner.createDialogAndParent(
+            DepanFxNodeKeyColumnToolDialog.class);
     dlg.getController().setTooldata(columnData);
-    dlg.runDialog(title);
+    dlg.runDialog(DepanFxNodeKeyColumn.NEW_NODE_KEY_COLUMN);
     return dlg;
   }
 
@@ -100,6 +103,10 @@ public class DepanFxNodeKeyColumnToolDialog {
     keyChoiceField.getItems().add(KeyChoice.NODE_KEY);
   }
 
+  public void setDestination(DepanFxProjectDocument projDoc) {
+    destinationField.setText(projDoc.getMemberPath().toString());
+  }
+
   public void setTooldata(DepanFxNodeKeyColumnData columnData) {
     toolNameField.setText(columnData.getToolName());
     toolDescriptionField.setText(columnData.getToolDescription());
@@ -108,12 +115,6 @@ public class DepanFxNodeKeyColumnToolDialog {
     widthMsField.setText(Integer.toString(columnData.getWidthMs()));
 
     keyChoiceField.setValue(columnData.getKeyChoice());
-  }
-
-  public Optional<DepanFxNodeKeyColumnData> getTooldata() {
-    return optNodeKeyColumnRsrc
-        .map(DepanFxWorkspaceResource::getResource)
-        .map(DepanFxNodeKeyColumnData.class::cast);
   }
 
   public void setNodeKeyColumnResource(

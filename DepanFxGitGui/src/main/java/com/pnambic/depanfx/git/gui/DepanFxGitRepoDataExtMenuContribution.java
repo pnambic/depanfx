@@ -50,9 +50,11 @@ public class DepanFxGitRepoDataExtMenuContribution
       Path gitRepoPath) {
     try {
       workspace.toProjectDocument(gitRepoPath.toUri())
-          .flatMap(workspace::getWorkspaceResource)
+          .flatMap(r -> workspace.getWorkspaceResource(
+              r, DepanFxGitRepoData.class))
           .ifPresent( r -> DepanFxGitRepoToolDialog.runEditDialog(
-              r, dialogRunner));
+              r.getDocument(), (DepanFxGitRepoData) r.getResource(),
+              dialogRunner));
     } catch (RuntimeException errCaught) {
       LOG.error("Unable to open git repository data {} for edit",
           gitRepoPath.toUri(), errCaught);
