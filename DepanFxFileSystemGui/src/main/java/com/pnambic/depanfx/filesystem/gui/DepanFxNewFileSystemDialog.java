@@ -1,12 +1,17 @@
 package com.pnambic.depanfx.filesystem.gui;
 
-import com.pnambic.depanfx.filesystem.builder.FileSystemGraphDocBuilder;
+import com.google.common.base.Strings;
+import com.pnambic.depanfx.filesystem.builder.FileSystemDirectoryLoader;
+import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
+import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import net.rgielen.fxweaver.core.FxmlView;
@@ -18,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
@@ -33,12 +39,9 @@ public class DepanFxNewFileSystemDialog {
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNewFileSystemDialog.class.getName());
 
-  private static final String PREFIX = "tree";
-
-  private static final String EXT = "dgi";
-
   private static final ExtensionFilter EXT_FILTER =
-      new ExtensionFilter("Graph Info (*.dgi)", "*." + EXT);
+      DepanFxSceneControls.buildExtFilter(
+          "Graph Info", GraphDocument.GRAPH_DOC_EXT);
 
   private final DepanFxWorkspace workspace;
 
@@ -51,7 +54,29 @@ public class DepanFxNewFileSystemDialog {
   private TextField sourceField;
 
   @FXML
+  private TextField graphNameField;
+
+  @FXML
+  private TextField graphDescriptionField;
+
+  @FXML
   private TextField destinationField;
+
+  private Optional<DepanFxWorkspaceResource> graphDocRsrc = Optional.empty();
+
+  @FXML
+  public void initialize() {
+    sourceField.textProperty().addListener(
+        (observable, oldValue, newValue) -> updateGraphMetaFromDir(newValue));
+  }
+
+  public void setDestination(DepanFxProjectDocument document) {
+    destinationField.setText(document.getMemberPath().toString());
+  }
+
+  public Optional<DepanFxWorkspaceResource> getSavedResource() {
+    return graphDocRsrc;
+  }
 
   @FXML
   private void openDirectoryChooser() {
@@ -83,56 +108,77 @@ public class DepanFxNewFileSystemDialog {
   private void handleConfirm() {
     closeDialog();
 
-    System.out.println("Source directory: " + sourceField.getText());
-    System.out.println("Destination file: " + destinationField.getText());
-    DepanFxGraphModelBuilder modelBuilder = new SimpleGraphModelBuilder();
-    FileSystemGraphDocBuilder docBuilder =
-        new FileSystemGraphDocBuilder(modelBuilder);
-    analyzeTree(docBuilder, sourceField.getText());
-    GraphDocument graphDoc = docBuilder.getGraphDocument();
     File dstFile = new File(destinationField.getText());
     DepanFxProjectDocument projDoc =
         workspace.toProjectDocument(dstFile.toURI()).get();
 
     try {
-      workspace.saveDocument(projDoc, graphDoc);
+      GraphDocument graphDoc = buildGraphDoc();
+      graphDocRsrc = workspace.saveDocument(projDoc, graphDoc);
     } catch (IOException errIo) {
-      LOG.error("Unable to save " + dstFile, errIo);
+      LOG.error("Unable to save {}", dstFile, errIo);
+    }
+  }
+
+  private void updateGraphMetaFromDir(String newValue) {
+    if (graphNameField.getText().isBlank()) {
+      String graphName = new File(newValue).getName();
+      if (!Strings.isNullOrEmpty(graphName)) {
+        graphNameField.setText(graphName + " tree");
+      }
+    }
+    if (graphDescriptionField.getText().isBlank()) {
+      if (!Strings.isNullOrEmpty(newValue)) {
+        String descr = "Graph of file system tree from " + newValue;
+        graphDescriptionField.setText(descr);
+      }
     }
   }
 
   private FileChooser prepareFileChooser() {
-    FileChooser result = new FileChooser();
+    String baseName = graphNameField.getText();
+
+    FileChooser result =
+        DepanFxSceneControls.prepareFileChooser(
+            destinationField,
+            () -> new File(
+                getWorkspaceDestination(),
+                buildTimestampName(baseName, GraphDocument.GRAPH_DOC_EXT)));
     result.getExtensionFilters().add(EXT_FILTER);
     result.setSelectedExtensionFilter(EXT_FILTER);
 
-    String destFileName = destinationField.getText();
-    if (destFileName.isBlank()) {
-      result.setInitialFileName(buildTimestampName(PREFIX, EXT));
-      result.setInitialDirectory(getWorkspaceDestination());
-      return result;
-    }
-
-    File location = new File(destFileName);
-    result.setInitialFileName(location.getName());
-    result.setInitialDirectory(location.getParentFile());
     return result;
-  }
-
-  /**
-   * Ensure analysis failures don't propogate outside of the analysis request.
-   */
-  private void analyzeTree(
-      FileSystemGraphDocBuilder docBuilder, String treeName) {
-    try {
-      docBuilder.analyzeTree(treeName);
-    } catch (RuntimeException errBuild) {
-      LOG.error("unable to build tree from {}", treeName, errBuild);
-    }
   }
 
   private void closeDialog() {
     ((Stage) sourceField.getScene().getWindow()).close();
+  }
+
+  private GraphDocument buildGraphDoc() {
+    DepanFxGraphModelBuilder modelBuilder = new SimpleGraphModelBuilder();
+    analyzeTree(modelBuilder, sourceField.getText());
+
+    GraphModel graphModel = modelBuilder.createGraphModel();
+    String graphName = graphNameField.getText();
+    String graphDescr = graphDescriptionField.getText();
+
+    return new GraphDocument(graphName, graphDescr,
+        FileSystemContextDefinition.MODEL_ID, graphModel);
+  }
+
+  /**
+   * Ensure analysis failures don't propagate outside of the analysis request.
+   */
+  private void analyzeTree(
+      DepanFxGraphModelBuilder modelBuilder, String treePath) {
+    FileSystemDirectoryLoader loader =
+        new FileSystemDirectoryLoader(modelBuilder, treePath);
+    try {
+      loader.analyzeTree(treePath);
+    } catch (IOException errIo) {
+      throw new RuntimeException(
+          "Unable to analyze directory " + treePath, errIo);
+    }
   }
 
   private File getWorkspaceDestination() {

@@ -12,7 +12,8 @@ import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
 import com.pnambic.depanfx.persistence.plugins.GraphNodePersistencePluginRegistry;
 
 @Component
-public class GraphDocPersistenceContribution implements DocumentPersistenceContribution {
+public class GraphDocPersistenceContribution
+    implements DocumentPersistenceContribution {
 
   /**
    * Standard extension to use when loading or saving {@code ViewDocument}s.
@@ -47,12 +48,11 @@ public class GraphDocPersistenceContribution implements DocumentPersistenceContr
   @Override
   public DocumentXmlPersist getDocumentPersist() {
     DocumentXmlPersistBuilder builder = new DocumentXmlPersistBuilder();
-    ContextModelIdConverter modelIdConverter = new ContextModelIdConverter(modelRegistry);
 
     builder.setXStream();
     builder.setNoReferences();
-    builder.addConverter(modelIdConverter);
-    builder.addConverter(new GraphDocumentConverter(modelIdConverter));
+    builder.addConverter(new ContextModelIdConverter(modelRegistry));
+    builder.addConverter(new GraphDocumentConverter());
     builder.addConverter(new GraphEdgeConverter());
     builder.addConverter(new GraphModelConverter());
     builder.addConverter(new GraphNodeConverter());

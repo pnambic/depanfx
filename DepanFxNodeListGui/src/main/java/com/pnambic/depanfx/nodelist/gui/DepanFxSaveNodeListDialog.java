@@ -86,7 +86,8 @@ public class DepanFxSaveNodeListDialog {
   @FXML
   private void openFileChooser() {
     FileChooser fileChooser = prepareFileChooser();
-    File selectedFile = fileChooser.showSaveDialog(destinationField.getScene().getWindow());
+    File selectedFile =
+        fileChooser.showSaveDialog(destinationField.getScene().getWindow());
     if (selectedFile != null) {
       destinationField.setText(selectedFile.getAbsolutePath());
     }
@@ -120,7 +121,6 @@ public class DepanFxSaveNodeListDialog {
 
     try {
       savedRsrc = workspace.saveDocument(projDoc, saveDoc);
-      setNodeListDoc(saveDoc);
     } catch (Exception errAny) {
       throw new RuntimeException(
           "Unable to save nodelist " + projDoc.getMemberPath(), errAny);

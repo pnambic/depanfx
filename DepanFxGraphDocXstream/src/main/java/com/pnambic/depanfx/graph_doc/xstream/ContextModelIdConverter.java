@@ -43,8 +43,7 @@ public class ContextModelIdConverter
   public void marshal(Object source,
       HierarchicalStreamWriter writer, MarshallingContext context, Mapper mapper) {
 
-    marshalObject(CONTEXT_KEY_TAG, ((ContextModelId) source).getContextModelKey(),
-        writer, context);
+    marshalValue(((ContextModelId) source).getContextModelKey(), context);
   }
 
   @Override

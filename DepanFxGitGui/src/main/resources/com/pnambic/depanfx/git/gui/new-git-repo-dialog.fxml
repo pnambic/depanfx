@@ -25,6 +25,22 @@
                   HBox.hgrow="ALWAYS"/>
          </HBox>
 
+         <Label text="Graph Name"/>
+
+         <HBox spacing="10">
+            <TextField fx:id="graphNameField" editable="true"
+                  promptText="Graph name"
+                  HBox.hgrow="ALWAYS"/>
+         </HBox>
+
+         <Label text="Graph Description"/>
+
+         <HBox spacing="10">
+            <TextField fx:id="graphDescriptionField" editable="true"
+                  promptText="Graph description"
+                  HBox.hgrow="ALWAYS"/>
+         </HBox>
+
          <Label text="Select Destination File"/>
 
          <HBox spacing="10">

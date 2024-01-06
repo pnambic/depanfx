@@ -32,6 +32,13 @@ import com.pnambic.depanfx.graph.model.GraphModel;
  */
 public class GraphDocument {
 
+  /** Common extension for any workspace persisted graph document. */
+  public static final String GRAPH_DOC_EXT = "dgi";
+
+  private final String graphName;
+
+  private final String graphDescription;
+
   /**
    * Collected relation and node type providers.
    */
@@ -42,12 +49,21 @@ public class GraphDocument {
    */
   private final GraphModel graph;
 
-  /**
-   * Create a graph document from a context model and a graph model.
-   */
-  public GraphDocument(ContextModelId contextModelId, GraphModel graph) {
+  public GraphDocument(
+      String graphName, String graphDescription,
+      ContextModelId contextModelId, GraphModel graph) {
+    this.graphName = graphName;
+    this.graphDescription = graphDescription;
     this.contextModelId = contextModelId;
     this.graph = graph;
+  }
+
+  public String getGraphName() {
+    return graphName;
+  }
+
+  public String getGraphDescription() {
+    return graphDescription;
   }
 
   /**

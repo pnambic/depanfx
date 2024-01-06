@@ -36,7 +36,8 @@ public class FileSystemTest {
   public void test2LayerSerialization() throws IOException {
 
     GraphModel graph = buildTestGraph();
-    GraphDocument document = new GraphDocument(FileSystemContextDefinition.MODEL_ID, graph);
+    GraphDocument document = new GraphDocument(
+        "Test", "Testing", FileSystemContextDefinition.MODEL_ID, graph);
 
     DocumentXmlPersist persist = buildFileSystemPersist().getDocumentPersist();
 

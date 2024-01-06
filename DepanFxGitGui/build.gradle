@@ -16,6 +16,7 @@ dependencies {
 
   implementation project(':DepanFxFileSystem')
   implementation project(':DepanFxGit')
+  implementation project(':DepanFxGraph')
   implementation project(':DepanFxGraphDoc')
   implementation project(':DepanFxPerspective')
   implementation project(':DepanFxScene')

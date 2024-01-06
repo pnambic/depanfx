@@ -14,6 +14,8 @@ module depanfx.git.gui {
     requires depanfx.perspective;
     requires depanfx.workspace;
     requires javafx.graphics;
+    requires depanfx.graph;
+    requires com.google.common;
 
     opens com.pnambic.depanfx.git.gui to javafx.fxml, net.rgielen.fxweaver.core, spring.beans;
 

@@ -7,10 +7,12 @@ module depanfx.filesystem.gui {
     requires spring.beans;
     requires net.rgielen.fxweaver.core;
 
-    requires depanfx.scene;
     requires depanfx.filesystem;
+    requires depanfx.graph;
     requires depanfx.graph_doc;
     requires depanfx.workspace;
+    requires depanfx.scene;
+    requires com.google.common;
 
     opens com.pnambic.depanfx.filesystem.gui to javafx.fxml, net.rgielen.fxweaver.core, spring.beans;
 

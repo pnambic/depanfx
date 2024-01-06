@@ -15,6 +15,7 @@ dependencies {
   implementation "net.rgielen:javafx-weaver-core:${javafxWeaverVersion}"
 
   implementation project(':DepanFxScene')
+  implementation project(':DepanFxGraph')
   implementation project(':DepanFxGraphDoc')
   implementation project(':DepanFxFileSystem')
   implementation project(':DepanFxPersistence')
