@@ -31,7 +31,8 @@ import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
 
 public class FileSystemDirectoryLoader {
 
-  private static final Logger LOG = LoggerFactory.getLogger(FileSystemDirectoryLoader.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(FileSystemDirectoryLoader.class);
 
   private static final File[] EMPTY_FILES = new File[0];
 
@@ -144,13 +145,15 @@ public class FileSystemDirectoryLoader {
     try {
       if (child.isFile()) {
         GraphNode file = visitFile(child);
-        GraphEdge edge = new GraphEdge(rootNode, file, FileSystemRelation.CONTAINS_FILE);
+        GraphEdge edge = new GraphEdge(
+            rootNode, file, FileSystemRelation.CONTAINS_FILE);
         getBuilder().addEdge(edge);
         return;
       }
       if (child.isDirectory()) {
         GraphNode dir = visitDirectory(child);
-        GraphEdge edge = new GraphEdge(rootNode, dir, FileSystemRelation.CONTAINS_DIR);
+        GraphEdge edge = new GraphEdge(
+            rootNode, dir, FileSystemRelation.CONTAINS_DIR);
         getBuilder().addEdge(edge);
         traverseTree(dir, child);
         return;

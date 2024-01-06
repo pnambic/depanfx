@@ -4,6 +4,9 @@ import com.pnambic.depanfx.persistence.DocumentXmlPersist;
 import com.pnambic.depanfx.persistence.ObjectXmlConverter;
 import com.thoughtworks.xstream.XStream;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 public class DocumentXmlPersistBuilder {
 
   private XStream xstream;
@@ -41,6 +44,15 @@ public class DocumentXmlPersistBuilder {
     addAllowedType(contrib.getAllowTypes());
     xstream.registerConverter(
         new DelegateObjectXmlConverter(contrib, xstream.getMapper()));
+  }
+
+  public void addImplicitCollection(Class<?> type, String fieldName) {
+    xstream.addImplicitCollection(type, fieldName);
+    xstream.addDefaultImplementation(ArrayList.class, Collection.class);
+  }
+
+  public void processAnnotations(Class<?> type) {
+    xstream.processAnnotations(type);
   }
 
   public DocumentXmlPersist buildDocumentXmlPersist() {

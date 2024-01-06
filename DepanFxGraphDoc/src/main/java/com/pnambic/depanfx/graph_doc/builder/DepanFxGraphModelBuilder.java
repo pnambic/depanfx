@@ -17,6 +17,9 @@
 package com.pnambic.depanfx.graph_doc.builder;
 
 import com.pnambic.depanfx.graph.context.ContextNodeId;
+import com.pnambic.depanfx.graph.info.GraphEdgeInfo;
+import com.pnambic.depanfx.graph.info.GraphModelInfo;
+import com.pnambic.depanfx.graph.info.GraphNodeInfo;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
@@ -71,4 +74,35 @@ public interface DepanFxGraphModelBuilder {
    * to be used once, and return an immutable graph.
    */
   public GraphModel createGraphModel();
+
+  /**
+   * Add supplemental information for an edge.
+   *
+   * @param edge primary key for data.
+   * @param infoType
+   *    Explicit type, since {@code edgeInfo} might be derived from type key.
+   * @param edgeInfo typed data to associate with this edge.
+   */
+  public void addEdgeInfo(
+      GraphEdge edge, Class<?> infoType, GraphEdgeInfo edgeInfo);
+
+  /**
+   * Add supplemental information for an node.
+   *
+   * @param node primary key for data.
+   * @param infoType
+   *    Explicit type, since {@code nodeInfo} might be derived from type key.
+   * @param nodeInfo typed data to associate with this node.
+   */
+  public void addNodeInfo(
+      GraphNode node, Class<?> infoType, GraphNodeInfo nodeInfo);
+
+  /**
+   * Add supplemental information for the model.
+   *
+   * @param infoType
+   *    Explicit type, since {@code modelInfo} might be derived from type key.
+   * @param nodeInfo typed data to associate with this model.
+*/
+  public void addModelInfo(Class<?> infoType, GraphModelInfo modelInfo);
 }

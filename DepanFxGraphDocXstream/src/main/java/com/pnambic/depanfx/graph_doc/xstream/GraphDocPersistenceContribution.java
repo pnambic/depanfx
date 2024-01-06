@@ -22,6 +22,10 @@ public class GraphDocPersistenceContribution
 
   public static final String GRAPH_DOC_TAG = "graph-doc";
 
+  private static final Class<?>[] ALLOWED_INFO_BLOCKS = new Class[] {
+    EdgeInfoBlock.class, NodeInfoBlock.class
+  };
+
   private final GraphNodePersistencePluginRegistry graphNodeRegistry;
 
   @Autowired
@@ -51,7 +55,18 @@ public class GraphDocPersistenceContribution
     builder.addConverter(new GraphEdgeConverter());
     builder.addConverter(new GraphModelConverter());
     builder.addConverter(new GraphNodeConverter());
-    builder.addConverter(new GraphRelationConverter());
+
+    // XStream handled conversions
+    builder.addAlias("edge-info", EdgeInfoBlock.class);
+    builder.addImplicitCollection(EdgeInfoBlock.class, "infos");
+    builder.addAlias("node-info", NodeInfoBlock.class);
+    builder.addImplicitCollection(NodeInfoBlock.class, "infos");
+    builder.addAllowedType(ALLOWED_INFO_BLOCKS);
+
+    GraphRelationConverter relationConverter = new GraphRelationConverter();
+    builder.addAliasType(
+        relationConverter.getTag(), relationConverter.forType());
+    builder.addConverter(relationConverter);
 
     // Apply plugins for graph nodes.
     graphNodeRegistry.applyExtensions(builder, GraphNode.class);

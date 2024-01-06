@@ -13,7 +13,7 @@ javafx {
 dependencies {
   implementation 'org.springframework.boot:spring-boot-autoconfigure'
   implementation "net.rgielen:javafx-weaver-core:${javafxWeaverVersion}"
-  implementation 'org.apache.commons:commons-csv:1.10.0'
+  implementation "org.apache.commons:commons-csv:${apacheCsv}"
 
   implementation project(':DepanFxGraph')
   implementation project(':DepanFxGraphDoc')

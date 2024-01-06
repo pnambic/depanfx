@@ -19,6 +19,9 @@ module depanfx.app {
     requires depanfx.git.gui;
     requires depanfx.graph_doc;
     requires depanfx.graph_doc.xstream;
+    requires depanfx.java;
+    requires depanfx.java.gui;
+    requires depanfx.java.xstream;
     requires depanfx.nodelist.gui;
     requires depanfx.nodelist.xstream;
     requires depanfx.perspective;

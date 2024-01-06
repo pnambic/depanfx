@@ -24,6 +24,9 @@ import com.pnambic.depanfx.graph.api.Edge;
 import com.pnambic.depanfx.graph.api.Node;
 import com.pnambic.depanfx.graph.context.ContextNodeId;
 import com.pnambic.depanfx.graph.context.ContextRelationId;
+import com.pnambic.depanfx.graph.info.GraphEdgeInfo;
+import com.pnambic.depanfx.graph.info.GraphModelInfo;
+import com.pnambic.depanfx.graph.info.GraphNodeInfo;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
@@ -38,11 +41,20 @@ import com.pnambic.depanfx.graph.model.GraphNode;
  */
 public class SimpleGraphModelBuilder implements DepanFxGraphModelBuilder {
 
-  private final Map<ContextNodeId, Node<? extends ContextNodeId>> nodes
-      = new HashMap<>();
+  private final Map<ContextNodeId, Node<? extends ContextNodeId>> nodes =
+      new HashMap<>();
 
-  private final Set<Edge<? extends ContextNodeId, ? extends ContextRelationId>>
-      edges = new HashSet<>();
+  private final Set<Edge<? extends ContextNodeId, ? extends ContextRelationId>> edges =
+      new HashSet<>();
+
+  private final Map<GraphEdge, Map<Class<?>, GraphEdgeInfo>> edgeInfoMap =
+      new HashMap<>();
+
+  private final Map<GraphNode, Map<Class<?>, GraphNodeInfo>> nodeInfoMap =
+      new HashMap<>();
+
+  private final Map<Class<?>, GraphModelInfo> modelInfoMap =
+      new HashMap<>();
 
   @SuppressWarnings("serial")
   public static class DuplicateNodeException
@@ -92,6 +104,28 @@ public class SimpleGraphModelBuilder implements DepanFxGraphModelBuilder {
 
   @Override
   public GraphModel createGraphModel() {
-    return new GraphModel(nodes, edges);
+    return new GraphModel(
+        nodes, edges, edgeInfoMap, nodeInfoMap, modelInfoMap);
+  }
+
+  @Override
+  public void addEdgeInfo(
+      GraphEdge edge, Class<?> infoType, GraphEdgeInfo edgeInfo) {
+    Map<Class<?>, GraphEdgeInfo> edgeMap =
+        edgeInfoMap.computeIfAbsent(edge, e -> new HashMap<>());
+    edgeMap.put(infoType, edgeInfo);
+  }
+
+  @Override
+  public void addNodeInfo(
+      GraphNode node, Class<?> infoType, GraphNodeInfo nodeInfo) {
+    Map<Class<?>, GraphNodeInfo> nodeMap =
+        nodeInfoMap.computeIfAbsent(node, e -> new HashMap<>());
+    nodeMap.put(infoType, nodeInfo);
+  }
+
+  @Override
+  public void addModelInfo(Class<?> infoType, GraphModelInfo modelInfo) {
+    modelInfoMap.put(infoType, modelInfo);
   }
 }

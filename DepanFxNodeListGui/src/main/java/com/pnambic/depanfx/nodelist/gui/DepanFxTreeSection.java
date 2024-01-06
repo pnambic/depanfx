@@ -108,9 +108,14 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
     // Node registry may need to parse node to deliver best display name.
     // For example, Java method name would be better than full signature.
     // This works for current simple paths from FileSystem objects.
-    Path nodePath = Path.of(node.getId().getNodeKey());
-    String result = nodePath.getFileName().toString();
-    return result;
+    String nodeKey = node.getId().getNodeKey();
+    try {
+      Path nodePath = Path.of(nodeKey);
+      String result = nodePath.getFileName().toString();
+      return result;
+    } catch (Exception any) {
+    }
+    return nodeKey;
   }
 
   @Override

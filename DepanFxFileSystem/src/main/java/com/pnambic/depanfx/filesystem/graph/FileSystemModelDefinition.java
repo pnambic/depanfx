@@ -1,43 +1,29 @@
 package com.pnambic.depanfx.filesystem.graph;
 
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collections;
+import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
+import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
+import com.pnambic.depanfx.graph.model.BasicGraphContextModel;
+import com.pnambic.depanfx.graph_doc.model.GraphContextDocument;
+import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
-import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
-import com.pnambic.depanfx.filesystem.context.FileSystemNodeKindId;
-import com.pnambic.depanfx.graph.model.BasicGraphContextModel;
-import com.pnambic.depanfx.graph.model.GraphRelation;
-import com.pnambic.depanfx.graph_doc.model.GraphContextDocument;
-import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 public class FileSystemModelDefinition {
 
   public static final String FILE_SYSTEM_LABEL = "File System";
 
-  public static final FileSystemNodeKindId[] NODE_KIND_IDS ={
-    FileSystemContextDefinition.DIRECTORY_NKID,
-    FileSystemContextDefinition.DOCUMENT_NKID
-  };
-
-  /* Relations */
-  public static final GraphRelation[] RELATIONS = {
-    FileSystemRelation.CONTAINS_DIR,
-    FileSystemRelation.CONTAINS_FILE,
-    FileSystemRelation.SYMBOLIC_LINK
-  };
-
   public static final BasicGraphContextModel MODEL =
       new BasicGraphContextModel(
           FileSystemContextDefinition.MODEL_ID,
           Collections.emptyList(),
-          Arrays.asList(NODE_KIND_IDS),
-          Arrays.asList(RELATIONS));
+          Arrays.asList(FileSystemContextDefinition.NODE_KIND_IDS),
+          Arrays.asList(FileSystemRelation.RELATIONS));
 
   public static final GraphContextDocument DOCUMENT =
       new GraphContextDocument(

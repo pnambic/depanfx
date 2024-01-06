@@ -3,6 +3,9 @@ package com.pnambic.depanfx.nodelist.tree;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.link.DepanFxLink;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,6 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DepanFxSimpleAdjacencyModel implements DepanFxAdjacencyModel {
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxSimpleAdjacencyModel.class);
 
   private final Map<GraphNode, Collection<GraphNode>> adjacencyData;
 
@@ -38,6 +44,9 @@ public class DepanFxSimpleAdjacencyModel implements DepanFxAdjacencyModel {
   }
 
   public void addAdjacency(DepanFxLink link) {
+    LOG.info("Add adjacency {} to {}",
+        link.getSource().getId().getNodeKey(),
+        link.getTarget().getId().getNodeKey());
     addAdjacency(link.getSource(), link.getTarget());
   }
 }

@@ -24,7 +24,7 @@ public class FileSystemLinkMatcherBuiltIns {
   private static final String FILE_NAME = "File";
 
   @Bean
-  public DepanFxBuiltInContribution memberMatcher() {
+  public DepanFxBuiltInContribution memberMatcherFileSystem() {
     return createBuiltIn(MEMBER_NAME, FileSystemLinkMatchers.MEMBER_DOC);
   }
 
