@@ -103,8 +103,7 @@ public class DepanFxNodeKeyColumnConfiguration {
   private static Optional<DepanFxWorkspaceResource> getBuiltinNodeKeyColumnResource(
       DepanFxWorkspace workspace, Path toolPath) {
     return DepanFxProjects.getBuiltIn(
-        workspace, DepanFxNodeKeyColumnData.class,
-        c -> c.getPath().equals(toolPath));
+        workspace, DepanFxNodeKeyColumnData.class, toolPath);
   }
 
   private DepanFxNodeKeyColumnData buildNodeKeyColumnData(

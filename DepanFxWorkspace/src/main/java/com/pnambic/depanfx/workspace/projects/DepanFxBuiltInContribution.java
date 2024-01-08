@@ -25,7 +25,7 @@ public interface DepanFxBuiltInContribution {
 
     @Override
     public boolean matches(DepanFxProjectDocument projDoc) {
-      return projDoc.equals(projDoc.getMemberPath());
+      return getPath().equals(projDoc.getMemberPath());
     }
 
     @Override

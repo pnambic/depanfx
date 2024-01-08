@@ -20,8 +20,8 @@ public class FileSystemContextModelId implements ContextModelId {
    */
   @Override
   public boolean equals(Object obj) {
-    // Explicitly use the inherited equals() method, versus confusing
-    // future reviewer with its apparent absence.
+    // Explicitly use the inherited equals() method, versus confusing any
+    // future reviewers with its apparent absence.
     return super.equals(obj);
   }
 

@@ -1,16 +1,22 @@
 package com.pnambic.depanfx.workspace.documents;
 
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.pnambic.depanfx.graph_doc.model.GraphDocument;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
-
 public class DocumentRegistry {
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DocumentRegistry.class);
 
   private final Map<URI, Object> registry = new HashMap<>();
 
@@ -22,14 +28,18 @@ public class DocumentRegistry {
     return Optional.ofNullable(registry.get(getUri(projDoc)));
   }
 
-  public List<GraphDocument> getGraphDocuments() {
+  public <T> List<T> findByType(Class<T> type) {
     return registry.values().stream()
-        .filter(d -> GraphDocument.class.isAssignableFrom(d.getClass()))
-        .map(GraphDocument.class::cast)
+        .filter(d -> type.isAssignableFrom(d.getClass()))
+        .map(type::cast)
         .collect(Collectors.toList());
   }
 
   private URI getUri(DepanFxProjectDocument projDoc) {
-    return projDoc.getMemberPath().toAbsolutePath().toUri();
+    Path memberPath = projDoc.getMemberPath();
+    if (!memberPath.isAbsolute()) {
+      LOG.warn("Unexpected relative document path {}", memberPath);
+    }
+    return memberPath.toAbsolutePath().toUri();
   }
 }

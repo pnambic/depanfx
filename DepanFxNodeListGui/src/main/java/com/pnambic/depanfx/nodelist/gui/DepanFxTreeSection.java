@@ -54,11 +54,9 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
 
   private DepanFxNodeList sectionNodes;
 
-  static final String NEW_TREE_SECTION_DATA =
-  "New Tree Section Data...";
+  static final String NEW_TREE_SECTION_DATA = "New Tree Section Data...";
 
-  static final String EDIT_TREE_SECTION_DATA =
-  "Edit Tree Section Data...";
+  static final String EDIT_TREE_SECTION_DATA = "Edit Tree Section Data...";
 
   public DepanFxTreeSection(
       DepanFxNodeListViewer listViewer,

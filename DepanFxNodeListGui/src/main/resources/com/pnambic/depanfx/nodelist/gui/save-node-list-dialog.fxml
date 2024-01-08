@@ -21,6 +21,8 @@
 
          <Label fx:id="nodeListDetailsLabel"/>
 
+         <Label text="Node List Name"/>
+
          <HBox spacing="10">
             <TextField fx:id="nodeListNameField" editable="true"
                   promptText="Node list name"

@@ -34,8 +34,7 @@ public class DepanFxSimpleColumnConfiguration {
   public static Optional<DepanFxWorkspaceResource> getBuiltinSimpleColumnResource(
       DepanFxWorkspace workspace) {
     return DepanFxProjects.getBuiltIn(
-        workspace, DepanFxSimpleColumnData.class,
-        c -> c.getPath().equals(SIMPLE_COLUMN_TOOL_PATH));
+        workspace, DepanFxSimpleColumnData.class, SIMPLE_COLUMN_TOOL_PATH);
   }
 
   @Bean

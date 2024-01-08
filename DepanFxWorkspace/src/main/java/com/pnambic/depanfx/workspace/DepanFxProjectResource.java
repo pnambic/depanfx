@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.workspace;
 
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -24,10 +25,7 @@ public interface DepanFxProjectResource {
     public Optional<DepanFxWorkspaceResource> getResource(
         DepanFxWorkspace workspace, Class<?> docType) {
       return
-          workspace.getBuiltInProjectTree().asProjectDocument(builtInPath)
-          .flatMap(d ->
-              ((DepanFxBuiltInProject) workspace.getBuiltInProject())
-                  .getResource(d));
+          DepanFxProjects.getBuiltIn(workspace, docType, builtInPath);
     }
 
     public Path getBuiltInPath() {

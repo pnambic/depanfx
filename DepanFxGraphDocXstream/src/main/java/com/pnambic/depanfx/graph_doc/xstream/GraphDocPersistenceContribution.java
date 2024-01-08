@@ -3,7 +3,6 @@ package com.pnambic.depanfx.graph_doc.xstream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.pnambic.depanfx.graph.context.plugins.ContextModelRegistry;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.persistence.DocumentXmlPersist;
@@ -23,15 +22,11 @@ public class GraphDocPersistenceContribution
 
   public static final String GRAPH_DOC_TAG = "graph-doc";
 
-  private final ContextModelRegistry modelRegistry;
-
   private final GraphNodePersistencePluginRegistry graphNodeRegistry;
 
   @Autowired
   public GraphDocPersistenceContribution(
-      ContextModelRegistry modelRegistry,
       GraphNodePersistencePluginRegistry graphNodeRegistry) {
-    this.modelRegistry = modelRegistry;
     this.graphNodeRegistry = graphNodeRegistry;
   }
 
@@ -51,12 +46,12 @@ public class GraphDocPersistenceContribution
 
     builder.setXStream();
     builder.setNoReferences();
-    builder.addConverter(new ContextModelIdConverter(modelRegistry));
+    builder.addConverter(new ContextModelIdConverter());
     builder.addConverter(new GraphDocumentConverter());
     builder.addConverter(new GraphEdgeConverter());
     builder.addConverter(new GraphModelConverter());
     builder.addConverter(new GraphNodeConverter());
-    builder.addConverter(new GraphRelationConverter(modelRegistry));
+    builder.addConverter(new GraphRelationConverter());
 
     // Apply plugins for graph nodes.
     graphNodeRegistry.applyExtensions(builder, GraphNode.class);

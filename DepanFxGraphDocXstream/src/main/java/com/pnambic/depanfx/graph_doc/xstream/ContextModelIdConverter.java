@@ -1,13 +1,18 @@
 package com.pnambic.depanfx.graph_doc.xstream;
 
 import com.pnambic.depanfx.graph.context.ContextModelId;
-import com.pnambic.depanfx.graph.context.plugins.ContextModelRegistry;
+import com.pnambic.depanfx.graph_doc.model.GraphContextDocument;
 import com.pnambic.depanfx.persistence.AbstractObjectXmlConverter;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
+
+import java.nio.file.Path;
 
 public class ContextModelIdConverter
     extends AbstractObjectXmlConverter<ContextModelId> {
@@ -18,10 +23,7 @@ public class ContextModelIdConverter
 
   public static final String CONTEXT_KEY_TAG = "context-key";
 
-  private final ContextModelRegistry modelRegistry;
-
-  public ContextModelIdConverter(ContextModelRegistry modelRegistry) {
-    this.modelRegistry = modelRegistry;
+  public ContextModelIdConverter() {
   }
 
   @Override
@@ -51,6 +53,17 @@ public class ContextModelIdConverter
       UnmarshallingContext context, Mapper mapper) {
 
     String modelKey = reader.getValue();
-    return modelRegistry.getContextModel(modelKey).getId();
+
+    DepanFxWorkspace workspace =
+        (DepanFxWorkspace) context.get(DepanFxWorkspace.class);
+    Path modelPath = GraphContextDocument.CONTEXT_MODEL_PATH
+        .resolve(modelKey);
+
+     return DepanFxProjects.getBuiltIn(
+        workspace, GraphContextDocument.class, modelPath)
+        .map(DepanFxWorkspaceResource::getResource)
+        .map(GraphContextDocument.class::cast)
+        .map(d -> d.getGraphContext().getId())
+        .get();
   }
 }

@@ -47,7 +47,6 @@ public class DepanFxNodeListSectionData {
   public static Optional<DepanFxWorkspaceResource> getBuiltinSimpleSectionResource(
       DepanFxWorkspace workspace) {
     return DepanFxProjects.getBuiltIn(
-        workspace, DepanFxFlatSectionData.class,
-        c -> c.getPath().equals(SIMPLE_SECTION_TOOL_PATH));
+        workspace, DepanFxFlatSectionData.class, SIMPLE_SECTION_TOOL_PATH);
   }
 }

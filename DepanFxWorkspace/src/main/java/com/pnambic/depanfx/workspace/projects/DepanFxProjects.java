@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public class DepanFxProjects {
 
@@ -70,13 +71,29 @@ public class DepanFxProjects {
         .orElse(null);
   }
 
+  public static Stream<DepanFxBuiltInContribution> streamBuiltIns(
+      DepanFxWorkspace workspace, Class<?> type) {
+    DepanFxBuiltInProject project =
+        (DepanFxBuiltInProject) workspace.getBuiltInProject();
+    return project.getContributions(type);
+  }
+
+  public static Optional<DepanFxWorkspaceResource> getBuiltIn(
+      DepanFxWorkspace workspace, Class<?> type, Path builtInPath) {
+    return
+        workspace.getBuiltInProjectTree().asProjectDocument(builtInPath)
+        .flatMap(d ->
+            ((DepanFxBuiltInProject) workspace.getBuiltInProject())
+                .getResource(d));
+  }
+
   public static Optional<DepanFxWorkspaceResource> getBuiltIn(
       DepanFxWorkspace workspace, Class<?> type,
       Predicate<DepanFxBuiltInContribution> contribFilter) {
 
     DepanFxBuiltInProject project =
         (DepanFxBuiltInProject) workspace.getBuiltInProject();
-    return project.getContributions(type)
+    return streamBuiltIns(workspace, type)
         .filter(contribFilter)
         .findFirst()
         .flatMap(c -> buildContributionRsrc(c, project));

@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 /**
  * The project tree provides an abstraction for the storage of project
  * resources.  The project's storage is partitioned into a hierarchy of
- * containers.  Container members may be other containers or docu ments.
+ * containers.  Container members may be other containers or documents.
  */
 public interface DepanFxProjectTree extends DepanFxProjectContainer {
 

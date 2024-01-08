@@ -1,6 +1,5 @@
 package com.pnambic.depanfx.workspace.basic;
 
-import com.pnambic.depanfx.graph.context.plugins.ContextModelRegistry;
 import com.pnambic.depanfx.persistence.DocumentXmlPersist;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceRegistry;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
@@ -45,8 +44,6 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
 
   private final String workspaceName;
 
-  private final ContextModelRegistry modelRegistry;
-
   private final DocumentPersistenceRegistry persistRegistry;
 
   private final DepanFxProjectSpi builtInProj;
@@ -61,19 +58,17 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
 
   @Autowired
   public BasicDepanFxWorkspace(
-      ContextModelRegistry modelRegistry,
       DocumentPersistenceRegistry persistRegistry,
       @Qualifier("BuiltIn Workspace")
       DepanFxProjectSpi builtInProj) {
-    this(WORKSPACE_NAME, modelRegistry, persistRegistry, builtInProj);
+    this(WORKSPACE_NAME, persistRegistry, builtInProj);
   }
 
-  public BasicDepanFxWorkspace(String workspaceName,
-      ContextModelRegistry modelRegistry,
+  public BasicDepanFxWorkspace(
+      String workspaceName,
       DocumentPersistenceRegistry persistRegistry,
       DepanFxProjectSpi builtInProj) {
     this.workspaceName = workspaceName;
-    this.modelRegistry = modelRegistry;
     this.persistRegistry = persistRegistry;
     this.builtInProj = builtInProj;
   }
