@@ -52,7 +52,7 @@ public class GraphDocumentConverter
       new TagDataLoader(TAG_DATA_DESCR, TAGS_ALIAS);
 
   private static final String[] META_TAGS = new String[] {
-      GRAPH_NAME_TAG, GRAPH_DESCR_TAG, CONTEXT_KEY_TAG
+      GRAPH_NAME_TAG, GRAPH_DESCR_TAG, CONTEXT_KEY_TAG, GRAPH_MODEL_TAG
   };
 
   @Override

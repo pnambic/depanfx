@@ -29,7 +29,6 @@ dependencies {
   implementation project(':DepanFxNodeListXstream')
   implementation project(':DepanFxPersistence')
   implementation project(':DepanFxPerspective')
-  implementation project(':DepanFxPlatform')
   implementation project(':DepanFxScene')
   implementation project(':DepanFxWorkspace')
   implementation project(':DepanFxWorkspaceGui')
