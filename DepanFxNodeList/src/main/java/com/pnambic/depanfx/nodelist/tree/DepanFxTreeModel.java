@@ -13,7 +13,10 @@ public interface DepanFxTreeModel {
     LEAF
   }
 
-  DepanFxWorkspaceResource getWorkspaceResource();
+  /**
+   * Provide the graph document used to build the tree model.
+   */
+  DepanFxWorkspaceResource getGraphDocResource();
 
   /**
    * Provide the {@link TreeMode} for the supplied graph node.
@@ -33,7 +36,7 @@ public interface DepanFxTreeModel {
   Collection<GraphNode> getMembers(GraphNode node);
 
   /**
-   * Transitively reachable nodes from a start group.  The start nodes are
+   * Transitively reachable nodes from a start group.  If The start nodes are
    * the roots of disjoint trees, none of them will be included in the result.
    *
    * The collection of filter nodes should include the set of start nodes.

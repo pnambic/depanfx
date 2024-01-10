@@ -8,23 +8,23 @@ import java.util.Collection;
 
 public class DepanFxSimpleTreeModel implements DepanFxTreeModel, DepanFxAdjacencyModel {
 
-  private final DepanFxWorkspaceResource workspaceResource;
+  private final DepanFxWorkspaceResource graphDocResource;
 
   private final DepanFxAdjacencyModel nodeMembers;
 
   private final Collection<GraphNode> roots;
 
   public DepanFxSimpleTreeModel(
-      DepanFxWorkspaceResource workspaceResource,
+      DepanFxWorkspaceResource graphDocResource,
       DepanFxAdjacencyModel nodeMembers,
       Collection<GraphNode> roots) {
-    this.workspaceResource = workspaceResource;
+    this.graphDocResource = graphDocResource;
     this.nodeMembers = nodeMembers;
     this.roots = roots;
   }
 
-  public DepanFxWorkspaceResource getWorkspaceResource() {
-    return workspaceResource;
+  public DepanFxWorkspaceResource getGraphDocResource() {
+    return graphDocResource;
   }
 
   @Override
@@ -53,7 +53,7 @@ public class DepanFxSimpleTreeModel implements DepanFxTreeModel, DepanFxAdjacenc
     treeDft.buildFromNodes(startNodes);
     return new DepanFxNodeList(
         "Reachable nodes", "Reachable nodes",
-        workspaceResource, treeDft.getTreeMembers());
+        graphDocResource, treeDft.getTreeMembers());
   }
 
   @Override // DepanFxAdjacencyModel

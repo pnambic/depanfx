@@ -38,7 +38,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,6 +97,8 @@ public class DepanFxNodeListViewer {
 
   private List<DepanFxNodeListSection> sections;
 
+  private List<DepanFxNodeListColumn> columns;
+
   private TreeTableView<DepanFxNodeListMember> nodeListTable;
 
   private Map<DepanFxNodeListSection, BooleanProperty>
@@ -106,14 +110,26 @@ public class DepanFxNodeListViewer {
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxNodeList nodeList,
-      List<DepanFxNodeListSection> sections) {
+      List<DepanFxNodeListSection> sections,
+      List<DepanFxNodeListColumn> columns) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
     this.nodeList = nodeList;
-    this.sections = sections;
+
+    // Make defensive copies
+    this.sections = new ArrayList<>(sections);
+    this.columns = new ArrayList<>(columns);
 
     nodesCheckBoxStates = buildNodesCheckBoxStates(nodeList.getNodes());
     nodeListTable = createTable();
+  }
+
+  public DepanFxNodeListViewer(
+      DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner,
+      DepanFxNodeList nodeList,
+      List<DepanFxNodeListSection> sections) {
+    this(workspace, dialogRunner, nodeList, sections, Collections.emptyList());
   }
 
   public Tab createWorkspaceTab(String tabName) {
@@ -224,6 +240,11 @@ public class DepanFxNodeListViewer {
         DepanFxTreeSection insert = new DepanFxTreeSection(this, m);
         insertSection(before, insert);
     });
+  }
+
+  public List<DepanFxNodeListColumn> getColumns() {
+    // Make a defensive copy.
+    return new ArrayList<>(columns);
   }
 
   /////////////////////////////////////
@@ -354,8 +375,7 @@ public class DepanFxNodeListViewer {
           .flatMap(p -> workspace.getWorkspaceResource(
               p, DepanFxBaseColumnData.class))
           .flatMap(this::toColumn)
-          .ifPresent(c -> nodeListTable.getColumns()
-              .add(c.prepareColumn()));
+          .ifPresent(this::addColumn);
     }
   }
 
@@ -381,8 +401,7 @@ public class DepanFxNodeListViewer {
   private void doAddSimpleColumnAction() {
     DepanFxSimpleColumnConfiguration.getBuiltinSimpleColumnResource(workspace)
         .map(r -> new DepanFxSimpleColumn(this, r))
-        .ifPresent(c -> nodeListTable.getColumns()
-            .add(c.prepareColumn()));
+        .ifPresent(this::addColumn);
   }
 
   private void doNewNodeKeyColumnAction() {
@@ -419,6 +438,7 @@ public class DepanFxNodeListViewer {
   }
 
   private void addColumn(DepanFxNodeListColumn column) {
+    columns.add(column);
     nodeListTable.getColumns().add(column.prepareColumn());
   }
 

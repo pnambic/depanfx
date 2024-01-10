@@ -29,6 +29,13 @@ public class GraphContextKeys {
         nodeId.getNodeKey());
   }
 
+  public static String toNodeKindNodeKey(ContextNodeId nodeId) {
+    ContextNodeKindId kindId = nodeId.getContextNodeKindId();
+    return NODE_KEY_JOINER.join(
+        kindId.getNodeKindKey(),
+        nodeId.getNodeKey());
+  }
+
   public static String toRelationKey(GraphRelation relation) {
     return toRelationKey(relation.getId());
   }

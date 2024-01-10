@@ -19,10 +19,10 @@ public class DepanFxGitRepoDataExtMenuContribution
   }
 
   @Override
-  protected void runDialog(DepanFxWorkspaceResource wkspRsrce,
+  protected void runDialog(DepanFxWorkspaceResource wkspRsrc,
       DepanFxDialogRunner dialogRunner) {
     DepanFxGitRepoToolDialog.runEditDialog(
-        wkspRsrce.getDocument(), (DepanFxGitRepoData) wkspRsrce.getResource(),
+        wkspRsrc.getDocument(), (DepanFxGitRepoData) wkspRsrc.getResource(),
         dialogRunner);
   }
 }

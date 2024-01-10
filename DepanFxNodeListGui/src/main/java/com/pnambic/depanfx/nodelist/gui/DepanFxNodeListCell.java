@@ -31,13 +31,17 @@ public class DepanFxNodeListCell
 
   private static final String EDIT_FLAT_SECTION = "Edit Flat Section...";
 
+  // Tree section actions
   private static final String SELECT_TREE_SECTION = "Select Tree Section...";
 
   private static final String EDIT_TREE_SECTION = "Edit Tree Section...";
 
+  private static final String EXPORT_TO_CSV = "Export to CSV...";
+
   private static final String INSERT_ABOVE_MEMBER_TREE_SECTION =
       "Insert Member Tree Section";
 
+  // Fork/Directory actions
   private static final String SELECT_RECURSIVE = "Select Recursive";
 
   private static final String CLEAR_RECURSIVE = "Clear Recursive";
@@ -99,6 +103,12 @@ public class DepanFxNodeListCell
     builder.appendActionItem(SELECT_FLAT_SECTION,
         e -> openFlatSectionFinder(member));
 
+    builder.appendSeparator();
+    builder.appendActionItem(
+        EXPORT_TO_CSV,
+        e -> runExportToCsvAction(member));
+
+    builder.appendSeparator();
     builder.appendActionItem(
         INSERT_ABOVE_MEMBER_TREE_SECTION,
         e -> runInsertMemberTreeSectionAction(member));
@@ -111,6 +121,11 @@ public class DepanFxNodeListCell
         e -> openTreeSectionEditor(member));
     builder.appendActionItem(SELECT_TREE_SECTION,
         e -> openTreeSectionFinder(member));
+
+    builder.appendSeparator();
+    builder.appendActionItem(
+        EXPORT_TO_CSV,
+        e -> runExportToCsvAction(member));
     return builder.build();
   }
 
@@ -130,19 +145,27 @@ public class DepanFxNodeListCell
   }
 
   private void runExpandChildrenAction() {
-    TreeItem<DepanFxNodeListMember> tree = this.getTableRow().getTreeItem();
+    TreeItem<DepanFxNodeListMember> tree = getTableRow().getTreeItem();
     BreadthExpander expander = new BreadthExpander(100);
     expander.addBreadthItems(tree.getChildren());
     expander.expandChildren();
     tree.setExpanded(true);
   }
 
+  private void runExportToCsvAction(DepanFxFlatSection flatSection) {
+    DepanFxExportFlatSectionDialog.runExportDialog(flatSection, listViewer);
+  }
+
+  private void runExportToCsvAction(DepanFxTreeSection treeSection) {
+    DepanFxExportTreeSectionDialog.runExportDialog(
+        treeSection, listViewer.getDialogRunner());
+  }
+
   private void openTreeSectionEditor(DepanFxTreeSection member) {
     Dialog<DepanFxTreeSectionToolDialog> treeSectionEditor =
-        listViewer.buildDialog(DepanFxTreeSectionToolDialog.class);
-
-    treeSectionEditor.getController().setTooldata(member.getSectionData());
-    treeSectionEditor.runDialog("Update Tree Section");
+        DepanFxTreeSectionToolDialog.runEditDialog(
+            member.getProjDoc(), member.getSectionData(),
+            listViewer.getDialogRunner());
     treeSectionEditor.getController().getWorkspaceResource()
         .ifPresent(d -> updateSectionDataRsrc(member, d));
   }

@@ -4,6 +4,7 @@ import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.link.DepanFxLink;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
@@ -15,6 +16,7 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData.ContainerOrder;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModelBuilder;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
@@ -76,8 +78,16 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
     return (DepanFxTreeSectionData) sectionDataRsrc.getResource();
   }
 
+  public DepanFxProjectDocument getProjDoc() {
+    return sectionDataRsrc.getDocument();
+  }
+
   public DepanFxTreeModel getTreeModel() {
     return treeModel;
+  }
+
+  public List<DepanFxNodeListColumn> getColumns() {
+    return listViewer.getColumns();
   }
 
   @Override

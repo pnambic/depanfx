@@ -2,6 +2,7 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.graph.context.ContextNodeId;
 import com.pnambic.depanfx.graph.context.ContextNodeKindId;
+import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData;
@@ -72,6 +73,24 @@ public class DepanFxNodeKeyColumn extends DepanFxAbstractColumn {
     return builder.build();
   }
 
+  @Override
+  public String toString(DepanFxNodeListGraphNode member) {
+    return toString(member.getGraphNode().getId());
+  }
+
+  public String toString(ContextNodeId nodeId) {
+    ContextNodeKindId kindId = nodeId.getContextNodeKindId();
+    switch (getColumnData().getKeyChoice()) {
+    case MODEL_KEY:
+      return kindId.getContextModelId().getContextModelKey();
+    case KIND_KEY:
+      return kindId.getNodeKindKey();
+    case NODE_KEY:
+      return nodeId.getNodeKey();
+    }
+    return "<unknown key>";
+  }
+
   public static DepanFxNodeKeyColumnData buildInitialNodeKeyColumnData() {
     return new DepanFxNodeKeyColumnData(
         NEW_NODE_KEY_COLUMN_NAME, NEW_NODE_KEY_COLUMN_DESCR,
@@ -120,21 +139,6 @@ public class DepanFxNodeKeyColumn extends DepanFxAbstractColumn {
               p, DepanFxNodeKeyColumnData.class))
           .ifPresent(this::updateColumnDataRsrc);
     }
-  }
-
-  @Override
-  public String toString(DepanFxNodeListGraphNode member) {
-    ContextNodeId nodeId = member.getGraphNode().getId();
-    ContextNodeKindId kindId = nodeId.getContextNodeKindId();
-    switch (getColumnData().getKeyChoice()) {
-    case MODEL_KEY:
-      return kindId.getContextModelId().getContextModelKey();
-    case KIND_KEY:
-      return kindId.getNodeKindKey();
-    case NODE_KEY:
-      return nodeId.getNodeKey();
-    }
-    return "<unknown key>";
   }
 
   private void updateColumnDataRsrc(DepanFxWorkspaceResource columnDataRsrc) {

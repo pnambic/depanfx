@@ -6,8 +6,8 @@ module depanfx.filesystem {
   requires spring.beans;
 
   requires depanfx.graph;
-  requires depanfx.nodelist;
   requires depanfx.graph_doc;
+  requires depanfx.nodelist;
   requires depanfx.workspace;
 
   opens com.pnambic.depanfx.filesystem.graph to spring.core;
