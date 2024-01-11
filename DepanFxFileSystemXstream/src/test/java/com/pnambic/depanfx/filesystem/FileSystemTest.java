@@ -15,7 +15,6 @@ import com.pnambic.depanfx.filesystem.graph.DirectoryNode;
 import com.pnambic.depanfx.filesystem.graph.DocumentNode;
 import com.pnambic.depanfx.filesystem.graph.FileSystemRelation;
 import com.pnambic.depanfx.filesystem.xstream.FileSystemXstreamPlugin;
-import com.pnambic.depanfx.graph.context.plugins.ContextModelRegistry;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
@@ -49,13 +48,11 @@ public class FileSystemTest {
   }
 
   public GraphDocPersistenceContribution buildFileSystemPersist() {
-    ContextModelRegistry modelRegistry = null;
-
     FileSystemXstreamPlugin plugin = new FileSystemXstreamPlugin();
     List<GraphNodePersistencePluginContribution> extensions = Collections.singletonList(plugin);
 
     GraphNodePersistencePluginRegistry pluginRegistry = new GraphNodePersistencePluginRegistry(extensions);
-    return new GraphDocPersistenceContribution(modelRegistry, pluginRegistry);
+    return new GraphDocPersistenceContribution(pluginRegistry);
   }
 
   public GraphModel buildTestGraph() {

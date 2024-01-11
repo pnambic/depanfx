@@ -22,7 +22,8 @@ import java.util.stream.Stream;
 
 @Component
 @FxmlView("export-tree-section-csv-dialog.fxml")
-public class DepanFxExportTreeSectionDialog extends DepanFxBaseExportSectionDialog {
+public class DepanFxExportTreeSectionDialog
+    extends DepanFxBaseExportSectionDialog {
 
   @Autowired
   public DepanFxExportTreeSectionDialog(DepanFxWorkspace workspace) {

@@ -5,6 +5,7 @@ module depanfx.nodelist.gui {
   requires net.rgielen.fxweaver.core;
 
   requires com.google.common;
+  requires org.apache.commons.csv;
   requires org.slf4j;
   requires org.apache.commons.csv;
   requires spring.context;

@@ -92,6 +92,9 @@ public class DepanFxCategoryColumnCell extends DepanFxSimpleColumnCell {
           "Set recursive", e -> setRecursiveAction()));
       multiItems.add(DepanFxContextMenuBuilder.createActionItem(
           "Add recursive", e -> addRecursiveAction()));
+      multiItems.add(new SeparatorMenuItem());
+      multiItems.add(DepanFxContextMenuBuilder.createActionItem(
+          "Hoist", e -> hoistSelectsAction()));
     }
   }
 
@@ -121,31 +124,46 @@ public class DepanFxCategoryColumnCell extends DepanFxSimpleColumnCell {
         entry.getCategoryLabel(), e -> setCategoryAction(entry));
   }
 
+  /////////////////////////////////////
+  // Individual nodes
+
   private void setCategoryAction(CategoryEntry entry) {
-    DepanFxNodeListGraphNode nodeItem = (DepanFxNodeListGraphNode) getItem();
-    getCategoryColumn()
-        .setListMembership(nodeItem.getGraphNode(), entry);
+    DepanFxNodeListGraphNode nodeItem = getNodeItem();
+    getCategoryColumn() .setListMembership(nodeItem.getGraphNode(), entry);
     stylizeCell(nodeItem);
-  }
-
-  private void setRecursiveAction() {
-    DepanFxNodeListGraphNode nodeItem = (DepanFxNodeListGraphNode) getItem();
-    List<CategoryEntry> updateCategories = getUpdateCategories();
-    getCategoryColumn().setDecendantsCategories(nodeItem, updateCategories);
-  }
-
-  private void addRecursiveAction() {
-    DepanFxNodeListGraphNode nodeItem = (DepanFxNodeListGraphNode) getItem();
-    List<CategoryEntry> updateCategories = getUpdateCategories();
-    getCategoryColumn().addDecendantsCategories(nodeItem, updateCategories);
   }
 
   private void setCategoriesAction() {
-    DepanFxNodeListGraphNode nodeItem = (DepanFxNodeListGraphNode) getItem();
-    List<CategoryEntry> updateCategories = getUpdateCategories();
-    getCategoryColumn()
-        .setListMembership(nodeItem.getGraphNode(), updateCategories);
+    DepanFxNodeListGraphNode nodeItem = getNodeItem();
+    getCategoryColumn().setListMembership(
+        nodeItem.getGraphNode(), getUpdateCategories());
     stylizeCell(nodeItem);
+  }
+
+  private DepanFxNodeListGraphNode getNodeItem() {
+    return (DepanFxNodeListGraphNode) getItem();
+  }
+
+  /////////////////////////////////////
+  // Fork nodes
+
+  private void setRecursiveAction() {
+    getCategoryColumn().setDecendantsCategories(
+        getForkItem(), getUpdateCategories());
+  }
+
+  private void addRecursiveAction() {
+    getCategoryColumn().addDecendantsCategories(
+        getForkItem(), getUpdateCategories());
+  }
+
+  private void hoistSelectsAction() {
+    getCategoryColumn().hoistMemberships(
+        getForkItem(), categoryChoices.keySet());
+  }
+
+  private DepanFxTreeFork getForkItem() {
+    return (DepanFxTreeFork) getItem();
   }
 
   private List<CategoryEntry> getUpdateCategories() {

@@ -1,8 +1,8 @@
 module depanfx.nodelist {
+  requires com.google.common;
   requires org.slf4j;
   requires spring.context;
   requires spring.beans;
-  requires com.google.common;
 
   requires depanfx.graph;
   requires depanfx.graph_doc;

@@ -6,5 +6,8 @@ import java.util.Collection;
 
 public interface DepanFxAdjacencyModel {
 
+  /**
+   * Do not mutate these results.
+   */
   Collection<GraphNode> getAdjacentNodes(GraphNode node);
 }

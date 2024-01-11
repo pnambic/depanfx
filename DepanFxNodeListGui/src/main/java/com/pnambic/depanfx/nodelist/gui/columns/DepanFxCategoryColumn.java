@@ -10,6 +10,7 @@ import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxCategoryColumnData.CategoryEntry;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
+import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -147,23 +148,28 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
   }
 
   public void setDecendantsCategories(
-      DepanFxNodeListGraphNode nodeItem,
-      List<CategoryEntry> updateCategories) {
-    if (nodeItem instanceof DepanFxTreeFork) {
-      ((DepanFxTreeFork) nodeItem).getDecendants().stream()
-          .forEach(n -> categories.setListMembership(n, updateCategories));
-      listViewer.refreshView();
-    }
+      DepanFxTreeFork forkItem, Collection<CategoryEntry> updateCategories) {
+    forkItem.getDecendants()
+        .forEach(n -> categories.setListMembership(n, updateCategories));
+    listViewer.refreshView();
   }
 
   public void addDecendantsCategories(
-      DepanFxNodeListGraphNode nodeItem,
-      List<CategoryEntry> updateCategories) {
-    if (nodeItem instanceof DepanFxTreeFork) {
-      ((DepanFxTreeFork) nodeItem).getDecendants().stream()
+      DepanFxTreeFork forkItem, Collection<CategoryEntry> updateCategories) {
+    forkItem.getDecendants().stream()
           .forEach(n -> categories.adddListMembership(n, updateCategories));
       listViewer.refreshView();
-    }
+  }
+
+  public void hoistMemberships(
+      DepanFxTreeFork forkItem, Collection<CategoryEntry> updateCategories) {
+    Collection<GraphNode> sourceNodes = forkItem.getDecendants();
+    DepanFxTreeModel treeModel = forkItem.getTreeModel();
+
+    CategoryWinch winch = new CategoryWinch(
+        sourceNodes, categories.getCategoryList(), categories, treeModel);
+    winch.hoistCategories();
+    listViewer.refreshView();
   }
 
   private void onColumnMenuShowing() {
