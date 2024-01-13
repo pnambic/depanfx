@@ -5,10 +5,13 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
+import com.pnambic.depanfx.nodelist.gui.DepanFxTreeFork;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxCategoryColumnData.CategoryEntry;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
+import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -19,8 +22,8 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collections;
+import java.util.List;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -48,9 +51,10 @@ public class DepanFxFocusColumn extends DepanFxAbstractColumn {
 
   private DepanFxWorkspaceResource nodeListRsrc;
 
-  private Collection<GraphNode> saveNodes;
+  private CategoryEditor categories;
 
-  private Set<GraphNode> editNodes;
+  // Synthetic Category entry for this column
+  private CategoryEntry focusEntry;
 
   private SeparatorMenuItem saveSeparator;
 
@@ -103,10 +107,11 @@ public class DepanFxFocusColumn extends DepanFxAbstractColumn {
   }
 
   public void toggleNode(GraphNode graphNode) {
-    if (editNodes.contains(graphNode)) {
-      editNodes.remove(graphNode);
+    List<CategoryEntry> nodeCats = categories.getCurrentCategories(graphNode);
+    if (nodeCats.isEmpty()) {
+      categories.setListMembership(graphNode, categories.getCategoryList());
     } else {
-      editNodes.add(graphNode);
+      categories.setListMembership(graphNode, Collections.emptyList());
     }
     updateActions();
   }
@@ -114,14 +119,20 @@ public class DepanFxFocusColumn extends DepanFxAbstractColumn {
   @Override
   public String toString(DepanFxNodeListGraphNode member) {
     GraphNode graphNode = member.getGraphNode();
-    if (editNodes.contains(graphNode)) {
-      if (saveNodes.contains(graphNode)) {
-        return getColumnData().getFocusLabel();
+    int currentSize = categories.getCurrentCategories(graphNode).size();
+    int sourceSize = categories.getSourceCategories(graphNode).size();
+
+    if (currentSize == 1) {
+      String focusLabel = getColumnData().getFocusLabel();
+      // Added
+      if (sourceSize == 0) {
+        return focusLabel + "+";
       }
-      return getColumnData().getFocusLabel() + "+";
+      return focusLabel;
     }
+
     // Not now, but previously
-    if (saveNodes.contains(graphNode)) {
+    if (currentSize == 0 && sourceSize == 1) {
       return "-";
     }
     // Not in either collection.
@@ -135,6 +146,30 @@ public class DepanFxFocusColumn extends DepanFxAbstractColumn {
     return new FocusCellFactory();
   }
 
+  public void setDecendantsCategories(DepanFxTreeFork forkItem) {
+    forkItem.getDecendants()
+        .forEach(n -> categories.setListMembership(
+            n, categories.getCategoryList()));
+    listViewer.refreshView();
+  }
+
+  public void clearDecendantsCategories(DepanFxTreeFork forkItem) {
+    forkItem.getDecendants()
+        .forEach(n -> categories.setListMembership(
+              n, Collections.emptyList()));
+    listViewer.refreshView();
+  }
+
+  public void hoistMemberships(DepanFxTreeFork forkItem) {
+    Collection<GraphNode> sourceNodes = forkItem.getDecendants();
+    DepanFxTreeModel treeModel = forkItem.getTreeModel();
+
+    CategoryWinch winch = new CategoryWinch(
+        sourceNodes, categories.getCategoryList(), categories, treeModel);
+    winch.hoistCategories();
+    listViewer.refreshView();
+  }
+
   private void updateActions() {
     boolean hasEdits = hasNodeListEdits();
     saveSeparator.setVisible(hasEdits);
@@ -142,18 +177,12 @@ public class DepanFxFocusColumn extends DepanFxAbstractColumn {
   }
 
   private boolean hasNodeListEdits() {
-    // not the same size, must be edits
-    if (editNodes.size() != saveNodes.size()) {
-      return true;
-    }
-    if (!editNodes.containsAll(saveNodes)) {
-      return true;
-    }
-    return !saveNodes.containsAll(editNodes);
+    return categories.hasEdits();
   }
 
   private void runSaveNodeList() {
     DepanFxNodeList nodeList = (DepanFxNodeList) nodeListRsrc.getResource();
+    Collection<GraphNode> editNodes = categories.getCurrentNodes(focusEntry);
     DepanFxNodeList saveList =
         DepanFxNodeLists.buildRelatedNodeList(nodeList, editNodes);
 
@@ -217,9 +246,14 @@ public class DepanFxFocusColumn extends DepanFxAbstractColumn {
 
   private void updateNodeListRsrc(DepanFxWorkspaceResource nodeListRsrc) {
     this.nodeListRsrc = nodeListRsrc;
-    DepanFxNodeList nodeList = (DepanFxNodeList) nodeListRsrc.getResource();
-    saveNodes = nodeList.getNodes();
-    editNodes = new HashSet<>(saveNodes);
+    updateCategories();
+  }
+
+  private void updateCategories() {
+    this.focusEntry = new CategoryEntry(
+        getColumnData().getFocusLabel(), nodeListRsrc);
+    this.categories = new CategoryEditor(
+        Collections.singletonList(focusEntry));
   }
 
   private FileChooser prepareFocusColumnFinder(DepanFxWorkspace workspace) {

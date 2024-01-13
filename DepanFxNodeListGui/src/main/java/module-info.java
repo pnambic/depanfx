@@ -7,7 +7,6 @@ module depanfx.nodelist.gui {
   requires com.google.common;
   requires org.apache.commons.csv;
   requires org.slf4j;
-  requires org.apache.commons.csv;
   requires spring.context;
   requires spring.beans;
 

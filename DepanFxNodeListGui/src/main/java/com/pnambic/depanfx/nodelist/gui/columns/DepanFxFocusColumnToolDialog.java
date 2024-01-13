@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
+import com.google.common.base.Strings;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFocusColumnData;
@@ -101,7 +102,7 @@ public class DepanFxFocusColumnToolDialog {
 
   @FXML
   public void initialize() {
-    focusNodeListRsrcField.setContextMenu(buildRepoChoiceMenu());
+    focusNodeListRsrcField.setContextMenu(buildNodeListChoiceMenu());
   }
 
   public void setDestination(DepanFxProjectDocument projDoc) {
@@ -166,7 +167,7 @@ public class DepanFxFocusColumnToolDialog {
     }
   }
 
-  public ContextMenu buildRepoChoiceMenu() {
+  private ContextMenu buildNodeListChoiceMenu() {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
     builder.appendActionItem("Select Node List...",
         e -> runNodeListFinder());
@@ -176,8 +177,17 @@ public class DepanFxFocusColumnToolDialog {
   private void runNodeListFinder() {
     DepanFxNodeListChooser.runNodeListFinder(
         workspace, focusNodeListRsrcField.getScene().getWindow())
-        .ifPresent(r -> focusNodeListRsrcField.setText(
-            r.getDocument().getMemberPath().toString()));
+        .ifPresent(this::updateNodeListFields);
+  }
+
+  private void updateNodeListFields(DepanFxWorkspaceResource nodeListRsrc) {
+    focusNodeListRsrcField.setText(
+        nodeListRsrc.getDocument().getMemberPath().toString());
+
+    if (Strings.isNullOrEmpty(focusLabelField.getText())) {
+      focusLabelField.setText((
+          (DepanFxNodeList) nodeListRsrc.getResource()).getNodeListName());
+    }
   }
 
   private Optional<DepanFxWorkspaceResource> saveDocument(
