@@ -19,7 +19,9 @@ module depanfx.app {
     requires depanfx.graph_doc;
     requires depanfx.java;
     requires depanfx.java.gui;
+    requires depanfx.jogl;
     requires depanfx.nodelist.gui;
+    requires depanfx.nodeview.gui;
     requires depanfx.perspective;
     requires depanfx.persistence;
     requires depanfx.workspace.gui;

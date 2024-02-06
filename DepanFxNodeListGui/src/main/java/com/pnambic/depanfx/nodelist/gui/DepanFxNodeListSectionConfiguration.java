@@ -43,7 +43,7 @@ import javafx.scene.control.Tab;
 @Configuration
 public class DepanFxNodeListSectionConfiguration {
 
-  private static final String OPEN_AS_LIST = "Open as ListView";
+  private static final String OPEN_AS_LIST = "Open as Node List";
 
   private final DepanFxBuiltInContribution memberFinderlinkMatcherContrib =
       buildMemberFinderLinkMatcher();

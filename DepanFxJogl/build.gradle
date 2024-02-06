@@ -1,0 +1,23 @@
+plugins {
+  id 'depanfx.base'
+  id 'org.openjfx.javafxplugin'
+}
+
+// For javafx.scene.canvas.Canvas
+javafx {
+  version = "20"
+  modules = [ 'javafx.controls' ]
+}
+
+
+dependencies {
+  implementation files('lib/jogamp-fat.jar')
+
+  implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+}
+
+jar {
+    manifest {
+        attributes 'Automatic-Module-Name': 'depanfx.jogl'
+    }
+}
