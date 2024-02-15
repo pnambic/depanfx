@@ -1,14 +1,15 @@
 package com.pnambic.depanfx.nodeview.gui;
 
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.graph_doc.persistence.GraphDocPersistenceContribution;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
-import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxAnalysisExtMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -26,6 +27,8 @@ import javafx.scene.control.Cell;
 @Configuration
 public class DepanFxNodeViewConfiguration {
 
+  private static final String OPEN_VIEW = "Open Node View";
+
   private static final String OPEN_AS_VIEW = "Open as Node View";
 
   @Autowired
@@ -33,19 +36,45 @@ public class DepanFxNodeViewConfiguration {
   }
 
   @Bean
-  public DepanFxAnalysisExtMenuContribution nodeViewExtMenu() {
-    return new JoglContribution();
+  public DepanFxAnalysisExtMenuContribution graphNodeViewExtMenu() {
+    return new GraphContribution();
   }
 
-  private static class JoglContribution
+  @Bean
+  public DepanFxAnalysisExtMenuContribution listNodeViewExtMenu() {
+    return new NodeListContribution();
+  }
+
+  @Bean
+  public DepanFxAnalysisExtMenuContribution nodeViewExtMenu() {
+    return new NodeViewContribution();
+  }
+
+  private static abstract class BaseNodeViewExtMenuContribution
       implements DepanFxAnalysisExtMenuContribution {
 
     private static final Logger LOG =
-        LoggerFactory.getLogger(DepanFxNodeViewConfiguration.class);
+        LoggerFactory.getLogger(BaseNodeViewExtMenuContribution.class);
+
+    private final Class<?> resourceType;
+
+    private final String menuLabel;
+
+    private final String viewExt;
+
+    public BaseNodeViewExtMenuContribution(
+        Class<?> resourceType, String menuLabel, String viewExt) {
+      this.resourceType = resourceType;
+      this.menuLabel = menuLabel;
+      this.viewExt = viewExt;
+    }
+
+    abstract protected DepanFxNodeViewData getNodeViewData(
+        DepanFxWorkspaceResource rsrc);
 
     @Override
     public boolean acceptsExt(String ext) {
-      return DepanFxNodeList.NODE_LIST_EXT.equals(ext);
+      return viewExt.equals(ext);
     }
 
     @Override
@@ -56,11 +85,11 @@ public class DepanFxNodeViewConfiguration {
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       Path docPath = member.getMemberPath();
       builder.appendActionItem(
-          OPEN_AS_VIEW,
+          menuLabel,
           e -> runOpenNodeListAction(scene, dialogRunner, workspace, docPath));
     }
 
-    private void runOpenNodeListAction(
+    protected void runOpenNodeListAction(
         DepanFxSceneController scene,
         DepanFxDialogRunner dialogRunner,
         DepanFxWorkspace workspace,
@@ -69,14 +98,10 @@ public class DepanFxNodeViewConfiguration {
         Optional<DepanFxWorkspaceResource> optWkspRsrc =
             workspace.toProjectDocument(docPath.toUri())
                 .flatMap(r -> workspace.getWorkspaceResource(
-                      r, DepanFxNodeList.class));
-        optWkspRsrc.map(r -> r.getResource())
-            .map(DepanFxNodeList.class::cast)
-            .ifPresent(nl -> {
-              String title = DepanFxWorkspaceFactory.buildDocTitle(
-                  optWkspRsrc.get().getDocument()) + " View";
-              addNodeViewPanelToScene(scene, dialogRunner, workspace, nl, title);
-            });
+                      r, resourceType));
+        optWkspRsrc.map(this::getNodeViewData)
+            .ifPresent(nv ->
+                addNodeViewPanelToScene(scene, dialogRunner, workspace, nv));
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to open node view for {}",
             docPath.toUri(), errCaught);
@@ -85,10 +110,54 @@ public class DepanFxNodeViewConfiguration {
 
     private void addNodeViewPanelToScene(DepanFxSceneController scene,
         DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace,
-        DepanFxNodeList nodeList, String title) {
-      DepanFxNodeViewPanel nodeView =
-          new DepanFxNodeViewPanel(workspace, dialogRunner, nodeList);
-      scene.addTab(nodeView.createWorkspaceTab(title));
+        DepanFxNodeViewData viewData) {
+      DepanFxNodeViewPanel viewPanel =
+          new DepanFxNodeViewPanel(workspace, dialogRunner, viewData);
+      scene.addTab(viewPanel.createWorkspaceTab(viewData.getToolName()));
+    }
+  }
+
+  private static class GraphContribution
+      extends BaseNodeViewExtMenuContribution {
+
+    public GraphContribution() {
+      super(GraphDocument.class, OPEN_AS_VIEW,
+          GraphDocPersistenceContribution.EXTENSION);
+    }
+
+    @Override
+    protected DepanFxNodeViewData getNodeViewData(
+        DepanFxWorkspaceResource rsrc) {
+      return DepanFxNodeViews.fromGraphDocument(rsrc);
+    }
+  }
+
+  private static class NodeListContribution
+      extends BaseNodeViewExtMenuContribution {
+
+    public NodeListContribution() {
+      super(DepanFxNodeList.class, OPEN_AS_VIEW,
+          DepanFxNodeList.NODE_LIST_EXT);
+    }
+
+    @Override
+    protected DepanFxNodeViewData getNodeViewData(
+        DepanFxWorkspaceResource rsrc) {
+      return DepanFxNodeViews.fromNodeList(rsrc);
+    }
+  }
+
+  private static class NodeViewContribution
+      extends BaseNodeViewExtMenuContribution {
+
+    public NodeViewContribution() {
+      super(DepanFxNodeViewData.class, OPEN_VIEW, DepanFxNodeViewData.NODE_VIEW_TOOL_EXT);
+    }
+
+    @Override
+    protected DepanFxNodeViewData getNodeViewData(
+        DepanFxWorkspaceResource rsrc) {
+      return (DepanFxNodeViewData) rsrc.getResource();
     }
   }
 }

@@ -1,9 +1,10 @@
 package com.pnambic.depanfx.nodeview.gui;
 
-import com.pnambic.depanfx.jogl.JoglModule;
 import com.pnambic.depanfx.jogl.JoglCamera;
-
+import com.pnambic.depanfx.jogl.JoglModule;
+import com.pnambic.depanfx.jogl.JoglShape;
 import com.pnambic.depanfx.jogl.shapes.SquareShape;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +37,13 @@ public class DepanFxJoglView extends BorderPane {
 
   public DepanFxJoglView(JoglModule jogl) {
     this.jogl = jogl;
+    DepanFxNodeViewKeyActions.addActions(jogl, this);
   }
 
-  public static DepanFxJoglView createJoglView() {
-    return new DepanFxJoglView(new JoglModule());
+  public static DepanFxJoglView createJoglView(
+      DepanFxNodeViewCameraData cameraInfo) {
+    return new DepanFxJoglView(
+        new JoglModule(cameraInfo.getJoglCameraData()));
   }
 
   public void activate() {
@@ -47,7 +51,7 @@ public class DepanFxJoglView extends BorderPane {
     Bounds bounds = parent.getBoundsInLocal();
 
     // Start small.  Resized by listener during add to children.
-    Canvas canvas = jogl.prepareCanvas(
+    Canvas canvas = jogl.createCanvas(
         bounds.getHeight() / 2, bounds.getWidth() / 2);
 
     sizeListener = new ChangeListener<Bounds>() {
@@ -75,7 +79,7 @@ public class DepanFxJoglView extends BorderPane {
     viewport.getChildren().add(canvas);
 
     jogl.demoDisplay();
-    jogl.updateShape(this, new SquareShape(0.8f, 0.8f, 0.8f));
+    updateShape(this, new SquareShape(0.8f, 0.8f, 0.8f));
     jogl.start();
   }
 
@@ -90,6 +94,17 @@ public class DepanFxJoglView extends BorderPane {
     release();
   }
 
+  public void updateShape(Object key, JoglShape shape) {
+    jogl.updateShape(key, shape);
+  }
+
+  public void dolly(double dollyX, double dollyY, double dollyZ) {
+    hScrollBar.setValue(hScrollBar.getValue() + dollyX);
+    vScrollBar.setValue(vScrollBar.getValue() + dollyY);
+    jogl.dollyCamera(0, 0, dollyZ);
+    LOG.info("dolly to ({}, {}, {})", dollyX, dollyY, dollyZ);
+  }
+
   public void updateLayoutX(double layoutX) {
     JoglCamera.CameraData cameraData = jogl.getCurrentCamera();
     jogl.dollyCamera(layoutX - cameraData.cameraX, 0.0d, 0.0d);
@@ -102,6 +117,11 @@ public class DepanFxJoglView extends BorderPane {
     LOG.info("Y scroll to {}", layoutY);
   }
 
+  public DepanFxNodeViewCameraData getCameraData() {
+    return DepanFxNodeViewCameraData.ofJoglCamera(
+        jogl.getCurrentCamera());
+  }
+
   private ScrollBar createHScrollBar(double width) {
     ScrollBar result = new ScrollBar();
     result.setOrientation(javafx.geometry.Orientation.HORIZONTAL);
@@ -109,21 +129,20 @@ public class DepanFxJoglView extends BorderPane {
     result.setMax(100.0d);
     result.setValue(0.0d);
     result.setPrefWidth(width);
-    result.setBorder(null);
     result.valueProperty().addListener((observable, oldValue, newValue) -> {
-        this.updateLayoutX(newValue.doubleValue()); });
+      this.updateLayoutX(newValue.doubleValue()); });
     return result;
   }
 
-    private ScrollBar createVScrollBar(double height) {
-      ScrollBar result = new ScrollBar();
-      result.setOrientation(javafx.geometry.Orientation.VERTICAL);
-      result.setMin(-100.0d);
-      result.setMax(100.0d);
-      result.setValue(0.0d);
-      result.setPrefHeight(height);
-      result.valueProperty().addListener((observable, oldValue, newValue) -> {
-        this.updateLayoutY(-newValue.doubleValue()); });
-      return result;
-    }
+  private ScrollBar createVScrollBar(double height) {
+    ScrollBar result = new ScrollBar();
+    result.setOrientation(javafx.geometry.Orientation.VERTICAL);
+    result.setMin(-100.0d);
+    result.setMax(100.0d);
+    result.setValue(0.0d);
+    result.setPrefHeight(height);
+    result.valueProperty().addListener((observable, oldValue, newValue) -> {
+      this.updateLayoutY(-newValue.doubleValue()); });
+    return result;
+  }
 }

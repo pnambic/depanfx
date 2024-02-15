@@ -27,7 +27,6 @@ dependencies {
   implementation project(':DepanFxJava')
   implementation project(':DepanFxJavaGui')
   implementation project(':DepanFxNodeListGui')
-  implementation project(':DepanFxJogl')
   implementation project(':DepanFxNodeListGui')
   implementation project(':DepanFxNodeViewGui')
   implementation project(':DepanFxPersistence')
@@ -35,7 +34,6 @@ dependencies {
   implementation project(':DepanFxScene')
   implementation project(':DepanFxWorkspace')
   implementation project(':DepanFxWorkspaceGui')
-  implementation project(':DepanFxXstream')
 
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

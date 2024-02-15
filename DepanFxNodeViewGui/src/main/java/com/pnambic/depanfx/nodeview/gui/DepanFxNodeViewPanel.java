@@ -1,9 +1,18 @@
 package com.pnambic.depanfx.nodeview.gui;
 
 import com.pnambic.depanfx.graph.context.ContextModelId;
+import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
-import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.jogl.JoglShape;
+import com.pnambic.depanfx.jogl.shapes.DepanFxNodeShape;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxEdgeDisplayData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewSceneData;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -15,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
@@ -32,7 +42,7 @@ public class DepanFxNodeViewPanel {
 
   private static final String INVERT_SELECTION_ITEM = "Invert Selection";
 
-  private static final String SAVE_NODE_LIST_ITEM = "Save as node list...";
+  private static final String SAVE_NODE_VIEW_ITEM = "Save node view ..";
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeViewPanel.class);
@@ -41,23 +51,39 @@ public class DepanFxNodeViewPanel {
 
   private final DepanFxDialogRunner dialogRunner;
 
-  private DepanFxNodeList nodeList;
+  private final DepanFxNodeViewData viewData;
 
   private Map<GraphNode, BooleanProperty> nodesCheckBoxStates;
+
+  private Collection<GraphNode> viewNodes;
+
+  private Map<GraphNode, DepanFxNodeLocationData> nodeLocations;
+
+  private Map<GraphNode, DepanFxNodeDisplayData> nodeDisplay;
+
+  private Map<GraphEdge, DepanFxEdgeDisplayData> edgeDisplay;
+
+  private DepanFxJoglView joglView;
 
   public DepanFxNodeViewPanel(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
-      DepanFxNodeList nodeList) {
+      DepanFxNodeViewData viewData) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
-    this.nodeList = nodeList;
+    this.viewData = viewData;
 
-    nodesCheckBoxStates = buildNodesCheckBoxStates(nodeList.getNodes());
+    // Unpack the interesting parts of the view data.
+    this.viewNodes = viewData.getViewNodes();
+    this.nodeLocations = viewData.getNodeLocations();
+    this.nodeDisplay = viewData.getNodeDisplay();
+    this.edgeDisplay = viewData.getEdgeDisplay();
+
+    nodesCheckBoxStates = buildNodesCheckBoxStates(viewNodes);
   }
 
   public Tab createWorkspaceTab(String tabTitle) {
-    DepanFxJoglView joglView = DepanFxJoglView.createJoglView();
+    joglView = createJoglView();
     Tab result = new Tab(tabTitle, joglView);
 
     result.setOnSelectionChanged(new EventHandler<Event>() {
@@ -89,12 +115,11 @@ public class DepanFxNodeViewPanel {
   }
 
   public GraphDocument getGraphDoc() {
-    return (GraphDocument) nodeList.getGraphDocResource().getResource();
+    return (GraphDocument) viewData.getGraphDocRsrc().getResource();
   }
 
   public ContextModelId getContextModelId() {
-    return getGraphDoc()
-        .getContextModelId();
+    return getGraphDoc().getContextModelId();
   }
 
   public <T> Dialog<T> buildDialog(Class<T> controllerType) {
@@ -106,15 +131,15 @@ public class DepanFxNodeViewPanel {
   }
 
   public void doSelectAllAction() {
-    doSelectGraphNodesAction(nodeList.getNodes(), true);
+    doSelectGraphNodesAction(viewNodes, true);
   }
 
   public void doClearSelectionAction() {
-    doSelectGraphNodesAction(nodeList.getNodes(), false);
+    doSelectGraphNodesAction(viewNodes, false);
   }
 
   public void doInvertSelectionAction() {
-    nodeList.getNodes().stream()
+    viewNodes.stream()
         .forEach(this::doInvertGraphNodeAction);
   }
 
@@ -138,10 +163,6 @@ public class DepanFxNodeViewPanel {
   /////////////////////////////////////
   // Internal
 
-  private void runSaveNodeListDialog() {
-    // STUB
-  }
-
   private ContextMenu buildViewContextMenu() {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
     builder.appendActionItem(
@@ -152,8 +173,79 @@ public class DepanFxNodeViewPanel {
         INVERT_SELECTION_ITEM, e -> doInvertSelectionAction());
     builder.appendSeparator();
     builder.appendActionItem(
-        SAVE_NODE_LIST_ITEM, e -> runSaveNodeListDialog());
+        SAVE_NODE_VIEW_ITEM, e -> runSaveNodeViewDialog());
     return builder.build();
+  }
+
+  private void runSaveNodeViewDialog() {
+    Dialog<DepanFxSaveNodeViewDialog> saveDlg =
+        dialogRunner.createDialogAndParent(DepanFxSaveNodeViewDialog.class);
+    DepanFxNodeViewData saveView = buildSaveView();
+    saveDlg.getController().setNodeViewDoc(saveView);
+    saveDlg.runDialog("Save node view");
+  }
+
+  /////////////////////////////////////
+  // Render
+
+  private DepanFxNodeViewData buildSaveView() {
+    DepanFxNodeViewData result = new DepanFxNodeViewData(
+        viewData.getToolName(), viewData.getToolDescription(),
+        buildSceneData(),
+        viewData.getGraphDocRsrc(), viewNodes,
+        nodeLocations, nodeDisplay, edgeDisplay);
+    return result ;
+  }
+
+  private DepanFxNodeViewSceneData buildSceneData() {
+    
+    DepanFxNodeViewCameraData cameraInfo =
+        joglView.getCameraData();
+    DepanFxNodeViewSceneData result = new DepanFxNodeViewSceneData(
+        viewData.getSceneData().getBackgroundColor(), cameraInfo);
+    return result ;
+  }
+
+  private DepanFxJoglView createJoglView() {
+    DepanFxNodeViewCameraData cameraInfo =
+        viewData.getSceneData().getCameraInfo();
+    DepanFxJoglView result = DepanFxJoglView.createJoglView(cameraInfo);
+    viewNodes.stream()
+        .forEach(n -> installShape(result, n));
+    return result;
+  }
+
+  private void installShape(DepanFxJoglView view, GraphNode node) {
+    createShape(node)
+        .ifPresent(s -> view.updateShape(node, s));
+  }
+
+  private Optional<JoglShape> createShape(GraphNode node) {
+    DepanFxNodeLocationData location = nodeLocations.get(node);
+    if (location == null) {
+      return Optional.empty();
+    }
+    DepanFxNodeDisplayData display = nodeDisplay.get(node);
+    if (display == null) {
+      return Optional.empty();
+    }
+
+    DepanFxJoglColor color = display.color;
+    String nodeName = guessName(node);
+    return Optional.of(new DepanFxNodeShape(
+        color.getRed(), color.getGreen(), color.getBlue(),
+        location.xPos, location.yPos, location.zPos,
+        true, nodeName));
+  }
+
+  private String guessName(GraphNode node) {
+    String nodeKey = node.getId().getNodeKey();
+    String[] nameWords = nodeKey.split("[./\\\\]");
+    int lastSplit = nameWords.length - 1;
+    if (lastSplit > 0) {
+      return nameWords[lastSplit - 1];
+    }
+    return nameWords[lastSplit];
   }
 
   /////////////////////////////////////

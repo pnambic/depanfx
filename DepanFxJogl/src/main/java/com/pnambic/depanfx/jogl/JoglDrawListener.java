@@ -3,11 +3,11 @@ package com.pnambic.depanfx.jogl;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 
-class BasicOglListener implements GLEventListener {
+class JoglDrawListener implements GLEventListener {
 
   private final JoglRenderer renderer;
 
-  public BasicOglListener(JoglRenderer renderer) {
+  public JoglDrawListener(JoglRenderer renderer) {
     this.renderer = renderer;
   }
 

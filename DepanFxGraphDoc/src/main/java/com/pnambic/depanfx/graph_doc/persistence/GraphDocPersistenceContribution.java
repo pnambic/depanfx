@@ -1,6 +1,8 @@
 package com.pnambic.depanfx.graph_doc.persistence;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.docdata.EdgeInfoBlock;
+import com.pnambic.depanfx.graph_doc.docdata.NodeInfoBlock;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;

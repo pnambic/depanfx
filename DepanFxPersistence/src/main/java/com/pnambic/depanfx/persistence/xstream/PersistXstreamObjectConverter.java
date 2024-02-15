@@ -7,7 +7,8 @@ import com.pnambic.depanfx.xstream.XstreamMarshalContext;
 import com.pnambic.depanfx.xstream.XstreamObjectConverter;
 import com.pnambic.depanfx.xstream.XstreamUnmarshalContext;
 
-public class PersistXstreamObjectConverter<T> implements XstreamObjectConverter<T> {
+public class PersistXstreamObjectConverter<T>
+    implements XstreamObjectConverter<T> {
 
   private final PersistObjectConverter<T> contrib;
 

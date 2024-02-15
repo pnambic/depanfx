@@ -20,24 +20,30 @@ public class JoglModule {
 
   private JoglRenderer renderer;
 
-  private BasicOglListener listener;
+  private JoglDrawListener drawListener;
+
+  private JoglKeyListener keyListener;
+
+  public JoglModule(CameraData cameraData) {
+    camera = new JoglCamera(cameraData);
+    renderer = new JoglRenderer(camera);
+    drawListener = new JoglDrawListener(renderer);
+    keyListener = new JoglKeyListener();
+  }
 
   /**
    * Create the GLWindow and add it to the JavaFx Group.
    */
-  public Canvas prepareCanvas(double height, double width) {
+  public Canvas createCanvas(double height, double width) {
     com.jogamp.newt.Display jfxNewtDisplay =
         NewtFactory.createDisplay(null, false);
     final Screen screen = NewtFactory.createScreen(jfxNewtDisplay, 0);
     final GLCapabilities caps =
         new GLCapabilities(GLProfile.getMaxFixedFunc(true));
 
-    camera = new JoglCamera(new CameraData());
-    renderer = new JoglRenderer(camera);
-
-    listener = new BasicOglListener(renderer);
     glWindow = GLWindow.create(screen, caps);
-    glWindow.addGLEventListener(listener);
+    glWindow.addGLEventListener(drawListener);
+    glWindow.addKeyListener(keyListener);
 
     final NewtCanvasJFX result = new NewtCanvasJFX(glWindow);
     result.setHeight(height);
@@ -65,6 +71,14 @@ public class JoglModule {
 
   public void updateShape(Object key, JoglShape shape) {
     renderer.updateShape(key, shape);
+  }
+
+  public void addPressAction(JoglKeyListener.KeyAction action) {
+    keyListener.addPressAction(action);
+  }
+
+  public void addReleaseAction(JoglKeyListener.KeyAction action) {
+    keyListener.addReleaseAction(action);
   }
 
   public void dollyCamera(double dollyX, double dollyY, double dollyZ) {

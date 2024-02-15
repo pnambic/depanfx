@@ -1,4 +1,4 @@
-package com.pnambic.depanfx.graph_doc.persistence;
+package com.pnambic.depanfx.graph_doc.docdata;
 
 import com.pnambic.depanfx.graph.info.GraphEdgeInfo;
 import com.pnambic.depanfx.graph.model.GraphEdge;

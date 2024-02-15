@@ -12,6 +12,8 @@ import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
+import com.pnambic.depanfx.graph_doc.docdata.EdgeInfoBlock;
+import com.pnambic.depanfx.graph_doc.docdata.NodeInfoBlock;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
 import com.pnambic.depanfx.persistence.PersistMarshalContext;
 import com.pnambic.depanfx.persistence.PersistUnmarshalContext;

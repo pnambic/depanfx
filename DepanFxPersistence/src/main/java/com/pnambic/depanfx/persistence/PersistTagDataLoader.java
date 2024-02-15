@@ -3,9 +3,12 @@ package com.pnambic.depanfx.persistence;
 import com.pnambic.depanfx.persistence.xstream.PersistXstreamObjectConverter;
 import com.pnambic.depanfx.xstream.XstreamUnmarshalContext;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,6 +45,10 @@ public class PersistTagDataLoader {
     this.tagDescrips = Arrays.asList(tagsDescrs).stream()
         .collect(Collectors.toMap(TagDescriptor::getDataTag, d -> d));
     this.tagAliases = tagAliases;
+  }
+
+  public Collection<String> getTags() {
+    return new ArrayList<>(tagDescrips.keySet());
   }
 
   public Map<String, Object> loadData(
