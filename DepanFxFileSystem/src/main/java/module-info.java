@@ -8,13 +8,16 @@ module depanfx.filesystem {
   requires depanfx.graph;
   requires depanfx.graph_doc;
   requires depanfx.nodelist;
+  requires depanfx.persistence;
   requires depanfx.workspace;
 
   opens com.pnambic.depanfx.filesystem.graph to spring.core;
   opens com.pnambic.depanfx.filesystem.nodelist.link to spring.core;
+  opens com.pnambic.depanfx.filesystem.persistence to spring.core;
 
   exports com.pnambic.depanfx.filesystem.builder;
   exports com.pnambic.depanfx.filesystem.context;
   exports com.pnambic.depanfx.filesystem.graph;
+  exports com.pnambic.depanfx.filesystem.persistence;
   exports com.pnambic.depanfx.filesystem.nodelist.link;
 }

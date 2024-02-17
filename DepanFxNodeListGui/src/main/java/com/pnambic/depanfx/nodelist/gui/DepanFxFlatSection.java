@@ -1,11 +1,10 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFlatSectionData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderBy;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.util.Comparator;

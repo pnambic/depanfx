@@ -6,6 +6,7 @@ plugins {
 
 dependencies {
   implementation 'org.springframework.boot:spring-boot-autoconfigure'
+  implementation "org.slf4j:slf4j-api:${slf4jVersion}"
 
   implementation project(':DepanFxGraph')
   implementation project(':DepanFxPersistence')

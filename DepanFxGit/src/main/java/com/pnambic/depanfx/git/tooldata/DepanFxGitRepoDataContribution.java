@@ -1,7 +1,6 @@
 package com.pnambic.depanfx.git.tooldata;
 
-import com.pnambic.depanfx.persistence.DocumentXmlPersist;
-import com.pnambic.depanfx.persistence.builder.DocumentXmlPersistBuilder;
+import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
 
 import org.springframework.stereotype.Component;
@@ -36,14 +35,8 @@ public class DepanFxGitRepoDataContribution
   }
 
   @Override
-  public DocumentXmlPersist getDocumentPersist() {
-    DocumentXmlPersistBuilder builder = new DocumentXmlPersistBuilder();
-
-    builder.setXStream();
-    builder.setNoReferences();
+  public void prepareTransport(PersistDocumentTransportBuilder builder) {
     builder.addAlias(GIT_REPO_TAG, DepanFxGitRepoData.class);
     builder.addAllowedType(ALLOWED_TYPES);
-
-    return builder.buildDocumentXmlPersist();
   }
 }

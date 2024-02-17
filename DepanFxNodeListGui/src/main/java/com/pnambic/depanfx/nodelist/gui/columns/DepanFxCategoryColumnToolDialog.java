@@ -2,10 +2,10 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.google.common.base.Strings;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData.CategoryEntry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxCategoryColumnData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxCategoryColumnData.CategoryEntry;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;

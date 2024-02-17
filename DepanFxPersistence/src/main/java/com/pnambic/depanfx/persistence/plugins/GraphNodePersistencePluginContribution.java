@@ -1,8 +1,8 @@
 package com.pnambic.depanfx.persistence.plugins;
 
-import com.pnambic.depanfx.persistence.builder.DocumentXmlPersistBuilder;
+import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 
 public interface GraphNodePersistencePluginContribution {
 
-  void extendPersist(DocumentXmlPersistBuilder builder, Class<?> withType);
+  void extendPersist(PersistDocumentTransportBuilder builder, Class<?> withType);
 }

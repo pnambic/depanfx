@@ -24,10 +24,10 @@ import com.pnambic.depanfx.nodelist.gui.columns.DepanFxFocusColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxSimpleColumn;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData.CategoryEntry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxCategoryColumnData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxFocusColumnData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxCategoryColumnData.CategoryEntry;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -5,15 +5,9 @@ plugins {
 }
 
 dependencies {
-  implementation "com.thoughtworks.xstream:xstream:${xstreamVersion}"
   implementation 'org.springframework.boot:spring-boot-autoconfigure'
   implementation "org.slf4j:slf4j-api:${slf4jVersion}"
 
   implementation project(':DepanFxGraph')
-}
-
-jar {
-  manifest {
-    attributes 'Automatic-Module-Name': 'depanfx.persistence'
-  }
+  implementation project(':DepanFxXstream')
 }

@@ -1,0 +1,14 @@
+plugins {
+  id 'depanfx.base'
+}
+
+dependencies {
+  implementation "com.thoughtworks.xstream:xstream:${xstreamVersion}"
+  implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+}
+
+jar {
+  manifest {
+    attributes 'Automatic-Module-Name': 'depanfx.xstream'
+  }
+}

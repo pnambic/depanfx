@@ -1,9 +1,8 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData.KeyChoice;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
-import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData.KeyChoice;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -15,8 +14,6 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

@@ -2,7 +2,7 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxSimpleColumnData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxSimpleColumnData;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 

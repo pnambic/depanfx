@@ -14,19 +14,15 @@ module depanfx.app {
 
     // For Spring @Component discovery
     requires depanfx.filesystem.gui;
-    requires depanfx.filesystem.xstream;
     requires depanfx.git;
     requires depanfx.git.gui;
     requires depanfx.graph_doc;
-    requires depanfx.graph_doc.xstream;
     requires depanfx.java;
     requires depanfx.java.gui;
-    requires depanfx.java.xstream;
     requires depanfx.nodelist.gui;
-    requires depanfx.nodelist.xstream;
     requires depanfx.perspective;
+    requires depanfx.persistence;
     requires depanfx.workspace.gui;
-    requires depanfx.workspace.xstream;
 
     opens com.pnambic.depanfx to spring.core;
     opens com.pnambic.depanfx.app to spring.core;

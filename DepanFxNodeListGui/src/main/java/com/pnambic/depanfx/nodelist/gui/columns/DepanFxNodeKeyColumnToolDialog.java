@@ -1,8 +1,8 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData.KeyChoice;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData.KeyChoice;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;

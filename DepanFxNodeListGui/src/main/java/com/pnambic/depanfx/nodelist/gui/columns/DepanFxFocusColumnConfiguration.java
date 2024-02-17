@@ -1,6 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxFocusColumnData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;

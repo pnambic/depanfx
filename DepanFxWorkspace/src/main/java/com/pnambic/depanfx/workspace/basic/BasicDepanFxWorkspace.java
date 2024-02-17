@@ -1,6 +1,6 @@
 package com.pnambic.depanfx.workspace.basic;
 
-import com.pnambic.depanfx.persistence.DocumentXmlPersist;
+import com.pnambic.depanfx.persistence.PersistDocumentTransport;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceRegistry;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
@@ -134,11 +134,12 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   public Optional<DepanFxWorkspaceResource> saveDocument(
       DepanFxProjectDocument projDoc, Object document)
       throws IOException {
-    DocumentXmlPersist persist = persistRegistry.getDocumentPersist(document);
-    persist.addContextValue(DepanFxWorkspace.class, this);
+    PersistDocumentTransport transport =
+        persistRegistry.getDocumentTransport(document);
+    transport.addContextValue(DepanFxWorkspace.class, this);
 
     try (Writer saver = openForSave(projDoc)) {
-      persist.save(saver, document);
+      transport.save(saver, document);
       Optional<DepanFxWorkspaceResource> result =
           toWorkspaceResource(projDoc, document);
       result.ifPresent(this::registerProjectDocument);
@@ -149,12 +150,12 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   @Override
   public Optional<DepanFxWorkspaceResource> loadDocument(
       DepanFxProjectDocument projDoc, String expectedLabel) {
-    DocumentXmlPersist persist =
-        persistRegistry.getDocumentPersist(getMemberUri(projDoc));
-    persist.addContextValue(DepanFxWorkspace.class, this);
+    PersistDocumentTransport transport =
+        persistRegistry.getDocumentTransport(getMemberUri(projDoc));
+    transport.addContextValue(DepanFxWorkspace.class, this);
 
     try (Reader importer = openForLoad(projDoc)) {
-      Object document = persist.load(importer);
+      Object document = transport.load(importer);
       return toWorkspaceResource(projDoc, document);
     } catch (IOException errIo) {
       LOG.error("Unable to open {} at {}", expectedLabel, projDoc, errIo);

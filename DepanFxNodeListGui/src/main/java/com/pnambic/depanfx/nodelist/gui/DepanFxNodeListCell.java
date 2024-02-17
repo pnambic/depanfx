@@ -1,9 +1,9 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFlatSectionData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
