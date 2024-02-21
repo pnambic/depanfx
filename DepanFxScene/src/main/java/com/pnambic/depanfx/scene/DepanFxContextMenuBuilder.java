@@ -47,4 +47,10 @@ public class DepanFxContextMenuBuilder {
   public void appendSubMenu(Menu subMenu) {
     contextList.add(subMenu);
   }
+
+  public void appendConditionalSeparator() {
+    if (!contextList.isEmpty()) {
+      appendSeparator();
+    }
+  }
 }

@@ -151,6 +151,7 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
 
   private void appendDeleteDocument(
       DepanFxContextMenuBuilder builder, DepanFxProjectDocument projDoc) {
+    builder.appendConditionalSeparator();
     builder.appendActionItem(DELETE_DOCUMENT,
         e -> projDoc.getProject().deleteDocument(projDoc));
   }
