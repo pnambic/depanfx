@@ -4,6 +4,7 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.graph_doc.persistence.GraphDocPersistenceContribution;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.plugins.DepanFxAnalysisExtMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -84,9 +85,18 @@ public class DepanFxNodeViewConfiguration {
         Cell<DepanFxWorkspaceMember> cell, String ext,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       Path docPath = member.getMemberPath();
+
+      installOnOpen(scene, dialogRunner, workspace, cell, docPath);
       builder.appendActionItem(
           menuLabel,
           e -> runOpenNodeListAction(scene, dialogRunner, workspace, docPath));
+    }
+
+    protected void installOnOpen(
+        DepanFxSceneController scene,
+        DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace,
+        Cell<DepanFxWorkspaceMember> cell, Path docPath) {
+      // The default is no onOpen action.
     }
 
     protected void runOpenNodeListAction(
@@ -151,7 +161,17 @@ public class DepanFxNodeViewConfiguration {
       extends BaseNodeViewExtMenuContribution {
 
     public NodeViewContribution() {
-      super(DepanFxNodeViewData.class, OPEN_VIEW, DepanFxNodeViewData.NODE_VIEW_TOOL_EXT);
+      super(DepanFxNodeViewData.class, OPEN_VIEW,
+          DepanFxNodeViewData.NODE_VIEW_TOOL_EXT);
+    }
+
+    @Override
+    protected void installOnOpen(
+        DepanFxSceneController scene,
+        DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace,
+        Cell<DepanFxWorkspaceMember> cell, Path docPath) {
+      DepanFxResourcePerspectives.installOnOpen(cell, docPath,
+          p -> runOpenNodeListAction(scene, dialogRunner, workspace, p));
     }
 
     @Override
