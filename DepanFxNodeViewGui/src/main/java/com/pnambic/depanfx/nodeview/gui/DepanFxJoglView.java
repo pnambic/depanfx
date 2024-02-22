@@ -1,24 +1,23 @@
 package com.pnambic.depanfx.nodeview.gui;
 
-import com.pnambic.depanfx.jogl.JoglCamera;
 import com.pnambic.depanfx.jogl.JoglModule;
 import com.pnambic.depanfx.jogl.JoglShape;
 import com.pnambic.depanfx.jogl.shapes.SquareShape;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+
+import net.rgielen.fxweaver.core.FxControllerAndView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
-import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 
 public class DepanFxJoglView extends BorderPane {
 
@@ -27,65 +26,60 @@ public class DepanFxJoglView extends BorderPane {
 
   private final JoglModule jogl;
 
-  private ChangeListener<? super Bounds> sizeListener;
+  private final CameraControl cameraControl;
+
+  private final DepanFxDialogRunner dialogRunner;
 
   private ScrollBar hScrollBar;
 
   private ScrollBar vScrollBar;
 
+  private FxControllerAndView<DepanFxNodeViewStatusPanel, Node> statusPanel;
+
   private Pane viewport;
 
-  public DepanFxJoglView(JoglModule jogl) {
+  public DepanFxJoglView(
+      JoglModule jogl, DepanFxDialogRunner dialogRunner) {
     this.jogl = jogl;
-    DepanFxNodeViewKeyActions.addActions(jogl, this);
+    this.dialogRunner = dialogRunner;
+    this.cameraControl = new CameraControl(jogl);
+    DepanFxNodeViewKeyActions.addActions(jogl, cameraControl);
   }
 
   public static DepanFxJoglView createJoglView(
-      DepanFxNodeViewCameraData cameraInfo) {
+      DepanFxNodeViewCameraData cameraInfo,
+      DepanFxDialogRunner dialogRunner) {
     return new DepanFxJoglView(
-        new JoglModule(cameraInfo.getJoglCameraData()));
+        new JoglModule(cameraInfo.getJoglCameraData()),
+        dialogRunner);
   }
 
   public void activate() {
     Parent parent = getParent();
     Bounds bounds = parent.getBoundsInLocal();
 
-    // Start small.  Resized by listener during add to children.
-    Canvas canvas = jogl.createCanvas(
-        bounds.getHeight() / 2, bounds.getWidth() / 2);
-
-    sizeListener = new ChangeListener<Bounds>() {
-
-      @Override
-      public void changed(
-          ObservableValue<? extends Bounds> observable,
-          Bounds oldValue, Bounds newValue) {
-        LOG.info("Resizing Jogl to WxH {} {}", newValue.getWidth(), newValue.getHeight());
-        canvas.setHeight(newValue.getHeight());
-        canvas.setWidth(newValue.getWidth());
-      }
-    };
-
-    hScrollBar = createHScrollBar(bounds.getHeight());
+    hScrollBar = createHScrollBar(bounds.getWidth());
     setBottom(hScrollBar);
 
     vScrollBar = createVScrollBar(bounds.getHeight());
     setRight(vScrollBar);
 
-    viewport = new Pane();
-    setCenter(viewport);
+    statusPanel = createStatusPanel();
+    setTop(statusPanel.getView().get());
 
-    viewport.boundsInLocalProperty().addListener(sizeListener);
-    viewport.getChildren().add(canvas);
+    viewport = createJoglViewport();
+    setCenter(viewport);
 
     jogl.demoDisplay();
     updateShape(this, new SquareShape(0.8f, 0.8f, 0.8f));
-    jogl.start();
+
+    // JogAmp Bug #1504: Should start jogl rendering here,
+    // not in viewport layout children.
+    // jogl.start();
   }
 
   public void release() {
     jogl.stop();
-    viewport.boundsInLocalProperty().removeListener(sizeListener);
     viewport.getChildren().clear();
     jogl.destroy();
   }
@@ -98,25 +92,6 @@ public class DepanFxJoglView extends BorderPane {
     jogl.updateShape(key, shape);
   }
 
-  public void dolly(double dollyX, double dollyY, double dollyZ) {
-    hScrollBar.setValue(hScrollBar.getValue() + dollyX);
-    vScrollBar.setValue(vScrollBar.getValue() + dollyY);
-    jogl.dollyCamera(0, 0, dollyZ);
-    LOG.info("dolly to ({}, {}, {})", dollyX, dollyY, dollyZ);
-  }
-
-  public void updateLayoutX(double layoutX) {
-    JoglCamera.CameraData cameraData = jogl.getCurrentCamera();
-    jogl.dollyCamera(layoutX - cameraData.cameraX, 0.0d, 0.0d);
-    LOG.info("X scroll to {}", layoutX);
-  }
-
-  public void updateLayoutY(double layoutY) {
-    JoglCamera.CameraData cameraData = jogl.getCurrentCamera();
-    jogl.dollyCamera(0.0d, layoutY - cameraData.cameraY, 0.0d);
-    LOG.info("Y scroll to {}", layoutY);
-  }
-
   public DepanFxNodeViewCameraData getCameraData() {
     return DepanFxNodeViewCameraData.ofJoglCamera(
         jogl.getCurrentCamera());
@@ -125,12 +100,13 @@ public class DepanFxJoglView extends BorderPane {
   private ScrollBar createHScrollBar(double width) {
     ScrollBar result = new ScrollBar();
     result.setOrientation(javafx.geometry.Orientation.HORIZONTAL);
+    result.setPrefWidth(width);
     result.setMin(-100.0d);
     result.setMax(100.0d);
-    result.setValue(0.0d);
-    result.setPrefWidth(width);
-    result.valueProperty().addListener((observable, oldValue, newValue) -> {
-      this.updateLayoutX(newValue.doubleValue()); });
+    result.setValue(cameraControl.cameraX.get());
+    // X-Axis is positive to right (+).
+    result.valueProperty().addListener((observable, oldValue, newValue) ->
+        this.updateLayoutX(newValue.doubleValue() - oldValue.doubleValue()));
     return result;
   }
 
@@ -141,8 +117,81 @@ public class DepanFxJoglView extends BorderPane {
     result.setMax(100.0d);
     result.setValue(0.0d);
     result.setPrefHeight(height);
-    result.valueProperty().addListener((observable, oldValue, newValue) -> {
-      this.updateLayoutY(-newValue.doubleValue()); });
+    // Y-Axis is positive to down (-).
+    result.valueProperty().addListener((observable, oldValue, newValue) ->
+      this.updateLayoutY(oldValue.doubleValue() - newValue.doubleValue()));
     return result;
+  }
+
+  private FxControllerAndView<DepanFxNodeViewStatusPanel, Node> createStatusPanel() {
+    FxControllerAndView<DepanFxNodeViewStatusPanel, Node> result =
+        dialogRunner.weaveFxmlView(DepanFxNodeViewStatusPanel.class);
+    result.getController().setCameraControl(cameraControl);
+    return result;
+  }
+
+  private Pane createJoglViewport() {
+    Canvas canvas = jogl.createCanvas();
+    return new NewtCanvasPane(canvas);
+  }
+
+  private void updateLayoutX(double deltaX) {
+    cameraControl.dolly(deltaX, 0.0d, 0.0d);
+    LOG.info("X scroll by {}", deltaX);
+  }
+
+  private void updateLayoutY(double deltaY) {
+    cameraControl.dolly(0.0d, deltaY, 0.0d);
+    LOG.info("Y scroll by {}", deltaY);
+  }
+
+  /**
+   * Handles details of packaging the NewtCanvas.
+   *
+   * Encapsulates much of the work around for JogAmp Bug #1504.
+   */
+  public class NewtCanvasPane extends Pane {
+
+    private final Canvas canvas;
+
+    private boolean firstLayout = true;
+
+    public NewtCanvasPane(Canvas canvas) {
+      this.canvas = canvas;
+
+      setPrefSize(0.0d, 0.0d);
+      setMinSize(0.0d, 0.0d);
+    }
+
+    @Override
+    protected void layoutChildren() {
+      super.layoutChildren();
+
+      if (firstLayout) {
+        firstLayout = false;
+        layoutJogAmpBug1504();
+      }
+    }
+
+    private void layoutJogAmpBug1504() {
+      double width = getWidth();
+      double height = getHeight();
+
+      canvas.setWidth(width);
+      canvas.setHeight(height);
+
+      widthProperty().addListener((obs, oldVal, newVal) ->
+          canvas.setWidth(newVal.doubleValue()));
+
+      heightProperty().addListener((obs, oldVal, newVal) ->
+          canvas.setHeight(newVal.doubleValue()));
+
+      // Work around #1504 with late reparent the NewtCanvas pane.
+      getChildren().add(canvas);
+
+      // Without JogAmp Bug #1504, this should happen in activate().
+      // Canvas canvas = prepareCanvasBug1504(jogl);
+      jogl.start();
+    }
   }
 }

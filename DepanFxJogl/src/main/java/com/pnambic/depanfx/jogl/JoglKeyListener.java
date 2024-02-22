@@ -15,14 +15,19 @@ public class JoglKeyListener implements KeyListener {
   private final static Logger LOG =
       LoggerFactory.getLogger(JoglKeyListener.class);
 
-  public static class KeyAction {
+  public interface KeyAction {
+    boolean matches(KeyEvent event);
+    void apply(KeyEvent event);
+  }
+
+  public static class SymbolAction implements KeyAction {
     private final short actionSymbol;
 
     private final int actionMods;
 
     private final BiConsumer<Short, Integer> keyAction;
 
-    public KeyAction(
+    public SymbolAction(
         short actionSymbol, int actionMods,
         BiConsumer<Short, Integer> keyAction) {
       this.actionSymbol = actionSymbol;
@@ -30,6 +35,7 @@ public class JoglKeyListener implements KeyListener {
       this.keyAction = keyAction;
     }
 
+    @Override
     public boolean matches(KeyEvent event) {
       if (event.getKeySymbol() != actionSymbol) {
         return false;
@@ -41,8 +47,33 @@ public class JoglKeyListener implements KeyListener {
       return true;
     }
 
+    @Override
     public void apply(KeyEvent event) {
       keyAction.accept(event.getKeySymbol(), event.getModifiers());
+      LOG.info("Applied action for key event {}", event);
+    }
+  }
+
+  public static class CharAction implements KeyAction {
+    private final char actionChar;
+
+    private final BiConsumer<Character, Integer> keyAction;
+
+    public CharAction(
+        char actionChar,
+        BiConsumer<Character, Integer> keyAction) {
+      this.actionChar = actionChar;
+      this.keyAction = keyAction;
+    }
+
+    @Override
+    public boolean matches(KeyEvent event) {
+      return event.getKeyChar() == actionChar;
+    }
+
+    @Override
+    public void apply(KeyEvent event) {
+      keyAction.accept(event.getKeyChar(), event.getModifiers());
       LOG.info("Applied action for key event {}", event);
     }
   }
@@ -61,11 +92,13 @@ public class JoglKeyListener implements KeyListener {
 
   @Override
   public void keyPressed(KeyEvent event) {
+    LOG.info("Key press {}", event);
     performActions(event, pressActions);
   }
 
   @Override
   public void keyReleased(KeyEvent event) {
+    LOG.info("Key release {}", event);
     performActions(event, releaseActions);
   }
 

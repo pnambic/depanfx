@@ -86,6 +86,18 @@ public class JoglCamera {
       lookAtZ = source.lookAtZ;
       zoom = source.zoom;
     }
+
+    public float[] captureCamera() {
+      return new float[] {
+          (float) cameraX, (float) cameraY, (float) cameraZ
+      };
+    }
+
+    public float[] captureLookAt() {
+      return new float[] {
+          (float) lookAtX, (float) lookAtY, (float) lookAtZ
+      };
+    }
   }
 
   /** Allocate one to retrieve snapshot data at rendering time. */
@@ -132,14 +144,7 @@ public class JoglCamera {
         0.0f, 1.0f, 0.0f);
   }
 
-  public void dollyCamera(double dollyX, double dollyY, double dollyZ) {
-    updateCamera.cameraX += dollyX;
-    updateCamera.lookAtX += dollyX;
-
-    updateCamera.cameraY += dollyY;
-    updateCamera.lookAtY += dollyY;
-
-    updateCamera.cameraZ += dollyZ;
-    updateCamera.lookAtZ += dollyZ;
+  public void updateCamera(CameraData updateData) {
+    updateCamera.capture(updateData);
   }
 }

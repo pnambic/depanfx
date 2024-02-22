@@ -6,6 +6,7 @@ import net.rgielen.fxweaver.core.FxWeaver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
@@ -24,6 +25,10 @@ public class DepanFxDialogRunner {
     this.fxweaver = fxweaver;
   }
 
+  public <T> FxControllerAndView<T, Node> weaveFxmlView(Class<T> type) {
+    return fxweaver.load(type);
+  }
+
   public static void runDialog(Parent dialogPane, String title) {
     Stage dialogStage = new Stage();
     dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -39,7 +44,7 @@ public class DepanFxDialogRunner {
    */
   public void runDialog(Class<?> type, String title) {
     // Equivalent to createDialogAndParent(type).runDialog(title),
-    // but avoids an object creation.s
+    // but avoids an object creation.
     Parent view = fxweaver.loadView(type);
     runDialog(view, title);
   }

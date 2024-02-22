@@ -53,8 +53,6 @@ public class DepanFxNodeViewPanel {
 
   private final DepanFxNodeViewData viewData;
 
-  private Map<GraphNode, BooleanProperty> nodesCheckBoxStates;
-
   private Collection<GraphNode> viewNodes;
 
   private Map<GraphNode, DepanFxNodeLocationData> nodeLocations;
@@ -62,6 +60,8 @@ public class DepanFxNodeViewPanel {
   private Map<GraphNode, DepanFxNodeDisplayData> nodeDisplay;
 
   private Map<GraphEdge, DepanFxEdgeDisplayData> edgeDisplay;
+
+  private Map<GraphNode, BooleanProperty> nodesCheckBoxStates;
 
   private DepanFxJoglView joglView;
 
@@ -198,7 +198,6 @@ public class DepanFxNodeViewPanel {
   }
 
   private DepanFxNodeViewSceneData buildSceneData() {
-    
     DepanFxNodeViewCameraData cameraInfo =
         joglView.getCameraData();
     DepanFxNodeViewSceneData result = new DepanFxNodeViewSceneData(
@@ -209,7 +208,8 @@ public class DepanFxNodeViewPanel {
   private DepanFxJoglView createJoglView() {
     DepanFxNodeViewCameraData cameraInfo =
         viewData.getSceneData().getCameraInfo();
-    DepanFxJoglView result = DepanFxJoglView.createJoglView(cameraInfo);
+    DepanFxJoglView result =
+        DepanFxJoglView.createJoglView(cameraInfo, dialogRunner);
     viewNodes.stream()
         .forEach(n -> installShape(result, n));
     return result;

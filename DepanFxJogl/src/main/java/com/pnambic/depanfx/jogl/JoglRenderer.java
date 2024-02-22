@@ -6,6 +6,9 @@ import com.jogamp.opengl.GL2ES1;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.fixedfunc.GLLightingFunc;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,6 +16,9 @@ import java.util.List;
 import java.util.Map;
 
 class JoglRenderer {
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(JoglRenderer.class);
 
   private static final float BACKGROUND_RED = JoglTransforms.colorByte(240);
 

@@ -40,17 +40,17 @@ public class DepanFxContextMenuBuilder {
     return result;
   }
 
-  public ContextMenu build() {
-    return result;
+  public void appendConditionalSeparator() {
+    if (!contextList.isEmpty()) {
+      appendSeparator();
+    }
   }
 
   public void appendSubMenu(Menu subMenu) {
     contextList.add(subMenu);
   }
 
-  public void appendConditionalSeparator() {
-    if (!contextList.isEmpty()) {
-      appendSeparator();
-    }
+  public ContextMenu build() {
+    return result;
   }
 }

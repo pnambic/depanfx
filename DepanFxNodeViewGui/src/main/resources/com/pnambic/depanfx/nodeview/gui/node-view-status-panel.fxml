@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewStatusPanel" >
+
+   <HBox spacing="10" layoutX="10" layoutY="10"
+         AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"
+         AnchorPane.topAnchor="10" AnchorPane.bottomAnchor="1">
+
+         <HBox spacing="5">
+             <Label text="Camera"/>
+             <HBox spacing="2">
+                 <Label text="x:"/>
+                 <Label fx:id="cameraXField"/>
+                 <Label text="y:"/>
+                 <Label fx:id="cameraYField"/>
+                 <Label text="z:"/>
+                 <Label fx:id="cameraZField"/>
+             </HBox>
+         </HBox>
+
+         <HBox spacing="5">
+             <Label text="LookAt"/>
+             <HBox spacing="2">
+                 <Label text="x:"/>
+                 <Label fx:id="lookAtXField"/>
+                 <Label text="y:"/>
+                 <Label fx:id="lookAtYField"/>
+                 <Label text="z:"/>
+                 <Label fx:id="lookAtZField"/>
+             </HBox>
+         </HBox>
+
+         <HBox spacing="5">
+             <Label text="Zoom"/>
+             <Label fx:id="zoomField"/>
+         </HBox>
+
+         <Region HBox.hgrow="ALWAYS" />
+
+         <HBox spacing="10">
+             <Label text="FPS"/>
+             <Label fx:id="fpsField"/>
+         </HBox>
+   </HBox>
+
+</AnchorPane>
