@@ -73,9 +73,6 @@ public class DepanFxNodeViewDataConverter
       GRAPH_DOC, NODE_VIEW_NAME, NODE_VIEW_DESCR, SCENE_DATA
   };
 
-  private static final String[] META_TAGSX =
-      TAG_LOADER.getTags().stream().toArray(String[]::new);
-
   @Override
   public Class<?> forType() {
     return DepanFxNodeViewData.class;

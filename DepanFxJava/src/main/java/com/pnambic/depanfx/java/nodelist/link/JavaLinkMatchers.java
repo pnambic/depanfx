@@ -4,7 +4,6 @@ import com.pnambic.depanfx.java.context.JavaContextDefinition;
 import com.pnambic.depanfx.java.graph.JavaRelation;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatchers.Composite;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatchers.ForwardRelation;
 

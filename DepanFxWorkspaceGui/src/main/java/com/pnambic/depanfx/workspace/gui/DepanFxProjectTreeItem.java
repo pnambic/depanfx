@@ -74,6 +74,7 @@ public class DepanFxProjectTreeItem extends TreeItem<DepanFxWorkspaceMember> {
       }
     }
 
+    @Override
     public void onDocumentAdded(DepanFxProjectDocument projDoc) {
       Optional<TreeItem<DepanFxWorkspaceMember>> optParentItem =
           projDoc.getParent()

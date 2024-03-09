@@ -25,6 +25,7 @@ public class MethodNode extends MemberNode {
         JavaContextDefinition.METHOD_NKID, fqcn, memberName));
   }
 
+  @Override
   public String toString() {
     String kindKey = getId().getContextNodeKindId().getNodeKindKey();
     return kindKey + ":" + getId().getNodeKey();

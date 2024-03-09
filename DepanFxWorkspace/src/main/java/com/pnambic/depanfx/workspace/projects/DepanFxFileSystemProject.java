@@ -101,6 +101,7 @@ public class DepanFxFileSystemProject implements DepanFxProjectSpi {
     docPath.toFile().delete();
   }
 
+  @Override
   public Stream<DepanFxProjectMember> getMembers(DepanFxProjectMember projDoc) {
     if (projDoc instanceof DepanFxProjectContainer) {
       return scanDirectory((DepanFxProjectContainer) projDoc);

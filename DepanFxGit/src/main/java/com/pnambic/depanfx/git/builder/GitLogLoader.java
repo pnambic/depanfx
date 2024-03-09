@@ -145,8 +145,6 @@ public class GitLogLoader {
 
     private final String branchName;
 
-    private final int logMax;
-
     private final int digits;
 
     private int count = 0;
@@ -158,7 +156,6 @@ public class GitLogLoader {
       this.graphRsrc = graphRsrc;
       this.dstDir = dstDir;
       this.branchName = branchName;
-      this.logMax = logMax;
       this.digits = 1 + (int) Math.floor(Math.log10(logMax - 1));
     }
 

@@ -37,11 +37,13 @@ public abstract class JavaNodeConverter<T extends JavaNode>
     return nodeTag;
   }
 
+  @Override
   public void marshal(PersistMarshalContext dstContext, Object source) {
     JavaNode node = (JavaNode) source;
     marshalValue(dstContext, node.getId().getNodeKey());
   }
 
+  @Override
   public T unmarshal(PersistUnmarshalContext srcContext) {
     String nodeKey = srcContext.getValue();
     return createNode(nodeKey);

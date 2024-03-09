@@ -23,6 +23,7 @@ public class DepanFxSimpleTreeModel implements DepanFxTreeModel, DepanFxAdjacenc
     this.roots = roots;
   }
 
+  @Override
   public DepanFxWorkspaceResource getGraphDocResource() {
     return graphDocResource;
   }

@@ -5,7 +5,6 @@ import com.pnambic.depanfx.bytecode.AsmFactory;
 import com.pnambic.depanfx.bytecode.ClassAnalysisStats;
 import com.pnambic.depanfx.bytecode.ClassFileReader;
 import com.pnambic.depanfx.bytecode.ClassTreeLoader;
-import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;

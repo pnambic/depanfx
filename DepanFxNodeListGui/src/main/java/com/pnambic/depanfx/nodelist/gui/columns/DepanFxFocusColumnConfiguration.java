@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -54,7 +55,7 @@ public class DepanFxFocusColumnConfiguration {
 
     @Override
     public boolean acceptsPath(Path rsrcPath) {
-      return DepanFxFocusColumnData.FOCUS_COLUMN_TOOL_EXT.equals(rsrcPath);
+      return DepanFxNodeListColumnData.COLUMNS_TOOL_PATH.equals(rsrcPath);
     }
 
     @Override
