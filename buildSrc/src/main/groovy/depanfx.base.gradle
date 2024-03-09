@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.pnambic.depanfx'
-sourceCompatibility = '17'
+sourceCompatibility = '21'
 
 repositories {
   // Use Maven Central for resolving dependencies.
