@@ -10,6 +10,10 @@ import java.util.Collections;
 
 public class DepanFxLinkMatcherBuiltIns {
 
+  private static final String MATCH_ALL_MATCHER_LABEL = "All Edges";
+
+  private static final String MATCH_ALL_MATCHER_DESCR = "All Edges";
+
   private static final String MATCH_ALL_DOC_NAME = "All Edges";
 
   private DepanFxLinkMatcherBuiltIns() {
@@ -20,6 +24,8 @@ public class DepanFxLinkMatcherBuiltIns {
   public DepanFxBuiltInContribution allEdgeMatcher() {
     DepanFxLinkMatcherDocument allEdgeMatcherDoc =
         new DepanFxLinkMatcherDocument(
+            MATCH_ALL_MATCHER_LABEL,
+            MATCH_ALL_MATCHER_DESCR,
             BaseContextDefinition.MODEL_ID,
             Collections.emptyList(),
             DepanFxLinkMatchers.ALL_EDGES_FORWARD);

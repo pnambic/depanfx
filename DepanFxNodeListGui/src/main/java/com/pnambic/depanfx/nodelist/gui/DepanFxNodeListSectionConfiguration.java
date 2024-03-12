@@ -122,6 +122,7 @@ public class DepanFxNodeListSectionConfiguration {
         .resolve("Tree Member");
     DepanFxLinkMatcherDocument finderMatcher =
         new DepanFxLinkMatcherDocument(
+            "Tree Member", "Synthetic tree membership",
             null, DepanFxLinkMatcherGroup.MEMBER_MATCHER_GROUP, null);
     return new DepanFxBuiltInContribution.Simple(docPath, finderMatcher);
   }

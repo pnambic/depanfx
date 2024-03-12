@@ -68,10 +68,14 @@ public class JavaLinkMatchers {
       new Composite(JAVA_CLASS_MEMBERS);
 
   public static final DepanFxLinkMatcherDocument JAVA_MEMBER_DOC =
-      new DepanFxLinkMatcherDocument(JavaContextDefinition.MODEL_ID,
+      new DepanFxLinkMatcherDocument(
+          "Java Member", "Java entity membership.",
+          JavaContextDefinition.MODEL_ID,
           Collections.emptyList(), JAVA_CLASS_MEMBER_MATCH);
 
   public static final DepanFxLinkMatcherDocument CALL_DOC =
-      new DepanFxLinkMatcherDocument(JavaContextDefinition.MODEL_ID,
+      new DepanFxLinkMatcherDocument(
+          "Java Call", "Java method call.",
+          JavaContextDefinition.MODEL_ID,
           Collections.emptyList(), CALL_FORWARD);
 }

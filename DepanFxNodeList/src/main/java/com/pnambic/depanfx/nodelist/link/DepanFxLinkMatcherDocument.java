@@ -2,11 +2,12 @@ package com.pnambic.depanfx.nodelist.link;
 
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
+import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import java.nio.file.Path;
 import java.util.List;
 
-public class DepanFxLinkMatcherDocument {
+public class DepanFxLinkMatcherDocument extends DepanFxBaseToolData {
 
   public static final String LINK_MATCHER_TOOL_DIR =
       "Link Matchers";
@@ -20,8 +21,11 @@ public class DepanFxLinkMatcherDocument {
 
   private final DepanFxLinkMatcher matcher;
 
-  public DepanFxLinkMatcherDocument(ContextModelId contextModelId,
-      List<DepanFxLinkMatcher> matchGroups, DepanFxLinkMatcher matcher) {
+  public DepanFxLinkMatcherDocument(
+      String toolName, String toolDescription,
+      ContextModelId contextModelId, List<DepanFxLinkMatcher> matchGroups,
+      DepanFxLinkMatcher matcher) {
+    super(toolName, toolDescription);
     this.contextModelId = contextModelId;
     this.matchGroups = matchGroups;
     this.matcher = matcher;

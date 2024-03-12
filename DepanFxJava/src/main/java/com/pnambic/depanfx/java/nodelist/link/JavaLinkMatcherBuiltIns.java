@@ -38,6 +38,7 @@ public class JavaLinkMatcherBuiltIns {
 
   public static final DepanFxLinkMatcherDocument MEMBER_DOC =
       new DepanFxLinkMatcherDocument(
+          "Java Relationship", "Java relationship.",
           JavaContextDefinition.MODEL_ID,
           DepanFxLinkMatcherGroup.MEMBER_MATCHER_GROUP, MEMBER);
 

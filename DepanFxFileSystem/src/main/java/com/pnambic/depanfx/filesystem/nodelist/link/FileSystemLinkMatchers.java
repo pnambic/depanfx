@@ -35,14 +35,20 @@ public class FileSystemLinkMatchers {
   public static final Composite MEMBER = new Composite(FILE_SYSTEM_MEMBERS);
 
   public static final DepanFxLinkMatcherDocument MEMBER_DOC =
-      new DepanFxLinkMatcherDocument(FileSystemContextDefinition.MODEL_ID,
+      new DepanFxLinkMatcherDocument(
+          "File System Relationship", "File system relationship.",
+          FileSystemContextDefinition.MODEL_ID,
           DepanFxLinkMatcherGroup.MEMBER_MATCHER_GROUP, MEMBER);
 
   public static final DepanFxLinkMatcherDocument DIRECTORY_DOC =
-      new DepanFxLinkMatcherDocument(FileSystemContextDefinition.MODEL_ID,
+      new DepanFxLinkMatcherDocument(
+          "Directory Matcher", "Matches directories.",
+          FileSystemContextDefinition.MODEL_ID,
           Collections.emptyList(), DIRECTORY_FORWARD);
 
   public static final DepanFxLinkMatcherDocument FILE_DOC =
-      new DepanFxLinkMatcherDocument(FileSystemContextDefinition.MODEL_ID,
+      new DepanFxLinkMatcherDocument(
+          "File Matcher", "Matches files.",
+          FileSystemContextDefinition.MODEL_ID,
           Collections.emptyList(), FILE_FORWARD);
 }
