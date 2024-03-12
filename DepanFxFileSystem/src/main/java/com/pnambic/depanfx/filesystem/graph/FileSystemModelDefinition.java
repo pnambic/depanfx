@@ -3,7 +3,9 @@ package com.pnambic.depanfx.filesystem.graph;
 import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
 import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
 import com.pnambic.depanfx.graph.model.BasicGraphContextModel;
+import com.pnambic.depanfx.graph.model.GraphContextModel;
 import com.pnambic.depanfx.graph_doc.model.GraphContextDocument;
+import com.pnambic.depanfx.graph_doc.model.GraphContextlModelDefinition;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 
 import org.springframework.context.annotation.Bean;
@@ -11,7 +13,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 
 @Configuration
 public class FileSystemModelDefinition {
@@ -21,7 +22,7 @@ public class FileSystemModelDefinition {
   public static final BasicGraphContextModel MODEL =
       new BasicGraphContextModel(
           FileSystemContextDefinition.MODEL_ID,
-          Collections.emptyList(),
+          Arrays.asList(GraphContextlModelDefinition.BASE_DEPENDENCY),
           Arrays.asList(FileSystemContextDefinition.NODE_KIND_IDS),
           Arrays.asList(FileSystemRelation.RELATIONS));
 
@@ -31,6 +32,12 @@ public class FileSystemModelDefinition {
           "Identifies the graph elements and components for the"
               + " File System graph context.",
           MODEL);
+
+  /**
+   * Convenience for extensions built on File System models.
+   */
+  public static final GraphContextModel[] FILE_SYSTEM_DEPENDENCY =
+      { GraphContextlModelDefinition.MODEL, MODEL };
 
   /** Goes into BuiltIn project under key, not label. */
   public static final Path BUILTIN_PATH =

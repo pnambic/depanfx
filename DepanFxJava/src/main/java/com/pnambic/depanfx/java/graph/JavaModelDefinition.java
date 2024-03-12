@@ -19,6 +19,7 @@ import com.pnambic.depanfx.filesystem.graph.FileSystemModelDefinition;
 import com.pnambic.depanfx.graph.model.BasicGraphContextModel;
 import com.pnambic.depanfx.graph.model.GraphContextModel;
 import com.pnambic.depanfx.graph_doc.model.GraphContextDocument;
+import com.pnambic.depanfx.graph_doc.model.GraphContextlModelDefinition;
 import com.pnambic.depanfx.java.context.JavaContextDefinition;
 import com.pnambic.depanfx.java.context.JavaContextModelId;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
@@ -34,14 +35,10 @@ public class JavaModelDefinition {
 
   public static final String JAVA_LABEL = "Java";
 
-  public static final GraphContextModel[] INCLUDED_MODELS = {
-      FileSystemModelDefinition.MODEL
-  };
-
   public static final BasicGraphContextModel MODEL =
       new BasicGraphContextModel(
           JavaContextDefinition.MODEL_ID,
-          Arrays.asList(INCLUDED_MODELS),
+          Arrays.asList(FileSystemModelDefinition.FILE_SYSTEM_DEPENDENCY),
           Arrays.asList(JavaContextDefinition.NODE_KIND_IDS),
           Arrays.asList(JavaRelation.RELATIONS));
 
@@ -51,6 +48,15 @@ public class JavaModelDefinition {
           "Identifies the graph elements and components for"
               + " Java graph context.",
           MODEL);
+
+  /**
+   * Convenience for extensions built on Java models.
+   */
+  public static final GraphContextModel[] JAVA_DEPENDENCY = {
+      GraphContextlModelDefinition.MODEL,
+      FileSystemModelDefinition.MODEL,
+      MODEL
+  };
 
   /** Goes into BuiltIn project under key, not label. */
   public static final Path BUILTIN_PATH =

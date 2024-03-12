@@ -13,6 +13,26 @@ public class DepanFxLinkMatchers {
     // Prevent instantiation.
   }
 
+  public static final DepanFxLinkMatcher ALL_EDGES_FORWARD =
+
+      new DepanFxLinkMatcher() {
+
+        @Override
+        public Optional<DepanFxLink> match(GraphEdge edge) {
+          return Optional.of(new DepanFxLink.Forward(edge));
+        }
+  };
+
+  public static final DepanFxLinkMatcher ALL_EDGES_REVERSE =
+
+      new DepanFxLinkMatcher() {
+
+        @Override
+        public Optional<DepanFxLink> match(GraphEdge edge) {
+          return Optional.of(new DepanFxLink.Reverse(edge));
+        }
+  };
+
   public static class ForwardRelation implements DepanFxLinkMatcher {
 
     private final Relation<? extends ContextRelationId> forwardRelation;

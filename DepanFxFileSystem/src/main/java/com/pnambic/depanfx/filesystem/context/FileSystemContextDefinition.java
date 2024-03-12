@@ -2,6 +2,10 @@ package com.pnambic.depanfx.filesystem.context;
 
 public class FileSystemContextDefinition {
 
+  private FileSystemContextDefinition() {
+    // Prevent instantiation.
+  }
+
   public static final FileSystemContextModelId MODEL_ID =
       new FileSystemContextModelId();
 

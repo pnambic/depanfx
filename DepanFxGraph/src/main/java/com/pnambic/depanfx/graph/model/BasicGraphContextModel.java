@@ -1,9 +1,9 @@
 package com.pnambic.depanfx.graph.model;
 
-import java.util.Collection;
-
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.context.ContextNodeKindId;
+
+import java.util.Collection;
 
 public class BasicGraphContextModel implements GraphContextModel {
 
