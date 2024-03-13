@@ -1,9 +1,10 @@
 package com.pnambic.depanfx.jogl.shapes;
 
 import com.jogamp.opengl.GL2;
+import com.pnambic.depanfx.jogl.JoglRenderer;
 import com.pnambic.depanfx.jogl.JoglShape;
 
-public class DepanFxNodeShape implements JoglShape {
+public class NodeShape implements JoglShape {
 
   public static final float SPEED = 10.0f;
 
@@ -21,11 +22,11 @@ public class DepanFxNodeShape implements JoglShape {
 
   public double targetZ;
 
-  public float red;
+  public double red;
 
-  public float green;
+  public double green;
 
-  public float blue;
+  public double blue;
 
   public boolean showLabel;
 
@@ -36,8 +37,8 @@ public class DepanFxNodeShape implements JoglShape {
 
   private TextureLoader labelTexture;
 
-  public DepanFxNodeShape(
-      float red, float green, float blue,
+  public NodeShape(
+      double red, double green, double blue,
       double initialX, double initialY, double initialZ,
       boolean showLabel, String labelText) {
     this.red = red;
@@ -57,7 +58,7 @@ public class DepanFxNodeShape implements JoglShape {
   }
 
   @Override
-  public void draw(GL2 gl) {
+  public void draw(GL2 gl, JoglRenderer renderer) {
     gl.glTranslated(shapeX, shapeY, shapeZ);
     renderShape(gl);
 
@@ -67,7 +68,7 @@ public class DepanFxNodeShape implements JoglShape {
   }
 
   @Override
-  public void step(GL2 gl) {
+  public void step(GL2 gl, JoglRenderer renderer) {
     if (isBelowTolerance()) {
       stopAnimation();
       return;
@@ -89,7 +90,7 @@ public class DepanFxNodeShape implements JoglShape {
 
   protected void renderShape(GL2 gl) {
     gl.glBegin(GL2.GL_QUADS);
-    gl.glColor3f(red, green, blue);
+    gl.glColor3d(red, green, blue);
     gl.glVertex3f(-1.0f, 1.0f, 0.0f);
     gl.glVertex3f( 1.0f, 1.0f, 0.0f);
     gl.glVertex3f( 1.0f,-1.0f, 0.0f);

@@ -5,18 +5,22 @@ import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.docdata.NodeInfoBlock;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxEdgeDisplayData;
+import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewLinkDisplayDataBuiltIns;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewSceneData;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
 import com.pnambic.depanfx.persistence.PersistMarshalContext;
 import com.pnambic.depanfx.persistence.PersistTagDataLoader;
 import com.pnambic.depanfx.persistence.PersistUnmarshalContext;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +43,8 @@ public class DepanFxNodeViewDataConverter
 
   public static final String GRAPH_DOC = "graph-doc";
 
+  public static final String LINK_DISPLAY_DOC = "link-display-doc";
+
   public static final String NODE_VIEW_NAME = "node-view-name";
 
   public static final String NODE_VIEW_DESCR = "node-view-descr";
@@ -51,13 +57,15 @@ public class DepanFxNodeViewDataConverter
           DepanFxJoglColor.class, DepanFxNodeViewCameraData.class,
       NodeInfoBlock.class,
           DepanFxNodeLocationData.class, DepanFxNodeDisplayData.class,
-      DepanFxEdgeDisplayData.class
+      DepanFxLineDisplayData.class
   };
 
   private static final PersistTagDataLoader.TagDescriptor[] TAG_DATA_DESCR =
       new PersistTagDataLoader.TagDescriptor[] {
           new PersistTagDataLoader.TagDescriptor(
               GRAPH_DOC, DepanFxWorkspaceResource.class),
+          new PersistTagDataLoader.TagDescriptor(
+              LINK_DISPLAY_DOC, DepanFxWorkspaceResource.class),
           new PersistTagDataLoader.TagDescriptor(NODE_VIEW_NAME, String.class),
           new PersistTagDataLoader.TagDescriptor(NODE_VIEW_DESCR, String.class),
           new PersistTagDataLoader.TagDescriptor(
@@ -70,7 +78,7 @@ public class DepanFxNodeViewDataConverter
       new PersistTagDataLoader(TAG_DATA_DESCR, TAGS_ALIAS);
 
   private static final String[] META_TAGS = new String[] {
-      GRAPH_DOC, NODE_VIEW_NAME, NODE_VIEW_DESCR, SCENE_DATA
+      GRAPH_DOC, LINK_DISPLAY_DOC, NODE_VIEW_NAME, NODE_VIEW_DESCR, SCENE_DATA
   };
 
   @Override
@@ -92,8 +100,12 @@ public class DepanFxNodeViewDataConverter
   public void marshal(PersistMarshalContext dstContext, Object source) {
     DepanFxNodeViewData viewData = (DepanFxNodeViewData) source;
 
-    marshalObject(dstContext, GRAPH_DOC, viewData.getGraphDocRsrc());
-    marshalObject(dstContext, NODE_VIEW_NAME, viewData.getToolName());
+    marshalObject(dstContext,
+        GRAPH_DOC, viewData.getGraphDocRsrc());
+    marshalObject(dstContext,
+        LINK_DISPLAY_DOC, viewData.getLinkDisplayDocRsrc());
+    marshalObject(dstContext,
+        NODE_VIEW_NAME, viewData.getToolName());
     marshalObject(dstContext,
         NODE_VIEW_DESCR, viewData.getToolDescription());
     marshalObject(dstContext,
@@ -112,6 +124,8 @@ public class DepanFxNodeViewDataConverter
     String toolDescr = (String) metaData.get(NODE_VIEW_DESCR);
     DepanFxWorkspaceResource graphDocRsrc =
         (DepanFxWorkspaceResource) metaData.get(GRAPH_DOC);
+    DepanFxWorkspaceResource linkDisplayDocRsrc =
+        (DepanFxWorkspaceResource) metaData.get(LINK_DISPLAY_DOC);
     DepanFxNodeViewSceneData sceneData =
         (DepanFxNodeViewSceneData) metaData.get(SCENE_DATA);
 
@@ -142,7 +156,18 @@ public class DepanFxNodeViewDataConverter
         nodeBuilder.getNodeLocations();
     Map<GraphNode, DepanFxNodeDisplayData> nodeDisplay =
         nodeBuilder.getNodeDisplay();
-    return new DepanFxNodeViewData(toolName, toolDescr, sceneData, graphDocRsrc,
+
+    if (linkDisplayDocRsrc == null) {
+      DepanFxWorkspace workspace =
+          (DepanFxWorkspace) srcContext.getContextValue(DepanFxWorkspace.class);
+      linkDisplayDocRsrc =
+          DepanFxProjects.getBuiltIn(workspace,
+              DepanFxNodeViewLinkDisplayData.class,
+              DepanFxNodeViewLinkDisplayDataBuiltIns.ALL_EDGES_DOC_PATH)
+          .get();
+    }
+    return new DepanFxNodeViewData(toolName, toolDescr, sceneData,
+        graphDocRsrc, linkDisplayDocRsrc,
         viewNodes, nodeLocations, nodeDisplay, Collections.emptyMap());
   }
 

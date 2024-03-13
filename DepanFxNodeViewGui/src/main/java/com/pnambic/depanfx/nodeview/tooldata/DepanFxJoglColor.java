@@ -2,40 +2,56 @@ package com.pnambic.depanfx.nodeview.tooldata;
 
 import com.pnambic.depanfx.jogl.JoglTransforms;
 
+import javafx.scene.paint.Color;
+
+/**
+ * A serializable version of JavaFX's Color.
+ */
 public class DepanFxJoglColor {
 
-  private final float red;
+  private final double red;
 
-  private final float green;
+  private final double green;
 
-  private final float blue;
+  private final double blue;
 
-  public DepanFxJoglColor(float red, float green, float blue) {
+  public DepanFxJoglColor(double red, double green, double blue) {
     this.red = red;
     this.green = green;
     this.blue = blue;
   }
 
-  public static DepanFxJoglColor ofRGB(int red, int green, int blue) {
+  public static DepanFxJoglColor of(Color color) {
     return new DepanFxJoglColor(
-        JoglTransforms.colorByte(red),
-        JoglTransforms.colorByte(green),
-        JoglTransforms.colorByte(blue));
+        color.getRed(), color.getGreen(), color.getBlue());
   }
 
-  public float[] getColor() {
-    return new float[] { red, green, blue };
+  public static DepanFxJoglColor rgb(
+      int redColor, int greenColor, int blueColor) {
+    return new DepanFxJoglColor(
+        JoglTransforms.colorByte(redColor),
+        JoglTransforms.colorByte(greenColor),
+        JoglTransforms.colorByte(blueColor));
   }
 
-  public float getRed() {
+  public double[] getColor() {
+    return new double[] { red, green, blue };
+  }
+
+  public double getRed() {
     return red;
   }
 
-  public float getGreen() {
+  public double getGreen() {
     return green;
   }
 
-  public float getBlue() {
+  public double getBlue() {
     return blue;
+  }
+
+  public Color toFxColor() {
+    return Color.color(
+        getRed(), getGreen(), getBlue());
   }
 }

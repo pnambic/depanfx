@@ -4,14 +4,15 @@ import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
-import com.pnambic.depanfx.jogl.JoglShape;
-import com.pnambic.depanfx.jogl.shapes.DepanFxNodeShape;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxEdgeDisplayData;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
+import com.pnambic.depanfx.nodeview.jogl.JoglLines;
+import com.pnambic.depanfx.nodeview.jogl.JoglShapes;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewSceneData;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -23,9 +24,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -59,7 +61,7 @@ public class DepanFxNodeViewPanel {
 
   private Map<GraphNode, DepanFxNodeDisplayData> nodeDisplay;
 
-  private Map<GraphEdge, DepanFxEdgeDisplayData> edgeDisplay;
+  private Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay;
 
   private Map<GraphNode, BooleanProperty> nodesCheckBoxStates;
 
@@ -173,8 +175,32 @@ public class DepanFxNodeViewPanel {
         INVERT_SELECTION_ITEM, e -> doInvertSelectionAction());
     builder.appendSeparator();
     builder.appendActionItem(
+        DepanFxNodeViewLinkDisplayDialog.EDIT_LINK_DISPLAY,
+        e -> runEditLinkDisplayDialog());
+    builder.appendSeparator();
+    builder.appendActionItem(
         SAVE_NODE_VIEW_ITEM, e -> runSaveNodeViewDialog());
     return builder.build();
+  }
+
+  private void runEditLinkDisplayDialog() {
+    DepanFxNodeViewLinkDisplayData linkDisplayData = buildLinkDisplayData();
+    Dialog<DepanFxNodeViewLinkDisplayDialog> linkDisplayDgl =
+        DepanFxNodeViewLinkDisplayDialog.runEditDialog(
+            linkDisplayData, dialogRunner);
+
+    // TODO: apply any outstanding changes from the dialog.
+    // However, most changes should be live modifications.
+  }
+
+  private DepanFxNodeViewLinkDisplayData buildLinkDisplayData() {
+    DepanFxNodeViewLinkDisplayData linkDisplayData =
+        (DepanFxNodeViewLinkDisplayData) viewData.getLinkDisplayDocRsrc().getResource();
+    List<LinkDisplayEntry> linkDisplayEntries =
+        linkDisplayData.streamLinkDisplay().collect(Collectors.toList());
+    return new DepanFxNodeViewLinkDisplayData(
+        viewData.getToolName(), viewData.getToolDescription(),
+        linkDisplayData.getContextModelId(), linkDisplayEntries);
   }
 
   private void runSaveNodeViewDialog() {
@@ -192,8 +218,8 @@ public class DepanFxNodeViewPanel {
     DepanFxNodeViewData result = new DepanFxNodeViewData(
         viewData.getToolName(), viewData.getToolDescription(),
         buildSceneData(),
-        viewData.getGraphDocRsrc(), viewNodes,
-        nodeLocations, nodeDisplay, edgeDisplay);
+        viewData.getGraphDocRsrc(), viewData.getLinkDisplayDocRsrc(),
+        viewNodes, nodeLocations, nodeDisplay, edgeDisplay);
     return result ;
   }
 
@@ -212,40 +238,47 @@ public class DepanFxNodeViewPanel {
         DepanFxJoglView.createJoglView(cameraInfo, dialogRunner);
     viewNodes.stream()
         .forEach(n -> installShape(result, n));
+    getViewEdges()
+        .forEach(e -> installEdge(result, e));
     return result;
   }
 
   private void installShape(DepanFxJoglView view, GraphNode node) {
-    createShape(node)
-        .ifPresent(s -> view.updateShape(node, s));
-  }
 
-  private Optional<JoglShape> createShape(GraphNode node) {
     DepanFxNodeLocationData location = nodeLocations.get(node);
     if (location == null) {
-      return Optional.empty();
+      return;
     }
-    DepanFxNodeDisplayData display = nodeDisplay.get(node);
-    if (display == null) {
-      return Optional.empty();
+    DepanFxNodeDisplayData displayInfo = nodeDisplay.get(node);
+    if (displayInfo == null) {
+      return;
     }
-
-    DepanFxJoglColor color = display.color;
-    String nodeName = guessName(node);
-    return Optional.of(new DepanFxNodeShape(
-        color.getRed(), color.getGreen(), color.getBlue(),
-        location.xPos, location.yPos, location.zPos,
-        true, nodeName));
+    JoglShapes.installShape(view, node, location, displayInfo);
   }
 
-  private String guessName(GraphNode node) {
-    String nodeKey = node.getId().getNodeKey();
-    String[] nameWords = nodeKey.split("[./\\\\]");
-    int lastSplit = nameWords.length - 1;
-    if (lastSplit > 0) {
-      return nameWords[lastSplit - 1];
+  private Stream<GraphEdge> getViewEdges() {
+    return getGraphDoc().getGraph().getEdges().stream()
+        .map(GraphEdge.class::cast)
+        .filter(this::isViewEdge);
+  }
+
+  private boolean isViewEdge(GraphEdge edge) {
+    if (!viewNodes.contains(edge.getHead())) {
+      return false;
     }
-    return nameWords[lastSplit];
+    if (!viewNodes.contains(edge.getTail())) {
+      return false;
+    }
+    return true;
+  }
+
+  private void installEdge(DepanFxJoglView result, GraphEdge edge) {
+
+    DepanFxNodeViewLinkDisplayData displayInfo =
+        (DepanFxNodeViewLinkDisplayData) viewData.getLinkDisplayDocRsrc().getResource();
+
+    displayInfo.getLinkDisplayEnty(edge)
+        .ifPresent(l -> JoglLines.installLine(result, edge, l));
   }
 
   /////////////////////////////////////

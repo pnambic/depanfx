@@ -137,6 +137,13 @@ public class DepanFxBuiltInProject implements DepanFxProjectSpi {
         .map(d -> new DepanFxWorkspaceResource.StaticWorkspaceResource(projDoc, d));
   }
 
+  private void installBuiltIns() {
+    projectTree = new BasicDepanFxProjectTree(this);
+    containers.put(getProjectPath(), projectTree);
+
+    builtIns.installBuiltIns(this);
+  }
+
   private static Path buildProjectPath() {
     return new File(BUILT_IN_ROOT_PATH).toPath();
   }
@@ -145,24 +152,7 @@ public class DepanFxBuiltInProject implements DepanFxProjectSpi {
     return projectTree;
   }
 
-  private void installBuiltIns() {
-    projectTree = new BasicDepanFxProjectTree(this);
-    containers.put(getProjectPath(), projectTree);
-
-    builtIns.getContribs().forEach(c -> addContribution(c));
-  }
-
-  private void addContribution(DepanFxBuiltInContribution contrib) {
-    Path contribPath = contrib.getPath();
-    DepanFxProjectContainer parentDir =
-        installProjectContainer(contribPath.getParent());
-    DepanFxProjectDocument contribDoc =
-        parentDir.getProject().asProjectDocument(contribPath).get();
-    documents.put(contribDoc, contrib);
-    members.put(parentDir, contribDoc);
-  }
-
-  private DepanFxProjectContainer installProjectContainer(Path projPath) {
+  public DepanFxProjectContainer installProjectContainer(Path projPath) {
     if (projPath == null) {
       return projectTree;
     }
@@ -178,5 +168,13 @@ public class DepanFxBuiltInProject implements DepanFxProjectSpi {
     containers.put(projPath, result);
     members.put(parentDir, result);
     return result;
+  }
+
+  public void installContribDoc(
+      DepanFxProjectContainer parentDir,
+      DepanFxProjectDocument contribDoc,
+      DepanFxBuiltInContribution contrib) {
+    documents.put(contribDoc, contrib);
+    members.put(parentDir, contribDoc);
   }
 }

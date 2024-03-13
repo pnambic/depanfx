@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.jogl.shapes;
 
 import com.jogamp.opengl.GL2;
+import com.pnambic.depanfx.jogl.JoglRenderer;
 import com.pnambic.depanfx.jogl.JoglShape;
 
 public class SquareShape implements JoglShape {
@@ -18,7 +19,7 @@ public class SquareShape implements JoglShape {
   }
 
   @Override
-  public void draw(GL2 gl) {
+  public void draw(GL2 gl, JoglRenderer renderer) {
     gl.glTranslatef(0.0f, 0.0f, -5.0f);
     gl.glBegin(GL2.GL_QUADS);
     gl.glColor3f(red, green, blue);
@@ -30,7 +31,7 @@ public class SquareShape implements JoglShape {
   }
 
   @Override
-  public void step(GL2 gl) {
+  public void step(GL2 gl, JoglRenderer renderer) {
     // Not animated.
   }
 }

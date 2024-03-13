@@ -7,10 +7,10 @@ public interface JoglShape {
   /**
    * Draw the shape with the current values.
    */
-  void draw(GL2 gl);
+  void draw(GL2 gl, JoglRenderer renderer);
 
   /**
    * Animate the shape by updating the current values.
    */
-  void step(GL2 gl);
+  void step(GL2 gl, JoglRenderer renderer);
 }

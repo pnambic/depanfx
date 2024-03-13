@@ -9,7 +9,7 @@ module depanfx.nodelist {
   requires depanfx.persistence;
   requires depanfx.workspace;
 
-  opens com.pnambic.depanfx.nodelist.link to spring.beans;
+  opens com.pnambic.depanfx.nodelist.link to spring.beans, spring.core;
   opens com.pnambic.depanfx.nodelist.persistence to spring.beans;
 
   exports com.pnambic.depanfx.nodelist.link;

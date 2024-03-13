@@ -27,25 +27,36 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
 
   private final DepanFxWorkspaceResource graphDocRsrc;
 
+  /**
+   * Source of default rendering data for edges.
+   *
+   * Edges are matched to a link, then rendered with that link's selections.
+   * Provides a {@link DepanFxNodeViewLinkDisplayData},
+   * with a stream of {@code LinkDisplayEnty} values.
+   */
+  private final DepanFxWorkspaceResource linkDisplayDocRsrc;
+
   private final Collection<GraphNode> viewNodes;
 
   private final Map<GraphNode, DepanFxNodeLocationData> nodeLocations;
 
   private final Map<GraphNode, DepanFxNodeDisplayData> nodeDisplay;
 
-  private final Map<GraphEdge, DepanFxEdgeDisplayData> edgeDisplay;
+  private final Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay;
 
   public DepanFxNodeViewData(
       String toolName, String toolDescription,
       DepanFxNodeViewSceneData sceneData,
       DepanFxWorkspaceResource graphDocRsrc,
+      DepanFxWorkspaceResource linkDisplayDocRsrc,
       Collection<GraphNode> viewNodes,
       Map<GraphNode, DepanFxNodeLocationData> nodeLocations,
       Map<GraphNode, DepanFxNodeDisplayData> nodeDisplay,
-      Map<GraphEdge, DepanFxEdgeDisplayData> edgeDisplay) {
+      Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay) {
     super(toolName, toolDescription);
     this.sceneData = sceneData;
     this.graphDocRsrc = graphDocRsrc;
+    this.linkDisplayDocRsrc = linkDisplayDocRsrc;
     this.viewNodes = viewNodes;
     this.nodeLocations = nodeLocations;
     this.nodeDisplay = nodeDisplay;
@@ -56,9 +67,11 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
       String toolName, String toolDescription,
       DepanFxNodeViewSceneData sceneData,
       DepanFxWorkspaceResource graphDocRsrc,
+      DepanFxWorkspaceResource linkDisplayDocRsrc,
       Collection<GraphNode> viewNodes) {
-    this(toolName, toolDescription, sceneData, graphDocRsrc, viewNodes,
-        new HashMap<>(), new HashMap<>(), new HashMap<>());
+    this(toolName, toolDescription, sceneData,
+        graphDocRsrc, linkDisplayDocRsrc,
+        viewNodes, new HashMap<>(), new HashMap<>(), new HashMap<>());
   }
 
   public DepanFxNodeViewSceneData getSceneData() {
@@ -67,6 +80,10 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
 
   public DepanFxWorkspaceResource getGraphDocRsrc() {
     return graphDocRsrc;
+  }
+
+  public DepanFxWorkspaceResource getLinkDisplayDocRsrc() {
+    return linkDisplayDocRsrc;
   }
 
   /** Provide defensive copy. */
@@ -85,7 +102,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   }
 
   /** Provide defensive copy. */
-  public Map<GraphEdge, DepanFxEdgeDisplayData> getEdgeDisplay() {
+  public Map<GraphEdge, DepanFxLineDisplayData> getEdgeDisplay() {
     return new HashMap<>(edgeDisplay);
   }
 
@@ -100,7 +117,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   }
 
   /** Provide defensive copy. */
-  public DepanFxEdgeDisplayData getEdgeDisplay(GraphEdge edge) {
+  public DepanFxLineDisplayData getLineDisplay(GraphEdge edge) {
     return edgeDisplay.get(edge);
   }
 }
