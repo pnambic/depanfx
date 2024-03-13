@@ -13,7 +13,7 @@ public class JoglTransforms {
     // Prevent instantiation.
   }
 
-  public static float colorByte(int color) {
+  public static double colorByte(int color) {
     if (color <= COLOR_BYTE_MIN) {
       return 0.0f;
     }

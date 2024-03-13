@@ -52,7 +52,7 @@ import javafx.stage.Stage;
 public class DepanFxCategoryColumnToolDialog {
 
   private static final Logger LOG =
-      LoggerFactory.getLogger(DepanFxCategoryColumnToolDialog.class.getName());
+      LoggerFactory.getLogger(DepanFxCategoryColumnToolDialog.class);
 
   public static final ExtensionFilter CATEGORY_COLUMN_FILTER =
       DepanFxSceneControls.buildExtFilter(

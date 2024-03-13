@@ -6,13 +6,15 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.jogl.JoglShape;
 import com.pnambic.depanfx.jogl.shapes.DepanFxNodeShape;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxEdgeDisplayData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewSceneData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -23,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,6 +36,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tab;
+import javafx.scene.paint.Color;
 
 public class DepanFxNodeViewPanel {
 
@@ -59,7 +63,7 @@ public class DepanFxNodeViewPanel {
 
   private Map<GraphNode, DepanFxNodeDisplayData> nodeDisplay;
 
-  private Map<GraphEdge, DepanFxEdgeDisplayData> edgeDisplay;
+  private Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay;
 
   private Map<GraphNode, BooleanProperty> nodesCheckBoxStates;
 
@@ -173,8 +177,32 @@ public class DepanFxNodeViewPanel {
         INVERT_SELECTION_ITEM, e -> doInvertSelectionAction());
     builder.appendSeparator();
     builder.appendActionItem(
+        DepanFxNodeViewLinkDisplayDialog.EDIT_LINK_DISPLAY,
+        e -> runEditLinkDisplayDialog());
+    builder.appendSeparator();
+    builder.appendActionItem(
         SAVE_NODE_VIEW_ITEM, e -> runSaveNodeViewDialog());
     return builder.build();
+  }
+
+  private void runEditLinkDisplayDialog() {
+    DepanFxNodeViewLinkDisplayData linkDisplayData = buildLinkDisplayData();
+    Dialog<DepanFxNodeViewLinkDisplayDialog> linkDisplayDgl =
+        DepanFxNodeViewLinkDisplayDialog.runEditDialog(
+            linkDisplayData, dialogRunner);
+
+    // TODO: apply any outstanding changes from the dialog.
+    // However, most changes should be live modfications.
+  }
+
+  private DepanFxNodeViewLinkDisplayData buildLinkDisplayData() {
+    DepanFxNodeViewLinkDisplayData linkDisplayData =
+        (DepanFxNodeViewLinkDisplayData) viewData.getLinkDisplayDocRsrc().getResource();
+    List<LinkDisplayEntry> linkDisplayEntries =
+        linkDisplayData.streamLinkDisplay().collect(Collectors.toList());
+    return new DepanFxNodeViewLinkDisplayData(
+        viewData.getToolName(), viewData.getToolDescription(),
+        linkDisplayData.getContextModelId(), linkDisplayEntries);
   }
 
   private void runSaveNodeViewDialog() {
@@ -192,8 +220,8 @@ public class DepanFxNodeViewPanel {
     DepanFxNodeViewData result = new DepanFxNodeViewData(
         viewData.getToolName(), viewData.getToolDescription(),
         buildSceneData(),
-        viewData.getGraphDocRsrc(), viewNodes,
-        nodeLocations, nodeDisplay, edgeDisplay);
+        viewData.getGraphDocRsrc(), viewData.getLinkDisplayDocRsrc(),
+        viewNodes, nodeLocations, nodeDisplay, edgeDisplay);
     return result ;
   }
 

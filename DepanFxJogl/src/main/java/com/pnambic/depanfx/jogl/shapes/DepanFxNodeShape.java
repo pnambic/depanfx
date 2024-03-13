@@ -21,11 +21,11 @@ public class DepanFxNodeShape implements JoglShape {
 
   public double targetZ;
 
-  public float red;
+  public double red;
 
-  public float green;
+  public double green;
 
-  public float blue;
+  public double blue;
 
   public boolean showLabel;
 
@@ -37,7 +37,7 @@ public class DepanFxNodeShape implements JoglShape {
   private TextureLoader labelTexture;
 
   public DepanFxNodeShape(
-      float red, float green, float blue,
+      double red, double green, double blue,
       double initialX, double initialY, double initialZ,
       boolean showLabel, String labelText) {
     this.red = red;
@@ -89,7 +89,7 @@ public class DepanFxNodeShape implements JoglShape {
 
   protected void renderShape(GL2 gl) {
     gl.glBegin(GL2.GL_QUADS);
-    gl.glColor3f(red, green, blue);
+    gl.glColor3d(red, green, blue);
     gl.glVertex3f(-1.0f, 1.0f, 0.0f);
     gl.glVertex3f( 1.0f, 1.0f, 0.0f);
     gl.glVertex3f( 1.0f,-1.0f, 0.0f);

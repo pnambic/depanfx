@@ -92,13 +92,13 @@ public class JoglKeyListener implements KeyListener {
 
   @Override
   public void keyPressed(KeyEvent event) {
-    LOG.info("Key press {}", event);
+    LOG.debug("Key press {}", event);
     performActions(event, pressActions);
   }
 
   @Override
   public void keyReleased(KeyEvent event) {
-    LOG.info("Key release {}", event);
+    LOG.debug("Key release {}", event);
     performActions(event, releaseActions);
   }
 

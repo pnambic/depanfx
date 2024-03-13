@@ -20,11 +20,14 @@ class JoglRenderer {
   private static final Logger LOG =
       LoggerFactory.getLogger(JoglRenderer.class);
 
-  private static final float BACKGROUND_RED = JoglTransforms.colorByte(240);
+  private static final float BACKGROUND_RED =
+      (float) JoglTransforms.colorByte(240);
 
-  private static final float BACKGROUND_GREEN = JoglTransforms.colorByte(240);
+  private static final float BACKGROUND_GREEN =
+      (float) JoglTransforms.colorByte(240);
 
-  private static final float BACKGROUND_BLUE = JoglTransforms.colorByte(240);
+  private static final float BACKGROUND_BLUE =
+      (float) JoglTransforms.colorByte(240);
 
   private static final float BACKGROUND_ALPHA = 1.0f;
 
@@ -54,17 +57,11 @@ class JoglRenderer {
     gl.glShadeModel(GLLightingFunc.GL_SMOOTH);
     gl.glHint(GL2ES1.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
     gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-  }
 
-  public void enhance(GLAutoDrawable drawable) {
-    /*
-    //TODO: add options for this parameters: it looks way nicer,
-    //but is way slower ;)
-    gl.glEnable(GL.GL_LINE_SMOOTH);
-    gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);
-    gl.glEnable(GL.GL_POLYGON_SMOOTH);
-    gl.glHint(GL.GL_POLYGON_SMOOTH_HINT, GL.GL_NICEST);
-    */
+    // Other options to review
+    // enhance(gl);
+
+    LOG.info("initialized drawable");
   }
 
   public void reshape(
@@ -72,8 +69,12 @@ class JoglRenderer {
       final int x, final int y, final int width, final int height) {
     GL2 gl = drawable.getGL().getGL2();
     camera.reshapeCanvas(gl, x, y, width, height);
+    LOG.info("reshape to {}x{} @ ({}, {})", width, height, x, y);
   }
 
+  /**
+   * See frames per second for display details.
+   */
   public void display(final GLAutoDrawable drawable) {
     if (installUpdates()) {
       updateShapes();
@@ -90,6 +91,7 @@ class JoglRenderer {
   }
 
   public void dispose(final GLAutoDrawable drawable) {
+    LOG.info("disposing drawable");
   }
 
   private void drawShape(GL2 gl, JoglShape shape) {
@@ -100,6 +102,17 @@ class JoglRenderer {
 
   public void updateShape(Object key, JoglShape shape) {
     updates.put(key, shape);
+  }
+
+  private void enhance(GLAutoDrawable drawable) {
+    /*
+    //TODO: add options for this parameters: it looks way nicer,
+    //but is way slower ;)
+    gl.glEnable(GL.GL_LINE_SMOOTH);
+    gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_NICEST);
+    gl.glEnable(GL.GL_POLYGON_SMOOTH);
+    gl.glHint(GL.GL_POLYGON_SMOOTH_HINT, GL.GL_NICEST);
+    */
   }
 
   private void updateShapes() {
