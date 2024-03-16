@@ -28,7 +28,12 @@ import java.util.stream.Stream;
  */
 public class DepanFxBuiltInProject implements DepanFxProjectSpi {
 
-  private static final String BUILT_IN_ROOT_PATH = "/";
+  /**
+   * This value is blank so
+   * {@link com.pnambic.depanfx.workspace.projects.DepanFxProjects.DepanFxProjects.TOOLS_PATH}
+   * and its derived values work in both the FileSystem and BuildIn projects.
+   */
+  private static final String BUILT_IN_ROOT_PATH = "";
 
   public static final String BUILT_IN_LABEL = "Built In";
 

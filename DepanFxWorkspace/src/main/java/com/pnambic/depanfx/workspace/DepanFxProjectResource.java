@@ -8,8 +8,6 @@ import java.util.Optional;
 
 public interface DepanFxProjectResource {
 
-  Path BUILT_IN_PROJECT_PATH = null;
-
   Optional<DepanFxWorkspaceResource> getResource(
       DepanFxWorkspace workspace, Class<?> docType);
 

@@ -96,7 +96,7 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   public List<DepanFxProjectTree> getProjectList() {
     List<DepanFxProjectTree> result = new ArrayList<>(projectList.size() + 1);
     result.addAll(projectList);
-    result.add(((DepanFxBuiltInProject) builtInProj).getProjectTree());
+    result.add(getBuiltInProjectTree());
     return result;
   }
 
@@ -196,11 +196,10 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
         .map(p -> buildProjectDocument(p, resourcePath));
   }
 
-
   @Override
   public Optional<DepanFxWorkspaceResource> getWorkspaceResource(
       DepanFxProjectDocument resourceDoc, String expectedContent) {
-    if (resourceDoc.getProject().equals(getBuiltInProjectTree())) {
+    if (getBuiltInProjectTree().equals(resourceDoc.getProject())) {
       return ((DepanFxBuiltInProject) getBuiltInProject())
           .getResource(resourceDoc);
     }
@@ -241,6 +240,10 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   }
 
   private Optional<DepanFxProjectTree> findProjectByName(String projectName) {
+    if (builtInProj.getProjectName().equals(projectName)) {
+      return Optional.of(getBuiltInProjectTree());
+    }
+
     return projectList.stream()
         .filter(t -> projectName.equals(t.getMemberName()))
         .findFirst();
