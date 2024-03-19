@@ -3,6 +3,7 @@ package com.pnambic.depanfx.nodelist.persistence;
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphModels;
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.docdata.NodeInfoBlock;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
@@ -12,13 +13,20 @@ import com.pnambic.depanfx.persistence.PersistTagDataLoader;
 import com.pnambic.depanfx.persistence.PersistUnmarshalContext;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class NodeListConverter
     extends BasePersistObjectConverter<DepanFxNodeList> {
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(NodeListConverter.class);
 
   private static final Class<?>[] ALLOW_TYPES = new Class[] {
       DepanFxNodeList.class
@@ -26,11 +34,11 @@ public class NodeListConverter
 
   public static final String NODE_LIST_TAG = "node-list";
 
+  public static final String GRAPH_DOC = "graph-doc";
+
   public static final String NODE_LIST_NAME = "node-list-name";
 
   public static final String NODE_LIST_DESCR = "node-list-descr";
-
-  public static final String GRAPH_DOC = "graph-doc";
 
   // Legacy type alias for graphDoc.
   public static final String WORSPACE_RSRC = "workspace-resource";
@@ -56,9 +64,6 @@ public class NodeListConverter
       GRAPH_DOC, NODE_LIST_NAME, NODE_LIST_DESCR
   };
 
-  public NodeListConverter() {
-  }
-
   @Override
   public Class<?> forType() {
     return DepanFxNodeList.class;
@@ -83,9 +88,8 @@ public class NodeListConverter
     marshalObject(dstContext,
         NODE_LIST_DESCR, nodeList.getNodeListDescription());
 
-    for (GraphNode node : nodeList.getNodes()) {
-      marshalObject(dstContext, node);
-    }
+    nodeList.getNodes().stream()
+        .forEach(n -> marshalNodeInfo(dstContext, n, nodeList));
   }
 
   @Override
@@ -96,22 +100,54 @@ public class NodeListConverter
 
     DepanFxWorkspaceResource graphDocRsrc =
         (DepanFxWorkspaceResource) metaData.get(GRAPH_DOC);
+
+    // Extract the basis for model mapping.
     GraphDocument graphDoc = (GraphDocument) graphDocRsrc.getResource();
     GraphModel graphModel = graphDoc.getGraph();
+    srcContext.putContextValue(GraphModel.class, graphModel );
 
     Collection<GraphNode> nodes = new ArrayList<>();
     while (srcContext.hasMoreChildren()) {
-      GraphNode baseNode = (GraphNode) unmarshalOne(srcContext);
-      GraphNode mapped = GraphModels.mapGraphNode(baseNode, graphModel);
+      Object element = unmarshalOne(srcContext);
+      switch (element) {
+      case NodeInfoBlock info -> {
+        GraphNode mapped = info.mapNode(graphModel);
+        nodes.add(mapped);
+      }
 
-      nodes.add(mapped);
+      // Legacy node lists used to contain bare graphnodes vs. nodeinfos.
+      // Remove after conversions .. Jun-2024?
+      case GraphNode node -> {
+        GraphNode mapped = GraphModels.mapGraphNode(node, graphModel);
+        nodes.add(mapped);
+      }
+      default ->
+          LOG.warn("Unrecognized node view element {}", element.getClass());
+      }
     }
     String nodeListName = guessName(
         (String) metaData.get(NODE_LIST_NAME), graphDocRsrc);
     String nodeListDescr = guessDescr(
         (String) metaData.get(NODE_LIST_DESCR), nodeListName);
-    return new DepanFxNodeList(nodeListName, nodeListDescr, graphDocRsrc, nodes);
+    return new DepanFxNodeList(
+        nodeListName, nodeListDescr, graphDocRsrc, nodes);
   }
+
+  /**
+   * Node list included for parallel structure and as a future source
+   * of node information.
+   */
+  private void marshalNodeInfo(
+      PersistMarshalContext dstContext,
+      GraphNode node,
+      DepanFxNodeList nodeList) {
+
+    marshalObject(
+        dstContext, new NodeInfoBlock(node, Collections.emptyList()));
+  }
+
+  /////////////////////////////////////
+  // Adjustments for legacy documents.
 
   private String guessName(
       String loadName, DepanFxWorkspaceResource graphDocRsrc) {

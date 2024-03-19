@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodelist.persistence;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.docdata.NodeInfoBlock;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
@@ -41,6 +42,7 @@ public class NodeListPersistenceContribution
   @Override
   public void prepareTransport(PersistDocumentTransportBuilder builder) {
     builder.addConverter(new NodeListConverter());
+    NodeInfoBlock.prepareTransport(builder);
 
     // Apply plugins for document elements.
     graphNodeRegistry.applyExtensions(builder, GraphNode.class);
