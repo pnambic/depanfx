@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,6 +57,7 @@ public class DepanFxResourceMenuRegistry {
 
       analysisContribs.stream()
           .filter(c -> c.acceptsExt(ext))
+          .sorted(DepanFxOrderableContribution.CONTRIB_COMPARE)
           .forEach(c -> c.prepareCell(
               scene, dialogRunner, workspace, cell, ext, document, builder));
     }
@@ -79,6 +81,7 @@ public class DepanFxResourceMenuRegistry {
 
       extContribs.stream()
           .filter(c -> c.acceptsExt(ext))
+          .sorted(DepanFxOrderableContribution.CONTRIB_COMPARE)
           .forEach(c -> c.prepareCell(
               dialogRunner, workspace, cell, ext, document, builder));
     }
@@ -97,6 +100,7 @@ public class DepanFxResourceMenuRegistry {
 
     pathContribs.stream()
         .filter(c -> c.acceptsPath(docPath))
+        .sorted(DepanFxOrderableContribution.CONTRIB_COMPARE)
         .forEach(c -> c.prepareCell(
             dialogRunner, workspace, cell, member, builder));
   }

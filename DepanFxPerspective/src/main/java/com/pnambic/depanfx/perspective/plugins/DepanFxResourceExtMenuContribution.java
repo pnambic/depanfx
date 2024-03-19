@@ -15,7 +15,8 @@ import java.nio.file.Path;
 
 import javafx.scene.control.Cell;
 
-public interface DepanFxResourceExtMenuContribution {
+public interface DepanFxResourceExtMenuContribution
+    extends DepanFxOrderableContribution {
 
   boolean acceptsExt(String ext);
 
@@ -35,10 +36,20 @@ public interface DepanFxResourceExtMenuContribution {
 
     private final Class<?> dataType;
 
-    public Basic(Class<?> dataType, String editActionLabel, String fileExt) {
+    private final String orderKey;
+
+    public Basic(
+        Class<?> dataType, String orderKey,
+        String editActionLabel, String fileExt) {
       this.dataType = dataType;
+      this.orderKey = orderKey;
       this.editActionLabel = editActionLabel;
       this.fileExt = fileExt;
+    }
+
+    @Override
+    public String getOrderKey() {
+      return orderKey;
     }
 
     @Override

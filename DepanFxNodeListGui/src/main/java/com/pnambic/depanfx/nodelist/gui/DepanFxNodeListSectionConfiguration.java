@@ -43,6 +43,12 @@ import javafx.scene.control.Tab;
 @Configuration
 public class DepanFxNodeListSectionConfiguration {
 
+  private static final String FLAT_SECTION_KEY = "Flat Section";
+
+  private static final String TREE_SECTION_KEY = "Tree Section";
+
+  private static final String NODE_LIST_KEY = "Node List Key";
+
   private static final String OPEN_AS_LIST = "Open as Node List";
 
   private final DepanFxBuiltInContribution memberFinderlinkMatcherContrib =
@@ -176,9 +182,14 @@ public class DepanFxNodeListSectionConfiguration {
               addNodeListViewToScene(scene, dialogRunner, workspace, nl, title);
             });
       } catch (RuntimeException errCaught) {
-        LOG.error("Unable to open list view for {}",
+        LOG.error("Unable to open node list for {}",
             docPath.toUri(), errCaught);
       }
+    }
+
+    @Override
+    public String getOrderKey() {
+      return NODE_LIST_KEY;
     }
   }
 
@@ -229,6 +240,11 @@ public class DepanFxNodeListSectionConfiguration {
             docPath.toUri(), errCaught);
       }
     }
+
+    @Override
+    public String getOrderKey() {
+      return NODE_LIST_KEY;
+    }
   }
 
   private static void addNodeListViewToScene(
@@ -252,7 +268,7 @@ public class DepanFxNodeListSectionConfiguration {
       extends DepanFxResourceExtMenuContribution.Basic {
 
     public FlatSectionExtContribution() {
-      super(DepanFxFlatSectionData.class,
+      super(DepanFxFlatSectionData.class, FLAT_SECTION_KEY,
           DepanFxFlatSection.EDIT_FLAT_SECTION_DATA,
           DepanFxFlatSectionData.FLAT_SECTION_TOOL_EXT);
     }
@@ -306,13 +322,18 @@ public class DepanFxNodeListSectionConfiguration {
         LOG.error("Unable to create flat section data", errCaught);
       }
     }
+
+    @Override
+    public String getOrderKey() {
+      return FLAT_SECTION_KEY;
+    }
   }
 
   private static class TreeSectionExtContribution
       extends DepanFxResourceExtMenuContribution.Basic {
 
     public TreeSectionExtContribution() {
-      super(DepanFxTreeSectionData.class,
+      super(DepanFxTreeSectionData.class, TREE_SECTION_KEY,
           DepanFxTreeSection.EDIT_TREE_SECTION_DATA,
           DepanFxTreeSectionData.TREE_SECTION_TOOL_EXT);
     }
@@ -376,6 +397,11 @@ public class DepanFxNodeListSectionConfiguration {
           NEW_TREE_SECTION_LABEL, true,
           new DepanFxProjectResource.BuiltIn(builtInMatcherPath), true,
           OrderBy.NODE_LEAF, ContainerOrder.LAST, OrderDirection.FORWARD);
+    }
+
+    @Override
+    public String getOrderKey() {
+      return TREE_SECTION_KEY;
     }
   }
 }

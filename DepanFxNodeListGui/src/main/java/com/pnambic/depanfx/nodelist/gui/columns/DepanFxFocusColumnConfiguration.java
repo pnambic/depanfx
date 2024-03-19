@@ -21,6 +21,8 @@ import javafx.scene.control.Cell;
 @Configuration
 public class DepanFxFocusColumnConfiguration {
 
+  private static final String FOCUS_COLUMN_KEY = "Focus Column";
+
   @Bean
   public DepanFxResourceExtMenuContribution focusColumnExtMenu() {
     return new FocusColumnExtContribution();
@@ -35,7 +37,7 @@ public class DepanFxFocusColumnConfiguration {
       extends DepanFxResourceExtMenuContribution.Basic {
 
     public FocusColumnExtContribution() {
-      super(DepanFxFocusColumnData.class,
+      super(DepanFxFocusColumnData.class, FOCUS_COLUMN_KEY,
           DepanFxFocusColumn.EDIT_FOCUS_COLUMN,
           DepanFxFocusColumnData.FOCUS_COLUMN_TOOL_EXT);
     }
@@ -64,6 +66,11 @@ public class DepanFxFocusColumnConfiguration {
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       DepanFxFocusColumn.addNewColumnAction(builder, dialogRunner);
+    }
+
+    @Override
+    public String getOrderKey() {
+      return FOCUS_COLUMN_KEY;
     }
   }
 }

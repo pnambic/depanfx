@@ -50,4 +50,9 @@ public class DepanFxGitRepoDataPathMenuContribution
       LOG.error("Unable to create git repo data", errCaught);
     }
   }
+
+  @Override
+  public String getOrderKey() {
+    return DepanFxGitRepoGuiContribution.GIT_REPO_KEY;
+  }
 }

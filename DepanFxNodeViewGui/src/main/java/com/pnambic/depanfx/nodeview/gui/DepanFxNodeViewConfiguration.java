@@ -32,6 +32,8 @@ import javafx.scene.control.Cell;
 @Configuration
 public class DepanFxNodeViewConfiguration {
 
+  public static final String NODE_VIEW_KEY = "Node View";
+
   private static final String OPEN_VIEW = "Open Node View";
 
   private static final String OPEN_AS_VIEW = "Open as Node View";
@@ -151,6 +153,11 @@ public class DepanFxNodeViewConfiguration {
       return DepanFxNodeViews.fromGraphDocument(
           rsrc, linkDisplayDocRsrc);
     }
+
+    @Override
+    public String getOrderKey() {
+      return NODE_VIEW_KEY;
+    }
   }
 
   private class NodeListContribution
@@ -172,6 +179,11 @@ public class DepanFxNodeViewConfiguration {
           getContextLinkDisplay(workspace, graphDoc.getContextModelId());
 
       return DepanFxNodeViews.fromNodeList(rsrc, linkDisplayDocRsrc);
+    }
+
+    @Override
+    public String getOrderKey() {
+      return NODE_VIEW_KEY;
     }
   }
 
@@ -197,6 +209,11 @@ public class DepanFxNodeViewConfiguration {
         DepanFxWorkspace workspace,
         DepanFxWorkspaceResource rsrc) {
       return (DepanFxNodeViewData) rsrc.getResource();
+    }
+
+    @Override
+    public String getOrderKey() {
+      return NODE_VIEW_KEY;
     }
   }
 

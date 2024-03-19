@@ -14,8 +14,8 @@ public class DepanFxGitRepoDataExtMenuContribution
   private static final String EDIT_GIT_REPO = "Edit git Repo Data...";
 
   public DepanFxGitRepoDataExtMenuContribution() {
-    super(DepanFxGitRepoData.class, EDIT_GIT_REPO,
-        DepanFxGitRepoData.GIT_REPO_TOOL_EXT);
+    super(DepanFxGitRepoData.class, DepanFxGitRepoGuiContribution.GIT_REPO_KEY,
+        EDIT_GIT_REPO, DepanFxGitRepoData.GIT_REPO_TOOL_EXT);
   }
 
   @Override

@@ -10,7 +10,8 @@ import java.nio.file.Path;
 
 import javafx.scene.control.Cell;
 
-public interface DepanFxResourcePathMenuContribution {
+public interface DepanFxResourcePathMenuContribution
+    extends DepanFxOrderableContribution {
 
   boolean acceptsPath(Path rsrcPath);
 

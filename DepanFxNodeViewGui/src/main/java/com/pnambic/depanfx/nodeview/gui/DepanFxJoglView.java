@@ -82,6 +82,7 @@ public class DepanFxJoglView extends BorderPane {
     jogl.stop();
     viewport.getChildren().clear();
     jogl.destroy();
+    statusPanel.getController().stop();
   }
 
   public void close() {

@@ -3,6 +3,7 @@ package com.pnambic.depanfx.nodeview.gui;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
 import net.rgielen.fxweaver.core.FxmlView;
+import com.pnambic.depanfx.jogl.JoglModule;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
 import javafx.util.Duration;
 
 @Component
@@ -26,40 +26,34 @@ public class DepanFxNodeViewStatusPanel {
 
   @FXML
   private Label cameraXField;
-  // private Slider cameraXField;
 
   @FXML
   private Label cameraYField;
-//private Slider cameraYField;
 
   @FXML
   private Label cameraZField;
-//private Slider cameraZField;
 
   @FXML
   private Label lookAtXField;
-//private Slider lookAtXField;
 
   @FXML
   private Label lookAtYField;
-//private Slider lookAtYField;
 
   @FXML
   private Label lookAtZField;
-//private Slider lookAtZField;
 
   @FXML
   private Label destinationField;
-//private Slider destinationField;
 
   @FXML
   private Label zoomField;
-//private Slider zoomField;
 
   @FXML
   private Label fpsField;
 
   private final DepanFxWorkspace workspace;
+
+  private Timeline fpsTimeline;
 
   @Autowired
   public DepanFxNodeViewStatusPanel(DepanFxWorkspace workspace) {
@@ -75,7 +69,13 @@ public class DepanFxNodeViewStatusPanel {
     bind(lookAtZField, cameraControl.lookAtZ);
     bind(zoomField, cameraControl.zoom);
 
-    Timeline fpsTimeline = new Timeline(new KeyFrame(Duration.seconds(1),
+    String initFps = String.format("%1.4g", (float) JoglModule.TARGET_FPS);
+    fpsField.setText(initFps);
+
+    int fpsRateSec =
+        (JoglModule.FRAME_CNT + JoglModule.TARGET_FPS)
+            / JoglModule.TARGET_FPS;
+    fpsTimeline = new Timeline(new KeyFrame(Duration.seconds(fpsRateSec),
         event -> {
           String rateFps = String.format("%1.4g", cameraControl.getFps());
           fpsField.setText(rateFps);
@@ -83,6 +83,13 @@ public class DepanFxNodeViewStatusPanel {
 
     fpsTimeline.setCycleCount(Timeline.INDEFINITE); // Run indefinitely
     fpsTimeline.play();
+  }
+
+  public void stop() {
+    if (fpsTimeline != null) {
+      fpsTimeline.stop();
+      fpsTimeline = null;
+    }
   }
 
   private void bind(Label statusField, SimpleDoubleProperty dataSrc) {
@@ -110,7 +117,6 @@ public class DepanFxNodeViewStatusPanel {
     protected String computeValue() {
       return String.format("%1.4g", dataSrc.doubleValue());
     }
-
 
     @Override
     public ObservableList<ObservableValue<?>> getDependencies() {

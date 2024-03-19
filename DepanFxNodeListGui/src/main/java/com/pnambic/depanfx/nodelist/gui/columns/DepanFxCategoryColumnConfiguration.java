@@ -21,6 +21,8 @@ import javafx.scene.control.Cell;
 @Configuration
 public class DepanFxCategoryColumnConfiguration {
 
+  private static final String CATEGORY_COLUMN_KEY = "Category Column";
+
   @Bean
   public DepanFxResourceExtMenuContribution categoryColumnExtMenu() {
     return new CategoryColumnExtContribution();
@@ -35,7 +37,7 @@ public class DepanFxCategoryColumnConfiguration {
       extends DepanFxResourceExtMenuContribution.Basic {
 
     public CategoryColumnExtContribution() {
-      super(DepanFxCategoryColumnData.class,
+      super(DepanFxCategoryColumnData.class, CATEGORY_COLUMN_KEY,
           DepanFxCategoryColumn.EDIT_CATEGORY_COLUMN,
           DepanFxCategoryColumnData.CATEGORY_COLUMN_TOOL_EXT);
     }
@@ -64,6 +66,11 @@ public class DepanFxCategoryColumnConfiguration {
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       DepanFxCategoryColumn.addNewColumnAction(builder, dialogRunner);
+    }
+
+    @Override
+    public String getOrderKey() {
+      return CATEGORY_COLUMN_KEY;
     }
   }
 }

@@ -68,6 +68,11 @@ public class DepanFxResourceConfiguration {
       newGraphMenu.getItems().addAll(newResourceRegistry.buildNewAnalysisItems());
       return newGraphMenu;
     }
+
+    @Override
+    public String getOrderKey() {
+      return "Theory";
+    }
   }
 
   private static class GraphsPathContribution
@@ -98,6 +103,11 @@ public class DepanFxResourceConfiguration {
       Menu newGraphMenu = new Menu(NEW_GRAPH_MENU);
       newGraphMenu.getItems().addAll(newResourceRegistry.buildNewResourceItems());
       return newGraphMenu;
+    }
+
+    @Override
+    public String getOrderKey() {
+      return "Graph";
     }
   }
 }

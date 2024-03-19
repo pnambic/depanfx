@@ -13,7 +13,8 @@ import javafx.scene.control.Cell;
  * An analysis contribution that is expect to interact closely with the
  * application scene.
  */
-public interface DepanFxAnalysisExtMenuContribution {
+public interface DepanFxAnalysisExtMenuContribution
+    extends DepanFxOrderableContribution {
 
   boolean acceptsExt(String ext);
 

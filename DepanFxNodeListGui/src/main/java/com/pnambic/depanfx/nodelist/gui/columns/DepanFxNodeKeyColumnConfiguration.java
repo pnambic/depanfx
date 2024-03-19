@@ -26,6 +26,8 @@ import javafx.scene.control.Cell;
 @Configuration
 public class DepanFxNodeKeyColumnConfiguration {
 
+  private static final String NODE_KEY_COLUMN_KEY = "Node Key Column";
+
   public static final String MODEL_KEY_COLUMN_NAME = "Model Key Column";
 
   public static final String KIND_KEY_COLUMN_NAME = "Kind Key Column";
@@ -123,7 +125,7 @@ public class DepanFxNodeKeyColumnConfiguration {
       extends DepanFxResourceExtMenuContribution.Basic {
 
     public NodeKeyColumnExtContribution() {
-      super(DepanFxNodeKeyColumnData.class,
+      super(DepanFxNodeKeyColumnData.class, NODE_KEY_COLUMN_KEY,
           DepanFxNodeKeyColumn.EDIT_NODE_KEY_COLUMN,
           DepanFxNodeKeyColumnData.NODE_KEY_COLUMN_TOOL_EXT);
     }
@@ -152,6 +154,11 @@ public class DepanFxNodeKeyColumnConfiguration {
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       DepanFxNodeKeyColumn.addNewColumnAction(builder, dialogRunner);
+    }
+
+    @Override
+    public String getOrderKey() {
+      return NODE_KEY_COLUMN_KEY;
     }
   }
 }

@@ -29,7 +29,8 @@ public class NodeListConverter
       LoggerFactory.getLogger(NodeListConverter.class);
 
   private static final Class<?>[] ALLOW_TYPES = new Class[] {
-      DepanFxNodeList.class
+      DepanFxNodeList.class,
+      NodeInfoBlock.class
   };
 
   public static final String NODE_LIST_TAG = "node-list";

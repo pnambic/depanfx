@@ -17,7 +17,9 @@ import javafx.scene.canvas.Canvas;
 
 public class JoglModule {
 
-  private static final int FRAME_CNT =
+  public static final int TARGET_FPS = 60;
+
+  public  static final int FRAME_CNT =
       FPSCounter.DEFAULT_FRAMES_PER_INTERVAL;  // 300 .. ~ 5 seconds.
 
   private GLWindow glWindow;
