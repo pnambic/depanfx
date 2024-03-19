@@ -108,6 +108,7 @@ public class JoglRenderer {
     return renders.get(renderKey);
   }
 
+  @SuppressWarnings("unused")
   private void enhance(GLAutoDrawable drawable) {
     /*
     //TODO: add options for this parameters: it looks way nicer,
