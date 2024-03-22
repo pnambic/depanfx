@@ -11,6 +11,7 @@ import net.rgielen.fxweaver.core.FxControllerAndView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -105,9 +106,16 @@ public class DepanFxJoglView extends BorderPane {
     result.setMin(-100.0d);
     result.setMax(100.0d);
     result.setValue(cameraControl.cameraX.get());
+
     // X-Axis is positive to right (+).
-    result.valueProperty().addListener((observable, oldValue, newValue) ->
-        this.updateLayoutX(newValue.doubleValue() - oldValue.doubleValue()));
+    cameraControl.cameraX.addListener((observable, oldValue, newValue) ->
+      result.valueProperty().setValue(newValue.doubleValue()));
+
+    result.valueProperty().addListener((observable, oldValue, newValue) -> {
+        if (newValue.doubleValue() != cameraControl.cameraX.get() ) {
+          updateLayoutX(newValue.doubleValue() - oldValue.doubleValue());
+        }
+    });
     return result;
   }
 
@@ -118,9 +126,16 @@ public class DepanFxJoglView extends BorderPane {
     result.setMax(100.0d);
     result.setValue(0.0d);
     result.setPrefHeight(height);
+
     // Y-Axis is positive to down (-).
-    result.valueProperty().addListener((observable, oldValue, newValue) ->
-      this.updateLayoutY(oldValue.doubleValue() - newValue.doubleValue()));
+    cameraControl.cameraY.addListener((observable, oldValue, newValue) ->
+        result.valueProperty().setValue(-newValue.doubleValue()));
+
+    result.valueProperty().addListener((observable, oldValue, newValue) -> {
+      if (newValue.doubleValue() != -cameraControl.cameraY.get()) {
+        this.updateLayoutY(oldValue.doubleValue() - newValue.doubleValue());
+      }
+    });
     return result;
   }
 
