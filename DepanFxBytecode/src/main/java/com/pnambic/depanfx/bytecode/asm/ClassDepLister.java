@@ -39,6 +39,7 @@ import org.springframework.asm.AnnotationVisitor;
 import org.springframework.asm.ClassVisitor;
 import org.springframework.asm.FieldVisitor;
 import org.springframework.asm.MethodVisitor;
+import org.springframework.asm.ModuleVisitor;
 import org.springframework.asm.Opcodes;
 import org.springframework.asm.Type;
 import org.springframework.asm.TypePath;
@@ -98,8 +99,16 @@ public class ClassDepLister extends ClassVisitor {
   @Override
   public void visit(int version, int access, String name, String signature,
       String superName, String[] interfaces) {
+    ClassKind classKind = getClassKind(access);
+    if (classKind == ClassKind.KIND_MODULE) {
+      mainClass =  new ClassNode("module-info");
+      addClassInfo(mainClass, ClassKind.KIND_MODULE);
+      return;
+    }
+
+    // Visit normal classes
     mainClass = TypeNameUtil.fromInternalName(name);
-    addClassInfo(mainClass, access);
+    addClassInfo(mainClass, classKind);
 
     PackageNode packageNode = installPackageForTypeName(name);
     addEdge(packageNode, mainClass, JavaRelation.CLASS);
@@ -115,27 +124,9 @@ public class ClassDepLister extends ClassVisitor {
     checkAnonymousType(name);
   }
 
-  /**
-   * Check if the given internal name is an anonymous class. If so, generate
-   * the appropriate dependencies.
-   *
-   * @param name
-   */
-  private void checkAnonymousType(String name) {
-    // anonymous classes names contains a $ followed by a digit
-    if (name.contains("$")) {
-      String superClass = name.substring(0, name.lastIndexOf('$'));
-
-      // recursively check: maybe name is not an anonymous class, but is
-      // an innerclass contained into an anonymous class.
-      checkAnonymousType(superClass);
-
-      // A digit must follow the $ in the name.
-      if (Character.isDigit(name.charAt(name.lastIndexOf('$')+1))) {
-        ClassNode superType = TypeNameUtil.fromInternalName(superClass);
-        addEdge(superType, mainClass, JavaRelation.ANONYMOUS_TYPE);
-      }
-    }
+  @Override
+  public ModuleVisitor visitModule(String name, int access, String version) {
+    return new DepanFxModuleVisitor(builder, name, access);
   }
 
   @Override
@@ -177,7 +168,7 @@ public class ClassDepLister extends ClassVisitor {
       return;
     }
 
-    addClassInfo(inner, access);
+    addClassInfo(inner, getClassKind(access));
     ClassNode parent = TypeNameUtil.fromInternalName(outerName);
     addEdge(parent, inner, JavaRelation.INNER_TYPE);
   }
@@ -244,6 +235,29 @@ public class ClassDepLister extends ClassVisitor {
   }
 
   /**
+   * Check if the given internal name is an anonymous class. If so, generate
+   * the appropriate dependencies.
+   *
+   * @param name
+   */
+  private void checkAnonymousType(String name) {
+    // anonymous classes names contains a $ followed by a digit
+    if (name.contains("$")) {
+      String superClass = name.substring(0, name.lastIndexOf('$'));
+
+      // recursively check: maybe name is not an anonymous class, but is
+      // an innerclass contained into an anonymous class.
+      checkAnonymousType(superClass);
+
+      // A digit must follow the $ in the name.
+      if (Character.isDigit(name.charAt(name.lastIndexOf('$')+1))) {
+        ClassNode superType = TypeNameUtil.fromInternalName(superClass);
+        addEdge(superType, mainClass, JavaRelation.ANONYMOUS_TYPE);
+      }
+    }
+  }
+
+  /**
    * Install a package hierarchy and a matching directory hierarchy for
    * the full path name of the type.
    *
@@ -284,27 +298,27 @@ public class ClassDepLister extends ClassVisitor {
     return result;
   }
 
-  private void addClassInfo(ClassNode classNode, int access) {
-    builder.addNodeInfo(classNode, ClassInfo.class, buildClassInfo(access));
+  private void addClassInfo(ClassNode classNode, ClassKind classKind) {
+    builder.addNodeInfo(classNode, ClassInfo.class, new ClassInfo(classKind));
   }
 
-  private ClassInfo buildClassInfo(int access) {
+  private ClassKind getClassKind(int access) {
     if (hasOpcode(Opcodes.ACC_INTERFACE, access)) {
-      return new ClassInfo(ClassKind.KIND_INTERFACE);
+      return ClassKind.KIND_INTERFACE;
     }
     if (hasOpcode(Opcodes.ACC_ENUM, access)) {
-      return new ClassInfo(ClassKind.KIND_ENUM);
+      return ClassKind.KIND_ENUM;
     }
     if (hasOpcode(Opcodes.ACC_ANNOTATION, access)) {
-      return new ClassInfo(ClassKind.KIND_ANNOTATION);
+      return ClassKind.KIND_ANNOTATION;
     }
     if (hasOpcode(Opcodes.ACC_MODULE, access)) {
-      return new ClassInfo(ClassKind.KIND_MODULE);
+      return ClassKind.KIND_MODULE;
     }
     if (hasOpcode(Opcodes.ACC_RECORD, access)) {
-      return new ClassInfo(ClassKind.KIND_MODULE);
+      return ClassKind.KIND_MODULE;
     }
-    return new ClassInfo(ClassKind.KIND_CLASS);
+    return ClassKind.KIND_CLASS;
   }
 
   private JavaRelation getMemberRelation(

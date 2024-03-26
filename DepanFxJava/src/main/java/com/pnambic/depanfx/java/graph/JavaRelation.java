@@ -119,10 +119,47 @@ public class JavaRelation extends GraphRelation {
       new JavaRelation(JavaContextDefinition.COMPILE_ANNOTATION_RELID,
           "annotation (compile)", "annotator (compile)");
 
+  /////////////////////////////////////
+  // Module relationships
+
+  public static final JavaRelation MODULE_EXPORTED_TO =
+      new JavaRelation(JavaContextDefinition.MODULE_EXPORTED_TO_RELID,
+          "exported to", "can use");
+
+  public static final JavaRelation MODULE_EXPORTS =
+      new JavaRelation(JavaContextDefinition.MODULE_EXPORTS_RELID,
+          "exports", "exported by");
+
+  public static final JavaRelation MODULE_PROVIDES =
+      new JavaRelation(JavaContextDefinition.MODULE_PROVIDES_RELID,
+          "provides", "provided by");
+
+  public static final JavaRelation MODULE_OPENED_TO =
+      new JavaRelation(JavaContextDefinition.MODULE_OPENED_TO_RELID,
+          "opened to", "can inspect");
+
+  public static final JavaRelation MODULE_OPENS =
+      new JavaRelation(JavaContextDefinition.MODULE_OPENS_RELID,
+          "opens", "opened by");
+
+  public static final JavaRelation MODULE_REQUIRES =
+      new JavaRelation(JavaContextDefinition.MODULE_REQUIRES_RELID,
+          "requires", "required by");
+
+  public static final JavaRelation MODULE_USES =
+      new JavaRelation(JavaContextDefinition.MODULE_USES_RELID,
+          "uses", "used by");
+
+  /////////////////////////////////////
+  // Everyone
+
   public static final GraphRelation[] RELATIONS = {
       CLASS, EXTENDS, IMPLEMENTS, ANONYMOUS_TYPE, TYPE,
       STATIC_FIELD, MEMBER_FIELD, STATIC_METHOD, MEMBER_METHOD,
       CALL, READ, CLASSFILE, ERROR_HANDLING, PACKAGE, PACKAGEDIR,
-      RUNTIME_ANNOTATION, COMPILE_ANNOTATION
+      RUNTIME_ANNOTATION, COMPILE_ANNOTATION,
+      MODULE_EXPORTED_TO, MODULE_EXPORTS,
+      MODULE_PROVIDES, MODULE_OPENED_TO, MODULE_OPENS,
+      MODULE_REQUIRES, MODULE_USES
   };
 }

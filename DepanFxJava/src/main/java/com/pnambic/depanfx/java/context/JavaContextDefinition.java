@@ -36,10 +36,13 @@ public class JavaContextDefinition {
   public static final JavaNodeKindId PACKAGE_NKID =
       new JavaNodeKindId(MODEL_ID, "Package");
 
+  public static final JavaNodeKindId MODULE_NKID =
+      new JavaNodeKindId(MODEL_ID, "Module");
+
   public static final JavaNodeKindId[] NODE_KIND_IDS = {
       // JVM recognized
       FIELD_NKID, METHOD_NKID, PARAMETER_NKID, CLASS_NKID,
-      PACKAGE_NKID
+      PACKAGE_NKID, MODULE_NKID
   };
 
   /* Relations */
@@ -97,12 +100,36 @@ public class JavaContextDefinition {
   public static final JavaRelationId COMPILE_ANNOTATION_RELID =
       new JavaRelationId(MODEL_ID, "compile-annotation");
 
+  public static final JavaRelationId MODULE_EXPORTED_TO_RELID =
+      new JavaRelationId(MODEL_ID, "module-exported-to");
+
+  public static final JavaRelationId MODULE_EXPORTS_RELID =
+      new JavaRelationId(MODEL_ID, "module-exports");
+
+  public static final JavaRelationId MODULE_PROVIDES_RELID =
+      new JavaRelationId(MODEL_ID, "module-provides");
+
+  public static final JavaRelationId MODULE_OPENED_TO_RELID =
+      new JavaRelationId(MODEL_ID, "module-open-to");
+
+  public static final JavaRelationId MODULE_OPENS_RELID =
+      new JavaRelationId(MODEL_ID, "module-opens");
+
+  public static final JavaRelationId MODULE_REQUIRES_RELID =
+      new JavaRelationId(MODEL_ID, "module-requires");
+
+  public static final JavaRelationId MODULE_USES_RELID =
+      new JavaRelationId(MODEL_ID, "module-uses");
+
   public static final JavaRelationId[] RELATION_IDS = {
       CLASS_RELID, EXTENDS_RELID, IMPLEMENTS_RELID, ANONYMOUS_TYPE_RELID,
       TYPE_RELID, STATIC_FIELD_RELID, MEMBER_FIELD_RELID,
       STATIC_METHOD_RELID, MEMBER_METHOD_RELID,
       INNER_TYPE_RELID, CALL_RELID, READ_RELID, CLASSFILE_RELID,
       ERROR_HANDLING_RELID, PACKAGE_RELID, PACKAGEDIR_RELID,
-      RUNTIME_ANNOTATION_RELID, COMPILE_ANNOTATION_RELID
+      RUNTIME_ANNOTATION_RELID, COMPILE_ANNOTATION_RELID,
+      MODULE_EXPORTED_TO_RELID, MODULE_EXPORTS_RELID,
+      MODULE_PROVIDES_RELID, MODULE_OPENED_TO_RELID, MODULE_OPENS_RELID,
+      MODULE_REQUIRES_RELID, MODULE_USES_RELID
   };
 }

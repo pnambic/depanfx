@@ -8,10 +8,13 @@ import com.pnambic.depanfx.java.graph.FieldNode;
 import com.pnambic.depanfx.java.graph.JavaNode;
 import com.pnambic.depanfx.java.graph.MemberNode;
 import com.pnambic.depanfx.java.graph.MethodNode;
+import com.pnambic.depanfx.java.graph.ModuleNode;
 import com.pnambic.depanfx.java.graph.PackageNode;
 import com.pnambic.depanfx.java.graph.graphdata.ClassInfo;
 import com.pnambic.depanfx.java.graph.graphdata.FieldInfo;
 import com.pnambic.depanfx.java.graph.graphdata.MethodInfo;
+import com.pnambic.depanfx.java.graph.graphdata.ModuleEdgeInfo;
+import com.pnambic.depanfx.java.graph.graphdata.ModuleInfo;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.persistence.plugins.GraphNodePersistencePluginContribution;
 
@@ -22,7 +25,8 @@ public class JavaPersistenceContribution
     implements GraphNodePersistencePluginContribution {
 
   private static final Class<?>[] ALLOWED_INFOS = new Class[] {
-      ClassInfo.class, FieldInfo.class, MethodInfo.class
+      ClassInfo.class, FieldInfo.class, MethodInfo.class,
+      ModuleEdgeInfo.class, ModuleInfo.class
   };
 
   @Override
@@ -32,6 +36,7 @@ public class JavaPersistenceContribution
       builder.addConverter(new ClassNodeConverter());
       builder.addConverter(new FieldNodeConverter());
       builder.addConverter(new MethodNodeConverter());
+      builder.addConverter(new ModuleNodeConverter());
       builder.addConverter(new PackageNodeConverter());
       builder.addAlias("class-info", ClassInfo.class);
       builder.addAlias("field-info", FieldInfo.class);
@@ -53,6 +58,19 @@ public class JavaPersistenceContribution
     @Override
     protected ClassNode createNode(String fqcn) {
       return new ClassNode(fqcn);
+    }
+  }
+
+  private static class ModuleNodeConverter
+      extends JavaNodeConverter<JavaNode> {
+
+    public ModuleNodeConverter() {
+      super(ModuleNode.class, JavaContextDefinition.MODULE_NKID);
+    }
+
+    @Override
+    protected JavaNode createNode(String moduleName) {
+      return new ModuleNode(moduleName);
     }
   }
 
