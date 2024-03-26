@@ -44,7 +44,7 @@ public class DepanFxSimpleAdjacencyModel implements DepanFxAdjacencyModel {
   }
 
   public void addAdjacency(DepanFxLink link) {
-    LOG.info("Add adjacency {} to {}",
+    LOG.debug("Add adjacency {} to {}",
         link.getSource().getId().getNodeKey(),
         link.getTarget().getId().getNodeKey());
     addAdjacency(link.getSource(), link.getTarget());
