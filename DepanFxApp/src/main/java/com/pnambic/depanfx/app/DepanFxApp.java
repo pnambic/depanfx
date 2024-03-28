@@ -6,6 +6,7 @@ import com.pnambic.depanfx.scene.DepanFxSceneController;
 
 import net.rgielen.fxweaver.core.FxWeaver;
 
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -26,14 +27,7 @@ public class DepanFxApp extends Application implements Closeable {
 
   @Override
   public void init() {
-    String[] args = getParameters().getRaw().toArray(new String[0]);
-
-    this.applicationContext = new SpringApplicationBuilder()
-        // .main(getClass())
-        .sources(DepanFxApplication.class)
-        .run(args);
-
-    this.fxWeaver = applicationContext.getBean(FxWeaver.class);
+    main();
   }
 
   @Override
@@ -56,5 +50,26 @@ public class DepanFxApp extends Application implements Closeable {
   @Override
   public void close() throws IOException {
     stop();
+  }
+
+  /**
+   * Help Spring Boot find this class and identify it as
+   * the main class for the application.
+   *
+   * The {@link DepanFxApplication#main(String[])} doesn't get recognized,
+   * 'cuz that's in a different thread.
+   *
+   * See {@link SpringApplication#deduceMainApplicationClass()} for details
+   * regarding the discovery of the main application class.
+   */
+  public void main() {
+    String[] args = getParameters().getRaw().toArray(new String[0]);
+
+    this.applicationContext = new SpringApplicationBuilder()
+        // .main(getClass())
+        .sources(DepanFxApplication.class)
+        .run(args);
+
+    this.fxWeaver = applicationContext.getBean(FxWeaver.class);
   }
 }
