@@ -4,6 +4,9 @@ import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderDirection;
+import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
+import com.pnambic.depanfx.perspective.DepanFxProctor;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
@@ -136,6 +139,14 @@ public class DepanFxFlatSectionToolDialog {
 
   @FXML
   private void handleConfirm() {
+    DepanFxProctor proctor = new DepanFxProctor.Simple();
+    DepanFxDialogChecks.checkDestinationFile(
+        proctor, destinationField.getText());
+    if (DepanFxResourcePerspectives.errorAlert(
+        proctor, "Section Save Confirmation Error")) {
+      return;
+    }
+
     closeDialog();
 
     DepanFxFlatSectionData flatSectionData = new DepanFxFlatSectionData(

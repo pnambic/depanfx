@@ -4,6 +4,9 @@ import com.pnambic.depanfx.git.builder.GitCommandRunner;
 import com.pnambic.depanfx.git.builder.GitLogLoader;
 import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
+import com.pnambic.depanfx.perspective.DepanFxProctor;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
@@ -117,6 +120,14 @@ public class DepanFxNewGitLogsDialog
 
   @FXML
   private void handleConfirm() {
+    DepanFxProctor proctor = new DepanFxProctor.Simple();
+    DepanFxDialogChecks.checkDestinationFile(
+        proctor, dstDirectoryField.getText());
+    if (DepanFxResourcePerspectives.errorAlert(
+        proctor, "Git Log Node List Save Confirmation Error")) {
+      return;
+    }
+
     closeDialog();
 
     GitCommandRunner cmdRunner = new GitCommandRunner(repoData);

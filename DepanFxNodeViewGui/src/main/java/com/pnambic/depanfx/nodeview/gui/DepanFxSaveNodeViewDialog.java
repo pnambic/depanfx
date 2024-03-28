@@ -2,6 +2,9 @@ package com.pnambic.depanfx.nodeview.gui;
 
 import com.google.common.base.Strings;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
+import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
+import com.pnambic.depanfx.perspective.DepanFxProctor;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -100,18 +103,17 @@ public class DepanFxSaveNodeViewDialog {
 
   @FXML
   private void handleConfirm() {
-    String dstName = destinationField.getText();
-    File dstFile = new File(dstName);
-    if (Strings.isNullOrEmpty(dstName)) {
-      Alert alert = new Alert(AlertType.ERROR);
-      alert.setContentText("Destination field is not usable");
-      alert.setHeaderText("Node List Save Confirmation Error");
-      alert.setTitle("Blank value for destination field");
-      alert.showAndWait();
+    DepanFxProctor proctor = new DepanFxProctor.Simple();
+    DepanFxDialogChecks.checkDestinationFile(
+        proctor, destinationField.getText());
+    if (DepanFxResourcePerspectives.errorAlert(
+        proctor, "Node View Save Confirmation Error")) {
       return;
     }
+
     closeDialog();
 
+    File dstFile = new File(destinationField.getText());
     DepanFxProjectDocument projDoc =
         workspace.toProjectDocument(dstFile.toURI()).get();
     DepanFxNodeViewData saveDoc =

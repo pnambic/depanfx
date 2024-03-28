@@ -9,6 +9,8 @@ import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
+import com.pnambic.depanfx.perspective.DepanFxProctor;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
@@ -109,6 +111,14 @@ public class DepanFxNewGitRepoDialog
 
   @FXML
   private void handleConfirm() {
+    DepanFxProctor proctor = new DepanFxProctor.Simple();
+    DepanFxDialogChecks.checkDestinationFile(
+        proctor, destinationField.getText());
+    if (DepanFxResourcePerspectives.errorAlert(
+        proctor, "Git Repository Save Confirmation Error")) {
+      return;
+    }
+
     closeDialog();
 
     DepanFxProjectDocument projDoc =

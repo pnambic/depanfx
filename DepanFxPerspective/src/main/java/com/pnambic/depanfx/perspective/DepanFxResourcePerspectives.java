@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.perspective;
 
+import com.google.common.base.Strings;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -12,8 +13,10 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import javafx.scene.control.Alert;
 import javafx.scene.control.Cell;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.FileChooser;
 
 /**
@@ -52,5 +55,18 @@ public class DepanFxResourcePerspectives {
 
     File dstFile = new File(destinationField.getText());
     return workspace.toProjectDocument(dstFile.toURI());
+  }
+
+  public static boolean errorAlert(
+      DepanFxProctor validator, String alertHeader) {
+    if (validator.hasErrors()) {
+      Alert alert = new Alert(AlertType.ERROR);
+      alert.setContentText(alertHeader);
+      alert.setTitle(validator.getSummaryText());
+      alert.setHeaderText(validator.getDetailText());
+      alert.showAndWait();
+      return true;
+    }
+    return false;
   }
 }

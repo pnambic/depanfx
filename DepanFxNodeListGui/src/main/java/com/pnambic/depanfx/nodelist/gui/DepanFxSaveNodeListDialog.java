@@ -1,8 +1,10 @@
 package com.pnambic.depanfx.nodelist.gui;
 
-import com.google.common.base.Strings;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
+import com.pnambic.depanfx.perspective.DepanFxProctor;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -20,8 +22,6 @@ import java.text.MessageFormat;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
@@ -101,18 +101,17 @@ public class DepanFxSaveNodeListDialog {
 
   @FXML
   private void handleConfirm() {
-    String dstName = destinationField.getText();
-    File dstFile = new File(dstName);
-    if (Strings.isNullOrEmpty(dstName)) {
-      Alert alert = new Alert(AlertType.ERROR);
-      alert.setContentText("Destination field is not usable");
-      alert.setHeaderText("Node List Save Confirmation Error");
-      alert.setTitle("Blank value for destination field");
-      alert.showAndWait();
+    DepanFxProctor proctor = new DepanFxProctor.Simple();
+    DepanFxDialogChecks.checkDestinationFile(
+        proctor, destinationField.getText());
+    if (DepanFxResourcePerspectives.errorAlert(
+        proctor, "Node List Save Confirmation Error")) {
       return;
     }
+
     closeDialog();
 
+    File dstFile = new File(destinationField.getText());
     DepanFxProjectDocument projDoc =
         workspace.toProjectDocument(dstFile.toURI()).get();
     DepanFxNodeList saveDoc = DepanFxNodeLists.buildNodeList(

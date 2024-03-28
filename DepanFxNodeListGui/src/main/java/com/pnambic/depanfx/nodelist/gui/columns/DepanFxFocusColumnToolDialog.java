@@ -5,6 +5,9 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
+import com.pnambic.depanfx.perspective.DepanFxProctor;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -141,6 +144,14 @@ public class DepanFxFocusColumnToolDialog {
 
   @FXML
   private void handleConfirm() {
+    DepanFxProctor proctor = new DepanFxProctor.Simple();
+    DepanFxDialogChecks.checkDestinationFile(
+        proctor, destinationField.getText());
+    if (DepanFxResourcePerspectives.errorAlert(
+        proctor, "Focus Column Save Confirmation Error")) {
+      return;
+    }
+
     closeDialog();
     File nodeListFile = new File(focusNodeListRsrcField.getText());
     Optional<DepanFxWorkspaceResource> optNodeListRsrc = workspace

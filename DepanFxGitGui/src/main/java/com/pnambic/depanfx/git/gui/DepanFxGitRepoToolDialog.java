@@ -1,6 +1,9 @@
 package com.pnambic.depanfx.git.gui;
 
 import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
+import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
+import com.pnambic.depanfx.perspective.DepanFxProctor;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -187,6 +190,14 @@ public class DepanFxGitRepoToolDialog {
 
   @FXML
   private void handleConfirm() {
+    DepanFxProctor proctor = new DepanFxProctor.Simple();
+    DepanFxDialogChecks.checkDestinationFile(
+        proctor, destinationField.getText());
+    if (DepanFxResourcePerspectives.errorAlert(
+        proctor, "Git Repository Graph Save Confirmation Error")) {
+      return;
+    }
+
     closeDialog();
 
     DepanFxGitRepoData repoData = new DepanFxGitRepoData(

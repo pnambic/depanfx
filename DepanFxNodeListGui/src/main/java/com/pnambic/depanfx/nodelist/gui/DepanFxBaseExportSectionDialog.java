@@ -8,6 +8,10 @@ import com.pnambic.depanfx.nodelist.export.ExportColumn;
 import com.pnambic.depanfx.nodelist.export.ExportData;
 import com.pnambic.depanfx.nodelist.export.ExportData.NodeIdHandling;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
+import com.pnambic.depanfx.perspective.DepanFxProctor;
+import com.pnambic.depanfx.perspective.DepanFxProctor.Simple;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
@@ -40,7 +44,8 @@ public abstract class DepanFxBaseExportSectionDialog {
 
   private static final String CSV_EXT = "csv";
 
-  private static final ExtensionFilter EXT_FILTER = DepanFxSceneControls.buildExtFilter("Spreadsheet/CSV", CSV_EXT);
+  private static final ExtensionFilter EXT_FILTER =
+      DepanFxSceneControls.buildExtFilter("Spreadsheet/CSV", CSV_EXT);
 
   private final DepanFxWorkspace workspace;
 
@@ -97,22 +102,22 @@ public abstract class DepanFxBaseExportSectionDialog {
 
   @FXML
   private void handleConfirm() {
-    String dstName = destinationField.getText();
-    File dstFile = new File(dstName);
-    if (Strings.isNullOrEmpty(dstName)) {
-      Alert alert = new Alert(AlertType.ERROR);
-      alert.setContentText("Destination field is not usable");
-      alert.setHeaderText("Node List Save Confirmation Error");
-      alert.setTitle("Blank value for destination field");
-      alert.showAndWait();
+    DepanFxProctor proctor = new DepanFxProctor.Simple();
+    DepanFxDialogChecks.checkDestinationFile(
+        proctor, destinationField.getText());
+    if (DepanFxResourcePerspectives.errorAlert(
+        proctor, "Node List Export Confirmation Error")) {
       return;
     }
+
     closeDialog();
 
     List<ExportColumn> exportColumns = ExportColumn.fromExportData(
         nodeIdExportChoiceField.getValue(), exportTable.getItems().stream());
     AbstractCsvExporter exporter = getCsvExporter(exportColumns);
     Collection<GraphNode> roots = getExportRoots();
+
+    File dstFile = new File(destinationField.getText());
 
     try (Writer writer = new FileWriter(dstFile)) {
       exporter.export(writer, roots);

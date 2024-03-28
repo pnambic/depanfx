@@ -4,12 +4,15 @@ import com.google.common.base.Strings;
 import com.pnambic.depanfx.bytecode.AsmFactory;
 import com.pnambic.depanfx.bytecode.ClassAnalysisStats;
 import com.pnambic.depanfx.bytecode.ClassFileReader;
-import com.pnambic.depanfx.bytecode.ClassTreeLoader;
+import com.pnambic.depanfx.bytecode.JavaTreeLoader;
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.java.context.JavaContextDefinition;
+import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
+import com.pnambic.depanfx.perspective.DepanFxProctor;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -109,6 +112,14 @@ public class DepanFxNewJavaDialog {
 
   @FXML
   private void handleConfirm() {
+    DepanFxProctor proctor = new DepanFxProctor.Simple();
+    DepanFxDialogChecks.checkDestinationFile(
+        proctor, destinationField.getText());
+    if (DepanFxResourcePerspectives.errorAlert(
+        proctor, "Java Graph Save Confirmation Error")) {
+      return;
+    }
+
     closeDialog();
 
     File dstFile = new File(destinationField.getText());
@@ -177,8 +188,8 @@ public class DepanFxNewJavaDialog {
     ClassAnalysisStats stats = new ClassAnalysisStats();
     ClassFileReader reader =
         new ClassFileReader(AsmFactory.ASM9_FACTORY, stats);
-    ClassTreeLoader loader =
-        new ClassTreeLoader(treePath, modelBuilder, reader);
+    JavaTreeLoader loader =
+        new JavaTreeLoader(treePath, modelBuilder, reader);
     try {
       loader.analyzeTree(treePath);
     } catch (IOException errIo) {

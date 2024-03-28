@@ -1,6 +1,8 @@
 package com.pnambic.depanfx.workspace.gui;
 
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.perspective.DepanFxProctor;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -59,6 +61,13 @@ public class DepanFxFileImportDialog {
 
   @FXML
   private void handleConfirm() {
+    DepanFxProctor proctor = new DepanFxProctor.Simple();
+    // Need check for valid source file, etc.
+    if (DepanFxResourcePerspectives.errorAlert(
+        proctor, "Graph Import Confirmation Error")) {
+      return;
+    }
+
     closeDialog();
 
     File srcFile = new File(sourceField.getText());

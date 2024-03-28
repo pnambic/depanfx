@@ -4,6 +4,7 @@ module depanfx.perspective {
     requires transitive javafx.graphics;
     requires net.rgielen.fxweaver.core;
 
+    requires com.google.common;
     requires org.slf4j;
     requires spring.context;
     requires spring.beans;

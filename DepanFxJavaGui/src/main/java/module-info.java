@@ -12,6 +12,7 @@ module depanfx.java.gui {
   requires depanfx.graph;
   requires depanfx.graph_doc;
   requires depanfx.java;
+  requires depanfx.perspective;
   requires depanfx.workspace;
   requires depanfx.scene;
 
