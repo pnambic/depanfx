@@ -55,7 +55,7 @@ public interface DepanFxProctor {
 
     private int errors;
 
-    private List<ErrorInfo> messages;
+    private List<ErrorInfo> messages = new ArrayList<>();
 
     @Override
     public boolean hasErrors() {
