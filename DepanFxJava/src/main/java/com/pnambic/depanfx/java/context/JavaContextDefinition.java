@@ -106,6 +106,12 @@ public class JavaContextDefinition {
   public static final JavaRelationId MODULE_EXPORTS_RELID =
       new JavaRelationId(MODEL_ID, "module-exports");
 
+  public static final JavaRelationId MODULE_MAIN_RELID =
+      new JavaRelationId(MODEL_ID, "module-main");
+
+  public static final JavaRelationId MODULE_PACKAGE_RELID =
+      new JavaRelationId(MODEL_ID, "module-package");
+
   public static final JavaRelationId MODULE_PROVIDES_RELID =
       new JavaRelationId(MODEL_ID, "module-provides");
 

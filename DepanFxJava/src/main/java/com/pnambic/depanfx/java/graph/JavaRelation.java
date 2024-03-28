@@ -130,6 +130,14 @@ public class JavaRelation extends GraphRelation {
       new JavaRelation(JavaContextDefinition.MODULE_EXPORTS_RELID,
           "exports", "exported by");
 
+  public static final JavaRelation MODULE_MAIN =
+      new JavaRelation(JavaContextDefinition.MODULE_MAIN_RELID,
+          "main is", "main of");
+
+  public static final JavaRelation MODULE_PACKAGE =
+      new JavaRelation(JavaContextDefinition.MODULE_PACKAGE_RELID,
+          "packaged", "packaged by");
+
   public static final JavaRelation MODULE_PROVIDES =
       new JavaRelation(JavaContextDefinition.MODULE_PROVIDES_RELID,
           "provides", "provided by");

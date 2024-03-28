@@ -128,7 +128,7 @@ public class JarFileLister {
     File parentFile = new File(name).getParentFile();
 
     if (null == parentFile) {
-      builder.newNode(entryNode);
+      builder.mapNode(entryNode);
       return;
     }
 

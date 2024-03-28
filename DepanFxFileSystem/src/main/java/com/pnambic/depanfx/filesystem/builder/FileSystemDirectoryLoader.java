@@ -110,7 +110,7 @@ public class FileSystemDirectoryLoader {
     // If it is just a file, it's pretty uninteresting - one node
     if (treeFile.isFile()) {
       DocumentNode fileNode = visitFile(treeFile);
-      getBuilder().newNode(fileNode);
+      getBuilder().mapNode(fileNode);
       return;
     }
 

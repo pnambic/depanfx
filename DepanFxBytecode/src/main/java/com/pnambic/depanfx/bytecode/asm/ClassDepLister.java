@@ -243,7 +243,7 @@ public class ClassDepLister extends ClassVisitor {
   private void checkAnonymousType(String name) {
     // anonymous classes names contains a $ followed by a digit
     if (name.contains("$")) {
-      String superClass = name.substring(0, name.lastIndexOf('$'));
+      String superClass = nextSuperClass(name);
 
       // recursively check: maybe name is not an anonymous class, but is
       // an innerclass contained into an anonymous class.
@@ -255,6 +255,16 @@ public class ClassDepLister extends ClassVisitor {
         addEdge(superType, mainClass, JavaRelation.ANONYMOUS_TYPE);
       }
     }
+  }
+
+  private String nextSuperClass(String name) {
+    int truncateIndex = name.lastIndexOf('$');
+
+    // Handle Kotlin generated classes.
+    while (name.charAt(truncateIndex) == '$') {
+      truncateIndex--;
+    }
+    return name.substring(0, truncateIndex);
   }
 
   /**

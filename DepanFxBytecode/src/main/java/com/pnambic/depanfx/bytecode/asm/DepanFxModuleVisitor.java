@@ -48,17 +48,24 @@ public class DepanFxModuleVisitor extends ModuleVisitor {
   }
 
   @Override
-  public void visitMainClass(String mainClass) {
-    super.visitMainClass(mainClass);
+  public void visitMainClass(String mainFqcn) {
+    super.visitMainClass(mainFqcn);
 
-    LOG.debug("module {} has main class {}", moduleName, mainClass);
+    LOG.warn("module {} has main class {}", moduleName, mainFqcn);
+
+    //$ Transform mainFqcn to class (replace / with .)?
+    ClassNode mainNode = getClass(mainFqcn);
+    addEdge(mainNode, JavaRelation.MODULE_MAIN);
   }
 
   @Override
   public void visitPackage(String packageName) {
     super.visitPackage(packageName);
 
-    LOG.debug("module {} has package {}", moduleName, packageName);
+    LOG.warn("module {} has package {}", moduleName, packageName);
+
+    PackageNode packageNode = getPackage(packageName);
+    addEdge(packageNode, JavaRelation.MODULE_PACKAGE);
   }
 
   @Override
@@ -104,7 +111,7 @@ public class DepanFxModuleVisitor extends ModuleVisitor {
   public void visitUse(String serviceFqcn) {
     super.visitUse(serviceFqcn);
 
-    LOG.debug("module {} uses service {}", moduleName, serviceFqcn);
+    LOG.info("module {} uses service {}", moduleName, serviceFqcn);
 
     ClassNode serviceNode = getClass(serviceFqcn);
     addEdge(serviceNode, JavaRelation.MODULE_USES);
@@ -114,7 +121,7 @@ public class DepanFxModuleVisitor extends ModuleVisitor {
   public void visitProvide(String serviceFqcn, String... providers) {
     super.visitProvide(serviceFqcn, providers);
 
-    LOG.debug("module {} provides {}", moduleName, serviceFqcn);
+    LOG.info("module {} provides {}", moduleName, serviceFqcn);
 
     ClassNode serviceNode = getClass(serviceFqcn);
     addEdge(serviceNode, JavaRelation.MODULE_PROVIDES);
