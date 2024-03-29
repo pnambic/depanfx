@@ -27,7 +27,6 @@ import com.pnambic.depanfx.java.graph.FieldNode;
 import com.pnambic.depanfx.java.graph.JavaRelation;
 import com.pnambic.depanfx.java.graph.MemberNode;
 import com.pnambic.depanfx.java.graph.MethodNode;
-import com.pnambic.depanfx.java.graph.PackageNode;
 import com.pnambic.depanfx.java.graph.graphdata.ClassInfo;
 import com.pnambic.depanfx.java.graph.graphdata.ClassInfo.ClassKind;
 import com.pnambic.depanfx.java.graph.graphdata.FieldInfo;
@@ -43,8 +42,6 @@ import org.springframework.asm.ModuleVisitor;
 import org.springframework.asm.Opcodes;
 import org.springframework.asm.Type;
 import org.springframework.asm.TypePath;
-
-import java.io.File;
 
 /**
  * Implements a visitor of the ASM package, to find the dependencies in a class
@@ -74,6 +71,12 @@ public class ClassDepLister extends ClassVisitor {
   private final DocumentNode fileNode;
 
   /**
+   * Construct classes, with all their inferred accouterments
+   * (e.g. containing packages and source files).
+   */
+  private final ClassNodeFactory classBuilder;
+
+  /**
    * class currently read class. (typically the class A when the file A.java is
    * read.
    */
@@ -94,6 +97,8 @@ public class ClassDepLister extends ClassVisitor {
     this.asmFactory = asmFactory;
     this.builder = builder;
     this.fileNode = fileNode;
+
+    this.classBuilder = new ClassNodeFactory(builder, fileNode);
   }
 
   @Override
@@ -107,16 +112,15 @@ public class ClassDepLister extends ClassVisitor {
     }
 
     // Visit normal classes
-    mainClass = TypeNameUtil.fromInternalName(name);
+    mainClass = classBuilder.fromInternalName(name);
     addClassInfo(mainClass, classKind);
 
-    PackageNode packageNode = installPackageForTypeName(name);
-    addEdge(packageNode, mainClass, JavaRelation.CLASS);
+    ClassNode baseClass = classBuilder.fromInternalName(superName);
+    addEdge(baseClass, mainClass, JavaRelation.EXTENDS);
 
-    addEdge(TypeNameUtil.fromInternalName(superName), mainClass,
-        JavaRelation.EXTENDS);
     for (String s : interfaces) {
-      ClassNode interfaceNode = TypeNameUtil.fromInterfaceName(s);
+      ClassNode interfaceNode =
+          (ClassNode) builder.mapNode(classBuilder.fromInterfaceName(s));
       builder.addNodeInfo(interfaceNode, ClassInfo.class,
           new ClassInfo(ClassKind.KIND_INTERFACE));
       addEdge(interfaceNode, mainClass, JavaRelation.IMPLEMENTS);
@@ -126,7 +130,7 @@ public class ClassDepLister extends ClassVisitor {
 
   @Override
   public ModuleVisitor visitModule(String name, int access, String version) {
-    return new DepanFxModuleVisitor(builder, name, access);
+    return asmFactory.buildModuleVisitor(builder, classBuilder, name, access);
   }
 
   @Override
@@ -134,7 +138,7 @@ public class ClassDepLister extends ClassVisitor {
       int access, String name, String desc, String signature, Object value) {
     MemberNode fieldNode = new FieldNode(mainClass.getFQCN(), name);
 
-    ClassNode typeNode = TypeNameUtil.fromDescriptor(desc);
+    ClassNode typeNode = classBuilder.fromDescriptor(desc);
     builder.addNodeInfo(fieldNode, FieldInfo.class,
         new FieldInfo(typeNode));
 
@@ -160,7 +164,7 @@ public class ClassDepLister extends ClassVisitor {
           name, outerName, innerName, access, mainClass);
       return;
     }
-    ClassNode inner = TypeNameUtil.fromInternalName(name);
+    ClassNode inner = classBuilder.fromInternalName(name);
     if (inner.equals(mainClass)) {
       // the visitInnerClass callback is called twice: once when visiting the
       // outer class (A in A$B), and once when visiting the A$B class. we
@@ -169,20 +173,20 @@ public class ClassDepLister extends ClassVisitor {
     }
 
     addClassInfo(inner, getClassKind(access));
-    ClassNode parent = TypeNameUtil.fromInternalName(outerName);
+    ClassNode parent = classBuilder.fromInternalName(outerName);
     addEdge(parent, inner, JavaRelation.INNER_TYPE);
   }
 
   @Override
   public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-    TypeNameUtil.buildAnnotationDep(builder, mainClass, desc, visible);
+    classBuilder.buildAnnotationDep(mainClass, desc, visible);
     return null;
   }
 
   @Override
   public AnnotationVisitor visitTypeAnnotation(
       int typeRef, TypePath typePath, String desc, boolean visible) {
-    TypeNameUtil.buildAnnotationDep(builder, mainClass, desc, visible);
+    classBuilder.buildAnnotationDep(mainClass, desc, visible);
     return null;
   }
 
@@ -201,16 +205,18 @@ public class ClassDepLister extends ClassVisitor {
 
     // arguments dependencies
     for (Type t : Type.getArgumentTypes(desc)) {
-      addEdge(methodNode, TypeNameUtil.fromDescriptor(t.getDescriptor()),
+      addEdge(
+          methodNode,
+          classBuilder.fromDescriptor(t.getDescriptor()),
           JavaRelation.TYPE);
     }
 
     // return-type dependency
-    ClassNode type = TypeNameUtil.fromDescriptor(
-        Type.getReturnType(desc).getDescriptor());
-    addEdge(mainClass, type, JavaRelation.READ);
+    ClassNode typeNode =
+        classBuilder.fromDescriptor(Type.getReturnType(desc).getDescriptor());
+    addEdge(mainClass, typeNode, JavaRelation.READ);
 
-    return asmFactory.buildMethodVisitor(builder, methodNode);
+    return asmFactory.buildMethodVisitor(builder, classBuilder, methodNode);
   }
 
   @Override
@@ -250,8 +256,8 @@ public class ClassDepLister extends ClassVisitor {
       checkAnonymousType(superClass);
 
       // A digit must follow the $ in the name.
-      if (Character.isDigit(name.charAt(name.lastIndexOf('$')+1))) {
-        ClassNode superType = TypeNameUtil.fromInternalName(superClass);
+      if (Character.isDigit(name.charAt(name.lastIndexOf('$') + 1))) {
+        ClassNode superType = classBuilder.fromInternalName(superClass);
         addEdge(superType, mainClass, JavaRelation.ANONYMOUS_TYPE);
       }
     }
@@ -260,52 +266,17 @@ public class ClassDepLister extends ClassVisitor {
   private String nextSuperClass(String name) {
     int truncateIndex = name.lastIndexOf('$');
 
-    // Handle Kotlin generated classes.
-    while (name.charAt(truncateIndex) == '$') {
+    // Handle Kotlin generated classes with multiple dollar sequences.
+    while (name.charAt(truncateIndex - 1) == '$') {
       truncateIndex--;
     }
     return name.substring(0, truncateIndex);
-  }
-
-  /**
-   * Install a package hierarchy and a matching directory hierarchy for
-   * the full path name of the type.
-   *
-   * @param typePath full path name of a type
-   * @return PackageElement that contains the type
-   */
-  private PackageNode installPackageForTypeName(String typePath) {
-    // TODO(leeca): Add short-circuit early exit if package is already defined.
-    // This would avoid a fair bit of unnecessary object creation.
-    File packageFile = new File(typePath).getParentFile();
-    if (null == packageFile) {
-      return new PackageNode("<unnamed>");
-    }
-    File treeFile = createTreeFile();
-    PackageTreeBuilder packageBuilder = new PackageTreeBuilder(builder);
-
-    return packageBuilder.installPackageTree(packageFile, treeFile);
   }
 
   private void addEdge(
       GraphNode head, GraphNode tail, GraphRelation relation) {
     builder.addEdge(
         new GraphEdge(builder.mapNode(head), builder.mapNode(tail), relation));
-  }
-
-  /**
-   * Define the tree for the file node, even if it doesn't have a directory.
-   * This can happen for class files at the top of the analysis tree, such as
-   * classes in the unnamed package at the top of a Jar file.
-   *
-   * @return valid directory tree reference
-   */
-  private File createTreeFile() {
-    File result = fileNode.getPath().toFile().getParentFile();
-    if (null == result) {
-      return new File("");
-    }
-    return result;
   }
 
   private void addClassInfo(ClassNode classNode, ClassKind classKind) {

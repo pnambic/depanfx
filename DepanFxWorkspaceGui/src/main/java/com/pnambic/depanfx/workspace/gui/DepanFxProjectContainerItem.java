@@ -8,7 +8,7 @@ import javafx.scene.control.TreeItem;
 
 public class DepanFxProjectContainerItem extends TreeItem<DepanFxWorkspaceMember> {
 
-  private boolean isFirstTimeChildren = true;
+  private boolean projectLoaded = false;
 
   public DepanFxProjectContainerItem(DepanFxProjectContainer container) {
     super(container);
@@ -21,8 +21,8 @@ public class DepanFxProjectContainerItem extends TreeItem<DepanFxWorkspaceMember
 
   @Override
   public ObservableList<TreeItem<DepanFxWorkspaceMember>> getChildren() {
-    if (isFirstTimeChildren) {
-      isFirstTimeChildren = false;
+    if (!projectLoaded) {
+      projectLoaded = true;
       DepanFxProjectMemberItemBuilder builder =
           new DepanFxProjectMemberItemBuilder(
               (DepanFxProjectContainer) getValue());

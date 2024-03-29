@@ -35,6 +35,10 @@ import java.nio.file.Path;
  */
 public class PackageTreeBuilder {
 
+  private static final char WINDOWS_PATH_CHAR = '\\';
+
+  private static final char JAVA_PATH_CHAR = '/';
+
   /** Dependency builder */
   private final DepanFxGraphModelBuilder builder;
 
@@ -86,7 +90,7 @@ public class PackageTreeBuilder {
     }
 
     TreeClimber treePath = new TreeClimber(treeFile);
-    GraphNode lookupNode = builder.mapNode(packageNode);
+    GraphNode lookupNode = packageNode;
 
     // If the lookup is not the same node, then a node with that identity
     // already exists.  No need to add that package (or its parents) again.
@@ -107,7 +111,7 @@ public class PackageTreeBuilder {
 
       addEdge(packageNode, childNode, JavaRelation.PACKAGE);
       addEdge(packageDir, childDir, FileSystemRelation.CONTAINS_DIR);
-      lookupNode = builder.mapNode(packageNode);
+      lookupNode = packageNode;
     }
   }
 
@@ -119,17 +123,25 @@ public class PackageTreeBuilder {
    * @param treePath path to directory
    */
   private void createPackageDir(File packageFile, Path treePath) {
-    packageNode = createPackage(packageFile);
+    packageNode = (PackageNode) builder.mapNode(createPackage(packageFile));
 
-    packageDir = new DirectoryNode(treePath);
+    packageDir = (DirectoryNode) builder.mapNode(new DirectoryNode(treePath));
     addEdge(packageDir, packageNode, JavaRelation.PACKAGEDIR);
   }
 
   private PackageNode createPackage(File packageFile) {
     if (packageFile != null) {
-      return new PackageNode(packageFile.getPath());
+      return new PackageNode(getPackageName(packageFile));
     }
-    return new PackageNode("");
+    return new PackageNode("<unnamed>");
+  }
+
+  private String getPackageName(File packageFile) {
+    String result = packageFile.getPath();
+    if (File.separatorChar == WINDOWS_PATH_CHAR) {
+      return result.replace(WINDOWS_PATH_CHAR, JAVA_PATH_CHAR);
+    }
+    return result;
   }
 
   private void addEdge(

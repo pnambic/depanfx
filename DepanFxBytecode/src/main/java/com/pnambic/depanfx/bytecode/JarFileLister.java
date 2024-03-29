@@ -18,6 +18,7 @@ package com.pnambic.depanfx.bytecode;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.Enumeration;
 
@@ -51,6 +52,11 @@ public class JarFileLister {
   private final ClassFileReader reader;
 
   /**
+   * Supplied location for contents.
+   */
+  private final DocumentNode homeNode;
+
+  /**
    * Create a new JarFileLister, to list files in file, and call callbacks of
    * listener.
    *
@@ -63,10 +69,12 @@ public class JarFileLister {
   public JarFileLister(
       ZipFile zipFile,
       DepanFxGraphModelBuilder builder,
-      ClassFileReader reader) {
+      ClassFileReader reader,
+      DocumentNode homeNode) {
     this.zipFile = zipFile;
     this.builder = builder;
     this.reader = reader;
+    this.homeNode = homeNode;
   }
 
   /**
@@ -98,16 +106,15 @@ public class JarFileLister {
       ZipEntry entry = entries.nextElement();
       String name = entry.getName();
 
-      GraphNode entryNode = createEntryNode(entry);
-      createEntryEdge(entry);
+      GraphNode entryNode = prepareEntryNode(entry);
 
       // If it is a .class file, parse those contents.
       // TODO(leeca): re-add path filtering
-      if (!entry.isDirectory() && name.endsWith(".class")) {
+      if (entryNode instanceof DocumentNode docNode
+          && name.endsWith(".class")) {
         try {
           InputStream inputStream = zipFile.getInputStream(entry);
-          reader.readClassFile(
-              getBuilder(), (DocumentNode) entryNode, inputStream);
+          reader.readClassFile(getBuilder(), docNode, inputStream);
         } catch (IOException e1) {
           LOG.error("Error while reading file {}.", name);
         }
@@ -122,20 +129,10 @@ public class JarFileLister {
     }
   }
 
-  private void createEntryEdge(ZipEntry entry) {
-    GraphNode entryNode = createEntryNode(entry);
-    String name = entry.getName();
-    File parentFile = new File(name).getParentFile();
+  private void createEntryEdge(GraphNode entryNode) {
+    GraphNode parentNode = getParentNode(entryNode);
 
-    if (null == parentFile) {
-      builder.mapNode(entryNode);
-      return;
-    }
-
-    GraphNode parentNode =
-        builder.mapNode(new DirectoryNode(parentFile.toPath()));
-
-    if (entry.isDirectory()) {
+    if (entryNode instanceof DirectoryNode ) {
       GraphEdge edge = new GraphEdge(
           parentNode, entryNode, FileSystemRelation.CONTAINS_DIR);
       builder.addEdge(edge);
@@ -145,14 +142,30 @@ public class JarFileLister {
     GraphEdge edge = new GraphEdge(
         parentNode, entryNode, FileSystemRelation.CONTAINS_FILE);
     builder.addEdge(edge);
+  }
 
+  private GraphNode prepareEntryNode(ZipEntry entry) {
+    GraphNode result = createEntryNode(entry);
+    createEntryEdge(result);
+    return result;
+  }
+
+  private GraphNode getParentNode(GraphNode entryNode) {
+    String entryName = entryNode.getId().getNodeKey();
+    Path parentPath = Path.of(entryName).getParent();
+
+    if (null == parentPath) {
+      return homeNode;
+    }
+
+    return builder.mapNode(new DirectoryNode(parentPath));
   }
 
   private GraphNode createEntryNode(ZipEntry entry) {
-    Path entryPath = new File(entry.getName()).toPath();
+    Path entryPath = Path.of(entry.getName());
     if (entry.isDirectory()) {
-      return new DirectoryNode(entryPath);
+      return builder.mapNode(new DirectoryNode(entryPath));
     }
-    return new DocumentNode(entryPath);
+    return builder.mapNode(new DocumentNode(entryPath));
   }
 }

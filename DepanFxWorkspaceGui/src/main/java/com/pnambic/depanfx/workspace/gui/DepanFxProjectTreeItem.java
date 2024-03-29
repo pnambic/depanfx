@@ -14,7 +14,7 @@ import javafx.scene.control.TreeItem;
 
 public class DepanFxProjectTreeItem extends TreeItem<DepanFxWorkspaceMember> {
 
-  private boolean isFirstTimeChildren = true;
+  private boolean treeLoaded = false;
 
   public DepanFxProjectTreeItem(DepanFxProjectTree project) {
     super(project);
@@ -29,8 +29,8 @@ public class DepanFxProjectTreeItem extends TreeItem<DepanFxWorkspaceMember> {
 
   @Override
   public ObservableList<TreeItem<DepanFxWorkspaceMember>> getChildren() {
-    if (isFirstTimeChildren) {
-      isFirstTimeChildren = false;
+    if (!treeLoaded) {
+      treeLoaded = true;
       DepanFxProjectMemberItemBuilder builder =
           new DepanFxProjectMemberItemBuilder(
               (DepanFxProjectTree) getValue());

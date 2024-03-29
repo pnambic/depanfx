@@ -42,6 +42,15 @@ import javafx.stage.Stage;
 @FxmlView("new-java-dialog.fxml")
 public class DepanFxNewJavaDialog {
 
+  private static final ExtensionFilter ALL_FILES_FILTER =
+      new FileChooser.ExtensionFilter("All Files", "*.*");
+
+  private static final ExtensionFilter CLASS_FILTER =
+      new FileChooser.ExtensionFilter("Java Class Files", "*.class");
+
+  private static final ExtensionFilter ARCHIVE_FILTER =
+      new FileChooser.ExtensionFilter("Java Archives", "*.jar", "*.zip");
+
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNewJavaDialog.class.getName());
 
@@ -85,10 +94,28 @@ public class DepanFxNewJavaDialog {
   }
 
   @FXML
-  private void openDirectoryChooser() {
+  private void openDirSourceChooser() {
     DirectoryChooser directoryChooser = new DirectoryChooser();
+    directoryChooser.setTitle("Select Source Directory for Java Graph");
     File selectedDirectory =
         directoryChooser.showDialog(sourceField.getScene().getWindow());
+    if (selectedDirectory != null) {
+      sourceField.setText(selectedDirectory.getAbsolutePath());
+    }
+  }
+
+  @FXML
+  private void openFileSourceChooser() {
+    FileChooser fileChooser = new FileChooser();
+
+    fileChooser.setTitle("Select Source File for Java Graph");
+
+    fileChooser.getExtensionFilters().addAll(
+            ARCHIVE_FILTER, CLASS_FILTER, ALL_FILES_FILTER);
+    fileChooser.setSelectedExtensionFilter(ARCHIVE_FILTER);
+
+    File selectedDirectory =
+        fileChooser.showOpenDialog(sourceField.getScene().getWindow());
     if (selectedDirectory != null) {
       sourceField.setText(selectedDirectory.getAbsolutePath());
     }
@@ -205,4 +232,6 @@ public class DepanFxNewJavaDialog {
   private String buildTimestampName(String prefix, String ext) {
     return DepanFxWorkspaceFactory.buildDocumentTimestampName(prefix, ext);
   }
+
+  @FXML public void openDirChooser() {}
 }

@@ -18,7 +18,7 @@ public class DepanFxTreeForkItem extends DepanFxNodeListItem {
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxTreeForkItem.class);
 
-  private boolean freshTree = true;
+  private boolean treeLoaded = false;
 
   public DepanFxTreeForkItem(DepanFxTreeFork fork) {
     super(fork);
@@ -31,8 +31,8 @@ public class DepanFxTreeForkItem extends DepanFxNodeListItem {
 
   @Override
   public ObservableList<TreeItem<DepanFxNodeListMember>> getChildren() {
-    if (freshTree) {
-      freshTree = false;
+    if (!treeLoaded) {
+      treeLoaded = true;
       super.getChildren().setAll(buildChildren());
     }
 

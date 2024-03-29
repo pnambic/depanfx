@@ -13,7 +13,7 @@ import javafx.scene.control.TreeItem;
 
 public class DepanFxFlatSectionItem extends DepanFxNodeListSectionItem {
 
-  private boolean freshSections = false;
+  private boolean sectionLoaded = false;
 
   public DepanFxFlatSectionItem(DepanFxFlatSection section) {
     super(section);
@@ -21,9 +21,9 @@ public class DepanFxFlatSectionItem extends DepanFxNodeListSectionItem {
 
   @Override
   public ObservableList<TreeItem<DepanFxNodeListMember>> getChildren() {
-    if (!freshSections) {
+    if (!sectionLoaded) {
+      sectionLoaded = true;
       super.getChildren().setAll(buildChildren());
-      freshSections = true;
     }
 
     return super.getChildren();

@@ -16,6 +16,8 @@
 package com.pnambic.depanfx.bytecode;
 
 import com.pnambic.depanfx.bytecode.asm.ClassDepLister;
+import com.pnambic.depanfx.bytecode.asm.ClassNodeFactory;
+import com.pnambic.depanfx.bytecode.asm.DepanFxModuleVisitor;
 import com.pnambic.depanfx.bytecode.asm.FieldDepLister;
 import com.pnambic.depanfx.bytecode.asm.MethodDepLister;
 import com.pnambic.depanfx.filesystem.graph.DocumentNode;
@@ -25,6 +27,7 @@ import com.pnambic.depanfx.java.graph.MethodNode;
 import org.springframework.asm.ClassVisitor;
 import org.springframework.asm.FieldVisitor;
 import org.springframework.asm.MethodVisitor;
+import org.springframework.asm.ModuleVisitor;
 import org.springframework.asm.Opcodes;
 
 /**
@@ -56,7 +59,18 @@ public interface AsmFactory {
    * Provide a new {@link MethodVisitor} instance.
    */
   MethodVisitor buildMethodVisitor(
-      DepanFxGraphModelBuilder builder, MethodNode methodNode);
+      DepanFxGraphModelBuilder builder,
+      ClassNodeFactory classBuilder,
+      MethodNode methodNode);
+
+  /**
+   * Provide a new {@link MethodVisitor} instance.
+   */
+  ModuleVisitor buildModuleVisitor(
+      DepanFxGraphModelBuilder builder,
+      ClassNodeFactory classBuilder,
+      String moduleName,
+      int access);
 
   /////////////////////////////////////
   // Provides the standard factory methods.
@@ -90,8 +104,20 @@ public interface AsmFactory {
 
     @Override
     public MethodVisitor buildMethodVisitor(
-        DepanFxGraphModelBuilder builder, MethodNode methodNode) {
-      return new MethodDepLister(this, builder, methodNode);
+        DepanFxGraphModelBuilder builder,
+        ClassNodeFactory classBuilder,
+        MethodNode methodNode) {
+      return new MethodDepLister(this, builder, classBuilder, methodNode);
+    }
+
+    @Override
+    public ModuleVisitor buildModuleVisitor(
+        DepanFxGraphModelBuilder builder,
+        ClassNodeFactory classBuilder,
+        String moduleName,
+        int access) {
+      return new DepanFxModuleVisitor(
+          this, builder, classBuilder, moduleName, access);
     }
   }
 

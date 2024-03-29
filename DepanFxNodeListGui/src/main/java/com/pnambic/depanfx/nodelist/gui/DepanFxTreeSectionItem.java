@@ -19,7 +19,7 @@ import javafx.scene.control.TreeItem;
 public class DepanFxTreeSectionItem
     extends DepanFxNodeListSectionItem {
 
-  private boolean freshTree = false;
+  private boolean treeLoaded = false;
 
   public DepanFxTreeSectionItem(DepanFxTreeSection section) {
     super(section);
@@ -32,9 +32,9 @@ public class DepanFxTreeSectionItem
 
   @Override
   public ObservableList<TreeItem<DepanFxNodeListMember>> getChildren() {
-    if (!freshTree) {
+    if (!treeLoaded) {
+      treeLoaded = true;
       super.getChildren().setAll(buildChildren());
-      freshTree = true;
     }
 
     return super.getChildren();

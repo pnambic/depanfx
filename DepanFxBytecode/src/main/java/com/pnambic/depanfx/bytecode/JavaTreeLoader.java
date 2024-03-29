@@ -61,7 +61,7 @@ public class JavaTreeLoader extends FileSystemDirectoryLoader {
 
     if (treeFile.getName().endsWith(".jar")
         || treeFile.getName().endsWith(".zip") ) {
-      readZipFile(treeFile.getPath());
+      readZipFile(treeFile.getPath(), result);
     }
 
     return result;
@@ -69,17 +69,18 @@ public class JavaTreeLoader extends FileSystemDirectoryLoader {
 
   /**
    * Build Java dependencies from a Jar file.
-   * 
+   *
    * @param classPath path to Jar file
    * @param builder destination of discovered dependencies
    * @param progress indicator for user interface
    * @throws IOException
    */
-  private void readZipFile(String classPath)
+  private void readZipFile(String classPath, DocumentNode document)
       throws IOException {
 
     ZipFile zipFile = new ZipFile(classPath);
-    JarFileLister jarReader = new JarFileLister(zipFile, getBuilder(), reader);
+    JarFileLister jarReader =
+        new JarFileLister(zipFile, getBuilder(), reader, document);
     jarReader.start();
   }
 }

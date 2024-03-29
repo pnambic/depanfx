@@ -52,35 +52,39 @@ public class MethodDepLister extends MethodVisitor {
 
   private DepanFxGraphModelBuilder builder;
 
+  private ClassNodeFactory classBuilder;
+
   private MethodNode methodNode;
 
   public MethodDepLister(
       AsmFactory asmFactory,
       DepanFxGraphModelBuilder builder,
+      ClassNodeFactory classBuilder,
       MethodNode methodNode) {
     super(asmFactory.getApiLevel());
     this.asmFactory = asmFactory;
     this.builder = builder;
+    this.classBuilder = classBuilder;
     this.methodNode = methodNode;
   }
 
   @Override
   public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-    TypeNameUtil.buildAnnotationDep(builder, methodNode, desc, visible);
+    classBuilder.buildAnnotationDep(methodNode, desc, visible);
     return null;
   }
 
   @Override
   public AnnotationVisitor visitTypeAnnotation(
       int typeRef, TypePath typePath, String desc, boolean visible) {
-    TypeNameUtil.buildAnnotationDep(builder, methodNode, desc, visible);
+    classBuilder.buildAnnotationDep(methodNode, desc, visible);
     return null;
   }
 
   @Override
   public void visitFieldInsn(
       int opcode, String owner, String name, String desc) {
-    ClassNode ownerClassNode = TypeNameUtil.fromInternalName(owner);
+    ClassNode ownerClassNode = classBuilder.fromInternalName(owner);
     MemberNode readFieldNode = new FieldNode(ownerClassNode.getFQCN(), name);
     addEdge(ownerClassNode, readFieldNode, getFieldRelation(opcode));
     addEdge(methodNode, readFieldNode, JavaRelation.READ);
@@ -89,7 +93,8 @@ public class MethodDepLister extends MethodVisitor {
   @Override // ASM-5
   public void visitMethodInsn(
       int opcode, String owner, String name, String desc, boolean itf) {
-    ClassNode ownerClassNode = TypeNameUtil.fromInternalName(owner);
+    ClassNode ownerClassNode = classBuilder.fromInternalName(owner);
+
     MethodNode calledMethodNode = new MethodNode(
         ownerClassNode.getFQCN(), name);
 
@@ -101,14 +106,16 @@ public class MethodDepLister extends MethodVisitor {
   public void visitMethodInsn(
       int opcode, String owner, String name, String desc) {
     MethodNode calledMethodNode = new MethodNode(
-        TypeNameUtil.fromInternalName(owner).getFQCN(), name);
+        classBuilder.fromInternalName(owner).getFQCN(), name);
     addEdge(methodNode, calledMethodNode, JavaRelation.CALL);
   }
 
   @Override
   public void visitTypeInsn(int opcode, String type) {
     addEdge(
-        methodNode, TypeNameUtil.fromInternalName(type), JavaRelation.TYPE);
+        methodNode,
+        classBuilder.fromInternalName(type),
+        JavaRelation.TYPE);
   }
 
   @Override
@@ -119,7 +126,9 @@ public class MethodDepLister extends MethodVisitor {
     if (null == type) {
       return;
     }
-    addEdge(methodNode, TypeNameUtil.fromInternalName(type),
+    addEdge(
+        methodNode,
+        classBuilder.fromInternalName(type),
         JavaRelation.ERROR_HANDLING);
   }
 

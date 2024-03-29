@@ -30,7 +30,11 @@ public class JavaLinkMatcherBuiltIns {
       Arrays.asList(new DepanFxLinkMatcher [] {
           FileSystemLinkMatchers.MEMBER,
           // Link file system nodes to Java classes nodes
-          JavaLinkMatchers.CLASSFILE_FORWARD,
+          // JavaLinkMatchers.CLASSFILE_FORWARD,
+
+          // Link nested packages with Java class
+          JavaLinkMatchers.CLASS_FORWARD,
+          JavaLinkMatchers.PACKAGE_FORWARD,
           JavaLinkMatchers.JAVA_CLASS_MEMBER_MATCH
       });
 

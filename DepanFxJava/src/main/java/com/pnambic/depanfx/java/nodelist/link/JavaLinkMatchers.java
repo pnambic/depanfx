@@ -17,6 +17,9 @@ public class JavaLinkMatchers {
     // Prevent instantiation.
   }
 
+  public static final ForwardRelation CLASS_FORWARD =
+      new ForwardRelation(JavaRelation.CLASS);
+
   public static final ForwardRelation EXTENDS_FORWARD =
       new ForwardRelation(JavaRelation.EXTENDS);
 

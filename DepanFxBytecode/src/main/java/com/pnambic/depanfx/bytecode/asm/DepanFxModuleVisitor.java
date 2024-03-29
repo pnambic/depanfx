@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.bytecode.asm;
 
+import com.pnambic.depanfx.bytecode.AsmFactory;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.model.GraphRelation;
@@ -28,21 +29,31 @@ public class DepanFxModuleVisitor extends ModuleVisitor {
   private static Logger LOG =
       LoggerFactory.getLogger(DepanFxModuleVisitor.class);
 
-  private final DepanFxGraphModelBuilder builder;
+  private final AsmFactory asmFactory;
+
+  private final DepanFxGraphModelBuilder graphBuilder;
+
+  private final ClassNodeFactory classBuilder;
 
   private final String moduleName;
 
   private final ModuleNode moduleNode;
 
   public DepanFxModuleVisitor(
-      DepanFxGraphModelBuilder builder, String moduleName, int access) {
-    super(Opcodes.ASM9);
-    this.builder = builder;
+      AsmFactory asmFactory,
+      DepanFxGraphModelBuilder graphBuilder,
+      ClassNodeFactory classBuilder,
+      String moduleName,
+      int access) {
+    super(asmFactory.getApiLevel());
+    this.asmFactory = asmFactory;
+    this.graphBuilder = graphBuilder;
+    this.classBuilder = classBuilder;
     this.moduleName = moduleName;
 
     this.moduleNode = getModule(moduleName);
     if (access == Opcodes.ACC_OPEN) {
-      builder.addNodeInfo(moduleNode, ModuleInfo.class,
+      graphBuilder.addNodeInfo(moduleNode, ModuleInfo.class,
           new ModuleInfo(ModuleInfo.ModuleKind.KIND_OPEN));
     }
   }
@@ -51,7 +62,7 @@ public class DepanFxModuleVisitor extends ModuleVisitor {
   public void visitMainClass(String mainFqcn) {
     super.visitMainClass(mainFqcn);
 
-    LOG.warn("module {} has main class {}", moduleName, mainFqcn);
+    LOG.info("module {} has main class {}", moduleName, mainFqcn);
 
     //$ Transform mainFqcn to class (replace / with .)?
     ClassNode mainNode = getClass(mainFqcn);
@@ -76,13 +87,14 @@ public class DepanFxModuleVisitor extends ModuleVisitor {
 
     GraphEdge edge = addEdge(requireNode, JavaRelation.MODULE_REQUIRES);
     if (access == Opcodes.ACC_TRANSITIVE) {
-      builder.addEdgeInfo(edge, ModuleInfo.class,
+      graphBuilder.addEdgeInfo(edge, ModuleInfo.class,
         new ModuleEdgeInfo(ModuleEdgeInfo.ModuleEdgeKind.KIND_TRANSITIVE));
     }
   }
 
   @Override
-  public void visitExport(String exportPackage, int access, String... modules) {
+  public void visitExport(
+      String exportPackage, int access, String... modules) {
     super.visitExport(exportPackage, access, modules);
 
     PackageNode exportNode = getPackage(exportPackage);
@@ -138,24 +150,24 @@ public class DepanFxModuleVisitor extends ModuleVisitor {
   }
 
   private GraphEdge addEdge(GraphNode tail, GraphRelation relation) {
-    return builder.addEdge(new GraphEdge(moduleNode, tail, relation));
+    return addEdge(moduleNode, tail, relation);
   }
 
-  private void addEdge(
+  private GraphEdge addEdge(
       GraphNode head, GraphNode tail, GraphRelation relation) {
-    builder.addEdge(new GraphEdge(head, tail, relation));
+    return graphBuilder.addEdge(new GraphEdge(head, tail, relation));
   }
 
-  private ClassNode getClass(String fqcn) {
-    return (ClassNode) builder.mapNode(new ClassNode(fqcn));
+  private ClassNode getClass(String bytecodeFqcn) {
+    return classBuilder.fromInternalName(bytecodeFqcn);
   }
 
   private ModuleNode getModule(String name) {
-    return (ModuleNode) builder.mapNode(new ModuleNode(name));
+    return (ModuleNode) graphBuilder.mapNode(new ModuleNode(name));
   }
 
   private PackageNode getPackage(String packageName) {
-    return (PackageNode) builder.mapNode(new PackageNode(packageName));
+    return (PackageNode) graphBuilder.mapNode(new PackageNode(packageName));
   }
 
   private Stream<String> stream(String[] elements) {

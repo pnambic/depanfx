@@ -21,7 +21,7 @@ public class DepanFxWorkspaceItem extends TreeItem<DepanFxWorkspaceMember> {
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxWorkspaceItem.class);
 
-  private boolean isFirstTimeChildren = true;
+  private boolean treeLoaded = false;
 
   public DepanFxWorkspaceItem(DepanFxWorkspace workspace) {
     super(workspace);
@@ -36,8 +36,8 @@ public class DepanFxWorkspaceItem extends TreeItem<DepanFxWorkspaceMember> {
 
   @Override
   public ObservableList<TreeItem<DepanFxWorkspaceMember>> getChildren() {
-    if (isFirstTimeChildren) {
-      isFirstTimeChildren = false;
+    if (!treeLoaded) {
+      treeLoaded = true;
       super.getChildren().setAll(buildChildren());
     }
 

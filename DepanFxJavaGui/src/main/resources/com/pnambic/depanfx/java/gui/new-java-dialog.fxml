@@ -17,13 +17,15 @@
          AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"
          AnchorPane.topAnchor="10" AnchorPane.bottomAnchor="10">
 
-         <Label text="Select Source Directory"/>
+         <Label text="Select Source for Java Graph"/>
 
          <HBox spacing="10">
             <TextField fx:id="sourceField" editable="false" promptText="No directory selected"
                   HBox.hgrow="ALWAYS"/>
-            <Button text="Browse" onAction="#openDirectoryChooser"
-                  HBox.hgrow="ALWAYS"/>
+            <HBox spacing="2">
+                <Button text="Dir" onAction="#openDirSourceChooser" />
+                <Button text="File" onAction="#openFileSourceChooser" />
+            </HBox>
          </HBox>
 
          <Label text="Graph Name"/>
@@ -47,8 +49,7 @@
          <HBox spacing="10">
             <TextField fx:id="destinationField" editable="false" promptText="No file selected"
                   HBox.hgrow="ALWAYS"/>
-            <Button text="Browse" onAction="#openFileChooser"
-                  HBox.hgrow="ALWAYS"/>
+            <Button text="Browse" onAction="#openFileChooser" />
          </HBox>
 
          <Region VBox.vgrow="ALWAYS" />
