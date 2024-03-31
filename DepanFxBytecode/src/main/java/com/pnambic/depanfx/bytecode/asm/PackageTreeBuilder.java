@@ -69,7 +69,7 @@ public class PackageTreeBuilder {
    */
   public PackageNode installPackageTree(
       File packageFile, File treeFile) {
-    createPackageDir(packageFile, treeFile.toPath());
+    updatePkgDirNodes(packageFile, treeFile.toPath());
     PackageNode result = packageNode;
 
     createPackageParents(packageFile, treeFile);
@@ -107,7 +107,7 @@ public class PackageTreeBuilder {
       PackageNode childNode = packageNode;
       DirectoryNode childDir = packageDir;
 
-      createPackageDir(packageFile, treePath.getTreePath());
+      updatePkgDirNodes(packageFile, treePath.getTreePath());
 
       addEdge(packageNode, childNode, JavaRelation.PACKAGE);
       addEdge(packageDir, childDir, FileSystemRelation.CONTAINS_DIR);
@@ -122,7 +122,7 @@ public class PackageTreeBuilder {
    * @param packageFile path to package
    * @param treePath path to directory
    */
-  private void createPackageDir(File packageFile, Path treePath) {
+  private void updatePkgDirNodes(File packageFile, Path treePath) {
     packageNode = (PackageNode) builder.mapNode(createPackage(packageFile));
 
     packageDir = (DirectoryNode) builder.mapNode(new DirectoryNode(treePath));

@@ -44,6 +44,9 @@ public class JavaLinkMatchers {
   public static final ForwardRelation INNER_TYPE_FORWARD =
       new ForwardRelation(JavaRelation.INNER_TYPE);
 
+  public static final ForwardRelation ANONYMOUS_TYPE_FORWARD =
+      new ForwardRelation(JavaRelation.ANONYMOUS_TYPE);
+
   public static final ForwardRelation CLASSFILE_FORWARD =
       new ForwardRelation(JavaRelation.CLASSFILE);
 
@@ -64,7 +67,7 @@ public class JavaLinkMatchers {
       Arrays.asList(new DepanFxLinkMatcher [] {
           STATIC_FIELD_FORWARD, MEMBER_FIELD_FORWARD,
           STATIC_METHOD_FORWARD, MEMBER_METHOD_FORWARD,
-          INNER_TYPE_FORWARD
+          INNER_TYPE_FORWARD, ANONYMOUS_TYPE_FORWARD
       });
 
   public static final Composite JAVA_CLASS_MEMBER_MATCH =

@@ -37,6 +37,10 @@ public class JavaRelation extends GraphRelation {
       new JavaRelation(JavaContextDefinition.READ_RELID,
           "reads", "provides");
 
+  public static final JavaRelation WRITE =
+      new JavaRelation(JavaContextDefinition.WRITE_RELID,
+          "writes", "written by");
+
   public static final JavaRelation TYPE =
       new JavaRelation(JavaContextDefinition.TYPE_RELID,
           "type references", "used by");

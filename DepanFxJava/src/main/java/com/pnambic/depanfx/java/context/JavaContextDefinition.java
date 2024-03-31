@@ -82,6 +82,9 @@ public class JavaContextDefinition {
   public static final JavaRelationId READ_RELID =
       new JavaRelationId(MODEL_ID, "read");
 
+  public static final JavaRelationId WRITE_RELID =
+      new JavaRelationId(MODEL_ID, "write");
+
   public static final JavaRelationId CLASSFILE_RELID =
       new JavaRelationId(MODEL_ID, "class-file");
 

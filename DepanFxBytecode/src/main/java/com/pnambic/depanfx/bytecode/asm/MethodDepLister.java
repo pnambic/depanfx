@@ -27,6 +27,8 @@ import com.pnambic.depanfx.java.graph.JavaRelation;
 import com.pnambic.depanfx.java.graph.MemberNode;
 import com.pnambic.depanfx.java.graph.MethodNode;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.asm.AnnotationVisitor;
 import org.springframework.asm.Label;
 import org.springframework.asm.MethodVisitor;
@@ -47,6 +49,9 @@ import org.springframework.asm.TypePath;
  * @author ycoppel@google.com (Yohann Coppel)
  */
 public class MethodDepLister extends MethodVisitor {
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(MethodDepLister.class);
 
   private final AsmFactory asmFactory;
 
@@ -85,9 +90,31 @@ public class MethodDepLister extends MethodVisitor {
   public void visitFieldInsn(
       int opcode, String owner, String name, String desc) {
     ClassNode ownerClassNode = classBuilder.fromInternalName(owner);
-    MemberNode readFieldNode = new FieldNode(ownerClassNode.getFQCN(), name);
-    addEdge(ownerClassNode, readFieldNode, getFieldRelation(opcode));
-    addEdge(methodNode, readFieldNode, JavaRelation.READ);
+    MemberNode fieldNode = (MemberNode)
+        builder.mapNode(new FieldNode(ownerClassNode.getFQCN(), name));
+
+    switch (opcode) {
+    case Opcodes.GETSTATIC:
+      addEdge(ownerClassNode, fieldNode, JavaRelation.STATIC_FIELD);
+      addEdge(methodNode, fieldNode, JavaRelation.READ);
+      return;
+    case Opcodes.PUTSTATIC:
+      addEdge(ownerClassNode, fieldNode, JavaRelation.STATIC_FIELD);
+      addEdge(methodNode, fieldNode, JavaRelation.WRITE);
+      return;
+    case Opcodes.GETFIELD:
+      addEdge(ownerClassNode, fieldNode, JavaRelation.MEMBER_FIELD);
+      addEdge(methodNode, fieldNode, JavaRelation.READ);
+      return;
+    case Opcodes.PUTFIELD:
+      addEdge(ownerClassNode, fieldNode, JavaRelation.MEMBER_FIELD);
+      addEdge(methodNode, fieldNode, JavaRelation.WRITE);
+      return;
+    default:
+      // Fall through.
+    }
+    LOG.warn("Unrecognized opcode {} for field () of class {}",
+        opcode, owner, name);
   }
 
   @Override // ASM-5
@@ -95,8 +122,8 @@ public class MethodDepLister extends MethodVisitor {
       int opcode, String owner, String name, String desc, boolean itf) {
     ClassNode ownerClassNode = classBuilder.fromInternalName(owner);
 
-    MethodNode calledMethodNode = new MethodNode(
-        ownerClassNode.getFQCN(), name);
+    MethodNode calledMethodNode = (MethodNode)
+        builder.mapNode(new MethodNode(ownerClassNode.getFQCN(), name));
 
     addEdge(ownerClassNode, calledMethodNode, getMethodRelation(opcode));
     addEdge(methodNode, calledMethodNode, JavaRelation.CALL);
@@ -105,8 +132,9 @@ public class MethodDepLister extends MethodVisitor {
   @Override // ASM-4
   public void visitMethodInsn(
       int opcode, String owner, String name, String desc) {
-    MethodNode calledMethodNode = new MethodNode(
-        classBuilder.fromInternalName(owner).getFQCN(), name);
+    String fqcn = classBuilder.fromInternalName(owner).getFQCN();
+    MethodNode calledMethodNode = (MethodNode)
+        builder.mapNode(new MethodNode(fqcn, name));
     addEdge(methodNode, calledMethodNode, JavaRelation.CALL);
   }
 
@@ -132,15 +160,8 @@ public class MethodDepLister extends MethodVisitor {
         JavaRelation.ERROR_HANDLING);
   }
 
-  private JavaRelation getFieldRelation(int opCode) {
-    if (Opcodes.GETSTATIC == opCode) {
-      return JavaRelation.STATIC_FIELD;
-    }
-    return JavaRelation.MEMBER_FIELD;
-  }
-
   private JavaRelation getMethodRelation(int opCode) {
-    if (Opcodes.H_INVOKESTATIC == opCode) {
+    if (Opcodes.INVOKESTATIC == opCode) {
       return JavaRelation.STATIC_METHOD;
     }
     return JavaRelation.MEMBER_METHOD;

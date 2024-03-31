@@ -18,7 +18,6 @@ package com.pnambic.depanfx.bytecode;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.nio.file.Path;
 import java.util.Enumeration;
 

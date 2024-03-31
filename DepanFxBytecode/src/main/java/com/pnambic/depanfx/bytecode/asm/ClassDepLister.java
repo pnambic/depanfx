@@ -98,7 +98,7 @@ public class ClassDepLister extends ClassVisitor {
     this.builder = builder;
     this.fileNode = fileNode;
 
-    this.classBuilder = new ClassNodeFactory(builder, fileNode);
+    this.classBuilder = new ClassNodeFactory(builder);
   }
 
   @Override
@@ -136,7 +136,8 @@ public class ClassDepLister extends ClassVisitor {
   @Override
   public FieldVisitor visitField(
       int access, String name, String desc, String signature, Object value) {
-    MemberNode fieldNode = new FieldNode(mainClass.getFQCN(), name);
+    MemberNode fieldNode =
+        (MemberNode) builder.mapNode(new FieldNode(mainClass.getFQCN(), name));
 
     ClassNode typeNode = classBuilder.fromDescriptor(desc);
     builder.addNodeInfo(fieldNode, FieldInfo.class,
@@ -195,7 +196,8 @@ public class ClassDepLister extends ClassVisitor {
       String signature, String[] exceptions) {
 
     // the method itself
-    MethodNode methodNode = new MethodNode(mainClass.getFQCN(), name);
+    MethodNode methodNode = (MethodNode)
+        builder.mapNode(new MethodNode(mainClass.getFQCN(), name));
     builder.addNodeInfo(
         methodNode, MethodInfo.class, new MethodInfo(signature));
 

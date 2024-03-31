@@ -15,7 +15,6 @@
  */
 package com.pnambic.depanfx.bytecode.asm;
 
-import com.pnambic.depanfx.filesystem.graph.DocumentNode;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.model.GraphRelation;
@@ -46,15 +45,8 @@ public class ClassNodeFactory {
    */
   private final DepanFxGraphModelBuilder builder;
 
-  /**
-   * File element for source code.
-   */
-  private final DocumentNode fileNode;
-
-  public ClassNodeFactory(
-      DepanFxGraphModelBuilder builder, DocumentNode fileNode) {
+  public ClassNodeFactory(DepanFxGraphModelBuilder builder) {
     this.builder = builder;
-    this.fileNode = fileNode;
   }
 
   /**
@@ -132,20 +124,6 @@ public class ClassNodeFactory {
   }
 
   /**
-   * Convert a {@link Type} reference used in an interface to it fully-
-   * qualified name.
-   *
-   * @param type {@code Type} used in an interface
-   * @return fully qualified name for {@code Type}
-   */
-  private String getFullyQualifiedInterfaceName(Type type) {
-    if (type.getSort() == Type.ARRAY) {
-      return Type.getObjectType(type.getInternalName()).getClassName();
-    }
-    return type.getClassName();
-  }
-
-  /**
    * Convert class and field {@link Type} references to it's fully-qualified
    * name.  The class's implemented interfaces should get the fully-qualified
    * name via {@link #getFullyQualifiedInterfaceName(Type)}.
@@ -181,24 +159,9 @@ public class ClassNodeFactory {
       addEdge(result, classNode, JavaRelation.CLASS);
       return;
     }
-    File treeFile = createTreeFile();
     PackageTreeBuilder packageBuilder = new PackageTreeBuilder(builder);
-    PackageNode packageNode = packageBuilder.installPackageTree(packageFile, treeFile);
+    PackageNode packageNode =
+        packageBuilder.installPackageTree(packageFile, packageFile);
     addEdge(packageNode, classNode, JavaRelation.CLASS);
-  }
-
-  /**
-   * Define the tree for the file node, even if it doesn't have a directory.
-   * This can happen for class files at the top of the analysis tree, such as
-   * classes in the unnamed package at the top of a Jar file.
-   *
-   * @return valid directory tree reference
-   */
-  private File createTreeFile() {
-    File result = fileNode.getPath().toFile().getParentFile();
-    if (null == result) {
-      return new File("");
-    }
-    return result;
   }
 }
