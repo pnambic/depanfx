@@ -1,6 +1,5 @@
 package com.pnambic.depanfx.nodeview.gui;
 
-import com.google.common.base.Strings;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
 import com.pnambic.depanfx.perspective.DepanFxProctor;
@@ -22,8 +21,6 @@ import java.text.MessageFormat;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;

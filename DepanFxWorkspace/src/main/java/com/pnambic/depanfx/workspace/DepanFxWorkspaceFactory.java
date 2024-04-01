@@ -75,6 +75,17 @@ public class DepanFxWorkspaceFactory {
     return new File(buildCurrentToolDir, documentName);
   }
 
+  public static Path bestDocumentPath(String documentName,
+      DepanFxWorkspace workspace, Path targetPath, Path fallbackPath) {
+
+    Path buildCurrentToolDir =  workspace.getCurrentProject()
+        .map(t -> t.getMemberPath())
+        .map(p -> p.resolve(targetPath))
+        .map(f -> DepanFxWorkspaceFactory.bestDirectory(f, fallbackPath))
+        .orElse(fallbackPath);
+    return buildCurrentToolDir.resolve(buildCurrentToolDir);
+  }
+
   public static Optional<String> getExtension(String filename) {
       int dotIndex = filename.lastIndexOf(EXTENSION_DOT);
       if (dotIndex > 0 && dotIndex < filename.length() - 1) {
@@ -88,6 +99,26 @@ public class DepanFxWorkspaceFactory {
     return DepanFxWorkspaceFactory.getExtension(fullName)
         .map(e -> chopExtension(fullName, e.length() + 1))
         .orElse(fullName);
+  }
+
+  private static Path bestDirectory(Path basePath, Path fallbackPath) {
+    if (isDirectory(basePath)) {
+      return basePath;
+    }
+
+    Path containerPath = basePath;
+    while (containerPath.compareTo(fallbackPath) > 0) {
+      Path testPath = containerPath.getParent();
+      if (isDirectory(testPath)) {
+        return testPath;
+      }
+      containerPath = testPath;
+    }
+    return fallbackPath;
+  }
+
+  private static boolean isDirectory(Path basePath) {
+    return basePath.toFile().isDirectory();
   }
 
   private static File bestDirectory(File baseFile, File fallbackFile) {

@@ -51,6 +51,34 @@ public class DepanFxProjects {
     }
   }
 
+  /////////////////////////////////////
+  // Resources by Path, prefered
+
+  public static Optional<Path> getCurrentGraphsPath(
+      DepanFxWorkspace workspace) {
+    return getCurrentPath(workspace, GRAPHS_CONTAINER);
+  }
+
+  public static Optional<Path> getCurrentAnalyzesPath(
+      DepanFxWorkspace workspace) {
+    return getCurrentPath(workspace, ANALYSES_CONTAINER);
+  }
+
+  public static Optional<Path> getCurrentToolsPath(
+      DepanFxWorkspace workspace) {
+    return getCurrentPath(workspace, TOOLS_CONTAINER);
+  }
+
+  public static Optional<Path> getCurrentPath(
+      DepanFxWorkspace workspace, String container) {
+    return workspace.getCurrentProject()
+        .map(t -> t.getMemberPath())
+        .map(p -> p.resolve(container));
+  }
+
+  /////////////////////////////////////
+  // Resources by File, deprecated
+
   public static File getCurrentGraphs(DepanFxWorkspace workspace) {
     return getCurrent(workspace, GRAPHS_CONTAINER);
   }

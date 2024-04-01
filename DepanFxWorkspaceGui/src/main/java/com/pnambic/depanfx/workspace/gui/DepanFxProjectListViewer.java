@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.workspace.gui;
 
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceMenuRegistry;
+import com.pnambic.depanfx.perspective.workspace.controls.DepanFxWorkspaceItem;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;

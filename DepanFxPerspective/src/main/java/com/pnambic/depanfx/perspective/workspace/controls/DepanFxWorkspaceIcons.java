@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.pnambic.depanfx.scene;
+package com.pnambic.depanfx.perspective.workspace.controls;
+
+import com.pnambic.depanfx.scene.DepanFxSceneControls;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,20 +25,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
 
 /**
  * A kludgy singleton to hold all the icon images for wide reuse.
  */
-public class DepanFxAppIcons {
+public class DepanFxWorkspaceIcons {
 
   private static final Logger LOG =
-      LoggerFactory.getLogger(DepanFxAppIcons.class);
+      LoggerFactory.getLogger(DepanFxWorkspaceIcons.class);
 
-  private static final Map<IconSize, Image> APP_ICON_IMAGES = loadDepanIcons();
+  private static final Map<Icon, Image> WORKSPACE_ICON_IMAGES =
+      loadWorkspaceIcons();
 
-  private DepanFxAppIcons() {
+  private DepanFxWorkspaceIcons() {
     // Prevent instantiation.
   }
 
@@ -53,29 +55,38 @@ public class DepanFxAppIcons {
     public String getSizeSfx() {
       return sizeSfx;
     }
+  }
 
-    public String getIconName() {
-      return "branding/depan" + sizeSfx + ".png";
+  public static enum Icon {
+    CONTAINER("container", IconSize.ICON_16x16),
+    DOCUMENT("document", IconSize.ICON_16x16);
+
+    private String baseName;
+
+    private IconSize size;
+
+    private Icon(String baseName, IconSize size) {
+      this.baseName = baseName;
+      this.size = size;
+    }
+
+    String getIconName() {
+      return baseName + size.getSizeSfx() + ".png";
     }
   }
 
-  public static void installDepanIcons(ObservableList<Image> appIcons) {
-    APP_ICON_IMAGES.values().forEach(appIcons::add);
+  public static Optional<Image> loadDepanIcon(Icon icon) {
+    return Optional.ofNullable(WORKSPACE_ICON_IMAGES.get(icon));
   }
 
-  public static Optional<Image> loadDepanIcon(IconSize size) {
-    return Optional.ofNullable(APP_ICON_IMAGES.get(size));
-  }
-
-  private static Map<IconSize, Image> loadDepanIcons() {
-    Map<IconSize, Image> result = new HashMap<>();
-    for (IconSize size : IconSize.values()) {
+  private static Map<Icon, Image> loadWorkspaceIcons() {
+    Map<Icon, Image> result = new HashMap<>();
+    for (Icon icon : Icon.values()) {
       DepanFxSceneControls.loadResourceImage(
-          DepanFxAppIcons.class, size.getIconName())
+          DepanFxWorkspaceIcons.class, icon.getIconName())
           .ifPresentOrElse(
-              i -> result.put(size, i),
-              () -> LOG.warn("Unable to load icon for size {}",
-                      size.getSizeSfx()));
+              i -> result.put(icon, i),
+              () -> LOG.warn("Unable to load icon {}", icon.getIconName()));
     }
     return result;
   }

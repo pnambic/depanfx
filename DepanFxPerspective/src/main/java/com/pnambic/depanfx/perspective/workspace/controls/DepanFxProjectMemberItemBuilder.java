@@ -1,4 +1,4 @@
-package com.pnambic.depanfx.workspace.gui;
+package com.pnambic.depanfx.perspective.workspace.controls;
 
 import com.pnambic.depanfx.workspace.DepanFxProjectBadMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
@@ -28,11 +28,13 @@ public class DepanFxProjectMemberItemBuilder {
 
   private TreeItem<DepanFxWorkspaceMember> createNode(
       DepanFxWorkspaceMember member) {
-    if (member instanceof DepanFxProjectContainer) {
-      return new DepanFxProjectContainerItem((DepanFxProjectContainer) member);
-    }
-    if (member instanceof DepanFxProjectDocument) {
-      return new DepanFxProjectDocumentItem((DepanFxProjectDocument) member);
+    switch (member) {
+    case DepanFxProjectContainer container:
+      return new DepanFxProjectContainerItem(container);
+    case DepanFxProjectDocument document:
+      return new DepanFxProjectDocumentItem(document);
+    default:
+      // fall-through
     }
     return new DepanFxProjectBadMemberItem((DepanFxProjectBadMember) member);
   }

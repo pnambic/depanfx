@@ -25,6 +25,7 @@
                         <SeparatorMenuItem />
                         <MenuItem text="Open"/>
                         <MenuItem fx:id="fileOpenProjectItem" text="Open Project..."/>
+                        <MenuItem fx:id="fileOpenResourceItem" text="Open Resource..."/>
                         <SeparatorMenuItem />
                         <MenuItem text="Save"/>
                         <MenuItem text="Save As..."/>

@@ -1,4 +1,4 @@
-package com.pnambic.depanfx.workspace.gui;
+package com.pnambic.depanfx.perspective.workspace.controls;
 
 import java.util.List;
 import java.util.Optional;

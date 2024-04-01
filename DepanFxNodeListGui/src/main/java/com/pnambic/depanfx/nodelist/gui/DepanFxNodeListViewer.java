@@ -29,6 +29,7 @@ import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
@@ -66,6 +67,8 @@ import javafx.scene.control.TreeTableView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Callback;
+
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 
 public class DepanFxNodeListViewer {
 
@@ -358,25 +361,24 @@ public class DepanFxNodeListViewer {
   }
 
   private void doSelectColumnAction() {
-    FileChooser fileChooser = DepanFxResourcePerspectives.prepareToolFinder(
-        workspace, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
-    ObservableList<ExtensionFilter> filters = fileChooser.getExtensionFilters();
+    DepanFxResourceChooser rsrcChooser =
+        new DepanFxResourceChooser(workspace, dialogRunner);
+
+    DepanFxResourcePerspectives.prepareResourceFinder(
+        rsrcChooser, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
+
+    ObservableList<ExtensionFilter> filters = rsrcChooser.getExtensionFilters();
     filters.add(DepanFxCategoryColumnToolDialog.CATEGORY_COLUMN_FILTER);
     filters.add(DepanFxFocusColumnToolDialog.FOCUS_COLUMN_FILTER);
     filters.add(DepanFxNodeKeyColumnToolDialog.NODE_KEY_COLUMN_FILTER);
     filters.add(NODE_KEY_COLUMN_FILTER);
-    fileChooser.setSelectedExtensionFilter(NODE_KEY_COLUMN_FILTER);
+    rsrcChooser.setSelectedExtensionFilter(NODE_KEY_COLUMN_FILTER);
 
-    File selectedFile =
-        fileChooser.showOpenDialog(nodeListTable.getScene().getWindow());
-    if (selectedFile != null) {
-       workspace
-          .toProjectDocument(selectedFile.getAbsoluteFile().toURI())
-          .flatMap(p -> workspace.getWorkspaceResource(
-              p, DepanFxBaseColumnData.class))
-          .flatMap(this::toColumn)
-          .ifPresent(this::addColumn);
-    }
+    rsrcChooser.showOpenDialog(nodeListTable.getScene())
+        .map(DepanFxProjectDocument.class::cast)
+        .flatMap(m -> workspace.getWorkspaceResource(m, "Column Definition"))
+        .flatMap(this::toColumn)
+        .ifPresent(this::addColumn);
   }
 
   private Optional<DepanFxNodeListColumn> toColumn(

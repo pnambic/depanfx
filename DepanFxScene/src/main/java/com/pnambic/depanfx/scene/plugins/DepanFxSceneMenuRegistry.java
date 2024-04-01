@@ -1,14 +1,20 @@
 package com.pnambic.depanfx.scene.plugins;
 
-import java.util.List;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 import javafx.event.ActionEvent;
+import javafx.scene.control.MenuItem;
 
 @Component
 public class DepanFxSceneMenuRegistry {
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxSceneMenuRegistry.class);
 
   private final List<DepanFxSceneMenuContribution> contributions;
 
@@ -18,10 +24,15 @@ public class DepanFxSceneMenuRegistry {
   }
 
   public void dispatch(ActionEvent event) {
-    DepanFxSceneMenuContribution actor = contributions.stream()
+    contributions.stream()
         .filter(c -> c.acceptsEvent(event))
         .findFirst()
-        .get();
-    actor.handleEvent(event);
+        .ifPresentOrElse(
+            a -> a.handleEvent(event),
+            () -> {
+              MenuItem item = (MenuItem) event.getSource();
+              LOG.info("Unable to dispatch scene menu event {}",
+                  item.idProperty().getValue());
+            });
   }
 }

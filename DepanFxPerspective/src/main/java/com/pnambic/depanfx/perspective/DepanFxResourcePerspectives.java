@@ -1,6 +1,6 @@
 package com.pnambic.depanfx.perspective;
 
-import com.google.common.base.Strings;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -14,9 +14,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Cell;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Alert.AlertType;
 import javafx.stage.FileChooser;
 
 /**
@@ -35,6 +35,18 @@ public class DepanFxResourcePerspectives {
     cell.setOnMouseClicked(
         e -> DepanFxSceneControls.handleDoubleClickOpenPath(
             e, docPath, onOpenPath));
+  }
+
+  public static void prepareResourceFinder(
+      DepanFxResourceChooser chooser, Path targetPath) {
+
+    DepanFxWorkspace workspace = chooser.getWorkspace();
+    Path initPath = DepanFxWorkspaceFactory.bestDocumentPath(
+        "temp", workspace, targetPath,
+        DepanFxProjects.getCurrentToolsPath(workspace).orElse(null));
+
+    chooser.setInitialResourceName(initPath.getFileName().toString());
+    chooser.setInitialContainer(initPath.getParent().toString());
   }
 
   public static FileChooser prepareToolFinder(

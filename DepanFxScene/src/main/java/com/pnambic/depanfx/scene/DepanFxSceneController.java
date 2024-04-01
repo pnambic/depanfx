@@ -51,13 +51,10 @@ public class DepanFxSceneController {
   private ImageView welcomeImage;
 
   @FXML
-  private MenuItem fileOpenProjectItem;
-
-  @FXML
-  private MenuItem fileImportItem;
-
-  @FXML
   private Menu fileNewItem;
+
+  @FXML
+  private MenuItem fileOpenResourceItem;
 
   public static Scene createDepanScene(FxWeaver fxWeaver, Closeable onClose) throws IOException {
 
@@ -91,6 +88,7 @@ public class DepanFxSceneController {
     // Start any initial tabs
     starterRegistry.addStarterTabs(this);
     fileNewItem.getItems().addAll(newResourceRegistry.buildNewResourceItems());
+    fileOpenResourceItem.setOnAction(this::handleByMenuRegistry);
   }
 
   @FXML
@@ -119,5 +117,9 @@ public class DepanFxSceneController {
 
   public void addTab(Tab tab) {
     viewRoot.getTabs().add(tab);
+  }
+
+  private void handleByMenuRegistry(ActionEvent event) {
+    menuRegistry.dispatch(event);
   }
 }

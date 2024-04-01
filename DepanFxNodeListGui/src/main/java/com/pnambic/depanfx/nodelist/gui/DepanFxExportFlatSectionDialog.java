@@ -20,7 +20,8 @@ import java.util.stream.Stream;
 
 @Component
 @FxmlView("export-flat-section-csv-dialog.fxml")
-public class DepanFxExportFlatSectionDialog extends DepanFxBaseExportSectionDialog {
+public class DepanFxExportFlatSectionDialog
+    extends DepanFxBaseExportSectionDialog {
 
   private DepanFxNodeListViewer listViwer;
 
