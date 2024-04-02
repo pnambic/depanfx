@@ -8,6 +8,7 @@ import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
 import com.pnambic.depanfx.perspective.DepanFxProctor;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -46,6 +47,12 @@ public class DepanFxFocusColumnToolDialog {
   public static final ExtensionFilter FOCUS_COLUMN_FILTER =
       DepanFxSceneControls.buildExtFilter(
           "Focus Columns", DepanFxFocusColumnData.FOCUS_COLUMN_TOOL_EXT);
+
+  public static final DepanFxResourceFilter FOCUS_COLUMN_RSRC_FILTER =
+      DepanFxResourceFilter.buildResourceFilter(
+          "Focus Columns",
+          DepanFxFocusColumnData.FOCUS_COLUMN_TOOL_EXT,
+          DepanFxFocusColumnData.class);
 
   private final DepanFxWorkspace workspace;
 

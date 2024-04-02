@@ -14,6 +14,7 @@ import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.function.Predicate;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SelectionMode;

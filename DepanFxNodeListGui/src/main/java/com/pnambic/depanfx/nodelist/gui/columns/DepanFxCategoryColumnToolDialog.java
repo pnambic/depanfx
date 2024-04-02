@@ -9,6 +9,7 @@ import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
 import com.pnambic.depanfx.perspective.DepanFxProctor;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
@@ -61,6 +62,12 @@ public class DepanFxCategoryColumnToolDialog {
       DepanFxSceneControls.buildExtFilter(
           "Category Columns",
           DepanFxCategoryColumnData.CATEGORY_COLUMN_TOOL_EXT);
+
+  public static final DepanFxResourceFilter CATEGORY_COLUMN__RSRC_FILTER =
+      DepanFxResourceFilter.buildResourceFilter(
+          "Category Columns",
+          DepanFxCategoryColumnData.CATEGORY_COLUMN_TOOL_EXT,
+          DepanFxCategoryColumnData.class);
 
   private final DepanFxWorkspace workspace;
 

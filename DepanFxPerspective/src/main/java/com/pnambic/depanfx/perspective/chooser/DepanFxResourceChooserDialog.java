@@ -12,16 +12,13 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 
 import net.rgielen.fxweaver.core.FxmlView;
-import java.nio.file.PathMatcher;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
 
 import org.springframework.stereotype.Component;
 
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -31,7 +28,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 @Component
@@ -51,7 +47,7 @@ public class DepanFxResourceChooserDialog {
   private ListView<DepanFxWorkspaceMember> fileListView;
 
   @FXML
-  private ComboBox<ExtensionFilter> fileTypeComboBox;
+  private ComboBox<DepanFxResourceFilter> fileTypeComboBox;
 
   @FXML
   private TextField resourceNameField;
@@ -60,13 +56,13 @@ public class DepanFxResourceChooserDialog {
 
   private DepanFxWorkspaceMember selectedResource;
 
-  private ExtensionFilter activeFilter;
-
-  private List<PathMatcher> activeMatchers;
+  private DepanFxResourceFilter activeFilter;
 
   private String initialResourceName;
 
   private DepanFxProjectContainer initialContainer;
+
+  private List<PathMatcher> activeMatchers;
 
   public DepanFxResourceChooserDialog(
       DepanFxDialogRunner dialogRunner,
@@ -82,22 +78,19 @@ public class DepanFxResourceChooserDialog {
     initComboBox();
   }
 
-  public void setExtension(ObservableList<ExtensionFilter> items) {
+  public void setExtension(ObservableList<DepanFxResourceFilter> items) {
     fileTypeComboBox.setItems(items);
   }
 
-  public void setActiveFilter(ExtensionFilter activeFilter) {
+  public void setActiveFilter(DepanFxResourceFilter activeFilter) {
     this.activeFilter = activeFilter;
     fileTypeComboBox.setValue(activeFilter);
+
     if (activeFilter == null) {
       activeMatchers = null;
       return;
     }
-
-    FileSystem fileSys = FileSystems.getDefault();
-    activeMatchers = activeFilter.getExtensions().stream()
-        .map(ext -> fileSys.getPathMatcher("glob:" + ext))
-        .collect(Collectors.toList());
+    this.activeMatchers = activeFilter.getPathMatchers();
 
     TreeItem<DepanFxWorkspaceMember> treeItem =
         directoryTreeView.getSelectionModel().getSelectedItem();
@@ -199,14 +192,25 @@ public class DepanFxResourceChooserDialog {
   }
 
   private boolean matchesFilter(DepanFxProjectDocument document) {
-    if (activeMatchers == null) {
+    if (activeFilter == null) {
       return true;
     }
     Path namePath = Path.of(document.getMemberName());
-    return activeMatchers.stream()
+    boolean byName = activeMatchers.stream()
         .filter(m -> m.matches(namePath))
         .findFirst()
         .isPresent();
+    if (byName)
+      return true;
+
+    // In the BuiltIn project, try the actual object ('cuz loads are cheap).
+    if (workspace.getBuiltInProjectTree().equals(document.getProject())) {
+      return workspace.getWorkspaceResource(document, "resource chooser")
+        .map(r -> r.getResource())
+        .filter(r -> activeFilter.matchDocument(r))
+        .isPresent();
+    }
+    return false;
   }
 
   private void updateSelectedResource(DepanFxWorkspaceMember member) {
@@ -214,10 +218,10 @@ public class DepanFxResourceChooserDialog {
     resourceNameField.setText(selectedResource.getMemberName());
   }
 
-  private class ComboBoxCell extends ListCell<ExtensionFilter> {
+  private class ComboBoxCell extends ListCell<DepanFxResourceFilter> {
 
     @Override
-    protected void updateItem(ExtensionFilter item, boolean empty) {
+    protected void updateItem(DepanFxResourceFilter item, boolean empty) {
         super.updateItem(item, empty);
 
         if (item == null || empty) {

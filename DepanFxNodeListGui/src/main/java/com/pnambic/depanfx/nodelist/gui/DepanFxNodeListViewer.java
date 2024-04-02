@@ -13,7 +13,6 @@ import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumnToolDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxSimpleColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxSimpleColumnConfiguration;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
@@ -25,6 +24,8 @@ import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -38,8 +39,8 @@ import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -64,11 +65,7 @@ import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.CellDataFeatures;
 import javafx.scene.control.TreeTableView;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Callback;
-
-import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 
 public class DepanFxNodeListViewer {
 
@@ -86,8 +83,17 @@ public class DepanFxNodeListViewer {
 
   private static final String COLUMN_TOOL_EXT = "d*cti";
 
-  public static final ExtensionFilter NODE_KEY_COLUMN_FILTER =
-      DepanFxSceneControls.buildExtFilter("Any Column", COLUMN_TOOL_EXT);
+  private static final List<Class<?>> COLUMN_TYPES =
+      Arrays.asList(new Class<?>[] {
+        DepanFxCategoryColumnData.class,
+        DepanFxFocusColumnData.class,
+        DepanFxNodeKeyColumnData.class,
+        DepanFxSimpleColumnData.class
+  });
+
+  public static final DepanFxResourceFilter NODE_KEY_COLUMN_RSRC_FILTER =
+      DepanFxResourceFilter.buildResourceFilter(
+          "Any Column", COLUMN_TOOL_EXT, COLUMN_TYPES);
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeListViewer.class);
@@ -367,12 +373,13 @@ public class DepanFxNodeListViewer {
     DepanFxResourcePerspectives.prepareResourceFinder(
         rsrcChooser, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
 
-    ObservableList<ExtensionFilter> filters = rsrcChooser.getExtensionFilters();
-    filters.add(DepanFxCategoryColumnToolDialog.CATEGORY_COLUMN_FILTER);
-    filters.add(DepanFxFocusColumnToolDialog.FOCUS_COLUMN_FILTER);
-    filters.add(DepanFxNodeKeyColumnToolDialog.NODE_KEY_COLUMN_FILTER);
-    filters.add(NODE_KEY_COLUMN_FILTER);
-    rsrcChooser.setSelectedExtensionFilter(NODE_KEY_COLUMN_FILTER);
+    ObservableList<DepanFxResourceFilter> filters =
+        rsrcChooser.getExtensionFilters();
+    filters.add(DepanFxCategoryColumnToolDialog.CATEGORY_COLUMN__RSRC_FILTER);
+    filters.add(DepanFxFocusColumnToolDialog.FOCUS_COLUMN_RSRC_FILTER);
+    filters.add(DepanFxNodeKeyColumnToolDialog.NODE_KEY_COLUMN_RSRC_FILTER);
+    filters.add(NODE_KEY_COLUMN_RSRC_FILTER);
+    rsrcChooser.setSelectedExtensionFilter(NODE_KEY_COLUMN_RSRC_FILTER);
 
     rsrcChooser.showOpenDialog(nodeListTable.getScene())
         .map(DepanFxProjectDocument.class::cast)

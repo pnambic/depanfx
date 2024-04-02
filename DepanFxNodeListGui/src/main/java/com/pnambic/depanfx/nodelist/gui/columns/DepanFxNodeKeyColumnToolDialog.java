@@ -6,6 +6,7 @@ import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData.KeyCho
 import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
 import com.pnambic.depanfx.perspective.DepanFxProctor;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
@@ -43,6 +44,12 @@ public class DepanFxNodeKeyColumnToolDialog {
   public static final ExtensionFilter NODE_KEY_COLUMN_FILTER =
       DepanFxSceneControls.buildExtFilter(
           "Node Key Columns", DepanFxNodeKeyColumnData.NODE_KEY_COLUMN_TOOL_EXT);
+
+  public static final DepanFxResourceFilter NODE_KEY_COLUMN_RSRC_FILTER =
+      DepanFxResourceFilter.buildResourceFilter(
+          "Node Key Columns",
+          DepanFxNodeKeyColumnData.NODE_KEY_COLUMN_TOOL_EXT,
+          DepanFxNodeKeyColumnData.class);
 
   private final DepanFxWorkspace workspace;
 
