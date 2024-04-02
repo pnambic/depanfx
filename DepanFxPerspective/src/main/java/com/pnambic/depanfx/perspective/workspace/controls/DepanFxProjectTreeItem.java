@@ -8,16 +8,23 @@ import com.pnambic.depanfx.workspace.DepanFxProjectTree.ProjectTreeListener;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
 public class DepanFxProjectTreeItem extends TreeItem<DepanFxWorkspaceMember> {
 
+  private final Predicate<DepanFxProjectMember> filter;
+
   private boolean treeLoaded = false;
 
-  public DepanFxProjectTreeItem(DepanFxProjectTree project) {
+  public DepanFxProjectTreeItem(
+      DepanFxProjectTree project,
+      Predicate<DepanFxProjectMember> filter) {
     super(project);
+    this.filter = filter;
+
     setExpanded(true);
     project.addListener(new UpdateListener());
   }
@@ -33,7 +40,7 @@ public class DepanFxProjectTreeItem extends TreeItem<DepanFxWorkspaceMember> {
       treeLoaded = true;
       DepanFxProjectMemberItemBuilder builder =
           new DepanFxProjectMemberItemBuilder(
-              (DepanFxProjectTree) getValue());
+              (DepanFxProjectTree) getValue(), filter);
       super.getChildren().setAll(builder.buildChildren());
     }
     return super.getChildren();
@@ -57,7 +64,8 @@ public class DepanFxProjectTreeItem extends TreeItem<DepanFxWorkspaceMember> {
           optParentItem .map(i -> findMemberItem(i, projDir));
       if (optDirItem.isEmpty()) {
         optParentItem.ifPresent(p ->
-            p.getChildren().add(new DepanFxProjectContainerItem(projDir)));
+            p.getChildren().add(
+                new DepanFxProjectContainerItem(projDir, filter)));
       }
       // should refresh if project directory is present
     }
@@ -124,7 +132,7 @@ public class DepanFxProjectTreeItem extends TreeItem<DepanFxWorkspaceMember> {
       if (dirItem != null) {
         return dirItem;
       }
-      dirItem = new DepanFxProjectContainerItem(projDir);
+      dirItem = new DepanFxProjectContainerItem(projDir, filter);
       parentItem.getChildren().add(dirItem);
       return dirItem;
     }

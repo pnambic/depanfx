@@ -99,8 +99,11 @@ public class DepanFxResourceChooserDialog {
         .map(ext -> fileSys.getPathMatcher("glob:" + ext))
         .collect(Collectors.toList());
 
-    updateFileListView(
-        directoryTreeView.getSelectionModel().getSelectedItem().getValue());
+    TreeItem<DepanFxWorkspaceMember> treeItem =
+        directoryTreeView.getSelectionModel().getSelectedItem();
+    if (treeItem != null) {
+      updateFileListView(treeItem.getValue());
+    }
   }
 
   public void setInitialContainer(DepanFxProjectContainer initialContainer) {
@@ -116,7 +119,8 @@ public class DepanFxResourceChooserDialog {
     this.workspace = workspace;
 
       TreeItem<DepanFxWorkspaceMember> rootItem =
-          new DepanFxWorkspaceItem(workspace);
+          new DepanFxWorkspaceItem(workspace,
+              m -> !(m instanceof DepanFxProjectDocument));
       directoryTreeView.setRoot(rootItem);
   }
 

@@ -3,7 +3,10 @@ package com.pnambic.depanfx.perspective.workspace.controls;
 import com.pnambic.depanfx.workspace.DepanFxProjectBadMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
+import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
+
+import java.util.function.Predicate;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,8 +16,12 @@ public class DepanFxProjectMemberItemBuilder {
 
   private final DepanFxProjectContainer member;
 
-  public DepanFxProjectMemberItemBuilder(DepanFxProjectContainer member) {
+  private final Predicate<DepanFxProjectMember> filter;
+
+  public DepanFxProjectMemberItemBuilder(
+      DepanFxProjectContainer member, Predicate<DepanFxProjectMember> filter) {
     this.member = member;
+    this.filter = filter;
   }
 
   public ObservableList<TreeItem<DepanFxWorkspaceMember>> buildChildren() {
@@ -22,6 +29,7 @@ public class DepanFxProjectMemberItemBuilder {
         FXCollections.observableArrayList();
 
     member.getMembers()
+        .filter(filter::test)
         .forEach(c -> result.add(createNode(c)));
     return result;
   }
@@ -30,7 +38,7 @@ public class DepanFxProjectMemberItemBuilder {
       DepanFxWorkspaceMember member) {
     switch (member) {
     case DepanFxProjectContainer container:
-      return new DepanFxProjectContainerItem(container);
+      return new DepanFxProjectContainerItem(container, filter);
     case DepanFxProjectDocument document:
       return new DepanFxProjectDocumentItem(document);
     default:

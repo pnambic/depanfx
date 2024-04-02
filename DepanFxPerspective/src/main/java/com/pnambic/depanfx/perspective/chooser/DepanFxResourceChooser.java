@@ -38,8 +38,6 @@ public class DepanFxResourceChooser {
   private ObjectProperty<ExtensionFilter> selectedExtensionFilter =
       new SimpleObjectProperty<>();
 
-  private ExtensionFilter activeFilter;
-
   public DepanFxResourceChooser(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
     this.workspace = workspace;
@@ -60,7 +58,7 @@ public class DepanFxResourceChooser {
     DepanFxResourceChooserDialog chooserCtrl = openDialog.getController();
     chooserCtrl.setWorkspace(workspace);
     chooserCtrl.setExtension(extensionFilters);
-    chooserCtrl.setActiveFilter(activeFilter);
+    chooserCtrl.setActiveFilter(selectedExtensionFilter.getValue());
     chooserCtrl.setInitialResourceName(initialResourceName);
     chooserCtrl.setInitialContainer(initialContainer);
 
@@ -85,7 +83,7 @@ public class DepanFxResourceChooser {
   }
 
   public void setActiveFilter(ExtensionFilter activeFilter) {
-    this.activeFilter = activeFilter;
+    selectedExtensionFilter.set(activeFilter);
   }
 
   public ObservableList<ExtensionFilter> getExtensionFilters() {

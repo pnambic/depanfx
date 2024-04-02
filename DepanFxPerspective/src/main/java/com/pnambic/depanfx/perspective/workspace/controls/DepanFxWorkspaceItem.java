@@ -2,6 +2,7 @@ package com.pnambic.depanfx.perspective.workspace.controls;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
@@ -23,8 +24,14 @@ public class DepanFxWorkspaceItem extends TreeItem<DepanFxWorkspaceMember> {
 
   private boolean treeLoaded = false;
 
-  public DepanFxWorkspaceItem(DepanFxWorkspace workspace) {
+  private final Predicate<DepanFxProjectMember> filter;
+
+  public DepanFxWorkspaceItem(
+      DepanFxWorkspace workspace,
+      Predicate<DepanFxProjectMember> filter) {
     super(workspace);
+    this.filter = filter;
+
     setExpanded(true);
     workspace.addListener(new UpdateListener());
   }
@@ -54,9 +61,8 @@ public class DepanFxWorkspaceItem extends TreeItem<DepanFxWorkspaceMember> {
 
     ObservableList<TreeItem<DepanFxWorkspaceMember>> result =
         FXCollections.observableArrayList();
-    for (DepanFxProjectTree project : projects) {
-      result.add(new DepanFxProjectTreeItem(project));
-    }
+    projects.stream()
+        .forEach(p -> result.add(new DepanFxProjectTreeItem(p, filter)));
     return result;
   }
 
@@ -67,7 +73,8 @@ public class DepanFxWorkspaceItem extends TreeItem<DepanFxWorkspaceMember> {
       findProjectItem(project).ifPresentOrElse(
           pi -> LOG.warn("Project {} cannot be added to workspace again",
               project.getMemberName()),
-          () -> getChildren().add(new DepanFxProjectTreeItem(project)));
+          () -> getChildren().add(
+              new DepanFxProjectTreeItem(project, filter)));
     }
 
     @Override

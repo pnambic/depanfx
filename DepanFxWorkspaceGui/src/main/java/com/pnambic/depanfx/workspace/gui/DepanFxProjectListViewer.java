@@ -130,7 +130,7 @@ public class DepanFxProjectListViewer {
 
   private TreeItem<DepanFxWorkspaceMember> buildWorkspaceRoot() {
     TreeItem<DepanFxWorkspaceMember> result =
-        new DepanFxWorkspaceItem(workspace);
+        new DepanFxWorkspaceItem(workspace, m -> true);
     return result;
   }
 
