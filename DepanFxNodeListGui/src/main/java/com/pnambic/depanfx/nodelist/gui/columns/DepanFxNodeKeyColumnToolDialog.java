@@ -1,11 +1,8 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData.KeyChoice;
-import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
-import com.pnambic.depanfx.perspective.DepanFxProctor;
-import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -24,22 +21,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Stage;
 
 @Component
 @FxmlView("node-key-column-tool-dialog.fxml")
-public class DepanFxNodeKeyColumnToolDialog {
+public class DepanFxNodeKeyColumnToolDialog
+    extends DepanFxBaseColumnToolDialog {
 
   private static final Logger LOG =
-      LoggerFactory.getLogger(DepanFxNodeKeyColumnToolDialog.class.getName());
+      LoggerFactory.getLogger(DepanFxNodeKeyColumnToolDialog.class);
 
   public static final ExtensionFilter NODE_KEY_COLUMN_FILTER =
       DepanFxSceneControls.buildExtFilter(
@@ -51,31 +46,12 @@ public class DepanFxNodeKeyColumnToolDialog {
           DepanFxNodeKeyColumnData.NODE_KEY_COLUMN_TOOL_EXT,
           DepanFxNodeKeyColumnData.class);
 
-  private final DepanFxWorkspace workspace;
-
-  private Optional<DepanFxWorkspaceResource> optNodeKeyColumnRsrc;
-
-  @FXML
-  private TextField columnLabelField;
-
-  @FXML
-  private TextField widthMsField;
-
   @FXML
   private ComboBox<KeyChoice> keyChoiceField;
 
-  @FXML
-  private TextField toolNameField;
-
-  @FXML
-  private TextField toolDescriptionField;
-
-  @FXML
-  private TextField destinationField;
-
   @Autowired
   public DepanFxNodeKeyColumnToolDialog(DepanFxWorkspace workspace) {
-    this.workspace = workspace;
+    super(workspace);
   }
 
   public static Dialog<DepanFxNodeKeyColumnToolDialog> runEditDialog(
@@ -113,15 +89,6 @@ public class DepanFxNodeKeyColumnToolDialog {
     keyChoiceField.getItems().add(KeyChoice.NODE_KEY);
   }
 
-  public void setDestination(DepanFxProjectDocument projDoc) {
-    // Don't allow a destination in the built-in project.
-    if (workspace.getBuiltInProjectTree().equals(projDoc.getProject())) {
-      destinationField.setText(null);
-      return;
-    }
-    destinationField.setText(projDoc.getMemberPath().toString());
-  }
-
   public void setTooldata(DepanFxNodeKeyColumnData columnData) {
     toolNameField.setText(columnData.getToolName());
     toolDescriptionField.setText(columnData.getToolDescription());
@@ -132,35 +99,8 @@ public class DepanFxNodeKeyColumnToolDialog {
     keyChoiceField.setValue(columnData.getKeyChoice());
   }
 
-  public void setNodeKeyColumnResource(
-      DepanFxWorkspaceResource nodeKeyColumnRsrc) {
-    this.optNodeKeyColumnRsrc = Optional.of(nodeKeyColumnRsrc);
-    setTooldata(((DepanFxNodeKeyColumnData) nodeKeyColumnRsrc.getResource()));
-    destinationField.setText(
-        nodeKeyColumnRsrc.getDocument().getMemberPath().toString());
-  }
-
-  public Optional<DepanFxWorkspaceResource> getWorkspaceResource() {
-    return optNodeKeyColumnRsrc;
-  }
-
-  @FXML
-  private void handleCancel() {
-    closeDialog();
-    optNodeKeyColumnRsrc = Optional.empty();
-  }
-
-  @FXML
-  private void handleConfirm() {
-    DepanFxProctor proctor = new DepanFxProctor.Simple();
-    DepanFxDialogChecks.checkDestinationFile(
-        proctor, destinationField.getText());
-    if (DepanFxResourcePerspectives.errorAlert(
-        proctor, "Key Column Save Confirmation Error")) {
-      return;
-    }
-
-    closeDialog();
+  @Override
+  protected Optional<DepanFxWorkspaceResource> prepareResult() {
 
     DepanFxNodeKeyColumnData nodeKeyColumnData = new DepanFxNodeKeyColumnData(
         toolNameField.getText(), toolDescriptionField.getText(),
@@ -168,60 +108,25 @@ public class DepanFxNodeKeyColumnToolDialog {
         keyChoiceField.getValue());
 
     File dstDocFile = new File(destinationField.getText());
-    optNodeKeyColumnRsrc = workspace.toProjectDocument(dstDocFile.toURI())
+    return getWorkspace().toProjectDocument(dstDocFile.toURI())
         .flatMap(d -> saveDocument(d, nodeKeyColumnData));
   }
 
-  @FXML
-  private void openDestinationChooser() {
-    FileChooser fileChooser = prepareDestinationFileChooser();
-    File selectedFile =
-        fileChooser.showSaveDialog(destinationField.getScene().getWindow());
-    if (selectedFile != null) {
-      destinationField.setText(selectedFile.getAbsolutePath());
-    }
-  }
-
-  private Optional<DepanFxWorkspaceResource> saveDocument(
-      DepanFxProjectDocument projDoc, Object docData) {
-    try {
-      return workspace.saveDocument(projDoc, docData);
-    } catch (IOException errIo) {
-      LOG.error("Unable to save {}, type {}",
-          projDoc.toString(), docData.getClass().getName(), errIo);
-      throw new RuntimeException(
-          "Unable to save " + projDoc.toString()
-          + ", type " + docData.getClass().getName(),
-          errIo);
-    }
-  }
-
-  private int parseWidthMs(String widthMs) {
-    int result = 10; // nominal value
-    try {
-      result = Integer.parseUnsignedInt(widthMs);
-    } catch (NumberFormatException errFmt) {
-      LOG.warn("Bad user value for widthMs {}", widthMs, errFmt);
-    }
-    return Math.min(200, Math.max(5, result));
-  }
-
-  private void closeDialog() {
-    ((Stage) destinationField.getScene().getWindow()).close();
-  }
-
-  private FileChooser prepareDestinationFileChooser() {
-    FileChooser result =
-        DepanFxSceneControls.prepareFileChooser(
-            destinationField, () -> buildInitialDestinationFile());
-    setNodeKeyColumnTooldataFilters(result);
-    return result;
-  }
-
-  private File buildInitialDestinationFile() {
+  @Override
+  protected File buildInitialDestinationFile() {
     return DepanFxWorkspaceFactory.bestDocumentFile(
         toolNameField.getText(), DepanFxNodeKeyColumnData.NODE_KEY_COLUMN_TOOL_EXT,
-        workspace, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH,
-        DepanFxProjects.getCurrentTools(workspace));
+        getWorkspace(), DepanFxNodeListColumnData.COLUMNS_TOOL_PATH,
+        DepanFxProjects.getCurrentTools(getWorkspace()));
+  }
+
+  @Override
+  protected void setColumnTooldataFilters(FileChooser result) {
+    DepanFxNodeKeyColumnToolDialog.setNodeKeyColumnTooldataFilters(result);
+  }
+
+  @Override
+  protected String getInputCheckFailureText() {
+    return  "Node Key Column Save Confirmation Error";
   }
 }

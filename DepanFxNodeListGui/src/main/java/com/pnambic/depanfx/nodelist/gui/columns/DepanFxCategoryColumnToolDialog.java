@@ -3,12 +3,9 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 import com.google.common.base.Strings;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData.CategoryEntry;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
-import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
-import com.pnambic.depanfx.perspective.DepanFxProctor;
-import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -27,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -44,16 +40,15 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Stage;
 
 @Component
 @FxmlView("category-column-tool-dialog.fxml")
-public class DepanFxCategoryColumnToolDialog {
+public class DepanFxCategoryColumnToolDialog
+    extends DepanFxBaseColumnToolDialog {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxCategoryColumnToolDialog.class);
@@ -69,34 +64,15 @@ public class DepanFxCategoryColumnToolDialog {
           DepanFxCategoryColumnData.CATEGORY_COLUMN_TOOL_EXT,
           DepanFxCategoryColumnData.class);
 
-  private final DepanFxWorkspace workspace;
-
-  // Only valid after a successful handle confirm.
-  private Optional<DepanFxWorkspaceResource> optCategoryColumnRsrc;
-
-  @FXML
-  private TextField columnLabelField;
-
-  @FXML
-  private TextField widthMsField;
 
   @FXML
   private TableView<EditCategory> categoriesTable;
-
-  @FXML
-  private TextField toolNameField;
-
-  @FXML
-  private TextField toolDescriptionField;
-
-  @FXML
-  private TextField destinationField;
 
   private ObservableList<EditCategory> categoryTableData;
 
   @Autowired
   public DepanFxCategoryColumnToolDialog(DepanFxWorkspace workspace) {
-    this.workspace = workspace;
+    super(workspace);
   }
 
   public static Dialog<DepanFxCategoryColumnToolDialog> runEditDialog(
@@ -179,55 +155,9 @@ public class DepanFxCategoryColumnToolDialog {
     categoriesTable.setItems(categoryTableData);
   }
 
-  public void setDestination(DepanFxProjectDocument projDoc) {
-    destinationField.setText(projDoc.getMemberPath().toString());
-  }
-
-  public Optional<DepanFxWorkspaceResource> getWorkspaceResource() {
-    return optCategoryColumnRsrc;
-  }
-
   @FXML
   private void addCategoryRow() {
     categoryTableData.add(new EditCategory("", null));
-  }
-
-  @FXML
-  private void handleCancel() {
-    closeDialog();
-    optCategoryColumnRsrc = Optional.empty();
-  }
-
-  @FXML
-  private void handleConfirm() {
-    DepanFxProctor proctor = new DepanFxProctor.Simple();
-    DepanFxDialogChecks.checkDestinationFile(
-        proctor, destinationField.getText());
-    if (DepanFxResourcePerspectives.errorAlert(
-        proctor, "Category Column Save Confirmation Error")) {
-      return;
-    }
-    closeDialog();
-
-    DepanFxCategoryColumnData categoryColumnData =
-        new DepanFxCategoryColumnData(
-            toolNameField.getText(), toolDescriptionField.getText(),
-            columnLabelField.getText(), parseWidthMs(widthMsField.getText()),
-            buildCategories());
-
-    File dstDocFile = new File(destinationField.getText());
-    optCategoryColumnRsrc = workspace.toProjectDocument(dstDocFile.toURI())
-        .flatMap(d -> saveDocument(d, categoryColumnData));
-  }
-
-  @FXML
-  private void openDestinationChooser() {
-    FileChooser fileChooser = prepareDestinationFileChooser();
-    File selectedFile =
-        fileChooser.showSaveDialog(destinationField.getScene().getWindow());
-    if (selectedFile != null) {
-      destinationField.setText(selectedFile.getAbsolutePath());
-    }
   }
 
   private void onUpdateLabelEvent(
@@ -250,51 +180,40 @@ public class DepanFxCategoryColumnToolDialog {
   private void runNodeListFinder(TableCell<?, ?> cell) {
     EditCategory editData =  categoryTableData.get(cell.getIndex());
     DepanFxNodeListChooser.runNodeListFinder(
-        workspace, categoriesTable.getScene().getWindow())
+        getWorkspace(), categoriesTable.getScene().getWindow())
         .ifPresent(editData::setNodeListResource);
   }
 
-  private Optional<DepanFxWorkspaceResource> saveDocument(
-      DepanFxProjectDocument projDoc, Object docData) {
-    try {
-      return workspace.saveDocument(projDoc, docData);
-    } catch (IOException errIo) {
-      LOG.error("Unable to save {}, type {}",
-          projDoc.toString(), docData.getClass().getName(), errIo);
-      throw new RuntimeException(
-          "Unable to save " + projDoc.toString()
-          + ", type " + docData.getClass().getName(),
-          errIo);
-    }
+  @Override
+  protected Optional<DepanFxWorkspaceResource> prepareResult() {
+
+    DepanFxCategoryColumnData categoryColumnData =
+        new DepanFxCategoryColumnData(
+            toolNameField.getText(), toolDescriptionField.getText(),
+            columnLabelField.getText(), parseWidthMs(widthMsField.getText()),
+            buildCategories());
+
+    File dstDocFile = new File(destinationField.getText());
+    return getWorkspace().toProjectDocument(dstDocFile.toURI())
+        .flatMap(d -> saveDocument(d, categoryColumnData));
   }
 
-  private int parseWidthMs(String widthMs) {
-    int result = 10; // nominal value
-    try {
-      result = Integer.parseUnsignedInt(widthMs);
-    } catch (NumberFormatException errFmt) {
-      LOG.warn("Bad user value for widthMs {}", widthMs, errFmt);
-    }
-    return Math.min(200, Math.max(5, result));
-  }
-
-  private void closeDialog() {
-    ((Stage) destinationField.getScene().getWindow()).close();
-  }
-
-  private FileChooser prepareDestinationFileChooser() {
-    FileChooser result =
-        DepanFxSceneControls.prepareFileChooser(
-            destinationField, () -> buildInitialDestinationFile());
-    setCategoryColumnTooldataFilters(result);
-    return result;
-  }
-
-  private File buildInitialDestinationFile() {
+  @Override
+  protected File buildInitialDestinationFile() {
     return DepanFxWorkspaceFactory.bestDocumentFile(
         toolNameField.getText(), DepanFxCategoryColumnData.CATEGORY_COLUMN_TOOL_EXT,
-        workspace, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH,
-        DepanFxProjects.getCurrentTools(workspace));
+        getWorkspace(), DepanFxNodeListColumnData.COLUMNS_TOOL_PATH,
+        DepanFxProjects.getCurrentTools(getWorkspace()));
+  }
+
+  @Override
+  protected void setColumnTooldataFilters(FileChooser result) {
+    DepanFxCategoryColumnToolDialog.setCategoryColumnTooldataFilters(result);
+  }
+
+  @Override
+  protected String getInputCheckFailureText() {
+    return  "Node Key Column Save Confirmation Error";
   }
 
   private static class ButtonActionCell<S, T> extends TableCell<S, T> {

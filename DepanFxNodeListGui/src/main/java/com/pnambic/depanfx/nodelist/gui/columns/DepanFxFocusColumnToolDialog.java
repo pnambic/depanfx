@@ -5,9 +5,6 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
-import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
-import com.pnambic.depanfx.perspective.DepanFxProctor;
-import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -27,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
@@ -35,11 +31,11 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Stage;
 
 @Component
 @FxmlView("focus-column-tool-dialog.fxml")
-public class DepanFxFocusColumnToolDialog {
+public class DepanFxFocusColumnToolDialog
+    extends DepanFxBaseColumnToolDialog {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxFocusColumnToolDialog.class.getName());
@@ -54,34 +50,15 @@ public class DepanFxFocusColumnToolDialog {
           DepanFxFocusColumnData.FOCUS_COLUMN_TOOL_EXT,
           DepanFxFocusColumnData.class);
 
-  private final DepanFxWorkspace workspace;
-
-  private Optional<DepanFxWorkspaceResource> optFocusColumnRsrc;
-
-  @FXML
-  private TextField columnLabelField;
-
-  @FXML
-  private TextField widthMsField;
-
   @FXML
   private TextField focusLabelField;
 
   @FXML
   private TextField focusNodeListRsrcField;
 
-  @FXML
-  private TextField toolNameField;
-
-  @FXML
-  private TextField toolDescriptionField;
-
-  @FXML
-  private TextField destinationField;
-
   @Autowired
   public DepanFxFocusColumnToolDialog(DepanFxWorkspace workspace) {
-    this.workspace = workspace;
+    super(workspace);
   }
 
   public static Dialog<DepanFxFocusColumnToolDialog> runEditDialog(
@@ -115,10 +92,6 @@ public class DepanFxFocusColumnToolDialog {
     focusNodeListRsrcField.setContextMenu(buildNodeListChoiceMenu());
   }
 
-  public void setDestination(DepanFxProjectDocument projDoc) {
-    destinationField.setText(projDoc.getMemberPath().toString());
-  }
-
   public void setTooldata(DepanFxFocusColumnData columnData) {
     toolNameField.setText(columnData.getToolName());
     toolDescriptionField.setText(columnData.getToolDescription());
@@ -139,52 +112,6 @@ public class DepanFxFocusColumnToolDialog {
     return null;
   }
 
-  public Optional<DepanFxWorkspaceResource> getWorkspaceResource() {
-    return optFocusColumnRsrc;
-  }
-
-  @FXML
-  private void handleCancel() {
-    closeDialog();
-    optFocusColumnRsrc = Optional.empty();
-  }
-
-  @FXML
-  private void handleConfirm() {
-    DepanFxProctor proctor = new DepanFxProctor.Simple();
-    DepanFxDialogChecks.checkDestinationFile(
-        proctor, destinationField.getText());
-    if (DepanFxResourcePerspectives.errorAlert(
-        proctor, "Focus Column Save Confirmation Error")) {
-      return;
-    }
-
-    closeDialog();
-    File nodeListFile = new File(focusNodeListRsrcField.getText());
-    Optional<DepanFxWorkspaceResource> optNodeListRsrc = workspace
-        .toProjectDocument(nodeListFile.toURI())
-        .flatMap(p -> workspace.getWorkspaceResource(p, DepanFxNodeList.class));
-
-    DepanFxFocusColumnData focusColumnData = new DepanFxFocusColumnData(
-        toolNameField.getText(), toolDescriptionField.getText(),
-        columnLabelField.getText(), parseWidthMs(widthMsField.getText()),
-        focusLabelField.getText(), optNodeListRsrc.get());
-
-    File dstDocFile = new File(destinationField.getText());
-    optFocusColumnRsrc = workspace.toProjectDocument(dstDocFile.toURI())
-        .flatMap(d -> saveDocument(d, focusColumnData));
-  }
-
-  @FXML
-  private void openDestinationChooser() {
-    FileChooser fileChooser = prepareDestinationFileChooser();
-    File selectedFile =
-        fileChooser.showSaveDialog(destinationField.getScene().getWindow());
-    if (selectedFile != null) {
-      destinationField.setText(selectedFile.getAbsolutePath());
-    }
-  }
-
   private ContextMenu buildNodeListChoiceMenu() {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
     builder.appendActionItem("Select Node List...",
@@ -194,7 +121,7 @@ public class DepanFxFocusColumnToolDialog {
 
   private void runNodeListFinder() {
     DepanFxNodeListChooser.runNodeListFinder(
-        workspace, focusNodeListRsrcField.getScene().getWindow())
+        getWorkspace(), focusNodeListRsrcField.getScene().getWindow())
         .ifPresent(this::updateNodeListFields);
   }
 
@@ -208,46 +135,39 @@ public class DepanFxFocusColumnToolDialog {
     }
   }
 
-  private Optional<DepanFxWorkspaceResource> saveDocument(
-      DepanFxProjectDocument projDoc, Object docData) {
-    try {
-      return workspace.saveDocument(projDoc, docData);
-    } catch (IOException errIo) {
-      LOG.error("Unable to save {}, type {}",
-          projDoc.toString(), docData.getClass().getName(), errIo);
-      throw new RuntimeException(
-          "Unable to save " + projDoc.toString()
-          + ", type " + docData.getClass().getName(),
-          errIo);
-    }
+  @Override
+  protected Optional<DepanFxWorkspaceResource> prepareResult() {
+    File nodeListFile = new File(focusNodeListRsrcField.getText());
+    Optional<DepanFxWorkspaceResource> optNodeListRsrc = getWorkspace()
+        .toProjectDocument(nodeListFile.toURI())
+        .flatMap(p -> getWorkspace()
+            .getWorkspaceResource(p, DepanFxNodeList.class));
+
+    DepanFxFocusColumnData focusColumnData = new DepanFxFocusColumnData(
+        toolNameField.getText(), toolDescriptionField.getText(),
+        columnLabelField.getText(), parseWidthMs(widthMsField.getText()),
+        focusLabelField.getText(), optNodeListRsrc.get());
+
+    File dstDocFile = new File(destinationField.getText());
+    return getWorkspace().toProjectDocument(dstDocFile.toURI())
+        .flatMap(d -> saveDocument(d, focusColumnData));
   }
 
-  private int parseWidthMs(String widthMs) {
-    int result = 10; // nominal value
-    try {
-      result = Integer.parseUnsignedInt(widthMs);
-    } catch (NumberFormatException errFmt) {
-      LOG.warn("Bad user value for widthMs {}", widthMs, errFmt);
-    }
-    return Math.min(200, Math.max(5, result));
-  }
-
-  private void closeDialog() {
-    ((Stage) destinationField.getScene().getWindow()).close();
-  }
-
-  private FileChooser prepareDestinationFileChooser() {
-    FileChooser result =
-        DepanFxSceneControls.prepareFileChooser(
-            destinationField, () -> buildInitialDestinationFile());
-    setFocusColumnTooldataFilters(result);
-    return result;
-  }
-
-  private File buildInitialDestinationFile() {
+  @Override
+  protected File buildInitialDestinationFile() {
     return DepanFxWorkspaceFactory.bestDocumentFile(
         toolNameField.getText(), DepanFxFocusColumnData.FOCUS_COLUMN_TOOL_EXT,
-        workspace, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH,
-        DepanFxProjects.getCurrentTools(workspace));
+        getWorkspace(), DepanFxNodeListColumnData.COLUMNS_TOOL_PATH,
+        DepanFxProjects.getCurrentTools(getWorkspace()));
+  }
+
+  @Override
+  protected void setColumnTooldataFilters(FileChooser result) {
+    DepanFxFocusColumnToolDialog.setFocusColumnTooldataFilters(result);
+  }
+
+  @Override
+  protected String getInputCheckFailureText() {
+    return  "Focus Column Save Confirmation Error";
   }
 }
