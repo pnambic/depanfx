@@ -6,6 +6,7 @@ import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData.CategoryEntry;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -25,7 +26,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -48,7 +48,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 @Component
 @FxmlView("category-column-tool-dialog.fxml")
 public class DepanFxCategoryColumnToolDialog
-    extends DepanFxBaseColumnToolDialog {
+    extends DepanFxBaseColumnToolDialog<DepanFxCategoryColumnData> {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxCategoryColumnToolDialog.class);
@@ -64,7 +64,6 @@ public class DepanFxCategoryColumnToolDialog
           DepanFxCategoryColumnData.CATEGORY_COLUMN_TOOL_EXT,
           DepanFxCategoryColumnData.class);
 
-
   @FXML
   private TableView<EditCategory> categoriesTable;
 
@@ -72,30 +71,27 @@ public class DepanFxCategoryColumnToolDialog
 
   @Autowired
   public DepanFxCategoryColumnToolDialog(DepanFxWorkspace workspace) {
-    super(workspace);
+    super(workspace, DepanFxCategoryColumnData.class);
   }
 
   public static Dialog<DepanFxCategoryColumnToolDialog> runEditDialog(
       DepanFxProjectDocument projDoc,
       DepanFxCategoryColumnData categoryColumnData,
       DepanFxDialogRunner dialogRunner) {
-    Dialog<DepanFxCategoryColumnToolDialog> dlg =
-        dialogRunner.createDialogAndParent(
-            DepanFxCategoryColumnToolDialog.class);
-    dlg.getController().setTooldata(categoryColumnData);
-    dlg.getController().setDestination(projDoc);
-    dlg.runDialog(DepanFxCategoryColumn.EDIT_CATEGORY_COLUMN);
-    return dlg;
+
+    return DepanFxResourcePerspectives.runEditDialog(
+        projDoc, categoryColumnData, dialogRunner,
+        DepanFxCategoryColumnToolDialog.class,
+        DepanFxCategoryColumn.EDIT_CATEGORY_COLUMN);
   }
 
   public static Dialog<DepanFxCategoryColumnToolDialog> runCreateDialog(
       DepanFxCategoryColumnData columnData, DepanFxDialogRunner dialogRunner) {
-    Dialog<DepanFxCategoryColumnToolDialog> dlg =
-        dialogRunner.createDialogAndParent(
-            DepanFxCategoryColumnToolDialog.class);
-    dlg.getController().setTooldata(columnData);
-    dlg.runDialog(DepanFxCategoryColumn.NEW_CATEGORY_COLUMN);
-    return dlg;
+
+    return DepanFxResourcePerspectives.runCreateDialog(
+        columnData, dialogRunner,
+        DepanFxCategoryColumnToolDialog.class,
+        DepanFxCategoryColumn.NEW_CATEGORY_COLUMN);
   }
 
   public static void setCategoryColumnTooldataFilters(FileChooser result) {
@@ -140,12 +136,9 @@ public class DepanFxCategoryColumnToolDialog
             .subtract(2));
   }
 
+  @Override // DepanFxBaseColumnToolDialog
   public void setTooldata(DepanFxCategoryColumnData columnData) {
-    toolNameField.setText(columnData.getToolName());
-    toolDescriptionField.setText(columnData.getToolDescription());
-
-    columnLabelField.setText(columnData.getColumnLabel());
-    widthMsField.setText(Integer.toString(columnData.getWidthMs()));
+    super.setTooldata(columnData);
 
     List<EditCategory> editCategories = columnData.getCategories().stream()
         .map(c -> new EditCategory(c))
@@ -184,18 +177,15 @@ public class DepanFxCategoryColumnToolDialog
         .ifPresent(editData::setNodeListResource);
   }
 
-  @Override
-  protected Optional<DepanFxWorkspaceResource> prepareResult() {
+  /////////////////////////////////////
+  // Tool Dialog protected overrides
 
-    DepanFxCategoryColumnData categoryColumnData =
-        new DepanFxCategoryColumnData(
+  @Override
+  protected DepanFxCategoryColumnData prepareResult() {
+    return new DepanFxCategoryColumnData(
             toolNameField.getText(), toolDescriptionField.getText(),
             columnLabelField.getText(), parseWidthMs(widthMsField.getText()),
             buildCategories());
-
-    File dstDocFile = new File(destinationField.getText());
-    return getWorkspace().toProjectDocument(dstDocFile.toURI())
-        .flatMap(d -> saveDocument(d, categoryColumnData));
   }
 
   @Override
@@ -215,6 +205,9 @@ public class DepanFxCategoryColumnToolDialog
   protected String getInputCheckFailureText() {
     return  "Node Key Column Save Confirmation Error";
   }
+
+  /////////////////////////////////////
+  // Internal Table Classes
 
   private static class ButtonActionCell<S, T> extends TableCell<S, T> {
 

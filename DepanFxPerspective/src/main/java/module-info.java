@@ -11,7 +11,8 @@ module depanfx.perspective {
     requires depanfx.workspace;
     requires depanfx.scene;
 
-    opens com.pnambic.depanfx.perspective to spring.core;
+    opens com.pnambic.depanfx.perspective
+        to javafx.fxml, net.rgielen.fxweaver.core, spring.core;
     opens com.pnambic.depanfx.perspective.chooser
         to javafx.fxml, net.rgielen.fxweaver.core, spring.beans;
     opens com.pnambic.depanfx.perspective.workspace.controls

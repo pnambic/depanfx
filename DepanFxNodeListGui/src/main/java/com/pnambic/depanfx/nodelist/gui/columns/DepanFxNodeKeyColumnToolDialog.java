@@ -3,6 +3,7 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData.KeyChoice;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -10,18 +11,14 @@ import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -31,10 +28,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 @Component
 @FxmlView("node-key-column-tool-dialog.fxml")
 public class DepanFxNodeKeyColumnToolDialog
-    extends DepanFxBaseColumnToolDialog {
-
-  private static final Logger LOG =
-      LoggerFactory.getLogger(DepanFxNodeKeyColumnToolDialog.class);
+    extends DepanFxBaseColumnToolDialog<DepanFxNodeKeyColumnData> {
 
   public static final ExtensionFilter NODE_KEY_COLUMN_FILTER =
       DepanFxSceneControls.buildExtFilter(
@@ -51,30 +45,27 @@ public class DepanFxNodeKeyColumnToolDialog
 
   @Autowired
   public DepanFxNodeKeyColumnToolDialog(DepanFxWorkspace workspace) {
-    super(workspace);
+    super(workspace, DepanFxNodeKeyColumnData.class);
   }
 
   public static Dialog<DepanFxNodeKeyColumnToolDialog> runEditDialog(
       DepanFxProjectDocument projDoc,
       DepanFxNodeKeyColumnData columnData,
       DepanFxDialogRunner dialogRunner) {
-    Dialog<DepanFxNodeKeyColumnToolDialog> dlg =
-        dialogRunner.createDialogAndParent(
-            DepanFxNodeKeyColumnToolDialog.class);
-    dlg.getController().setDestination(projDoc);
-    dlg.getController().setTooldata(columnData);
-    dlg.runDialog(DepanFxNodeKeyColumn.EDIT_NODE_KEY_COLUMN);
-    return dlg;
+
+    return DepanFxResourcePerspectives.runEditDialog(
+        projDoc, columnData, dialogRunner,
+        DepanFxNodeKeyColumnToolDialog.class,
+        DepanFxNodeKeyColumn.EDIT_NODE_KEY_COLUMN);
   }
 
   public static Dialog<DepanFxNodeKeyColumnToolDialog> runCreateDialog(
       DepanFxNodeKeyColumnData columnData, DepanFxDialogRunner dialogRunner) {
-    Dialog<DepanFxNodeKeyColumnToolDialog> dlg =
-        dialogRunner.createDialogAndParent(
-            DepanFxNodeKeyColumnToolDialog.class);
-    dlg.getController().setTooldata(columnData);
-    dlg.runDialog(DepanFxNodeKeyColumn.NEW_NODE_KEY_COLUMN);
-    return dlg;
+
+    return DepanFxResourcePerspectives.runCreateDialog(
+        columnData, dialogRunner,
+        DepanFxNodeKeyColumnToolDialog.class,
+        DepanFxNodeKeyColumn.NEW_NODE_KEY_COLUMN);
   }
 
   public static void setNodeKeyColumnTooldataFilters(FileChooser result) {
@@ -89,34 +80,32 @@ public class DepanFxNodeKeyColumnToolDialog
     keyChoiceField.getItems().add(KeyChoice.NODE_KEY);
   }
 
+  @Override // DepanFxBaseColumnToolDialog
   public void setTooldata(DepanFxNodeKeyColumnData columnData) {
-    toolNameField.setText(columnData.getToolName());
-    toolDescriptionField.setText(columnData.getToolDescription());
-
-    columnLabelField.setText(columnData.getColumnLabel());
-    widthMsField.setText(Integer.toString(columnData.getWidthMs()));
+    super.setTooldata(columnData);
 
     keyChoiceField.setValue(columnData.getKeyChoice());
   }
 
-  @Override
-  protected Optional<DepanFxWorkspaceResource> prepareResult() {
+  /////////////////////////////////////
+  // Tool Dialog protected overrides
 
-    DepanFxNodeKeyColumnData nodeKeyColumnData = new DepanFxNodeKeyColumnData(
+  @Override
+  protected DepanFxNodeKeyColumnData prepareResult() {
+
+    return new DepanFxNodeKeyColumnData(
         toolNameField.getText(), toolDescriptionField.getText(),
         columnLabelField.getText(), parseWidthMs(widthMsField.getText()),
         keyChoiceField.getValue());
-
-    File dstDocFile = new File(destinationField.getText());
-    return getWorkspace().toProjectDocument(dstDocFile.toURI())
-        .flatMap(d -> saveDocument(d, nodeKeyColumnData));
   }
 
   @Override
   protected File buildInitialDestinationFile() {
     return DepanFxWorkspaceFactory.bestDocumentFile(
-        toolNameField.getText(), DepanFxNodeKeyColumnData.NODE_KEY_COLUMN_TOOL_EXT,
-        getWorkspace(), DepanFxNodeListColumnData.COLUMNS_TOOL_PATH,
+        toolNameField.getText(),
+        DepanFxNodeKeyColumnData.NODE_KEY_COLUMN_TOOL_EXT,
+        getWorkspace(),
+        DepanFxNodeListColumnData.COLUMNS_TOOL_PATH,
         DepanFxProjects.getCurrentTools(getWorkspace()));
   }
 

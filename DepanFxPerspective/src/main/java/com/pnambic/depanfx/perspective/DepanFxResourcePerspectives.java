@@ -1,14 +1,19 @@
 package com.pnambic.depanfx.perspective;
 
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
+import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import java.io.File;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -36,6 +41,53 @@ public class DepanFxResourcePerspectives {
         e -> DepanFxSceneControls.handleDoubleClickOpenPath(
             e, docPath, onOpenPath));
   }
+
+  public static URI toUri(TextField text) {
+    // TODO: reasonableness and safety checks.
+    return Path.of(text.getText()).toUri();
+  }
+
+  public static Optional<DepanFxProjectDocument> toProjecDocument(
+      DepanFxWorkspace workspace, TextField text) {
+    return workspace.toProjectDocument(toUri(text));
+  }
+
+  public static Optional<DepanFxWorkspaceResource> toResource(
+      DepanFxWorkspace workspace, TextField text, Class<?> rsrcType) {
+    return toProjecDocument( workspace, text)
+        .flatMap(p -> workspace .getWorkspaceResource(p, rsrcType));
+  }
+
+  public static <
+          Dlg extends DepanFxBaseToolDialog<Data>,
+          Data extends DepanFxBaseToolData>
+    Dialog<Dlg> runEditDialog(
+        DepanFxProjectDocument projDoc,
+        Data toolData,
+        DepanFxDialogRunner dialogRunner,
+        Class<Dlg> dialogType,
+        String title) {
+    Dialog<Dlg> dlg = dialogRunner.createDialogAndParent(dialogType);
+    dlg.getController().setDestination(projDoc);
+    dlg.getController().setTooldata(toolData);
+    dlg.runDialog(title);
+    return dlg;
+  }
+
+  public static <
+        Dlg extends DepanFxBaseToolDialog<Data>,
+        Data extends DepanFxBaseToolData>
+  Dialog<Dlg> runCreateDialog(
+      Data toolData,
+      DepanFxDialogRunner dialogRunner,
+      Class<Dlg> dialogType,
+      String title) {
+    Dialog<Dlg> dlg = dialogRunner.createDialogAndParent(dialogType);
+    dlg.getController().setTooldata(toolData);
+    dlg.runDialog(title);
+    return dlg;
+  }
+
 
   public static void prepareResourceFinder(
       DepanFxResourceChooser chooser, Path targetPath) {

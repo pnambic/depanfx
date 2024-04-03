@@ -5,6 +5,7 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -18,8 +19,6 @@ import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,10 +34,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 @Component
 @FxmlView("focus-column-tool-dialog.fxml")
 public class DepanFxFocusColumnToolDialog
-    extends DepanFxBaseColumnToolDialog {
-
-  private static final Logger LOG =
-      LoggerFactory.getLogger(DepanFxFocusColumnToolDialog.class.getName());
+    extends DepanFxBaseColumnToolDialog<DepanFxFocusColumnData> {
 
   public static final ExtensionFilter FOCUS_COLUMN_FILTER =
       DepanFxSceneControls.buildExtFilter(
@@ -58,28 +54,27 @@ public class DepanFxFocusColumnToolDialog
 
   @Autowired
   public DepanFxFocusColumnToolDialog(DepanFxWorkspace workspace) {
-    super(workspace);
+    super(workspace, DepanFxFocusColumnData.class);
   }
 
   public static Dialog<DepanFxFocusColumnToolDialog> runEditDialog(
       DepanFxProjectDocument projDoc,
       DepanFxFocusColumnData focusColumnData,
       DepanFxDialogRunner dialogRunner) {
-    Dialog<DepanFxFocusColumnToolDialog> dlg =
-        dialogRunner.createDialogAndParent(DepanFxFocusColumnToolDialog.class);
-    dlg.getController().setDestination(projDoc);
-    dlg.getController().setTooldata(focusColumnData);
-    dlg.runDialog(DepanFxFocusColumn.EDIT_FOCUS_COLUMN);
-    return dlg;
+
+    return DepanFxResourcePerspectives.runEditDialog(
+        projDoc, focusColumnData, dialogRunner,
+        DepanFxFocusColumnToolDialog.class,
+        DepanFxFocusColumn.EDIT_FOCUS_COLUMN);
   }
 
   public static Dialog<DepanFxFocusColumnToolDialog> runCreateDialog(
       DepanFxFocusColumnData columnData, DepanFxDialogRunner dialogRunner) {
-    Dialog<DepanFxFocusColumnToolDialog> dlg =
-        dialogRunner.createDialogAndParent(DepanFxFocusColumnToolDialog.class);
-    dlg.getController().setTooldata(columnData);
-    dlg.runDialog(DepanFxFocusColumn.NEW_FOCUS_COLUMN);
-    return dlg;
+
+    return DepanFxResourcePerspectives.runCreateDialog(
+        columnData, dialogRunner,
+        DepanFxFocusColumnToolDialog.class,
+        DepanFxFocusColumn.NEW_FOCUS_COLUMN);
   }
 
   public static void setFocusColumnTooldataFilters(FileChooser result) {
@@ -92,12 +87,9 @@ public class DepanFxFocusColumnToolDialog
     focusNodeListRsrcField.setContextMenu(buildNodeListChoiceMenu());
   }
 
+  @Override // DepanFxBaseColumnToolDialog
   public void setTooldata(DepanFxFocusColumnData columnData) {
-    toolNameField.setText(columnData.getToolName());
-    toolDescriptionField.setText(columnData.getToolDescription());
-
-    columnLabelField.setText(columnData.getColumnLabel());
-    widthMsField.setText(Integer.toString(columnData.getWidthMs()));
+    super.setTooldata(columnData);
 
     focusLabelField.setText(columnData.getFocusLabel());
     focusNodeListRsrcField.setText(getNodeListRsrcName(columnData));
@@ -135,22 +127,19 @@ public class DepanFxFocusColumnToolDialog
     }
   }
 
-  @Override
-  protected Optional<DepanFxWorkspaceResource> prepareResult() {
-    File nodeListFile = new File(focusNodeListRsrcField.getText());
-    Optional<DepanFxWorkspaceResource> optNodeListRsrc = getWorkspace()
-        .toProjectDocument(nodeListFile.toURI())
-        .flatMap(p -> getWorkspace()
-            .getWorkspaceResource(p, DepanFxNodeList.class));
+  /////////////////////////////////////
+  // Tool Dialog protected overrides
 
-    DepanFxFocusColumnData focusColumnData = new DepanFxFocusColumnData(
+  @Override
+  protected DepanFxFocusColumnData prepareResult() {
+    Optional<DepanFxWorkspaceResource> optNodeListRsrc =
+        DepanFxResourcePerspectives.toResource(
+            getWorkspace(), focusNodeListRsrcField, DepanFxNodeList.class);
+
+    return new DepanFxFocusColumnData(
         toolNameField.getText(), toolDescriptionField.getText(),
         columnLabelField.getText(), parseWidthMs(widthMsField.getText()),
         focusLabelField.getText(), optNodeListRsrc.get());
-
-    File dstDocFile = new File(destinationField.getText());
-    return getWorkspace().toProjectDocument(dstDocFile.toURI())
-        .flatMap(d -> saveDocument(d, focusColumnData));
   }
 
   @Override

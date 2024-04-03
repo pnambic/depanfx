@@ -27,6 +27,7 @@ import javafx.scene.control.SeparatorMenuItem;
 
 public class DepanFxCategoryColumnCell extends DepanFxBaseColumnCell {
 
+  @SuppressWarnings("unused")
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxCategoryColumnCell.class);
 

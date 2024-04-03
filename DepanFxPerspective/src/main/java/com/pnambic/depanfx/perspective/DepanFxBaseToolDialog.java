@@ -1,0 +1,154 @@
+package com.pnambic.depanfx.perspective;
+
+import com.pnambic.depanfx.scene.DepanFxSceneControls;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
+public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData> {
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxBaseToolDialog.class);
+
+  private final DepanFxWorkspace workspace;
+
+  // Allow for future casts, type checks.
+  @SuppressWarnings("unused")
+  private final Class<T> forType;
+
+  private Optional<DepanFxWorkspaceResource> optColumnRsrc;
+
+  @FXML
+  protected TextField toolNameField;
+
+  @FXML
+  protected TextField toolDescriptionField;
+
+  @FXML
+  protected TextField destinationField;
+
+  public DepanFxBaseToolDialog(DepanFxWorkspace workspace, Class<T> forType) {
+    this.workspace = workspace;
+    this.forType = forType;
+  }
+
+  public void setDestination(DepanFxProjectDocument projDoc) {
+    // Don't allow a destination in the built-in project.
+    if (workspace.getBuiltInProjectTree().equals(projDoc.getProject())) {
+      destinationField.setText(null);
+      return;
+    }
+    destinationField.setText(projDoc.getMemberPath().toString());
+  }
+
+  public DepanFxWorkspace getWorkspace() {
+    return workspace;
+  }
+
+  public Optional<DepanFxWorkspaceResource> getWorkspaceResource() {
+    return optColumnRsrc;
+  }
+
+  /////////////////////////////////////
+  // Hook methods for derived classes.
+
+  /**
+   * Extendible, {@code @Override} with {@code super.setTooldata()}.
+   */
+  public void setTooldata(T toolData) {
+    toolNameField.setText(toolData.getToolName());
+    toolDescriptionField.setText(toolData.getToolDescription());
+  }
+
+  protected abstract T prepareResult();
+
+  protected abstract void setColumnTooldataFilters(FileChooser result);
+
+  protected abstract File buildInitialDestinationFile();
+
+  protected abstract String getInputCheckFailureText();
+
+  /**
+   * Extendible, {@code @Override} with {@code super.checkInput()}.
+   */
+  protected void checkInput(DepanFxProctor proctor) {
+    DepanFxDialogChecks.checkDestinationFile(
+        proctor, destinationField.getText());
+  }
+
+  /////////////////////////////////////
+  // FXML handlers.
+
+  @FXML
+  protected void handleCancel() {
+    closeDialog();
+    optColumnRsrc = Optional.empty();
+  }
+
+  @FXML
+  protected void handleConfirm() {
+    DepanFxProctor proctor = new DepanFxProctor.Simple();
+    checkInput(proctor);
+    if (DepanFxResourcePerspectives.errorAlert(
+        proctor, getInputCheckFailureText())) {
+      return;
+    }
+    closeDialog();
+
+    // Make sure we can get a result before trying to save
+    T toolData = prepareResult();
+
+    optColumnRsrc =
+        DepanFxResourcePerspectives.toProjDoc(workspace, destinationField)
+        .flatMap(d -> saveDocument(d, toolData));
+  }
+
+  @FXML
+  private void openDestinationChooser() {
+    FileChooser fileChooser = prepareDestinationFileChooser();
+    File selectedFile =
+        fileChooser.showSaveDialog(destinationField.getScene().getWindow());
+    if (selectedFile != null) {
+      destinationField.setText(selectedFile.getAbsolutePath());
+    }
+  }
+
+  private Optional<DepanFxWorkspaceResource> saveDocument(
+      DepanFxProjectDocument projDoc, Object docData) {
+    try {
+      return workspace.saveDocument(projDoc, docData);
+    } catch (IOException errIo) {
+      LOG.error("Unable to save {}, type {}",
+          projDoc.toString(), docData.getClass().getName(), errIo);
+      throw new RuntimeException(
+          "Unable to save " + projDoc.toString()
+          + ", type " + docData.getClass().getName(),
+          errIo);
+    }
+  }
+
+  private void closeDialog() {
+    ((Stage) destinationField.getScene().getWindow()).close();
+  }
+
+  private FileChooser prepareDestinationFileChooser() {
+    FileChooser result =
+        DepanFxSceneControls.prepareFileChooser(
+            destinationField, () -> buildInitialDestinationFile());
+    setColumnTooldataFilters(result);
+    return result;
+  }
+}
