@@ -32,7 +32,7 @@ public class DepanFxNodeKeyColumnConfiguration {
 
   public static final String KIND_KEY_COLUMN_NAME = "Kind Key Column";
 
-  public static final String NODE_KEY_COLUMN_NAME = "Node Column";
+  public static final String NODE_KEY_COLUMN_NAME = "Node Key Column";
 
   public static final Path MODEL_KEY_COLUMN_TOOL_PATH =
       DepanFxNodeListColumnData.COLUMNS_TOOL_PATH.resolve(MODEL_KEY_COLUMN_NAME);
