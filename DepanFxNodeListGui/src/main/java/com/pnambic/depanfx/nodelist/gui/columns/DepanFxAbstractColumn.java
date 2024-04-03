@@ -89,7 +89,7 @@ public abstract class DepanFxAbstractColumn
     @Override
     public TreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember> call(
         TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember> param) {
-      return new DepanFxSimpleColumnCell(DepanFxAbstractColumn.this);
+      return new DepanFxBaseColumnCell(DepanFxAbstractColumn.this);
     }
   }
 

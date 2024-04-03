@@ -23,10 +23,9 @@ import com.pnambic.depanfx.nodelist.gui.columns.DepanFxCategoryColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxFocusColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxSimpleColumn;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData.CategoryEntry;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 
 import java.util.ArrayList;
@@ -153,14 +152,6 @@ public class ExportColumn {
       DepanFxNodeKeyColumn nodeKeyCol = (DepanFxNodeKeyColumn) column;
       String columnLabel = nodeKeyCol.getColumnData().getColumnLabel();
       builder.addTransform(columnLabel, n -> nodeKeyCol.toString(n.getId()));
-    }
-    if (column instanceof DepanFxSimpleColumn) {
-      DepanFxSimpleColumn simpleCol = (DepanFxSimpleColumn) column;
-      String columnLabel = simpleCol.getColumnData().getColumnLabel();
-      builder.addTransform(columnLabel,
-          n -> n.getId().getContextNodeKindId().getContextModelId()
-          .getContextModelKey());
-      return;
     }
   }
 

@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
-public class DepanFxFocusColumnCell extends DepanFxSimpleColumnCell {
+public class DepanFxFocusColumnCell extends DepanFxBaseColumnCell {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxFocusColumnCell.class);

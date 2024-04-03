@@ -5,12 +5,12 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 
 import javafx.scene.control.TreeTableCell;
 
-public class DepanFxSimpleColumnCell
+public class DepanFxBaseColumnCell
     extends TreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember> {
 
   private final DepanFxNodeListColumn nodeListColumn;
 
-  public DepanFxSimpleColumnCell(DepanFxNodeListColumn nodeListColumn) {
+  public DepanFxBaseColumnCell(DepanFxNodeListColumn nodeListColumn) {
     this.nodeListColumn = nodeListColumn;
   }
 
@@ -40,10 +40,8 @@ public class DepanFxSimpleColumnCell
   }
 
   protected void stylizeCell(DepanFxNodeListMember member) {
-    if (member instanceof DepanFxNodeListGraphNode) {
-      String modelKey =
-          nodeListColumn.toString((DepanFxNodeListGraphNode) member);
-      setText(modelKey);
+    if (member instanceof DepanFxNodeListGraphNode node) {
+      setText(nodeListColumn.toString(node));
       return;
     }
     setText("");

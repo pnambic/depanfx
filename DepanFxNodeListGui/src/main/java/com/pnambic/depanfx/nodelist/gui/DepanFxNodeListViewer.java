@@ -11,13 +11,10 @@ import com.pnambic.depanfx.nodelist.gui.columns.DepanFxFocusColumnToolDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumnToolDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxSimpleColumn;
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxSimpleColumnConfiguration;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxSimpleColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
@@ -87,8 +84,7 @@ public class DepanFxNodeListViewer {
       Arrays.asList(new Class<?>[] {
         DepanFxCategoryColumnData.class,
         DepanFxFocusColumnData.class,
-        DepanFxNodeKeyColumnData.class,
-        DepanFxSimpleColumnData.class
+        DepanFxNodeKeyColumnData.class
   });
 
   public static final DepanFxResourceFilter NODE_KEY_COLUMN_RSRC_FILTER =
@@ -353,8 +349,6 @@ public class DepanFxNodeListViewer {
         e -> doSelectColumnAction()));
     items.add(new SeparatorMenuItem());
     items.add(DepanFxContextMenuBuilder.createActionItem(
-        "Simple Column", e -> doAddSimpleColumnAction()));
-    items.add(DepanFxContextMenuBuilder.createActionItem(
         DepanFxNodeKeyColumn.NEW_NODE_KEY_COLUMN,
         e -> doNewNodeKeyColumnAction()));
     items.add(DepanFxContextMenuBuilder.createActionItem(
@@ -400,17 +394,8 @@ public class DepanFxNodeListViewer {
     if (DepanFxNodeKeyColumnData.class.isAssignableFrom(type)) {
       return Optional.of(new DepanFxNodeKeyColumn(this, columnRsrc));
     }
-    if (DepanFxSimpleColumnData.class.isAssignableFrom(type)) {
-      return Optional.of(new DepanFxSimpleColumn(this, columnRsrc));
-    }
     LOG.warn("Unknown type {} for column construction", type.getName());
     return Optional.empty();
-  }
-
-  private void doAddSimpleColumnAction() {
-    DepanFxSimpleColumnConfiguration.getBuiltinSimpleColumnResource(workspace)
-        .map(r -> new DepanFxSimpleColumn(this, r))
-        .ifPresent(this::addColumn);
   }
 
   private void doNewNodeKeyColumnAction() {
