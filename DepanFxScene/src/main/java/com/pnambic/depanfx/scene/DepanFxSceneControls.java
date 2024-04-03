@@ -16,6 +16,8 @@
 
 package com.pnambic.depanfx.scene;
 
+import com.google.common.base.Strings;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +78,7 @@ public class DepanFxSceneControls {
   }
 
   public static void updateBlankField(TextField updateField, String newValue) {
-    if (updateField.getText().isBlank()) {
+    if (isPresent(updateField.getText())) {
       updateField.setText(newValue);
     }
   }
@@ -92,7 +94,7 @@ public class DepanFxSceneControls {
   public static DirectoryChooser prepareDirectoryChooser(TextField dirField) {
     DirectoryChooser result = new DirectoryChooser();
     String dirName = dirField.getText();
-    if (!dirName.isBlank()) {
+    if (isPresent(dirName)) {
       File location = new File(dirName);
       result.setInitialDirectory(location.getParentFile());
     }
@@ -102,7 +104,7 @@ public class DepanFxSceneControls {
   public static FileChooser prepareFileChooser(TextField fileField) {
     FileChooser result = new FileChooser();
     String fileName = fileField.getText();
-    if (!fileName.isBlank()) {
+    if (isPresent(fileName)) {
       initializeFileChooser(result, new File(fileName));
     }
     return result;
@@ -130,9 +132,19 @@ public class DepanFxSceneControls {
   private static File buildLocationFile(
       TextField fileField, Supplier<File> onBlank) {
     String fileName = fileField.getText();
-    if (!fileName.isBlank()) {
+    if (isPresent(fileName)) {
       return new File(fileName);
     }
     return onBlank.get();
+  }
+
+  /**
+   * Partially to abbreviate a common check.
+   * Partially to get a positive sense for the test.
+   *
+   * @return {@code true} of supplied text seems to have a non-blank body.
+   */
+  private static boolean isPresent(String text) {
+    return !Strings.isNullOrEmpty(text);
   }
 }

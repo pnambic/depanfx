@@ -114,6 +114,11 @@ public class DepanFxNodeKeyColumnToolDialog {
   }
 
   public void setDestination(DepanFxProjectDocument projDoc) {
+    // Don't allow a destination in the built-in project.
+    if (workspace.getBuiltInProjectTree().equals(projDoc.getProject())) {
+      destinationField.setText(null);
+      return;
+    }
     destinationField.setText(projDoc.getMemberPath().toString());
   }
 
