@@ -151,4 +151,8 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData> {
     setColumnTooldataFilters(result);
     return result;
   }
+
+  protected void updateBlankField(TextField updateField, String newValue) {
+    DepanFxSceneControls.updateBlankField(updateField, newValue);
+  }
 }
