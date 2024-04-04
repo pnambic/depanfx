@@ -3,98 +3,60 @@ package com.pnambic.depanfx.nodelist.gui.sections;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderBy;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderDirection;
-import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
-import com.pnambic.depanfx.perspective.DepanFxProctor;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Stage;
 
 @Component
 @FxmlView("flat-section-tool-dialog.fxml")
-public class DepanFxFlatSectionToolDialog {
-
-  private static final Logger LOG =
-      LoggerFactory.getLogger(DepanFxFlatSectionToolDialog.class.getName());
+public class DepanFxFlatSectionToolDialog
+    extends DepanFxBaseSectionToolDialog<DepanFxFlatSectionData> {
 
   private static final ExtensionFilter FLAT_SECTION_FILTER =
       DepanFxSceneControls.buildExtFilter(
           "Flat Sections", DepanFxFlatSectionData.FLAT_SECTION_TOOL_EXT);
 
-  private final DepanFxWorkspace workspace;
-
-  private Optional<DepanFxWorkspaceResource> optFlatSectionRsrc;
-
-  @FXML
-  private TextField sectionLabelField;
-
-  @FXML
-  private CheckBox displayNodeCountField;
-
   @FXML
   private ComboBox<OrderBy> orderByField;
 
-  @FXML
-  private ComboBox<OrderDirection> orderDirectionField;
-
-  @FXML
-  private TextField toolNameField;
-
-  @FXML
-  private TextField toolDescriptionField;
-
-  @FXML
-  private TextField destinationField;
-
   @Autowired
   public DepanFxFlatSectionToolDialog(DepanFxWorkspace workspace) {
-    this.workspace = workspace;
+    super(workspace, DepanFxFlatSectionData.class);
   }
 
   public static Dialog<DepanFxFlatSectionToolDialog> runEditDialog(
       DepanFxProjectDocument projDoc,
       DepanFxFlatSectionData sectionDataData,
       DepanFxDialogRunner dialogRunner) {
-    Dialog<DepanFxFlatSectionToolDialog> dlg =
-        dialogRunner.createDialogAndParent(DepanFxFlatSectionToolDialog.class);
-    dlg.getController().setDestination(projDoc);
-    dlg.getController().setTooldata(sectionDataData);
-    dlg.runDialog(DepanFxFlatSection.EDIT_FLAT_SECTION_DATA);
-    return dlg;
+
+    return DepanFxResourcePerspectives.runEditDialog(
+        projDoc, sectionDataData, dialogRunner,
+        DepanFxFlatSectionToolDialog.class,
+        DepanFxFlatSection.EDIT_FLAT_SECTION_DATA);
   }
 
   public static Dialog<DepanFxFlatSectionToolDialog> runCreateDialog(
       DepanFxFlatSectionData sectionData, DepanFxDialogRunner dialogRunner) {
-    Dialog<DepanFxFlatSectionToolDialog> dlg =
-        dialogRunner.createDialogAndParent(DepanFxFlatSectionToolDialog.class);
-    dlg.getController().setTooldata(sectionData);
-    dlg.runDialog(DepanFxFlatSection.NEW_FLAT_SECTION_DATA);
-    return dlg;
+
+    return DepanFxResourcePerspectives.runCreateDialog(
+        sectionData, dialogRunner,
+        DepanFxFlatSectionToolDialog.class,
+        DepanFxFlatSection.EDIT_FLAT_SECTION_DATA);
   }
 
   public static void setFlatSectionTooldataFilters(FileChooser result) {
@@ -102,103 +64,45 @@ public class DepanFxFlatSectionToolDialog {
     result.setSelectedExtensionFilter(FLAT_SECTION_FILTER);
   }
 
+  @Override
   @FXML
   public void initialize() {
-    orderByField.getItems().add(OrderBy.NODE_LEAF);
-    orderByField.getItems().add(OrderBy.NODE_KEY);
-    orderByField.getItems().add(OrderBy.NODE_ID);
-
-    orderDirectionField.getItems().add(OrderDirection.FORWARD);
-    orderDirectionField.getItems().add(OrderDirection.REVERSE);
+    super.initialize();
+    populateOrderBy(orderByField);
   }
 
-  public void setDestination(DepanFxProjectDocument projDoc) {
-    destinationField.setText(projDoc.getMemberPath().toString());
-  }
-
+  @Override
   public void setTooldata(DepanFxFlatSectionData sectionData) {
-    toolNameField.setText(sectionData.getToolName());
-    toolDescriptionField.setText(sectionData.getToolDescription());
-
-    sectionLabelField.setText(sectionData.getSectionLabel());
-    displayNodeCountField.setSelected(sectionData.displayNodeCount());
+    super.setTooldata(sectionData);
 
     orderByField.setValue(sectionData.getOrderBy());
-    orderDirectionField.setValue(sectionData.getOrderDirection());
   }
 
-  public Optional<DepanFxWorkspaceResource> getWorkspaceResource() {
-    return optFlatSectionRsrc;
-  }
+  /////////////////////////////////////
+  // Tool Dialog protected overrides
 
-  @FXML
-  private void handleCancel() {
-    closeDialog();
-    optFlatSectionRsrc = Optional.empty();
-  }
-
-  @FXML
-  private void handleConfirm() {
-    DepanFxProctor proctor = new DepanFxProctor.Simple();
-    DepanFxDialogChecks.checkDestinationFile(
-        proctor, destinationField.getText());
-    if (DepanFxResourcePerspectives.errorAlert(
-        proctor, "Section Save Confirmation Error")) {
-      return;
-    }
-
-    closeDialog();
-
-    DepanFxFlatSectionData flatSectionData = new DepanFxFlatSectionData(
+  @Override
+  protected DepanFxFlatSectionData prepareResult() {
+    return new DepanFxFlatSectionData(
         toolNameField.getText(), toolDescriptionField.getText(),
-        sectionLabelField.getText(), displayNodeCountField.isSelected(),
-        orderByField.getValue(), orderDirectionField.getValue());
-
-    File dstDocFile = new File(destinationField.getText());
-    optFlatSectionRsrc = workspace.toProjectDocument(dstDocFile.toURI())
-        .flatMap(d -> saveDocument(d, flatSectionData));
+        getSectionLabel(), displayNodeCount(),
+        orderByField.getValue(), getOrderDirection());
   }
 
-  @FXML
-  private void openDestinationChooser() {
-    FileChooser fileChooser = prepareDestinationFileChooser();
-    File selectedFile =
-        fileChooser.showSaveDialog(destinationField.getScene().getWindow());
-    if (selectedFile != null) {
-      destinationField.setText(selectedFile.getAbsolutePath());
-    }
+  @Override
+  protected File buildInitialDestinationFile() {
+    return buildToolInitialDestination(
+        DepanFxFlatSectionData.FLAT_SECTION_TOOL_EXT,
+        DepanFxNodeListSectionData.SECTIONS_TOOL_PATH);
   }
 
-  private Optional<DepanFxWorkspaceResource> saveDocument(
-      DepanFxProjectDocument projDoc, Object docData) {
-    try {
-      return workspace.saveDocument(projDoc, docData);
-    } catch (IOException errIo) {
-      LOG.error("Unable to save {}, type {}",
-          projDoc.toString(), docData.getClass().getName(), errIo);
-      throw new RuntimeException(
-          "Unable to save " + projDoc.toString()
-          + ", type " + docData.getClass().getName(),
-          errIo);
-    }
+  @Override
+  protected void setColumnTooldataFilters(FileChooser chooser) {
+    DepanFxFlatSectionToolDialog.setFlatSectionTooldataFilters(chooser);
   }
 
-  private void closeDialog() {
-    ((Stage) destinationField.getScene().getWindow()).close();
-  }
-
-  private FileChooser prepareDestinationFileChooser() {
-    FileChooser result =
-        DepanFxSceneControls.prepareFileChooser(
-            destinationField, () -> buildInitialDestinationFile());
-    setFlatSectionTooldataFilters(result);
-    return result;
-  }
-
-  private File buildInitialDestinationFile() {
-    return DepanFxWorkspaceFactory.bestDocumentFile(
-        toolNameField.getText(), DepanFxFlatSectionData.FLAT_SECTION_TOOL_EXT,
-        workspace, DepanFxNodeListSectionData.SECTIONS_TOOL_PATH,
-        DepanFxProjects.getCurrentTools(workspace));
+  @Override
+  protected String getInputCheckFailureText() {
+    return "Section Save Confirmation Error";
   }
 }

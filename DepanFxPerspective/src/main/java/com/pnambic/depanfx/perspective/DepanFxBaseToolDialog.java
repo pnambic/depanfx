@@ -30,7 +30,7 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData> {
 
   // Allow for future casts, type checks.
   @SuppressWarnings("unused")
-  private final Class<T> forType;
+  private final Class<T> dataType;
 
   private Optional<DepanFxWorkspaceResource> optColumnRsrc;
 
@@ -43,9 +43,9 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData> {
   @FXML
   protected TextField destinationField;
 
-  public DepanFxBaseToolDialog(DepanFxWorkspace workspace, Class<T> forType) {
+  public DepanFxBaseToolDialog(DepanFxWorkspace workspace, Class<T> dataType) {
     this.workspace = workspace;
-    this.forType = forType;
+    this.dataType = dataType;
   }
 
   public void setDestination(DepanFxProjectDocument projDoc) {

@@ -24,7 +24,6 @@ import com.pnambic.depanfx.workspace.DepanFxProjectResource;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -32,17 +31,13 @@ import java.nio.file.Path;
 /**
  * Persisted data for tree sections.
  */
-public class DepanFxTreeSectionData extends DepanFxBaseToolData {
+public class DepanFxTreeSectionData extends DepanFxBaseSectionData {
 
   public static final String TREE_SECTION_TOOL_EXT = "dtsti";
 
   public static final String BASE_SECTION_LABEL = "Tree";
 
   public enum ContainerOrder { FIRST, MIXED, LAST };
-
-  private final String sectionLabel; // 1
-
-  private final boolean displayNodeCount; // 3
 
   private final DepanFxProjectResource linkMatcherRsrc; // 2
 
@@ -52,24 +47,21 @@ public class DepanFxTreeSectionData extends DepanFxBaseToolData {
 
   private final ContainerOrder containerOrder;
 
-  private final OrderDirection orderDirection;
-
   public DepanFxTreeSectionData(String toolName, String toolDescription,
       String sectionLabel, boolean displayNodeCount,
       DepanFxProjectResource linkMatcherRsrc, boolean inferMissingParents,
       OrderBy orderBy, ContainerOrder containerOrder,
       OrderDirection orderDirection) {
-    super(toolName, toolDescription);
-    // Column header
-    this.sectionLabel = sectionLabel;
-    this.displayNodeCount = displayNodeCount;
+    super(toolName, toolDescription,
+        sectionLabel, displayNodeCount, orderDirection);
+
     // Tree construction
     this.linkMatcherRsrc = linkMatcherRsrc;
     this.inferMissingParents = inferMissingParents;
+
     // Collation criteria
     this.orderBy = orderBy;
     this.containerOrder = containerOrder;
-    this.orderDirection = orderDirection;
   }
 
   public DepanFxWorkspaceResource getLinkMatcherRsrc(
@@ -86,24 +78,12 @@ public class DepanFxTreeSectionData extends DepanFxBaseToolData {
     return orderBy;
   }
 
-  public OrderDirection getOrderDirection() {
-    return orderDirection;
-  }
-
   public ContainerOrder getContainerOrder() {
     return containerOrder;
   }
 
-  public String getSectionLabel() {
-    return sectionLabel;
-  }
-
   public boolean inferMissingParents() {
     return inferMissingParents;
-  }
-
-  public boolean displayNodeCount() {
-    return displayNodeCount;
   }
 
   public static File buildCurrentToolFile(

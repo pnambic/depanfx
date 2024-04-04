@@ -29,8 +29,8 @@ public abstract class DepanFxBaseColumnToolDialog<T extends DepanFxBaseColumnDat
   protected TextField widthMsField;
 
   public DepanFxBaseColumnToolDialog(
-      DepanFxWorkspace workspace, Class<T> forType) {
-    super(workspace, forType);
+      DepanFxWorkspace workspace, Class<T> dataType) {
+    super(workspace, dataType);
   }
 
   /**
