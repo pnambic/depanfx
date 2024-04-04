@@ -101,12 +101,9 @@ public class DepanFxNodeKeyColumnToolDialog
 
   @Override
   protected File buildInitialDestinationFile() {
-    return DepanFxWorkspaceFactory.bestDocumentFile(
-        toolNameField.getText(),
+    return buildToolInitialDestination(
         DepanFxNodeKeyColumnData.NODE_KEY_COLUMN_TOOL_EXT,
-        getWorkspace(),
-        DepanFxNodeListColumnData.COLUMNS_TOOL_PATH,
-        DepanFxProjects.getCurrentTools(getWorkspace()));
+        DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
   }
 
   @Override

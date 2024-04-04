@@ -144,10 +144,9 @@ public class DepanFxFocusColumnToolDialog
 
   @Override
   protected File buildInitialDestinationFile() {
-    return DepanFxWorkspaceFactory.bestDocumentFile(
-        toolNameField.getText(), DepanFxFocusColumnData.FOCUS_COLUMN_TOOL_EXT,
-        getWorkspace(), DepanFxNodeListColumnData.COLUMNS_TOOL_PATH,
-        DepanFxProjects.getCurrentTools(getWorkspace()));
+    return buildToolInitialDestination(
+        DepanFxFocusColumnData.FOCUS_COLUMN_TOOL_EXT,
+        DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
   }
 
   @Override

@@ -3,7 +3,9 @@ package com.pnambic.depanfx.perspective;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import org.slf4j.Logger;
@@ -11,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
@@ -87,6 +90,24 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData> {
   protected void checkInput(DepanFxProctor proctor) {
     DepanFxDialogChecks.checkDestinationFile(
         proctor, destinationField.getText());
+  }
+
+  /**
+   * For now, all analysis files go at the root of the current analysis
+   * tree.  Future may define an analysis sub-container, as TBD.
+   */
+  protected File buildAnalysisInitialDestination(String targetExt) {
+    return DepanFxWorkspaceFactory.bestDocumentFile(
+        toolNameField.getText(), targetExt, workspace,
+        DepanFxProjects.getCurrentAnalyzesPath(workspace).orElse(null),
+        DepanFxProjects.getCurrentAnalyzes(workspace));
+  }
+
+  protected File buildToolInitialDestination(
+      String targetExt, Path targetPath) {
+    return DepanFxWorkspaceFactory.bestDocumentFile(
+        toolNameField.getText(), targetExt, workspace, targetPath,
+        DepanFxProjects.getCurrentTools(workspace));
   }
 
   /////////////////////////////////////
