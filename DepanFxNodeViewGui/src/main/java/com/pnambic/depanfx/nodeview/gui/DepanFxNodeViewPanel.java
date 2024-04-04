@@ -14,6 +14,7 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewSceneData;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -185,9 +186,9 @@ public class DepanFxNodeViewPanel {
 
   private void runEditLinkDisplayDialog() {
     DepanFxNodeViewLinkDisplayData linkDisplayData = buildLinkDisplayData();
-    Dialog<DepanFxNodeViewLinkDisplayDialog> linkDisplayDgl =
-        DepanFxNodeViewLinkDisplayDialog.runEditDialog(
-            linkDisplayData, dialogRunner);
+    DepanFxNodeViewLinkDisplayDialog.runEditDialog(
+        viewData.getLinkDisplayDocRsrc().getDocument(),
+        linkDisplayData, dialogRunner);
 
     // TODO: apply any outstanding changes from the dialog.
     // However, most changes should be live modifications.
@@ -204,11 +205,11 @@ public class DepanFxNodeViewPanel {
   }
 
   private void runSaveNodeViewDialog() {
-    Dialog<DepanFxSaveNodeViewDialog> saveDlg =
-        dialogRunner.createDialogAndParent(DepanFxSaveNodeViewDialog.class);
     DepanFxNodeViewData saveView = buildSaveView();
-    saveDlg.getController().setNodeViewDoc(saveView);
-    saveDlg.runDialog("Save node view");
+
+    DepanFxResourcePerspectives.runCreateDialog(
+        saveView, dialogRunner,
+        DepanFxSaveNodeViewDialog.class, "Save node view");
   }
 
   /////////////////////////////////////

@@ -9,17 +9,14 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineLabel;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineStyle;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
-import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
-import com.pnambic.depanfx.perspective.DepanFxProctor;
+import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -28,9 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ObjectProperty;
@@ -46,45 +41,32 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Stage;
 
 @Component
 @FxmlView("node-view-link-display-dialog.fxml")
-public class DepanFxNodeViewLinkDisplayDialog {
+public class DepanFxNodeViewLinkDisplayDialog
+    extends DepanFxBaseToolDialog<DepanFxNodeViewLinkDisplayData> {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeViewLinkDisplayDialog.class);
 
   public static final String EDIT_LINK_DISPLAY = "Edit Link Display...";
 
+  public static final String NEW_LINK_DISPLAY = "New Link Display...";
+
   public static final ExtensionFilter NODE_VIEW_LINK_DISPLAY_FILTER =
       DepanFxSceneControls.buildExtFilter(
           "Link Display",
           DepanFxNodeViewLinkDisplayData.NODE_VIEW_LINK_DISPLAY_EXT);
 
-  private final DepanFxWorkspace workspace;
-
-  // Only valid after a successful handle confirm.
-  private Optional<DepanFxWorkspaceResource> optLinkDisplayDocRsrc;
-
   @FXML
   private TableView<EditLinkDisplay> linksDisplayTable;
-
-  @FXML
-  private TextField toolNameField;
-
-  @FXML
-  private TextField toolDescriptionField;
-
-  @FXML
-  private TextField destinationField;
 
   private ObservableList<EditLinkDisplay> linksDiplayTableData;
 
@@ -96,19 +78,28 @@ public class DepanFxNodeViewLinkDisplayDialog {
   private DepanFxNodeViewLinkDisplayData linkDisplayData;
 
   public DepanFxNodeViewLinkDisplayDialog(DepanFxWorkspace workspace) {
-    this.workspace = workspace;
+    super(workspace, DepanFxNodeViewLinkDisplayData.class);
   }
 
   public static Dialog<DepanFxNodeViewLinkDisplayDialog> runEditDialog(
+      DepanFxProjectDocument projDoc,
       DepanFxNodeViewLinkDisplayData viewLinkData,
       DepanFxDialogRunner dialogRunner) {
-    Dialog<DepanFxNodeViewLinkDisplayDialog> dlg =
-        dialogRunner.createDialogAndParent(
-            DepanFxNodeViewLinkDisplayDialog.class);
-    dlg.getController().setTooldata(viewLinkData);
-    // dlg.getController().setDestination(projDoc);
-    dlg.runDialog(EDIT_LINK_DISPLAY);
-    return dlg;
+
+    return DepanFxResourcePerspectives.runEditDialog(
+        projDoc, viewLinkData, dialogRunner,
+        DepanFxNodeViewLinkDisplayDialog.class,
+        EDIT_LINK_DISPLAY);
+  }
+
+  public static Dialog<DepanFxNodeViewLinkDisplayDialog> runCreateDialog(
+      DepanFxNodeViewLinkDisplayData viewLinkData,
+      DepanFxDialogRunner dialogRunner) {
+
+    return DepanFxResourcePerspectives.runCreateDialog(
+        viewLinkData, dialogRunner,
+        DepanFxNodeViewLinkDisplayDialog.class,
+        NEW_LINK_DISPLAY);
   }
 
   public static void setNodeViewLinkDisplayTooldataFilters(FileChooser chooser) {
@@ -161,10 +152,10 @@ public class DepanFxNodeViewLinkDisplayDialog {
     linkOperationColumn.setOnEditCommit(this::onLinkOperationEvent);
   }
 
+  @Override // DepanFxBaseToolDialog
   public void setTooldata(DepanFxNodeViewLinkDisplayData linkDisplayData) {
+    super.setTooldata(linkDisplayData);
     this.linkDisplayData = linkDisplayData;
-    toolNameField.setText(linkDisplayData.getToolName());
-    toolDescriptionField.setText(linkDisplayData.getToolDescription());
 
     List<EditLinkDisplay> editLinkDisplay =
         linkDisplayData.streamLinkDisplay()
@@ -185,102 +176,6 @@ public class DepanFxNodeViewLinkDisplayDialog {
 
   @FXML
   private void handleApply() {
-  }
-
-  @FXML
-  private void handleCancel() {
-    closeDialog();
-    optLinkDisplayDocRsrc = Optional.empty();
-  }
-
-  @FXML
-  private void handleConfirm() {
-    DepanFxProctor proctor = new DepanFxProctor.Simple();
-    DepanFxDialogChecks.checkDestinationFile(
-        proctor, destinationField.getText());
-    if (DepanFxResourcePerspectives.errorAlert(
-        proctor, "Link Display Save Confirmation Error")) {
-      return;
-    }
-
-    closeDialog();
-
-    List<LinkDisplayEntry> displayEntries = linksDiplayTableData.stream()
-        .map(this::toLinkDisplayEntry)
-        .collect(Collectors.toList());
-
-    DepanFxNodeViewLinkDisplayData saveData =
-        new DepanFxNodeViewLinkDisplayData(
-            toolNameField.getText(),
-            toolDescriptionField.getText(),
-            linkDisplayData.getContextModelId(), displayEntries);
-
-    File dstDocFile = new File(destinationField.getText());
-    optLinkDisplayDocRsrc = workspace.toProjectDocument(dstDocFile.toURI())
-        .flatMap(d -> saveDocument(d, saveData));
-  }
-
-  @FXML
-  private void openDestinationChooser() {
-    FileChooser fileChooser = prepareDestinationFileChooser();
-    File selectedFile =
-        fileChooser.showSaveDialog(destinationField.getScene().getWindow());
-    if (selectedFile != null) {
-      destinationField.setText(selectedFile.getAbsolutePath());
-    }
-  }
-
-  private void closeDialog() {
-    ((Stage) destinationField.getScene().getWindow()).close();
-  }
-
-  private LinkDisplayEntry toLinkDisplayEntry(EditLinkDisplay editData) {
-    DepanFxLineDisplayData lineDisplayData = new DepanFxLineDisplayData(
-        editData.lineFormProperty().getValue(),
-        editData.lineStyleProperty().getValue(),
-        DepanFxJoglColor.of(editData.lineColorProperty().getValue()),
-        editData.lineWidthProperty().getValue(),
-
-        editData.lineLabelProperty().getValue(),
-        editData.sourceArrowProperty().getValue(),
-        editData.targetArrowProperty().getValue(),
-        editData.lineDirectionProperty().getValue());
-
-    LinkDisplayEntry result = new LinkDisplayEntry(
-        editData.linkDisplayLabelProperty().getValue(),
-        editData.linkDisplayRsrc,
-        lineDisplayData );
-    return result ;
-  }
-
-  private Optional<DepanFxWorkspaceResource> saveDocument(
-      DepanFxProjectDocument projDoc, DepanFxNodeViewLinkDisplayData docData) {
-    try {
-      return workspace.saveDocument(projDoc, docData);
-    } catch (IOException errIo) {
-      LOG.error("Unable to save {}, type {}",
-          projDoc.toString(), docData.getClass().getName(), errIo);
-      throw new RuntimeException(
-          "Unable to save " + projDoc.toString()
-          + ", type " + docData.getClass().getName(),
-          errIo);
-    }
-  }
-
-  private FileChooser prepareDestinationFileChooser() {
-    FileChooser result =
-        DepanFxSceneControls.prepareFileChooser(
-            destinationField, () -> buildInitialDestinationFile());
-    setNodeViewLinkDisplayTooldataFilters(result);
-    return result;
-  }
-
-  private File buildInitialDestinationFile() {
-    return DepanFxWorkspaceFactory.bestDocumentFile(
-        toolNameField.getText(),
-        DepanFxNodeViewLinkDisplayData.NODE_VIEW_LINK_DISPLAY_EXT,
-        workspace, DepanFxNodeViewLinkDisplayData.LINK_DISPLAY_PATH,
-        DepanFxProjects.getCurrentTools(workspace));
   }
 
   private void onUpdateLabelEvent(
@@ -316,11 +211,66 @@ public class DepanFxNodeViewLinkDisplayDialog {
     }
   }
 
+  /////////////////////////////////////
+  // Tool Dialog protected overrides
+
+  @Override
+  protected DepanFxNodeViewLinkDisplayData prepareResult() {
+    List<LinkDisplayEntry> displayEntries = linksDiplayTableData.stream()
+        .map(this::toLinkDisplayEntry)
+        .collect(Collectors.toList());
+
+    return new DepanFxNodeViewLinkDisplayData(
+            toolNameField.getText(),
+            toolDescriptionField.getText(),
+            linkDisplayData.getContextModelId(), displayEntries);
+  }
+
+  @Override
+  protected File buildInitialDestinationFile() {
+    return buildToolInitialDestination(
+        DepanFxNodeViewLinkDisplayData.NODE_VIEW_LINK_DISPLAY_EXT,
+        DepanFxNodeViewLinkDisplayData.LINK_DISPLAY_PATH);
+  }
+
+  @Override
+  protected void setColumnTooldataFilters(FileChooser result) {
+    DepanFxNodeViewLinkDisplayDialog
+      .setNodeViewLinkDisplayTooldataFilters(result);
+  }
+
+  @Override
+  protected String getInputCheckFailureText() {
+    return  "Link Display Save Confirmation Error";
+  }
+
+  private LinkDisplayEntry toLinkDisplayEntry(EditLinkDisplay editData) {
+    DepanFxLineDisplayData lineDisplayData = new DepanFxLineDisplayData(
+        editData.lineFormProperty().getValue(),
+        editData.lineStyleProperty().getValue(),
+        DepanFxJoglColor.of(editData.lineColorProperty().getValue()),
+        editData.lineWidthProperty().getValue(),
+
+        editData.lineLabelProperty().getValue(),
+        editData.sourceArrowProperty().getValue(),
+        editData.targetArrowProperty().getValue(),
+        editData.lineDirectionProperty().getValue());
+
+    LinkDisplayEntry result = new LinkDisplayEntry(
+        editData.linkDisplayLabelProperty().getValue(),
+        editData.linkDisplayRsrc,
+        lineDisplayData );
+    return result ;
+  }
+
   private EditLinkDisplay getEventLinkDisplay(
       CellEditEvent<EditLinkDisplay, String> updateEvent) {
     return updateEvent.getTableView().getItems().get(
         updateEvent.getTablePosition().getRow());
   }
+
+  /////////////////////////////////////
+  // Internal Table Classes
 
   private static enum LinkOrderOperation {
     NONE, UP, DOWN, DELETE;
