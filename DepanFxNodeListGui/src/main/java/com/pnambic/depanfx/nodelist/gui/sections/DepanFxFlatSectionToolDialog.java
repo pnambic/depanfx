@@ -1,4 +1,4 @@
-package com.pnambic.depanfx.nodelist.gui;
+package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData;

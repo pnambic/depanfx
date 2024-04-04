@@ -1,9 +1,8 @@
-package com.pnambic.depanfx.nodelist.gui;
+package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
+import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,15 +12,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
-public class DepanFxTreeForkItem extends DepanFxNodeListItem {
-
-  private static final Logger LOG =
-      LoggerFactory.getLogger(DepanFxTreeForkItem.class);
+/**
+ * Provides top-level rendering of a tree section.
+ * Used as the mechanism to provide {@link DepanFxTreeFork} elements with
+ * the section's {@link DepanFxTreeModel}.
+ */
+public class DepanFxTreeSectionItem
+    extends DepanFxNodeListSectionItem {
 
   private boolean treeLoaded = false;
 
-  public DepanFxTreeForkItem(DepanFxTreeFork fork) {
-    super(fork);
+  public DepanFxTreeSectionItem(DepanFxTreeSection section) {
+    super(section);
   }
 
   @Override
@@ -40,17 +42,17 @@ public class DepanFxTreeForkItem extends DepanFxNodeListItem {
   }
 
   private ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
-    DepanFxTreeFork folder = (DepanFxTreeFork) getValue();
-    LOG.info("building children for {}", folder.getDisplayName());
+    DepanFxNodeListSection section = getSection();
 
-    Collection<GraphNode> nodes = folder.getMembers();
+    DepanFxTreeModel treeModel = ((DepanFxTreeSection) section).getTreeModel();
+    Collection<GraphNode> nodes = treeModel.getRoots();
 
     List<TreeItem<DepanFxNodeListMember>> result =
         new ArrayList<>(nodes.size());
     nodes.stream()
-      .map(folder::buildTreeMember)
-      .forEach(result::add);
-    folder.sortTreeItems(result);
+        .map(section::buildNodeItem)
+        .forEach(result::add);
+    section.sortTreeItems(result);
 
     return FXCollections.observableList(result);
   }

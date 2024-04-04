@@ -1,4 +1,6 @@
-package com.pnambic.depanfx.nodelist.gui;
+package com.pnambic.depanfx.nodelist.gui.sections;
+
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListItem;
 
 /**
  * Common behavior for all node list section items.

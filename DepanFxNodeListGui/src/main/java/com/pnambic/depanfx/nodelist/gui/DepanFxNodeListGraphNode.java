@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 
 /**
  * Encapsulates the basic details of a node that is rendered within a section.

@@ -1,7 +1,11 @@
-package com.pnambic.depanfx.nodelist.gui;
+package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListItem;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,18 +15,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
-/**
- * Provides top-level rendering of a tree section.
- * Used as the mechanism to provide {@link DepanFxTreeFork} elements with
- * the section's {@link DepanFxTreeModel}.
- */
-public class DepanFxTreeSectionItem
-    extends DepanFxNodeListSectionItem {
+public class DepanFxTreeForkItem extends DepanFxNodeListItem {
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxTreeForkItem.class);
 
   private boolean treeLoaded = false;
 
-  public DepanFxTreeSectionItem(DepanFxTreeSection section) {
-    super(section);
+  public DepanFxTreeForkItem(DepanFxTreeFork fork) {
+    super(fork);
   }
 
   @Override
@@ -41,17 +42,17 @@ public class DepanFxTreeSectionItem
   }
 
   private ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
-    DepanFxNodeListSection section = getSection();
+    DepanFxTreeFork folder = (DepanFxTreeFork) getValue();
+    LOG.info("building children for {}", folder.getDisplayName());
 
-    DepanFxTreeModel treeModel = ((DepanFxTreeSection) section).getTreeModel();
-    Collection<GraphNode> nodes = treeModel.getRoots();
+    Collection<GraphNode> nodes = folder.getMembers();
 
     List<TreeItem<DepanFxNodeListMember>> result =
         new ArrayList<>(nodes.size());
     nodes.stream()
-        .map(section::buildNodeItem)
-        .forEach(result::add);
-    section.sortTreeItems(result);
+      .map(folder::buildTreeMember)
+      .forEach(result::add);
+    folder.sortTreeItems(result);
 
     return FXCollections.observableList(result);
   }

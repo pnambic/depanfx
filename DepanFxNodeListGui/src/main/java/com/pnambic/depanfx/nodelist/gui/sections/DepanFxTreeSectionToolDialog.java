@@ -1,4 +1,4 @@
-package com.pnambic.depanfx.nodelist.gui;
+package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData;
@@ -204,7 +204,6 @@ public class DepanFxTreeSectionToolDialog {
         linkMatcherRsrc , inferMissingParentsField.isSelected(),
         orderByField.getValue(), containerOrderField.getValue(),
         orderDirectionField.getValue());
-
   }
 
   private Optional<DepanFxWorkspaceResource> saveDocument(

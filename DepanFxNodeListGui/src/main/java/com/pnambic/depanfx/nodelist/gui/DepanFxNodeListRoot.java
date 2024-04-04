@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui;
 
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
