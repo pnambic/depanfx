@@ -13,9 +13,7 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -137,8 +135,8 @@ public class DepanFxFocusColumnToolDialog
             getWorkspace(), focusNodeListRsrcField, DepanFxNodeList.class);
 
     return new DepanFxFocusColumnData(
-        toolNameField.getText(), toolDescriptionField.getText(),
-        columnLabelField.getText(), parseWidthMs(widthMsField.getText()),
+        getToolName(), getToolDescription(),
+        getColumnLabel(), getColumnWidthMs(),
         focusLabelField.getText(), optNodeListRsrc.get());
   }
 
@@ -150,7 +148,7 @@ public class DepanFxFocusColumnToolDialog
   }
 
   @Override
-  protected void setColumnTooldataFilters(FileChooser result) {
+  protected void setTooldataFilters(FileChooser result) {
     DepanFxFocusColumnToolDialog.setFocusColumnTooldataFilters(result);
   }
 

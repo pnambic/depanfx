@@ -13,9 +13,7 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -50,6 +48,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 public class DepanFxCategoryColumnToolDialog
     extends DepanFxBaseColumnToolDialog<DepanFxCategoryColumnData> {
 
+  @SuppressWarnings("unused")
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxCategoryColumnToolDialog.class);
 
@@ -183,8 +182,8 @@ public class DepanFxCategoryColumnToolDialog
   @Override
   protected DepanFxCategoryColumnData prepareResult() {
     return new DepanFxCategoryColumnData(
-            toolNameField.getText(), toolDescriptionField.getText(),
-            columnLabelField.getText(), parseWidthMs(widthMsField.getText()),
+            getToolName(), getToolDescription(),
+            getColumnLabel(), getColumnWidthMs(),
             buildCategories());
   }
 
@@ -196,7 +195,7 @@ public class DepanFxCategoryColumnToolDialog
   }
 
   @Override
-  protected void setColumnTooldataFilters(FileChooser result) {
+  protected void setTooldataFilters(FileChooser result) {
     DepanFxCategoryColumnToolDialog.setCategoryColumnTooldataFilters(result);
   }
 

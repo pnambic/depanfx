@@ -10,8 +10,6 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
-import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -94,8 +92,8 @@ public class DepanFxNodeKeyColumnToolDialog
   protected DepanFxNodeKeyColumnData prepareResult() {
 
     return new DepanFxNodeKeyColumnData(
-        toolNameField.getText(), toolDescriptionField.getText(),
-        columnLabelField.getText(), parseWidthMs(widthMsField.getText()),
+        getToolName(), getToolDescription(),
+        getColumnLabel(), getColumnWidthMs(),
         keyChoiceField.getValue());
   }
 
@@ -107,7 +105,7 @@ public class DepanFxNodeKeyColumnToolDialog
   }
 
   @Override
-  protected void setColumnTooldataFilters(FileChooser result) {
+  protected void setTooldataFilters(FileChooser result) {
     DepanFxNodeKeyColumnToolDialog.setNodeKeyColumnTooldataFilters(result);
   }
 

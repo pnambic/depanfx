@@ -126,7 +126,7 @@ public class DepanFxTreeSectionToolDialog
         DepanFxProjectResource.fromWorkspaceResource(
             sectionData.getLinkMatcherRsrc(getWorkspace()));
     return new DepanFxTreeSectionData(
-        toolNameField.getText(), toolDescriptionField.getText(),
+        getToolName(), getToolDescription(),
         getSectionLabel(), displayNodeCount(),
         linkMatcherRsrc , inferMissingParentsField.isSelected(),
         orderByField.getValue(), containerOrderField.getValue(),
@@ -141,7 +141,7 @@ public class DepanFxTreeSectionToolDialog
   }
 
   @Override
-  protected void setColumnTooldataFilters(FileChooser chooser) {
+  protected void setTooldataFilters(FileChooser chooser) {
     DepanFxFlatSectionToolDialog.setFlatSectionTooldataFilters(chooser);
   }
 

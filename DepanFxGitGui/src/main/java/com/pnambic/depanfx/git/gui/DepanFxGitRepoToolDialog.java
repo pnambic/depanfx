@@ -47,6 +47,7 @@ public class DepanFxGitRepoToolDialog
     void setTooldata(DepanFxGitRepoData repoData);
   } 
 
+  @SuppressWarnings("unused")
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxGitRepoToolDialog.class.getName());
 
@@ -146,22 +147,12 @@ public class DepanFxGitRepoToolDialog
     }
   }
 
-  @FXML
-  private void openFileChooser() {
-    FileChooser fileChooser = prepareDestinationFileChooser();
-    File selectedFile =
-        fileChooser.showSaveDialog(destinationField.getScene().getWindow());
-    if (selectedFile != null) {
-      destinationField.setText(selectedFile.getAbsolutePath());
-    }
-  }
-
   private void updateRepoNameFromDir(String newValue) {
     updateBlankField(repoNameField, newValue);
   }
 
   private void updateToolName(String newValue) {
-    updateBlankField(toolNameField, newValue);
+    updateBlankToolName(newValue);
   }
 
   private void updateToolDescription(String newValue) {
@@ -181,21 +172,13 @@ public class DepanFxGitRepoToolDialog
         .prepareDirectoryChooser(repoDirectoryField);
   }
 
-  private FileChooser prepareDestinationFileChooser() {
-    FileChooser result =
-        DepanFxSceneControls.prepareFileChooser(
-            destinationField, () -> buildInitialDestinationFile());
-    setGitRepoTooldataFilters(result);
-    return result;
-  }
-
   /////////////////////////////////////
   // Tool Dialog protected overrides
 
   @Override
   protected DepanFxGitRepoData prepareResult() {
     return new DepanFxGitRepoData(
-            toolNameField.getText(), toolDescriptionField.getText(),
+            getToolName(), getToolDescription(),
             gitExeField.getText(), repoNameField.getText(),
             repoDirectoryField.getText());
   }
@@ -209,7 +192,7 @@ public class DepanFxGitRepoToolDialog
   }
 
   @Override
-  protected void setColumnTooldataFilters(FileChooser result) {
+  protected void setTooldataFilters(FileChooser result) {
     DepanFxGitRepoToolDialog.setGitRepoTooldataFilters(result);
   }
 

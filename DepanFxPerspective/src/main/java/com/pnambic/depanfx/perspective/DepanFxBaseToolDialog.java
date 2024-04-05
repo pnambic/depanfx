@@ -32,16 +32,16 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData> {
   @SuppressWarnings("unused")
   private final Class<T> dataType;
 
-  private Optional<DepanFxWorkspaceResource> optColumnRsrc;
+  private Optional<DepanFxWorkspaceResource> optResource;
 
   @FXML
-  protected TextField toolNameField;
+  private TextField toolNameField;
 
   @FXML
-  protected TextField toolDescriptionField;
+  private TextField toolDescriptionField;
 
   @FXML
-  protected TextField destinationField;
+  private TextField destinationField;
 
   public DepanFxBaseToolDialog(DepanFxWorkspace workspace, Class<T> dataType) {
     this.workspace = workspace;
@@ -62,7 +62,7 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData> {
   }
 
   public Optional<DepanFxWorkspaceResource> getWorkspaceResource() {
-    return optColumnRsrc;
+    return optResource;
   }
 
   /////////////////////////////////////
@@ -76,9 +76,33 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData> {
     toolDescriptionField.setText(toolData.getToolDescription());
   }
 
+  protected String getToolName() {
+    return toolNameField.getText();
+  }
+
+  protected void updateBlankToolName(String newValue) {
+    updateBlankField(toolNameField, newValue);
+  }
+
+  protected String getToolDescription() {
+    return toolDescriptionField.getText();
+  }
+
+  protected void updateBlankToolDescription(String newValue) {
+    updateBlankField(toolDescriptionField, newValue);
+  }
+
+  protected String getDestination() {
+    return destinationField.getText();
+  }
+
+  protected void setDestinationField(TextField destinationField) {
+    this.destinationField = destinationField;
+  }
+
   protected abstract T prepareResult();
 
-  protected abstract void setColumnTooldataFilters(FileChooser result);
+  protected abstract void setTooldataFilters(FileChooser result);
 
   protected abstract File buildInitialDestinationFile();
 
@@ -116,7 +140,7 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData> {
   @FXML
   protected void handleCancel() {
     closeDialog();
-    optColumnRsrc = Optional.empty();
+    optResource = Optional.empty();
   }
 
   @FXML
@@ -132,7 +156,7 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData> {
     // Make sure we can get a result before trying to save
     T toolData = prepareResult();
 
-    optColumnRsrc =
+    optResource =
         DepanFxResourcePerspectives.toProjDoc(workspace, destinationField)
         .flatMap(d -> saveDocument(d, toolData));
   }
@@ -169,7 +193,7 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData> {
     FileChooser result =
         DepanFxSceneControls.prepareFileChooser(
             destinationField, () -> buildInitialDestinationFile());
-    setColumnTooldataFilters(result);
+    setTooldataFilters(result);
     return result;
   }
 

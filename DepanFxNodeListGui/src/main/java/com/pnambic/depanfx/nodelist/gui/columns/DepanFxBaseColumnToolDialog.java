@@ -23,32 +23,28 @@ public abstract class DepanFxBaseColumnToolDialog<T extends DepanFxBaseColumnDat
   public static final int MIN_COLUMN_WIDTH = 5;
 
   @FXML
-  protected TextField columnLabelField;
+  private TextField columnLabelField;
 
   @FXML
-  protected TextField widthMsField;
+  private TextField widthMsField;
 
   public DepanFxBaseColumnToolDialog(
       DepanFxWorkspace workspace, Class<T> dataType) {
     super(workspace, dataType);
   }
 
-  /**
-   * Extendible, {@code @Override} with {@code super.setTooldata()}.
-   */
-  public void setTooldata(T toolData) {
-    super.setTooldata(toolData);
-    toolNameField.setText(toolData.getToolName());
-    toolDescriptionField.setText(toolData.getToolDescription());
-  }
-
   /////////////////////////////////////
   // Hook methods for derived classes.
 
-  /**
-   * Available to implement {@link #prepareResult()}.
-   */
-  protected int parseWidthMs(String widthMs) {
+  protected String getColumnLabel() {
+    return columnLabelField.getText();
+  }
+
+  protected int getColumnWidthMs() {
+    return parseWidthMs(widthMsField.getText());
+  }
+
+  private int parseWidthMs(String widthMs) {
     int result = BASE_COLUMN_WIDTH;
     try {
       result = Integer.parseUnsignedInt(widthMs);

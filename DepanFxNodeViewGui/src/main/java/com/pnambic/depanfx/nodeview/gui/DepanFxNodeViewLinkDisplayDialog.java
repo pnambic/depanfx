@@ -53,6 +53,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 public class DepanFxNodeViewLinkDisplayDialog
     extends DepanFxBaseToolDialog<DepanFxNodeViewLinkDisplayData> {
 
+  @SuppressWarnings("unused")
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeViewLinkDisplayDialog.class);
 
@@ -108,7 +109,7 @@ public class DepanFxNodeViewLinkDisplayDialog
   }
 
   @FXML
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("unused")
   public void initialize() {
     ColumnBinder<EditLinkDisplay> columnBinder =
         new ColumnBinder<>(linksDisplayTable);
@@ -221,8 +222,7 @@ public class DepanFxNodeViewLinkDisplayDialog
         .collect(Collectors.toList());
 
     return new DepanFxNodeViewLinkDisplayData(
-            toolNameField.getText(),
-            toolDescriptionField.getText(),
+            getToolName(), getToolDescription(),
             linkDisplayData.getContextModelId(), displayEntries);
   }
 
@@ -234,7 +234,7 @@ public class DepanFxNodeViewLinkDisplayDialog
   }
 
   @Override
-  protected void setColumnTooldataFilters(FileChooser result) {
+  protected void setTooldataFilters(FileChooser result) {
     DepanFxNodeViewLinkDisplayDialog
       .setNodeViewLinkDisplayTooldataFilters(result);
   }

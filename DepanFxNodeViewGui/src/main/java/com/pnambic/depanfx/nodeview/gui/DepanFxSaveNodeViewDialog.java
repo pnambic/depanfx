@@ -59,9 +59,7 @@ public class DepanFxSaveNodeViewDialog
   @Override
   protected DepanFxNodeViewData prepareResult() {
     return DepanFxNodeViews.updateNameDescr(
-        viewDoc,
-        toolNameField.getText(),
-        toolDescriptionField.getText());
+        viewDoc, getToolName(), getToolDescription());
   }
 
   @Override
@@ -70,7 +68,7 @@ public class DepanFxSaveNodeViewDialog
   }
 
   @Override
-  protected void setColumnTooldataFilters(FileChooser result) {
+  protected void setTooldataFilters(FileChooser result) {
     result.getExtensionFilters().add(EXT_FILTER);
     result.setSelectedExtensionFilter(EXT_FILTER);
   }

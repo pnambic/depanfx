@@ -84,7 +84,7 @@ public class DepanFxFlatSectionToolDialog
   @Override
   protected DepanFxFlatSectionData prepareResult() {
     return new DepanFxFlatSectionData(
-        toolNameField.getText(), toolDescriptionField.getText(),
+        getToolName(), getToolDescription(),
         getSectionLabel(), displayNodeCount(),
         orderByField.getValue(), getOrderDirection());
   }
@@ -97,7 +97,7 @@ public class DepanFxFlatSectionToolDialog
   }
 
   @Override
-  protected void setColumnTooldataFilters(FileChooser chooser) {
+  protected void setTooldataFilters(FileChooser chooser) {
     DepanFxFlatSectionToolDialog.setFlatSectionTooldataFilters(chooser);
   }
 
