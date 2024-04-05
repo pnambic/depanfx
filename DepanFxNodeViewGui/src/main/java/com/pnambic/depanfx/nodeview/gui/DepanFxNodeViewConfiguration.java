@@ -4,6 +4,7 @@ import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.graph_doc.persistence.GraphDocPersistenceContribution;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
@@ -38,23 +39,27 @@ public class DepanFxNodeViewConfiguration {
 
   private static final String OPEN_AS_VIEW = "Open as Node View";
 
+  private final DepanFxNodeLayoutRegistry layoutRegistry;
+
   @Autowired
-  public DepanFxNodeViewConfiguration() {
+  public DepanFxNodeViewConfiguration(
+      DepanFxNodeLayoutRegistry layoutRegistry) {
+    this.layoutRegistry = layoutRegistry;
   }
 
   @Bean
   public DepanFxAnalysisExtMenuContribution graphNodeViewExtMenu() {
-    return new GraphContribution();
+    return new GraphContribution(layoutRegistry);
   }
 
   @Bean
   public DepanFxAnalysisExtMenuContribution listNodeViewExtMenu() {
-    return new NodeListContribution();
+    return new NodeListContribution(layoutRegistry);
   }
 
   @Bean
   public DepanFxAnalysisExtMenuContribution nodeViewExtMenu() {
-    return new NodeViewContribution();
+    return new NodeViewContribution(layoutRegistry);
   }
 
   private static abstract class BaseNodeViewExtMenuContribution
@@ -69,8 +74,12 @@ public class DepanFxNodeViewConfiguration {
 
     private final String viewExt;
 
+    private final DepanFxNodeLayoutRegistry layoutRegistry;
+
     public BaseNodeViewExtMenuContribution(
+        DepanFxNodeLayoutRegistry layoutRegistry,
         Class<?> resourceType, String menuLabel, String viewExt) {
+      this.layoutRegistry = layoutRegistry;
       this.resourceType = resourceType;
       this.menuLabel = menuLabel;
       this.viewExt = viewExt;
@@ -128,8 +137,8 @@ public class DepanFxNodeViewConfiguration {
     private void addNodeViewPanelToScene(DepanFxSceneController scene,
         DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace,
         DepanFxNodeViewData viewData) {
-      DepanFxNodeViewPanel viewPanel =
-          new DepanFxNodeViewPanel(workspace, dialogRunner, viewData);
+      DepanFxNodeViewPanel viewPanel = new DepanFxNodeViewPanel(
+          workspace, dialogRunner, layoutRegistry, viewData);
       scene.addTab(viewPanel.createWorkspaceTab(viewData.getToolName()));
     }
   }
@@ -137,8 +146,10 @@ public class DepanFxNodeViewConfiguration {
   private class GraphContribution
       extends BaseNodeViewExtMenuContribution {
 
-    public GraphContribution() {
-      super(GraphDocument.class, OPEN_AS_VIEW,
+    public GraphContribution(DepanFxNodeLayoutRegistry layoutRegistry) {
+      super(
+          layoutRegistry,
+          GraphDocument.class, OPEN_AS_VIEW,
           GraphDocPersistenceContribution.EXTENSION);
     }
 
@@ -163,8 +174,10 @@ public class DepanFxNodeViewConfiguration {
   private class NodeListContribution
       extends BaseNodeViewExtMenuContribution {
 
-    public NodeListContribution() {
-      super(DepanFxNodeList.class, OPEN_AS_VIEW,
+    public NodeListContribution(DepanFxNodeLayoutRegistry layoutRegistry) {
+      super(
+          layoutRegistry,
+          DepanFxNodeList.class, OPEN_AS_VIEW,
           DepanFxNodeList.NODE_LIST_EXT);
     }
 
@@ -190,8 +203,10 @@ public class DepanFxNodeViewConfiguration {
   private static class NodeViewContribution
       extends BaseNodeViewExtMenuContribution {
 
-    public NodeViewContribution() {
-      super(DepanFxNodeViewData.class, OPEN_VIEW,
+    public NodeViewContribution(DepanFxNodeLayoutRegistry layoutRegistry) {
+      super(
+          layoutRegistry,
+          DepanFxNodeViewData.class, OPEN_VIEW,
           DepanFxNodeViewData.NODE_VIEW_TOOL_EXT);
     }
 

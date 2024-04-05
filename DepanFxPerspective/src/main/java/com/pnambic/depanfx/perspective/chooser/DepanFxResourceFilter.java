@@ -36,7 +36,6 @@ public class DepanFxResourceFilter {
       return result;
     }
 
-
     public boolean matchDocument(Object content) {
       return types.stream()
           .filter(t -> t.isAssignableFrom(content.getClass()))

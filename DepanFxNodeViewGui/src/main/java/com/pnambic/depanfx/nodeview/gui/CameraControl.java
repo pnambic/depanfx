@@ -6,6 +6,9 @@ import com.pnambic.depanfx.jogl.JoglTransforms;
 
 import javafx.beans.property.SimpleDoubleProperty;
 
+/**
+ * Connect the Jogl rendering engine to the JavaFX ReactiveUI model.
+ */
 public class CameraControl implements CameraChangeListener {
 
   public final SimpleDoubleProperty cameraX = new SimpleDoubleProperty();

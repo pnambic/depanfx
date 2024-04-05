@@ -90,6 +90,10 @@ public class DepanFxJoglView extends BorderPane {
     release();
   }
 
+  public JoglShape getShape(Object key) {
+    return jogl.getShape(key);
+  }
+
   public void updateShape(Object key, JoglShape shape) {
     jogl.updateShape(key, shape);
   }

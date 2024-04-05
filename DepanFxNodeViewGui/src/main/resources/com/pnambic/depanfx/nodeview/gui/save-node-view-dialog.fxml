@@ -24,7 +24,7 @@
          <Label text="Node View Name"/>
 
          <HBox spacing="10">
-            <TextField fx:id="nodeViewNameField" editable="true"
+            <TextField fx:id="toolNameField" editable="true"
                   promptText="Node view name"
                   HBox.hgrow="ALWAYS"/>
          </HBox>
@@ -32,7 +32,7 @@
          <Label text="Node View Description"/>
 
          <HBox spacing="10">
-            <TextField fx:id="nodeViewDescriptionField" editable="true"
+            <TextField fx:id="toolDescriptionField" editable="true"
                   promptText="Node view description"
                   HBox.hgrow="ALWAYS"/>
          </HBox>
@@ -42,7 +42,7 @@
          <HBox spacing="10">
             <TextField fx:id="destinationField" editable="false" promptText="No file selected"
                   HBox.hgrow="ALWAYS"/>
-            <Button text="Browse" onAction="#openFileChooser"
+            <Button text="Browse" onAction="#openDestinationChooser"
                   HBox.hgrow="ALWAYS"/>
          </HBox>
 

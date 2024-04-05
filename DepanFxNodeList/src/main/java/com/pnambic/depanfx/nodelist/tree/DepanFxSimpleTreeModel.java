@@ -6,7 +6,8 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.util.Collection;
 
-public class DepanFxSimpleTreeModel implements DepanFxTreeModel, DepanFxAdjacencyModel {
+public class DepanFxSimpleTreeModel
+    implements DepanFxTreeModel, DepanFxAdjacencyModel {
 
   private final DepanFxWorkspaceResource graphDocResource;
 
@@ -50,7 +51,8 @@ public class DepanFxSimpleTreeModel implements DepanFxTreeModel, DepanFxAdjacenc
   public DepanFxNodeList getReachableGraphNodes(
       Collection<GraphNode> startNodes, Collection<GraphNode> filterNodes) {
 
-    DepanFxDepthFirstTree treeDft = new DepanFxDepthFirstTree(this, filterNodes);
+    DepanFxDepthFirstTree treeDft =
+        new DepanFxDepthFirstTree(this, filterNodes);
     treeDft.buildFromNodes(startNodes);
     return new DepanFxNodeList(
         "Reachable nodes", "Reachable nodes",

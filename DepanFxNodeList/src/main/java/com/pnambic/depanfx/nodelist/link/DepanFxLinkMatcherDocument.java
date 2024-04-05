@@ -9,8 +9,9 @@ import java.util.List;
 
 public class DepanFxLinkMatcherDocument extends DepanFxBaseToolData {
 
-  public static final String LINK_MATCHER_TOOL_DIR =
-      "Link Matchers";
+  public static final String LINK_MATCHER_TOOL_EXT = "dlmti";
+
+  public static final String LINK_MATCHER_TOOL_DIR = "Link Matchers";
 
   public static final Path LINK_MATCHER_TOOL_PATH =
       DepanFxProjects.TOOLS_PATH.resolve(LINK_MATCHER_TOOL_DIR);

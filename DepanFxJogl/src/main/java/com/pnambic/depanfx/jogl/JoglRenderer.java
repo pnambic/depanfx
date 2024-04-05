@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 public class JoglRenderer {
 
   private static final Logger LOG =
@@ -98,6 +100,15 @@ public class JoglRenderer {
     gl.glPushMatrix();
     shape.draw(gl, this);
     gl.glPopMatrix();
+  }
+
+  @Nullable
+  public JoglShape getShape(Object key) {
+    JoglShape update = updates.get(key);
+    if (update != null) {
+      return update;
+    }
+    return getRenderShape(key).forUpdate();
   }
 
   public void updateShape(Object key, JoglShape shape) {

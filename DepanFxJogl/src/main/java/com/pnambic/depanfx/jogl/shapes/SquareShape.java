@@ -34,4 +34,10 @@ public class SquareShape implements JoglShape {
   public void step(GL2 gl, JoglRenderer renderer) {
     // Not animated.
   }
+
+  @Override
+  public NodeShape forUpdate() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

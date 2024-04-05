@@ -16,28 +16,19 @@
 package com.pnambic.depanfx.nodeview.layouts;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Ensures that one layout is always available.
  * 
  * @author <a href="leeca@pnambic.com">Lee Carver</a>
  */
-public class GridLayoutRunner implements LayoutRunner {
+public class GridLayoutRunner extends DirectLayoutRunner {
 
   public enum LayoutDirection {
     HORIZONTAL, VERTICAL;
   }
-
-  public static final double UNIT = 5.0; // 30.0d;
-
-  private static final double Z_ORIGIN = 0.0d;
-
-  private Map<GraphNode, DepanFxNodeLocationData> positions;
 
   private final int columns;
 
@@ -48,8 +39,6 @@ public class GridLayoutRunner implements LayoutRunner {
   private double horizontalSpace = UNIT;
 
   private double verticalSpace = UNIT;
-
-  private boolean done = false;
 
   public GridLayoutRunner(int columns, int rows, LayoutDirection direction) {
     this.columns = columns;
@@ -62,40 +51,12 @@ public class GridLayoutRunner implements LayoutRunner {
     double leftPos = - horizontalSpace * ((columns / 2.0) - 0.5);
     double topPos = verticalSpace * ((rows / 2.0) - 0.5);
     populationPositions(layoutNodes, topPos, leftPos);
-    done = true;
-  }
-
-  @Override
-  public int layoutCost() {
-    if (done) {
-      return 0;
-    }
-    return 1;
-  }
-
-  @Override
-  public void layoutStep() {
-    // Nothing to do.
-  }
-
-  @Override
-  public boolean layoutDone() {
-    return done ;
-  }
-
-  @Override
-  public Map<GraphNode, DepanFxNodeLocationData> getPositions(
-      Collection<GraphNode> nodes) {
-    Map<GraphNode, DepanFxNodeLocationData> result =
-        new HashMap<>(nodes.size());
-    nodes.stream()
-        .forEach(n -> populatePositions(result, n));
-    return result;
+    setDone();
   }
 
   private void populationPositions(
       Collection<GraphNode> layoutNodes, double topPos, double leftPos) {
-    positions = new HashMap<>(layoutNodes.size());
+    // positions = new HashMap<>(layoutNodes.size());
     switch (direction) {
     case HORIZONTAL:
       populateHorizontal(layoutNodes, topPos, leftPos);
@@ -114,7 +75,7 @@ public class GridLayoutRunner implements LayoutRunner {
 
     int item = (int) columns;
     for (GraphNode node : layoutNodes) {
-      positions.put(node, new DepanFxNodeLocationData(xCurr, yCurr, Z_ORIGIN));
+      assignPosition(node, xCurr, yCurr, Z_ORIGIN);
       item--;
       if (item > 0) {
         xCurr += horizontalSpace;
@@ -135,7 +96,7 @@ public class GridLayoutRunner implements LayoutRunner {
 
     int item = (int) rows;
     for (GraphNode node : layoutNodes) {
-      positions.put(node, new DepanFxNodeLocationData(xCurr, yCurr, Z_ORIGIN));
+      assignPosition(node, xCurr, yCurr, Z_ORIGIN);
       item--;
       if (item > 0) {
         yCurr -= verticalSpace;
@@ -146,14 +107,5 @@ public class GridLayoutRunner implements LayoutRunner {
         xCurr += horizontalSpace;
       }
     }
-  }
-
-  private void populatePositions(
-      Map<GraphNode, DepanFxNodeLocationData> populate, GraphNode node) {
-    DepanFxNodeLocationData result = positions.get(node);
-    if (result != null) {
-      populate.put(node, result);
-    }
-    // No known position, don't offer one.
   }
 }

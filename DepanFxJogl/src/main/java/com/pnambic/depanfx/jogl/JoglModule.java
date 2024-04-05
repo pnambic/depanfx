@@ -89,6 +89,10 @@ public class JoglModule {
     glWindow.destroy();
   }
 
+  public JoglShape getShape(Object key) {
+    return renderer.getShape(key);
+  }
+
   public void updateShape(Object key, JoglShape shape) {
     renderer.updateShape(key, shape);
   }

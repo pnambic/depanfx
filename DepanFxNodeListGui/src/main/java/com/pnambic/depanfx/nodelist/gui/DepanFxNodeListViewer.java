@@ -89,7 +89,7 @@ public class DepanFxNodeListViewer {
         DepanFxNodeKeyColumnData.class
   });
 
-  public static final DepanFxResourceFilter NODE_KEY_COLUMN_RSRC_FILTER =
+  public static final DepanFxResourceFilter ANY_COLUMN_RSRC_FILTER =
       DepanFxResourceFilter.buildResourceFilter(
           "Any Column", COLUMN_TOOL_EXT, COLUMN_TYPES);
 
@@ -374,30 +374,32 @@ public class DepanFxNodeListViewer {
     filters.add(DepanFxCategoryColumnToolDialog.CATEGORY_COLUMN__RSRC_FILTER);
     filters.add(DepanFxFocusColumnToolDialog.FOCUS_COLUMN_RSRC_FILTER);
     filters.add(DepanFxNodeKeyColumnToolDialog.NODE_KEY_COLUMN_RSRC_FILTER);
-    filters.add(NODE_KEY_COLUMN_RSRC_FILTER);
-    rsrcChooser.setSelectedExtensionFilter(NODE_KEY_COLUMN_RSRC_FILTER);
+    filters.add(ANY_COLUMN_RSRC_FILTER);
+    rsrcChooser.setSelectedExtensionFilter(ANY_COLUMN_RSRC_FILTER);
 
     rsrcChooser.showOpenDialog(nodeListTable.getScene())
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(m -> workspace.getWorkspaceResource(m, "Column Definition"))
-        .flatMap(this::toColumn)
+        .map(this::toColumn)
         .ifPresent(this::addColumn);
   }
 
-  private Optional<DepanFxNodeListColumn> toColumn(
+  private DepanFxNodeListColumn toColumn(
       DepanFxWorkspaceResource columnRsrc) {
     Class<?> type = columnRsrc.getResource().getClass();
-    if (DepanFxCategoryColumnData.class.isAssignableFrom(type)) {
-      return Optional.of(new DepanFxCategoryColumn(this, columnRsrc));
-    }
-    if (DepanFxFocusColumnData.class.isAssignableFrom(type)) {
-      return Optional.of(new DepanFxFocusColumn(this, columnRsrc));
-    }
-    if (DepanFxNodeKeyColumnData.class.isAssignableFrom(type)) {
-      return Optional.of(new DepanFxNodeKeyColumn(this, columnRsrc));
+    switch (columnRsrc.getResource()) {
+    case DepanFxCategoryColumnData val:
+      return new DepanFxCategoryColumn(this, columnRsrc);
+    case DepanFxFocusColumnData val:
+      return new DepanFxFocusColumn(this, columnRsrc);
+    case DepanFxNodeKeyColumnData val:
+      return new DepanFxNodeKeyColumn(this, columnRsrc);
+
+    default:
+      break;
     }
     LOG.warn("Unknown type {} for column construction", type.getName());
-    return Optional.empty();
+    return null;
   }
 
   private void doNewNodeKeyColumnAction() {

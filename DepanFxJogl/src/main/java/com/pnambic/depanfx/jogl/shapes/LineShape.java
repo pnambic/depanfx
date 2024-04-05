@@ -79,4 +79,22 @@ public class LineShape implements JoglShape {
     }
     return null;
   }
+
+  @Override
+  public LineShape forUpdate() {
+    LineShape result = new LineShape();
+
+    result.isVisible = isVisible;
+    result.lineSource = lineSource;
+    result.lineTarget = lineTarget;
+    result.lineForm = lineForm;
+    result.lineStyle = lineStyle;
+    result.lineColor = lineColor;
+    result.lineWidth = lineWidth;
+    result.lineLabel = lineLabel;
+    result.sourceArrow = sourceArrow;
+    result.targetArrow = targetArrow;
+
+    return result;
+  }
 }

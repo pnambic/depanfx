@@ -24,6 +24,18 @@ public class JoglShapes {
         .ifPresent(s -> view.updateShape(node, s));
   }
 
+  public static void updateLocation(
+      DepanFxJoglView view, GraphNode node,
+      DepanFxNodeLocationData location) {
+    JoglShape joglShape = view.getShape(node);
+    if (joglShape instanceof NodeShape nodeShape) {
+      nodeShape.targetX = location.xPos;
+      nodeShape.targetY = location.yPos;
+      nodeShape.targetZ = location.zPos;
+      view.updateShape(node, nodeShape);
+    }
+  }
+
   private static Optional<JoglShape> createShape(
       GraphNode node, DepanFxNodeLocationData location, DepanFxNodeDisplayData display) {
 

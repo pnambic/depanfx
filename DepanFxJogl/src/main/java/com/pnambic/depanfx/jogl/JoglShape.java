@@ -13,4 +13,6 @@ public interface JoglShape {
    * Animate the shape by updating the current values.
    */
   void step(GL2 gl, JoglRenderer renderer);
+
+  JoglShape forUpdate();
 }

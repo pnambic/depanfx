@@ -15,6 +15,7 @@ module depanfx.nodeview.gui {
   requires depanfx.graph_doc;
   requires depanfx.jogl;
   requires depanfx.nodelist;
+  requires depanfx.nodelist.gui;
   requires depanfx.persistence;
   requires depanfx.perspective;
   requires depanfx.workspace;
@@ -22,6 +23,9 @@ module depanfx.nodeview.gui {
 
   opens com.pnambic.depanfx.nodeview.gui
       to javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;
+  opens com.pnambic.depanfx.nodeview.layouts
+      to javafx.fxml, net.rgielen.fxweaver.core,
+          spring.beans, spring.context, spring.core;
   opens com.pnambic.depanfx.nodeview.tooldata;
 
   exports com.pnambic.depanfx.nodeview.gui;

@@ -88,7 +88,6 @@ public class DepanFxResourcePerspectives {
     return dlg;
   }
 
-
   public static void prepareResourceFinder(
       DepanFxResourceChooser chooser, Path targetPath) {
 

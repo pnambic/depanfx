@@ -10,6 +10,12 @@ public class NodeShape implements JoglShape {
 
   public static final float STEP_TOLERANCE = 10.0f;
 
+  public double red;
+
+  public double green;
+
+  public double blue;
+
   public double shapeX;
 
   public double shapeY;
@@ -22,12 +28,6 @@ public class NodeShape implements JoglShape {
 
   public double targetZ;
 
-  public double red;
-
-  public double green;
-
-  public double blue;
-
   public boolean showLabel;
 
   public String labelText;
@@ -37,24 +37,41 @@ public class NodeShape implements JoglShape {
 
   private TextureLoader labelTexture;
 
+  private NodeShape(
+      double red, double green, double blue,
+      double shapeX, double shapeY, double shapeZ,
+      double targetX, double targetY, double targetZ,
+      boolean showLabel, String labelText) {
+    this.shapeX = shapeX;
+    this.shapeY = shapeY;
+    this.shapeZ = shapeZ;
+    this.targetX = targetX;
+    this.targetY = targetY;
+    this.targetZ = targetZ;
+    this.red = red;
+    this.green = green;
+    this.blue = blue;
+    this.showLabel = showLabel;
+    this.labelText = labelText;
+  }
+
   public NodeShape(
       double red, double green, double blue,
       double initialX, double initialY, double initialZ,
       boolean showLabel, String labelText) {
-    this.red = red;
-    this.green = green;
-    this.blue = blue;
+    this(red, green, blue,
+        initialX, initialY, initialZ,
+        initialX, initialY, initialZ,
+        showLabel, labelText);
+  }
 
-    this.shapeX = initialX;
-    this.shapeY = initialY;
-    this.shapeZ = initialZ;
-
-    this.targetX = initialX;
-    this.targetY = initialY;
-    this.targetZ = initialZ;
-
-    this.showLabel = showLabel;
-    this.labelText = labelText;
+  @Override
+  public NodeShape forUpdate() {
+    return new NodeShape(
+        red, green, blue,
+        shapeX, shapeY, shapeZ,
+        targetX, targetY, targetZ,
+        showLabel, labelText);
   }
 
   @Override

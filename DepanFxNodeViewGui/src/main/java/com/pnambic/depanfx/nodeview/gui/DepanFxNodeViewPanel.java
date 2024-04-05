@@ -4,8 +4,11 @@ import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodeview.jogl.JoglLines;
 import com.pnambic.depanfx.nodeview.jogl.JoglShapes;
+import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
@@ -15,10 +18,16 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewSceneData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,14 +36,19 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tab;
 
 public class DepanFxNodeViewPanel {
@@ -45,7 +59,11 @@ public class DepanFxNodeViewPanel {
 
   private static final String INVERT_SELECTION_ITEM = "Invert Selection";
 
-  private static final String SAVE_NODE_VIEW_ITEM = "Save node view ..";
+  private static final String SAVE_NODE_VIEW_ITEM = "Save node view...";
+
+  private static final String LAYOUT_NODES = "Layout Nodes";
+
+  private static final String SELECT_LAYOUT = "Select Layout...";
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeViewPanel.class);
@@ -53,6 +71,8 @@ public class DepanFxNodeViewPanel {
   private final DepanFxWorkspace workspace;
 
   private final DepanFxDialogRunner dialogRunner;
+
+  private final DepanFxNodeLayoutRegistry layoutRegistry;
 
   private final DepanFxNodeViewData viewData;
 
@@ -71,9 +91,11 @@ public class DepanFxNodeViewPanel {
   public DepanFxNodeViewPanel(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
+      DepanFxNodeLayoutRegistry layoutRegistry,
       DepanFxNodeViewData viewData) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
+    this.layoutRegistry = layoutRegistry;
     this.viewData = viewData;
 
     // Unpack the interesting parts of the view data.
@@ -117,6 +139,10 @@ public class DepanFxNodeViewPanel {
     return workspace;
   }
 
+  public DepanFxWorkspaceResource getGraphDocRsrc() {
+    return viewData.getGraphDocRsrc();
+  }
+
   public GraphDocument getGraphDoc() {
     return (GraphDocument) viewData.getGraphDocRsrc().getResource();
   }
@@ -131,6 +157,36 @@ public class DepanFxNodeViewPanel {
 
   public DepanFxDialogRunner getDialogRunner() {
     return dialogRunner;
+  }
+
+  /**
+   * Might be selected nodes, or might by all nodes.
+   */
+  public Stream<GraphNode> streamChosenNodes() {
+    // TODO: Check for selected nodes
+    return viewNodes.stream();
+  }
+
+  public Optional<DepanFxWorkspaceResource> getHierachyMatcherRsrc() {
+    ContextModelId modelId = getGraphDoc().getContextModelId();
+    return DepanFxProjects.getBuiltIn(
+        workspace, DepanFxLinkMatcherDocument.class,
+        c -> this.byMemberLinkMatcherDoc(c, modelId));
+  }
+
+  private boolean byMemberLinkMatcherDoc(
+      DepanFxBuiltInContribution contrib, Object modelId) {
+    DepanFxLinkMatcherDocument linkMatchDoc =
+        (DepanFxLinkMatcherDocument) contrib.getDocument();
+    if (!linkMatchDoc.getMatchGroups()
+        .contains(DepanFxLinkMatcherGroup.MEMBER)) {
+      return false;
+    }
+    // [29-Nov-2023] Kludge for matches any, actual matcher provided later.
+    if (linkMatchDoc.getModelId() == null) {
+      return true;
+    }
+    return linkMatchDoc.getModelId().equals(modelId);
   }
 
   public void doSelectAllAction() {
@@ -163,6 +219,13 @@ public class DepanFxNodeViewPanel {
     return invertSelectGraphNode(node);
   }
 
+  public void updateNodeLocations(
+      Map<GraphNode, DepanFxNodeLocationData> locations) {
+    LOG.info("Updating location of {} nodes", locations.size());
+    locations.entrySet().stream()
+        .forEach(e -> updateNodeLocation(e.getKey(), e.getValue()));
+  }
+
   /////////////////////////////////////
   // Internal
 
@@ -174,14 +237,62 @@ public class DepanFxNodeViewPanel {
         CLEAR_SELECTION_ITEM, e -> doClearSelectionAction());
     builder.appendActionItem(
         INVERT_SELECTION_ITEM, e -> doInvertSelectionAction());
+
     builder.appendSeparator();
     builder.appendActionItem(
         DepanFxNodeViewLinkDisplayDialog.EDIT_LINK_DISPLAY,
         e -> runEditLinkDisplayDialog());
+    // PENDING: builder.appendActionItem(
+    //     EDIT_NODE_DISPLAY, e -> runEditLinkDisplayDialog());
+
+    builder.appendSeparator();
+    builder.appendSubMenu(buildLayoutNodesMenu());
+
     builder.appendSeparator();
     builder.appendActionItem(
         SAVE_NODE_VIEW_ITEM, e -> runSaveNodeViewDialog());
     return builder.build();
+  }
+
+  private Menu buildLayoutNodesMenu() {
+    Menu result = new Menu(LAYOUT_NODES);
+
+    ObservableList<MenuItem> items = result.getItems();
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        SELECT_LAYOUT, e -> doSelectLayoutAction()));
+
+    items.add(new SeparatorMenuItem());
+    layoutRegistry.popuplateLayoutMenu(result, c -> true, this);
+    return result;
+  }
+
+  private void doSelectLayoutAction() {
+    DepanFxResourceChooser rsrcChooser =
+        new DepanFxResourceChooser(workspace, dialogRunner);
+
+    DepanFxResourcePerspectives.prepareResourceFinder(
+        rsrcChooser, DepanFxNodeViewData.NODE_VIEW_TOOL_PATH);
+
+    ObservableList<DepanFxResourceFilter> filters =
+        rsrcChooser.getExtensionFilters();
+
+    filters.addAll(layoutRegistry.getOpenFilters(c -> true));
+    DepanFxResourceFilter allLayoutsFilter =
+        layoutRegistry.buildAllLayoutsFilter(c -> true);
+    filters.add(allLayoutsFilter);
+    rsrcChooser.setSelectedExtensionFilter(allLayoutsFilter);
+
+    rsrcChooser.showOpenDialog(joglView.getScene())
+        .map(DepanFxProjectDocument.class::cast)
+        .flatMap(m -> workspace.getWorkspaceResource(m, "Node Layout"))
+        .ifPresent(this::layoutNodes);
+  }
+
+  private void layoutNodes(DepanFxWorkspaceResource wkspRsrc) {
+    List<GraphNode> updateNodes =
+        streamChosenNodes().collect(Collectors.toList());
+    updateNodeLocations(
+        layoutRegistry.layoutNodes(wkspRsrc, getGraphDocRsrc(), updateNodes));
   }
 
   private void runEditLinkDisplayDialog() {
@@ -242,6 +353,14 @@ public class DepanFxNodeViewPanel {
     getViewEdges()
         .forEach(e -> installEdge(result, e));
     return result;
+  }
+
+  private void updateNodeLocation(
+      GraphNode node, DepanFxNodeLocationData location) {
+    if (viewNodes.contains(node)) {
+      JoglShapes.updateLocation(joglView, node, location);
+      nodeLocations.put(node, location);
+    }
   }
 
   private void installShape(DepanFxJoglView view, GraphNode node) {

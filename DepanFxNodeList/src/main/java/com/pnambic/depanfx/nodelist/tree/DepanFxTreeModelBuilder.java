@@ -6,8 +6,10 @@ import com.pnambic.depanfx.graph.context.ContextRelationId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -35,6 +37,23 @@ public class DepanFxTreeModelBuilder {
 
     return new DepanFxSimpleTreeModel(
         nodeList.getGraphDocResource(), nodeMembers, nonEmpty);
+  }
+
+  public DepanFxTreeModel traverseGraph(
+      DepanFxWorkspaceResource graphRsrc, Collection<GraphNode> nodes) {
+    GraphDocument graphDoc = (GraphDocument) graphRsrc.getResource();
+    DepanFxAdjacencyModel adjModel = buildAdjacencyModel(graphDoc.getGraph());
+
+    DepanFxDepthFirstTree dfsTree = new DepanFxDepthFirstTree(adjModel, nodes);
+    dfsTree.buildFromNodes(nodes);
+    Collection<GraphNode> roots = dfsTree.getRoots();
+    DepanFxAdjacencyModel nodeMembers = dfsTree.getNodeMembers();
+
+    Collection<GraphNode> nonEmpty = roots.stream()
+        .filter(n -> hasMembers(nodeMembers, n))
+        .collect(Collectors.toList());
+
+    return new DepanFxSimpleTreeModel(graphRsrc, nodeMembers, nonEmpty);
   }
 
   private static boolean hasMembers(

@@ -27,4 +27,9 @@ public class DemoShape implements JoglShape {
   public void step(GL2 gl, JoglRenderer renderer) {
     rotateT += 0.2f;
   }
+
+  @Override
+  public JoglShape forUpdate() {
+    return this;
+  }
 }
