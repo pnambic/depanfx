@@ -24,6 +24,15 @@ import javafx.event.ActionEvent;
 public class RadialLayoutContribution
     implements DepanFxNodeLayoutRegistry.Contribution {
 
+  public static final double MIN_ARC_SEPARATION =
+      3 * RadialLayoutRunner.UNIT;
+
+  public static final double MIN_RADIAL_SEPARATION =
+      4 * RadialLayoutRunner.UNIT;
+
+  public static final double MAX_RADIAL_SEPARATION =
+      10 * RadialLayoutRunner.UNIT;
+
   private static final String RADIAL_LAYOUT = "Radial Layout...";
 
   @Override
@@ -66,9 +75,9 @@ public class RadialLayoutContribution
     List<GraphNode> updateNodes =
         view.streamChosenNodes().collect(Collectors.toList());
 
-    view.updateNodeLocations(layoutNodes(
-        layoutDlg.getController().getWorkspaceResource().get(),
-        graphDocRsrc, updateNodes));
+    layoutDlg.getController().getWorkspaceResource()
+        .ifPresent(r -> view.updateNodeLocations(
+            layoutNodes(r, graphDocRsrc, updateNodes)));
   }
 
   private Map<GraphNode, DepanFxNodeLocationData> buildNodeLocations(
@@ -81,11 +90,22 @@ public class RadialLayoutContribution
 
     DryRunLayoutRunner dryRunLayout = new DryRunLayoutRunner(treeModel);
     dryRunLayout.layoutNodes(updateNodes);
-    int circumference = dryRunLayout.getLeafCount();
-    double radiansPerLeaf = 2.0 * Math.PI / circumference;
 
-    RadialLayoutRunner radialLayout =
-        new RadialLayoutRunner(treeModel, radiansPerLeaf);
+    int rootLevel = RadialLayoutRunner.calcRootLevel(updateNodes);
+    int circumference = dryRunLayout.getLeafCount();
+    int levels = dryRunLayout.getMaxLevel() + rootLevel;
+    double radiansPerLeaf = 2.0 * Math.PI / circumference;
+    double radiusTotal = MIN_ARC_SEPARATION / radiansPerLeaf;
+    double radiusPerLevel =
+        Math.min(MAX_RADIAL_SEPARATION,
+        Math.max(MIN_RADIAL_SEPARATION, radiusTotal / levels));
+
+    RadialLayoutRunner radialLayout = new RadialLayoutRunner(
+        treeModel,
+        RadialLayoutRunner.X_ORIGIN,
+        RadialLayoutRunner.Y_ORIGIN,
+        RadialLayoutRunner.Z_ORIGIN,
+        rootLevel, radiansPerLeaf, radiusPerLevel);
     radialLayout.layoutNodes(updateNodes);
 
     // Radial is naturally centered.

@@ -16,8 +16,10 @@
 package com.pnambic.depanfx.nodeview.layouts;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Ensures that one layout is always available.
@@ -26,84 +28,143 @@ import java.util.Collection;
  */
 public class GridLayoutRunner extends DirectLayoutRunner {
 
+  public static final double MIN_GRID_SPACE = 3 * DirectLayoutRunner.UNIT;
+
+  public static final double MIN_SPACE_ROW = MIN_GRID_SPACE;
+
+  private static final double MIN_SPACE_COL = MIN_GRID_SPACE;
+
+  public static final double TARGET_GRID_HEIGHT = MIN_SPACE_ROW * 10;
+
+  public static final double TARGET_GRID_WIDTH = MIN_SPACE_COL * 10;
+
   public enum LayoutDirection {
-    HORIZONTAL, VERTICAL;
+    HORIZONTAL {
+      @Override
+      public int getLimit(int rowCount, int colCount) {
+          return rowCount;
+      }
+    },
+    VERTICAL {
+      @Override
+      public int getLimit(int rowCount, int colCount) {
+          return colCount;
+      }
+    };
+
+    public abstract int getLimit(int colCount, int rowCount);
   }
 
-  private final int columns;
+  private final double xBase;
 
-  private final int rows;
+  private final double yBase;
+
+  private final double zBase;
+
+  private final double horizontalSpace;
+
+  private final double verticalSpace;
 
   private final LayoutDirection direction;
 
-  private double horizontalSpace = UNIT;
+  private int limit;
 
-  private double verticalSpace = UNIT;
-
-  public GridLayoutRunner(int columns, int rows, LayoutDirection direction) {
-    this.columns = columns;
-    this.rows = rows;
+  public GridLayoutRunner(
+      double xBase, double yBase, double zBase,
+      double horizontalSpace, double verticalSpace,
+      LayoutDirection direction, int limit) {
+    this.xBase = xBase;
+    this.yBase = yBase;
+    this.zBase = zBase;
+    this.horizontalSpace = horizontalSpace;
+    this.verticalSpace = verticalSpace;
     this.direction = direction;
+    this.limit = limit;
+  }
+
+  /**
+   * Standardize simple grid layout.
+   */
+  public static Map<GraphNode, DepanFxNodeLocationData> buildNodeLocations(
+      Collection<GraphNode> nodes) {
+    int size = nodes.size();
+    int width = (int) Math.ceil(Math.sqrt(size));   // aka column count, x
+    int breadth = (size + width - 1) / width;       // aka row rount, y
+
+    double spacePerColumn =
+        Math.max(MIN_SPACE_COL, TARGET_GRID_WIDTH / width);
+    double spacePerRow =
+        Math.max(MIN_SPACE_ROW, TARGET_GRID_HEIGHT / breadth);
+
+    // The grid runner assigns leafs from the top left
+    // heading downward and to the right.
+    double xBase =
+        DirectLayoutRunner.Y_ORIGIN - spacePerColumn * ((width / 2.0) - 0.5);
+    double yBase =
+        DirectLayoutRunner.Y_ORIGIN + spacePerRow * ((breadth / 2.0) - 0.5);
+
+    LayoutDirection direction = GridLayoutRunner.LayoutDirection.HORIZONTAL;
+    GridLayoutRunner layout = new GridLayoutRunner(
+        xBase, yBase, DirectLayoutRunner.Z_ORIGIN,
+        spacePerColumn, spacePerRow,
+        direction, direction.getLimit(width, breadth));
+    layout.layoutNodes(nodes);
+    return layout.getPositions(nodes);
   }
 
   @Override
   public void layoutNodes(Collection<GraphNode> layoutNodes) {
-    double leftPos = - horizontalSpace * ((columns / 2.0) - 0.5);
-    double topPos = verticalSpace * ((rows / 2.0) - 0.5);
-    populationPositions(layoutNodes, topPos, leftPos);
+    populationPositions(layoutNodes);
     setDone();
   }
 
-  private void populationPositions(
-      Collection<GraphNode> layoutNodes, double topPos, double leftPos) {
+  private void populationPositions(Collection<GraphNode> layoutNodes) {
     // positions = new HashMap<>(layoutNodes.size());
     switch (direction) {
     case HORIZONTAL:
-      populateHorizontal(layoutNodes, topPos, leftPos);
+      populateHorizontal(layoutNodes);
       return;
     case VERTICAL:
-      populateVertical(layoutNodes, topPos, leftPos);
+      populateVertical(layoutNodes);
       return;
     }
   }
 
-  private void populateHorizontal(
-      Collection<GraphNode> layoutNodes, double topPos, double leftPos) {
+  private void populateHorizontal(Collection<GraphNode> layoutNodes) {
 
-    double xCurr = leftPos;
-    double yCurr = topPos;
+    double xCurr = xBase;
+    double yCurr = yBase;
 
-    int item = (int) columns;
+    int item = limit;
     for (GraphNode node : layoutNodes) {
-      assignPosition(node, xCurr, yCurr, Z_ORIGIN);
+      assignPosition(node, xCurr, yCurr, zBase);
       item--;
       if (item > 0) {
         xCurr += horizontalSpace;
       }
       else {
-        item = (int) columns;
-        xCurr = leftPos;
+        item = limit;
+        xCurr = xBase;
         yCurr -= verticalSpace;
       }
     }
   }
 
-  private void populateVertical(
-      Collection<GraphNode> layoutNodes, double topPos, double leftPos) {
+  private void populateVertical(Collection<GraphNode> layoutNodes) {
 
-    double xCurr = leftPos;
-    double yCurr = topPos;
+    double xCurr = xBase;
+    double yCurr = yBase;
 
-    int item = (int) rows;
+    int item = limit;
     for (GraphNode node : layoutNodes) {
-      assignPosition(node, xCurr, yCurr, Z_ORIGIN);
+      assignPosition(node, xCurr, yCurr, zBase);
       item--;
       if (item > 0) {
         yCurr -= verticalSpace;
       }
       else {
-        item = (int) rows;
-        yCurr = topPos;
+        item = limit;
+        yCurr = yBase;
         xCurr += horizontalSpace;
       }
     }

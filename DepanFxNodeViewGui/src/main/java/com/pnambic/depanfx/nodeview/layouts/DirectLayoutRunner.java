@@ -28,7 +28,11 @@ import java.util.Map;
  */
 public abstract class DirectLayoutRunner implements LayoutRunner {
 
-  public static final double UNIT = 5.0; // 30.0d;
+  public static final double UNIT = 1.0;  // The nominal size of a node.
+
+  public static final double X_ORIGIN = 0.0d;
+
+  public static final double Y_ORIGIN = 0.0d;
 
   public static final double Z_ORIGIN = 0.0d;
 

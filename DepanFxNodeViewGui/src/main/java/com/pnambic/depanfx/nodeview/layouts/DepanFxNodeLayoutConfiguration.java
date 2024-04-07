@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +53,8 @@ public class DepanFxNodeLayoutConfiguration {
     public void handleLayout(ActionEvent e, DepanFxNodeViewPanel view) {
       List<GraphNode> updateNodes = view.streamChosenNodes()
           .collect(Collectors.toList());
-      view.updateNodeLocations(buildNodeLocations(updateNodes));
+      view.updateNodeLocations(
+          GridLayoutRunner.buildNodeLocations(updateNodes));
     }
 
     @Override
@@ -62,7 +62,7 @@ public class DepanFxNodeLayoutConfiguration {
         DepanFxWorkspaceResource layoutRsrc,
         DepanFxWorkspaceResource graphDocRsrc,
         List<GraphNode> updateNodes) {
-      return buildNodeLocations(updateNodes);
+      return GridLayoutRunner.buildNodeLocations(updateNodes);
     }
   }
 
@@ -83,7 +83,8 @@ public class DepanFxNodeLayoutConfiguration {
       List<GraphNode> updateNodes = view.streamChosenNodes()
           .collect(Collectors.toList());
       Collections.shuffle(updateNodes);
-      view.updateNodeLocations(buildNodeLocations(updateNodes));
+      view.updateNodeLocations(
+          GridLayoutRunner.buildNodeLocations(updateNodes));
     }
 
     @Override
@@ -91,18 +92,7 @@ public class DepanFxNodeLayoutConfiguration {
         DepanFxWorkspaceResource layoutRsrc,
         DepanFxWorkspaceResource graphDocRsrc,
         List<GraphNode> updateNodes) {
-      return buildNodeLocations(updateNodes);
+      return GridLayoutRunner.buildNodeLocations(updateNodes);
     }
-  }
-
-  private static Map<GraphNode, DepanFxNodeLocationData> buildNodeLocations(
-      Collection<GraphNode> nodes) {
-    int size = nodes.size();
-    int width = (int) Math.ceil(Math.sqrt(size));
-    int breadth = (size + width - 1) / width;
-    GridLayoutRunner layout = new GridLayoutRunner(
-        width, breadth, GridLayoutRunner.LayoutDirection.HORIZONTAL);
-    layout.layoutNodes(nodes);
-    return layout.getPositions(nodes);
   }
 }

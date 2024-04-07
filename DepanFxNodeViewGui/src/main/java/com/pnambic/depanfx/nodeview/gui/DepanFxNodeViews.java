@@ -151,12 +151,8 @@ public class DepanFxNodeViews {
 
   private static Map<GraphNode, DepanFxNodeLocationData> buildNodeLocations(
       Collection<GraphNode> nodes) {
-    int size = nodes.size();
-    int width = (int) Math.ceil(Math.sqrt(size));
-    int breadth = (size + width - 1) / width;
-    GridLayoutRunner layout = new GridLayoutRunner(
-        width, breadth, GridLayoutRunner.LayoutDirection.HORIZONTAL);
-    layout.layoutNodes(nodes);
-    return layout.getPositions(nodes);
+
+    // TODO: Pick from alternatives for a better initial layout choice.
+    return GridLayoutRunner.buildNodeLocations(nodes);
   }
 }

@@ -5,6 +5,7 @@ import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewPanel;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
+import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class DepanFxNodeLayoutRegistry {
   public static final String ALL_LAYOUTS = "All Layouts";
 
   public static final String ALL_LAYOUTS_EXT = "d*lti";
+
+  public static final String ALL_LAYOUTS_GLOB =
+      DepanFxSceneControls.buildMatchGlob(ALL_LAYOUTS_EXT);
 
   public interface Contribution {
 
@@ -89,6 +93,7 @@ public class DepanFxNodeLayoutRegistry {
       Predicate<Contribution> layoutFilter) {
     return ordered(layoutFilter)
         .map(c -> c.getResourceFilter())
+        .filter(f -> f != null)
         .collect(Collectors.toList());
   }
 
@@ -99,7 +104,9 @@ public class DepanFxNodeLayoutRegistry {
         .map(c -> c.getResourceFilter().getClass())
         .collect(Collectors.toList());
     return new DepanFxResourceFilter(
-        ALL_LAYOUTS, Collections.singletonList(ALL_LAYOUTS_EXT), resourceTypes);
+        ALL_LAYOUTS,
+        Collections.singletonList(ALL_LAYOUTS_GLOB),
+        resourceTypes);
   }
 
   public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(

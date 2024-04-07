@@ -22,18 +22,29 @@ import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import java.util.Collection;
 
 /**
+ * Layouts the elements of a hierarchy as a planar tree on the
+ * supplied {@link #zBase} coordinate.
  */
 public class TreeLayoutRunner extends HierarchicalLayoutRunner {
 
-  private double horizontalSpace;
+  private final double xBase;
 
-  private double verticalSpace;
+  private final double yBase;
+
+  private final double zBase;
+
+  private final double horizontalSpace;
+
+  private final double verticalSpace;
 
   protected TreeLayoutRunner(
       DepanFxTreeModel treeModel,
-      double horizontalSpace,
-      double verticalSpace) {
+      double xBase, double yBase, double zBase,
+      double horizontalSpace, double verticalSpace) {
     super(treeModel);
+    this.xBase = xBase;
+    this.yBase = yBase;
+    this.zBase = zBase;
     this.horizontalSpace = horizontalSpace;
     this.verticalSpace = verticalSpace;
   }
@@ -41,7 +52,9 @@ public class TreeLayoutRunner extends HierarchicalLayoutRunner {
   @Override
   protected void assignNode(GraphNode node, int level, int offset) {
     assignPosition(node,
-        level * horizontalSpace, offset * verticalSpace, 0.0d);
+        xBase + (level * horizontalSpace),
+        yBase + (offset * verticalSpace),
+        zBase);
   }
 
   @Override

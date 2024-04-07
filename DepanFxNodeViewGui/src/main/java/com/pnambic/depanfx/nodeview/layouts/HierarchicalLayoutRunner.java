@@ -36,6 +36,8 @@ public abstract class HierarchicalLayoutRunner extends DirectLayoutRunner {
   /** Each leaf node is assigned a new position. */
   private int leafOffset = 0;
 
+  private int maxLevel = 0;
+
   /** Protection from loops */
   private Set<GraphNode> allreadyDone = new HashSet<>();
 
@@ -49,9 +51,9 @@ public abstract class HierarchicalLayoutRunner extends DirectLayoutRunner {
   public void layoutNodes(Collection<GraphNode> layoutNodes) {
     visibleNodes = new HashSet<>(layoutNodes);
     Collection<GraphNode> roots = treeModel.getRoots();
-    int level = getRootLevel(roots);
+    int level = setLevel(getRootLevel(roots));
     roots.stream()
-        .forEach(r -> assignChildren(r, level ));
+        .forEach(r -> assignChildren(r, level));
     setDone();
   }
 
@@ -98,6 +100,10 @@ public abstract class HierarchicalLayoutRunner extends DirectLayoutRunner {
     return leafOffset;
   }
 
+  protected int getMaxLevel() {
+    return maxLevel;
+  }
+
   /**
    * Recursively assign the position for the given node and all of
    * it's descendants.  Through the use of an alreadyDone lookup set,
@@ -117,7 +123,7 @@ public abstract class HierarchicalLayoutRunner extends DirectLayoutRunner {
     }
     allreadyDone.add(root);
 
-    int nextLevel = level + 1;
+    int nextLevel = setLevel(level + 1);
     int childLeft = getCurrOffset(nextLevel);
     for (GraphNode node : orderChildren(root)) {
       assignChildren(node, nextLevel);
@@ -134,6 +140,11 @@ public abstract class HierarchicalLayoutRunner extends DirectLayoutRunner {
       assignNode(root, level, getCurrOffset(level));
       incrCurrOffset(level);
     }
+  }
+
+  private int setLevel(int newLevel) {
+    maxLevel = Math.max(newLevel, maxLevel);
+    return newLevel;
   }
 
   /**

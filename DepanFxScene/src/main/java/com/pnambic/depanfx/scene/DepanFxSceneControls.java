@@ -55,8 +55,17 @@ public class DepanFxSceneControls {
    }
 
   public static ExtensionFilter buildExtFilter(String label, String ext) {
-    String matchRe = "*." + ext;
-    return new ExtensionFilter(label + "(" + matchRe + ")", matchRe);
+    String matchGlob = buildMatchGlob(ext);
+    return new ExtensionFilter(label + "(" + matchGlob + ")", matchGlob);
+  }
+
+  /**
+   * Encapsulates the secret of taking a file extension (which may contain
+   * glob patterns), and converting into a glob pattern for matching files
+   * with the supplied extension.
+   */
+  public static String buildMatchGlob(String ext) {
+    return "*." + ext;
   }
 
   public static Optional<Image> loadResourceImage(

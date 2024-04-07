@@ -26,6 +26,20 @@ public class TreeLayoutContribution
 
   public static final String TREE_LAYOUT = "Tree Layout...";
 
+  public static final double MIN_SPACE_PER_LEAF =
+      5 * RadialLayoutRunner.UNIT;
+
+  public static final double MIN_SPACE_PER_LEVEL =
+      3 * RadialLayoutRunner.UNIT;
+
+  public static final double TARGET_ASPECT_RATIO = 3.0d;
+
+  public static final double TARGET_TREE_HIEGHT =
+      MIN_SPACE_PER_LEAF * 20;
+
+  public static final double TARGET_TREE_WIDTH =
+      TARGET_TREE_HIEGHT / TARGET_ASPECT_RATIO;
+
   @Override
   public String getLabel() {
     return TREE_LAYOUT;
@@ -66,9 +80,9 @@ public class TreeLayoutContribution
     List<GraphNode> updateNodes =
         view.streamChosenNodes().collect(Collectors.toList());
 
-    view.updateNodeLocations(layoutNodes(
-        layoutDlg.getController().getWorkspaceResource().get(),
-        graphDocRsrc, updateNodes));
+    layoutDlg.getController().getWorkspaceResource()
+        .ifPresent(r -> view.updateNodeLocations(
+            layoutNodes(r, graphDocRsrc, updateNodes)));
   }
 
   private Map<GraphNode, DepanFxNodeLocationData> buildNodeLocations(
@@ -79,8 +93,27 @@ public class TreeLayoutContribution
     DepanFxTreeModel treeModel =
         builder.traverseGraph(graphDocRsrc, updateNodes);
 
+    DryRunLayoutRunner dryRunLayout = new DryRunLayoutRunner(treeModel);
+    dryRunLayout.layoutNodes(updateNodes);
+    int leafs = dryRunLayout.getLeafCount();
+    int levels = dryRunLayout.getMaxLevel();
+
+    double spacePerLeaf =
+        Math.max(MIN_SPACE_PER_LEAF, TARGET_TREE_HIEGHT / leafs);
+
+    double spacePerLevel =
+        Math.max(MIN_SPACE_PER_LEVEL, TARGET_TREE_WIDTH / levels);
+
+    // The tree runner assigns leafs from the bottom left heading upward
+    // and to the right.
+    double xBase =
+        RadialLayoutRunner.X_ORIGIN - spacePerLevel * ((levels / 2.0d) - 0.5d);
+    double yBase =
+        RadialLayoutRunner.Y_ORIGIN - spacePerLeaf * ((leafs / 2.0d) - 0.5d);
+
     TreeLayoutRunner treeLayout = new TreeLayoutRunner(
-        treeModel, DirectLayoutRunner.UNIT, DirectLayoutRunner.UNIT);
+        treeModel, xBase, yBase, RadialLayoutRunner.Z_ORIGIN,
+        spacePerLevel, spacePerLeaf);
     treeLayout.layoutNodes(updateNodes);
 
     // TODO:  center the tree, cluster the orphans.
