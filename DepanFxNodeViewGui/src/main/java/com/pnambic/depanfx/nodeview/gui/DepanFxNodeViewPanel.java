@@ -22,9 +22,11 @@ import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
@@ -32,6 +34,10 @@ import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +45,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.imageio.ImageIO;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -50,6 +58,8 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tab;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class DepanFxNodeViewPanel {
 
@@ -65,8 +75,20 @@ public class DepanFxNodeViewPanel {
 
   private static final String SELECT_LAYOUT = "Select Layout...";
 
+  private static final String TAKE_SCREENSHOT = "Take Screenshot";
+
+  private static final String ALL_GRAPHIC_LABEL = "All Images";
+
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeViewPanel.class);
+
+  private static final String[] ALL_GRAPHIC_EXTS =
+      { "*.png", "*.jpg", "*.gif", "*.bmp", "*.*" };
+
+  private static final ExtensionFilter ALL_GRAPHICS_FILTER =
+      new ExtensionFilter(ALL_GRAPHIC_LABEL, Arrays.asList(ALL_GRAPHIC_EXTS));
+
+  private static final String PNG_EXT = "png";
 
   private final DepanFxWorkspace workspace;
 
@@ -189,6 +211,9 @@ public class DepanFxNodeViewPanel {
     return linkMatchDoc.getModelId().equals(modelId);
   }
 
+  /////////////////////////////////////
+  // Actions
+
   public void doSelectAllAction() {
     doSelectGraphNodesAction(viewNodes, true);
   }
@@ -226,6 +251,55 @@ public class DepanFxNodeViewPanel {
         .forEach(e -> updateNodeLocation(e.getKey(), e.getValue()));
   }
 
+  /**
+   * Take a snaphot of the given view. Ask the user a filename, and use
+   * this filename to determine which type of file format has to be used.
+   * PNG format is used as default.
+   *
+   * @param view the view to capture.
+   */
+  public void takeScreenshot() {
+    // make the screenshot first, so that the overlapping file selection window
+    // does not Interfere with the process of taking the screenshot
+    // (apparently, otherwise, it does)
+    BufferedImage screenshot = joglView.takeScreenshot();
+
+    // TODO: A real dialog with options for size, format, etc.
+    // Ask the user a filename where to save the screenshot.
+    String baseName = viewData.getToolName() + " snapshot";
+    String screenshopName = DepanFxWorkspaceFactory
+        .buildDocumentTimestampName(baseName, PNG_EXT);
+
+    File initDst = new File(screenshopName);
+    FileChooser dstDlg = DepanFxSceneControls.prepareFileChooser(initDst);
+    dstDlg.getExtensionFilters().add(ALL_GRAPHICS_FILTER);
+    dstDlg.setSelectedExtensionFilter(ALL_GRAPHICS_FILTER);
+
+    File dstFile = dstDlg.showSaveDialog(joglView.getScene().getWindow());
+    if (dstFile == null) {
+      LOG.info("User cancelled save of image");
+      return;
+    }
+
+    // check if the file has an extension. otherwise, use .png as default
+    // extension.
+    String dstName = dstFile.getName();
+    if (dstName.lastIndexOf('.') == -1) {
+      dstName = dstName + ".png";
+      dstFile = new File(dstFile.getParentFile(), dstName);
+    }
+
+    String typeSuffix = dstName.substring(dstName.lastIndexOf('.') + 1);
+    try {
+      // finally, write the image on a file.
+      ImageIO.write(screenshot, typeSuffix, dstFile);
+      LOG.info("Image saved to {}", dstName);
+    } catch (IOException errIo) {
+      LOG.error("Failure saving image {}", dstName, errIo);
+    }
+  }
+
+
   /////////////////////////////////////
   // Internal
 
@@ -247,6 +321,9 @@ public class DepanFxNodeViewPanel {
 
     builder.appendSeparator();
     builder.appendSubMenu(buildLayoutNodesMenu());
+
+    builder.appendSeparator();
+    builder.appendActionItem(TAKE_SCREENSHOT, e -> takeScreenshot());
 
     builder.appendSeparator();
     builder.appendActionItem(

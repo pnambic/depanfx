@@ -1,17 +1,28 @@
 package com.pnambic.depanfx.jogl;
 
-import com.jogamp.newt.NewtFactory;
 import com.jogamp.newt.Display;
+import com.jogamp.newt.NewtFactory;
 import com.jogamp.newt.Screen;
 import com.jogamp.newt.javafx.NewtCanvasJFX;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.FPSCounter;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL2ES3;
 import com.jogamp.opengl.GLAnimatorControl;
 import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLContext;
+import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.Animator;
+import com.jogamp.opengl.util.GLPixelStorageModes;
+import com.jogamp.opengl.util.awt.ImageUtil;
 import com.pnambic.depanfx.jogl.JoglCamera.CameraData;
 import com.pnambic.depanfx.jogl.shapes.DemoShape;
+
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.nio.ByteBuffer;
 
 import javafx.scene.canvas.Canvas;
 
@@ -113,7 +124,59 @@ public class JoglModule {
      return camera.getCurrent();
    }
 
+  /**
+   * Read the last image out of the graphics context.
+   */
+  public BufferedImage takeScreenshot() {
+    GLContext context = glWindow.getContext();
+    context.makeCurrent();
+    int height = (int) canvas.getHeight();
+    int width = (int) canvas.getWidth();
+    BufferedImage image = readToBufferedImage(0, 0, width, height, false);
+    context.release();
+    return image;
+  }
+
   public void demoDisplay() {
     updateShape(this, new DemoShape());
   }
+
+  /**
+   * Stolen from com.jogamp.opengl.util.awt.Screenshot.readToBufferedImage()
+   *
+   * JOGL 2.1.2
+   */
+  private static BufferedImage readToBufferedImage(
+      int x,int y, int width, int height, boolean alpha) throws GLException {
+
+    int bufImgType =
+        (alpha ? BufferedImage.TYPE_4BYTE_ABGR : BufferedImage.TYPE_3BYTE_BGR);
+    int readbackType =
+        (alpha ? GL2.GL_ABGR_EXT : GL2ES3.GL_BGR);
+
+    // Allocate necessary storage
+    BufferedImage image = new BufferedImage(width, height, bufImgType);
+
+    GLContext glc = GLContext.getCurrent();
+    GL gl = glc.getGL();
+
+    // Set up pixel storage modes
+    GLPixelStorageModes psm = new GLPixelStorageModes();
+    psm.setPackAlignment(gl, 1);
+
+    // read the BGR values into the image
+    gl.glReadPixels(x, y, width, height, readbackType,
+        GL.GL_UNSIGNED_BYTE,
+        ByteBuffer.wrap(((DataBufferByte) image.getRaster().getDataBuffer()).getData()));
+
+    // Restore pixel storage modes
+    psm.restore(gl);
+
+    if( glc.getGLDrawable().isGLOriented() ) {
+      // Must flip BufferedImage vertically for correct results
+      ImageUtil.flipImageVertically(image);
+    }
+    return image;
+  }
+
 }

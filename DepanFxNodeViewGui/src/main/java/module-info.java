@@ -20,6 +20,7 @@ module depanfx.nodeview.gui {
   requires depanfx.perspective;
   requires depanfx.workspace;
   requires depanfx.scene;
+  requires java.desktop;
 
   opens com.pnambic.depanfx.nodeview.gui
       to javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;

@@ -11,6 +11,8 @@ import net.rgielen.fxweaver.core.FxControllerAndView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.image.BufferedImage;
+
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
@@ -82,12 +84,12 @@ public class DepanFxJoglView extends BorderPane {
   public void release() {
     jogl.stop();
     viewport.getChildren().clear();
-    jogl.destroy();
     statusPanel.getController().stop();
   }
 
   public void close() {
     release();
+    jogl.destroy();
   }
 
   public JoglShape getShape(Object key) {
@@ -101,6 +103,10 @@ public class DepanFxJoglView extends BorderPane {
   public DepanFxNodeViewCameraData getCameraData() {
     return DepanFxNodeViewCameraData.ofJoglCamera(
         jogl.getCurrentCamera());
+  }
+
+  public BufferedImage takeScreenshot() {
+    return jogl.takeScreenshot();
   }
 
   private ScrollBar createHScrollBar(double width) {
