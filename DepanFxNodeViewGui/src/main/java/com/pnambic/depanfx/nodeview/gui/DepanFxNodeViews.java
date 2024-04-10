@@ -4,6 +4,7 @@ import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodeview.jogl.JoglColors;
 import com.pnambic.depanfx.nodeview.layouts.GridLayoutRunner;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
@@ -113,7 +114,7 @@ public class DepanFxNodeViews {
     DepanFxNodeViewCameraData cameraData = DepanFxNodeViewCameraData.getHome();
     DepanFxNodeViewSceneData sceneData =
         new DepanFxNodeViewSceneData(
-            DepanFxJoglColor.of(DEFAULT_BACKGROUND_COLOR), cameraData);
+            JoglColors.of(DEFAULT_BACKGROUND_COLOR), cameraData);
 
     Map<GraphNode, DepanFxNodeLocationData> locations =
         buildNodeLocations(nodes);
@@ -145,9 +146,8 @@ public class DepanFxNodeViews {
     if (colorChoice >= NODE_COLOR_CHOICES.length) {
       colorChoice = 0;
     }
-    DepanFxJoglColor blix = DepanFxJoglColor.of(color);
     return new DepanFxNodeDisplayData(
-        true, DepanFxSizerModel.FIXED, blix );
+        true, DepanFxSizerModel.FIXED, JoglColors.of(color));
   }
 
   private static Map<GraphNode, DepanFxNodeLocationData> buildNodeLocations(

@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodeview.gui;
 
+import com.pnambic.depanfx.nodeview.jogl.JoglColors;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDirection;
@@ -248,7 +249,7 @@ public class DepanFxNodeViewLinkDisplayDialog
     DepanFxLineDisplayData lineDisplayData = new DepanFxLineDisplayData(
         editData.lineFormProperty().getValue(),
         editData.lineStyleProperty().getValue(),
-        DepanFxJoglColor.of(editData.lineColorProperty().getValue()),
+        JoglColors.of(editData.lineColorProperty().getValue()),
         editData.lineWidthProperty().getValue(),
 
         editData.lineLabelProperty().getValue(),
@@ -372,7 +373,7 @@ public class DepanFxNodeViewLinkDisplayDialog
       lineFormProp = new SimpleObjectProperty<>(lineDisplay.lineForm);
       lineStyleProp = new SimpleObjectProperty<>(lineDisplay.lineStyle);
       lineColorProp =
-          new SimpleObjectProperty<>(lineDisplay.lineColor.toFxColor());
+          new SimpleObjectProperty<>(JoglColors.of(lineDisplay.lineColor));
       lineWidthProp = new SimpleDoubleProperty(lineDisplay.lineWidth);
       lineLabelProp = new SimpleObjectProperty<>(lineDisplay.lineLabel);
       sourceArrowProp = new SimpleObjectProperty<>(lineDisplay.sourceArrow);

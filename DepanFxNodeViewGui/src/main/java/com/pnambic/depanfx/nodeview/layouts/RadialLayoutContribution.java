@@ -26,7 +26,7 @@ public class RadialLayoutContribution
     implements DepanFxNodeLayoutRegistry.Contribution {
 
   public static final double MIN_ARC_SEPARATION =
-      3 * RadialLayoutRunner.UNIT;
+      4 * RadialLayoutRunner.UNIT;
 
   public static final double MIN_RADIAL_SEPARATION =
       4 * RadialLayoutRunner.UNIT;

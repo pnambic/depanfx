@@ -1,13 +1,19 @@
 package com.pnambic.depanfx.nodeview.tooldata;
 
-import com.pnambic.depanfx.jogl.JoglTransforms;
-
-import javafx.scene.paint.Color;
 
 /**
  * A serializable version of JavaFX's Color.
  */
 public class DepanFxJoglColor {
+
+  // Minimal number of "well-known" colors.
+  // Mostly, UI aware components should use native color definitions
+  // and map those colors into this storage format.
+  public static final DepanFxJoglColor BLACK =
+      new DepanFxJoglColor(0.0, 0.0, 0.0);
+
+  public static final DepanFxJoglColor WHITE =
+      new DepanFxJoglColor(0.0, 0.0, 0.0);
 
   private final double red;
 
@@ -19,19 +25,6 @@ public class DepanFxJoglColor {
     this.red = red;
     this.green = green;
     this.blue = blue;
-  }
-
-  public static DepanFxJoglColor of(Color color) {
-    return new DepanFxJoglColor(
-        color.getRed(), color.getGreen(), color.getBlue());
-  }
-
-  public static DepanFxJoglColor rgb(
-      int redColor, int greenColor, int blueColor) {
-    return new DepanFxJoglColor(
-        JoglTransforms.colorByte(redColor),
-        JoglTransforms.colorByte(greenColor),
-        JoglTransforms.colorByte(blueColor));
   }
 
   public double[] getColor() {
@@ -48,10 +41,5 @@ public class DepanFxJoglColor {
 
   public double getBlue() {
     return blue;
-  }
-
-  public Color toFxColor() {
-    return Color.color(
-        getRed(), getGreen(), getBlue());
   }
 }

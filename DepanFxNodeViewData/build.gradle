@@ -17,12 +17,7 @@ dependencies {
 
   implementation project(':DepanFxGraph')
   implementation project(':DepanFxGraphDoc')
-  implementation project(':DepanFxJogl')
   implementation project(':DepanFxNodeList')
-  implementation project(':DepanFxNodeListGui')
-  implementation project(':DepanFxNodeViewData')
   implementation project(':DepanFxPersistence')
-  implementation project(':DepanFxPerspective')
-  implementation project(':DepanFxScene')
   implementation project(':DepanFxWorkspace')
 }

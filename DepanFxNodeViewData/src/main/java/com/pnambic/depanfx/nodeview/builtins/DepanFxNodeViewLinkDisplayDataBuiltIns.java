@@ -1,4 +1,4 @@
-package com.pnambic.depanfx.nodeview.gui;
+package com.pnambic.depanfx.nodeview.builtins;
 
 import com.pnambic.depanfx.graph.context.BaseContextDefinition;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherBuiltIns;

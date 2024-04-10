@@ -2,8 +2,6 @@ package com.pnambic.depanfx.nodeview.tooldata;
 
 import com.pnambic.depanfx.graph.info.GraphEdgeInfo;
 
-import javafx.scene.paint.Color;
-
 public class DepanFxLineDisplayData implements GraphEdgeInfo {
 
   public DepanFxLineForm lineForm;
@@ -47,7 +45,7 @@ public class DepanFxLineDisplayData implements GraphEdgeInfo {
     return new DepanFxLineDisplayData(
         DepanFxLineForm.DEFAULT,
         DepanFxLineStyle.DEFAULT,
-        DepanFxJoglColor.of(Color.BLACK),
+        DepanFxJoglColor.BLACK,
         1.0d /* width*/,
         DepanFxLineLabel.DEFAULT,
         DepanFxLineArrow.SOURCE_DEFAULT,
