@@ -4,6 +4,7 @@ import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodeview.jogl.JoglCameras;
 import com.pnambic.depanfx.nodeview.jogl.JoglColors;
 import com.pnambic.depanfx.nodeview.layouts.GridLayoutRunner;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
@@ -111,7 +112,7 @@ public class DepanFxNodeViews {
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkViewDocRsrc,
       Collection<GraphNode> nodes,
       DepanFxWorkspace workspace) {
-    DepanFxNodeViewCameraData cameraData = DepanFxNodeViewCameraData.getHome();
+    DepanFxNodeViewCameraData cameraData = JoglCameras.getHome();
     DepanFxNodeViewSceneData sceneData =
         new DepanFxNodeViewSceneData(
             JoglColors.of(DEFAULT_BACKGROUND_COLOR), cameraData);

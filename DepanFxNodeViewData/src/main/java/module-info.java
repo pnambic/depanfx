@@ -1,5 +1,6 @@
 module depanfx.nodeview.data {
   requires javafx.base;
+  requires javafx.graphics;  // For color definitions
 
   requires com.google.common;
   requires org.slf4j;

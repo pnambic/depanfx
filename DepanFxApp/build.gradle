@@ -20,6 +20,7 @@ dependencies {
   implementation project(':DepanFxBytecode')
   implementation project(':DepanFxFileSystem')
   implementation project(':DepanFxFileSystemGui')
+  implementation project(':DepanFxFileSystemNodeView')
   implementation project(':DepanFxGit')
   implementation project(':DepanFxGitGui')
   implementation project(':DepanFxGraph')

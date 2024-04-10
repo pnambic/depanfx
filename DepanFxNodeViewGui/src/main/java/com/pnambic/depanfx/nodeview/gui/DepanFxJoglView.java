@@ -3,6 +3,7 @@ package com.pnambic.depanfx.nodeview.gui;
 import com.pnambic.depanfx.jogl.JoglModule;
 import com.pnambic.depanfx.jogl.JoglShape;
 import com.pnambic.depanfx.jogl.shapes.SquareShape;
+import com.pnambic.depanfx.nodeview.jogl.JoglCameras;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 
@@ -53,7 +54,7 @@ public class DepanFxJoglView extends BorderPane {
       DepanFxNodeViewCameraData cameraInfo,
       DepanFxDialogRunner dialogRunner) {
     return new DepanFxJoglView(
-        new JoglModule(cameraInfo.getJoglCameraData()),
+        new JoglModule(JoglCameras.of(cameraInfo)),
         dialogRunner);
   }
 
@@ -101,8 +102,7 @@ public class DepanFxJoglView extends BorderPane {
   }
 
   public DepanFxNodeViewCameraData getCameraData() {
-    return DepanFxNodeViewCameraData.ofJoglCamera(
-        jogl.getCurrentCamera());
+    return JoglCameras.of(jogl.getCurrentCamera());
   }
 
   public BufferedImage takeScreenshot() {

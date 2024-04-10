@@ -13,34 +13,45 @@ public class FileSystemLinkMatcherBuiltIns {
 
   public static final String FILE_SYSTEM_LINK_MATCHER_DIR = "File System";
 
+  public static final String MEMBER_NAME = "Member";
+
+  public static final String DIRECTORY_NAME = "Directory";
+
+  public static final String FILE_NAME = "File";
+
   public static final Path FILE_SYSTEM_LINK_MATCHER_PATH =
       DepanFxLinkMatcherDocument.LINK_MATCHER_TOOL_PATH
           .resolve(FILE_SYSTEM_LINK_MATCHER_DIR);
 
-  private static final String MEMBER_NAME = "Member";
+  public static final Path FILE_SYSTEM_MEMBER_MATCHER_PATH =
+      FILE_SYSTEM_LINK_MATCHER_PATH.resolve(MEMBER_NAME);
 
-  private static final String DIRECTORY_NAME = "Directory";
+  public static final Path FILE_SYSTEM_DIRECTORY_MATCHER_PATH =
+      FILE_SYSTEM_LINK_MATCHER_PATH.resolve(DIRECTORY_NAME);
 
-  private static final String FILE_NAME = "File";
+  public static final Path FILE_SYSTEM_FILE_MATCHER_PATH =
+      FILE_SYSTEM_LINK_MATCHER_PATH.resolve(FILE_NAME);
 
   @Bean
   public DepanFxBuiltInContribution memberMatcherFileSystem() {
-    return createBuiltIn(MEMBER_NAME, FileSystemLinkMatchers.MEMBER_DOC);
+    return createBuiltIn(MEMBER_NAME, FileSystemLinkMatchers.MEMBER_DOC,
+        FILE_SYSTEM_MEMBER_MATCHER_PATH);
   }
 
   @Bean
   public DepanFxBuiltInContribution directoryMatcher() {
-    return createBuiltIn(DIRECTORY_NAME, FileSystemLinkMatchers.DIRECTORY_DOC);
+    return createBuiltIn(DIRECTORY_NAME, FileSystemLinkMatchers.DIRECTORY_DOC,
+        FILE_SYSTEM_DIRECTORY_MATCHER_PATH);
   }
 
   @Bean
   public DepanFxBuiltInContribution fileMatcher() {
-    return createBuiltIn(FILE_NAME, FileSystemLinkMatchers.FILE_DOC);
+    return createBuiltIn(FILE_NAME, FileSystemLinkMatchers.FILE_DOC,
+        FILE_SYSTEM_FILE_MATCHER_PATH);
   }
 
   private DepanFxBuiltInContribution createBuiltIn(
-      String docName, DepanFxLinkMatcherDocument doc) {
-    Path docPath = FILE_SYSTEM_LINK_MATCHER_PATH.resolve(docName);
+      String docName, DepanFxLinkMatcherDocument doc, Path docPath) {
     return new DepanFxBuiltInContribution.Simple(docPath, doc);
   }
 }

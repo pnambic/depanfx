@@ -14,6 +14,7 @@ module depanfx.app {
 
     // For Spring @Component discovery
     requires depanfx.filesystem.gui;
+    requires depanfx.filesystem.nodeview;
     requires depanfx.git;
     requires depanfx.git.gui;
     requires depanfx.graph_doc;

@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodeview.tooldata;
 
+import javafx.scene.paint.Color;
 
 /**
  * A serializable version of JavaFX's Color.
@@ -25,6 +26,14 @@ public class DepanFxJoglColor {
     this.red = red;
     this.green = green;
     this.blue = blue;
+  }
+
+  /**
+   * Recommended source of color definitions.
+   */
+  public static DepanFxJoglColor of(Color color) {
+    return new DepanFxJoglColor(
+        color.getRed(), color.getGreen(), color.getBlue());
   }
 
   public double[] getColor() {
