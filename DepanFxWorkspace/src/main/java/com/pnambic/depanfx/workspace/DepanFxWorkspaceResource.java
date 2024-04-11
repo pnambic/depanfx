@@ -1,10 +1,10 @@
 package com.pnambic.depanfx.workspace;
 
-public interface DepanFxWorkspaceResource {
+public interface DepanFxWorkspaceResource<T> {
 
   DepanFxProjectDocument getDocument();
 
-  Object getResource();
+  T getResource();
 
   /**
    * This implementation is suitable for resource that reference static content,
@@ -12,14 +12,14 @@ public interface DepanFxWorkspaceResource {
    * be useful for transitory resource, such as temporary compositions used to
    * initialize editor dialogs.
    */
-  public static class StaticWorkspaceResource
-      implements DepanFxWorkspaceResource {
+  public static class StaticWorkspaceResource<T>
+      implements DepanFxWorkspaceResource<T> {
 
     private final DepanFxProjectDocument rsrcDoc;
 
-    private final Object rsrcData;
+    private final T rsrcData;
 
-    public StaticWorkspaceResource(DepanFxProjectDocument rsrcDoc, Object rsrcData) {
+    public StaticWorkspaceResource(DepanFxProjectDocument rsrcDoc, T rsrcData) {
       this.rsrcDoc = rsrcDoc;
       this.rsrcData = rsrcData;
     }
@@ -30,7 +30,7 @@ public interface DepanFxWorkspaceResource {
     }
 
     @Override
-    public Object getResource() {
+    public T getResource() {
       return rsrcData;
     }
   }

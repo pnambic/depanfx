@@ -29,8 +29,10 @@ public class DepanFxLinkMatcherBuiltIns {
   }
 
   @Bean
-  public DepanFxBuiltInContribution allEdgeMatcher() {
-    return new DepanFxBuiltInContribution.Simple(
+  public DepanFxBuiltInContribution<DepanFxLinkMatcherDocument>
+      allEdgeMatcher() {
+
+    return new DepanFxBuiltInContribution.Simple<>(
         MATCH_ALL_DOC_PATH, allEdgeMatcherDoc);
   }
 

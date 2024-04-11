@@ -45,8 +45,10 @@ public class DepanFxNodeListSectionData {
 
   public enum OrderDirection { FORWARD, REVERSE };
 
-  public static Optional<DepanFxWorkspaceResource> getBuiltinSimpleSectionResource(
-      DepanFxWorkspace workspace) {
+  public static Optional<DepanFxWorkspaceResource<DepanFxFlatSectionData>>
+      getBuiltinSimpleSectionResource(
+            DepanFxWorkspace workspace) {
+
     return DepanFxProjects.getBuiltIn(
         workspace, DepanFxFlatSectionData.class, SIMPLE_SECTION_TOOL_PATH);
   }

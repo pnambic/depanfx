@@ -6,12 +6,12 @@ import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 import java.nio.file.Path;
 import java.util.Optional;
 
-public interface DepanFxProjectResource {
+public interface DepanFxProjectResource<T> {
 
-  Optional<DepanFxWorkspaceResource> getResource(
-      DepanFxWorkspace workspace, Class<?> docType);
+  Optional<DepanFxWorkspaceResource<T>> getResource(
+      DepanFxWorkspace workspace, Class<T> docType);
 
-  public static class BuiltIn implements DepanFxProjectResource {
+  public static class BuiltIn<T> implements DepanFxProjectResource<T> {
 
     private Path builtInPath;
 
@@ -20,8 +20,8 @@ public interface DepanFxProjectResource {
     }
 
     @Override
-    public Optional<DepanFxWorkspaceResource> getResource(
-        DepanFxWorkspace workspace, Class<?> docType) {
+    public Optional<DepanFxWorkspaceResource<T>> getResource(
+        DepanFxWorkspace workspace, Class<T> docType) {
       return
           DepanFxProjects.getBuiltIn(workspace, docType, builtInPath);
     }
@@ -31,7 +31,7 @@ public interface DepanFxProjectResource {
     }
   }
 
-  public static class FileSystem implements DepanFxProjectResource {
+  public static class FileSystem<T> implements DepanFxProjectResource<T> {
 
     private DepanFxProjectDocument projDoc;
 
@@ -40,19 +40,19 @@ public interface DepanFxProjectResource {
     }
 
     @Override
-    public Optional<DepanFxWorkspaceResource> getResource(
-        DepanFxWorkspace workspace, Class<?> docType) {
+    public Optional<DepanFxWorkspaceResource<T>> getResource(
+        DepanFxWorkspace workspace, Class<T> docType) {
       return workspace.getWorkspaceResource(projDoc, docType);
     }
   }
 
-  public static DepanFxProjectResource fromWorkspaceResource(
-      DepanFxWorkspaceResource wkspRsrc) {
+  public static <T> DepanFxProjectResource<T> fromWorkspaceResource(
+      DepanFxWorkspaceResource<T> wkspRsrc) {
     DepanFxProjectDocument rsrcDoc = wkspRsrc.getDocument();
     if (rsrcDoc.getProject().getMemberPath().equals(
         DepanFxBuiltInProject.BUILT_IN_PROJECT_PATH)) {
-      return new BuiltIn(rsrcDoc.getMemberPath());
+      return new BuiltIn<T>(rsrcDoc.getMemberPath());
     }
-    return new FileSystem(rsrcDoc);
+    return new FileSystem<T>(rsrcDoc);
   }
 }

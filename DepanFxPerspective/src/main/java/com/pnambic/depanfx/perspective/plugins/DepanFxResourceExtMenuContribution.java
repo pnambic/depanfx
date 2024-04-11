@@ -25,7 +25,7 @@ public interface DepanFxResourceExtMenuContribution
       Cell<DepanFxWorkspaceMember> cell, String ext,
       DepanFxProjectMember member, DepanFxContextMenuBuilder builder);
 
-  public static abstract class Basic
+  public static abstract class Basic<T>
       implements DepanFxResourceExtMenuContribution {
 
     private static Logger LOG = LoggerFactory.getLogger(Basic.class);
@@ -34,12 +34,12 @@ public interface DepanFxResourceExtMenuContribution
 
     private final String editActionLabel;
 
-    private final Class<?> dataType;
+    private final Class<T> dataType;
 
     private final String orderKey;
 
     public Basic(
-        Class<?> dataType, String orderKey,
+        Class<T> dataType, String orderKey,
         String editActionLabel, String fileExt) {
       this.dataType = dataType;
       this.orderKey = orderKey;
@@ -71,7 +71,8 @@ public interface DepanFxResourceExtMenuContribution
     }
 
     abstract protected void runDialog(
-        DepanFxWorkspaceResource wkspRsrc, DepanFxDialogRunner dialogRunner);
+        DepanFxWorkspaceResource<T> wkspRsrc,
+        DepanFxDialogRunner dialogRunner);
 
     private void runEditAction(
         DepanFxDialogRunner dialogRunner,

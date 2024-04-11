@@ -1,11 +1,10 @@
 package com.pnambic.depanfx.workspace.projects;
 
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
-import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
 import java.nio.file.Path;
 
-public interface DepanFxBuiltInContribution {
+public interface DepanFxBuiltInContribution<T> {
 
   @SuppressWarnings("serial")
   public class MissingDependencyException extends RuntimeException {
@@ -34,9 +33,9 @@ public interface DepanFxBuiltInContribution {
 
   Path getPath();
 
-  Object getDocument();
+  T getDocument();
 
-  public abstract class Basic implements DepanFxBuiltInContribution {
+  public abstract class Basic<T> implements DepanFxBuiltInContribution<T> {
 
     private final Path path;
 
@@ -55,42 +54,42 @@ public interface DepanFxBuiltInContribution {
     }
   }
 
-  public class Simple extends Basic {
+  public class Simple<T> extends Basic<T> {
 
-    private final Object document;
+    private final T document;
 
-    public Simple(Path path, Object document) {
+    public Simple(Path path, T document) {
       super(path);
       this.document = document;
     }
 
     @Override
-    public Object getDocument() {
+    public T getDocument() {
       return document;
     }
   }
 
-  public abstract class Dependent extends Basic {
+  public abstract class Dependent<T> extends Basic<T> {
 
     /**
      * Dependent contributions create their document late.
      */
-    private Object document = null;
+    private T document = null;
 
     public Dependent(Path path) {
       super(path);
     }
 
     @Override
-    public Object getDocument() {
+    public T getDocument() {
       return document;
     }
 
-    public Object installDocument(DepanFxBuiltInProject project) {
+    public T installDocument(DepanFxBuiltInProject project) {
       document = buildDocument(project);
       return document;
     };
 
-    protected abstract Object buildDocument(DepanFxBuiltInProject project);
+    protected abstract T buildDocument(DepanFxBuiltInProject project);
   }
 }

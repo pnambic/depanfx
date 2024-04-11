@@ -14,6 +14,8 @@ import java.util.Optional;
 /**
  * Hides the use of the {@code com.panbmic.dpeanfx.workspace.basic} package
  * as the implementations.
+ *
+ * Provides a number of common utilities for working with file names.
  */
 public class DepanFxWorkspaceFactory {
 
@@ -26,8 +28,8 @@ public class DepanFxWorkspaceFactory {
   private static final DateTimeFormatter DOCUMENT_TIMESTAMP_FORMATTER =
       DateTimeFormatter.ofPattern("yyyyMMddHHmm");
 
-      private DepanFxWorkspaceFactory() {
-    // Prevent instantiation
+  private DepanFxWorkspaceFactory() {
+    // Prevent instantiation.
   }
 
   public static final char EXTENSION_DOT = '.';

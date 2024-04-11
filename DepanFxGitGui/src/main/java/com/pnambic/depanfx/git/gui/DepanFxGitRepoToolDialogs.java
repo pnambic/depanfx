@@ -60,7 +60,6 @@ public class DepanFxGitRepoToolDialogs {
           .flatMap(p -> workspace.getWorkspaceResource(
               p, DepanFxGitRepoData.class))
           .map(d -> d.getResource())
-          .map(DepanFxGitRepoData.class::cast)
           .ifPresent(d -> srcDlg.setTooldata(d));
     }
   }
@@ -72,7 +71,6 @@ public class DepanFxGitRepoToolDialogs {
         DepanFxGitRepoToolDialog.runCreateDialog(repoData, dialogRunner);
     repoDlg.getController().getWorkspaceResource()
         .map(r -> r.getResource())
-        .map(DepanFxGitRepoData.class::cast)
         .ifPresent(d -> srcDlg.setTooldata(d));
   }
 

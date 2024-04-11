@@ -2,6 +2,7 @@ package com.pnambic.depanfx.nodeview.tooldata;
 
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
@@ -25,7 +26,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
 
   private final DepanFxNodeViewSceneData sceneData;
 
-  private final DepanFxWorkspaceResource graphDocRsrc;
+  private final DepanFxWorkspaceResource<GraphDocument> graphDocRsrc;
 
   /**
    * Source of default rendering data for edges.
@@ -34,7 +35,8 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
    * Provides a {@link DepanFxNodeViewLinkDisplayData},
    * with a stream of {@code LinkDisplayEnty} values.
    */
-  private final DepanFxWorkspaceResource linkDisplayDocRsrc;
+  private final DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData>
+      linkDisplayDocRsrc;
 
   private final Collection<GraphNode> viewNodes;
 
@@ -47,8 +49,8 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   public DepanFxNodeViewData(
       String toolName, String toolDescription,
       DepanFxNodeViewSceneData sceneData,
-      DepanFxWorkspaceResource graphDocRsrc,
-      DepanFxWorkspaceResource linkDisplayDocRsrc,
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
+      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayDocRsrc,
       Collection<GraphNode> viewNodes,
       Map<GraphNode, DepanFxNodeLocationData> nodeLocations,
       Map<GraphNode, DepanFxNodeDisplayData> nodeDisplay,
@@ -66,8 +68,8 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   public DepanFxNodeViewData(
       String toolName, String toolDescription,
       DepanFxNodeViewSceneData sceneData,
-      DepanFxWorkspaceResource graphDocRsrc,
-      DepanFxWorkspaceResource linkDisplayDocRsrc,
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
+      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayDocRsrc,
       Collection<GraphNode> viewNodes) {
     this(toolName, toolDescription, sceneData,
         graphDocRsrc, linkDisplayDocRsrc,
@@ -78,11 +80,11 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
     return sceneData;
   }
 
-  public DepanFxWorkspaceResource getGraphDocRsrc() {
+  public DepanFxWorkspaceResource<GraphDocument> getGraphDocRsrc() {
     return graphDocRsrc;
   }
 
-  public DepanFxWorkspaceResource getLinkDisplayDocRsrc() {
+  public DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> getLinkDisplayDocRsrc() {
     return linkDisplayDocRsrc;
   }
 

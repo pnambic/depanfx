@@ -51,7 +51,8 @@ public class DepanFxSaveNodeListDialog {
 
   private final DepanFxWorkspace workspace;
 
-  private Optional<DepanFxWorkspaceResource> savedRsrc = Optional.empty();
+  private Optional<DepanFxWorkspaceResource<DepanFxNodeList>> savedRsrc =
+      Optional.empty();
 
   private DepanFxNodeList nodeList;
 
@@ -79,7 +80,7 @@ public class DepanFxSaveNodeListDialog {
     destinationField.setText(document.getMemberPath().toString());
   }
 
-  public Optional<DepanFxWorkspaceResource> getSavedResource() {
+  public Optional<DepanFxWorkspaceResource<DepanFxNodeList>> getSavedResource() {
     return savedRsrc;
   }
 

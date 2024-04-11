@@ -12,21 +12,17 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
-import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
 import java.text.MessageFormat;
-import java.util.Optional;
 
 import javafx.scene.control.Cell;
 
 @Configuration
 public class DepanFxNodeKeyColumnConfiguration {
-
-  private static final String NODE_KEY_COLUMN_KEY = "Node Key Column";
 
   public static final String MODEL_KEY_COLUMN_NAME = "Model Key Column";
 
@@ -43,6 +39,8 @@ public class DepanFxNodeKeyColumnConfiguration {
   public static final Path NODE_KEY_COLUMN_TOOL_PATH =
       DepanFxNodeListColumnData.COLUMNS_TOOL_PATH.resolve(NODE_KEY_COLUMN_NAME);
 
+  private static final String NODE_KEY_COLUMN_KEY = "Node Key Column";
+
   private static final String MODEL_KEY_COLUMN_LABEL = "Model Key";
 
   private static final String KIND_KEY_COLUMN_LABEL = "Kind Key";
@@ -51,41 +49,27 @@ public class DepanFxNodeKeyColumnConfiguration {
 
   private static final int COLUMN_WIDTH = 15;
 
-  public static Optional<DepanFxWorkspaceResource> getBuiltinNodeKeyColumnResource(
-      DepanFxWorkspace workspace, KeyChoice keyChoice) {
-    switch (keyChoice) {
-    case MODEL_KEY:
-      return getBuiltinNodeKeyColumnResource(workspace, MODEL_KEY_COLUMN_TOOL_PATH);
-    case KIND_KEY:
-      return getBuiltinNodeKeyColumnResource(workspace, KIND_KEY_COLUMN_TOOL_PATH);
-    case NODE_KEY:
-      return getBuiltinNodeKeyColumnResource(workspace, NODE_KEY_COLUMN_TOOL_PATH);
-    default:
-      throw new IllegalArgumentException("Unexpected value: " + keyChoice);
-    }
-  }
-
   @Bean
-  public DepanFxBuiltInContribution modelKeyColumn() {
+  public DepanFxBuiltInContribution<DepanFxNodeKeyColumnData> modelKeyColumn() {
     DepanFxNodeKeyColumnData toolData = buildNodeKeyColumnData(
         KeyChoice.MODEL_KEY, MODEL_KEY_COLUMN_LABEL);
-    return new DepanFxBuiltInContribution.Simple(
+    return new DepanFxBuiltInContribution.Simple<>(
         MODEL_KEY_COLUMN_TOOL_PATH, toolData);
   }
 
   @Bean
-  public DepanFxBuiltInContribution kindKeyColumn() {
+  public DepanFxBuiltInContribution<DepanFxNodeKeyColumnData> kindKeyColumn() {
     DepanFxNodeKeyColumnData toolData = buildNodeKeyColumnData(
         KeyChoice.KIND_KEY, KIND_KEY_COLUMN_LABEL);
-    return new DepanFxBuiltInContribution.Simple(
+    return new DepanFxBuiltInContribution.Simple<>(
         KIND_KEY_COLUMN_TOOL_PATH, toolData);
   }
 
   @Bean
-  public DepanFxBuiltInContribution nodeKeyColumn() {
+  public DepanFxBuiltInContribution<DepanFxNodeKeyColumnData> nodeKeyColumn() {
     DepanFxNodeKeyColumnData toolData = buildNodeKeyColumnData(
         KeyChoice.NODE_KEY, NODE_KEY_COLUMN_LABEL);
-    return new DepanFxBuiltInContribution.Simple(
+    return new DepanFxBuiltInContribution.Simple<>(
         NODE_KEY_COLUMN_TOOL_PATH, toolData);
   }
 
@@ -97,12 +81,6 @@ public class DepanFxNodeKeyColumnConfiguration {
   @Bean
   public DepanFxResourcePathMenuContribution nodeKeyColumnPathMenu() {
     return new NodeKeyColumnPathContribution();
-  }
-
-  private static Optional<DepanFxWorkspaceResource> getBuiltinNodeKeyColumnResource(
-      DepanFxWorkspace workspace, Path toolPath) {
-    return DepanFxProjects.getBuiltIn(
-        workspace, DepanFxNodeKeyColumnData.class, toolPath);
   }
 
   private DepanFxNodeKeyColumnData buildNodeKeyColumnData(
@@ -122,7 +100,7 @@ public class DepanFxNodeKeyColumnConfiguration {
   }
 
   private static class NodeKeyColumnExtContribution
-      extends DepanFxResourceExtMenuContribution.Basic {
+      extends DepanFxResourceExtMenuContribution.Basic<DepanFxNodeKeyColumnData> {
 
     public NodeKeyColumnExtContribution() {
       super(DepanFxNodeKeyColumnData.class, NODE_KEY_COLUMN_KEY,
@@ -132,11 +110,10 @@ public class DepanFxNodeKeyColumnConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource wkspRsrc, DepanFxDialogRunner dialogRunner) {
+        DepanFxWorkspaceResource<DepanFxNodeKeyColumnData> wkspRsrc,
+        DepanFxDialogRunner dialogRunner) {
       DepanFxNodeKeyColumnToolDialog.runEditDialog(
-          wkspRsrc.getDocument(),
-          (DepanFxNodeKeyColumnData) wkspRsrc.getResource(),
-          dialogRunner);
+          wkspRsrc.getDocument(), wkspRsrc.getResource(), dialogRunner);
     }
   }
 

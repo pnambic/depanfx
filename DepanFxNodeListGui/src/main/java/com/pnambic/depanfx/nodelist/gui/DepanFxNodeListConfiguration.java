@@ -83,10 +83,10 @@ public class DepanFxNodeListConfiguration {
         DepanFxWorkspace workspace,
         Path docPath) {
       try {
-        Optional<DepanFxWorkspaceResource> optWkspRsrc =
+        Optional<DepanFxWorkspaceResource<GraphDocument>> optWkspRsrc =
             workspace.toProjectDocument(docPath.toUri())
-                .flatMap(r -> workspace.getWorkspaceResource(
-                      r, GraphDocument.class));
+                .flatMap(r ->
+                    workspace.getWorkspaceResource(r, GraphDocument.class));
         optWkspRsrc.map(DepanFxNodeLists::buildNodeList)
             .ifPresent(nl -> {
               String title = DepanFxWorkspaceFactory.buildDocTitle(
@@ -136,12 +136,11 @@ public class DepanFxNodeListConfiguration {
         DepanFxWorkspace workspace,
         Path docPath) {
       try {
-        Optional<DepanFxWorkspaceResource> optWkspRsrc =
+        Optional<DepanFxWorkspaceResource<DepanFxNodeList>> optWkspRsrc =
             workspace.toProjectDocument(docPath.toUri())
                 .flatMap(r -> workspace.getWorkspaceResource(
                       r, DepanFxNodeList.class));
         optWkspRsrc.map(r -> r.getResource())
-            .map(DepanFxNodeList.class::cast)
             .ifPresent(nl -> {
               String title = DepanFxWorkspaceFactory.buildDocTitle(
                   optWkspRsrc.get().getDocument());

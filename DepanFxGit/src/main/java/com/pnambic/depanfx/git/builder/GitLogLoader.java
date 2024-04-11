@@ -54,7 +54,7 @@ public class GitLogLoader {
 
   private final DepanFxProjectContainer dstDir;
 
-  private final DepanFxWorkspaceResource graphRsrc;
+  private final DepanFxWorkspaceResource<GraphDocument> graphRsrc;
 
   private final GitCommandRunner cmdRunner;
 
@@ -69,8 +69,10 @@ public class GitLogLoader {
   private NodeListContext loaderContext;
 
   public GitLogLoader(
-      DepanFxWorkspace workspace, DepanFxProjectContainer dstDir,
-      DepanFxWorkspaceResource graphRsrc, GitCommandRunner cmdRunner) {
+      DepanFxWorkspace workspace,
+      DepanFxProjectContainer dstDir,
+      DepanFxWorkspaceResource<GraphDocument> graphRsrc,
+      GitCommandRunner cmdRunner) {
     this.workspace = workspace;
     this.dstDir = dstDir;
     this.graphRsrc = graphRsrc;
@@ -80,7 +82,7 @@ public class GitLogLoader {
   public void loadBranchCommits(String branchName, int logCount) {
     String loadBranchName =
         Strings.isNullOrEmpty(branchName) ? DEFAULT_BRANCH_NAME : branchName;
-    graphModel = ((GraphDocument) graphRsrc.getResource()).getGraph();
+    graphModel = graphRsrc.getResource().getGraph();
     loaderContext =
         new NodeListContext(graphRsrc, dstDir, loadBranchName, logCount);
 
@@ -117,7 +119,7 @@ public class GitLogLoader {
     }
   }
 
-  private Optional<DepanFxWorkspaceResource> saveNodeList() {
+  private Optional<DepanFxWorkspaceResource<DepanFxNodeList>> saveNodeList() {
     Optional<DepanFxProjectDocument> optProjDoc =
         loaderContext.buildProjectDocument(commitId);
     if (optProjDoc.isEmpty()) {
@@ -139,7 +141,7 @@ public class GitLogLoader {
 
   private static class NodeListContext {
 
-    private final DepanFxWorkspaceResource graphRsrc;
+    private final DepanFxWorkspaceResource<GraphDocument> graphRsrc;
 
     private final DepanFxProjectContainer dstDir;
 
@@ -150,7 +152,7 @@ public class GitLogLoader {
     private int count = 0;
 
     public NodeListContext(
-        DepanFxWorkspaceResource graphRsrc,
+        DepanFxWorkspaceResource<GraphDocument> graphRsrc,
         DepanFxProjectContainer dstDir,
         String branchName, int logMax) {
       this.graphRsrc = graphRsrc;

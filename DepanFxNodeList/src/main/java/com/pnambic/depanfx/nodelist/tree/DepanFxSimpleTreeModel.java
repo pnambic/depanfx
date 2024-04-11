@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodelist.tree;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -9,14 +10,14 @@ import java.util.Collection;
 public class DepanFxSimpleTreeModel
     implements DepanFxTreeModel, DepanFxAdjacencyModel {
 
-  private final DepanFxWorkspaceResource graphDocResource;
+  private final DepanFxWorkspaceResource<GraphDocument> graphDocResource;
 
   private final DepanFxAdjacencyModel nodeMembers;
 
   private final Collection<GraphNode> roots;
 
   public DepanFxSimpleTreeModel(
-      DepanFxWorkspaceResource graphDocResource,
+      DepanFxWorkspaceResource<GraphDocument> graphDocResource,
       DepanFxAdjacencyModel nodeMembers,
       Collection<GraphNode> roots) {
     this.graphDocResource = graphDocResource;
@@ -25,7 +26,7 @@ public class DepanFxSimpleTreeModel
   }
 
   @Override
-  public DepanFxWorkspaceResource getGraphDocResource() {
+  public DepanFxWorkspaceResource<GraphDocument> getGraphDocResource() {
     return graphDocResource;
   }
 

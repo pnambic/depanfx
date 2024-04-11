@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui.tooldata;
 
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 public class DepanFxFocusColumnData extends DepanFxBaseColumnData {
@@ -14,12 +15,13 @@ public class DepanFxFocusColumnData extends DepanFxBaseColumnData {
 
   private final String focusLabel;
 
-  private final DepanFxWorkspaceResource nodeListRsrc;
+  private final DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc;
 
   public DepanFxFocusColumnData(
       String toolName, String toolDescription,
       String columnLabel, int widthMs,
-      String focusLabel, DepanFxWorkspaceResource nodeListRsrc) {
+      String focusLabel,
+      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
 
     super(toolName, toolDescription, columnLabel, widthMs);
     this.focusLabel = focusLabel;
@@ -27,7 +29,7 @@ public class DepanFxFocusColumnData extends DepanFxBaseColumnData {
   }
 
   public static DepanFxFocusColumnData buildInitialFocusColumnData(
-      DepanFxWorkspaceResource nodeListRsrc) {
+      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
     return new DepanFxFocusColumnData(
         DepanFxBaseColumnData.BASE_COLUMN_NAME, BASE_COLUMN_DESCR,
         BASE_COLUMN_LABEL, DepanFxBaseColumnData.BASE_COLUMN_WIDTH_MS,
@@ -38,7 +40,7 @@ public class DepanFxFocusColumnData extends DepanFxBaseColumnData {
     return focusLabel;
   }
 
-  public DepanFxWorkspaceResource getNodeListRsrc() {
+  public DepanFxWorkspaceResource<DepanFxNodeList> getNodeListRsrc() {
     return nodeListRsrc;
   }
 }

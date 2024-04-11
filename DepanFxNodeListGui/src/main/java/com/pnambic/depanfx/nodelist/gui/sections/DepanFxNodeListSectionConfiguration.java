@@ -12,12 +12,13 @@ import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContributio
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
-import com.pnambic.depanfx.workspace.DepanFxProjectResource;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
+import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 import javafx.scene.control.Cell;
 
@@ -36,35 +38,54 @@ public class DepanFxNodeListSectionConfiguration {
 
   private static final String TREE_SECTION_KEY = "Tree Section";
 
-  private final DepanFxBuiltInContribution memberFinderlinkMatcherContrib =
-      buildMemberFinderLinkMatcher();
+  private static final Path MEMBER_MATCHER_PATH =
+      DepanFxLinkMatcherDocument.LINK_MATCHER_TOOL_PATH.resolve("Tree Member");
+
+  private static final Path MEMBER_TREE_SECTION_PATH =
+      DepanFxNodeListSectionData.SECTIONS_TOOL_PATH.resolve("Member Tree");
 
   @Autowired
   public DepanFxNodeListSectionConfiguration() {
   }
 
   @Bean
-  public DepanFxBuiltInContribution memberTreeSection() {
-    DepanFxTreeSectionData toolData = buildInitialTreeSection(
-        "Member Tree Section",
-        "Tree section based on a link matcher for membership");
-    return createBuiltIn("Member Tree", toolData);
+  public DepanFxBuiltInContribution<DepanFxTreeSectionData>
+      memberTreeSection() {
+
+    return new DepanFxBuiltInContribution.Dependent<DepanFxTreeSectionData>(
+        MEMBER_TREE_SECTION_PATH) {
+
+      @Override
+      protected DepanFxTreeSectionData buildDocument(
+          DepanFxBuiltInProject project) {
+        return buildMemberTreeSection(
+            project, "Member Tree Section",
+            "Tree section based on a link matcher for membership");
+      }
+    };
   }
 
   @Bean
-  public DepanFxBuiltInContribution flatSection() {
+  public DepanFxBuiltInContribution<DepanFxFlatSectionData> flatSection() {
     DepanFxFlatSectionData toolData =
         new DepanFxFlatSectionData(
             "Built-in Flat Section", "Built-in flat section.",
             DepanFxFlatSectionData.BASE_SECTION_LABEL, true,
             OrderBy.NODE_KEY, OrderDirection.FORWARD);
-    return new DepanFxBuiltInContribution.Simple(
+    return new DepanFxBuiltInContribution.Simple<>(
         DepanFxNodeListSectionData.SIMPLE_SECTION_TOOL_PATH, toolData);
   }
 
   @Bean
-  public DepanFxBuiltInContribution memberFinderLinkMatcher() {
-    return memberFinderlinkMatcherContrib;
+  public DepanFxBuiltInContribution<DepanFxLinkMatcherDocument>
+      memberFinderLinkMatcher() {
+
+    DepanFxLinkMatcherDocument finderMatcher =
+        new DepanFxLinkMatcherDocument(
+            "Tree Member", "Synthetic tree membership",
+            null, DepanFxLinkMatcherGroup.MEMBER_MATCHER_GROUP, null);
+    return new DepanFxBuiltInContribution.Simple<>(
+        MEMBER_MATCHER_PATH, finderMatcher);
   }
 
   @Bean
@@ -84,39 +105,29 @@ public class DepanFxNodeListSectionConfiguration {
 
   @Bean
   public DepanFxResourcePathMenuContribution treeSectionPathMenu() {
-    return new TreeSectionPathContribution(
-        memberFinderlinkMatcherContrib.getPath());
+    return new TreeSectionPathContribution();
   }
 
-  public DepanFxTreeSectionData buildInitialTreeSection(
-      String toolName, String toolDescription) {
+  private DepanFxTreeSectionData buildMemberTreeSection(
+      DepanFxBuiltInProject project, String toolName, String toolDescription) {
+
+    Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+        optMatcherRsrc = project.getResource(MEMBER_MATCHER_PATH);
+    DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc =
+        optMatcherRsrc.orElseThrow(() ->
+            new DepanFxBuiltInContribution.MissingDependencyException(
+                MEMBER_TREE_SECTION_PATH, MEMBER_MATCHER_PATH));
+
     return new DepanFxTreeSectionData(
-        toolName, toolDescription,
-        "Tree", true,
-        new DepanFxProjectResource.BuiltIn(
-            memberFinderlinkMatcherContrib.getPath()), true,
+        toolName, toolDescription, "Tree", true, matcherRsrc, true,
         OrderBy.NODE_LEAF, ContainerOrder.LAST, OrderDirection.FORWARD);
   }
 
-  private DepanFxBuiltInContribution buildMemberFinderLinkMatcher() {
-    Path docPath = DepanFxLinkMatcherDocument.LINK_MATCHER_TOOL_PATH
-        .resolve("Tree Member");
-    DepanFxLinkMatcherDocument finderMatcher =
-        new DepanFxLinkMatcherDocument(
-            "Tree Member", "Synthetic tree membership",
-            null, DepanFxLinkMatcherGroup.MEMBER_MATCHER_GROUP, null);
-    return new DepanFxBuiltInContribution.Simple(docPath, finderMatcher);
-  }
-
-  private DepanFxBuiltInContribution createBuiltIn(
-      String docName, Object doc) {
-    Path docPath =
-        DepanFxNodeListSectionData.SECTIONS_TOOL_PATH.resolve(docName);
-    return new DepanFxBuiltInContribution.Simple(docPath, doc);
-  }
+  /////////////////////////////////////
+  // Flat section contributions
 
   private static class FlatSectionExtContribution
-      extends DepanFxResourceExtMenuContribution.Basic {
+      extends DepanFxResourceExtMenuContribution.Basic<DepanFxFlatSectionData> {
 
     public FlatSectionExtContribution() {
       super(DepanFxFlatSectionData.class, FLAT_SECTION_KEY,
@@ -126,11 +137,10 @@ public class DepanFxNodeListSectionConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource wkspRsrc, DepanFxDialogRunner dialogRunner) {
+        DepanFxWorkspaceResource<DepanFxFlatSectionData> wkspRsrc,
+        DepanFxDialogRunner dialogRunner) {
       DepanFxFlatSectionToolDialog.runEditDialog(
-          wkspRsrc.getDocument(),
-          (DepanFxFlatSectionData) wkspRsrc.getResource(),
-          dialogRunner);
+          wkspRsrc.getDocument(), wkspRsrc.getResource(), dialogRunner);
     }
   }
 
@@ -180,8 +190,11 @@ public class DepanFxNodeListSectionConfiguration {
     }
   }
 
+  /////////////////////////////////////
+  // Tree section GUI contributions
+
   private static class TreeSectionExtContribution
-      extends DepanFxResourceExtMenuContribution.Basic {
+      extends DepanFxResourceExtMenuContribution.Basic<DepanFxTreeSectionData> {
 
     public TreeSectionExtContribution() {
       super(DepanFxTreeSectionData.class, TREE_SECTION_KEY,
@@ -191,11 +204,10 @@ public class DepanFxNodeListSectionConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource wkspRsrc, DepanFxDialogRunner dialogRunner) {
+        DepanFxWorkspaceResource<DepanFxTreeSectionData> wkspRsrc,
+        DepanFxDialogRunner dialogRunner) {
       DepanFxTreeSectionToolDialog.runEditDialog(
-          wkspRsrc.getDocument(),
-          (DepanFxTreeSectionData) wkspRsrc.getResource(),
-          dialogRunner);
+          wkspRsrc.getDocument(), wkspRsrc.getResource(), dialogRunner);
     }
   }
 
@@ -211,12 +223,6 @@ public class DepanFxNodeListSectionConfiguration {
     private static Logger LOG =
         LoggerFactory.getLogger(TreeSectionPathContribution.class);
 
-    private final Path builtInMatcherPath;
-
-    public TreeSectionPathContribution(Path builtInMatcherPath) {
-      this.builtInMatcherPath = builtInMatcherPath;
-    }
-
     @Override
     public boolean acceptsPath(Path rsrcPath) {
       return DepanFxNodeListSectionData.SECTIONS_TOOL_PATH.equals(rsrcPath);
@@ -229,25 +235,30 @@ public class DepanFxNodeListSectionConfiguration {
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       builder.appendActionItem(
           DepanFxTreeSection.NEW_TREE_SECTION_DATA,
-          e -> runNewTreeSectionDataAction(dialogRunner));
+          e -> runNewTreeSectionDataAction(dialogRunner, workspace));
     }
 
     private void runNewTreeSectionDataAction(
-        DepanFxDialogRunner dialogRunner) {
+        DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace) {
       try {
-        DepanFxTreeSectionData sectionData = buildInitialTreeSection();
+        DepanFxTreeSectionData sectionData = buildInitialTreeSection(workspace);
         DepanFxTreeSectionToolDialog.runCreateDialog(sectionData, dialogRunner);
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to create tree section data", errCaught);
       }
     }
 
-    private DepanFxTreeSectionData buildInitialTreeSection() {
-      return new DepanFxTreeSectionData(
-          NEW_TREE_SECTION_NAME, NEW_TREE_SECTION_DESCR,
-          NEW_TREE_SECTION_LABEL, true,
-          new DepanFxProjectResource.BuiltIn(builtInMatcherPath), true,
-          OrderBy.NODE_LEAF, ContainerOrder.LAST, OrderDirection.FORWARD);
+    private DepanFxTreeSectionData buildInitialTreeSection(
+        DepanFxWorkspace workspace) {
+      Optional<DepanFxProjectDocument> matcherProjPath =
+          workspace.getBuiltInProjectTree().asProjectDocument(MEMBER_MATCHER_PATH);
+      return  workspace.getWorkspaceResource(
+          matcherProjPath.get(), DepanFxLinkMatcherDocument.class)
+          .map(m -> new DepanFxTreeSectionData(
+                NEW_TREE_SECTION_NAME, NEW_TREE_SECTION_DESCR,
+                NEW_TREE_SECTION_LABEL, true, m, true,
+                OrderBy.NODE_LEAF, ContainerOrder.LAST, OrderDirection.FORWARD))
+          .get();
     }
 
     @Override

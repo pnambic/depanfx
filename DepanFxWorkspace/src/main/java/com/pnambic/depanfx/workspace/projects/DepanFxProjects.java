@@ -99,15 +99,15 @@ public class DepanFxProjects {
         .orElse(null);
   }
 
-  public static Stream<DepanFxBuiltInContribution> streamBuiltIns(
-      DepanFxWorkspace workspace, Class<?> type) {
+  public static <T> Stream<DepanFxBuiltInContribution<T>> streamBuiltIns(
+      DepanFxWorkspace workspace, Class<T> type) {
     DepanFxBuiltInProject project =
         (DepanFxBuiltInProject) workspace.getBuiltInProject();
     return project.getContributions(type);
   }
 
-  public static Optional<DepanFxWorkspaceResource> getBuiltIn(
-      DepanFxWorkspace workspace, Class<?> type, Path builtInPath) {
+  public static <T> Optional<DepanFxWorkspaceResource<T>> getBuiltIn(
+      DepanFxWorkspace workspace, Class<T> type, Path builtInPath) {
     return
         workspace.getBuiltInProjectTree().asProjectDocument(builtInPath)
         .flatMap(d ->
@@ -115,9 +115,13 @@ public class DepanFxProjects {
                 .getResource(d));
   }
 
-  public static Optional<DepanFxWorkspaceResource> getBuiltIn(
-      DepanFxWorkspace workspace, Class<?> type,
-      Predicate<DepanFxBuiltInContribution> contribFilter) {
+  /**
+   * By the time a candidate built in hits the filter,
+   * it has already been filtered to be of the requested type.
+   */
+  public static <T> Optional<DepanFxWorkspaceResource<T>> getBuiltIn(
+      DepanFxWorkspace workspace, Class<T> type,
+      Predicate<DepanFxBuiltInContribution<T>> contribFilter) {
 
     DepanFxBuiltInProject project =
         (DepanFxBuiltInProject) workspace.getBuiltInProject();
@@ -141,12 +145,12 @@ public class DepanFxProjects {
     return projectTree.asProjectContainer(dirPath);
   }
 
-  private static Optional<DepanFxWorkspaceResource> buildContributionRsrc(
-      DepanFxBuiltInContribution contrib, DepanFxBuiltInProject project) {
+  private static <T> Optional<DepanFxWorkspaceResource<T>> buildContributionRsrc(
+      DepanFxBuiltInContribution<T> contrib, DepanFxBuiltInProject project) {
     Optional<DepanFxProjectDocument> optProjDoc =
         project.getProjectTree().asProjectDocument(contrib.getPath());
     return optProjDoc
-        .map(p -> new DepanFxWorkspaceResource.StaticWorkspaceResource(
+        .map(p -> new DepanFxWorkspaceResource.StaticWorkspaceResource<T>(
             p, contrib.getDocument()));
   }
 }

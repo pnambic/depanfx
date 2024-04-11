@@ -99,13 +99,13 @@ public class NodeListConverter
 
     Map<String, Object> metaData = TAG_LOADER.loadData(META_TAGS, srcContext);
 
-    DepanFxWorkspaceResource graphDocRsrc =
-        (DepanFxWorkspaceResource) metaData.get(GRAPH_DOC);
+    @SuppressWarnings("unchecked")
+    DepanFxWorkspaceResource<GraphDocument> graphDocRsrc =
+        (DepanFxWorkspaceResource<GraphDocument>) metaData.get(GRAPH_DOC);
 
     // Extract the basis for model mapping.
-    GraphDocument graphDoc = (GraphDocument) graphDocRsrc.getResource();
-    GraphModel graphModel = graphDoc.getGraph();
-    srcContext.putContextValue(GraphModel.class, graphModel );
+    GraphModel graphModel = graphDocRsrc.getResource().getGraph();
+    srcContext.putContextValue(GraphModel.class, graphModel);
 
     Collection<GraphNode> nodes = new ArrayList<>();
     while (srcContext.hasMoreChildren()) {
@@ -151,7 +151,7 @@ public class NodeListConverter
   // Adjustments for legacy documents.
 
   private String guessName(
-      String loadName, DepanFxWorkspaceResource graphDocRsrc) {
+      String loadName, DepanFxWorkspaceResource<GraphDocument> graphDocRsrc) {
     if (loadName != null) {
       return loadName;
     }

@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui.tooldata;
 
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.util.ArrayList;
@@ -12,10 +13,11 @@ public class DepanFxCategoryColumnData extends DepanFxBaseColumnData {
 
     private final String categoryLabel;
 
-    private final DepanFxWorkspaceResource nodeListRsrc;
+    private final DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc;
 
     public CategoryEntry(
-        String categoryLabel, DepanFxWorkspaceResource nodeListRsrc) {
+        String categoryLabel,
+        DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
       this.categoryLabel = categoryLabel;
       this.nodeListRsrc = nodeListRsrc;
     }
@@ -24,7 +26,7 @@ public class DepanFxCategoryColumnData extends DepanFxBaseColumnData {
       return categoryLabel;
     }
 
-    public DepanFxWorkspaceResource getNodeListRsrc() {
+    public DepanFxWorkspaceResource<DepanFxNodeList> getNodeListRsrc() {
       return nodeListRsrc;
     }
   }

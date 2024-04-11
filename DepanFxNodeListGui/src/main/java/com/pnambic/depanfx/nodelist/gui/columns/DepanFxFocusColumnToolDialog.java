@@ -115,13 +115,13 @@ public class DepanFxFocusColumnToolDialog
         .ifPresent(this::updateNodeListFields);
   }
 
-  private void updateNodeListFields(DepanFxWorkspaceResource nodeListRsrc) {
+  private void updateNodeListFields(
+      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
     focusNodeListRsrcField.setText(
         nodeListRsrc.getDocument().getMemberPath().toString());
 
     if (Strings.isNullOrEmpty(focusLabelField.getText())) {
-      focusLabelField.setText((
-          (DepanFxNodeList) nodeListRsrc.getResource()).getNodeListName());
+      focusLabelField.setText(nodeListRsrc.getResource().getNodeListName());
     }
   }
 
@@ -130,7 +130,7 @@ public class DepanFxFocusColumnToolDialog
 
   @Override
   protected DepanFxFocusColumnData prepareResult() {
-    Optional<DepanFxWorkspaceResource> optNodeListRsrc =
+    Optional<DepanFxWorkspaceResource<DepanFxNodeList>> optNodeListRsrc =
         DepanFxResourcePerspectives.toResource(
             getWorkspace(), focusNodeListRsrcField, DepanFxNodeList.class);
 

@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodeview.layouts;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
@@ -47,8 +48,8 @@ public class RadialLayoutContribution
 
   @Override
   public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
-      DepanFxWorkspaceResource layoutRsrc,
-      DepanFxWorkspaceResource graphDocRsrc,
+      DepanFxWorkspaceResource<?> layoutRsrc,
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
       List<GraphNode> updateNodes) {
     DepanFxRadialLayoutData radialData =
         (DepanFxRadialLayoutData) layoutRsrc.getResource();
@@ -71,7 +72,8 @@ public class RadialLayoutContribution
         DepanFxRadialLayoutToolDialog.runCreateDialog(
             initialData, view.getDialogRunner());
 
-    DepanFxWorkspaceResource graphDocRsrc = view.getGraphDocRsrc();
+    DepanFxWorkspaceResource<GraphDocument> graphDocRsrc =
+        view.getGraphDocRsrc();
     List<GraphNode> updateNodes =
         view.streamChosenNodes().collect(Collectors.toList());
 
@@ -81,7 +83,7 @@ public class RadialLayoutContribution
   }
 
   private Map<GraphNode, DepanFxNodeLocationData> buildNodeLocations(
-      DepanFxWorkspaceResource graphDocRsrc,
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
       List<GraphNode> updateNodes,
       DepanFxLinkMatcher linkMatcher) {
     DepanFxTreeModelBuilder builder = new DepanFxTreeModelBuilder(linkMatcher);

@@ -7,7 +7,7 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 public class WorkspaceResourceConverter
-    extends BasePersistObjectConverter<DepanFxWorkspaceResource> {
+    extends BasePersistObjectConverter<DepanFxWorkspaceResource<?>> {
 
   public static final String WORKSPACE_RESOURCE_TAG = "workspace-resource";
 
@@ -31,7 +31,7 @@ public class WorkspaceResourceConverter
 
   @Override
   public void marshal(PersistMarshalContext dstContext, Object source) {
-    DepanFxWorkspaceResource wkspRsrc = (DepanFxWorkspaceResource) source;
+    DepanFxWorkspaceResource<?> wkspRsrc = (DepanFxWorkspaceResource<?>) source;
 
     PersistWorkspaceResource persistWkspRsrc =
         PersistWorkspaceResource.of(wkspRsrc);
@@ -39,7 +39,7 @@ public class WorkspaceResourceConverter
   }
 
   @Override
-  public DepanFxWorkspaceResource unmarshal(
+  public DepanFxWorkspaceResource<?> unmarshal(
       PersistUnmarshalContext srcContext) {
     PersistWorkspaceResource persistWkspRsrc =
         (PersistWorkspaceResource) unmarshalValue(
@@ -47,7 +47,7 @@ public class WorkspaceResourceConverter
 
     DepanFxWorkspace workspace =
         (DepanFxWorkspace) srcContext.getContextValue(DepanFxWorkspace.class);
-    DepanFxWorkspaceResource result =
+    DepanFxWorkspaceResource<?> result =
         PersistWorkspaceResource.forWksp(workspace, persistWkspRsrc)
         .get();
     return result;

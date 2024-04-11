@@ -52,8 +52,8 @@ public class DepanFxResourcePerspectives {
     return workspace.toProjectDocument(toUri(text));
   }
 
-  public static Optional<DepanFxWorkspaceResource> toResource(
-      DepanFxWorkspace workspace, TextField text, Class<?> rsrcType) {
+  public static <T> Optional<DepanFxWorkspaceResource<T>> toResource(
+      DepanFxWorkspace workspace, TextField text, Class<T> rsrcType) {
     return toProjecDocument( workspace, text)
         .flatMap(p -> workspace .getWorkspaceResource(p, rsrcType));
   }

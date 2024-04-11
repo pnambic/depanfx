@@ -23,7 +23,7 @@ public class DepanFxFlatSection implements DepanFxNodeListSection {
   public static final String NEW_FLAT_SECTION_DATA =
       "New Flat Section Data...";
 
-  private DepanFxWorkspaceResource sectionDataRsrc;
+  private DepanFxWorkspaceResource<DepanFxFlatSectionData> sectionDataRsrc;
 
   // Update this whenever sectionDataRsrc is revised.
   private Comparator<TreeItem<DepanFxNodeListMember>> flatMemberCompare;
@@ -31,22 +31,23 @@ public class DepanFxFlatSection implements DepanFxNodeListSection {
   private DepanFxNodeList sectionNodes;
 
   public DepanFxFlatSection(
-      DepanFxWorkspaceResource sectionDataRsrc) {
+      DepanFxWorkspaceResource<DepanFxFlatSectionData> sectionDataRsrc) {
     this.sectionDataRsrc = sectionDataRsrc;
     this.flatMemberCompare = updateCompare();
   }
 
-  public void setSectionDataRsrc(DepanFxWorkspaceResource sectionDataRsrc) {
+  public void setSectionDataRsrc(
+      DepanFxWorkspaceResource<DepanFxFlatSectionData> sectionDataRsrc) {
     this.sectionDataRsrc = sectionDataRsrc;
     this.flatMemberCompare = updateCompare();
   }
 
-  public DepanFxWorkspaceResource getSectionDataRsrc() {
+  public DepanFxWorkspaceResource<DepanFxFlatSectionData> getSectionDataRsrc() {
     return sectionDataRsrc;
   }
 
   public DepanFxFlatSectionData getSectionData() {
-    return (DepanFxFlatSectionData) sectionDataRsrc.getResource();
+    return sectionDataRsrc.getResource();
   }
 
   @Override

@@ -17,13 +17,13 @@ public class DepanFxNodeViewLinkDisplayData extends DepanFxBaseToolData {
 
     private final String linkLabel;
 
-    private final DepanFxWorkspaceResource linkRsrc;
+    private final DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkRsrc;
 
     private final DepanFxLineDisplayData lineDisplay;
 
     public LinkDisplayEntry(
         String linkLabel,
-        DepanFxWorkspaceResource linkRsrc,
+        DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkRsrc,
         DepanFxLineDisplayData lineDisplay) {
       this.linkLabel = linkLabel;
       this.linkRsrc = linkRsrc;
@@ -34,7 +34,7 @@ public class DepanFxNodeViewLinkDisplayData extends DepanFxBaseToolData {
       return linkLabel;
     }
 
-    public DepanFxWorkspaceResource getLinkRsrc() {
+    public DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> getLinkRsrc() {
       return linkRsrc;
     }
 
@@ -91,7 +91,7 @@ public class DepanFxNodeViewLinkDisplayData extends DepanFxBaseToolData {
 
   private boolean handlesEdge(LinkDisplayEntry displayInfo, GraphEdge edge) {
     DepanFxLinkMatcherDocument matcherDoc =
-        (DepanFxLinkMatcherDocument) displayInfo.getLinkRsrc().getResource();
+        displayInfo.getLinkRsrc().getResource();
     return matcherDoc.getMatcher().match(edge).isPresent();
   }
 }

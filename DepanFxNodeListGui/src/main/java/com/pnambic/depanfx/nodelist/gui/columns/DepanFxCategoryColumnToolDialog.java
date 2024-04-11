@@ -244,10 +244,11 @@ public class DepanFxCategoryColumnToolDialog
 
     public StringProperty nodeListNameProp;
 
-    public DepanFxWorkspaceResource nodeListRsrc;
+    public DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc;
 
     public EditCategory(
-        String categoryLabel, DepanFxWorkspaceResource nodeListRsrc) {
+        String categoryLabel,
+        DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
       this.categoryLabelProp =  new SimpleStringProperty(categoryLabel);
       this.nodeListRsrc = nodeListRsrc;
       this.nodeListNameProp =  new SimpleStringProperty();
@@ -270,7 +271,8 @@ public class DepanFxCategoryColumnToolDialog
       return nodeListNameProp;
     }
 
-    public void setNodeListResource(DepanFxWorkspaceResource nodeListRsrc) {
+    public void setNodeListResource(
+        DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
       this.nodeListRsrc = nodeListRsrc;
       updateNodeNameProp();
       updateCategoryLabelProp();
@@ -289,7 +291,7 @@ public class DepanFxCategoryColumnToolDialog
       if (Strings.isNullOrEmpty(categoryLabelProp.getValue())) {
         if (nodeListRsrc != null) {
           categoryLabelProp.setValue(
-              ((DepanFxNodeList) nodeListRsrc.getResource()).getNodeListName());
+              nodeListRsrc.getResource().getNodeListName());
         }
       }
     }

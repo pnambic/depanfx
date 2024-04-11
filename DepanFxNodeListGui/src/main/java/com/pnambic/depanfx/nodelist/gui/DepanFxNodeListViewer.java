@@ -150,7 +150,7 @@ public class DepanFxNodeListViewer {
   }
 
   public GraphDocument getGraphDoc() {
-    return (GraphDocument) nodeList.getGraphDocResource().getResource();
+    return nodeList.getGraphDocResource().getResource();
   }
 
   public ContextModelId getContextModelId() {
@@ -266,21 +266,20 @@ public class DepanFxNodeListViewer {
     saveDlg.runDialog("Save selection as node list");
   }
 
-  private Optional<DepanFxWorkspaceResource> getInitialTreeSectionResource() {
+  private Optional<DepanFxWorkspaceResource<DepanFxTreeSectionData>>
+      getInitialTreeSectionResource() {
     ContextModelId modelId = getGraphDoc().getContextModelId();
 
     return DepanFxProjects.getBuiltIn(
         workspace, DepanFxTreeSectionData.class,
-        c -> this.byMemberLinkMatcherDoc(c, modelId));
+        c -> byMemberLinkMatcherDoc(c, modelId));
   }
 
   private boolean byMemberLinkMatcherDoc(
-      DepanFxBuiltInContribution contrib, Object modelId) {
-    DepanFxTreeSectionData doc =
-        (DepanFxTreeSectionData) contrib.getDocument();
+      DepanFxBuiltInContribution<?> contrib, Object modelId) {
+    DepanFxTreeSectionData doc = (DepanFxTreeSectionData) contrib.getDocument();
     DepanFxLinkMatcherDocument linkMatchDoc =
-        ((DepanFxLinkMatcherDocument) doc.getLinkMatcherRsrc(workspace)
-            .getResource());
+        doc.getLinkMatcherRsrc().getResource();
     if (!linkMatchDoc.getMatchGroups()
         .contains(DepanFxLinkMatcherGroup.MEMBER)) {
       return false;
@@ -384,21 +383,25 @@ public class DepanFxNodeListViewer {
         .ifPresent(this::addColumn);
   }
 
+  @SuppressWarnings("unchecked")
   private DepanFxNodeListColumn toColumn(
-      DepanFxWorkspaceResource columnRsrc) {
-    Class<?> type = columnRsrc.getResource().getClass();
+      DepanFxWorkspaceResource<?> columnRsrc) {
     switch (columnRsrc.getResource()) {
     case DepanFxCategoryColumnData val:
-      return new DepanFxCategoryColumn(this, columnRsrc);
+      return new DepanFxCategoryColumn(this,
+          (DepanFxWorkspaceResource<DepanFxCategoryColumnData>) columnRsrc);
     case DepanFxFocusColumnData val:
-      return new DepanFxFocusColumn(this, columnRsrc);
+      return new DepanFxFocusColumn(this,
+          (DepanFxWorkspaceResource<DepanFxFocusColumnData>) columnRsrc);
     case DepanFxNodeKeyColumnData val:
-      return new DepanFxNodeKeyColumn(this, columnRsrc);
+      return new DepanFxNodeKeyColumn(this,
+          (DepanFxWorkspaceResource<DepanFxNodeKeyColumnData>) columnRsrc);
 
     default:
       break;
     }
-    LOG.warn("Unknown type {} for column construction", type.getName());
+    LOG.warn("Unknown type {} for column construction",
+        columnRsrc.getResource().getClass().getName());
     return null;
   }
 

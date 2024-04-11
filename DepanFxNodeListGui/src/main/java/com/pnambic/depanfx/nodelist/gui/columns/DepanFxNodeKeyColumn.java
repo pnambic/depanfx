@@ -20,7 +20,8 @@ import java.io.File;
 import javafx.scene.control.ContextMenu;
 import javafx.stage.FileChooser;
 
-public class DepanFxNodeKeyColumn extends DepanFxAbstractColumn {
+public class DepanFxNodeKeyColumn
+    extends DepanFxAbstractColumn<DepanFxNodeKeyColumnData> {
 
   public static final String EDIT_NODE_KEY_COLUMN =
       "Edit Node Key Column...";
@@ -39,27 +40,10 @@ public class DepanFxNodeKeyColumn extends DepanFxAbstractColumn {
 
   private static final int COLUMN_WIDTH_MS = 15;
 
-  private DepanFxWorkspaceResource columnDataRsrc;
-
   public DepanFxNodeKeyColumn(
       DepanFxNodeListViewer listViewer,
-      DepanFxWorkspaceResource columnDataRsrc) {
-    super(listViewer);
-    this.columnDataRsrc = columnDataRsrc;
-  }
-
-  public DepanFxNodeKeyColumnData getColumnData() {
-    return (DepanFxNodeKeyColumnData) columnDataRsrc.getResource();
-  }
-
-  @Override
-  public String getColumnLabel() {
-    return getColumnData().getColumnLabel();
-  }
-
-  @Override
-  protected double getWidthMs() {
-    return getColumnData().getWidthMs();
+      DepanFxWorkspaceResource<DepanFxNodeKeyColumnData> columnDataRsrc) {
+    super(listViewer, columnDataRsrc);
   }
 
   @Override
@@ -110,7 +94,7 @@ public class DepanFxNodeKeyColumn extends DepanFxAbstractColumn {
   private void openColumnEditor(DepanFxDialogRunner dialogRunner) {
     Dialog<DepanFxNodeKeyColumnToolDialog> nodeKeyColumnEditor =
           DepanFxNodeKeyColumnToolDialog.runEditDialog(
-              columnDataRsrc.getDocument(), buildEditResource(),
+              getColumnProjectDoc(), buildEditResource(),
               dialogRunner);
 
     nodeKeyColumnEditor.getController().getWorkspaceResource()
@@ -138,11 +122,6 @@ public class DepanFxNodeKeyColumn extends DepanFxAbstractColumn {
               p, DepanFxNodeKeyColumnData.class))
           .ifPresent(this::updateColumnDataRsrc);
     }
-  }
-
-  private void updateColumnDataRsrc(DepanFxWorkspaceResource columnDataRsrc) {
-    this.columnDataRsrc = columnDataRsrc;
-    refreshColumn();
   }
 
   private FileChooser prepareNodeKeyColumnFinder(DepanFxWorkspace workspace) {

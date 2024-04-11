@@ -21,11 +21,9 @@ public class DepanFxNodeListChooser {
           "Node List", DepanFxNodeList.NODE_LIST_EXT);
 
   /**
-   * Obtain an existing git repo tooldata with file chooser.
-   * @param window 
-   * @param targetType 
+   * Obtain an existing node list with a file chooser.
    */
-  public static Optional<DepanFxWorkspaceResource> runNodeListFinder(
+  public static Optional<DepanFxWorkspaceResource<DepanFxNodeList>> runNodeListFinder(
       DepanFxWorkspace workspace, Window window) {
     FileChooser fileChooser = prepareNodeListFinder(workspace);
     File selectedFile = fileChooser.showOpenDialog(window);

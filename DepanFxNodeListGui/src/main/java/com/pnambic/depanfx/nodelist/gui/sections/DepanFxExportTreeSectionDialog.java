@@ -62,9 +62,8 @@ public class DepanFxExportTreeSectionDialog
 
   @Override
   protected GraphDocument getGraphDoc() {
-    return
-        (GraphDocument) getTreeSection().getTreeModel().getGraphDocResource()
-        .getResource();
+    return getTreeSection().getTreeModel()
+        .getGraphDocResource().getResource();
   }
 
   private DepanFxTreeSection getTreeSection() {

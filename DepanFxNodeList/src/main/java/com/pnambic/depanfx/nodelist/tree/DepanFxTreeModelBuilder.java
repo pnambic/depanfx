@@ -8,7 +8,6 @@ import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
-import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.util.Collection;
@@ -22,27 +21,11 @@ public class DepanFxTreeModelBuilder {
     this.linkMatcher = linkMatcher;
   }
 
-  public DepanFxTreeModel traverseGraph(GraphModel model, DepanFxNodeList nodeList) {
-    DepanFxAdjacencyModel adjModel = buildAdjacencyModel(model);
-
-    Collection<GraphNode> nodes = nodeList.getNodes();
-    DepanFxDepthFirstTree dfsTree = new DepanFxDepthFirstTree(adjModel, nodes);
-    dfsTree.buildFromNodes(nodes);
-    Collection<GraphNode> roots = dfsTree.getRoots();
-    DepanFxAdjacencyModel nodeMembers = dfsTree.getNodeMembers();
-
-    Collection<GraphNode> nonEmpty = roots.stream()
-        .filter(n -> hasMembers(nodeMembers, n))
-        .collect(Collectors.toList());
-
-    return new DepanFxSimpleTreeModel(
-        nodeList.getGraphDocResource(), nodeMembers, nonEmpty);
-  }
-
   public DepanFxTreeModel traverseGraph(
-      DepanFxWorkspaceResource graphRsrc, Collection<GraphNode> nodes) {
-    GraphDocument graphDoc = (GraphDocument) graphRsrc.getResource();
-    DepanFxAdjacencyModel adjModel = buildAdjacencyModel(graphDoc.getGraph());
+      DepanFxWorkspaceResource<GraphDocument> graphRsrc,
+      Collection<GraphNode> nodes) {
+    GraphModel graph = graphRsrc.getResource().getGraph();
+    DepanFxAdjacencyModel adjModel = buildAdjacencyModel(graph);
 
     DepanFxDepthFirstTree dfsTree = new DepanFxDepthFirstTree(adjModel, nodes);
     dfsTree.buildFromNodes(nodes);

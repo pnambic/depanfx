@@ -11,6 +11,7 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewSceneData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxSizerModel;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -52,10 +53,10 @@ public class DepanFxNodeViews {
   }
 
   public static DepanFxNodeViewData fromNodeList(
-      DepanFxWorkspaceResource nodeListRsrc,
-      DepanFxWorkspaceResource linkDisplayDocRsrc) {
+      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc,
+      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayDocRsrc) {
 
-    DepanFxNodeList nodeList = (DepanFxNodeList) nodeListRsrc.getResource();
+    DepanFxNodeList nodeList = nodeListRsrc.getResource();
     Collection<GraphNode> nodes = nodeList.getNodes().stream()
         .map(GraphNode.class::cast)
         .collect(Collectors.toList());
@@ -72,10 +73,10 @@ public class DepanFxNodeViews {
   }
 
   public static DepanFxNodeViewData fromGraphDocument(
-      DepanFxWorkspaceResource graphDocRsrc,
-      DepanFxWorkspaceResource linkDisplayDocRsrc) {
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
+      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayDocRsrc) {
 
-    GraphDocument graphDoc = (GraphDocument) graphDocRsrc.getResource();
+    GraphDocument graphDoc = graphDocRsrc.getResource();
 
     Collection<GraphNode> nodes = graphDoc.getGraph().getNodes().stream()
         .map(GraphNode.class::cast)
@@ -105,8 +106,8 @@ public class DepanFxNodeViews {
 
   private static DepanFxNodeViewData buildNodeView(
       String viewName, String viewDescr,
-      DepanFxWorkspaceResource graphDocRsrc,
-      DepanFxWorkspaceResource linkViewDocRsrc,
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
+      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkViewDocRsrc,
       Collection<GraphNode> nodes,
       DepanFxWorkspace workspace) {
     DepanFxNodeViewCameraData cameraData = DepanFxNodeViewCameraData.getHome();

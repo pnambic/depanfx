@@ -4,13 +4,14 @@ import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData.ContainerOrder;
+import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
-import com.pnambic.depanfx.workspace.DepanFxProjectResource;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -100,8 +101,7 @@ public class DepanFxTreeSectionToolDialog
     this.sectionData = sectionData;
 
     linkMatcherResourceField.setText(
-        sectionData.getLinkMatcherRsrc(getWorkspace())
-            .getDocument().toString());
+        sectionData.getLinkMatcherRsrc().getDocument().toString());
     inferMissingParentsField.setSelected(sectionData.inferMissingParents());
 
     orderByField.setValue(sectionData.getOrderBy());
@@ -121,14 +121,13 @@ public class DepanFxTreeSectionToolDialog
 
   @Override
   protected DepanFxTreeSectionData prepareResult() {
+    DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkMatcherRsrc =
+        sectionData.getLinkMatcherRsrc();
 
-    DepanFxProjectResource linkMatcherRsrc =
-        DepanFxProjectResource.fromWorkspaceResource(
-            sectionData.getLinkMatcherRsrc(getWorkspace()));
     return new DepanFxTreeSectionData(
         getToolName(), getToolDescription(),
         getSectionLabel(), displayNodeCount(),
-        linkMatcherRsrc , inferMissingParentsField.isSelected(),
+        linkMatcherRsrc, inferMissingParentsField.isSelected(),
         orderByField.getValue(), containerOrderField.getValue(),
         getOrderDirection());
   }

@@ -25,9 +25,11 @@ public class DepanFxLinkMatcherChooser {
   /**
    * Provide an existing link matcher.
    */
-  public static Optional<DepanFxWorkspaceResource> runLinkMatcherFinder(
-      DepanFxWorkspace workspace,
-      DepanFxDialogRunner dialogRunner, Scene scene) {
+  public static Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+      runLinkMatcherFinder(
+            DepanFxWorkspace workspace,
+            DepanFxDialogRunner dialogRunner, Scene scene) {
+
     DepanFxResourceChooser chooser = prepareChooser(workspace, dialogRunner);
     return chooser.showOpenDialog(scene)
         .map(DepanFxProjectDocument.class::cast)

@@ -36,7 +36,7 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
 
-public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
+public class DepanFxCategoryColumn extends DepanFxAbstractColumn<DepanFxCategoryColumnData> {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxCategoryColumn.class);
@@ -53,8 +53,6 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
   public static final String SAVE_NODE_LISTS =
       "Save Node Lists...";
 
-  private DepanFxWorkspaceResource columnDataRsrc;
-
   private CategoryEditor categories;
 
   private SeparatorMenuItem saveSeparator;
@@ -63,14 +61,9 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
 
   public DepanFxCategoryColumn(
       DepanFxNodeListViewer listViewer,
-      DepanFxWorkspaceResource columnDataRsrc) {
-    super(listViewer);
-    this.columnDataRsrc = columnDataRsrc;
+      DepanFxWorkspaceResource<DepanFxCategoryColumnData> columnDataRsrc) {
+    super(listViewer, columnDataRsrc);
     updateCategories(getColumnData().getCategories());
-  }
-
-  public DepanFxCategoryColumnData getColumnData() {
-    return (DepanFxCategoryColumnData) columnDataRsrc.getResource();
   }
 
   public CategoryEditor getCategories() {
@@ -200,8 +193,7 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
   private void openColumnEditor(DepanFxDialogRunner dialogRunner) {
     Dialog<DepanFxCategoryColumnToolDialog> categoryColumnEditor =
           DepanFxCategoryColumnToolDialog.runEditDialog(
-              columnDataRsrc.getDocument(), buildEditData(),
-              dialogRunner);
+              getColumnProjectDoc(), buildEditData(), dialogRunner);
 
     categoryColumnEditor.getController().getWorkspaceResource()
         .ifPresent(this::updateColumnDataRsrc);
@@ -230,11 +222,11 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
   }
 
   private void saveCategory(CategoryEntry entry) {
-    DepanFxWorkspaceResource nodeListRsrc = entry.getNodeListRsrc();
+    DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc =
+        entry.getNodeListRsrc();
     DepanFxProjectDocument dstDoc = nodeListRsrc.getDocument();
     DepanFxNodeList updateRsrc = DepanFxNodeLists.buildRelatedNodeList(
-        (DepanFxNodeList) nodeListRsrc.getResource(),
-        categories.getCurrentNodes(entry));
+        nodeListRsrc.getResource(), categories.getCurrentNodes(entry));
 
     try {
       saveDocument(dstDoc, updateRsrc);
@@ -242,12 +234,6 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn {
       LOG.error("Unable to save updated node list for {}",
           entry.getCategoryLabel(), errIo);
     }
-  }
-
-  private void updateColumnDataRsrc(DepanFxWorkspaceResource columnDataRsrc) {
-    this.columnDataRsrc = columnDataRsrc;
-    updateCategories(getColumnData().getCategories());
-    refreshColumn();
   }
 
   private void updateCategories(List<CategoryEntry> categories) {

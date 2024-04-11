@@ -2,6 +2,7 @@ package com.pnambic.depanfx.nodeview.gui;
 
 import com.pnambic.depanfx.graph.context.BaseContextDefinition;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherBuiltIns;
+import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.Optional;
 
 @Configuration
 public class DepanFxNodeViewLinkDisplayDataBuiltIns {
@@ -35,11 +37,11 @@ public class DepanFxNodeViewLinkDisplayDataBuiltIns {
   }
 
   @Bean
-  public DepanFxBuiltInContribution allEdgeLinkDisplayDoc() {
-    return new DepanFxBuiltInContribution.Dependent(ALL_EDGES_DOC_PATH) {
+  public DepanFxBuiltInContribution<DepanFxNodeViewLinkDisplayData> allEdgeLinkDisplayDoc() {
+    return new DepanFxBuiltInContribution.Dependent<>(ALL_EDGES_DOC_PATH) {
 
       @Override
-      protected Object buildDocument(DepanFxBuiltInProject project) {
+      protected DepanFxNodeViewLinkDisplayData buildDocument(DepanFxBuiltInProject project) {
         return buildAllEdgesLinkDisplayData(project);
       }
     };
@@ -55,11 +57,12 @@ public class DepanFxNodeViewLinkDisplayDataBuiltIns {
     DepanFxLineDisplayData lineDisplayData =
         DepanFxLineDisplayData.buildSimpleLineDisplayData();
 
-    DepanFxWorkspaceResource allEdgeMatcher =
-        project.getProjectTree()
-            .asProjectDocument(DepanFxLinkMatcherBuiltIns.MATCH_ALL_DOC_PATH)
-            .flatMap(project::getResource)
-        .orElseThrow(() ->
+    Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+        optMatcherRsrc =
+            project.getResource(DepanFxLinkMatcherBuiltIns.MATCH_ALL_DOC_PATH);
+
+    DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> allEdgeMatcher =
+        optMatcherRsrc.orElseThrow(() ->
             new DepanFxBuiltInContribution.MissingDependencyException(
                 ALL_EDGES_DOC_PATH,
                 DepanFxLinkMatcherBuiltIns.MATCH_ALL_DOC_PATH));

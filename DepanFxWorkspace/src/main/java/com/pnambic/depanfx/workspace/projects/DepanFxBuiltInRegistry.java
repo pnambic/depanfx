@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -23,11 +24,11 @@ public class DepanFxBuiltInRegistry {
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxBuiltInRegistry.class);
 
-  private final List<DepanFxBuiltInContribution> builtInContribs;
+  private final List<DepanFxBuiltInContribution<?>> builtInContribs;
 
   @Autowired
   public DepanFxBuiltInRegistry(
-      List<DepanFxBuiltInContribution> builtInContribs) {
+      List<DepanFxBuiltInContribution<?>> builtInContribs) {
     this.builtInContribs = builtInContribs;
   }
 
@@ -38,12 +39,12 @@ public class DepanFxBuiltInRegistry {
         .findFirst();
   }
 
-  public Stream<DepanFxBuiltInContribution> getContribs() {
+  public Stream<DepanFxBuiltInContribution<?>> getContribs() {
     return builtInContribs.stream();
   }
 
   public void installBuiltIns(DepanFxBuiltInProject project) {
-    Map<Boolean, List<DepanFxBuiltInContribution>> contribsByDependent =
+    Map<Boolean, List<DepanFxBuiltInContribution<?>>> contribsByDependent =
         builtInContribs.stream()
             .collect(Collectors.partitioningBy(e -> e instanceof Dependent));
 
@@ -56,9 +57,9 @@ public class DepanFxBuiltInRegistry {
 
   public void installDependentContributions(
       DepanFxBuiltInProject project,
-      List<DepanFxBuiltInContribution> dependContribs) {
+      List<DepanFxBuiltInContribution<?>> dependContribs) {
 
-    List<DepanFxBuiltInContribution> uninstalledContribs =
+    List<DepanFxBuiltInContribution<?>> uninstalledContribs =
         closeDependentContributions(project, dependContribs);
     uninstalledContribs.stream()
         .forEach(c -> LOG.warn("Unable to install {}", c.getPath().toString()));
@@ -71,17 +72,19 @@ public class DepanFxBuiltInRegistry {
    * @return the {@link List} of uninstallable contributions,
    *   or empty if all contributes where installed.
    */
-  private List<DepanFxBuiltInContribution> closeDependentContributions(
+  private List<DepanFxBuiltInContribution<?>> closeDependentContributions(
       DepanFxBuiltInProject project,
-      List<DepanFxBuiltInContribution> dependContribs) {
+      List<DepanFxBuiltInContribution<?>> dependContribs) {
 
     int prevSize = dependContribs.size();
     while (dependContribs.size() > 0) {
-      List<DepanFxBuiltInContribution> nextContribs = dependContribs.stream()
+      // Avoid complexities of generic resolution with Collectors.toList()
+      List<DepanFxBuiltInContribution<?>> nextContribs = new ArrayList<>();
+      dependContribs.stream()
           // Only keep the ones that failed to build a document on this pass.
           .map(Dependent.class::cast)
           .filter(c -> !installDependent(project, c))
-          .collect(Collectors.toList());
+          .forEach(nextContribs::add);
       if (nextContribs.size() >= prevSize) {
         // The ones that did not load.
         return nextContribs;
@@ -96,7 +99,7 @@ public class DepanFxBuiltInRegistry {
    * Indicates if the dependent contribution was successfully installed.
    */
   private boolean installDependent(
-      DepanFxBuiltInProject project, Dependent contrib) {
+      DepanFxBuiltInProject project, Dependent<?> contrib) {
     Object contribDoc = contrib.installDocument(project);
     if (contribDoc != null ) {
       addContribution(project, contrib);
@@ -106,7 +109,7 @@ public class DepanFxBuiltInRegistry {
   }
 
   private void addContribution(
-      DepanFxBuiltInProject project, DepanFxBuiltInContribution contrib) {
+      DepanFxBuiltInProject project, DepanFxBuiltInContribution<?> contrib) {
     Path contribPath = contrib.getPath();
     DepanFxProjectContainer parentDir =
         project.installProjectContainer(contribPath.getParent());

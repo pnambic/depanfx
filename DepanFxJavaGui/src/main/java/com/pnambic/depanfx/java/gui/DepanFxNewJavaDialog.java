@@ -77,7 +77,8 @@ public class DepanFxNewJavaDialog {
   @FXML
   private TextField destinationField;
 
-  private Optional<DepanFxWorkspaceResource> graphDocRsrc = Optional.empty();
+  private Optional<DepanFxWorkspaceResource<GraphDocument>> graphDocRsrc =
+      Optional.empty();
 
   @FXML
   public void initialize() {
@@ -89,7 +90,7 @@ public class DepanFxNewJavaDialog {
     destinationField.setText(document.getMemberPath().toString());
   }
 
-  public Optional<DepanFxWorkspaceResource> getSavedResource() {
+  public Optional<DepanFxWorkspaceResource<GraphDocument>> getSavedResource() {
     return graphDocRsrc;
   }
 

@@ -3,7 +3,6 @@ package com.pnambic.depanfx.nodelist.gui.sections;
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
@@ -50,7 +49,7 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
 
   private final DepanFxNodeListViewer listViewer;
 
-  private DepanFxWorkspaceResource sectionDataRsrc;
+  private DepanFxWorkspaceResource<DepanFxTreeSectionData> sectionDataRsrc;
 
   // Update this whenever sectionDataRsrc is revised.
   private Comparator<TreeItem<DepanFxNodeListMember>> treeMemberCompare;
@@ -65,20 +64,21 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
 
   public DepanFxTreeSection(
       DepanFxNodeListViewer listViewer,
-      DepanFxWorkspaceResource sectionDataRsrc) {
+      DepanFxWorkspaceResource<DepanFxTreeSectionData> sectionDataRsrc) {
     this.listViewer = listViewer;
     this.sectionDataRsrc = sectionDataRsrc;
 
     this.treeMemberCompare = updateCompare();
   }
 
-  public void setSectionDataRsrc(DepanFxWorkspaceResource sectionDataRsrc) {
+  public void setSectionDataRsrc(
+      DepanFxWorkspaceResource<DepanFxTreeSectionData> sectionDataRsrc) {
     this.sectionDataRsrc = sectionDataRsrc;
     this.treeMemberCompare = updateCompare();
   }
 
   public DepanFxTreeSectionData getSectionData() {
-    return (DepanFxTreeSectionData) sectionDataRsrc.getResource();
+    return sectionDataRsrc.getResource();
   }
 
   public DepanFxProjectDocument getProjDoc() {
@@ -132,9 +132,8 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
       DepanFxNodeList baseNodes) {
     DepanFxTreeModelBuilder builder =
         new DepanFxTreeModelBuilder(getLinkMatcher());
-    GraphDocument graphDoc =
-        (GraphDocument) baseNodes.getGraphDocResource().getResource();
-    treeModel = builder.traverseGraph(graphDoc.getGraph(), baseNodes);
+    treeModel = builder.traverseGraph(
+        baseNodes.getGraphDocResource(), baseNodes.getNodes());
     sectionNodes = treeModel.getReachableGraphNodes(
         treeModel.getRoots(), baseNodes.getNodes());
 
@@ -175,15 +174,13 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
   }
 
   private DepanFxLinkMatcher getLinkMatcher() {
-    DepanFxWorkspaceResource linkMatcherRsrc =
-        getSectionData().getLinkMatcherRsrc(listViewer.getWorkspace());
+    DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkMatcherRsrc =
+        getSectionData().getLinkMatcherRsrc();
 
     // If the section data provides a matcher, use that.
     // Otherwise, find a matcher based on the graph's context model.
     if (linkMatcherRsrc != null) {
-      DepanFxLinkMatcher matcher =
-          ((DepanFxLinkMatcherDocument) linkMatcherRsrc.getResource())
-          .getMatcher();
+      DepanFxLinkMatcher matcher = linkMatcherRsrc.getResource().getMatcher();
       if (matcher != null) {
         return matcher;
       }
@@ -194,8 +191,7 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
     return DepanFxProjects.getBuiltIn(
             listViewer.getWorkspace(), DepanFxLinkMatcherDocument.class,
             c -> this.byMemberLinkMatcherDoc(c, modelId))
-        .map(r -> (DepanFxLinkMatcherDocument) r.getResource())
-        .map(d -> d.getMatcher())
+        .map(r -> r.getResource().getMatcher())
         .orElseGet(this::getEmptyLinkMatcher);
   }
 
@@ -206,9 +202,10 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
   }
 
   private boolean byMemberLinkMatcherDoc(
-      DepanFxBuiltInContribution contrib, Object modelId) {
+      DepanFxBuiltInContribution<?> contrib,
+      ContextModelId modelId) {
     DepanFxLinkMatcherDocument linkMatchDoc =
-        ((DepanFxLinkMatcherDocument) contrib.getDocument());
+        (DepanFxLinkMatcherDocument) contrib.getDocument();
     if (!linkMatchDoc.getMatchGroups()
         .contains(DepanFxLinkMatcherGroup.MEMBER)) {
       return false;

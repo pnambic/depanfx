@@ -143,7 +143,7 @@ public class DepanFxNewGitLogsDialog
     int logCount = Integer.parseInt(logCountField.getText());
 
     try {
-      DepanFxWorkspaceResource graphRsrc = optGraphDoc
+      DepanFxWorkspaceResource<GraphDocument> graphRsrc = optGraphDoc
           .flatMap(d -> workspace.getWorkspaceResource(d, GraphDocument.class))
           .get();
 

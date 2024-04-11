@@ -29,8 +29,7 @@ public class JoglLines {
       DepanFxJoglView result, GraphEdge edge, LinkDisplayEntry display) {
 
     // Use info from link matcher
-    DepanFxLinkMatcherDocument matcher =
-        (DepanFxLinkMatcherDocument) display.getLinkRsrc().getResource();
+    DepanFxLinkMatcherDocument matcher = display.getLinkRsrc().getResource();
 
     matcher.getMatcher().match(edge)
         .map(l -> buildLineShape(l, display))

@@ -142,8 +142,7 @@ public class ExportColumn {
       DepanFxFocusColumnData columnData = focusCol.getColumnData();
       String columnLabel = columnData.getColumnLabel();
       String focusLabel = columnData.getFocusLabel();
-      DepanFxNodeList nodeList =
-          (DepanFxNodeList) columnData.getNodeListRsrc().getResource();
+      DepanFxNodeList nodeList = columnData.getNodeListRsrc().getResource();
 
       builder.addNodeList(columnLabel, focusLabel, nodeList);
       return;
@@ -184,13 +183,12 @@ public class ExportColumn {
   private static void addCategoryEntryExport(
       Builder builder, CategoryEntry entry) {
     String categoryLabel = entry.getCategoryLabel();
-    DepanFxNodeList nodeList =
-        (DepanFxNodeList) entry.getNodeListRsrc().getResource();
+    DepanFxNodeList nodeList = entry.getNodeListRsrc().getResource();
     builder.addNodeList(nodeList.getNodeListName(), categoryLabel, nodeList);
   }
 
   private static boolean containsNode(GraphNode node, CategoryEntry entry) {
-    DepanFxNodeList nodeList = (DepanFxNodeList) entry.getNodeListRsrc().getResource();
+    DepanFxNodeList nodeList = entry.getNodeListRsrc().getResource();
     return nodeList.getNodes().contains(node);
   }
 }

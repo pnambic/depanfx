@@ -23,8 +23,8 @@ public class PersistWorkspaceResource {
     this.resourcePath = resourcePath;
   }
 
-  public static PersistWorkspaceResource of(
-      DepanFxWorkspaceResource wkspRsrc) {
+  public static <T> PersistWorkspaceResource of(
+      DepanFxWorkspaceResource<T> wkspRsrc) {
     DepanFxProjectDocument projectDoc = wkspRsrc.getDocument();
     DepanFxProjectTree rsrcProj = projectDoc.getProject();
     Path pathValue = rsrcProj.getRelativePath(projectDoc.getMemberPath());
@@ -34,7 +34,7 @@ public class PersistWorkspaceResource {
     return new PersistWorkspaceResource(projectName, resourcePath);
   }
 
-  public static Optional<DepanFxWorkspaceResource> forWksp(
+  public static <T> Optional<DepanFxWorkspaceResource<T>> forWksp(
       DepanFxWorkspace workspace, PersistWorkspaceResource persistWkspRsrc) {
     Optional<DepanFxProjectDocument> optProjDoc =
         workspace.toProjectDocument(

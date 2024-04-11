@@ -34,7 +34,7 @@ public class DepanFxFocusColumnConfiguration {
   }
 
   private static class FocusColumnExtContribution
-      extends DepanFxResourceExtMenuContribution.Basic {
+      extends DepanFxResourceExtMenuContribution.Basic<DepanFxFocusColumnData> {
 
     public FocusColumnExtContribution() {
       super(DepanFxFocusColumnData.class, FOCUS_COLUMN_KEY,
@@ -44,11 +44,10 @@ public class DepanFxFocusColumnConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource wkspRsrc, DepanFxDialogRunner dialogRunner) {
+        DepanFxWorkspaceResource<DepanFxFocusColumnData> wkspRsrc,
+        DepanFxDialogRunner dialogRunner) {
       DepanFxFocusColumnToolDialog.runEditDialog(
-          wkspRsrc.getDocument(),
-          (DepanFxFocusColumnData) wkspRsrc.getResource(),
-          dialogRunner);
+          wkspRsrc.getDocument(), wkspRsrc.getResource(), dialogRunner);
     }
   }
 

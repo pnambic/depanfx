@@ -46,7 +46,7 @@ public class DepanFxBuiltInProject implements DepanFxProjectSpi {
   private Map<Path, DepanFxProjectContainer> containers =
       new HashMap<>();
 
-  private Map<DepanFxProjectDocument, DepanFxBuiltInContribution> documents =
+  private Map<DepanFxProjectDocument, DepanFxBuiltInContribution<?>> documents =
       new HashMap<>();
 
   private Multimap<DepanFxProjectContainer, DepanFxProjectMember> members =
@@ -129,17 +129,35 @@ public class DepanFxBuiltInProject implements DepanFxProjectSpi {
     return Collections.<DepanFxProjectMember>emptyList().stream();
   }
 
-  public Stream<DepanFxBuiltInContribution> getContributions(
-      Class<?> targetType) {
+  @SuppressWarnings("unchecked")
+  public <T> Stream<DepanFxBuiltInContribution<T>> getContributions(
+      Class<T> targetType) {
     return builtIns.getContribs()
-        .filter(c -> targetType.isAssignableFrom(c.getDocument().getClass()));
+        .filter(c -> targetType.isAssignableFrom(c.getDocument().getClass()))
+        .map(c -> (DepanFxBuiltInContribution<T>) c);
   }
 
-  public Optional<DepanFxWorkspaceResource> getResource(
+  public <T> Optional<DepanFxWorkspaceResource<T>> getResource(
       DepanFxProjectDocument projDoc) {
-    return Optional.ofNullable(documents.get(projDoc))
-        .map(c -> c.getDocument())
-        .map(d -> new DepanFxWorkspaceResource.StaticWorkspaceResource(projDoc, d));
+    @SuppressWarnings("unchecked")
+    DepanFxBuiltInContribution<T> contrib =
+        (DepanFxBuiltInContribution<T>) documents.get(projDoc);
+    if (contrib != null) {
+      return Optional.of(
+          new DepanFxWorkspaceResource.StaticWorkspaceResource<T>(
+              projDoc, contrib.getDocument()));
+    }
+    return Optional.empty();
+  }
+
+  public <T> Optional<DepanFxWorkspaceResource<T>> getResource(
+      Path rsrcPath) {
+
+    // Let types be inferred.
+    Optional<DepanFxProjectDocument> rsrcProjDoc =
+        getProjectTree().asProjectDocument(rsrcPath);
+
+    return getResource(rsrcProjDoc.get());
   }
 
   private void installBuiltIns() {
@@ -178,7 +196,7 @@ public class DepanFxBuiltInProject implements DepanFxProjectSpi {
   public void installContribDoc(
       DepanFxProjectContainer parentDir,
       DepanFxProjectDocument contribDoc,
-      DepanFxBuiltInContribution contrib) {
+      DepanFxBuiltInContribution<?> contrib) {
     documents.put(contribDoc, contrib);
     members.put(parentDir, contribDoc);
   }

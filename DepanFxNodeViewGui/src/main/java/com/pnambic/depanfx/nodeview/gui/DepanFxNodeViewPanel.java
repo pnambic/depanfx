@@ -161,12 +161,12 @@ public class DepanFxNodeViewPanel {
     return workspace;
   }
 
-  public DepanFxWorkspaceResource getGraphDocRsrc() {
+  public DepanFxWorkspaceResource<GraphDocument> getGraphDocRsrc() {
     return viewData.getGraphDocRsrc();
   }
 
   public GraphDocument getGraphDoc() {
-    return (GraphDocument) viewData.getGraphDocRsrc().getResource();
+    return viewData.getGraphDocRsrc().getResource();
   }
 
   public ContextModelId getContextModelId() {
@@ -189,7 +189,8 @@ public class DepanFxNodeViewPanel {
     return viewNodes.stream();
   }
 
-  public Optional<DepanFxWorkspaceResource> getHierachyMatcherRsrc() {
+  public Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+      getHierachyMatcherRsrc() {
     ContextModelId modelId = getGraphDoc().getContextModelId();
     return DepanFxProjects.getBuiltIn(
         workspace, DepanFxLinkMatcherDocument.class,
@@ -197,9 +198,9 @@ public class DepanFxNodeViewPanel {
   }
 
   private boolean byMemberLinkMatcherDoc(
-      DepanFxBuiltInContribution contrib, Object modelId) {
-    DepanFxLinkMatcherDocument linkMatchDoc =
-        (DepanFxLinkMatcherDocument) contrib.getDocument();
+      DepanFxBuiltInContribution<DepanFxLinkMatcherDocument> contrib,
+      ContextModelId modelId) {
+    DepanFxLinkMatcherDocument linkMatchDoc = contrib.getDocument();
     if (!linkMatchDoc.getMatchGroups()
         .contains(DepanFxLinkMatcherGroup.MEMBER)) {
       return false;
@@ -365,7 +366,7 @@ public class DepanFxNodeViewPanel {
         .ifPresent(this::layoutNodes);
   }
 
-  private void layoutNodes(DepanFxWorkspaceResource wkspRsrc) {
+  private void layoutNodes(DepanFxWorkspaceResource<?> wkspRsrc) {
     List<GraphNode> updateNodes =
         streamChosenNodes().collect(Collectors.toList());
     updateNodeLocations(
@@ -384,7 +385,7 @@ public class DepanFxNodeViewPanel {
 
   private DepanFxNodeViewLinkDisplayData buildLinkDisplayData() {
     DepanFxNodeViewLinkDisplayData linkDisplayData =
-        (DepanFxNodeViewLinkDisplayData) viewData.getLinkDisplayDocRsrc().getResource();
+        viewData.getLinkDisplayDocRsrc().getResource();
     List<LinkDisplayEntry> linkDisplayEntries =
         linkDisplayData.streamLinkDisplay().collect(Collectors.toList());
     return new DepanFxNodeViewLinkDisplayData(
@@ -472,7 +473,7 @@ public class DepanFxNodeViewPanel {
   private void installEdge(DepanFxJoglView result, GraphEdge edge) {
 
     DepanFxNodeViewLinkDisplayData displayInfo =
-        (DepanFxNodeViewLinkDisplayData) viewData.getLinkDisplayDocRsrc().getResource();
+        viewData.getLinkDisplayDocRsrc().getResource();
 
     displayInfo.getLinkDisplayEnty(edge)
         .ifPresent(l -> JoglLines.installLine(result, edge, l));

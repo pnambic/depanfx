@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DepanFxGitRepoDataExtMenuContribution
-    extends DepanFxResourceExtMenuContribution.Basic {
+    extends DepanFxResourceExtMenuContribution.Basic<DepanFxGitRepoData> {
 
   private static final String EDIT_GIT_REPO = "Edit git Repo Data...";
 
@@ -19,10 +19,11 @@ public class DepanFxGitRepoDataExtMenuContribution
   }
 
   @Override
-  protected void runDialog(DepanFxWorkspaceResource wkspRsrc,
+  protected void runDialog(
+      DepanFxWorkspaceResource<DepanFxGitRepoData> wkspRsrc,
       DepanFxDialogRunner dialogRunner) {
     DepanFxGitRepoToolDialog.runEditDialog(
-        wkspRsrc.getDocument(), (DepanFxGitRepoData) wkspRsrc.getResource(),
+        wkspRsrc.getDocument(), wkspRsrc.getResource(),
         dialogRunner);
   }
 }

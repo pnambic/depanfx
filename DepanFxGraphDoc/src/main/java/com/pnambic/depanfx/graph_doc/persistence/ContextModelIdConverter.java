@@ -57,7 +57,6 @@ public class ContextModelIdConverter
      return DepanFxProjects.getBuiltIn(
         workspace, GraphContextDocument.class, modelPath)
         .map(DepanFxWorkspaceResource::getResource)
-        .map(GraphContextDocument.class::cast)
         .map(d -> d.getGraphContext().getId())
         .get();
   }

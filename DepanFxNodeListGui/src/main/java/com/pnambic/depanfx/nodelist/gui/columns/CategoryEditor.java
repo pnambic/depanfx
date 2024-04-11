@@ -96,8 +96,7 @@ public class CategoryEditor {
   }
 
   private Collection<GraphNode> getEntryNodes(CategoryEntry entry) {
-    DepanFxNodeList nodeList =
-        (DepanFxNodeList) entry.getNodeListRsrc().getResource();
+    DepanFxNodeList nodeList = entry.getNodeListRsrc().getResource();
     return nodeList.getNodes();
   }
 

@@ -33,7 +33,8 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
 
-public class DepanFxFocusColumn extends DepanFxAbstractColumn {
+public class DepanFxFocusColumn
+    extends DepanFxAbstractColumn<DepanFxFocusColumnData> {
 
   public static final String EDIT_FOCUS_COLUMN =
       "Edit Focus Column...";
@@ -47,9 +48,7 @@ public class DepanFxFocusColumn extends DepanFxAbstractColumn {
   public static final String SAVE_NODE_LIST =
       "Save Node List...";
 
-  private DepanFxWorkspaceResource columnDataRsrc;
-
-  private DepanFxWorkspaceResource nodeListRsrc;
+  private DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc;
 
   private CategoryEditor categories;
 
@@ -62,14 +61,9 @@ public class DepanFxFocusColumn extends DepanFxAbstractColumn {
 
   public DepanFxFocusColumn(
       DepanFxNodeListViewer listViewer,
-      DepanFxWorkspaceResource columnDataRsrc) {
-    super(listViewer);
-    this.columnDataRsrc = columnDataRsrc;
+      DepanFxWorkspaceResource<DepanFxFocusColumnData> columnDataRsrc) {
+    super(listViewer, columnDataRsrc);
     updateNodeListRsrc(getColumnData().getNodeListRsrc());
-  }
-
-  public DepanFxFocusColumnData getColumnData() {
-    return (DepanFxFocusColumnData) columnDataRsrc.getResource();
   }
 
   @Override
@@ -181,7 +175,7 @@ public class DepanFxFocusColumn extends DepanFxAbstractColumn {
   }
 
   private void runSaveNodeList() {
-    DepanFxNodeList nodeList = (DepanFxNodeList) nodeListRsrc.getResource();
+    DepanFxNodeList nodeList = nodeListRsrc.getResource();
     Collection<GraphNode> editNodes = categories.getCurrentNodes(focusEntry);
     DepanFxNodeList saveList =
         DepanFxNodeLists.buildRelatedNodeList(nodeList, editNodes);
@@ -207,8 +201,7 @@ public class DepanFxFocusColumn extends DepanFxAbstractColumn {
   private void openColumnEditor(DepanFxDialogRunner dialogRunner) {
     Dialog<DepanFxFocusColumnToolDialog> focusColumnEditor =
           DepanFxFocusColumnToolDialog.runEditDialog(
-              columnDataRsrc.getDocument(), buildEditData(),
-              dialogRunner);
+              getColumnProjectDoc(), buildEditData(), dialogRunner);
 
     focusColumnEditor.getController().getWorkspaceResource()
         .ifPresent(this::updateColumnDataRsrc);
@@ -238,13 +231,15 @@ public class DepanFxFocusColumn extends DepanFxAbstractColumn {
     }
   }
 
-  private void updateColumnDataRsrc(DepanFxWorkspaceResource columnDataRsrc) {
-    this.columnDataRsrc = columnDataRsrc;
+  @Override
+  protected void updateColumnDataRsrc(
+      DepanFxWorkspaceResource<DepanFxFocusColumnData> columnDataRsrc) {
     updateNodeListRsrc(getColumnData().getNodeListRsrc());
-    refreshColumn();
+    super.updateColumnDataRsrc(columnDataRsrc);
   }
 
-  private void updateNodeListRsrc(DepanFxWorkspaceResource nodeListRsrc) {
+  private void updateNodeListRsrc(
+      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
     this.nodeListRsrc = nodeListRsrc;
     updateCategories();
   }

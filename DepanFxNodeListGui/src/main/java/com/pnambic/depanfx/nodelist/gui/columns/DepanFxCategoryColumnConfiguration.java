@@ -34,7 +34,7 @@ public class DepanFxCategoryColumnConfiguration {
   }
 
   private static class CategoryColumnExtContribution
-      extends DepanFxResourceExtMenuContribution.Basic {
+      extends DepanFxResourceExtMenuContribution.Basic<DepanFxCategoryColumnData> {
 
     public CategoryColumnExtContribution() {
       super(DepanFxCategoryColumnData.class, CATEGORY_COLUMN_KEY,
@@ -44,11 +44,10 @@ public class DepanFxCategoryColumnConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource wkspRsrc, DepanFxDialogRunner dialogRunner) {
+        DepanFxWorkspaceResource<DepanFxCategoryColumnData> wkspRsrc,
+        DepanFxDialogRunner dialogRunner) {
       DepanFxCategoryColumnToolDialog.runEditDialog(
-          wkspRsrc.getDocument(),
-          (DepanFxCategoryColumnData) wkspRsrc.getResource(),
-          dialogRunner);
+          wkspRsrc.getDocument(), wkspRsrc.getResource(), dialogRunner);
     }
   }
 

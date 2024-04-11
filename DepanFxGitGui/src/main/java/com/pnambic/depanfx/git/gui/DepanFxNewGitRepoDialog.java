@@ -59,7 +59,8 @@ public class DepanFxNewGitRepoDialog
   @FXML
   private TextField destinationField;
 
-  private Optional<DepanFxWorkspaceResource> graphDocRsrc = Optional.empty();
+  private Optional<DepanFxWorkspaceResource<GraphDocument>> graphDocRsrc =
+      Optional.empty();
 
   @Autowired
   public DepanFxNewGitRepoDialog(
@@ -84,7 +85,7 @@ public class DepanFxNewGitRepoDialog
     return gitRepoNameField.getScene().getWindow();
   }
 
-  public Optional<DepanFxWorkspaceResource> getGraphDocRsrc() {
+  public Optional<DepanFxWorkspaceResource<GraphDocument>> getGraphDocRsrc() {
     return graphDocRsrc;
   }
 

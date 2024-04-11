@@ -122,17 +122,20 @@ public class DepanFxNodeViewDataConverter
 
     String toolName = (String) metaData.get(NODE_VIEW_NAME);
     String toolDescr = (String) metaData.get(NODE_VIEW_DESCR);
-    DepanFxWorkspaceResource graphDocRsrc =
-        (DepanFxWorkspaceResource) metaData.get(GRAPH_DOC);
-    DepanFxWorkspaceResource linkDisplayDocRsrc =
-        (DepanFxWorkspaceResource) metaData.get(LINK_DISPLAY_DOC);
     DepanFxNodeViewSceneData sceneData =
         (DepanFxNodeViewSceneData) metaData.get(SCENE_DATA);
 
+    @SuppressWarnings("unchecked")
+    DepanFxWorkspaceResource<GraphDocument> graphDocRsrc =
+        (DepanFxWorkspaceResource<GraphDocument>) metaData.get(GRAPH_DOC);
+
+    @SuppressWarnings("unchecked")
+    DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayDocRsrc =
+        (DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData>) metaData.get(LINK_DISPLAY_DOC);
+
     // Extract the basis for model mapping.
-    GraphDocument graphDoc = (GraphDocument) graphDocRsrc.getResource();
-    GraphModel graphModel = graphDoc.getGraph();
-    srcContext.putContextValue(GraphModel.class, graphModel );
+    GraphModel graphModel = graphDocRsrc.getResource().getGraph();
+    srcContext.putContextValue(GraphModel.class, graphModel);
 
     // Load the nodes and their view data
     NodeInfoBuilder nodeBuilder = new NodeInfoBuilder();

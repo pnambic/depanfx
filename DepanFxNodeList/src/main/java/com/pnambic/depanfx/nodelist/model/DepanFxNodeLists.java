@@ -20,16 +20,17 @@ public class DepanFxNodeLists {
 
   public static DepanFxNodeList buildNodeList(
       String nodeListName, String nodeListDescription,
-      DepanFxWorkspaceResource graphDocRsrc, Collection<GraphNode> nodes) {
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
+      Collection<GraphNode> nodes) {
 
     return new DepanFxNodeList(
         nodeListName, nodeListDescription, graphDocRsrc, nodes);
   }
 
   public static DepanFxNodeList buildNodeList(
-      DepanFxWorkspaceResource graphDocRsrc) {
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc) {
 
-    GraphDocument graphDoc = (GraphDocument) graphDocRsrc.getResource();
+    GraphDocument graphDoc = graphDocRsrc.getResource();
     Collection<GraphNode> nodes = graphDoc.getGraph().getNodes().stream()
         .map(GraphNode.class::cast)
         .collect(Collectors.toList());
@@ -43,7 +44,7 @@ public class DepanFxNodeLists {
   }
 
   public static String getNameFromGraphDoc(
-      DepanFxWorkspaceResource graphDocRsrc) {
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc) {
    String baseName = DepanFxWorkspaceFactory.buildDocTitle(
        graphDocRsrc.getDocument());
    return MessageFormat.format("{0} nodes", baseName);

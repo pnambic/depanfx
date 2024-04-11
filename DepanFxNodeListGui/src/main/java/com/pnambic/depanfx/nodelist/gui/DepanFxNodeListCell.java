@@ -217,13 +217,15 @@ public class DepanFxNodeListCell
   }
 
   private void updateSectionDataRsrc(
-      DepanFxFlatSection member, DepanFxWorkspaceResource dataRsrc) {
+      DepanFxFlatSection member,
+      DepanFxWorkspaceResource<DepanFxFlatSectionData> dataRsrc) {
     member.setSectionDataRsrc(dataRsrc);
     listViewer.resetView();
   }
 
   private void updateSectionDataRsrc(
-      DepanFxTreeSection member, DepanFxWorkspaceResource dataRsrc) {
+      DepanFxTreeSection member,
+      DepanFxWorkspaceResource<DepanFxTreeSectionData>  dataRsrc) {
     member.setSectionDataRsrc(dataRsrc);
     listViewer.resetView();
   }

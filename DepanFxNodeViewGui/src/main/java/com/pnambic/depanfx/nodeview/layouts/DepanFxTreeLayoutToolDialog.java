@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodeview.layouts;
 
 import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser;
+import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayoutData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxTreeLayoutData;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
@@ -46,7 +47,7 @@ public class DepanFxTreeLayoutToolDialog
   @FXML
   private TextField hierarchyMatcherRsrcField;
 
-  private DepanFxWorkspaceResource hierarchyMatcherRsrc;
+  private DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> hierarchyMatcherRsrc;
 
   @Autowired
   public DepanFxTreeLayoutToolDialog(
@@ -102,13 +103,14 @@ public class DepanFxTreeLayoutToolDialog
   }
 
   private void setHierarchyMatcherRsrc(
-      DepanFxWorkspaceResource hierarchyMatcherRsrc) {
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> hierarchyMatcherRsrc) {
     this.hierarchyMatcherRsrc = hierarchyMatcherRsrc;
     hierarchyMatcherRsrcField.setText(
         getHierarchyMatcherRsrcName(hierarchyMatcherRsrc));
   }
 
-  private String getHierarchyMatcherRsrcName(DepanFxWorkspaceResource rsrc ) {
+  private String getHierarchyMatcherRsrcName(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> rsrc ) {
     if (rsrc != null) {
       return rsrc.getDocument().getMemberPath().toString();
     }

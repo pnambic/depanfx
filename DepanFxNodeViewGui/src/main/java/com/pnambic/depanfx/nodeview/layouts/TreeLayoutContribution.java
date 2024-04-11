@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodeview.layouts;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
@@ -52,14 +53,14 @@ public class TreeLayoutContribution
 
   @Override
   public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
-      DepanFxWorkspaceResource layoutRsrc,
-      DepanFxWorkspaceResource graphDocRsrc,
+      DepanFxWorkspaceResource<?> layoutRsrc,
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
       List<GraphNode> updateNodes) {
     DepanFxTreeLayoutData treeData =
         (DepanFxTreeLayoutData) layoutRsrc.getResource();
 
     DepanFxLinkMatcherDocument matcherDoc =
-        (DepanFxLinkMatcherDocument) treeData.getHierarchyMatcherRsrc().getResource();
+        treeData.getHierarchyMatcherRsrc().getResource();
     DepanFxLinkMatcher linkMatcher = matcherDoc.getMatcher();
 
     return buildNodeLocations(graphDocRsrc, updateNodes, linkMatcher);
@@ -76,7 +77,8 @@ public class TreeLayoutContribution
         DepanFxTreeLayoutToolDialog.runCreateDialog(
             initialData, view.getDialogRunner());
 
-    DepanFxWorkspaceResource graphDocRsrc = view.getGraphDocRsrc();
+    DepanFxWorkspaceResource<GraphDocument> graphDocRsrc =
+        view.getGraphDocRsrc();
     List<GraphNode> updateNodes =
         view.streamChosenNodes().collect(Collectors.toList());
 
@@ -86,7 +88,7 @@ public class TreeLayoutContribution
   }
 
   private Map<GraphNode, DepanFxNodeLocationData> buildNodeLocations(
-      DepanFxWorkspaceResource graphDocRsrc,
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
       List<GraphNode> updateNodes,
       DepanFxLinkMatcher linkMatcher) {
     DepanFxTreeModelBuilder builder = new DepanFxTreeModelBuilder(linkMatcher);

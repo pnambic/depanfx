@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodeview.layouts;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewPanel;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
@@ -15,7 +16,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,20 +53,15 @@ public class DepanFxNodeLayoutRegistry {
      */
     void handleLayout(ActionEvent e, DepanFxNodeViewPanel view);
 
+    /**
+     * Implementations will want to cast the supplied layout resource
+     * to their underlying data type.
+     */
     Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
-        DepanFxWorkspaceResource layoutRsrc,
-        DepanFxWorkspaceResource graphDocRsrc,
+        DepanFxWorkspaceResource<?> layoutRsrc,
+        DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
         List<GraphNode> updateNodes);
   }
-
-  private static final Comparator<? super Contribution> CONTRIB_COMPARE =
-      new Comparator<>() {
-
-        @Override
-        public int compare(Contribution one, Contribution two) {
-          return one.getLabel().compareTo(two.getLabel());
-        }
-      };
 
   private final List<Contribution> layoutContribs;
 
@@ -110,24 +105,30 @@ public class DepanFxNodeLayoutRegistry {
   }
 
   public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
-      DepanFxWorkspaceResource wkspRsrc,
-      DepanFxWorkspaceResource graphDocRsrc,
+      DepanFxWorkspaceResource<?> layoutRsrc,
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
       List<GraphNode> updateNodes) {
-    Object layoutRsrc = wkspRsrc.getResource();
-    Optional<Contribution> layoutContrib = layoutContribs.stream()
-        .filter(c -> c.getResourceFilter().matchDocument(layoutRsrc))
-        .findFirst();
-    if (layoutContrib.isPresent()) {
-      return layoutContrib.get().layoutNodes(
-          wkspRsrc, graphDocRsrc, updateNodes);
+    return layoutContribs.stream()
+        .map(this::examine)
+        .filter(c -> c.getResourceFilter() != null)
+        .filter(c -> c.getResourceFilter().matchDocument(layoutRsrc.getResource()))
+        .findFirst()
+        .map(l -> l.layoutNodes(layoutRsrc, graphDocRsrc, updateNodes))
+        .orElse(Collections.emptyMap());
     }
-    return Collections.emptyMap();
-  }
 
   private Stream<Contribution> ordered(
       Predicate<? super Contribution> resourceFilter) {
     return layoutContribs.stream()
         .filter(resourceFilter)
-        .sorted(CONTRIB_COMPARE);
+        .sorted((a, b) -> compare(a, b));
+  }
+
+  private int compare(Contribution one, Contribution two) {
+    return one.getLabel().compareTo(two.getLabel());
+  }
+
+  private <T> T examine(T item) {
+    return item;
   }
 }

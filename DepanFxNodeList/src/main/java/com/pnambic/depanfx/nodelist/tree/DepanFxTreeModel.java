@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodelist.tree;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -16,7 +17,7 @@ public interface DepanFxTreeModel {
   /**
    * Provide the graph document used to build the tree model.
    */
-  DepanFxWorkspaceResource getGraphDocResource();
+  DepanFxWorkspaceResource<GraphDocument> getGraphDocResource();
 
   /**
    * Provide the {@link TreeMode} for the supplied graph node.

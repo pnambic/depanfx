@@ -62,13 +62,13 @@ public class DepanFxNodeViewConfiguration {
     return new NodeViewContribution(layoutRegistry);
   }
 
-  private static abstract class BaseNodeViewExtMenuContribution
+  private static abstract class BaseNodeViewExtMenuContribution<T>
       implements DepanFxAnalysisExtMenuContribution {
 
     private static final Logger LOG =
         LoggerFactory.getLogger(BaseNodeViewExtMenuContribution.class);
 
-    private final Class<?> resourceType;
+    private final Class<T> resourceType;
 
     private final String menuLabel;
 
@@ -78,7 +78,7 @@ public class DepanFxNodeViewConfiguration {
 
     public BaseNodeViewExtMenuContribution(
         DepanFxNodeLayoutRegistry layoutRegistry,
-        Class<?> resourceType, String menuLabel, String viewExt) {
+        Class<T> resourceType, String menuLabel, String viewExt) {
       this.layoutRegistry = layoutRegistry;
       this.resourceType = resourceType;
       this.menuLabel = menuLabel;
@@ -86,7 +86,7 @@ public class DepanFxNodeViewConfiguration {
     }
 
     abstract protected DepanFxNodeViewData getNodeViewData(
-        DepanFxWorkspace workspace, DepanFxWorkspaceResource rsrc);
+        DepanFxWorkspace workspace, DepanFxWorkspaceResource<?> rsrc);
 
     @Override
     public boolean acceptsExt(String ext) {
@@ -114,16 +114,18 @@ public class DepanFxNodeViewConfiguration {
       // The default is no onOpen action.
     }
 
+
     protected void runOpenNodeListAction(
         DepanFxSceneController scene,
         DepanFxDialogRunner dialogRunner,
         DepanFxWorkspace workspace,
         Path docPath) {
+
       try {
-        Optional<DepanFxWorkspaceResource> optWkspRsrc =
+        Optional<DepanFxWorkspaceResource<T>> optWkspRsrc =
             workspace.toProjectDocument(docPath.toUri())
-                .flatMap(r -> workspace.getWorkspaceResource(
-                      r, resourceType));
+                .flatMap(r ->
+                    workspace.getWorkspaceResource(r, resourceType));
         optWkspRsrc
             .map(r -> getNodeViewData(workspace, r))
             .ifPresent(nv ->
@@ -144,7 +146,7 @@ public class DepanFxNodeViewConfiguration {
   }
 
   private class GraphContribution
-      extends BaseNodeViewExtMenuContribution {
+      extends BaseNodeViewExtMenuContribution<GraphDocument> {
 
     public GraphContribution(DepanFxNodeLayoutRegistry layoutRegistry) {
       super(
@@ -156,13 +158,17 @@ public class DepanFxNodeViewConfiguration {
     @Override
     protected DepanFxNodeViewData getNodeViewData(
         DepanFxWorkspace workspace,
-        DepanFxWorkspaceResource rsrc) {
-      GraphDocument graphDoc = (GraphDocument) rsrc.getResource();
-      DepanFxWorkspaceResource linkDisplayDocRsrc =
+        DepanFxWorkspaceResource<?> rsrc) {
+      @SuppressWarnings("unchecked")
+      DepanFxWorkspaceResource<GraphDocument> graphDocResource =
+          (DepanFxWorkspaceResource<GraphDocument>) rsrc;
+
+      GraphDocument graphDoc = graphDocResource.getResource();
+      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayDocRsrc =
           getContextLinkDisplay(workspace, graphDoc.getContextModelId());
 
       return DepanFxNodeViews.fromGraphDocument(
-          rsrc, linkDisplayDocRsrc);
+          graphDocResource, linkDisplayDocRsrc);
     }
 
     @Override
@@ -172,7 +178,7 @@ public class DepanFxNodeViewConfiguration {
   }
 
   private class NodeListContribution
-      extends BaseNodeViewExtMenuContribution {
+      extends BaseNodeViewExtMenuContribution<DepanFxNodeList> {
 
     public NodeListContribution(DepanFxNodeLayoutRegistry layoutRegistry) {
       super(
@@ -184,14 +190,20 @@ public class DepanFxNodeViewConfiguration {
     @Override
     protected DepanFxNodeViewData getNodeViewData(
         DepanFxWorkspace workspace,
-        DepanFxWorkspaceResource rsrc) {
-      DepanFxNodeList nodeList = (DepanFxNodeList) rsrc.getResource();
+        DepanFxWorkspaceResource<?> rsrc) {
+      @SuppressWarnings("unchecked")
+      DepanFxWorkspaceResource<DepanFxNodeList> nodeListResource =
+          (DepanFxWorkspaceResource<DepanFxNodeList>) rsrc;
+
+      DepanFxNodeList nodeList = nodeListResource.getResource();
       GraphDocument graphDoc =
           (GraphDocument) nodeList.getGraphDocResource().getResource();
-      DepanFxWorkspaceResource linkDisplayDocRsrc =
-          getContextLinkDisplay(workspace, graphDoc.getContextModelId());
+      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData>
+          linkDisplayDocRsrc =
+              getContextLinkDisplay(workspace, graphDoc.getContextModelId());
 
-      return DepanFxNodeViews.fromNodeList(rsrc, linkDisplayDocRsrc);
+      return DepanFxNodeViews.fromNodeList(
+          nodeListResource, linkDisplayDocRsrc);
     }
 
     @Override
@@ -201,7 +213,7 @@ public class DepanFxNodeViewConfiguration {
   }
 
   private static class NodeViewContribution
-      extends BaseNodeViewExtMenuContribution {
+      extends BaseNodeViewExtMenuContribution<DepanFxNodeViewData> {
 
     public NodeViewContribution(DepanFxNodeLayoutRegistry layoutRegistry) {
       super(
@@ -222,8 +234,12 @@ public class DepanFxNodeViewConfiguration {
     @Override
     protected DepanFxNodeViewData getNodeViewData(
         DepanFxWorkspace workspace,
-        DepanFxWorkspaceResource rsrc) {
-      return (DepanFxNodeViewData) rsrc.getResource();
+        DepanFxWorkspaceResource<?> rsrc) {
+      @SuppressWarnings("unchecked")
+      DepanFxWorkspaceResource<DepanFxNodeViewData> nodeViewResource =
+          (DepanFxWorkspaceResource<DepanFxNodeViewData>) rsrc;
+
+      return nodeViewResource.getResource();
     }
 
     @Override
@@ -232,8 +248,9 @@ public class DepanFxNodeViewConfiguration {
     }
   }
 
-  private DepanFxWorkspaceResource getContextLinkDisplay(
-      DepanFxWorkspace workspace, ContextModelId contextModelId) {
+  private DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData>
+      getContextLinkDisplay(
+            DepanFxWorkspace workspace, ContextModelId contextModelId) {
 
     return DepanFxProjects.getBuiltIn(
             workspace, DepanFxNodeViewLinkDisplayData.class,
@@ -246,10 +263,9 @@ public class DepanFxNodeViewConfiguration {
   }
 
   private boolean byContextModel(
-      DepanFxBuiltInContribution viewDisplayContrib,
+      DepanFxBuiltInContribution<DepanFxNodeViewLinkDisplayData> viewDisplayContrib,
       ContextModelId contextModelId) {
-    DepanFxNodeViewLinkDisplayData linkDisplayData =
-        (DepanFxNodeViewLinkDisplayData) viewDisplayContrib.getDocument();
-    return linkDisplayData.getContextModelId().equals(contextModelId);
+    return viewDisplayContrib.getDocument()
+        .getContextModelId().equals(contextModelId);
   }
 }

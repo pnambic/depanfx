@@ -35,8 +35,8 @@ public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
    * to the document cache.
    *
    */
-  Optional<DepanFxWorkspaceResource> saveDocument(
-      DepanFxProjectDocument projDoc, Object item)
+  <T> Optional<DepanFxWorkspaceResource<T>> saveDocument(
+      DepanFxProjectDocument projDoc, T item)
       throws IOException;
 
   /**
@@ -48,22 +48,22 @@ public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
    * @throws RuntimeException rethrowing a wrapped {@link IOException} after
    *    logging the failure.
    */
-  Optional<DepanFxWorkspaceResource> loadDocument(
+  <T> Optional<DepanFxWorkspaceResource<T>> loadDocument(
       DepanFxProjectDocument projDoc, String expectedLabel);
 
   /**
    * Provide the resource identified by the project document.
    * The contents may be loaded from storage or provided by the cache.
    */
-  Optional<DepanFxWorkspaceResource> getWorkspaceResource(
+  <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
       DepanFxProjectDocument resourceDoc, String expectedContent);
 
   /**
    * Documents that do not match the supplied {@code docType} are quietly
    * dropped.
    */
-  Optional<DepanFxWorkspaceResource> getWorkspaceResource(
-      DepanFxProjectDocument resourceDoc, Class<?> type);
+  <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
+      DepanFxProjectDocument resourceDoc, Class<T> type);
 
   Optional<DepanFxProjectContainer> toProjectContainer(URI uri);
 

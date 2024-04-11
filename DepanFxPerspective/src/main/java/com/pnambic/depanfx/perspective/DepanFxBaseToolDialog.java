@@ -32,7 +32,7 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData> {
   @SuppressWarnings("unused")
   private final Class<T> dataType;
 
-  private Optional<DepanFxWorkspaceResource> optResource;
+  private Optional<DepanFxWorkspaceResource<T>> optResource;
 
   @FXML
   private TextField toolNameField;
@@ -61,7 +61,7 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData> {
     return workspace;
   }
 
-  public Optional<DepanFxWorkspaceResource> getWorkspaceResource() {
+  public Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource() {
     return optResource;
   }
 
@@ -171,8 +171,8 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData> {
     }
   }
 
-  private Optional<DepanFxWorkspaceResource> saveDocument(
-      DepanFxProjectDocument projDoc, Object docData) {
+  private Optional<DepanFxWorkspaceResource<T>> saveDocument(
+      DepanFxProjectDocument projDoc, T docData) {
     try {
       return workspace.saveDocument(projDoc, docData);
     } catch (IOException errIo) {

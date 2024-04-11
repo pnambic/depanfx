@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodelist.model;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.util.Collection;
@@ -14,14 +15,14 @@ public class DepanFxNodeList {
 
   private final String nodeListDescription;
 
-  private final DepanFxWorkspaceResource graphDocRsrc;
+  private final DepanFxWorkspaceResource<GraphDocument> graphDocRsrc;
 
   private final Collection<GraphNode> nodes;
 
   public DepanFxNodeList(
       String nodeListName,
       String nodeListDescription,
-      DepanFxWorkspaceResource graphDocRsrc,
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
       Collection<GraphNode> nodes) {
     this.nodeListName = nodeListName;
     this.nodeListDescription = nodeListDescription;
@@ -37,7 +38,7 @@ public class DepanFxNodeList {
     return nodeListDescription;
   }
 
-  public DepanFxWorkspaceResource getGraphDocResource() {
+  public DepanFxWorkspaceResource<GraphDocument> getGraphDocResource() {
     return graphDocRsrc;
   }
 

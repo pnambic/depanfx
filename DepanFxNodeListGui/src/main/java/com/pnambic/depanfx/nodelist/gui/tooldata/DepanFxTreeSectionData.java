@@ -20,7 +20,6 @@ import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.Orde
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
-import com.pnambic.depanfx.workspace.DepanFxProjectResource;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -39,18 +38,21 @@ public class DepanFxTreeSectionData extends DepanFxBaseSectionData {
 
   public enum ContainerOrder { FIRST, MIXED, LAST };
 
-  private final DepanFxProjectResource linkMatcherRsrc; // 2
+  private final DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkMatcherRsrc;
 
-  private final boolean inferMissingParents; // 4
+  private final boolean inferMissingParents;
 
   private final OrderBy orderBy;
 
   private final ContainerOrder containerOrder;
 
-  public DepanFxTreeSectionData(String toolName, String toolDescription,
+  public DepanFxTreeSectionData(
+      String toolName, String toolDescription,
       String sectionLabel, boolean displayNodeCount,
-      DepanFxProjectResource linkMatcherRsrc, boolean inferMissingParents,
-      OrderBy orderBy, ContainerOrder containerOrder,
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkMatcherRsrc,
+      boolean inferMissingParents,
+      OrderBy orderBy,
+      ContainerOrder containerOrder,
       OrderDirection orderDirection) {
     super(toolName, toolDescription,
         sectionLabel, displayNodeCount, orderDirection);
@@ -64,14 +66,13 @@ public class DepanFxTreeSectionData extends DepanFxBaseSectionData {
     this.containerOrder = containerOrder;
   }
 
-  public DepanFxWorkspaceResource getLinkMatcherRsrc(
-      DepanFxWorkspace workspace) {
-    return linkMatcherRsrc.getResource(workspace, DepanFxTreeSectionData.class).get();
+  public DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>
+      getLinkMatcherRsrc() {
+    return linkMatcherRsrc;
   }
 
   public DepanFxLinkMatcher getLinkMatcher(DepanFxWorkspace workspace) {
-    return ((DepanFxLinkMatcherDocument) getLinkMatcherRsrc(workspace)
-        .getResource()).getMatcher();
+    return linkMatcherRsrc.getResource().getMatcher();
   }
 
   public OrderBy getOrderBy() {
