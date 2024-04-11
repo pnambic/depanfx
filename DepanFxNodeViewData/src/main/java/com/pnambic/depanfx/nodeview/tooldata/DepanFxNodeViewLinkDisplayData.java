@@ -72,7 +72,7 @@ public class DepanFxNodeViewLinkDisplayData extends DepanFxBaseToolData {
   }
 
 
-  public Optional<LinkDisplayEntry> getLinkDisplayEnty(GraphEdge edge) {
+  public Optional<LinkDisplayEntry> getLinkDisplayEntry(GraphEdge edge) {
     return linkDisplayEntries.stream()
         .filter(d -> handlesEdge(d, edge))
         .findFirst();

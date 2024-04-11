@@ -4,6 +4,7 @@ import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.nodelist.link.DepanFxLink;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodeview.jogl.JoglLines;
@@ -470,12 +471,37 @@ public class DepanFxNodeViewPanel {
     return true;
   }
 
-  private void installEdge(DepanFxJoglView result, GraphEdge edge) {
+  private void installEdge(DepanFxJoglView view, GraphEdge edge) {
 
     DepanFxNodeViewLinkDisplayData displayInfo =
         viewData.getLinkDisplayDocRsrc().getResource();
 
-    displayInfo.getLinkDisplayEnty(edge)
+    Optional<LinkDisplayEntry> blix = displayInfo.getLinkDisplayEntry(edge);
+    if (blix.isPresent()) {
+      LinkDisplayEntry blax = blix.get();
+      DepanFxLinkMatcherDocument matcher =
+          (DepanFxLinkMatcherDocument) blax.getLinkRsrc().getResource();
+      matcher.getMatcher().match(edge)
+          .ifPresent(l -> addMatchedEdge(view, matcher, edge, l));
+      return;
+    }
+    addRemainderEdge(edge);
+
+    displayInfo.getLinkDisplayEntry(edge)
+        .ifPresent(l -> JoglLines.installLine(result, edge, l));
+  }
+
+  private void addMatchedEdge(DepanFxJoglView view,
+      DepanFxLinkMatcherDocument matcher, GraphEdge edge, DepanFxLink link) {
+    JoglLines.installLine(view, edge, link);
+  }
+
+  private void installEdgeX(DepanFxJoglView result, GraphEdge edge) {
+
+    DepanFxNodeViewLinkDisplayData displayInfo =
+        (DepanFxNodeViewLinkDisplayData) viewData.getLinkDisplayDocRsrc().getResource();
+
+    displayInfo.getLinkDisplayEntry(edge)
         .ifPresent(l -> JoglLines.installLine(result, edge, l));
   }
 
