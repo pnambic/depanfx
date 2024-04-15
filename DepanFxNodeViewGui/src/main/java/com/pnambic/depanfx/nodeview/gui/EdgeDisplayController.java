@@ -12,30 +12,33 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.Link
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public class EdgeDisplayController {
 
   private final DepanFxJoglView joglView;
-  
-  private final DepanFxNodeViewLinkDisplayData displayInfo;
 
   /**
    * Some edges are individually styled.
    */
   private final Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay;
 
-  private final Map<DepanFxLinkMatcherDocument, Collection<GraphEdge>>
-      edgeDisplayGroup = new HashMap<>();
-
-  private Collection<GraphEdge> remainderEdges = new ArrayList<>();
+  private DepanFxNodeViewLinkDisplayData displayInfo;
 
   private DepanFxLineDisplayData remainderDisplay;
 
   private String remainderLabel;
 
   private boolean remainderVisible;
+
+  private Collection<GraphEdge> directEdges = new ArrayList<>();
+
+  private Collection<GraphEdge> remainderEdges = new ArrayList<>();
+
+  private final Map<DepanFxLinkMatcherDocument, Collection<GraphEdge>>
+      edgeDisplayGroup = new HashMap<>();
 
   public EdgeDisplayController(
       DepanFxJoglView joglView,
@@ -63,6 +66,23 @@ public class EdgeDisplayController {
         viewData.getRemainerDisplay());
   }
 
+  public void setLinkDisplay(DepanFxNodeViewLinkDisplayData displayInfo) {
+    this.displayInfo = displayInfo;
+
+    // Capture the edges before we zap the current assignments
+    List<GraphEdge> updateEdges = new ArrayList<>();
+    edgeDisplayGroup.values().stream()
+        .flatMap(s -> s.stream())
+        .forEach(updateEdges::add);
+    remainderEdges.forEach(updateEdges::add);
+
+    edgeDisplayGroup.clear();
+    remainderEdges.clear();
+
+    // Rebuild with new display info.
+    updateEdges.forEach(this::installEdge);
+  }
+
   public void updateEdgeDisplayByMatcher(
       DepanFxLinkMatcherDocument matcher,
       LinkDisplayEntry displayEntry) {
@@ -76,7 +96,7 @@ public class EdgeDisplayController {
     // Prefer direct edge display
     DepanFxLineDisplayData edgeDirect = edgeDisplay.get(edge);
     if (edgeDirect != null) {
-      JoglLines.installEdge(joglView, edge, "Direct", remainderDisplay);
+      addDirectEdge(edge, edgeDirect);
       return;
     }
 
@@ -108,6 +128,11 @@ public class EdgeDisplayController {
     return remainderDisplay;
   }
 
+  private void addDirectEdge(GraphEdge edge, DepanFxLineDisplayData edgeDisplay) {
+    directEdges .add(edge);
+    JoglLines.installEdge(joglView, edge, "Direct", edgeDisplay);
+  }
+
   private void addMatchedEdge(GraphEdge edge, LinkDisplayEntry lineDisplay) {
 
     // Record edge with the matcher,
@@ -121,7 +146,7 @@ public class EdgeDisplayController {
   }
 
   private void updateMatchedEdge(
-      GraphEdge edge, 
+      GraphEdge edge,
       DepanFxLinkMatcherDocument matcher,
       LinkDisplayEntry lineDisplay) {
 

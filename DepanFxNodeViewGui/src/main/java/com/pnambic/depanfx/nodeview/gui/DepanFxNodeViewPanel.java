@@ -7,6 +7,7 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodeview.jogl.JoglShapes;
+import com.pnambic.depanfx.nodeview.layouts.DepanFxLayoutsChooser;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
@@ -16,13 +17,10 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewSceneData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
-import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
-import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -87,6 +85,10 @@ public class DepanFxNodeViewPanel {
       new ExtensionFilter(ALL_GRAPHIC_LABEL, Arrays.asList(ALL_GRAPHIC_EXTS));
 
   private static final String PNG_EXT = "png";
+
+  private static final String EDGE_DISPLAY = "Edge Display";
+
+  private static final String SELECT_EDGE_DISPLAY = "Select Edge Display...";
 
   private final DepanFxWorkspace workspace;
 
@@ -319,6 +321,7 @@ public class DepanFxNodeViewPanel {
         INVERT_SELECTION_ITEM, e -> doInvertSelectionAction());
 
     builder.appendSeparator();
+    builder.appendSubMenu(buildEdgeDisplayMenu());
     builder.appendActionItem(
         DepanFxNodeViewLinkDisplayDialog.EDIT_LINK_DISPLAY,
         e -> runEditLinkDisplayDialog());
@@ -337,6 +340,31 @@ public class DepanFxNodeViewPanel {
     return builder.build();
   }
 
+  private Menu buildEdgeDisplayMenu() {
+    Menu result = new Menu(EDGE_DISPLAY);
+
+    ObservableList<MenuItem> items = result.getItems();
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        SELECT_EDGE_DISPLAY, e -> doSelectEdgeDisplayAction()));
+
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        DepanFxNodeViewLinkDisplayDialog.EDIT_LINK_DISPLAY,
+        e -> runEditLinkDisplayDialog()));
+    return result;
+  }
+
+  private void doSelectEdgeDisplayAction() {
+    DepanFxLinkDisplayDataChooser
+        .runLinkDisplayFinder(
+            workspace, dialogRunner, joglView.getScene())
+        .ifPresent(r -> this.setLinkMatcher(r));
+  }
+
+  private void setLinkMatcher(
+      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc) {
+    edgeDisplay.setLinkDisplay(displayRsrc.getResource());
+  }
+
   private Menu buildLayoutNodesMenu() {
     Menu result = new Menu(LAYOUT_NODES);
 
@@ -350,32 +378,17 @@ public class DepanFxNodeViewPanel {
   }
 
   private void doSelectLayoutAction() {
-    DepanFxResourceChooser rsrcChooser =
-        new DepanFxResourceChooser(workspace, dialogRunner);
-
-    DepanFxResourcePerspectives.prepareResourceFinder(
-        rsrcChooser, DepanFxNodeViewData.NODE_VIEW_TOOL_PATH);
-
-    ObservableList<DepanFxResourceFilter> filters =
-        rsrcChooser.getExtensionFilters();
-
-    filters.addAll(layoutRegistry.getOpenFilters(c -> true));
-    DepanFxResourceFilter allLayoutsFilter =
-        layoutRegistry.buildAllLayoutsFilter(c -> true);
-    filters.add(allLayoutsFilter);
-    rsrcChooser.setSelectedExtensionFilter(allLayoutsFilter);
-
-    rsrcChooser.showOpenDialog(joglView.getScene())
-        .map(DepanFxProjectDocument.class::cast)
-        .flatMap(m -> workspace.getWorkspaceResource(m, "Node Layout"))
+    DepanFxLayoutsChooser
+        .runLayoutFinder(
+            workspace, dialogRunner, joglView.getScene(), layoutRegistry)
         .ifPresent(this::layoutNodes);
   }
 
-  private void layoutNodes(DepanFxWorkspaceResource<?> wkspRsrc) {
+  private void layoutNodes(DepanFxWorkspaceResource<?> layoutRsrc) {
     List<GraphNode> updateNodes =
         streamChosenNodes().collect(Collectors.toList());
     updateNodeLocations(
-        layoutRegistry.layoutNodes(wkspRsrc, getGraphDocRsrc(), updateNodes));
+        layoutRegistry.layoutNodes(layoutRsrc, getGraphDocRsrc(), updateNodes));
   }
 
   private void runEditLinkDisplayDialog() {

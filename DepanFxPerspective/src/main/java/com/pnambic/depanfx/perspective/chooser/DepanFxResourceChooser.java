@@ -5,7 +5,6 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.util.Optional;
 
@@ -14,7 +13,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.stage.Stage;
 
 public class DepanFxResourceChooser {
 
@@ -71,10 +69,6 @@ public class DepanFxResourceChooser {
 
   public void setInitialContainer(String initialResourceName) {
     this.initialResourceName = initialResourceName;
-  }
-
-  public void setActiveFilter(DepanFxResourceFilter activeFilter) {
-    selectedExtensionFilter.set(activeFilter);
   }
 
   public ObservableList<DepanFxResourceFilter> getExtensionFilters() {

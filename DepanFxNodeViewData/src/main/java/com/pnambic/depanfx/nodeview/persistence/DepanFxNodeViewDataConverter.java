@@ -132,7 +132,6 @@ public class DepanFxNodeViewDataConverter
   @Override
   public DepanFxNodeViewData unmarshal(PersistUnmarshalContext srcContext) {
 
-    // Map<String, Object> metaData = TAG_LOADER.loadData(META_TAGS, srcContext);
     PersistTagDataResult metaData =
         new PersistTagDataResult(TAG_LOADER.loadData(META_TAGS, srcContext));
 
