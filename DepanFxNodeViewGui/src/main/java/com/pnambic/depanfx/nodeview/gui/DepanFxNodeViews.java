@@ -8,7 +8,6 @@ import com.pnambic.depanfx.nodeview.jogl.JoglCameras;
 import com.pnambic.depanfx.nodeview.jogl.JoglColors;
 import com.pnambic.depanfx.nodeview.layouts.GridLayoutRunner;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
@@ -16,7 +15,6 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewSceneData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxSizerModel;
-import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -70,8 +68,7 @@ public class DepanFxNodeViews {
         "From node list {0} ({1} nodes).", baseName, nodes.size());
     return buildNodeView(
         resultName, resultDescr,
-        nodeList.getGraphDocResource(), linkDisplayDocRsrc,
-        nodes, null);
+        nodeList.getGraphDocResource(), linkDisplayDocRsrc, nodes);
   }
 
   public static DepanFxNodeViewData fromGraphDocument(
@@ -92,8 +89,7 @@ public class DepanFxNodeViews {
 
     return buildNodeView(
         resultName, resultDescr,
-        graphDocRsrc, linkDisplayDocRsrc,
-        nodes, null);
+        graphDocRsrc, linkDisplayDocRsrc, nodes);
   }
 
   public static DepanFxNodeViewData updateNameDescr(
@@ -103,15 +99,16 @@ public class DepanFxNodeViews {
         viewDoc.getGraphDocRsrc(), viewDoc.getLinkDisplayDocRsrc(),
         viewDoc.getViewNodes(),
         viewDoc.getNodeLocations(), viewDoc.getNodeDisplay(),
-        viewDoc.getEdgeDisplay());
+        viewDoc.getEdgeDisplay(),
+        viewDoc.getRemainerVisible(), viewDoc.getRemainderLabel(),
+        viewDoc.getRemainerDisplay());
   }
 
   private static DepanFxNodeViewData buildNodeView(
       String viewName, String viewDescr,
       DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkViewDocRsrc,
-      Collection<GraphNode> nodes,
-      DepanFxWorkspace workspace) {
+      Collection<GraphNode> nodes) {
     DepanFxNodeViewCameraData cameraData = JoglCameras.getHome();
     DepanFxNodeViewSceneData sceneData =
         new DepanFxNodeViewSceneData(
@@ -125,7 +122,10 @@ public class DepanFxNodeViews {
         buildEdgeDisplay();
     return new DepanFxNodeViewData(viewName, viewDescr, sceneData,
         graphDocRsrc, linkViewDocRsrc, nodes,
-        locations, nodeDisplay, edgeDisplay);
+        locations, nodeDisplay, edgeDisplay,
+        DepanFxNodeViewData.DEFAULT_REMAINDER_VISIBLE,
+        DepanFxNodeViewData.DEFAULT_REMAINDER_LABEL,
+        DepanFxNodeViewData.DEFAULT_REMAINDER_DISPLAY);
   }
 
   private static Map<GraphEdge, DepanFxLineDisplayData> buildEdgeDisplay() {

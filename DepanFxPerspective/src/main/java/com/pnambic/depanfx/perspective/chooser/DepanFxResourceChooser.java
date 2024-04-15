@@ -65,14 +65,6 @@ public class DepanFxResourceChooser {
     return chooserCtrl.getSelectedResource();
   }
 
-  public Optional<DepanFxWorkspaceResource> showOpenDialog(Stage stage) {
-    Dialog<DepanFxResourceChooserDialog> openDialog =
-        dialogRunner.createDialogAndParent(DepanFxResourceChooserDialog.class);
-    openDialog.runDialog(title);
-    openDialog.getController();
-    return Optional.empty();
-  }
-
   public void setInitialResourceName(String initialResourceName) {
     this.initialResourceName = initialResourceName;
   }

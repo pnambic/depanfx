@@ -4,13 +4,10 @@ import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
-import com.pnambic.depanfx.nodelist.link.DepanFxLink;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
-import com.pnambic.depanfx.nodeview.jogl.JoglLines;
 import com.pnambic.depanfx.nodeview.jogl.JoglShapes;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
@@ -23,8 +20,8 @@ import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
-import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
+import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
@@ -105,11 +102,11 @@ public class DepanFxNodeViewPanel {
 
   private Map<GraphNode, DepanFxNodeDisplayData> nodeDisplay;
 
-  private Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay;
-
   private Map<GraphNode, BooleanProperty> nodesCheckBoxStates;
 
   private DepanFxJoglView joglView;
+
+  private EdgeDisplayController edgeDisplay;
 
   public DepanFxNodeViewPanel(
       DepanFxWorkspace workspace,
@@ -125,13 +122,14 @@ public class DepanFxNodeViewPanel {
     this.viewNodes = viewData.getViewNodes();
     this.nodeLocations = viewData.getNodeLocations();
     this.nodeDisplay = viewData.getNodeDisplay();
-    this.edgeDisplay = viewData.getEdgeDisplay();
 
     nodesCheckBoxStates = buildNodesCheckBoxStates(viewNodes);
   }
 
   public Tab createWorkspaceTab(String tabTitle) {
     joglView = createJoglView();
+    populateJoglView();
+
     Tab result = new Tab(tabTitle, joglView);
 
     result.setOnSelectionChanged(new EventHandler<Event>() {
@@ -253,6 +251,13 @@ public class DepanFxNodeViewPanel {
         .forEach(e -> updateNodeLocation(e.getKey(), e.getValue()));
   }
 
+  public void updateEdgeDisplayByMatcher(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcher,
+      LinkDisplayEntry displayEntry) {
+    edgeDisplay.updateEdgeDisplayByMatcher(
+        matcher.getResource(), displayEntry);
+  }
+
   /**
    * Take a snaphot of the given view. Ask the user a filename, and use
    * this filename to determine which type of file format has to be used.
@@ -300,7 +305,6 @@ public class DepanFxNodeViewPanel {
       LOG.error("Failure saving image {}", dstName, errIo);
     }
   }
-
 
   /////////////////////////////////////
   // Internal
@@ -410,8 +414,11 @@ public class DepanFxNodeViewPanel {
         viewData.getToolName(), viewData.getToolDescription(),
         buildSceneData(),
         viewData.getGraphDocRsrc(), viewData.getLinkDisplayDocRsrc(),
-        viewNodes, nodeLocations, nodeDisplay, edgeDisplay);
-    return result ;
+        viewNodes, nodeLocations, nodeDisplay,
+        edgeDisplay.getEdgeDisplay(),
+        edgeDisplay.getRemainderVisible(), edgeDisplay.getRemainderLabel(),
+        edgeDisplay.getRemainderDisplay());
+    return result;
   }
 
   private DepanFxNodeViewSceneData buildSceneData() {
@@ -419,7 +426,7 @@ public class DepanFxNodeViewPanel {
         joglView.getCameraData();
     DepanFxNodeViewSceneData result = new DepanFxNodeViewSceneData(
         viewData.getSceneData().getBackgroundColor(), cameraInfo);
-    return result ;
+    return result;
   }
 
   private DepanFxJoglView createJoglView() {
@@ -427,11 +434,19 @@ public class DepanFxNodeViewPanel {
         viewData.getSceneData().getCameraInfo();
     DepanFxJoglView result =
         DepanFxJoglView.createJoglView(cameraInfo, dialogRunner);
-    viewNodes.stream()
-        .forEach(n -> installShape(result, n));
-    getViewEdges()
-        .forEach(e -> installEdge(result, e));
     return result;
+  }
+
+  private void populateJoglView() {
+
+    viewNodes.stream().forEach(this::installShape);
+
+    edgeDisplay = new EdgeDisplayController(joglView,
+        viewData.getLinkDisplayDocRsrc().getResource(),
+        viewData.getEdgeDisplay(),
+        viewData.getRemainerVisible(), viewData.getRemainderLabel(),
+        viewData.getRemainerDisplay());
+    getViewEdges().forEach(edgeDisplay::installEdge);
   }
 
   private void updateNodeLocation(
@@ -442,7 +457,7 @@ public class DepanFxNodeViewPanel {
     }
   }
 
-  private void installShape(DepanFxJoglView view, GraphNode node) {
+  private void installShape(GraphNode node) {
 
     DepanFxNodeLocationData location = nodeLocations.get(node);
     if (location == null) {
@@ -452,7 +467,7 @@ public class DepanFxNodeViewPanel {
     if (displayInfo == null) {
       return;
     }
-    JoglShapes.installShape(view, node, location, displayInfo);
+    JoglShapes.installShape(joglView, node, location, displayInfo);
   }
 
   private Stream<GraphEdge> getViewEdges() {
@@ -469,40 +484,6 @@ public class DepanFxNodeViewPanel {
       return false;
     }
     return true;
-  }
-
-  private void installEdge(DepanFxJoglView view, GraphEdge edge) {
-
-    DepanFxNodeViewLinkDisplayData displayInfo =
-        viewData.getLinkDisplayDocRsrc().getResource();
-
-    Optional<LinkDisplayEntry> blix = displayInfo.getLinkDisplayEntry(edge);
-    if (blix.isPresent()) {
-      LinkDisplayEntry blax = blix.get();
-      DepanFxLinkMatcherDocument matcher =
-          (DepanFxLinkMatcherDocument) blax.getLinkRsrc().getResource();
-      matcher.getMatcher().match(edge)
-          .ifPresent(l -> addMatchedEdge(view, matcher, edge, l));
-      return;
-    }
-    addRemainderEdge(edge);
-
-    displayInfo.getLinkDisplayEntry(edge)
-        .ifPresent(l -> JoglLines.installLine(result, edge, l));
-  }
-
-  private void addMatchedEdge(DepanFxJoglView view,
-      DepanFxLinkMatcherDocument matcher, GraphEdge edge, DepanFxLink link) {
-    JoglLines.installLine(view, edge, link);
-  }
-
-  private void installEdgeX(DepanFxJoglView result, GraphEdge edge) {
-
-    DepanFxNodeViewLinkDisplayData displayInfo =
-        (DepanFxNodeViewLinkDisplayData) viewData.getLinkDisplayDocRsrc().getResource();
-
-    displayInfo.getLinkDisplayEntry(edge)
-        .ifPresent(l -> JoglLines.installLine(result, edge, l));
   }
 
   /////////////////////////////////////

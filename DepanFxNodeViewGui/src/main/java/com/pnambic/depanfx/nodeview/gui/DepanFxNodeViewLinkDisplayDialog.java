@@ -1,7 +1,7 @@
 package com.pnambic.depanfx.nodeview.gui;
 
+import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodeview.jogl.JoglColors;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDirection;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
@@ -342,7 +342,7 @@ public class DepanFxNodeViewLinkDisplayDialog
 
     public StringProperty linkDisplayNameProp;
 
-    public DepanFxWorkspaceResource linkDisplayRsrc;
+    public DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkDisplayRsrc;
 
     public ObjectProperty<DepanFxLineForm> lineFormProp;
 
@@ -384,7 +384,8 @@ public class DepanFxNodeViewLinkDisplayDialog
           new SimpleObjectProperty<>(LinkOrderOperation.NONE);
     }
 
-    public void setLinkDisplayRsrc(DepanFxWorkspaceResource linkDisplayRsrc) {
+    public void setLinkDisplayRsrc(
+        DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkDisplayRsrc) {
       this.linkDisplayRsrc = linkDisplayRsrc;
       if (this.linkDisplayRsrc != null) {
         linkDisplayNameProp.setValue(

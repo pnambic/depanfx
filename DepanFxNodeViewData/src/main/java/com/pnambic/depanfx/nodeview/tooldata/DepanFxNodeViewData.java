@@ -13,7 +13,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javafx.scene.paint.Color;
+
 public class DepanFxNodeViewData extends DepanFxBaseToolData {
+
+  public static final boolean DEFAULT_REMAINDER_VISIBLE = true;
+
+  public static final String DEFAULT_REMAINDER_LABEL = "Remainder";
+
+  public static final DepanFxLineDisplayData DEFAULT_REMAINDER_DISPLAY =
+      buildRemainerDisplay();
 
   public static final String NODE_VIEW_TOOL_EXT = "dnvi";
 
@@ -46,6 +55,12 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
 
   private final Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay;
 
+  private boolean remainerVisible;
+
+  private String remainderLabel;
+
+  private DepanFxLineDisplayData remainderDisplay;
+
   public DepanFxNodeViewData(
       String toolName, String toolDescription,
       DepanFxNodeViewSceneData sceneData,
@@ -54,7 +69,10 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
       Collection<GraphNode> viewNodes,
       Map<GraphNode, DepanFxNodeLocationData> nodeLocations,
       Map<GraphNode, DepanFxNodeDisplayData> nodeDisplay,
-      Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay) {
+      Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay,
+      boolean remainerVisible,
+      String remainderLabel,
+      DepanFxLineDisplayData remainderDisplay) {
     super(toolName, toolDescription);
     this.sceneData = sceneData;
     this.graphDocRsrc = graphDocRsrc;
@@ -63,17 +81,9 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
     this.nodeLocations = nodeLocations;
     this.nodeDisplay = nodeDisplay;
     this.edgeDisplay = edgeDisplay;
-  }
-
-  public DepanFxNodeViewData(
-      String toolName, String toolDescription,
-      DepanFxNodeViewSceneData sceneData,
-      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
-      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayDocRsrc,
-      Collection<GraphNode> viewNodes) {
-    this(toolName, toolDescription, sceneData,
-        graphDocRsrc, linkDisplayDocRsrc,
-        viewNodes, new HashMap<>(), new HashMap<>(), new HashMap<>());
+    this.remainerVisible = remainerVisible;
+    this.remainderLabel = remainderLabel;
+    this.remainderDisplay = remainderDisplay;
   }
 
   public DepanFxNodeViewSceneData getSceneData() {
@@ -121,5 +131,24 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   /** Provide defensive copy. */
   public DepanFxLineDisplayData getLineDisplay(GraphEdge edge) {
     return edgeDisplay.get(edge);
+  }
+
+  public boolean getRemainerVisible() {
+    return remainerVisible;
+  }
+
+  public String getRemainderLabel() {
+    return remainderLabel;
+  }
+
+  public DepanFxLineDisplayData getRemainerDisplay() {
+    return remainderDisplay;
+  }
+
+  private static DepanFxLineDisplayData buildRemainerDisplay() {
+    DepanFxLineDisplayData result =
+        DepanFxLineDisplayData.buildSimpleLineDisplayData();
+    result.lineColor = DepanFxJoglColor.of(Color.GRAY);
+    return result ;
   }
 }

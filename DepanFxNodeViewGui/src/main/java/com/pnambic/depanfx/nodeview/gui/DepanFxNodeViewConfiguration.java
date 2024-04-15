@@ -234,8 +234,7 @@ public class DepanFxNodeViewConfiguration {
 
     @Override
     protected DepanFxNodeViewData getNodeViewData(
-        DepanFxWorkspace workspace,
-        DepanFxWorkspaceResource<?> rsrc) {
+        DepanFxWorkspace workspace, DepanFxWorkspaceResource<?> rsrc) {
       @SuppressWarnings("unchecked")
       DepanFxWorkspaceResource<DepanFxNodeViewData> nodeViewResource =
           (DepanFxWorkspaceResource<DepanFxNodeViewData>) rsrc;

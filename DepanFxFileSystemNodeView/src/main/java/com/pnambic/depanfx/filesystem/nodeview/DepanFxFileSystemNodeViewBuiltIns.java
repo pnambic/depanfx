@@ -2,6 +2,7 @@ package com.pnambic.depanfx.filesystem.nodeview;
 
 import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemLinkMatcherBuiltIns;
 import com.pnambic.depanfx.graph.context.BaseContextDefinition;
+import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDirection;
@@ -23,6 +24,7 @@ import org.springframework.context.annotation.Configuration;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.scene.paint.Color;
 
@@ -45,12 +47,14 @@ public class DepanFxFileSystemNodeViewBuiltIns {
   }
 
   @Bean
-  public DepanFxBuiltInContribution fileSystemMembersEdgeLinkDisplayDoc() {
-    return new DepanFxBuiltInContribution.Dependent(
+  public DepanFxBuiltInContribution<DepanFxNodeViewLinkDisplayData>
+      fileSystemMembersEdgeLinkDisplayDoc() {
+    return new DepanFxBuiltInContribution.Dependent<>(
         NODE_VIEW_FILE_SYSTEM_MEMBERS_DOC_PATH) {
 
       @Override
-      protected Object buildDocument(DepanFxBuiltInProject project) {
+      protected DepanFxNodeViewLinkDisplayData
+          buildDocument(DepanFxBuiltInProject project) {
         return buildFileSystemLinkDisplayData(project);
       }
     };
@@ -109,11 +113,11 @@ public class DepanFxFileSystemNodeViewBuiltIns {
   private static LinkDisplayEntry buildDisplayEntry(
       DepanFxBuiltInProject project, Path displayDataPath,
       String entryName, Path matcherPath, DepanFxLineDisplayData lineDisplay) {
-    DepanFxWorkspaceResource directoryMatcher =
-        project.getProjectTree()
-            .asProjectDocument(matcherPath)
-            .flatMap(project::getResource)
-        .orElseThrow(() ->
+
+    Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+        matcherRsrc = project.getResource(matcherPath);
+    DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> directoryMatcher =
+        matcherRsrc.orElseThrow(() ->
             new DepanFxBuiltInContribution.MissingDependencyException(
                 displayDataPath, matcherPath));
 

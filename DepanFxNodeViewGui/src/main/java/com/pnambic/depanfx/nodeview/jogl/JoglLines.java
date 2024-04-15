@@ -1,14 +1,10 @@
 package com.pnambic.depanfx.nodeview.jogl;
 
 import com.pnambic.depanfx.graph.model.GraphEdge;
+import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.jogl.JoglColor;
-import com.pnambic.depanfx.jogl.JoglShape;
 import com.pnambic.depanfx.jogl.shapes.LineShape;
-import com.pnambic.depanfx.jogl.shapes.LineShape.Arrow;
-import com.pnambic.depanfx.jogl.shapes.LineShape.Form;
-import com.pnambic.depanfx.jogl.shapes.LineShape.Style;
 import com.pnambic.depanfx.nodelist.link.DepanFxLink;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodeview.gui.DepanFxJoglView;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
@@ -25,32 +21,41 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.Link
  */
 public class JoglLines {
 
+  /**
+   * For edges matched to a link, use the link to define source and target.
+   */
   public static void installLine(
-      DepanFxJoglView result, GraphEdge edge, LinkDisplayEntry display) {
-
-    // Use info from link matcher
-    DepanFxLinkMatcherDocument matcher = display.getLinkRsrc().getResource();
-
-    matcher.getMatcher().match(edge)
-        .map(l -> buildLineShape(l, display))
-        .ifPresent(s -> result.updateShape(edge, s));
+      DepanFxJoglView joglView, GraphEdge edge,
+      DepanFxLink link, LinkDisplayEntry display) {
+    LineShape shape = buildLineShape(
+        link.getSource(), link.getTarget(),
+        toLabel(display), display.getLineDisplay());
+    joglView.updateShape(edge, shape);
   }
 
-  public static LineShape buildLineShape(
-      DepanFxLink link, LinkDisplayEntry display) {
+  public static void installEdge(
+      DepanFxJoglView result, GraphEdge edge,
+      String lineLabel, DepanFxLineDisplayData lineInfo) {
+    LineShape shape = buildLineShape(
+        edge.getHead(), edge.getTail(), lineLabel, lineInfo);
+    result.updateShape(edge, shape);
+  }
+
+  private static LineShape buildLineShape(
+      GraphNode lineSource, GraphNode lineTarget,
+      String lineLabel,  DepanFxLineDisplayData lineInfo) {
     LineShape result = new LineShape();
 
     // Use visibility from node view panel
     result.isVisible = true;
 
-    DepanFxLineDisplayData lineInfo = display.getLineDisplay();
     switch (lineInfo.lineDir) {
     case FORWARD:
-      result.lineSource = link.getSource();
-      result.lineTarget = link.getTarget();
+      result.lineSource = lineSource;
+      result.lineTarget = lineTarget;
     case REVERSE:
-      result.lineSource = link.getTarget();
-      result.lineTarget = link.getSource();
+      result.lineSource = lineTarget;
+      result.lineTarget = lineSource;
     }
 
     result.lineForm = toForm(lineInfo.lineForm);
@@ -58,7 +63,7 @@ public class JoglLines {
     result.lineColor = toColor(lineInfo.lineColor);
     result.lineWidth = lineInfo.lineWidth;
 
-    result.lineLabel = toLabel(display);
+    result.lineLabel = lineLabel;
 
     result.sourceArrow = toArrow(lineInfo.sourceArrow);
     result.targetArrow = toArrow(lineInfo.targetArrow);

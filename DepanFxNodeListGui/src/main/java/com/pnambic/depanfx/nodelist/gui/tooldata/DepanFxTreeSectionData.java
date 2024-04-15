@@ -38,7 +38,8 @@ public class DepanFxTreeSectionData extends DepanFxBaseSectionData {
 
   public enum ContainerOrder { FIRST, MIXED, LAST };
 
-  private final DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkMatcherRsrc;
+  private final DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>
+      linkMatcherRsrc;
 
   private final boolean inferMissingParents;
 
