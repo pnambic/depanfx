@@ -216,7 +216,7 @@ public class ClassDepLister extends ClassVisitor {
     // return-type dependency
     ClassNode typeNode =
         classBuilder.fromDescriptor(Type.getReturnType(desc).getDescriptor());
-    addEdge(mainClass, typeNode, JavaRelation.READ);
+    addEdge(mainClass, typeNode, JavaRelation.TYPE);
 
     return asmFactory.buildMethodVisitor(builder, classBuilder, methodNode);
   }

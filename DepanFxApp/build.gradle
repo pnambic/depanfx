@@ -27,6 +27,7 @@ dependencies {
   implementation project(':DepanFxGraphDoc')
   implementation project(':DepanFxJava')
   implementation project(':DepanFxJavaGui')
+  implementation project(':DepanFxJavaNodeView')
   implementation project(':DepanFxNodeListGui')
   implementation project(':DepanFxNodeListGui')
   implementation project(':DepanFxNodeViewGui')
