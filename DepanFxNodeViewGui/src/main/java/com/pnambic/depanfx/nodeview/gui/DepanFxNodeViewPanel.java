@@ -392,23 +392,13 @@ public class DepanFxNodeViewPanel {
   }
 
   private void runEditLinkDisplayDialog() {
-    DepanFxNodeViewLinkDisplayData linkDisplayData = buildLinkDisplayData();
+    edgeDisplay.getDisplayData();
     DepanFxNodeViewLinkDisplayDialog.runEditDialog(
         viewData.getLinkDisplayDocRsrc().getDocument(),
-        linkDisplayData, dialogRunner);
+        edgeDisplay.getDisplayData(), dialogRunner);
 
     // TODO: apply any outstanding changes from the dialog.
     // However, most changes should be live modifications.
-  }
-
-  private DepanFxNodeViewLinkDisplayData buildLinkDisplayData() {
-    DepanFxNodeViewLinkDisplayData linkDisplayData =
-        viewData.getLinkDisplayDocRsrc().getResource();
-    List<LinkDisplayEntry> linkDisplayEntries =
-        linkDisplayData.streamLinkDisplay().collect(Collectors.toList());
-    return new DepanFxNodeViewLinkDisplayData(
-        viewData.getToolName(), viewData.getToolDescription(),
-        linkDisplayData.getContextModelId(), linkDisplayEntries);
   }
 
   private void runSaveNodeViewDialog() {

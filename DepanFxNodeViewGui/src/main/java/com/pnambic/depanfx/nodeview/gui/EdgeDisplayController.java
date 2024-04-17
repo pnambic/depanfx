@@ -76,10 +76,9 @@ public class EdgeDisplayController {
         .forEach(updateEdges::add);
     remainderEdges.forEach(updateEdges::add);
 
+    // Rebuild with new display info.
     edgeDisplayGroup.clear();
     remainderEdges.clear();
-
-    // Rebuild with new display info.
     updateEdges.forEach(this::installEdge);
   }
 
@@ -90,6 +89,11 @@ public class EdgeDisplayController {
     if (updateEdges != null) {
       updateEdges.forEach(e -> updateMatchedEdge(e, matcher, displayEntry));
     }
+    // TODO: Update displayInfo.
+  }
+
+  public DepanFxNodeViewLinkDisplayData getDisplayData() {
+    return displayInfo;
   }
 
   public void installEdge(GraphEdge edge) {
