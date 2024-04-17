@@ -14,6 +14,8 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineLabel;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineStyle;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 
+import java.awt.Shape;
+
 /**
  * Hold references to line entities from the {@code Automatic-Module-Name}
  * module{@code depanfx.jogl}.  This avoids chatty but unhelpful warning
@@ -34,11 +36,18 @@ public class JoglLines {
   }
 
   public static void installEdge(
-      DepanFxJoglView result, GraphEdge edge,
+      DepanFxJoglView joglView, GraphEdge edge,
       String lineLabel, DepanFxLineDisplayData lineInfo) {
     LineShape shape = buildLineShape(
         edge.getHead(), edge.getTail(), lineLabel, lineInfo);
-    result.updateShape(edge, shape);
+    joglView.updateShape(edge, shape);
+  }
+
+  public static void setEdgeVisible(
+      DepanFxJoglView joglView, GraphEdge edge, boolean isVisible) {
+    LineShape shape = (LineShape) joglView.getShape(edge);
+    shape.isVisible = isVisible;
+    joglView.updateShape(edge, shape);
   }
 
   private static LineShape buildLineShape(

@@ -46,9 +46,13 @@ import javax.imageio.ImageIO;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -89,6 +93,18 @@ public class DepanFxNodeViewPanel {
   private static final String EDGE_DISPLAY = "Edge Display";
 
   private static final String SELECT_EDGE_DISPLAY = "Select Edge Display...";
+
+  private static final String EDGE_VISIBLITY = "Edge Visibility";
+
+  private static final String REMAINDERS_VISIBLE = "Remainders";
+
+  private static final String ALL_EDGES_VISIBLE = "Show All Edges";
+
+  private static final String NO_EDGES_VISIBLE = "Hide All Edges";
+
+  private static final String INVERT_EDGES_VISIBLE = "Invert Visible";
+
+  private static final String MORE_EDGE_VIBILITY = "More Visibility...";
 
   private final DepanFxWorkspace workspace;
 
@@ -322,11 +338,8 @@ public class DepanFxNodeViewPanel {
 
     builder.appendSeparator();
     builder.appendSubMenu(buildEdgeDisplayMenu());
-    builder.appendActionItem(
-        DepanFxNodeViewLinkDisplayDialog.EDIT_LINK_DISPLAY,
-        e -> runEditLinkDisplayDialog());
-    // PENDING: builder.appendActionItem(
-    //     EDIT_NODE_DISPLAY, e -> runEditLinkDisplayDialog());
+    Menu edgeVizMenu = new Menu(EDGE_VISIBLITY);
+    builder.appendSubMenu(edgeVizMenu);
 
     builder.appendSeparator();
     builder.appendSubMenu(buildLayoutNodesMenu());
@@ -337,8 +350,14 @@ public class DepanFxNodeViewPanel {
     builder.appendSeparator();
     builder.appendActionItem(
         SAVE_NODE_VIEW_ITEM, e -> runSaveNodeViewDialog());
-    return builder.build();
+
+    ContextMenu result = builder.build();
+    result.setOnShowing(e -> populateEdgeVisibilityMenu(edgeVizMenu));
+    return result;
   }
+
+  /////////////////////////////////////
+  // Edge Display Menu
 
   private Menu buildEdgeDisplayMenu() {
     Menu result = new Menu(EDGE_DISPLAY);
@@ -347,6 +366,7 @@ public class DepanFxNodeViewPanel {
     items.add(DepanFxContextMenuBuilder.createActionItem(
         SELECT_EDGE_DISPLAY, e -> doSelectEdgeDisplayAction()));
 
+    items.add(new SeparatorMenuItem());
     items.add(DepanFxContextMenuBuilder.createActionItem(
         DepanFxNodeViewLinkDisplayDialog.EDIT_LINK_DISPLAY,
         e -> runEditLinkDisplayDialog()));
@@ -364,6 +384,109 @@ public class DepanFxNodeViewPanel {
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc) {
     edgeDisplay.setLinkDisplay(displayRsrc.getResource());
   }
+
+  private void runEditLinkDisplayDialog() {
+    edgeDisplay.getDisplayData();
+    DepanFxNodeViewLinkDisplayDialog.runEditDialog(
+        viewData.getLinkDisplayDocRsrc().getDocument(),
+        edgeDisplay.getDisplayData(), dialogRunner);
+
+    // TODO: apply any outstanding changes from the dialog.
+    // However, most changes should be live modifications.
+  }
+
+  /////////////////////////////////////
+  // Edge Visibility Menu
+
+  private void populateEdgeVisibilityMenu(Menu vizMenu) {
+    ObservableList<MenuItem> items = vizMenu.getItems();
+    items.clear();
+
+    // Toggles for each matcher
+    edgeDisplay.streamVisibilityMatchers()
+        .forEach(m -> items.add(buildEdgeVisibleItem(m)));
+
+    // Add one for the remainders
+    items.add(buildEgdeVisibleItem(
+        edgeDisplay.getRemainderLabel(),
+        edgeDisplay.getRemainderVisibility(),
+        edgeDisplay.getRemainderCount(),
+        e -> doToggleRemainderVisibleAction()));
+
+    items.add(new SeparatorMenuItem());
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        ALL_EDGES_VISIBLE, e -> doAllEdgesVisibleAction()));
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        NO_EDGES_VISIBLE, e -> doNoEdgesVisibleAction()));
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        INVERT_EDGES_VISIBLE, e -> doInvertEdgesVisibleAction()));
+
+    items.add(new SeparatorMenuItem());
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        MORE_EDGE_VIBILITY, e -> runEditVisibleEdgesDialog()));
+  }
+
+  private void doAllEdgesVisibleAction() {
+    edgeDisplay.streamVisibilityMatchers()
+        .forEach(m -> edgeDisplay.setMatcherVisibility(m, true));
+    edgeDisplay.setRemainderVisibility(true);
+  }
+
+  private void doNoEdgesVisibleAction() {
+    edgeDisplay.streamVisibilityMatchers()
+        .forEach(m -> edgeDisplay.setMatcherVisibility(m, false));
+    edgeDisplay.setRemainderVisibility(false);
+  }
+
+  private void doInvertEdgesVisibleAction() {
+    edgeDisplay.streamVisibilityMatchers()
+        .forEach(m -> {
+          boolean isVisible = edgeDisplay.getMatcherVisibility(m);
+          edgeDisplay.setMatcherVisibility(m, !isVisible);
+        });
+    doToggleRemainderVisibleAction();
+  }
+
+  private MenuItem buildEdgeVisibleItem(DepanFxLinkMatcherDocument matcher) {
+    String label = matcher.getToolName();
+    boolean isVisible = edgeDisplay.getMatcherVisibility(matcher);
+    int edgeCount = edgeDisplay.getMatcherEdgeCount(matcher);
+    return buildEgdeVisibleItem(label, isVisible, edgeCount,
+        e -> setMatcherVisible(matcher, !isVisible));
+  }
+
+  private MenuItem buildEgdeVisibleItem(
+      String label, boolean isVisible, int edgeCount,
+      EventHandler<ActionEvent> handler) {
+    String itemLabel = String.format("%s (%,d)", label, edgeCount);
+    CheckMenuItem result = new CheckMenuItem(itemLabel);
+    result.setSelected(isVisible);
+    result.setOnAction(handler);
+    return result;
+  }
+
+  private void doToggleRemainderVisibleAction() {
+    boolean isVisible = edgeDisplay.getRemainderVisible();
+    edgeDisplay.setRemainderVisibility(!isVisible);
+  }
+
+  private void setMatcherVisible(
+      DepanFxLinkMatcherDocument matcher, boolean isVisible) {
+    edgeDisplay.setMatcherVisibility(matcher, isVisible);
+  }
+
+  private void runEditVisibleEdgesDialog() {
+    edgeDisplay.getDisplayData();
+    DepanFxNodeViewLinkDisplayDialog.runEditDialog(
+        viewData.getLinkDisplayDocRsrc().getDocument(),
+        edgeDisplay.getDisplayData(), dialogRunner);
+
+    // TODO: apply any outstanding changes from the dialog.
+    // However, most changes should be live modifications.
+  }
+
+  /////////////////////////////////////
+  // Layouts Menu
 
   private Menu buildLayoutNodesMenu() {
     Menu result = new Menu(LAYOUT_NODES);
@@ -389,16 +512,6 @@ public class DepanFxNodeViewPanel {
         streamChosenNodes().collect(Collectors.toList());
     updateNodeLocations(
         layoutRegistry.layoutNodes(layoutRsrc, getGraphDocRsrc(), updateNodes));
-  }
-
-  private void runEditLinkDisplayDialog() {
-    edgeDisplay.getDisplayData();
-    DepanFxNodeViewLinkDisplayDialog.runEditDialog(
-        viewData.getLinkDisplayDocRsrc().getDocument(),
-        edgeDisplay.getDisplayData(), dialogRunner);
-
-    // TODO: apply any outstanding changes from the dialog.
-    // However, most changes should be live modifications.
   }
 
   private void runSaveNodeViewDialog() {

@@ -14,7 +14,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            prefWidth="800"
+            prefWidth="900"
             fx:controller="com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewLinkDisplayDialog" >
    <VBox spacing="10" layoutX="10" layoutY="10"
          AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"
@@ -29,7 +29,7 @@
                     editable="true"
                     prefWidth="80" minWidth="50">
                 </TableColumn>
-                <TableColumn text="Link"
+                <TableColumn text="Matcher"
                     editable="false"
                     prefWidth="160" minWidth="80">
                 </TableColumn>
@@ -62,7 +62,7 @@
                     editable="true" resizable="false" sortable="false">
                 </TableColumn>
                 <TableColumn text="Dir"
-                    prefWidth="60"
+                    prefWidth="80"
                     editable="true" resizable="false" sortable="false">
                 </TableColumn>
                 <TableColumn text="Order"

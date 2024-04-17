@@ -49,6 +49,9 @@ public class LineShape implements JoglShape {
 
   @Override
   public void draw(GL2 gl, JoglRenderer renderer) {
+    if (!isVisible) {
+      return;
+    }
     NodeShape sourceShape = getShape(lineSource, renderer);
     if (sourceShape == null) {
       return;

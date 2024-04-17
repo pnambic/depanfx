@@ -142,9 +142,15 @@ public class JavaLinkMatcherBuiltIns {
   public static final Path JAVA_PACKAGE_MEMBER_PATH =
       buildMatcherPath(JavaLinkMatchers.JAVA_PACKAGE_MEMBER_DOC);
 
-  public static final Path JAVA_MEMBER_TREE_MATCHER_PATH =
-      buildMatcherPath(JavaLinkMatchers.JAVA_MEMBER_DOC);
+  public static final Path JAVA_TREE_MEMBER_MATCHER_PATH =
+      buildMatcherPath(JavaLinkMatchers.JAVA_TREE_MEMBER_DOC);
 
+  public static final Path JAVA_USE_MATCHER_PATH =
+      buildMatcherPath(JavaLinkMatchers.JAVA_USE_DOC);
+
+  /**
+   * Membership matcher for hierarchical tree building.
+   */
   public static final Path JAVA_MEMBER_MATCHER_PATH =
       JAVA_LINK_MATCHER_PATH.resolve(MEMBER_NAME);
 
@@ -363,28 +369,28 @@ public class JavaLinkMatcherBuiltIns {
   public DepanFxBuiltInContribution<DepanFxLinkMatcherDocument>
       classMembersUsesMatcherJava() {
     return createBuiltIn(
-        CLASS_MATCHER_PATH, JavaLinkMatchers.JAVA_CLASS_MEMBER_DOC);
+        JAVA_CLASS_MEMBER_MATCHER_PATH, JavaLinkMatchers.JAVA_CLASS_MEMBER_DOC);
   }
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxLinkMatcherDocument>
       packageMembersMatcherJava() {
     return createBuiltIn(
-        CLASS_MATCHER_PATH, JavaLinkMatchers.JAVA_PACKAGE_MEMBER_DOC);
+        JAVA_PACKAGE_MEMBER_PATH, JavaLinkMatchers.JAVA_PACKAGE_MEMBER_DOC);
   }
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxLinkMatcherDocument>
       memberMatcherJava() {
     return createBuiltIn(
-        CLASS_MATCHER_PATH, JavaLinkMatchers.JAVA_MEMBER_DOC);
+        JAVA_TREE_MEMBER_MATCHER_PATH, JavaLinkMatchers.JAVA_TREE_MEMBER_DOC);
   }
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxLinkMatcherDocument>
       useMatcherJava() {
     return createBuiltIn(
-        CLASS_MATCHER_PATH, JavaLinkMatchers.USE_DOC);
+        JAVA_USE_MATCHER_PATH, JavaLinkMatchers.JAVA_USE_DOC);
   }
 
   /////////////////////////////////////

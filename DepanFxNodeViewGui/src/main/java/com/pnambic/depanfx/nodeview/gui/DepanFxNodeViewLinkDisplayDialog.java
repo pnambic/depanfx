@@ -1,5 +1,7 @@
 package com.pnambic.depanfx.nodeview.gui;
 
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
+import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodeview.jogl.JoglColors;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
@@ -12,6 +14,7 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
@@ -38,6 +41,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -67,6 +71,8 @@ public class DepanFxNodeViewLinkDisplayDialog
           "Link Display",
           DepanFxNodeViewLinkDisplayData.NODE_VIEW_LINK_DISPLAY_EXT);
 
+  private final DepanFxDialogRunner dialogRunner;
+
   @FXML
   private TableView<EditLinkDisplay> linksDisplayTable;
 
@@ -79,8 +85,10 @@ public class DepanFxNodeViewLinkDisplayDialog
    */
   private DepanFxNodeViewLinkDisplayData linkDisplayData;
 
-  public DepanFxNodeViewLinkDisplayDialog(DepanFxWorkspace workspace) {
+  public DepanFxNodeViewLinkDisplayDialog(
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
     super(workspace, DepanFxNodeViewLinkDisplayData.class);
+    this.dialogRunner = dialogRunner;
   }
 
   public static Dialog<DepanFxNodeViewLinkDisplayDialog> runEditDialog(
@@ -122,6 +130,7 @@ public class DepanFxNodeViewLinkDisplayDialog
 
     TableColumn<EditLinkDisplay, String> filePathColumn =
         columnBinder.bind("linkDisplayName");
+    filePathColumn.setCellFactory(column -> new DisplayNameCellFactory());
 
     TableColumn<EditLinkDisplay, DepanFxLineForm> lineFormColumn =
         columnBinder.bind("lineForm", DepanFxLineForm.class);
@@ -308,6 +317,37 @@ public class DepanFxNodeViewLinkDisplayDialog
     }
   }
 
+  public class DisplayNameCellFactory
+      extends TableCell<EditLinkDisplay, String> {
+
+    @Override
+    protected void updateItem(String displayName, boolean empty) {
+      super.updateItem(displayName, empty);
+
+      if (empty) {
+        setGraphic(null);
+        setContextMenu(null);
+        return;
+      }
+      setText(displayName);
+      setContextMenu(buildContextMenu());
+    }
+
+    private ContextMenu buildContextMenu() {
+      DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+      builder.appendActionItem("Select LinkMatcher...",
+          e -> runLinkMatcherFinder());
+      getTableRow().getItem();
+      return builder.build();
+    }
+
+    private void runLinkMatcherFinder() {
+      DepanFxLinkMatcherChooser.runLinkMatcherFinder(
+          getWorkspace(), dialogRunner, linksDisplayTable.getScene())
+          .ifPresent(r -> updateMatcher(getTableRow().getItem(), r));
+    }
+  }
+
   public static class ColorCellFactory
       extends TableCell<EditLinkDisplay, Color> {
 
@@ -328,6 +368,12 @@ public class DepanFxNodeViewLinkDisplayDialog
         linkDisplay.lineColorProp.setValue(colorPicker.getValue());
       });
     }
+  }
+
+  private void updateMatcher(
+      EditLinkDisplay editLinkDisplay,
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
+    editLinkDisplay.setLinkDisplayRsrc(matcherRsrc);
   }
 
   /**
@@ -390,6 +436,7 @@ public class DepanFxNodeViewLinkDisplayDialog
       if (this.linkDisplayRsrc != null) {
         linkDisplayNameProp.setValue(
             linkDisplayRsrc.getDocument().getMemberName());
+        return;
       }
 
       linkDisplayNameProp.setValue("");

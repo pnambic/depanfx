@@ -231,7 +231,8 @@ public class JavaLinkMatchers {
 
   public static final DepanFxLinkMatcherDocument JAVA_CLASS_MEMBER_DOC =
       buildMatcherDoc(
-          "Java Class Members", "Java class membership.",
+          "Java Class Members",
+          "Java class membership (classes, inner classes, field, methods).",
           JAVA_CLASS_MEMBER_MATCH);
 
   // Just members of packages
@@ -245,12 +246,13 @@ public class JavaLinkMatchers {
 
   public static final DepanFxLinkMatcherDocument JAVA_PACKAGE_MEMBER_DOC =
       new DepanFxLinkMatcherDocument(
-          "Java Package Members", "Java package membership.",
+          "Java Package Members",
+          "Java package membership (packages, top-level classes).",
           JavaContextDefinition.MODEL_ID,
           Collections.emptyList(), JAVA_PACKAGE_MEMBER_MATCH);
 
   // Java package and class members
-  public static final List<DepanFxLinkMatcher> JAVA_MEMBERS =
+  public static final List<DepanFxLinkMatcher> JAVA_TREE_MEMBERS =
       Arrays.asList(new DepanFxLinkMatcher [] {
           STATIC_FIELD_FORWARD, MEMBER_FIELD_FORWARD,
           STATIC_METHOD_FORWARD, MEMBER_METHOD_FORWARD,
@@ -258,25 +260,27 @@ public class JavaLinkMatchers {
           CLASS_FORWARD, PACKAGE_FORWARD
       });
 
-  public static final Composite JAVA_MEMBER_MATCH =
-      new Composite(JAVA_MEMBERS);
+  public static final Composite JAVA_TREE_MEMBER_MATCH =
+      new Composite(JAVA_TREE_MEMBERS);
 
-  public static final DepanFxLinkMatcherDocument JAVA_MEMBER_DOC =
+  public static final DepanFxLinkMatcherDocument JAVA_TREE_MEMBER_DOC =
       buildMatcherDoc(
-          "Java Members", "Java membership.",
+          "Java Tree Members",
+          "Java tree membership (packages, classes, fields, and methods).",
           JAVA_PACKAGE_MEMBER_MATCH);
 
   // Common notion of "use"
-  public static final List<DepanFxLinkMatcher> USE =
+  public static final List<DepanFxLinkMatcher> JAVA_USE =
       Arrays.asList(new DepanFxLinkMatcher [] {
           CALL_FORWARD, READ_FORWARD, WRITE_FORWARD
       });
 
-  public static final Composite USE_MATCH =
-      new Composite(USE);
+  public static final Composite JAVA_USE_MATCH =
+      new Composite(JAVA_USE);
 
-  public static final DepanFxLinkMatcherDocument USE_DOC =
-      buildMatcherDoc("Java use", "Java use.", USE_MATCH);
+  public static final DepanFxLinkMatcherDocument JAVA_USE_DOC =
+      buildMatcherDoc("Java use", "Java use (call, read, write).",
+          JAVA_USE_MATCH);
 
   private static DepanFxLinkMatcherDocument buildMatcherDoc(
       String matcherName, String matcherDescr, DepanFxLinkMatcher matcher) {
@@ -284,6 +288,5 @@ public class JavaLinkMatchers {
         matcherName, matcherDescr,
         JavaContextDefinition.MODEL_ID,
         Collections.emptyList(), matcher);
-
   }
 }

@@ -33,25 +33,31 @@ public class FileSystemLinkMatcherBuiltIns {
       FILE_SYSTEM_LINK_MATCHER_PATH.resolve(FILE_NAME);
 
   @Bean
-  public DepanFxBuiltInContribution memberMatcherFileSystem() {
+  public DepanFxBuiltInContribution<DepanFxLinkMatcherDocument>
+      memberMatcherFileSystem() {
+
     return createBuiltIn(MEMBER_NAME, FileSystemLinkMatchers.MEMBER_DOC,
         FILE_SYSTEM_MEMBER_MATCHER_PATH);
   }
 
   @Bean
-  public DepanFxBuiltInContribution directoryMatcher() {
+  public DepanFxBuiltInContribution<DepanFxLinkMatcherDocument>
+      directoryMatcher() {
+
     return createBuiltIn(DIRECTORY_NAME, FileSystemLinkMatchers.DIRECTORY_DOC,
         FILE_SYSTEM_DIRECTORY_MATCHER_PATH);
   }
 
   @Bean
-  public DepanFxBuiltInContribution fileMatcher() {
+  public DepanFxBuiltInContribution<DepanFxLinkMatcherDocument>
+      fileMatcher() {
+
     return createBuiltIn(FILE_NAME, FileSystemLinkMatchers.FILE_DOC,
         FILE_SYSTEM_FILE_MATCHER_PATH);
   }
 
-  private DepanFxBuiltInContribution createBuiltIn(
+  private DepanFxBuiltInContribution<DepanFxLinkMatcherDocument> createBuiltIn(
       String docName, DepanFxLinkMatcherDocument doc, Path docPath) {
-    return new DepanFxBuiltInContribution.Simple(docPath, doc);
+    return new DepanFxBuiltInContribution.Simple<>(docPath, doc);
   }
 }

@@ -2,7 +2,9 @@ package com.pnambic.depanfx.workspace.projects;
 
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution.Dependent;
+import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,11 +113,34 @@ public class DepanFxBuiltInRegistry {
   private void addContribution(
       DepanFxBuiltInProject project, DepanFxBuiltInContribution<?> contrib) {
     Path contribPath = contrib.getPath();
+    Optional<DepanFxWorkspaceResource<Object>> priorRsrc =
+        project.getResource(contribPath);
+    priorRsrc.ifPresent(
+        p -> reportDuplicate(contribPath, p, contrib));
+
     DepanFxProjectContainer parentDir =
         project.installProjectContainer(contribPath.getParent());
     DepanFxProjectDocument contribDoc =
         parentDir.getProject().asProjectDocument(contribPath).get();
 
     project.installContribDoc(parentDir, contribDoc, contrib);
+  }
+
+  private void reportDuplicate(Path path,
+      DepanFxWorkspaceResource<?> priorRsrc,
+      DepanFxBuiltInContribution<?> contrib) {
+
+    LOG.warn("Duplicate builtin for path {}. Tool {} being replaced by {}",
+        path,
+        getToolName(priorRsrc.getResource()),
+        getToolName(contrib.getDocument()));
+  }
+
+  private String getToolName(Object maybeTool) {
+    try {
+      return ((DepanFxBaseToolData) maybeTool).getToolName();
+    } catch (Exception anyErr) {
+    }
+    return "<unknown tool>";
   }
 }
