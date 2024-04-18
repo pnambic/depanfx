@@ -25,7 +25,7 @@ public class CameraControl implements CameraChangeListener {
 
   public final SimpleDoubleProperty zoom = new SimpleDoubleProperty();
 
-  private  final JoglModule jogl;
+  private final JoglModule jogl;
 
   public CameraControl(JoglModule jogl) {
     this.jogl = jogl;

@@ -1,6 +1,5 @@
 package com.pnambic.depanfx.nodeview.gui;
 
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
 import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodeview.jogl.JoglColors;

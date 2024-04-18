@@ -45,11 +45,14 @@ public class JoglModule {
 
   private JoglKeyListener keyListener;
 
+  private JoglMouseListener mouseListener;
+
   public JoglModule(CameraData cameraData) {
     camera = new JoglCamera(cameraData);
     renderer = new JoglRenderer(camera);
     drawListener = new JoglDrawListener(renderer);
     keyListener = new JoglKeyListener();
+    mouseListener = new JoglMouseListener(renderer, keyListener);
   }
 
   /**
@@ -64,6 +67,7 @@ public class JoglModule {
     glWindow = GLWindow.create(screen, caps);
     glWindow.addGLEventListener(drawListener);
     glWindow.addKeyListener(keyListener);
+    glWindow.addMouseListener(mouseListener);
 
     canvas = new NewtCanvasJFX(glWindow);
     return canvas;
@@ -114,6 +118,10 @@ public class JoglModule {
 
   public void addReleaseAction(JoglKeyListener.KeyAction action) {
     keyListener.addReleaseAction(action);
+  }
+
+  public void addMouseActionListener(JoglMouseActionListener listener) {
+    mouseListener.addMouseActionListener(listener);
   }
 
   public void updateCamera(CameraData updateInfo) {

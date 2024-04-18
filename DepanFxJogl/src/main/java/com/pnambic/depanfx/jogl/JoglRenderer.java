@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,12 @@ public class JoglRenderer {
 
   private Map<Object, JoglShape> updates = new HashMap<>();
 
+  private int viewportWidth;
+
+  private int viewportHeight;
+
+  private JoglSelectRectangle selectionRect;
+
   public JoglRenderer(JoglCamera camera) {
     this.camera = camera;
   }
@@ -66,11 +73,48 @@ public class JoglRenderer {
     LOG.info("initialized drawable");
   }
 
+  public int getViewportHeight() {
+    return viewportHeight;
+  }
+
+  public int getViewportWidth() {
+    return viewportWidth;
+  }
+
+  public double scaleMouseX(int mouseX) {
+    return ((double) mouseX) / (double) viewportWidth;
+  }
+
+  public double scaleMouseY(int mouseY) {
+    return ((double) mouseY) / (double) viewportHeight;
+  }
+
+  public void activateSelectionRectangle(
+      double anchorX, double anchorY, double mouseX, double mouseY) {
+    selectionRect =
+        new JoglSelectRectangle(anchorX, anchorY, mouseX, mouseY);
+  }
+
+  public void releaseSelectionRectangle() {
+    selectionRect = null;
+  }
+
+  public List<Object> pickObjectsAt(int mouseX, int mouseY) {
+    return Collections.emptyList();
+  }
+
+  public List<Object> pickObjectsIn(
+      int anchorX, int anchorDownY, int eventX, int eventY) {
+    return Collections.emptyList();
+  }
+
   public void reshape(
       final GLAutoDrawable drawable,
       final int x, final int y, final int width, final int height) {
     GL2 gl = drawable.getGL().getGL2();
     camera.reshapeCanvas(gl, x, y, width, height);
+    viewportWidth = width;
+    viewportHeight = height;
     LOG.info("reshape to {}x{} @ ({}, {})", width, height, x, y);
   }
 
@@ -90,16 +134,14 @@ public class JoglRenderer {
 
     shapes.stream().forEach(s ->s.step(gl, this));
     shapes.stream().forEach(s -> drawShape(gl, s));
+
+    if (selectionRect != null) {
+      selectionRect.drawSelectRectangle(gl);
+    }
   }
 
   public void dispose(final GLAutoDrawable drawable) {
     LOG.info("disposing drawable");
-  }
-
-  private void drawShape(GL2 gl, JoglShape shape) {
-    gl.glPushMatrix();
-    shape.draw(gl, this);
-    gl.glPopMatrix();
   }
 
   @Nullable
@@ -131,6 +173,12 @@ public class JoglRenderer {
     */
   }
 
+  private void drawShape(GL2 gl, JoglShape shape) {
+    gl.glPushMatrix();
+    shape.draw(gl, this);
+    gl.glPopMatrix();
+  }
+
   private void updateShapes() {
     Collection<JoglShape> source = renders.values();
     List<JoglShape> result = new ArrayList<>(source.size());
@@ -150,4 +198,5 @@ public class JoglRenderer {
     }
     return false;
   }
+
 }

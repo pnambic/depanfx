@@ -2,6 +2,7 @@ package com.pnambic.depanfx.nodeview.gui;
 
 import com.pnambic.depanfx.jogl.JoglModule;
 import com.pnambic.depanfx.jogl.JoglShape;
+import com.pnambic.depanfx.jogl.JoglMouseActionListener;
 import com.pnambic.depanfx.jogl.shapes.SquareShape;
 import com.pnambic.depanfx.nodeview.jogl.JoglCameras;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
@@ -14,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
 
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -93,6 +93,10 @@ public class DepanFxJoglView extends BorderPane {
     jogl.destroy();
   }
 
+  public void addMouseActionListener(JoglMouseActionListener listener) {
+    jogl.addMouseActionListener(listener);
+  }
+
   public JoglShape getShape(Object key) {
     return jogl.getShape(key);
   }
@@ -103,6 +107,10 @@ public class DepanFxJoglView extends BorderPane {
 
   public DepanFxNodeViewCameraData getCameraData() {
     return JoglCameras.of(jogl.getCurrentCamera());
+  }
+
+  public void dolly(double dollyX, double dollyY, double dollyZ ) {
+    cameraControl.dolly(dollyX, dollyY, dollyZ);
   }
 
   public BufferedImage takeScreenshot() {

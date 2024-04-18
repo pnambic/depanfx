@@ -4,6 +4,7 @@ import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.jogl.JoglMouseActionListener;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodeview.jogl.JoglShapes;
@@ -46,8 +47,6 @@ import javax.imageio.ImageIO;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -95,8 +94,6 @@ public class DepanFxNodeViewPanel {
   private static final String SELECT_EDGE_DISPLAY = "Select Edge Display...";
 
   private static final String EDGE_VISIBLITY = "Edge Visibility";
-
-  private static final String REMAINDERS_VISIBLE = "Remainders";
 
   private static final String ALL_EDGES_VISIBLE = "Show All Edges";
 
@@ -563,6 +560,7 @@ public class DepanFxNodeViewPanel {
         viewData.getRemainerVisible(), viewData.getRemainderLabel(),
         viewData.getRemainerDisplay());
     getViewEdges().forEach(edgeDisplay::installEdge);
+    joglView.addMouseActionListener(new ViewMouseActionListener());
   }
 
   private void updateNodeLocation(
@@ -635,5 +633,49 @@ public class DepanFxNodeViewPanel {
     boolean result = !checkedProperty.get();
     checkedProperty.set(result);
     return result;
+  }
+
+  private class ViewMouseActionListener implements JoglMouseActionListener {
+
+    @Override
+    public void mouseDolly(double deltaX, double deltaY, double deltaZ) {
+      DepanFxNodeViewCameraData cameraInfo = joglView.getCameraData();
+      double viewScale = cameraInfo.zoom * cameraInfo.cameraZ * 2;
+      LOG.debug("view scale {}", viewScale);
+      joglView.dolly(viewScale * deltaX, viewScale * deltaY, deltaZ);
+    }
+
+    @Override
+    public void moveSelection(double deltaX, double deltaY, double deltaZ) {
+    }
+
+    @Override
+    public void rotateCamera(double f, double g, double h) {
+    }
+
+    @Override
+    public void setSelection(List<Object> selection) {
+      streamNodes(selection)
+          .forEach(n -> setSelectGraphNode(n, true));
+    }
+
+    @Override
+    public void reduceSelection(List<Object> reduction) {
+      streamNodes(reduction)
+          .forEach(n -> setSelectGraphNode(n, false));
+    }
+
+    @Override
+    public void extendSelection(List<Object> extension) {
+      streamNodes(extension)
+          .forEach(n -> setSelectGraphNode(n, true));
+    }
+
+    private Stream<GraphNode> streamNodes(List<?> source) {
+      return source.stream()
+          .filter(o -> o instanceof GraphNode)
+          .map(GraphNode.class::cast);
+          // .collect(Collectors.toList());
+    }
   }
 }
