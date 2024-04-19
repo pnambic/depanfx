@@ -136,7 +136,7 @@ public class JoglMouseListener implements MouseListener {
 
   @Override
   public void mousePressed(MouseEvent event) {
-    LOG.info("mouse pressed button {})", event.getButton());
+    LOG.info("mouse pressed button {}", event.getButton());
 
     anchorX = event.getX();
     anchorY = event.getY();
@@ -169,7 +169,7 @@ public class JoglMouseListener implements MouseListener {
 
   @Override
   public void mouseReleased(MouseEvent event) {
-    LOG.info("mouse release button {} state ()", event.getButton(), state);
+    LOG.info("mouse release button {} state {}", event.getButton(), state);
 
     int eventX = event.getX();
     int eventY = event.getY();

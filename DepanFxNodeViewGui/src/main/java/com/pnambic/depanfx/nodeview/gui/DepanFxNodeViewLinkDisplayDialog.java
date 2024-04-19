@@ -129,7 +129,13 @@ public class DepanFxNodeViewLinkDisplayDialog
 
     TableColumn<EditLinkDisplay, String> filePathColumn =
         columnBinder.bind("linkDisplayName");
-    filePathColumn.setCellFactory(column -> new DisplayNameCellFactory());
+
+    // filePathColumn.setCellFactory(column -> new DisplayNameCellFactory());
+    filePathColumn.setCellFactory(column ->
+        new DepanFxLinkMatcherChooser.LinkMatcherCell<>(
+            getWorkspace(), dialogRunner,
+            linksDisplayTable.getScene(),
+            (t, r) -> updateMatcher(t, r)));
 
     TableColumn<EditLinkDisplay, DepanFxLineForm> lineFormColumn =
         columnBinder.bind("lineForm", DepanFxLineForm.class);
@@ -313,37 +319,6 @@ public class DepanFxNodeViewLinkDisplayDialog
       result.setCellFactory(
           ComboBoxTableCell.forTableColumn(values));
       return result;
-    }
-  }
-
-  public class DisplayNameCellFactory
-      extends TableCell<EditLinkDisplay, String> {
-
-    @Override
-    protected void updateItem(String displayName, boolean empty) {
-      super.updateItem(displayName, empty);
-
-      if (empty) {
-        setGraphic(null);
-        setContextMenu(null);
-        return;
-      }
-      setText(displayName);
-      setContextMenu(buildContextMenu());
-    }
-
-    private ContextMenu buildContextMenu() {
-      DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-      builder.appendActionItem("Select LinkMatcher...",
-          e -> runLinkMatcherFinder());
-      getTableRow().getItem();
-      return builder.build();
-    }
-
-    private void runLinkMatcherFinder() {
-      DepanFxLinkMatcherChooser.runLinkMatcherFinder(
-          getWorkspace(), dialogRunner, linksDisplayTable.getScene())
-          .ifPresent(r -> updateMatcher(getTableRow().getItem(), r));
     }
   }
 

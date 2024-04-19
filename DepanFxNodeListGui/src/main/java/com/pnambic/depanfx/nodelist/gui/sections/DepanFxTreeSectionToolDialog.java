@@ -1,17 +1,17 @@
 package com.pnambic.depanfx.nodelist.gui.sections;
 
+import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser;
+import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser.LinkMatcherControl;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData.ContainerOrder;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -36,10 +36,10 @@ public class DepanFxTreeSectionToolDialog
       DepanFxSceneControls.buildExtFilter(
           "Tree Sections", DepanFxTreeSectionData.TREE_SECTION_TOOL_EXT);
 
-  private static final ExtensionFilter LINK_MATCHER_FILTER = null;
+  private final DepanFxDialogRunner dialogRunner;
 
-  // Holds the link matcher reference.
-  private DepanFxTreeSectionData sectionData;
+  @FXML
+  private TextField linkMatcherResourceField;
 
   @FXML
   private CheckBox inferMissingParentsField;
@@ -50,12 +50,13 @@ public class DepanFxTreeSectionToolDialog
   @FXML
   private ComboBox<ContainerOrder> containerOrderField;
 
-  @FXML
-  private TextField linkMatcherResourceField;
+  private LinkMatcherControl linkMatcherControl;
 
   @Autowired
-  public DepanFxTreeSectionToolDialog(DepanFxWorkspace workspace) {
+  public DepanFxTreeSectionToolDialog(
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
     super(workspace, DepanFxTreeSectionData.class);
+    this.dialogRunner = dialogRunner;
   }
 
   public static Dialog<DepanFxTreeSectionToolDialog> runEditDialog(
@@ -88,6 +89,9 @@ public class DepanFxTreeSectionToolDialog
   public void initialize() {
     super.initialize();
 
+    linkMatcherControl = new DepanFxLinkMatcherChooser.LinkMatcherControl(
+        getWorkspace(), dialogRunner, linkMatcherResourceField);
+
     populateOrderBy(orderByField);
 
     containerOrderField.getItems().add(ContainerOrder.FIRST);
@@ -98,22 +102,12 @@ public class DepanFxTreeSectionToolDialog
   @Override // DepanFxBaseSectionToolDialog
   public void setTooldata(DepanFxTreeSectionData sectionData) {
     super.setTooldata(sectionData);
-    this.sectionData = sectionData;
+    linkMatcherControl.setLinkMatcherRsrc(sectionData.getLinkMatcherRsrc());
 
-    linkMatcherResourceField.setText(
-        sectionData.getLinkMatcherRsrc().getDocument().toString());
     inferMissingParentsField.setSelected(sectionData.inferMissingParents());
 
     orderByField.setValue(sectionData.getOrderBy());
     containerOrderField.setValue(sectionData.getContainerOrder());
-  }
-
-  private FileChooser prepareLinkMatcherChooser() {
-    FileChooser result =
-        DepanFxSceneControls.prepareFileChooser(linkMatcherResourceField);
-    result.getExtensionFilters().add(LINK_MATCHER_FILTER);
-    result.setSelectedExtensionFilter(LINK_MATCHER_FILTER);
-    return result;
   }
 
   /////////////////////////////////////
@@ -121,14 +115,15 @@ public class DepanFxTreeSectionToolDialog
 
   @Override
   protected DepanFxTreeSectionData prepareResult() {
-    DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkMatcherRsrc =
-        sectionData.getLinkMatcherRsrc();
-
     return new DepanFxTreeSectionData(
-        getToolName(), getToolDescription(),
-        getSectionLabel(), displayNodeCount(),
-        linkMatcherRsrc, inferMissingParentsField.isSelected(),
-        orderByField.getValue(), containerOrderField.getValue(),
+        getToolName(),
+        getToolDescription(),
+        getSectionLabel(),
+        displayNodeCount(),
+        linkMatcherControl.getLinkMatcherResource(),
+        inferMissingParentsField.isSelected(),
+        orderByField.getValue(),
+        containerOrderField.getValue(),
         getOrderDirection());
   }
 
@@ -141,7 +136,7 @@ public class DepanFxTreeSectionToolDialog
 
   @Override
   protected void setTooldataFilters(FileChooser chooser) {
-    DepanFxFlatSectionToolDialog.setFlatSectionTooldataFilters(chooser);
+    DepanFxTreeSectionToolDialog.setTreeSectionTooldataFilters(chooser);
   }
 
   @Override

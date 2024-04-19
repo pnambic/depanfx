@@ -125,10 +125,10 @@ public class DepanFxNodeListCell
 
   private ContextMenu treeSectionMenu(DepanFxTreeSection member) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem(EDIT_TREE_SECTION,
-        e -> openTreeSectionEditor(member));
     builder.appendActionItem(SELECT_TREE_SECTION,
         e -> openTreeSectionFinder(member));
+    builder.appendActionItem(EDIT_TREE_SECTION,
+        e -> openTreeSectionEditor(member));
 
     builder.appendSeparator();
     builder.appendActionItem(

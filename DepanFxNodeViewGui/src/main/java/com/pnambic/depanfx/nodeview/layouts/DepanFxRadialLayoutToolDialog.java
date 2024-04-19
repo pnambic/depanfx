@@ -1,19 +1,17 @@
 package com.pnambic.depanfx.nodeview.layouts;
 
 import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser.LinkMatcherControl;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayoutData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxRadialLayoutData;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
-import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -23,7 +21,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -47,8 +44,7 @@ public class DepanFxRadialLayoutToolDialog
   @FXML
   private TextField hierarchyMatcherRsrcField;
 
-  private DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>
-      hierarchyMatcherRsrc;
+  private LinkMatcherControl hierarchyMatcherControl;
 
   @Autowired
   public DepanFxRadialLayoutToolDialog(
@@ -79,44 +75,18 @@ public class DepanFxRadialLayoutToolDialog
 
   @FXML
   public void initialize() {
-    hierarchyMatcherRsrcField.setContextMenu(buildHierarchyMatcherMenu());
+    hierarchyMatcherControl =
+        new DepanFxLinkMatcherChooser.LinkMatcherControl(
+            getWorkspace(), dialogRunner, hierarchyMatcherRsrcField);
+
   }
 
   @Override // DepanFxBaseToolDialog
   public void setTooldata(DepanFxRadialLayoutData radialLayoutData) {
     super.setTooldata(radialLayoutData);
 
-    setHierarchyMatcherRsrc(radialLayoutData.getHierarchyMatcherRsrc());
-  }
-
-  private ContextMenu buildHierarchyMatcherMenu() {
-    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem("Select Link Matcher...",
-        e -> runLinkMatcherFinder());
-    return builder.build();
-  }
-
-  private void runLinkMatcherFinder() {
-    DepanFxLinkMatcherChooser.runLinkMatcherFinder(
-        getWorkspace(), dialogRunner,
-        hierarchyMatcherRsrcField.getScene())
-        .ifPresent(this::setHierarchyMatcherRsrc);
-  }
-
-  private void setHierarchyMatcherRsrc(
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> hierarchyMatcherRsrc) {
-    this.hierarchyMatcherRsrc = hierarchyMatcherRsrc;
-    hierarchyMatcherRsrcField.setText(
-        getHierarchyMatcherRsrcName(hierarchyMatcherRsrc));
-  }
-
-  private String getHierarchyMatcherRsrcName(
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> rsrc ) {
-    if (rsrc != null) {
-      return rsrc.getDocument().getMemberPath().toString();
-    }
-    // Let the text input field show a prompt text.
-    return null;
+    hierarchyMatcherControl.setLinkMatcherRsrc(
+        radialLayoutData.getHierarchyMatcherRsrc());
   }
 
   /////////////////////////////////////
@@ -125,7 +95,8 @@ public class DepanFxRadialLayoutToolDialog
   @Override
   protected DepanFxRadialLayoutData prepareResult() {
     return new DepanFxRadialLayoutData(
-        getToolName(), getToolDescription(), hierarchyMatcherRsrc);
+        getToolName(), getToolDescription(),
+        hierarchyMatcherControl.getLinkMatcherResource());
   }
 
   @Override
