@@ -172,11 +172,15 @@ public class JavaLinkMatchers {
           PACKAGEDIR_FORWARD);
 
   public static final DepanFxLinkMatcherDocument RUNTIME_ANNOTATION_FORWARD_DOC =
-      buildMatcherDoc("Package Member", "Parent package with nested package.",
+      buildMatcherDoc(
+          "Runtime Annotation",
+          "Source element has runtime annotations with class.",
           RUNTIME_ANNOTATION_FORWARD);
 
   public static final DepanFxLinkMatcherDocument COMPILE_ANNOTATION_FORWARD_DOC =
-      buildMatcherDoc("Package Member", "Parent package with nested package.",
+      buildMatcherDoc(
+          "Compile Time Annotation",
+          "Source element has compile-time annotations with class.",
           COMPILE_ANNOTATION_FORWARD);
 
   public static final DepanFxLinkMatcherDocument MODULE_EXPORTED_TO_FORWARD_DOC =
