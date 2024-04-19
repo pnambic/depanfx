@@ -379,14 +379,13 @@ public class DepanFxNodeViewPanel {
 
   private void setLinkMatcher(
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc) {
-    edgeDisplay.setLinkDisplay(displayRsrc.getResource());
+    edgeDisplay.setLinkDisplayRsrc(displayRsrc);
   }
 
   private void runEditLinkDisplayDialog() {
-    edgeDisplay.getDisplayData();
     DepanFxNodeViewLinkDisplayDialog.runEditDialog(
-        viewData.getLinkDisplayDocRsrc().getDocument(),
-        edgeDisplay.getDisplayData(), dialogRunner);
+        edgeDisplay.getLinkDisplayRsrc().getDocument(),
+        edgeDisplay.getLinkDisplayRsrc().getResource(), dialogRunner);
 
     // TODO: apply any outstanding changes from the dialog.
     // However, most changes should be live modifications.
@@ -473,10 +472,10 @@ public class DepanFxNodeViewPanel {
   }
 
   private void runEditVisibleEdgesDialog() {
-    edgeDisplay.getDisplayData();
+    // TODO: Should be a different dialog
     DepanFxNodeViewLinkDisplayDialog.runEditDialog(
-        viewData.getLinkDisplayDocRsrc().getDocument(),
-        edgeDisplay.getDisplayData(), dialogRunner);
+        edgeDisplay.getLinkDisplayRsrc().getDocument(),
+        edgeDisplay.getLinkDisplayRsrc().getResource(), dialogRunner);
 
     // TODO: apply any outstanding changes from the dialog.
     // However, most changes should be live modifications.
@@ -526,7 +525,8 @@ public class DepanFxNodeViewPanel {
     DepanFxNodeViewData result = new DepanFxNodeViewData(
         viewData.getToolName(), viewData.getToolDescription(),
         buildSceneData(),
-        viewData.getGraphDocRsrc(), viewData.getLinkDisplayDocRsrc(),
+        viewData.getGraphDocRsrc(),
+        edgeDisplay.getLinkDisplayRsrc(),
         viewNodes, nodeLocations, nodeDisplay,
         edgeDisplay.getEdgeDisplay(),
         edgeDisplay.getRemainderVisible(), edgeDisplay.getRemainderLabel(),
@@ -555,7 +555,7 @@ public class DepanFxNodeViewPanel {
     viewNodes.stream().forEach(this::installShape);
 
     edgeDisplay = new EdgeDisplayController(joglView,
-        viewData.getLinkDisplayDocRsrc().getResource(),
+        viewData.getLinkDisplayDocRsrc(),
         viewData.getEdgeDisplay(),
         viewData.getRemainerVisible(), viewData.getRemainderLabel(),
         viewData.getRemainerDisplay());

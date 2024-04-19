@@ -8,6 +8,7 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +30,8 @@ public class EdgeDisplayController {
    */
   private final Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay;
 
-  private DepanFxNodeViewLinkDisplayData displayInfo;
+  private DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc;
+  // private DepanFxNodeViewLinkDisplayData displayInfo;
 
   private DepanFxLineDisplayData remainderDisplay;
 
@@ -51,21 +53,22 @@ public class EdgeDisplayController {
    * The matchers that are currently visible.
    * Not the complete inventory of matchers for visibility.
    */
-  private final Set<DepanFxLinkMatcherDocument> visibleMatchers =
+  private final Set<DepanFxLinkMatcherDocument> visiblityMatchers =
       new HashSet<>();
 
   public EdgeDisplayController(
       DepanFxJoglView joglView,
-      DepanFxNodeViewLinkDisplayData displayInfo,
+      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc,
       Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay,
       boolean remainderVisible, String remainderLabel,
       DepanFxLineDisplayData remainderDisplay) {
     this.joglView = joglView;
     this.edgeDisplay = edgeDisplay;
+    this.displayRsrc = displayRsrc;
     this.remainderVisible = remainderVisible;
     this.remainderLabel = remainderLabel;
     this.remainderDisplay = remainderDisplay;
-    installDisplayData(displayInfo);
+    resetVisiblityMatchers();
   }
 
   public static EdgeDisplayController of(
@@ -73,25 +76,11 @@ public class EdgeDisplayController {
       DepanFxNodeViewData viewData) {
     return new EdgeDisplayController(
         joglView,
-        viewData.getLinkDisplayDocRsrc().getResource(),
+        viewData.getLinkDisplayDocRsrc(),
         viewData.getEdgeDisplay(),
         viewData.getRemainerVisible(),
         viewData.getRemainderLabel(),
         viewData.getRemainerDisplay());
-  }
-
-  public void setLinkDisplay(DepanFxNodeViewLinkDisplayData displayInfo) {
-
-    // Capture the edges before we zap the current assignments
-    List<GraphEdge> updateEdges = new ArrayList<>();
-    edgeDisplayGroup.values().stream()
-        .flatMap(s -> s.stream())
-        .forEach(updateEdges::add);
-    remainderEdges.forEach(updateEdges::add);
-
-    // Rebuild with new display info.
-    installDisplayData(displayInfo);
-    updateEdges.forEach(this::installEdge);
   }
 
   public Stream<DepanFxLinkMatcherDocument> streamDisplayMatchers() {
@@ -104,22 +93,33 @@ public class EdgeDisplayController {
     return edgeDisplayGroup.keySet().stream();
   }
 
+  public DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData>
+      getLinkDisplayRsrc() {
+    return displayRsrc;
+  }
+
+  public void setLinkDisplayRsrc(
+      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc) {
+    this.displayRsrc = displayRsrc;
+    setLinkDisplay();
+  }
+
   public int getMatcherEdgeCount(DepanFxLinkMatcherDocument matcher) {
     return edgeDisplayGroup
         .getOrDefault(matcher, Collections.emptyList()).size();
   }
 
   public boolean getMatcherVisibility(DepanFxLinkMatcherDocument matcher) {
-    return visibleMatchers.contains(matcher);
+    return visiblityMatchers.contains(matcher);
   }
 
   public void setMatcherVisibility(
       DepanFxLinkMatcherDocument matcher, boolean isVisible) {
     if (isVisible) {
-      visibleMatchers.add(matcher);
+      visiblityMatchers.add(matcher);
     }
     else {
-      visibleMatchers.remove(matcher);
+      visiblityMatchers.remove(matcher);
     }
     edgeDisplayGroup
         .getOrDefault(matcher, Collections.emptyList())
@@ -146,10 +146,6 @@ public class EdgeDisplayController {
     // TODO: Update displayInfo.
   }
 
-  public DepanFxNodeViewLinkDisplayData getDisplayData() {
-    return displayInfo;
-  }
-
   public void installEdge(GraphEdge edge) {
     // Prefer direct edge display
     DepanFxLineDisplayData edgeDirect = edgeDisplay.get(edge);
@@ -160,7 +156,7 @@ public class EdgeDisplayController {
 
     // Mostly, edges display per matcher
     Optional<LinkDisplayEntry> entryMatch =
-        displayInfo.getLinkDisplayEntry(edge);
+        getDisplayData().getLinkDisplayEntry(edge);
     if (entryMatch.isPresent()) {
       addMatchedEdge(edge, entryMatch.get());
       return;
@@ -190,19 +186,36 @@ public class EdgeDisplayController {
     return remainderDisplay;
   }
 
-  private void installDisplayData(DepanFxNodeViewLinkDisplayData displayInfo) {
-    this.displayInfo = displayInfo;
+  private DepanFxNodeViewLinkDisplayData getDisplayData() {
+    return displayRsrc.getResource();
+  }
+
+  private void setLinkDisplay() {
+    // Capture the edges before we zap the current assignments
+    List<GraphEdge> updateEdges = new ArrayList<>();
+    edgeDisplayGroup.values().stream()
+        .flatMap(s -> s.stream())
+        .forEach(updateEdges::add);
+    remainderEdges.forEach(updateEdges::add);
+
+    // Rebuild with new display info.
+    resetVisiblityMatchers();
+
+    // Rebuild the edge group info.
+    edgeDisplayGroup.clear();
+    remainderEdges.clear();
+    updateEdges.forEach(this::installEdge);
+  }
+
+  private void resetVisiblityMatchers() {
 
     // Start with the display matchers
     // TODO: Keep a separate set of visibility matchers,
     // somewhat in synchronization with the display matchers.
-    displayInfo.streamLinkDisplay()
+    visiblityMatchers.clear();
+    getDisplayData().streamLinkDisplay()
         .map(d -> d.getLinkRsrc().getResource())
-        .forEach(visibleMatchers::add);
-
-    // Other derived state
-    edgeDisplayGroup.clear();
-    remainderEdges.clear();
+        .forEach(visiblityMatchers::add);
   }
 
   private void addDirectEdge(GraphEdge edge, DepanFxLineDisplayData edgeDisplay) {

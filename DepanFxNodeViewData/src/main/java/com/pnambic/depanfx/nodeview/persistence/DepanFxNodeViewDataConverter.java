@@ -53,6 +53,12 @@ public class DepanFxNodeViewDataConverter
 
   public static final String SCENE_DATA = "scene-data";
 
+  private static final String REMAINDER_VISIBLE = "remainder-visible";
+
+  private static final String REMAINDER_LABEL = "remainder-label";
+
+  private static final String REMAINDER_DISPLAY = "remainder-display";
+
   private static final Class<?>[] ALLOWED_TYPES = new Class[] {
       DepanFxNodeViewData.class,
       DepanFxNodeViewSceneData.class,
@@ -71,7 +77,13 @@ public class DepanFxNodeViewDataConverter
           new PersistTagDataLoader.TagDescriptor(NODE_VIEW_NAME, String.class),
           new PersistTagDataLoader.TagDescriptor(NODE_VIEW_DESCR, String.class),
           new PersistTagDataLoader.TagDescriptor(
-              SCENE_DATA, DepanFxNodeViewSceneData.class)
+              SCENE_DATA, DepanFxNodeViewSceneData.class),
+          new PersistTagDataLoader.TagDescriptor(
+              REMAINDER_VISIBLE, Boolean.class),
+          new PersistTagDataLoader.TagDescriptor(
+              REMAINDER_LABEL, String.class),
+          new PersistTagDataLoader.TagDescriptor(
+              REMAINDER_DISPLAY, DepanFxLineDisplayData.class)
       };
 
   private static final Map<String, String> TAGS_ALIAS = Collections.emptyMap();
@@ -80,14 +92,9 @@ public class DepanFxNodeViewDataConverter
       new PersistTagDataLoader(TAG_DATA_DESCR, TAGS_ALIAS);
 
   private static final String[] META_TAGS = new String[] {
-      GRAPH_DOC, LINK_DISPLAY_DOC, NODE_VIEW_NAME, NODE_VIEW_DESCR, SCENE_DATA
+      GRAPH_DOC, LINK_DISPLAY_DOC, NODE_VIEW_NAME, NODE_VIEW_DESCR, SCENE_DATA,
+      REMAINDER_VISIBLE, REMAINDER_LABEL, REMAINDER_DISPLAY
   };
-
-  private static final String REMAINDER_VISIBLE = "remainder-visible";
-
-  private static final String REMAINDER_LABEL = "remainder-label";
-
-  private static final String REMAINDER_DISPLAY = "remainder-display";
 
   @Override
   public Class<?> forType() {
