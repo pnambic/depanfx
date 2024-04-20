@@ -28,6 +28,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 @Component
@@ -158,6 +160,7 @@ public class DepanFxResourceChooserDialog {
               updateSelectedResource(newValue);
             }
         });
+    fileListView.setOnMouseClicked(this::handleMouseClick);
   }
 
   private void initComboBox() {
@@ -171,10 +174,19 @@ public class DepanFxResourceChooserDialog {
 
   private void updateFileListView(DepanFxWorkspaceMember member) {
     if (member instanceof DepanFxProjectContainer container) {
-      fileListView.getItems().clear();
+      ObservableList<DepanFxWorkspaceMember> items = fileListView.getItems();
+      items.clear();
+      // First the matching documents
       container.getMembers()
           .filter(this::isIncluded)
-          .forEach(fileListView.getItems()::add);
+          .sorted(DepanFxWorkspaceMember.COMPARE)
+          .forEach(items::add);
+      // Then any containers
+      container.getMembers()
+          .filter(m -> m instanceof DepanFxProjectContainer)
+          .filter(m -> !isIncluded(m))
+          .sorted(DepanFxWorkspaceMember.COMPARE)
+          .forEach(items::add);
     }
   }
 
@@ -189,6 +201,74 @@ public class DepanFxResourceChooserDialog {
     }
 
     return false;
+  }
+
+  private void handleMouseClick(MouseEvent event) {
+
+    // Double click on primary opens ..
+    if (event.getButton().equals(MouseButton.PRIMARY)
+        && event.getClickCount() == 2) {
+      DepanFxWorkspaceMember item =
+          fileListView.getSelectionModel().getSelectedItem();
+      if (item == null) {
+        return;
+      }
+      // Double click on container opens its contents.
+      if (item instanceof DepanFxProjectContainer container) {
+        updateFileListView(item);
+        TreeItem<DepanFxWorkspaceMember> treeItem = getTreeItem(container);
+        if (treeItem != null) {
+          directoryTreeView.getSelectionModel().select(treeItem);
+          treeItem.setExpanded(true);
+        }
+      }
+      // Double click on document same is selection.
+      if (item instanceof DepanFxProjectDocument) {
+        updateSelectedResource(item);
+        handleOpen();
+      }
+    }
+  }
+
+  private TreeItem<DepanFxWorkspaceMember> getTreeItem(
+      DepanFxProjectContainer container) {
+    TreeItem<DepanFxWorkspaceMember> projectRoot =
+        directoryTreeView.getRoot().getChildren()
+            .filtered(p -> p.getValue() == container.getProject())
+            .getFirst();
+
+    return findTreeItem(projectRoot, container.getMemberPath());
+  }
+
+  private TreeItem<DepanFxWorkspaceMember> findTreeItem(
+      TreeItem<DepanFxWorkspaceMember> currentTree, Path targetPath) {
+    Path currentPath =
+        ((DepanFxProjectMember) currentTree.getValue()).getMemberPath();
+    if (currentPath.equals(targetPath)) {
+      return currentTree;
+    }
+    if (currentTree.isLeaf() ) {
+      return null;
+    }
+    if (!startWith(targetPath, currentPath)) {
+      return null;
+    }
+
+    for (TreeItem<DepanFxWorkspaceMember> child : currentTree.getChildren()) {
+      TreeItem<DepanFxWorkspaceMember> found = findTreeItem(child, targetPath);
+      if (found != null) {
+        return found;
+      }
+    }
+    return null;
+  }
+
+  private boolean startWith(Path targetPath, Path prefixPath) {
+    if (targetPath.startsWith(prefixPath)) {
+      return true;
+    }
+    // Odd root path behavior
+    return prefixPath.toString().isBlank();
   }
 
   private boolean matchesFilter(DepanFxProjectDocument document) {
@@ -214,8 +294,11 @@ public class DepanFxResourceChooserDialog {
   }
 
   private void updateSelectedResource(DepanFxWorkspaceMember member) {
-    selectedResource = member;
-    resourceNameField.setText(selectedResource.getMemberName());
+    // Don't pick a container.
+    if (member instanceof DepanFxProjectDocument) {
+      selectedResource = member;
+      resourceNameField.setText(selectedResource.getMemberName());
+    }
   }
 
   private class ComboBoxCell extends ListCell<DepanFxResourceFilter> {

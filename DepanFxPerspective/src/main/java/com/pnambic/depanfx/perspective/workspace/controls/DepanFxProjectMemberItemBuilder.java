@@ -30,6 +30,7 @@ public class DepanFxProjectMemberItemBuilder {
 
     member.getMembers()
         .filter(filter::test)
+        .sorted(DepanFxWorkspaceMember.COMPARE)
         .forEach(c -> result.add(createNode(c)));
     return result;
   }

@@ -61,7 +61,14 @@ public class DepanFxWorkspaceItem extends TreeItem<DepanFxWorkspaceMember> {
 
     ObservableList<TreeItem<DepanFxWorkspaceMember>> result =
         FXCollections.observableArrayList();
+
+    // Ensure the built in project is first.
+    DepanFxProjectTree builtInTree = workspace.getBuiltInProjectTree();
+    result.add(new DepanFxProjectTreeItem(builtInTree, filter));
+
     projects.stream()
+        .filter(p -> p != builtInTree)
+        .sorted(DepanFxWorkspaceMember.COMPARE)
         .forEach(p -> result.add(new DepanFxProjectTreeItem(p, filter)));
     return result;
   }

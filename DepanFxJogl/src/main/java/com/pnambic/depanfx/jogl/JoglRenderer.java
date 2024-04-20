@@ -115,7 +115,7 @@ public class JoglRenderer {
     camera.reshapeCanvas(gl, x, y, width, height);
     viewportWidth = width;
     viewportHeight = height;
-    LOG.info("reshape to {}x{} @ ({}, {})", width, height, x, y);
+    LOG.debug("reshape to {}x{} @ ({}, {})", width, height, x, y);
   }
 
   /**

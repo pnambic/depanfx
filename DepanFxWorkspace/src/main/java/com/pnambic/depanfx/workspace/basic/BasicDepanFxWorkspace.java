@@ -95,8 +95,8 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   @Override
   public List<DepanFxProjectTree> getProjectList() {
     List<DepanFxProjectTree> result = new ArrayList<>(projectList.size() + 1);
-    result.addAll(projectList);
     result.add(getBuiltInProjectTree());
+    result.addAll(projectList);
     return result;
   }
 
