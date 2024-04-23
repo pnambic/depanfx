@@ -13,7 +13,6 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
-import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
@@ -40,7 +39,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ColorPicker;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -51,6 +49,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 
 @Component
 @FxmlView("node-view-link-display-dialog.fxml")
@@ -90,25 +89,20 @@ public class DepanFxNodeViewLinkDisplayDialog
     this.dialogRunner = dialogRunner;
   }
 
-  public static Dialog<DepanFxNodeViewLinkDisplayDialog> runEditDialog(
+  /**
+   * Edge Display Editor is a modeless dialog coupled to the graph view.
+   */
+  public static Stage runEditDialog(
       DepanFxProjectDocument projDoc,
       DepanFxNodeViewLinkDisplayData viewLinkData,
       DepanFxDialogRunner dialogRunner) {
 
-    return DepanFxResourcePerspectives.runEditDialog(
-        projDoc, viewLinkData, dialogRunner,
-        DepanFxNodeViewLinkDisplayDialog.class,
-        EDIT_LINK_DISPLAY);
-  }
-
-  public static Dialog<DepanFxNodeViewLinkDisplayDialog> runCreateDialog(
-      DepanFxNodeViewLinkDisplayData viewLinkData,
-      DepanFxDialogRunner dialogRunner) {
-
-    return DepanFxResourcePerspectives.runCreateDialog(
-        viewLinkData, dialogRunner,
-        DepanFxNodeViewLinkDisplayDialog.class,
-        NEW_LINK_DISPLAY);
+    Dialog<DepanFxNodeViewLinkDisplayDialog> dlg =
+        DepanFxResourcePerspectives.prepareDialog(
+            viewLinkData, dialogRunner,
+            DepanFxNodeViewLinkDisplayDialog.class);
+    dlg.getController().setDestination(projDoc);
+    return dlg.runModeless(EDIT_LINK_DISPLAY);
   }
 
   public static void setNodeViewLinkDisplayTooldataFilters(FileChooser chooser) {

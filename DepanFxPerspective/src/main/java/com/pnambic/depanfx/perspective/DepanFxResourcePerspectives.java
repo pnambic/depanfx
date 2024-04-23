@@ -67,11 +67,10 @@ public class DepanFxResourcePerspectives {
         DepanFxDialogRunner dialogRunner,
         Class<Dlg> dialogType,
         String title) {
-    Dialog<Dlg> dlg = dialogRunner.createDialogAndParent(dialogType);
-    dlg.getController().setDestination(projDoc);
-    dlg.getController().setTooldata(toolData);
-    dlg.runDialog(title);
-    return dlg;
+    Dialog<Dlg> result = prepareDialog(toolData, dialogRunner, dialogType);
+    result.getController().setDestination(projDoc);
+    result.runDialog(title);
+    return result;
   }
 
   public static <
@@ -82,9 +81,23 @@ public class DepanFxResourcePerspectives {
       DepanFxDialogRunner dialogRunner,
       Class<Dlg> dialogType,
       String title) {
+    Dialog<Dlg> result = prepareDialog(toolData, dialogRunner, dialogType);
+    result.runDialog(title);
+    return result;
+  }
+
+  /**
+   * Run the dialog yourself, maybe after going modeless.
+   */
+  public static <
+        Dlg extends DepanFxBaseToolDialog<Data>,
+        Data extends DepanFxBaseToolData>
+  Dialog<Dlg> prepareDialog(
+      Data toolData,
+      DepanFxDialogRunner dialogRunner,
+      Class<Dlg> dialogType) {
     Dialog<Dlg> dlg = dialogRunner.createDialogAndParent(dialogType);
     dlg.getController().setTooldata(toolData);
-    dlg.runDialog(title);
     return dlg;
   }
 

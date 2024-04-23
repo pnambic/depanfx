@@ -38,6 +38,16 @@ public class DepanFxDialogRunner {
     dialogStage.showAndWait();
   }
 
+  public static Stage runModeless(Parent dialogPane, String title) {
+    Stage dialogStage = new Stage();
+    dialogStage.initModality(Modality.NONE);
+    dialogStage.setTitle(title);
+    DepanFxAppIcons.installDepanIcons(dialogStage.getIcons());
+    dialogStage.setScene(new Scene(dialogPane));
+    dialogStage.show();
+    return dialogStage;
+  }
+
   /**
    * Resolution of controller and dialog elements uses both the
    * FxWeaver and Spring injection capabilities.e
@@ -47,6 +57,17 @@ public class DepanFxDialogRunner {
     // but avoids an object creation.
     Parent view = fxweaver.loadView(type);
     runDialog(view, title);
+  }
+
+  /**
+   * Resolution of controller and dialog elements uses both the
+   * FxWeaver and Spring injection capabilities.
+   */
+  public Stage runModeless(Class<?> type, String title) {
+    // Equivalent to createDialogAndParent(type).runDialog(title),
+    // but avoids an object creation.
+    Parent view = fxweaver.loadView(type);
+    return runModeless(view, title);
   }
 
   public <C> Dialog<C>createDialogAndParent(Class<C> type) {
@@ -62,6 +83,10 @@ public class DepanFxDialogRunner {
 
     public void runDialog(String title) {
       DepanFxDialogRunner.runDialog(fxLoad.getView().get(), title);
+    }
+
+    public Stage runModeless(String title) {
+      return DepanFxDialogRunner.runModeless(fxLoad.getView().get(), title);
     }
 
     public C getController() {

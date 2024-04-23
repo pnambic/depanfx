@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,6 +60,7 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tab;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 
 public class DepanFxNodeViewPanel {
 
@@ -123,6 +125,11 @@ public class DepanFxNodeViewPanel {
 
   private EdgeDisplayController edgeDisplay;
 
+  /**
+   * Open supplemental windows (e.g. edit edge display).
+   */
+  private List<Stage> sideViews = new ArrayList<Stage>();
+
   public DepanFxNodeViewPanel(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
@@ -153,8 +160,10 @@ public class DepanFxNodeViewPanel {
       public void handle(Event event) {
         if (result.isSelected()) {
           joglView.activate();
+          showSideViews();
         } else {
           joglView.release();
+          hideSideViews();
         }
       }
     });
@@ -164,6 +173,7 @@ public class DepanFxNodeViewPanel {
       @Override
       public void handle(Event event) {
         joglView.close();
+        closeSideViews();
       }
     });
 
@@ -354,7 +364,19 @@ public class DepanFxNodeViewPanel {
   }
 
   /////////////////////////////////////
-  // Edge Display Menu
+  // Subwindow management
+
+  private void showSideViews() {
+    sideViews.forEach(e -> e.show());
+  }
+
+  private void hideSideViews() {
+    sideViews.forEach(e -> e.hide());
+  }
+
+  private void closeSideViews() {
+    sideViews.forEach(e -> e.close());
+  }
 
   private Menu buildEdgeDisplayMenu() {
     Menu result = new Menu(EDGE_DISPLAY);
@@ -383,12 +405,13 @@ public class DepanFxNodeViewPanel {
   }
 
   private void runEditLinkDisplayDialog() {
-    DepanFxNodeViewLinkDisplayDialog.runEditDialog(
+    Stage edgeDisplayDialog = DepanFxNodeViewLinkDisplayDialog.runEditDialog(
         edgeDisplay.getLinkDisplayRsrc().getDocument(),
         edgeDisplay.getLinkDisplayRsrc().getResource(), dialogRunner);
 
-    // TODO: apply any outstanding changes from the dialog.
-    // However, most changes should be live modifications.
+    sideViews.add(edgeDisplayDialog);
+    edgeDisplayDialog.setOnCloseRequest(
+        e -> sideViews.remove(edgeDisplayDialog));
   }
 
   /////////////////////////////////////
