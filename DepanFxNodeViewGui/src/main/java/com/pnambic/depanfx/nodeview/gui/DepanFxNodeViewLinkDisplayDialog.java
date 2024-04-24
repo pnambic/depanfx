@@ -19,6 +19,7 @@ import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import javafx.util.StringConverter;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -35,6 +36,8 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -50,6 +53,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
+import javafx.util.converter.DoubleStringConverter;
 
 @Component
 @FxmlView("node-view-link-display-dialog.fxml")
@@ -69,6 +74,10 @@ public class DepanFxNodeViewLinkDisplayDialog
           "Link Display",
           DepanFxNodeViewLinkDisplayData.NODE_VIEW_LINK_DISPLAY_EXT);
 
+  private static final double MAX_LINE_WIDTH = 5.0d;
+
+  private static final double MIN_LINE_WIDTH = 0.0d;
+
   private final DepanFxDialogRunner dialogRunner;
 
   @FXML
@@ -76,12 +85,15 @@ public class DepanFxNodeViewLinkDisplayDialog
 
   private ObservableList<EditLinkDisplay> linksDiplayTableData;
 
-  public Object propName;
-
   /**
    * Source of non-mutated data (e.g. context model)
    */
   private DepanFxNodeViewLinkDisplayData linkDisplayData;
+
+  /**
+   * Where live changes happen.
+   */
+  private DepanFxNodeViewPanel viewPanel;
 
   public DepanFxNodeViewLinkDisplayDialog(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
@@ -93,6 +105,7 @@ public class DepanFxNodeViewLinkDisplayDialog
    * Edge Display Editor is a modeless dialog coupled to the graph view.
    */
   public static Stage runEditDialog(
+      DepanFxNodeViewPanel viewPanel,
       DepanFxProjectDocument projDoc,
       DepanFxNodeViewLinkDisplayData viewLinkData,
       DepanFxDialogRunner dialogRunner) {
@@ -101,6 +114,7 @@ public class DepanFxNodeViewLinkDisplayDialog
         DepanFxResourcePerspectives.prepareDialog(
             viewLinkData, dialogRunner,
             DepanFxNodeViewLinkDisplayDialog.class);
+    dlg.getController().setViewPanel(viewPanel);
     dlg.getController().setDestination(projDoc);
     return dlg.runModeless(EDIT_LINK_DISPLAY);
   }
@@ -144,6 +158,7 @@ public class DepanFxNodeViewLinkDisplayDialog
 
     TableColumn<EditLinkDisplay, Double> lineWidthColumn =
         columnBinder.bind("lineWidth");
+    lineWidthColumn.setCellFactory(e -> new WidthTableCell());
 
     TableColumn<EditLinkDisplay, DepanFxLineLabel> lineLabelColumn =
         columnBinder.bind("lineLabel", DepanFxLineLabel.class);
@@ -162,14 +177,32 @@ public class DepanFxNodeViewLinkDisplayDialog
     linkOperationColumn.setOnEditCommit(this::onLinkOperationEvent);
   }
 
+  /**
+   * Both tooldata and view panel are required to populate the display table.
+   */
+  public void setViewPanel(DepanFxNodeViewPanel viewPanel) {
+    this.viewPanel = viewPanel;
+    prepareDisplayTable();
+  }
+
+  /**
+   * Both view panel and tooldata are required to populate the display table.
+   */
   @Override // DepanFxBaseToolDialog
   public void setTooldata(DepanFxNodeViewLinkDisplayData linkDisplayData) {
     super.setTooldata(linkDisplayData);
     this.linkDisplayData = linkDisplayData;
+    prepareDisplayTable();
+  }
 
+  private void prepareDisplayTable() {
+    // Wait for both to be configured.
+    if ((viewPanel == null) || (linkDisplayData == null)) {
+      return;
+    }
     List<EditLinkDisplay> editLinkDisplay =
         linkDisplayData.streamLinkDisplay()
-        .map(e -> new EditLinkDisplay(e))
+        .map(e -> new EditLinkDisplay(viewPanel, e))
         .collect(Collectors.toList());
 
     linksDiplayTableData = FXCollections.observableArrayList(editLinkDisplay);
@@ -181,7 +214,7 @@ public class DepanFxNodeViewLinkDisplayDialog
     DepanFxLineDisplayData lineDisplay =
         DepanFxLineDisplayData.buildSimpleLineDisplayData();
     LinkDisplayEntry rowDisplay = new LinkDisplayEntry("", null, lineDisplay);
-    linksDiplayTableData.add(new EditLinkDisplay(rowDisplay));
+    linksDiplayTableData.add(new EditLinkDisplay(viewPanel, rowDisplay));
   }
 
   @FXML
@@ -227,7 +260,7 @@ public class DepanFxNodeViewLinkDisplayDialog
   @Override
   protected DepanFxNodeViewLinkDisplayData prepareResult() {
     List<LinkDisplayEntry> displayEntries = linksDiplayTableData.stream()
-        .map(this::toLinkDisplayEntry)
+        .map(e -> toLinkDisplayEntry(e))
         .collect(Collectors.toList());
 
     return new DepanFxNodeViewLinkDisplayData(
@@ -253,27 +286,8 @@ public class DepanFxNodeViewLinkDisplayDialog
     return  "Link Display Save Confirmation Error";
   }
 
-  private LinkDisplayEntry toLinkDisplayEntry(EditLinkDisplay editData) {
-    DepanFxLineDisplayData lineDisplayData = new DepanFxLineDisplayData(
-        editData.lineFormProperty().getValue(),
-        editData.lineStyleProperty().getValue(),
-        JoglColors.of(editData.lineColorProperty().getValue()),
-        editData.lineWidthProperty().getValue(),
-
-        editData.lineLabelProperty().getValue(),
-        editData.sourceArrowProperty().getValue(),
-        editData.targetArrowProperty().getValue(),
-        editData.lineDirectionProperty().getValue());
-
-    LinkDisplayEntry result = new LinkDisplayEntry(
-        editData.linkDisplayLabelProperty().getValue(),
-        editData.linkDisplayRsrc,
-        lineDisplayData );
-    return result ;
-  }
-
   private EditLinkDisplay getEventLinkDisplay(
-      CellEditEvent<EditLinkDisplay, String> updateEvent) {
+      CellEditEvent<EditLinkDisplay, ?> updateEvent) {
     return updateEvent.getTableView().getItems().get(
         updateEvent.getTablePosition().getRow());
   }
@@ -316,7 +330,7 @@ public class DepanFxNodeViewLinkDisplayDialog
     }
   }
 
-  public static class ColorCellFactory
+  private static class ColorCellFactory
       extends TableCell<EditLinkDisplay, Color> {
 
     private final ColorPicker colorPicker = new ColorPicker();
@@ -338,10 +352,84 @@ public class DepanFxNodeViewLinkDisplayDialog
     }
   }
 
+  private static class WidthTableCell
+      extends TextFieldTableCell<EditLinkDisplay, Double> {
+
+    private class DoubleConverter extends DoubleStringConverter {
+
+      @Override
+      public Double fromString(String lineWidth) {
+        double current = WidthTableCell.this.getItem();
+        return parseLineWidth(lineWidth, current);
+      }
+
+      private double parseLineWidth(String lineWidth, double current) {
+        double result = current;
+        try {
+          Double parsed  = super.fromString(lineWidth);
+          if (parsed != null) {
+            result = parsed.doubleValue();
+          }
+        } catch (NumberFormatException errFmt) {
+          LOG.warn("Bad user value for line width {}", lineWidth);
+        }
+        return Math.min(MAX_LINE_WIDTH, Math.max(MIN_LINE_WIDTH, result));
+      }
+    }
+
+    public WidthTableCell() {
+      super();
+      setConverter(new DoubleConverter());
+    }
+  }
+
   private void updateMatcher(
       EditLinkDisplay editLinkDisplay,
       DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
     editLinkDisplay.setLinkDisplayRsrc(matcherRsrc);
+  }
+
+  private static class LinkDisplayUpdater implements ChangeListener<Object> {
+
+    private final DepanFxNodeViewPanel viewPanel;
+
+    private final EditLinkDisplay linkDisplay;
+
+    public LinkDisplayUpdater(
+        DepanFxNodeViewPanel viewPanel, EditLinkDisplay linkDisplay) {
+      this.viewPanel = viewPanel;
+      this.linkDisplay = linkDisplay;
+    }
+
+    @Override
+    public void changed(
+        ObservableValue<? extends Object> observable,
+        Object oldValue, Object newValue) {
+      LOG.info("update display for {}",
+          linkDisplay.linkDisplayLabelProp.getValue());
+      LinkDisplayEntry display = toLinkDisplayEntry(linkDisplay);
+      viewPanel.updateEdgeDisplayByMatcher(
+          linkDisplay.linkDisplayRsrc, display);
+    }
+  }
+
+  private static LinkDisplayEntry toLinkDisplayEntry(EditLinkDisplay editData) {
+    DepanFxLineDisplayData lineDisplayData = new DepanFxLineDisplayData(
+        editData.lineFormProperty().getValue(),
+        editData.lineStyleProperty().getValue(),
+        JoglColors.of(editData.lineColorProperty().getValue()),
+        editData.lineWidthProperty().getValue(),
+
+        editData.lineLabelProperty().getValue(),
+        editData.sourceArrowProperty().getValue(),
+        editData.targetArrowProperty().getValue(),
+        editData.lineDirectionProperty().getValue());
+
+    LinkDisplayEntry result = new LinkDisplayEntry(
+        editData.linkDisplayLabelProperty().getValue(),
+        editData.linkDisplayRsrc,
+        lineDisplayData );
+    return result ;
   }
 
   /**
@@ -351,6 +439,8 @@ public class DepanFxNodeViewLinkDisplayDialog
    * with the required property getter method xxxProperty().
    */
   public static class EditLinkDisplay {
+
+    private final LinkDisplayUpdater updater;
 
     public StringProperty linkDisplayLabelProp;
 
@@ -376,26 +466,47 @@ public class DepanFxNodeViewLinkDisplayDialog
 
     public ObjectProperty<LinkOrderOperation> linkOrderOperationProp;
 
-    public EditLinkDisplay(LinkDisplayEntry linkDisplay) {
+    public EditLinkDisplay(
+        DepanFxNodeViewPanel viewPanel, LinkDisplayEntry linkDisplay) {
+      updater = new LinkDisplayUpdater(viewPanel, this);
+
       // Unpack data from source.
       linkDisplayLabelProp =
           new SimpleStringProperty(linkDisplay.getLinkLabel());
+      linkDisplayLabelProp.addListener(updater);
+
       linkDisplayNameProp = new SimpleStringProperty();
       setLinkDisplayRsrc(linkDisplay.getLinkRsrc());
 
       DepanFxLineDisplayData lineDisplay = linkDisplay.getLineDisplay();
       lineFormProp = new SimpleObjectProperty<>(lineDisplay.lineForm);
+      lineFormProp.addListener(updater);
+
       lineStyleProp = new SimpleObjectProperty<>(lineDisplay.lineStyle);
+      lineStyleProp.addListener(updater);
+
       lineColorProp =
           new SimpleObjectProperty<>(JoglColors.of(lineDisplay.lineColor));
+      lineColorProp.addListener(updater);
+
       lineWidthProp = new SimpleDoubleProperty(lineDisplay.lineWidth);
+      lineWidthProp.addListener(updater);
+
       lineLabelProp = new SimpleObjectProperty<>(lineDisplay.lineLabel);
+      lineLabelProp.addListener(updater);
+
       sourceArrowProp = new SimpleObjectProperty<>(lineDisplay.sourceArrow);
+      sourceArrowProp.addListener(updater);
+
       targetArrowProp = new SimpleObjectProperty<>(lineDisplay.targetArrow);
+      targetArrowProp.addListener(updater);
+
       lineDirectionProp = new SimpleObjectProperty<>(lineDisplay.lineDir);
+      lineDirectionProp.addListener(updater);
 
       linkOrderOperationProp =
           new SimpleObjectProperty<>(LinkOrderOperation.NONE);
+      linkOrderOperationProp.addListener(updater);
     }
 
     public void setLinkDisplayRsrc(

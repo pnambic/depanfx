@@ -46,7 +46,7 @@
                     editable="true" resizable="false" sortable="false">
                 </TableColumn>
                 <TableColumn text="Width"
-                    prefWidth="60"
+                    prefWidth="40"
                     editable="true" resizable="false" sortable="false">
                 </TableColumn>
                 <TableColumn text="Label"

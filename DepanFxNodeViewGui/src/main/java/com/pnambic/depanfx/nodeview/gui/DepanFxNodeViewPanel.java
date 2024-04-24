@@ -406,7 +406,7 @@ public class DepanFxNodeViewPanel {
 
   private void runEditLinkDisplayDialog() {
     Stage edgeDisplayDialog = DepanFxNodeViewLinkDisplayDialog.runEditDialog(
-        edgeDisplay.getLinkDisplayRsrc().getDocument(),
+        this, edgeDisplay.getLinkDisplayRsrc().getDocument(),
         edgeDisplay.getLinkDisplayRsrc().getResource(), dialogRunner);
 
     sideViews.add(edgeDisplayDialog);
@@ -497,7 +497,7 @@ public class DepanFxNodeViewPanel {
   private void runEditVisibleEdgesDialog() {
     // TODO: Should be a different dialog
     DepanFxNodeViewLinkDisplayDialog.runEditDialog(
-        edgeDisplay.getLinkDisplayRsrc().getDocument(),
+        this, edgeDisplay.getLinkDisplayRsrc().getDocument(),
         edgeDisplay.getLinkDisplayRsrc().getResource(), dialogRunner);
 
     // TODO: apply any outstanding changes from the dialog.
