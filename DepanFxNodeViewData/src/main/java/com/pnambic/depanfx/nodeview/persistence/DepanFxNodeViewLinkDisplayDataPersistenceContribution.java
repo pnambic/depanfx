@@ -1,5 +1,7 @@
 package com.pnambic.depanfx.nodeview.persistence;
 
+import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.persistence.ContextModelIdConverter;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
@@ -47,6 +49,8 @@ public class DepanFxNodeViewLinkDisplayDataPersistenceContribution
 
   @Override
   public void prepareTransport(PersistDocumentTransportBuilder builder) {
+    ContextModelIdConverter.installIn(builder);
+
     builder.addAlias(
         LINK_DISPLAY_INFO_TAG, DepanFxNodeViewLinkDisplayData.class);
     builder.addImplicitCollection(
@@ -59,6 +63,7 @@ public class DepanFxNodeViewLinkDisplayDataPersistenceContribution
     builder.addAllowedType(ALLOW_TYPES);
 
     // Apply plugins for document elements.
+    graphNodeRegistry.applyExtensions(builder, GraphNode.class);
     graphNodeRegistry.applyExtensions(builder, DepanFxWorkspaceResource.class);
   }
 }

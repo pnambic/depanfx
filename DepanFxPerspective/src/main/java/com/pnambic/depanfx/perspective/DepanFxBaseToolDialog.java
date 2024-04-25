@@ -135,6 +135,19 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData> {
   }
 
   /////////////////////////////////////
+  // Available to modeless dialog which have a different protocol
+  // for window closing.
+
+  protected void closeDialog() {
+    ((Stage) destinationField.getScene().getWindow()).close();
+  }
+
+  protected Optional<DepanFxWorkspaceResource<T>> saveProjectDoc(T toolData) {
+    return DepanFxResourcePerspectives.toProjDoc(workspace, destinationField)
+        .flatMap(d -> saveDocument(d, toolData));
+  }
+
+  /////////////////////////////////////
   // FXML handlers.
 
   @FXML
@@ -153,12 +166,7 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData> {
     }
     closeDialog();
 
-    // Make sure we can get a result before trying to save
-    T toolData = prepareResult();
-
-    optResource =
-        DepanFxResourcePerspectives.toProjDoc(workspace, destinationField)
-        .flatMap(d -> saveDocument(d, toolData));
+    optResource = saveProjectDoc(prepareResult());
   }
 
   @FXML
@@ -169,6 +177,17 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData> {
     if (selectedFile != null) {
       destinationField.setText(selectedFile.getAbsolutePath());
     }
+  }
+
+  /////////////////////////////////////
+  // Internal
+
+  private FileChooser prepareDestinationFileChooser() {
+    FileChooser result =
+        DepanFxSceneControls.prepareFileChooser(
+            destinationField, () -> buildInitialDestinationFile());
+    setTooldataFilters(result);
+    return result;
   }
 
   private Optional<DepanFxWorkspaceResource<T>> saveDocument(
@@ -185,17 +204,6 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData> {
     }
   }
 
-  private void closeDialog() {
-    ((Stage) destinationField.getScene().getWindow()).close();
-  }
-
-  private FileChooser prepareDestinationFileChooser() {
-    FileChooser result =
-        DepanFxSceneControls.prepareFileChooser(
-            destinationField, () -> buildInitialDestinationFile());
-    setTooldataFilters(result);
-    return result;
-  }
 
   protected void updateBlankField(TextField updateField, String newValue) {
     DepanFxSceneControls.updateBlankField(updateField, newValue);

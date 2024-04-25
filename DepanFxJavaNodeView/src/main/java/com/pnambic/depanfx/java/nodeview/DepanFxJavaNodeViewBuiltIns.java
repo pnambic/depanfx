@@ -1,7 +1,7 @@
 package com.pnambic.depanfx.java.nodeview;
 
 import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemLinkMatcherBuiltIns;
-import com.pnambic.depanfx.graph.context.BaseContextDefinition;
+import com.pnambic.depanfx.java.context.JavaContextDefinition;
 import com.pnambic.depanfx.java.nodelist.link.JavaLinkMatcherBuiltIns;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
@@ -99,7 +99,7 @@ public class DepanFxJavaNodeViewBuiltIns {
     DepanFxNodeViewLinkDisplayData result =
         new DepanFxNodeViewLinkDisplayData(
             MEMBERS_LABEL, MEMBERS_DESCR,
-            BaseContextDefinition.MODEL_ID, displayInfo);
+            JavaContextDefinition.MODEL_ID, displayInfo);
     return result;
   }
 

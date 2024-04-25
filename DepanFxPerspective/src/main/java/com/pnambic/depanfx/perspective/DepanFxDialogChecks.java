@@ -15,5 +15,4 @@ public class DepanFxDialogChecks {
           "Blank value for destination field");
     }
   }
-
 }

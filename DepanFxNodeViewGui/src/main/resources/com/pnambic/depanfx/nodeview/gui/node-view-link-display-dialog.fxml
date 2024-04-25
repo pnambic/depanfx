@@ -102,7 +102,7 @@
          </HBox>
 
          <HBox spacing="10">
-            <Button text="Cancel" onAction="#handleCancel"/>
+            <Button text="Cancel" onAction="#handleRevert"/>
             <Region HBox.hgrow="ALWAYS" />
             <Button text="Apply" onAction="#handleApply"/>
             <Button text="Confirm" onAction="#handleConfirm"/>

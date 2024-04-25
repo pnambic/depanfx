@@ -17,11 +17,13 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewSceneData;
+import com.pnambic.depanfx.perspective.DepanFxProctor;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -123,6 +125,18 @@ public class DepanFxNodeViewPanel {
 
   private DepanFxJoglView joglView;
 
+  /////////////////////////////////////
+  // Link display state
+
+  /**
+   * If {@code true}, the current edge display settings have not be saved
+   * to a resource.  Therefore, the panel state cannot be saved.
+   */
+  private boolean linkDisplayDirty;
+
+  private DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData>
+      linkDisplayRsrc;
+
   private EdgeDisplayController edgeDisplay;
 
   /**
@@ -221,19 +235,21 @@ public class DepanFxNodeViewPanel {
         c -> this.byMemberLinkMatcherDoc(c, modelId));
   }
 
-  private boolean byMemberLinkMatcherDoc(
-      DepanFxBuiltInContribution<DepanFxLinkMatcherDocument> contrib,
-      ContextModelId modelId) {
-    DepanFxLinkMatcherDocument linkMatchDoc = contrib.getDocument();
-    if (!linkMatchDoc.getMatchGroups()
-        .contains(DepanFxLinkMatcherGroup.MEMBER)) {
-      return false;
-    }
-    // [29-Nov-2023] Kludge for matches any, actual matcher provided later.
-    if (linkMatchDoc.getModelId() == null) {
-      return true;
-    }
-    return linkMatchDoc.getModelId().equals(modelId);
+  public void revertLinkDisplay() {
+    edgeDisplay.revertLinkDisplay();
+    // reverting should not change the state of dirty
+  }
+
+  public void setLinkDisplayInfo(DepanFxNodeViewLinkDisplayData displayInfo) {
+    edgeDisplay.setLinkDisplayInfo(displayInfo);
+    linkDisplayDirty = true;
+  }
+
+  public void setLinkDisplayResource(
+      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc) {
+    edgeDisplay.setLinkDisplayInfo(displayRsrc.getResource());
+    linkDisplayRsrc = displayRsrc;
+    linkDisplayDirty = false;
   }
 
   /////////////////////////////////////
@@ -281,6 +297,8 @@ public class DepanFxNodeViewPanel {
       LinkDisplayEntry displayEntry) {
     edgeDisplay.updateEdgeDisplayByMatcher(
         matcher.getResource(), displayEntry);
+
+    linkDisplayDirty = true;
   }
 
   /**
@@ -363,6 +381,21 @@ public class DepanFxNodeViewPanel {
     return result;
   }
 
+  private boolean byMemberLinkMatcherDoc(
+      DepanFxBuiltInContribution<DepanFxLinkMatcherDocument> contrib,
+      ContextModelId modelId) {
+    DepanFxLinkMatcherDocument linkMatchDoc = contrib.getDocument();
+    if (!linkMatchDoc.getMatchGroups()
+        .contains(DepanFxLinkMatcherGroup.MEMBER)) {
+      return false;
+    }
+    // [29-Nov-2023] Kludge for matches any, actual matcher provided later.
+    if (linkMatchDoc.getModelId() == null) {
+      return true;
+    }
+    return linkMatchDoc.getModelId().equals(modelId);
+  }
+
   /////////////////////////////////////
   // Subwindow management
 
@@ -396,18 +429,14 @@ public class DepanFxNodeViewPanel {
     DepanFxLinkDisplayDataChooser
         .runLinkDisplayFinder(
             workspace, dialogRunner, joglView.getScene())
-        .ifPresent(r -> this.setLinkMatcher(r));
-  }
-
-  private void setLinkMatcher(
-      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc) {
-    edgeDisplay.setLinkDisplayRsrc(displayRsrc);
+        .ifPresent(this::setLinkDisplayResource);
   }
 
   private void runEditLinkDisplayDialog() {
-    Stage edgeDisplayDialog = DepanFxNodeViewLinkDisplayDialog.runEditDialog(
-        this, edgeDisplay.getLinkDisplayRsrc().getDocument(),
-        edgeDisplay.getLinkDisplayRsrc().getResource(), dialogRunner);
+    Stage edgeDisplayDialog =
+        DepanFxNodeViewLinkDisplayDialog.runEditDialog(
+            this, linkDisplayRsrc.getDocument(),
+            edgeDisplay.getLinkDisplayInfo(), dialogRunner);
 
     sideViews.add(edgeDisplayDialog);
     edgeDisplayDialog.setOnCloseRequest(
@@ -497,8 +526,8 @@ public class DepanFxNodeViewPanel {
   private void runEditVisibleEdgesDialog() {
     // TODO: Should be a different dialog
     DepanFxNodeViewLinkDisplayDialog.runEditDialog(
-        this, edgeDisplay.getLinkDisplayRsrc().getDocument(),
-        edgeDisplay.getLinkDisplayRsrc().getResource(), dialogRunner);
+        this, linkDisplayRsrc.getDocument(),
+        edgeDisplay.getLinkDisplayInfo(), dialogRunner);
 
     // TODO: apply any outstanding changes from the dialog.
     // However, most changes should be live modifications.
@@ -534,6 +563,12 @@ public class DepanFxNodeViewPanel {
   }
 
   private void runSaveNodeViewDialog() {
+    DepanFxProctor proctor = new DepanFxProctor.Simple();
+    checkInput(proctor);
+    if (DepanFxResourcePerspectives.errorAlert(
+        proctor, "Unable to save node view settings")) {
+      return;
+    }
     DepanFxNodeViewData saveView = buildSaveView();
 
     DepanFxResourcePerspectives.runCreateDialog(
@@ -544,12 +579,22 @@ public class DepanFxNodeViewPanel {
   /////////////////////////////////////
   // Render
 
+  private void checkInput(DepanFxProctor proctor) {
+    if (linkDisplayDirty) {
+      proctor.addError("Unsaved edge display",
+          "The edge display property settings have been applied"
+          + " but they have not been saved to a resource file."
+          + "  Use the Edge Display Edit window"
+          + " to save the current settings.");
+    }
+  }
+
   private DepanFxNodeViewData buildSaveView() {
     DepanFxNodeViewData result = new DepanFxNodeViewData(
         viewData.getToolName(), viewData.getToolDescription(),
         buildSceneData(),
         viewData.getGraphDocRsrc(),
-        edgeDisplay.getLinkDisplayRsrc(),
+        linkDisplayRsrc,
         viewNodes, nodeLocations, nodeDisplay,
         edgeDisplay.getEdgeDisplay(),
         edgeDisplay.getRemainderVisible(), edgeDisplay.getRemainderLabel(),
@@ -578,10 +623,13 @@ public class DepanFxNodeViewPanel {
     viewNodes.stream().forEach(this::installShape);
 
     edgeDisplay = new EdgeDisplayController(joglView,
-        viewData.getLinkDisplayDocRsrc(),
+        viewData.getLinkDisplayDocRsrc().getResource(),
         viewData.getEdgeDisplay(),
         viewData.getRemainerVisible(), viewData.getRemainderLabel(),
         viewData.getRemainerDisplay());
+    linkDisplayRsrc = viewData.getLinkDisplayDocRsrc();
+    linkDisplayDirty = false;
+
     getViewEdges().forEach(edgeDisplay::installEdge);
     joglView.addMouseActionListener(new ViewMouseActionListener());
   }

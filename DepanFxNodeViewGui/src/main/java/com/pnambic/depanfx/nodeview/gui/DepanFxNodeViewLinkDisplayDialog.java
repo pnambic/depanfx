@@ -12,6 +12,7 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineStyle;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
+import com.pnambic.depanfx.perspective.DepanFxProctor;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -19,7 +20,6 @@ import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import javafx.util.StringConverter;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ObjectProperty;
@@ -53,7 +54,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 import javafx.util.converter.DoubleStringConverter;
 
 @Component
@@ -61,7 +61,6 @@ import javafx.util.converter.DoubleStringConverter;
 public class DepanFxNodeViewLinkDisplayDialog
     extends DepanFxBaseToolDialog<DepanFxNodeViewLinkDisplayData> {
 
-  @SuppressWarnings("unused")
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeViewLinkDisplayDialog.class);
 
@@ -217,10 +216,6 @@ public class DepanFxNodeViewLinkDisplayDialog
     linksDiplayTableData.add(new EditLinkDisplay(viewPanel, rowDisplay));
   }
 
-  @FXML
-  private void handleApply() {
-  }
-
   private void onUpdateLabelEvent(
       CellEditEvent<EditLinkDisplay, String> updateEvent) {
     getEventLinkDisplay(updateEvent)
@@ -290,6 +285,28 @@ public class DepanFxNodeViewLinkDisplayDialog
       CellEditEvent<EditLinkDisplay, ?> updateEvent) {
     return updateEvent.getTableView().getItems().get(
         updateEvent.getTablePosition().getRow());
+  }
+
+  /////////////////////////////////////
+  // FXML handlers.
+
+  @FXML
+  protected void handleRevert() {
+    closeDialog();
+    viewPanel.revertLinkDisplay();
+  }
+
+  @FXML
+  protected void handleApply() {
+    closeDialog();
+    DepanFxNodeViewLinkDisplayData toolData = prepareResult();
+    viewPanel.setLinkDisplayInfo(toolData);
+  }
+
+  @FXML
+  protected void handleConfirm() {
+    super.handleConfirm();
+    getWorkspaceResource().ifPresent(viewPanel::setLinkDisplayResource);
   }
 
   /////////////////////////////////////

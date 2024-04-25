@@ -30,8 +30,7 @@ public class EdgeDisplayController {
    */
   private final Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay;
 
-  private DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc;
-  // private DepanFxNodeViewLinkDisplayData displayInfo;
+  private DepanFxNodeViewLinkDisplayData displayInfo;
 
   private DepanFxLineDisplayData remainderDisplay;
 
@@ -58,13 +57,13 @@ public class EdgeDisplayController {
 
   public EdgeDisplayController(
       DepanFxJoglView joglView,
-      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc,
+      DepanFxNodeViewLinkDisplayData displayInfo,
       Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay,
       boolean remainderVisible, String remainderLabel,
       DepanFxLineDisplayData remainderDisplay) {
     this.joglView = joglView;
+    this.displayInfo = displayInfo;
     this.edgeDisplay = edgeDisplay;
-    this.displayRsrc = displayRsrc;
     this.remainderVisible = remainderVisible;
     this.remainderLabel = remainderLabel;
     this.remainderDisplay = remainderDisplay;
@@ -76,11 +75,24 @@ public class EdgeDisplayController {
       DepanFxNodeViewData viewData) {
     return new EdgeDisplayController(
         joglView,
-        viewData.getLinkDisplayDocRsrc(),
+        viewData.getLinkDisplayDocRsrc().getResource(),
         viewData.getEdgeDisplay(),
         viewData.getRemainerVisible(),
         viewData.getRemainderLabel(),
         viewData.getRemainerDisplay());
+  }
+
+  public DepanFxNodeViewLinkDisplayData getLinkDisplayInfo() {
+    return displayInfo;
+  }
+
+  public void setLinkDisplayInfo(DepanFxNodeViewLinkDisplayData displayInfo) {
+    this.displayInfo = displayInfo;
+    setLinkDisplay();
+  }
+
+  public void revertLinkDisplay() {
+    setLinkDisplay();
   }
 
   public Stream<DepanFxLinkMatcherDocument> streamDisplayMatchers() {
@@ -93,15 +105,9 @@ public class EdgeDisplayController {
     return edgeDisplayGroup.keySet().stream();
   }
 
-  public DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData>
-      getLinkDisplayRsrc() {
-    return displayRsrc;
-  }
-
   public void setLinkDisplayRsrc(
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc) {
-    this.displayRsrc = displayRsrc;
-    setLinkDisplay();
+    setLinkDisplayInfo(displayRsrc.getResource());
   }
 
   public int getMatcherEdgeCount(DepanFxLinkMatcherDocument matcher) {
@@ -187,7 +193,7 @@ public class EdgeDisplayController {
   }
 
   private DepanFxNodeViewLinkDisplayData getDisplayData() {
-    return displayRsrc.getResource();
+    return displayInfo;
   }
 
   private void setLinkDisplay() {
