@@ -2,11 +2,8 @@ package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
-import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
-import com.pnambic.depanfx.perspective.DepanFxProctor;
-import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.DepanFxBaseDocumentDialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -26,11 +23,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Stage;
 
 @Component
 @FxmlView("save-node-list-dialog.fxml")
-public class DepanFxSaveNodeListDialog {
+public class DepanFxSaveNodeListDialog
+    extends DepanFxBaseDocumentDialog<DepanFxNodeList> {
 
   private static final String EXT = DepanFxNodeList.NODE_LIST_EXT;
 
@@ -46,11 +43,6 @@ public class DepanFxSaveNodeListDialog {
   @FXML
   private TextField nodeListDescriptionField;
 
-  @FXML
-  private TextField destinationField;
-
-  private final DepanFxWorkspace workspace;
-
   private Optional<DepanFxWorkspaceResource<DepanFxNodeList>> savedRsrc =
       Optional.empty();
 
@@ -58,7 +50,7 @@ public class DepanFxSaveNodeListDialog {
 
   @Autowired
   public DepanFxSaveNodeListDialog(DepanFxWorkspace workspace) {
-    this.workspace = workspace;
+    super(workspace, DepanFxNodeList.class);
   }
 
   public void setNodeListDoc(DepanFxNodeList nodeList) {
@@ -76,80 +68,41 @@ public class DepanFxSaveNodeListDialog {
         graphSource, nodeCount);
   }
 
-  public void setDestination(DepanFxProjectDocument document) {
-    destinationField.setText(document.getMemberPath().toString());
-  }
-
   public Optional<DepanFxWorkspaceResource<DepanFxNodeList>> getSavedResource() {
     return savedRsrc;
   }
 
-  @FXML
-  private void openFileChooser() {
-    FileChooser fileChooser = prepareFileChooser();
-    File selectedFile =
-        fileChooser.showSaveDialog(destinationField.getScene().getWindow());
-    if (selectedFile != null) {
-      destinationField.setText(selectedFile.getAbsolutePath());
-    }
+  /////////////////////////////////////
+  // Base Document Dialog protected overrides
+
+  @Override
+  protected String getDocumentName() {
+    return nodeListNameField.getText();
   }
 
-  @FXML
-  private void handleCancel() {
-    closeDialog();
-    savedRsrc = Optional.empty();
-  }
-
-  @FXML
-  private void handleConfirm() {
-    DepanFxProctor proctor = new DepanFxProctor.Simple();
-    DepanFxDialogChecks.checkDestinationFile(
-        proctor, destinationField.getText());
-    if (DepanFxResourcePerspectives.errorAlert(
-        proctor, "Node List Save Confirmation Error")) {
-      return;
-    }
-
-    closeDialog();
-
-    File dstFile = new File(destinationField.getText());
-    DepanFxProjectDocument projDoc =
-        workspace.toProjectDocument(dstFile.toURI()).get();
-    DepanFxNodeList saveDoc = DepanFxNodeLists.buildNodeList(
+  @Override
+  protected DepanFxNodeList prepareResult() {
+    return DepanFxNodeLists.buildNodeList(
         nodeListNameField.getText(), nodeListDescriptionField.getText(),
         nodeList.getGraphDocResource(), nodeList.getNodes());
-
-    try {
-      savedRsrc = workspace.saveDocument(projDoc, saveDoc);
-    } catch (Exception errAny) {
-      throw new RuntimeException(
-          "Unable to save nodelist " + projDoc.getMemberPath(), errAny);
-    }
   }
 
-  private FileChooser prepareFileChooser() {
-    String baseName = nodeListNameField.getText();
-    FileChooser result =
-        DepanFxSceneControls.prepareFileChooser(
-            destinationField,
-            () -> new File(
-                getWorkspaceDestination(),
-                buildTimestampName(baseName, EXT)));
-    result.getExtensionFilters().add(EXT_FILTER);
-    result.setSelectedExtensionFilter(EXT_FILTER);
-
-    return result;
+  @Override
+  protected File buildInitialDestinationFile() {
+    String docName = DepanFxWorkspaceFactory.buildDocumentTimestampName(
+        getDocumentName(), EXT);
+    return new File(
+        DepanFxProjects.getCurrentAnalyzes(getWorkspace()), docName);
   }
 
-  private void closeDialog() {
-    ((Stage) destinationField.getScene().getWindow()).close();
+  @Override
+  protected void setTooldataFilters(FileChooser chooser) {
+    chooser.getExtensionFilters().add(EXT_FILTER);
+    chooser.setSelectedExtensionFilter(EXT_FILTER);
   }
 
-  private File getWorkspaceDestination() {
-    return DepanFxProjects.getCurrentAnalyzes(workspace);
-  }
-
-  private String buildTimestampName(String prefix, String ext) {
-    return DepanFxWorkspaceFactory.buildDocumentTimestampName(prefix, ext);
+  @Override
+  protected String getInputCheckFailureText() {
+    return "Node List Save Confirmation Error";
   }
 }
