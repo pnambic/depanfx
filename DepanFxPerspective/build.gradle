@@ -14,6 +14,8 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-autoconfigure'
   implementation "net.rgielen:javafx-weaver-core:${javafxWeaverVersion}"
 
+  // 'cuz graph doc doesn't have a UI layer of its own.
+  implementation project(':DepanFxGraphDoc')
   implementation project(':DepanFxWorkspace')
   implementation project(':DepanFxScene')
 }

@@ -16,29 +16,31 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 
-public abstract class DepanFxBaseDocumentDialog<T> {
+public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxBaseDocumentDialog.class);
-
-  private final DepanFxWorkspace workspace;
 
   // Allow for future casts, type checks.
   @SuppressWarnings("unused")
   private final Class<T> dataType;
 
-  private Optional<DepanFxWorkspaceResource<T>> optResource;
+  /**
+   * The resource associated with the destination is empty
+   * unless there has been a successful save.
+   */
+  Optional<DepanFxWorkspaceResource<T>> optResource = Optional.empty();
 
   @FXML
-  private TextField destinationField;
+  TextField destinationField;
 
   public DepanFxBaseDocumentDialog(
       DepanFxWorkspace workspace, Class<T> dataType) {
-    this.workspace = workspace;
+    super(workspace);
     this.dataType = dataType;
   }
 
@@ -49,10 +51,6 @@ public abstract class DepanFxBaseDocumentDialog<T> {
       return;
     }
     destinationField.setText(projDoc.getMemberPath().toString());
-  }
-
-  public DepanFxWorkspace getWorkspace() {
-    return workspace;
   }
 
   public Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource() {
@@ -78,14 +76,11 @@ public abstract class DepanFxBaseDocumentDialog<T> {
 
   protected abstract File buildInitialDestinationFile();
 
-  protected abstract String getInputCheckFailureText();
-
-  /**
-   * Extendible, {@code @Override} with {@code super.checkInput()}.
-   */
-  protected void checkInput(DepanFxProctor proctor) {
-    DepanFxDialogChecks.checkDestinationFile(
-        proctor, destinationField.getText());
+  protected File buildGraphInitialDestination(String targetExt) {
+    return DepanFxWorkspaceFactory.bestDocumentFile(
+        getDocumentName(), targetExt, workspace,
+        DepanFxProjects.getCurrentGraphsPath(workspace).orElse(null),
+        DepanFxProjects.getCurrentGraphs(workspace));
   }
 
   /**
@@ -110,30 +105,26 @@ public abstract class DepanFxBaseDocumentDialog<T> {
   // Available to modeless dialog which have a different protocol
   // for window closing.
 
-  protected void closeDialog() {
-    ((Stage) destinationField.getScene().getWindow()).close();
-  }
-
   protected Optional<DepanFxWorkspaceResource<T>> saveProjectDoc(T toolData) {
     return DepanFxResourcePerspectives.toProjDoc(workspace, destinationField)
         .flatMap(d -> saveDocument(d, toolData));
+  }
+
+  /**
+   * Extendible, {@code @Override} with {@code super.checkInput()}.
+   */
+  @Override // DepanFxBaseDialog
+  protected void checkInput(DepanFxProctor proctor) {
+    DepanFxDialogChecks.checkDestinationFile(
+        proctor, destinationField.getText());
   }
 
   /////////////////////////////////////
   // FXML handlers.
 
   @FXML
-  protected void handleCancel() {
-    closeDialog();
-    optResource = Optional.empty();
-  }
-
-  @FXML
   protected void handleConfirm() {
-    DepanFxProctor proctor = new DepanFxProctor.Simple();
-    checkInput(proctor);
-    if (DepanFxResourcePerspectives.errorAlert(
-        proctor, getInputCheckFailureText())) {
+    if (hasInputErrors()) {
       return;
     }
     closeDialog();
@@ -153,6 +144,11 @@ public abstract class DepanFxBaseDocumentDialog<T> {
 
   /////////////////////////////////////
   // Internal
+
+  @Override // DepanFxBaseDialog
+  public Scene getScene() {
+    return destinationField.getScene();
+  }
 
   private FileChooser prepareDestinationFileChooser() {
     FileChooser result =
@@ -174,10 +170,5 @@ public abstract class DepanFxBaseDocumentDialog<T> {
           + ", type " + docData.getClass().getName(),
           errIo);
     }
-  }
-
-
-  protected void updateBlankField(TextField updateField, String newValue) {
-    DepanFxSceneControls.updateBlankField(updateField, newValue);
   }
 }

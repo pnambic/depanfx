@@ -4,9 +4,9 @@ import com.pnambic.depanfx.git.builder.GitCommandRunner;
 import com.pnambic.depanfx.git.builder.GitLogLoader;
 import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.perspective.DepanFxBaseDialog;
 import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
 import com.pnambic.depanfx.perspective.DepanFxProctor;
-import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
@@ -25,22 +25,18 @@ import java.io.File;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.Stage;
-import javafx.stage.Window;
 
 @Component
 @FxmlView("new-git-logs-dialog.fxml")
-public class DepanFxNewGitLogsDialog
-    implements DepanFxGitRepoToolDialog.Aware {
+public class DepanFxNewGitLogsDialog extends DepanFxBaseDialog {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNewGitLogsDialog.class);
 
   private static final int DEFAULT_LOG_COUNT = 10;
-
-  private final DepanFxWorkspace workspace;
 
   private final DepanFxDialogRunner dialogRunner;
 
@@ -64,24 +60,8 @@ public class DepanFxNewGitLogsDialog
   @Autowired
   public DepanFxNewGitLogsDialog(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
-    this.workspace = workspace;
+    super(workspace);
     this.dialogRunner = dialogRunner;
-  }
-
-  @Override // DepanFxGitRepoToolDialog.Aware
-  public DepanFxGitRepoData getTooldata() {
-    return repoData;
-  }
-
-  @Override // DepanFxGitRepoToolDialog.Aware
-  public void setTooldata(DepanFxGitRepoData repoData) {
-    this.repoData = repoData;
-    gitRepoNameField.setText(repoData.getToolName());
-  }
-
-  @Override // DepanFxGitRepoToolDialog.Aware
-  public Window getChooserWindow() {
-    return gitRepoNameField.getScene().getWindow();
   }
 
   @FXML
@@ -93,7 +73,14 @@ public class DepanFxNewGitLogsDialog
       logCountField.setText(Integer.toString(DEFAULT_LOG_COUNT));
     }
     gitRepoNameField.setContextMenu(
-        DepanFxGitRepoToolDialogs.buildRepoChoiceMenu(this, workspace, dialogRunner));
+        DepanFxGitRepoToolDialogs.buildRepoChoiceMenu(
+            workspace, dialogRunner, gitRepoNameField.getScene(),
+            () -> { return repoData; }, this::setRepoData));
+  }
+
+  public void setRepoData(DepanFxGitRepoData repoData) {
+    this.repoData = repoData;
+    gitRepoNameField.setText(repoData.getToolName());
   }
 
   @FXML
@@ -113,18 +100,8 @@ public class DepanFxNewGitLogsDialog
   }
 
   @FXML
-  private void handleCancel() {
-    closeDialog();
-    LOG.info("cancelled request");
-  }
-
-  @FXML
   private void handleConfirm() {
-    DepanFxProctor proctor = new DepanFxProctor.Simple();
-    DepanFxDialogChecks.checkDestinationFile(
-        proctor, dstDirectoryField.getText());
-    if (DepanFxResourcePerspectives.errorAlert(
-        proctor, "Git Log Node List Save Confirmation Error")) {
+    if (hasInputErrors()) {
       return;
     }
 
@@ -159,8 +136,20 @@ public class DepanFxNewGitLogsDialog
     }
   }
 
-  private void closeDialog() {
-    ((Stage) dstDirectoryField.getScene().getWindow()).close();
+  @Override
+  public Scene getScene() {
+    return dstDirectoryField.getScene();
+  }
+
+  @Override
+  protected String getInputCheckFailureText() {
+    return "Git Log Node List Save Confirmation Error";
+  }
+
+  @Override
+  protected void checkInput(DepanFxProctor proctor) {
+    DepanFxDialogChecks.checkDestinationFile(
+        proctor, dstDirectoryField.getText());
   }
 
   private DirectoryChooser prepareDstDirectoryChooser() {

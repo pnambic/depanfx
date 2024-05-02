@@ -10,6 +10,7 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
 import com.pnambic.depanfx.perspective.DepanFxProctor;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.graphdoc.GraphDocumentData;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -41,10 +42,6 @@ public class DepanFxNewFileSystemDialog {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNewFileSystemDialog.class.getName());
-
-  private static final ExtensionFilter EXT_FILTER =
-      DepanFxSceneControls.buildExtFilter(
-          "Graph Info", GraphDocument.GRAPH_DOC_EXT);
 
   private final DepanFxWorkspace workspace;
 
@@ -156,8 +153,8 @@ public class DepanFxNewFileSystemDialog {
             () -> new File(
                 getWorkspaceDestination(),
                 buildTimestampName(baseName, GraphDocument.GRAPH_DOC_EXT)));
-    result.getExtensionFilters().add(EXT_FILTER);
-    result.setSelectedExtensionFilter(EXT_FILTER);
+    result.getExtensionFilters().add(GraphDocumentData.GRAPH_DOC_FILTER);
+    result.setSelectedExtensionFilter(GraphDocumentData.GRAPH_DOC_FILTER);
 
     return result;
   }

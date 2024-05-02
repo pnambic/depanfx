@@ -3,6 +3,7 @@ package com.pnambic.depanfx.git.gui;
 import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
@@ -25,35 +26,26 @@ import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Window;
 
 @Component
 @FxmlView("git-repo-tool-dialog.fxml")
 public class DepanFxGitRepoToolDialog
     extends DepanFxBaseToolDialog<DepanFxGitRepoData> {
 
-  public interface Aware {
-
-    /**
-     * A window to parent the dialog.  Normally obtained from TextField for
-     * the displayed value.
-     */
-    Window getChooserWindow();
-
-    /** Provide the git repo data from the aware component. */
-    DepanFxGitRepoData getTooldata();
-
-    /** Update the aware component with new git repo data. */
-    void setTooldata(DepanFxGitRepoData repoData);
-  } 
-
   @SuppressWarnings("unused")
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxGitRepoToolDialog.class.getName());
 
-  private static final ExtensionFilter GIT_REPO_TOOL_FILTER =
+  public static final ExtensionFilter GIT_REPO_TOOL_FILTER =
       DepanFxSceneControls.buildExtFilter(
           "Git Repo Tool", DepanFxGitRepoData.GIT_REPO_TOOL_EXT);
+
+  public static final DepanFxResourceFilter GIT_REPO_RSRC_FILTER =
+      DepanFxResourceFilter.buildResourceFilter(
+          "Git Repo Tool",
+          DepanFxGitRepoData.GIT_REPO_TOOL_EXT,
+          DepanFxGitRepoData.class);
+
 
   // For executables (on Windows)
   private static final String EXE_EXT = "exe";
@@ -156,7 +148,7 @@ public class DepanFxGitRepoToolDialog
   }
 
   private void updateToolDescription(String newValue) {
-    updateBlankField(repoNameField, DEFAULT_REPO_DESCRIPTION + newValue);
+    updateBlankToolDescription(DEFAULT_REPO_DESCRIPTION + newValue);
   }
 
   private FileChooser prepareGitExeChooser() {

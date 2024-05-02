@@ -31,7 +31,7 @@ public class DepanFxNewLogsAnalysisContribution
         dialogRunner.createDialogAndParent(DepanFxNewGitLogsDialog.class);
     DepanFxGitRepoData repoData =
         DepanFxGitRepoToolDialogs.buildInitialGitRepoData();
-    newLogsDialog.getController().setTooldata(repoData);
+    newLogsDialog.getController().setRepoData(repoData);
     newLogsDialog.runDialog("Create new theory from git logs");
   }
 }

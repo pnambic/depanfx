@@ -29,7 +29,7 @@ public class DepanFxNewRepoGraphContribution
     Dialog<DepanFxNewGitRepoDialog> newRepoDlg =
         dialogRunner.createDialogAndParent(DepanFxNewGitRepoDialog.class);
 
-    newRepoDlg.getController().setTooldata(
+    newRepoDlg.getController().setRepoData(
         DepanFxGitRepoToolDialogs.buildInitialGitRepoData());
     newRepoDlg.runDialog("Create new graph from git repository");
   }

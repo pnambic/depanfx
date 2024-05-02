@@ -3,15 +3,20 @@ package com.pnambic.depanfx.git.gui;
 import com.pnambic.depanfx.git.builder.GitCommandRunner;
 import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
-import java.io.File;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
+import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
-import javafx.stage.FileChooser;
 
 public class DepanFxGitRepoToolDialogs {
 
@@ -23,13 +28,20 @@ public class DepanFxGitRepoToolDialogs {
   // Context menu for creation or selection
 
   public static ContextMenu buildRepoChoiceMenu(
-      DepanFxGitRepoToolDialog.Aware srcDlg,
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+      DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner,
+      Scene scene,
+      Supplier<DepanFxGitRepoData> srcRepoData,
+      Consumer<DepanFxGitRepoData> dstRepoData) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem("New git Repo...",
-        e -> runCreateDialog(srcDlg, dialogRunner));
     builder.appendActionItem("Select git Repo...",
-        e -> runGitRepoFinder(srcDlg, workspace));
+        e -> runGitRepoChooser(workspace, dialogRunner, scene)
+            .map(r -> r.getResource())
+            .ifPresent(dstRepoData));
+    builder.appendActionItem("New git Repo...",
+        e -> runCreateDialog(workspace, dialogRunner, scene, srcRepoData.get())
+        .map(r -> r.getResource())
+        .ifPresent(dstRepoData));
     return builder.build();
   }
 
@@ -47,37 +59,37 @@ public class DepanFxGitRepoToolDialogs {
   }
 
   /**
-   * Obtain an existing git repo tooldata with file chooser.
+   * Obtain an existing git repo tooldata with a resource chooser.
    */
-  public static void runGitRepoFinder(
-      DepanFxGitRepoToolDialog.Aware srcDlg,
-      DepanFxWorkspace workspace) {
-    FileChooser fileChooser = prepareGitRepoFinder(workspace);
-    File selectedFile =
-        fileChooser.showOpenDialog(srcDlg.getChooserWindow());
-    if (selectedFile != null) {
-       workspace.toProjectDocument(selectedFile.getAbsoluteFile().toURI())
-          .flatMap(p -> workspace.getWorkspaceResource(
-              p, DepanFxGitRepoData.class))
-          .map(d -> d.getResource())
-          .ifPresent(d -> srcDlg.setTooldata(d));
-    }
+  public static Optional<DepanFxWorkspaceResource<DepanFxGitRepoData>>
+      runGitRepoChooser(
+            DepanFxWorkspace workspace,
+            DepanFxDialogRunner dialogRunner,
+            Scene scene) {
+    DepanFxResourceChooser chooser =
+        new DepanFxResourceChooser(workspace, dialogRunner);
+
+    DepanFxResourcePerspectives.prepareResourceFinder(
+        chooser, DepanFxGitRepoData.GIT_REPOS_TOOL_PATH);
+    chooser.getExtensionFilters().add(
+        DepanFxGitRepoToolDialog.GIT_REPO_RSRC_FILTER);
+    chooser.setSelectedExtensionFilter(
+        DepanFxGitRepoToolDialog.GIT_REPO_RSRC_FILTER);
+
+    return chooser.showOpenDialog(scene)
+        .map(DepanFxProjectDocument.class::cast)
+        .flatMap(p -> workspace.getWorkspaceResource(
+            p, DepanFxGitRepoData.class));
   }
 
-  private static void runCreateDialog(
-      DepanFxGitRepoToolDialog.Aware srcDlg, DepanFxDialogRunner dialogRunner) {
-    DepanFxGitRepoData repoData = srcDlg.getTooldata();
+  private static Optional<DepanFxWorkspaceResource<DepanFxGitRepoData>>
+      runCreateDialog(
+          DepanFxWorkspace workspace,
+          DepanFxDialogRunner dialogRunner,
+          Scene scene,
+          DepanFxGitRepoData repoData) {
     Dialog<DepanFxGitRepoToolDialog> repoDlg =
         DepanFxGitRepoToolDialog.runCreateDialog(repoData, dialogRunner);
-    repoDlg.getController().getWorkspaceResource()
-        .map(r -> r.getResource())
-        .ifPresent(d -> srcDlg.setTooldata(d));
-  }
-
-  private static FileChooser prepareGitRepoFinder(DepanFxWorkspace workspace) {
-    FileChooser result = DepanFxResourcePerspectives.prepareToolFinder(
-        workspace, DepanFxGitRepoData.GIT_REPOS_TOOL_PATH);
-    DepanFxGitRepoToolDialog.setGitRepoTooldataFilters(result);
-    return result;
+    return repoDlg.getController().getWorkspaceResource();
   }
 }

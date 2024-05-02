@@ -9,11 +9,9 @@ import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
-import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
-import com.pnambic.depanfx.perspective.DepanFxProctor;
-import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.DepanFxBaseDocumentDialog;
+import com.pnambic.depanfx.perspective.graphdoc.GraphDocumentData;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -30,18 +28,19 @@ import java.util.Optional;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
-import javafx.stage.Stage;
-import javafx.stage.Window;
+import javafx.stage.FileChooser;
 
+/**
+ * Builds a new graph document from the file system components
+ * of a git repository.
+ */
 @Component
 @FxmlView("new-git-repo-dialog.fxml")
 public class DepanFxNewGitRepoDialog
-    implements DepanFxGitRepoToolDialog.Aware {
+    extends DepanFxBaseDocumentDialog<GraphDocument> {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNewGitRepoDialog.class.getName());
-
-  private final DepanFxWorkspace workspace;
 
   private final DepanFxDialogRunner dialogRunner;
 
@@ -56,33 +55,14 @@ public class DepanFxNewGitRepoDialog
   @FXML
   private TextInputControl graphDescriptionField;
 
-  @FXML
-  private TextField destinationField;
-
   private Optional<DepanFxWorkspaceResource<GraphDocument>> graphDocRsrc =
       Optional.empty();
 
   @Autowired
   public DepanFxNewGitRepoDialog(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
-    this.workspace = workspace;
+    super(workspace, GraphDocument.class);
     this.dialogRunner = dialogRunner;
-  }
-
-  @Override // DepanFxGitRepoToolDialog.Aware
-  public DepanFxGitRepoData getTooldata() {
-    return repoData;
-  }
-
-  @Override // DepanFxGitRepoToolDialog.Aware
-  public void setTooldata(DepanFxGitRepoData repoData) {
-    this.repoData = repoData;
-    gitRepoNameField.setText(repoData.getToolName());
-  }
-
-  @Override // DepanFxGitRepoToolDialog.Aware
-  public Window getChooserWindow() {
-    return gitRepoNameField.getScene().getWindow();
   }
 
   public Optional<DepanFxWorkspaceResource<GraphDocument>> getGraphDocRsrc() {
@@ -93,49 +73,41 @@ public class DepanFxNewGitRepoDialog
   public void initialize() {
     gitRepoNameField.setContextMenu(
         DepanFxGitRepoToolDialogs.buildRepoChoiceMenu(
-            this, workspace, dialogRunner));
+            workspace, dialogRunner, gitRepoNameField.getScene(),
+            () -> { return repoData; }, this::setRepoData));
     gitRepoNameField.textProperty().addListener(
         (observable, oldValue, newValue) -> updateGraphMetaFromDir(newValue));
   }
 
-  @FXML
-  private void openDestinationChooser() {
-    DepanFxGraphDocDialogs.runSaveGraphDocFileChooser(
-        destinationField, guessBaseDestName(), workspace);
+  public void setRepoData(DepanFxGitRepoData repoData) {
+    this.repoData = repoData;
+    gitRepoNameField.setText(repoData.getToolName());
   }
 
-  @FXML
-  private void handleCancel() {
-    closeDialog();
-    LOG.info("cancelled request");
+  @Override
+  protected String getInputCheckFailureText() {
+    return "Git Repository Graph Confirmation Error";
   }
 
-  @FXML
-  private void handleConfirm() {
-    DepanFxProctor proctor = new DepanFxProctor.Simple();
-    DepanFxDialogChecks.checkDestinationFile(
-        proctor, destinationField.getText());
-    if (DepanFxResourcePerspectives.errorAlert(
-        proctor, "Git Repository Save Confirmation Error")) {
-      return;
-    }
-
-    closeDialog();
-
-    DepanFxProjectDocument projDoc =
-        DepanFxResourcePerspectives.toProjDoc(workspace, destinationField)
-        .get();
-
-    try {
-      GraphDocument graphDoc = buildGraphDoc();
-      graphDocRsrc = workspace.saveDocument(projDoc, graphDoc);
-    } catch (Exception errAny) {
-      LOG.error("Unable to save {}", projDoc, errAny);
-    }
+  @Override
+  protected String getDocumentName() {
+    return guessBaseDestName();
   }
 
-  private void closeDialog() {
-    ((Stage) destinationField.getScene().getWindow()).close();
+  @Override
+  protected GraphDocument prepareResult() {
+    return buildGraphDoc();
+  }
+
+  @Override
+  protected void setTooldataFilters(FileChooser result) {
+    result.getExtensionFilters().add(GraphDocumentData.GRAPH_DOC_FILTER);
+    result.setSelectedExtensionFilter(GraphDocumentData.GRAPH_DOC_FILTER);
+  }
+
+  @Override
+  protected File buildInitialDestinationFile() {
+    return buildGraphInitialDestination(GraphDocument.GRAPH_DOC_EXT);
   }
 
   private void updateGraphMetaFromDir(String newValue) {
