@@ -31,7 +31,7 @@ public class DepanFxSaveNodeListDialog
 
   private static final String EXT = DepanFxNodeList.NODE_LIST_EXT;
 
-  private static final ExtensionFilter EXT_FILTER =
+  public static final ExtensionFilter EXT_FILTER =
       DepanFxSceneControls.buildExtFilter("Node List", EXT);
 
   @FXML

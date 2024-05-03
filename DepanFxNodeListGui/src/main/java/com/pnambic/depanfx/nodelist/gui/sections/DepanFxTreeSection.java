@@ -3,9 +3,9 @@ package com.pnambic.depanfx.nodelist.gui.sections;
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListCellAdapter;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderDirection;
@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.scene.control.TreeItem;
 
@@ -47,7 +48,7 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
         }
       };
 
-  private final DepanFxNodeListViewer listViewer;
+  private final DepanFxNodeListCellAdapter cellAdapter;
 
   private DepanFxWorkspaceResource<DepanFxTreeSectionData> sectionDataRsrc;
 
@@ -63,9 +64,9 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
   static final String EDIT_TREE_SECTION_DATA = "Edit Tree Section Data...";
 
   public DepanFxTreeSection(
-      DepanFxNodeListViewer listViewer,
+      DepanFxNodeListCellAdapter cellAdapter,
       DepanFxWorkspaceResource<DepanFxTreeSectionData> sectionDataRsrc) {
-    this.listViewer = listViewer;
+    this.cellAdapter = cellAdapter;
     this.sectionDataRsrc = sectionDataRsrc;
 
     this.treeMemberCompare = updateCompare();
@@ -90,7 +91,7 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
   }
 
   public List<DepanFxNodeListColumn> getColumns() {
-    return listViewer.getColumns();
+    return cellAdapter.streamColumns().collect(Collectors.toList());
   }
 
   @Override
@@ -187,9 +188,9 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
     }
 
     // Use the context model from the viewer to find a good link matcher.
-    ContextModelId modelId = listViewer.getGraphDoc().getContextModelId();
+    ContextModelId modelId = cellAdapter.getGraphDoc().getContextModelId();
     return DepanFxProjects.getBuiltIn(
-            listViewer.getWorkspace(), DepanFxLinkMatcherDocument.class,
+            cellAdapter.getWorkspace(), DepanFxLinkMatcherDocument.class,
             c -> this.byMemberLinkMatcherDoc(c, modelId))
         .map(r -> r.getResource().getMatcher())
         .orElseGet(this::getEmptyLinkMatcher);
@@ -197,24 +198,15 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
 
   private DepanFxLinkMatcher getEmptyLinkMatcher() {
     LOG.warn("Unable to find link matcher for {} context model",
-        listViewer.getGraphDoc().getContextModelId().getContextModelKey());
+        cellAdapter.getGraphDoc().getContextModelId().getContextModelKey());
     return EMPTY_MATCHER;
   }
 
   private boolean byMemberLinkMatcherDoc(
-      DepanFxBuiltInContribution<?> contrib,
+      DepanFxBuiltInContribution<DepanFxLinkMatcherDocument> contrib,
       ContextModelId modelId) {
-    DepanFxLinkMatcherDocument linkMatchDoc =
-        (DepanFxLinkMatcherDocument) contrib.getDocument();
-    if (!linkMatchDoc.getMatchGroups()
-        .contains(DepanFxLinkMatcherGroup.MEMBER)) {
-      return false;
-    }
-    // [29-Nov-2023] Kludge for matches any, actual matcher provided later.
-    if (linkMatchDoc.getModelId() == null) {
-      return false;  // Keep searching for a better matcher.
-    }
-    return linkMatchDoc.getModelId().equals(modelId);
+    return DepanFxLinkMatcherGroup.isContextModelMemberMatcher(
+        modelId, contrib.getDocument());
   }
 
   /////////////////////////////////////

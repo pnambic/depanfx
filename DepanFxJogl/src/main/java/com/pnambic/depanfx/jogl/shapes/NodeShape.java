@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.jogl.shapes;
 
 import com.jogamp.opengl.GL2;
+import com.pnambic.depanfx.jogl.JoglColor;
 import com.pnambic.depanfx.jogl.JoglRenderer;
 import com.pnambic.depanfx.jogl.JoglShape;
 
@@ -10,11 +11,11 @@ public class NodeShape implements JoglShape {
 
   public static final float STEP_TOLERANCE = 10.0f;
 
-  public double red;
+  public JoglColor fillColor;
 
-  public double green;
+  public JoglColor borderColor;
 
-  public double blue;
+  public float borderWidth;
 
   public double shapeX;
 
@@ -38,28 +39,28 @@ public class NodeShape implements JoglShape {
   private TextureLoader labelTexture;
 
   private NodeShape(
-      double red, double green, double blue,
+      JoglColor fillColor, JoglColor borderColor, float borderWidth,
       double shapeX, double shapeY, double shapeZ,
       double targetX, double targetY, double targetZ,
       boolean showLabel, String labelText) {
+    this.fillColor = fillColor;
+    this.borderColor = borderColor;
+    this.borderWidth = borderWidth;
     this.shapeX = shapeX;
     this.shapeY = shapeY;
     this.shapeZ = shapeZ;
     this.targetX = targetX;
     this.targetY = targetY;
     this.targetZ = targetZ;
-    this.red = red;
-    this.green = green;
-    this.blue = blue;
     this.showLabel = showLabel;
     this.labelText = labelText;
   }
 
   public NodeShape(
-      double red, double green, double blue,
+      JoglColor fillColor, JoglColor borderColor, float borderWidth,
       double initialX, double initialY, double initialZ,
       boolean showLabel, String labelText) {
-    this(red, green, blue,
+    this(fillColor, borderColor, borderWidth,
         initialX, initialY, initialZ,
         initialX, initialY, initialZ,
         showLabel, labelText);
@@ -67,17 +68,20 @@ public class NodeShape implements JoglShape {
 
   @Override
   public NodeShape forUpdate() {
-    return new NodeShape(
-        red, green, blue,
+    NodeShape result = new NodeShape(
+        fillColor, borderColor, borderWidth,
         shapeX, shapeY, shapeZ,
         targetX, targetY, targetZ,
         showLabel, labelText);
+    result.labelTexture = labelTexture;
+    return result;
   }
 
   @Override
   public void draw(GL2 gl, JoglRenderer renderer) {
     gl.glTranslated(shapeX, shapeY, shapeZ);
     renderShape(gl);
+    renderBorder(gl);
 
     if (showLabel) {
       renderText(gl);
@@ -105,14 +109,26 @@ public class NodeShape implements JoglShape {
     shapeZ = targetZ;
   }
 
-  protected void renderShape(GL2 gl) {
-    gl.glBegin(GL2.GL_QUADS);
-    gl.glColor3d(red, green, blue);
+  private void renderShape(GL2 gl) {
+    gl.glBegin(GL2.GL_TRIANGLE_FAN);
+    gl.glColor3d(fillColor.red, fillColor.green, fillColor.blue);
+    renderVertices(gl);
+    gl.glEnd();
+  }
+
+  private void renderBorder(GL2 gl) {
+    gl.glBegin(GL2.GL_LINE_LOOP);
+    gl.glColor3d(borderColor.red, borderColor.green, borderColor.blue);
+    gl.glLineWidth(borderWidth);
+    renderVertices(gl);
+    gl.glEnd();
+  }
+
+  private void renderVertices(GL2 gl) {
     gl.glVertex3f(-1.0f, 1.0f, 0.0f);
     gl.glVertex3f( 1.0f, 1.0f, 0.0f);
     gl.glVertex3f( 1.0f,-1.0f, 0.0f);
     gl.glVertex3f(-1.0f,-1.0f, 0.0f);
-    gl.glEnd();
   }
 
   private void renderText(GL2 gl) {

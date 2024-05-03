@@ -5,6 +5,7 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.util.Collection;
+import java.util.stream.Stream;
 
 public class DepanFxNodeList {
 
@@ -44,5 +45,9 @@ public class DepanFxNodeList {
 
   public Collection<GraphNode> getNodes() {
     return nodes;
+  }
+
+  public Stream<GraphNode> streamNodes() {
+    return nodes.stream();
   }
 }

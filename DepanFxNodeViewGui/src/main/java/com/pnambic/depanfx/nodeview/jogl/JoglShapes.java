@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodeview.jogl;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.jogl.JoglColor;
 import com.pnambic.depanfx.jogl.JoglShape;
 import com.pnambic.depanfx.jogl.shapes.NodeShape;
 import com.pnambic.depanfx.nodeview.gui.DepanFxJoglView;
@@ -9,6 +10,8 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 
 import java.util.Optional;
+
+import javafx.scene.paint.Color;
 
 /**
  * Hold references to shape entities from the {@code Automatic-Module-Name}
@@ -36,13 +39,35 @@ public class JoglShapes {
     }
   }
 
+  public static void updateSelection(
+      DepanFxJoglView view, GraphNode node, boolean isSelected) {
+    JoglShape joglShape = view.getShape(node);
+    if (joglShape instanceof NodeShape nodeShape) {
+      updateNodeSelection(nodeShape, isSelected);
+      view.updateShape(node, nodeShape);
+    }
+  }
+
+  private static void updateNodeSelection(
+      NodeShape nodeShape, boolean isSelected) {
+    if (isSelected) {
+      nodeShape.borderColor = highlightColor(nodeShape.fillColor);
+      nodeShape.borderWidth = 5.0f;
+      return;
+    }
+    nodeShape.borderColor = nodeShape.fillColor;
+    nodeShape.borderWidth = 1.0f;
+  }
+
   private static Optional<JoglShape> createShape(
       GraphNode node, DepanFxNodeLocationData location, DepanFxNodeDisplayData display) {
 
-    DepanFxJoglColor color = display.color;
+    DepanFxJoglColor viewColor = display.color;
+    JoglColor joglColor = JoglColors.toJogl(viewColor);
+
     String nodeName = guessName(node);
     return Optional.of(new NodeShape(
-        color.getRed(), color.getGreen(), color.getBlue(),
+        joglColor, joglColor, 1.0f,
         location.xPos, location.yPos, location.zPos,
         true, nodeName));
   }
@@ -56,5 +81,12 @@ public class JoglShapes {
       return nameWords[lastSplit - 1];
     }
     return nameWords[lastSplit];
+  }
+
+  private static JoglColor highlightColor(JoglColor joglColor) {
+    DepanFxJoglColor viewColor =
+        new DepanFxJoglColor(joglColor.red, joglColor.green, joglColor.blue);
+    Color sysColor = JoglColors.of(viewColor).brighter().brighter();
+    return JoglColors.toJogl(JoglColors.of(sysColor));
   }
 }

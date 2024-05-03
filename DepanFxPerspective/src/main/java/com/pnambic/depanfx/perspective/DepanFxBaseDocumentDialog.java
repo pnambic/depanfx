@@ -90,7 +90,7 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
   protected File buildAnalysisInitialDestination(String targetExt) {
     return DepanFxWorkspaceFactory.bestDocumentFile(
         getDocumentName(), targetExt, workspace,
-        DepanFxProjects.getCurrentAnalyzesPath(workspace).orElse(null),
+        DepanFxProjects.getCurrentAnalysesPath(workspace).orElse(null),
         DepanFxProjects.getCurrentAnalyzes(workspace));
   }
 

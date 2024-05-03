@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodelist.link;
 
+import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 
 import java.util.Arrays;
@@ -30,4 +31,18 @@ public class DepanFxLinkMatcherGroup implements DepanFxLinkMatcher {
 
   public static final List<DepanFxLinkMatcher> MEMBER_MATCHER_GROUP =
       Arrays.asList(new DepanFxLinkMatcher[] { DepanFxLinkMatcherGroup.MEMBER });
+
+  public static boolean isContextModelMemberMatcher(
+      ContextModelId modelId, DepanFxLinkMatcherDocument linkMatchDoc) {
+    if (!linkMatchDoc.getMatchGroups()
+        .contains(DepanFxLinkMatcherGroup.MEMBER)) {
+      return false;
+    }
+    // [29-Nov-2023] Kludge for matches any, actual matcher provided later.
+    if (linkMatchDoc.getModelId() == null) {
+      return true;
+    }
+    return linkMatchDoc.getModelId().equals(modelId);
+
+  }
 }

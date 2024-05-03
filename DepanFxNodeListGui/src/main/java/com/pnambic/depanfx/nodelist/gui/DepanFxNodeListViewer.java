@@ -1,7 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.google.common.collect.ImmutableList;
-import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxCategoryColumn;
@@ -12,14 +11,10 @@ import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumnToolDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
-import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeSection;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
@@ -32,8 +27,6 @@ import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
-import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +38,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -66,7 +59,8 @@ import javafx.scene.control.TreeTableColumn.CellDataFeatures;
 import javafx.scene.control.TreeTableView;
 import javafx.util.Callback;
 
-public class DepanFxNodeListViewer {
+public class DepanFxNodeListViewer
+    implements DepanFxNodeListCellAdapter {
 
   private static final String SELECT_ALL_ITEM = "Select All";
 
@@ -145,32 +139,33 @@ public class DepanFxNodeListViewer {
     return result;
   }
 
+  @Override // DepanFxNodeListCellAdapter
   public DepanFxWorkspace getWorkspace() {
     return workspace;
   }
 
+  @Override // DepanFxNodeListCellAdapter
   public GraphDocument getGraphDoc() {
     return nodeList.getGraphDocResource().getResource();
   }
 
-  public ContextModelId getContextModelId() {
-    return getGraphDoc()
-        .getContextModelId();
-  }
-
+  @Override // DepanFxNodeListCellAdapter
   public <T> Dialog<T> buildDialog(Class<T> controllerType) {
     return dialogRunner.createDialogAndParent(controllerType);
   }
 
+  @Override // DepanFxNodeListCellAdapter
   public DepanFxDialogRunner getDialogRunner() {
     return dialogRunner;
   }
 
+  @Override // DepanFxNodeListCellAdapter
   public TreeItem<DepanFxNodeListMember> getTreeItem(int intValue) {
     TreeItem<DepanFxNodeListMember> item = nodeListTable.getTreeItem(intValue);
     return item;
   }
 
+  @Override // DepanFxNodeListCellAdapter
   public ObservableValue<Boolean> getCheckBoxObservable(
       DepanFxNodeListMember member) {
     if (member instanceof DepanFxNodeListSection) {
@@ -186,11 +181,11 @@ public class DepanFxNodeListViewer {
   }
 
   public void doSelectAllAction() {
-    doSelectGraphNodesAction(nodeList.getNodes(), true);
+    doSelectGraphNodesAction(nodeList.streamNodes(), true);
   }
 
   public void doClearSelectionAction() {
-    doSelectGraphNodesAction(nodeList.getNodes(), false);
+    doSelectGraphNodesAction(nodeList.streamNodes(), false);
   }
 
   public void doInvertSelectionAction() {
@@ -198,11 +193,12 @@ public class DepanFxNodeListViewer {
         .forEach(this::doInvertGraphNodeAction);
   }
 
-  public void doSelectGraphNodesAction(
-      Collection<GraphNode> nodes, boolean value) {
-    nodes.stream().forEach(n -> setSelectGraphNode(n, value));
+  @Override // DepanFxNodeListCellAdapter
+  public void doSelectGraphNodesAction(Stream<GraphNode> nodes, boolean value) {
+    nodes.forEach(n -> setSelectGraphNode(n, value));
   }
 
+  @Override // DepanFxNodeListCellAdapter
   public void doSelectGraphNodeAction(GraphNode node, boolean value) {
     setSelectGraphNode(node, value);
   }
@@ -222,11 +218,13 @@ public class DepanFxNodeListViewer {
     nodeListTable.refresh();
   }
 
+  @Override // DepanFxNodeListCellAdapter
   public void resetView() {
     TreeItem<DepanFxNodeListMember> treeRoot = createTreeRoot();
     nodeListTable.setRoot(treeRoot);
   }
 
+  @Override // DepanFxNodeListCellAdapter
   public void insertSection(
       DepanFxNodeListSection before, DepanFxNodeListSection insert) {
 
@@ -235,23 +233,9 @@ public class DepanFxNodeListViewer {
     insertSection(index, insert);
   }
 
-  public void prependMemberTree() {
-    getInitialTreeSectionResource().ifPresent(m -> {
-        DepanFxTreeSection insert = new DepanFxTreeSection(this, m);
-        insertSection(0, insert);
-    });
-  }
-
-  public void insertMemberTreeSection(DepanFxNodeListSection before) {
-    getInitialTreeSectionResource().ifPresent(m -> {
-        DepanFxTreeSection insert = new DepanFxTreeSection(this, m);
-        insertSection(before, insert);
-    });
-  }
-
-  public List<DepanFxNodeListColumn> getColumns() {
-    // Make a defensive copy.
-    return new ArrayList<>(columns);
+  @Override // DepanFxNodeListCellAdapter
+  public Stream<DepanFxNodeListColumn> streamColumns() {
+    return columns.stream();
   }
 
   /////////////////////////////////////
@@ -266,35 +250,6 @@ public class DepanFxNodeListViewer {
     saveDlg.runDialog("Save selection as node list");
   }
 
-  private Optional<DepanFxWorkspaceResource<DepanFxTreeSectionData>>
-      getInitialTreeSectionResource() {
-    ContextModelId modelId = getGraphDoc().getContextModelId();
-
-    return DepanFxProjects.getBuiltIn(
-        workspace, DepanFxTreeSectionData.class,
-        c -> byMemberLinkMatcherDoc(c, modelId));
-  }
-
-  private boolean byMemberLinkMatcherDoc(
-      DepanFxBuiltInContribution<?> contrib, Object modelId) {
-    DepanFxTreeSectionData doc = (DepanFxTreeSectionData) contrib.getDocument();
-    DepanFxLinkMatcherDocument linkMatchDoc =
-        doc.getLinkMatcherRsrc().getResource();
-    if (!linkMatchDoc.getMatchGroups()
-        .contains(DepanFxLinkMatcherGroup.MEMBER)) {
-      return false;
-    }
-    // [29-Nov-2023] Kludge for matches any, actual matcher provided later.
-    if (linkMatchDoc.getModelId() == null) {
-      return true;
-    }
-    return linkMatchDoc.getModelId().equals(modelId);
-  }
-
-  private List<DepanFxNodeListSection> isolateSections() {
-    return ImmutableList.copyOf(sections);
-  }
-
   private void insertSection(int index, DepanFxNodeListSection insert) {
 
     // Don't default to after the last slot, 'cuz that's the catch-all section
@@ -304,8 +259,8 @@ public class DepanFxNodeListViewer {
   }
 
   private TreeItem<DepanFxNodeListMember> createTreeRoot() {
-    DepanFxNodeListRoot rootMember =
-        new DepanFxNodeListRoot(workspace, nodeList, isolateSections());
+    DepanFxNodeListRoot rootMember = new DepanFxNodeListRoot(
+        workspace, nodeList, ImmutableList.copyOf(sections));
     return new DepanFxNodeListRootItem(rootMember);
   }
 

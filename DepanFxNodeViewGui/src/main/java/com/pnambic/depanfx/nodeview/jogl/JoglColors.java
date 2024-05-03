@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodeview.jogl;
 
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
+import com.pnambic.depanfx.jogl.JoglColor;
 import com.pnambic.depanfx.jogl.JoglTransforms;
 import javafx.scene.paint.Color;
 
@@ -13,6 +14,11 @@ public class JoglColors {
   public static DepanFxJoglColor of(Color color) {
     return new DepanFxJoglColor(
         color.getRed(), color.getGreen(), color.getBlue());
+  }
+
+  public static JoglColor toJogl(DepanFxJoglColor lineColor) {
+    return new JoglColor(
+        lineColor.getRed(), lineColor.getGreen(), lineColor.getBlue());
   }
 
   public static Color of(DepanFxJoglColor joglColor) {

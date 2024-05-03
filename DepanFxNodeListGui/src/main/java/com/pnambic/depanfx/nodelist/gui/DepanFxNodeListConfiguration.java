@@ -1,9 +1,13 @@
 package com.pnambic.depanfx.nodelist.gui;
 
+import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeSection;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData;
+import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
@@ -16,6 +20,8 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -162,16 +168,34 @@ public class DepanFxNodeListConfiguration {
       DepanFxSceneController scene, DepanFxDialogRunner dialogRunner,
       DepanFxWorkspace workspace,
       DepanFxNodeList nodeList, String tabTitle) {
+
     List<DepanFxNodeListSection> sections = new ArrayList<>();
-    DepanFxNodeListSectionData.getBuiltinSimpleSectionResource(workspace)
-        .ifPresent(r -> sections.add(new DepanFxFlatSection(r)));
+    Optional<DepanFxFlatSection> optFlatSection =
+        DepanFxNodeListSectionData.getBuiltinSimpleSectionResource(workspace)
+            .map(r -> new DepanFxFlatSection(r));
+    optFlatSection.ifPresent(sections::add);
 
     DepanFxNodeListViewer viewer =
         new DepanFxNodeListViewer(
             workspace, dialogRunner, nodeList, sections);
 
-    viewer.prependMemberTree();
+    ContextModelId contextModel =
+        nodeList.getGraphDocResource().getResource().getContextModelId();
+    DepanFxProjects.getBuiltIn(
+            workspace,  DepanFxTreeSectionData.class,
+            c -> byMemberLinkMatcherDoc(c, contextModel))
+      .map(t -> new DepanFxTreeSection(viewer, t))
+      .ifPresent(
+          s -> viewer.insertSection(optFlatSection.get(), s));
+
     Tab viewerTab = viewer.createWorkspaceTab(tabTitle);
     scene.addTab(viewerTab);
+  }
+
+  private static boolean byMemberLinkMatcherDoc(
+      DepanFxBuiltInContribution<DepanFxTreeSectionData> contrib,
+      ContextModelId modelId) {
+    return DepanFxLinkMatcherGroup.isContextModelMemberMatcher(
+        modelId, contrib.getDocument().getLinkMatcherRsrc().getResource());
   }
 }

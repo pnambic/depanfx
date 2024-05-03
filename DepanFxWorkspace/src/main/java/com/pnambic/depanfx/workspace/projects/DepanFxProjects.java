@@ -59,7 +59,7 @@ public class DepanFxProjects {
     return getCurrentPath(workspace, GRAPHS_CONTAINER);
   }
 
-  public static Optional<Path> getCurrentAnalyzesPath(
+  public static Optional<Path> getCurrentAnalysesPath(
       DepanFxWorkspace workspace) {
     return getCurrentPath(workspace, ANALYSES_CONTAINER);
   }

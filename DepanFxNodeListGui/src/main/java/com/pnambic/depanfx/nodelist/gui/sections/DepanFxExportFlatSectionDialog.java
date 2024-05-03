@@ -4,7 +4,7 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.export.AbstractCsvExporter;
 import com.pnambic.depanfx.nodelist.export.ExportColumn;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListCellAdapter;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 public class DepanFxExportFlatSectionDialog
     extends DepanFxBaseExportSectionDialog {
 
-  private DepanFxNodeListViewer listViwer;
+  private DepanFxNodeListCellAdapter cellAdapter;
 
   @Autowired
   public DepanFxExportFlatSectionDialog(DepanFxWorkspace workspace) {
@@ -32,17 +32,17 @@ public class DepanFxExportFlatSectionDialog
   }
 
   public static Dialog<DepanFxExportFlatSectionDialog> runExportDialog(
-      DepanFxFlatSection flatSection, DepanFxNodeListViewer listViwer) {
+      DepanFxFlatSection flatSection, DepanFxNodeListCellAdapter cellAdapter) {
     Dialog<DepanFxExportFlatSectionDialog> dlg =
-        listViwer.buildDialog(DepanFxExportFlatSectionDialog.class);
-    dlg.getController().setFlatSectionInfo(flatSection, listViwer);
+        cellAdapter.buildDialog(DepanFxExportFlatSectionDialog.class);
+    dlg.getController().setFlatSectionInfo(flatSection, cellAdapter);
     dlg.runDialog("Export Flat Section");
     return dlg;
   }
 
   public void setFlatSectionInfo(
-      DepanFxFlatSection flatSection, DepanFxNodeListViewer listViwer) {
-    this.listViwer = listViwer;
+      DepanFxFlatSection flatSection, DepanFxNodeListCellAdapter cellAdapter) {
+    this.cellAdapter = cellAdapter;
     super.setSectionDoc(flatSection);
   }
 
@@ -59,12 +59,12 @@ public class DepanFxExportFlatSectionDialog
 
   @Override
   protected Stream<DepanFxNodeListColumn> streamColumns() {
-    return listViwer.getColumns().stream();
+    return cellAdapter.streamColumns();
   }
 
   @Override
   protected GraphDocument getGraphDoc() {
-    return listViwer.getGraphDoc();
+    return cellAdapter.getGraphDoc();
   }
 
   /**
