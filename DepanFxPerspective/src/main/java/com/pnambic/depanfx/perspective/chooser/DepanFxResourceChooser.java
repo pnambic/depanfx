@@ -67,8 +67,8 @@ public class DepanFxResourceChooser {
     this.initialResourceName = initialResourceName;
   }
 
-  public void setInitialContainer(String initialResourceName) {
-    this.initialResourceName = initialResourceName;
+  public void setInitialContainer(DepanFxProjectContainer initialContainer) {
+    this.initialContainer = initialContainer;
   }
 
   public ObservableList<DepanFxResourceFilter> getExtensionFilters() {

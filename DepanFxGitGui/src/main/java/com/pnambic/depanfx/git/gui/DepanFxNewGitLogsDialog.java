@@ -85,8 +85,12 @@ public class DepanFxNewGitLogsDialog extends DepanFxBaseDialog {
 
   @FXML
   private void openGraphDocChooser() {
-    DepanFxGraphDocDialogs
-        .runOpenGraphDocFileChooser(graphDocumentField, workspace);
+    DepanFxGraphDocDialogs.runOpenGraphDocChooser(
+            workspace, dialogRunner,
+            graphDocumentField.getScene(),
+            graphDocumentField.getText())
+        .ifPresent(p -> graphDocumentField.setText(
+            p.getDocument().getMemberPath().toString()));
   }
 
   @FXML

@@ -1,33 +1,51 @@
 package com.pnambic.depanfx.git.gui;
 
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
+import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.util.Optional;
 
+import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 
 public class DepanFxGraphDocDialogs {
 
-  // For Graph documents
-  public static final String DGI_EXT = "dgi";
+  public static final DepanFxResourceFilter GRAPH_INFO_FILTER =
+      DepanFxResourceFilter.buildResourceFilter(
+          "Graph Info",
+          GraphDocument.GRAPH_DOC_EXT,
+          GraphDocument.class);
 
-  private static final ExtensionFilter DGI_FILTER =
-      new ExtensionFilter("Graph Info (*.dgi)", "*." + DGI_EXT);
+  /**
+   * The supplied {@code initialPath} should be convertible into a
+   * workspace member via {@code toProjectDocument()}.
+   */
+  public static Optional<DepanFxWorkspaceResource<GraphDocument>>
+      runOpenGraphDocChooser(
+          DepanFxWorkspace workspace,
+          DepanFxDialogRunner dialogRunner,
+          Scene scene,
+          String initialPath) {
 
-  public static void runOpenGraphDocFileChooser(
-      TextField graphDocumentField, DepanFxWorkspace workspace) {
-    FileChooser fileChooser =
-        prepareGraphDocFileChooser(graphDocumentField, workspace);
-    File selectedFile =
-        fileChooser.showOpenDialog(graphDocumentField.getScene().getWindow());
-    if (selectedFile != null) {
-      graphDocumentField.setText(selectedFile.getAbsolutePath());
-    }
+    DepanFxResourceChooser chooser = prepareChooser(
+        workspace, dialogRunner, initialPath);
+    return chooser.showOpenDialog(scene)
+        .map(DepanFxProjectDocument.class::cast)
+        .flatMap(p -> workspace.getWorkspaceResource(
+            p, GraphDocument.class));
   }
 
   public static void runSaveGraphDocFileChooser(
@@ -54,36 +72,45 @@ public class DepanFxGraphDocDialogs {
   private static File buildDestinationName(
       DepanFxWorkspace wksp, String baseName) {
     String graphFilename =
-        DepanFxWorkspaceFactory.buildDocumentTimestampName(baseName, DGI_EXT);
+        DepanFxWorkspaceFactory.buildDocumentTimestampName(
+            baseName, GraphDocument.GRAPH_DOC_EXT);
     return new File(DepanFxProjects.getCurrentGraphs(wksp), graphFilename);
   }
 
   /**
-   * Provides a {@link FileChooser} initialized for working with graph
-   * documents.  The supplied text field provides an initial directory and
-   * file name if not blank.  The extension filters are configuration for
+   * Provides a {@link DepanFxResourceChooser} initialized for working with
+   * graph documents.  The supplied text field provides an initial directory
+   * and file name if not blank.  The extension filters are configured for
    * graph documents.
-   *
-   * The result can be used for file open or save operations.
-   *
-   * Further customization of the {@link FileChooser} is expected.
-   * @param workspace 
    */
-  private static FileChooser prepareGraphDocFileChooser(
-      TextField graphDocumentField, DepanFxWorkspace workspace) {
-    FileChooser result =
-        DepanFxSceneControls.prepareFileChooser(graphDocumentField);
-    result.getExtensionFilters().add(DGI_FILTER);
-    result.setSelectedExtensionFilter(DGI_FILTER);
+  private static DepanFxResourceChooser prepareChooser(
+      DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner,
+      String initialPath) {
+    DepanFxResourceChooser result =
+        new DepanFxResourceChooser(workspace, dialogRunner);
+    DepanFxResourcePerspectives.prepareResourceFinder(
+        result, DepanFxProjects.TOOLS_PATH);
+    result.getExtensionFilters().add(GRAPH_INFO_FILTER);
+    result.setSelectedExtensionFilter(GRAPH_INFO_FILTER);
 
-    String graghDocName = graphDocumentField.getText();
-    if (!graghDocName.isBlank()) {
-      File location = new File(graghDocName);
-      result.setInitialDirectory(location.getParentFile());
+    Optional<DepanFxProjectDocument> optDoc =
+        workspace.toProjectDocument(Path.of(initialPath).toUri());
+    if (optDoc.isPresent()) {
+      DepanFxProjectDocument initDoc = optDoc.get();
+      result.setInitialResourceName(initDoc.getMemberName());
+      initDoc.getParent().ifPresent(result::setInitialContainer);
       return result;
     }
 
-    result.setInitialDirectory(DepanFxProjects.getCurrentGraphs(workspace));
+    Optional<DepanFxProjectContainer> optDir =
+        workspace.toProjectContainer(Path.of(initialPath).toUri());
+    if (optDir.isPresent()) {
+      optDir.ifPresent(result::setInitialContainer);
+      return result;
+    }
+    DepanFxProjects.getCurrentGraphsDir(workspace)
+        .ifPresent(result::setInitialContainer);
     return result;
   }
 }

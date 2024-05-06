@@ -109,8 +109,11 @@ public class DepanFxResourcePerspectives {
         "temp", workspace, targetPath,
         DepanFxProjects.getCurrentToolsPath(workspace).orElse(null));
 
-    chooser.setInitialResourceName(initPath.getFileName().toString());
-    chooser.setInitialContainer(initPath.getParent().toString());
+    workspace.toProjectDocument(initPath.toUri())
+        .ifPresent(d -> {
+          chooser.setInitialResourceName(d.getMemberName());
+          d.getParent().ifPresent(chooser::setInitialContainer);
+        });
   }
 
   public static FileChooser prepareToolFinder(

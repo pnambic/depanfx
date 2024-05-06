@@ -52,6 +52,32 @@ public class DepanFxProjects {
   }
 
   /////////////////////////////////////
+  // Resources by Container, prefered
+
+  public static Optional<DepanFxProjectContainer> getCurrentGraphsDir(
+      DepanFxWorkspace workspace) {
+    return getCurrentDir(workspace, GRAPHS_CONTAINER);
+  }
+
+  public static Optional<DepanFxProjectContainer> getCurrentAnalysesDir(
+      DepanFxWorkspace workspace) {
+    return getCurrentDir(workspace, ANALYSES_CONTAINER);
+  }
+
+  public static Optional<DepanFxProjectContainer> getCurrentToolsDir(
+      DepanFxWorkspace workspace) {
+    return getCurrentDir(workspace, TOOLS_CONTAINER);
+  }
+
+  public static Optional<DepanFxProjectContainer> getCurrentDir(
+      DepanFxWorkspace workspace, String rsrcContainer) {
+    Optional<Path> rsrcPath =
+        DepanFxProjects.getCurrentPath(workspace, rsrcContainer);
+    return workspace.getCurrentProject()
+        .flatMap(p -> p.asProjectContainer(rsrcPath.get()));
+  }
+
+  /////////////////////////////////////
   // Resources by Path, prefered
 
   public static Optional<Path> getCurrentGraphsPath(

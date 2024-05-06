@@ -150,7 +150,8 @@ public class DepanFxLinkMatcherChooser {
   public static Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
       runLinkMatcherFinder(
             DepanFxWorkspace workspace,
-            DepanFxDialogRunner dialogRunner, Scene scene) {
+            DepanFxDialogRunner dialogRunner,
+            Scene scene) {
 
     DepanFxResourceChooser chooser = prepareChooser(workspace, dialogRunner);
     return chooser.showOpenDialog(scene)
