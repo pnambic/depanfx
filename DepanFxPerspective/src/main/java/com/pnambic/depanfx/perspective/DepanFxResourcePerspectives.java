@@ -22,7 +22,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Cell;
 import javafx.scene.control.TextField;
-import javafx.stage.FileChooser;
 
 /**
  * Utilities for defining resource perspectives
@@ -114,19 +113,6 @@ public class DepanFxResourcePerspectives {
           chooser.setInitialResourceName(d.getMemberName());
           d.getParent().ifPresent(chooser::setInitialContainer);
         });
-  }
-
-  public static FileChooser prepareToolFinder(
-      DepanFxWorkspace workspace, Path targetPath) {
-
-    File initFile = DepanFxWorkspaceFactory.bestDocumentFile(
-        "temp", workspace, targetPath,
-        DepanFxProjects.getCurrentTools(workspace));
-
-    FileChooser result =
-        DepanFxSceneControls.prepareFileChooser(initFile);
-    result.setInitialFileName("");
-    return result;
   }
 
   public static Optional<DepanFxProjectDocument> toProjDoc(

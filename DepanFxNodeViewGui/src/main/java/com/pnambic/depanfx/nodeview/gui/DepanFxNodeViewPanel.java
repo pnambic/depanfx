@@ -254,8 +254,8 @@ public class DepanFxNodeViewPanel {
     return nodesCheckBoxStates.values().stream()
         .filter(b -> b.get())
         .findFirst()
-        .map(v -> streamChosenNodes())
-        .orElseGet(() -> streamSelectedNodes());
+        .map(v -> streamSelectedNodes())
+        .orElseGet(() -> streamViewNodes());
   }
 
   public Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
