@@ -88,10 +88,10 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn<DepanFxCategory
   @Override
   public ContextMenu buildColumnContextMenu(DepanFxDialogRunner dialogRunner) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem(EDIT_CATEGORY_COLUMN,
-        e -> openColumnEditor(dialogRunner));
     builder.appendActionItem(SELECT_CATEGORY_COLUMN,
         e -> openColumnChooser(dialogRunner));
+    builder.appendActionItem(EDIT_CATEGORY_COLUMN,
+        e -> openColumnEditor(dialogRunner));
 
     // These actions are hidden if the node list is unchanged.
     saveSeparator = builder.appendSeparator();

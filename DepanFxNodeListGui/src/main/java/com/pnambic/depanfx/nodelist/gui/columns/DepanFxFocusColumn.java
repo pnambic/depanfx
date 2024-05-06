@@ -6,21 +6,22 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeFork;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData.CategoryEntry;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData.CategoryEntry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +31,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
-import javafx.stage.FileChooser;
 import javafx.util.Callback;
 
 public class DepanFxFocusColumn
@@ -79,10 +79,10 @@ public class DepanFxFocusColumn
   @Override
   public ContextMenu buildColumnContextMenu(DepanFxDialogRunner dialogRunner) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem(SELECT_FOCUS_COLUMN,
+        e -> openColumnChooser(dialogRunner));
     builder.appendActionItem(EDIT_FOCUS_COLUMN,
         e -> openColumnEditor(dialogRunner));
-    builder.appendActionItem(SELECT_FOCUS_COLUMN,
-        e -> openColumnFinder());
 
     // These actions are hidden if the node list is unchanged.
     saveSeparator = builder.appendSeparator();
@@ -217,18 +217,15 @@ public class DepanFxFocusColumn
         columnData.getFocusLabel(), nodeListRsrc);
   }
 
-  private void openColumnFinder() {
+  private void openColumnChooser(DepanFxDialogRunner dialogRunner) {
     DepanFxWorkspace workspace = listViewer.getWorkspace();
-    FileChooser fileChooser = prepareFocusColumnFinder(workspace);
-    File selectedFile =
-        fileChooser.showOpenDialog(getScene().getWindow());
-    if (selectedFile != null) {
-       workspace
-          .toProjectDocument(selectedFile.getAbsoluteFile().toURI())
-          .flatMap(p -> workspace.getWorkspaceResource(
+    DepanFxResourceChooser columnChooser =
+        prepareChooser(workspace, dialogRunner);
+    columnChooser.showOpenDialog(getScene())
+        .map(DepanFxProjectDocument.class::cast)
+        .flatMap(p -> workspace.getWorkspaceResource(
               p, DepanFxFocusColumnData.class))
-          .ifPresent(this::updateColumnDataRsrc);
-    }
+        .ifPresent(this::updateColumnDataRsrc);
   }
 
   @Override
@@ -251,10 +248,17 @@ public class DepanFxFocusColumn
         Collections.singletonList(focusEntry));
   }
 
-  private FileChooser prepareFocusColumnFinder(DepanFxWorkspace workspace) {
-    FileChooser result = DepanFxResourcePerspectives.prepareToolFinder(
-        workspace, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
-    DepanFxFocusColumnToolDialog.setFocusColumnTooldataFilters(result);
+  private static DepanFxResourceChooser prepareChooser(
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+    DepanFxResourceChooser result =
+        new DepanFxResourceChooser(workspace, dialogRunner);
+    DepanFxResourcePerspectives.prepareResourceFinder(
+        result, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
+
+    result.getExtensionFilters().add(
+        DepanFxFocusColumnToolDialog.FOCUS_COLUMN_RSRC_FILTER);
+    result.setSelectedExtensionFilter(
+        DepanFxFocusColumnToolDialog.FOCUS_COLUMN_RSRC_FILTER);
     return result;
   }
 
