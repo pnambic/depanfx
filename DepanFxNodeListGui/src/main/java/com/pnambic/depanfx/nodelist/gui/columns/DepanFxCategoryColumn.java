@@ -6,12 +6,13 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeFork;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData.CategoryEntry;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -23,7 +24,6 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -33,7 +33,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
-import javafx.stage.FileChooser;
 import javafx.util.Callback;
 
 public class DepanFxCategoryColumn extends DepanFxAbstractColumn<DepanFxCategoryColumnData> {
@@ -92,7 +91,7 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn<DepanFxCategory
     builder.appendActionItem(EDIT_CATEGORY_COLUMN,
         e -> openColumnEditor(dialogRunner));
     builder.appendActionItem(SELECT_CATEGORY_COLUMN,
-        e -> openColumnFinder());
+        e -> openColumnChooser(dialogRunner));
 
     // These actions are hidden if the node list is unchanged.
     saveSeparator = builder.appendSeparator();
@@ -208,17 +207,15 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn<DepanFxCategory
         columnData.getColumnLabel(), widthMs, categories.getCategoryList());
   }
 
-  private void openColumnFinder() {
+  private void openColumnChooser(DepanFxDialogRunner dialogRunner) {
     DepanFxWorkspace workspace = listViewer.getWorkspace();
-    FileChooser fileChooser = prepareCategoryColumnFinder(workspace);
-    File selectedFile =
-        fileChooser.showOpenDialog(getScene().getWindow());
-    if (selectedFile != null) {
-       workspace.toProjectDocument(selectedFile.getAbsoluteFile().toURI())
-          .flatMap(p -> workspace.getWorkspaceResource(
+    DepanFxResourceChooser columnChooser =
+        prepareChooser(workspace, dialogRunner);
+    columnChooser.showOpenDialog(getScene())
+        .map(DepanFxProjectDocument.class::cast)
+        .flatMap(p -> workspace.getWorkspaceResource(
               p, DepanFxCategoryColumnData.class))
-          .ifPresent(this::updateColumnDataRsrc);
-    }
+        .ifPresent(this::updateColumnDataRsrc);
   }
 
   private void saveCategory(CategoryEntry entry) {
@@ -240,10 +237,17 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn<DepanFxCategory
     this.categories = new CategoryEditor(categories);
   }
 
-  private FileChooser prepareCategoryColumnFinder(DepanFxWorkspace workspace) {
-    FileChooser result = DepanFxResourcePerspectives.prepareToolFinder(
-        workspace, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
-    DepanFxCategoryColumnToolDialog.setCategoryColumnTooldataFilters(result);
+  private static DepanFxResourceChooser prepareChooser(
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+    DepanFxResourceChooser result =
+        new DepanFxResourceChooser(workspace, dialogRunner);
+    DepanFxResourcePerspectives.prepareResourceFinder(
+        result, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
+
+    result.getExtensionFilters().add(
+        DepanFxCategoryColumnToolDialog.CATEGORY_COLUMN__RSRC_FILTER);
+    result.setSelectedExtensionFilter(
+        DepanFxCategoryColumnToolDialog.CATEGORY_COLUMN__RSRC_FILTER);
     return result;
   }
 
