@@ -4,14 +4,17 @@ import com.pnambic.depanfx.graph.context.ContextNodeId;
 import com.pnambic.depanfx.graph.context.ContextNodeKindId;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData.KeyChoice;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -49,10 +52,10 @@ public class DepanFxNodeKeyColumn
   @Override
   public ContextMenu buildColumnContextMenu(DepanFxDialogRunner dialogRunner) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem(SELECT_NODE_KEY_COLUMN,
+        e -> openColumnChooser(dialogRunner));
     builder.appendActionItem(EDIT_NODE_KEY_COLUMN,
         e -> openColumnEditor(dialogRunner));
-    builder.appendActionItem(SELECT_NODE_KEY_COLUMN,
-        e -> openColumnFinder());
     return builder.build();
   }
 
@@ -111,23 +114,28 @@ public class DepanFxNodeKeyColumn
         columnData.getColumnLabel(), widthMs, columnData.getKeyChoice());
   }
 
-  private void openColumnFinder() {
+  private void openColumnChooser(DepanFxDialogRunner dialogRunner) {
     DepanFxWorkspace workspace = listViewer.getWorkspace();
-    FileChooser fileChooser = prepareNodeKeyColumnFinder(workspace);
-    File selectedFile =
-        fileChooser.showOpenDialog(getScene().getWindow());
-    if (selectedFile != null) {
-       workspace.toProjectDocument(selectedFile.getAbsoluteFile().toURI())
-          .flatMap(p -> workspace.getWorkspaceResource(
+    DepanFxResourceChooser columnChooser =
+        prepareChooser(workspace, dialogRunner);
+    columnChooser.showOpenDialog(getScene())
+        .map(DepanFxProjectDocument.class::cast)
+        .flatMap(p -> workspace.getWorkspaceResource(
               p, DepanFxNodeKeyColumnData.class))
-          .ifPresent(this::updateColumnDataRsrc);
-    }
+        .ifPresent(this::updateColumnDataRsrc);
   }
 
-  private FileChooser prepareNodeKeyColumnFinder(DepanFxWorkspace workspace) {
-    FileChooser result = DepanFxResourcePerspectives.prepareToolFinder(
-        workspace, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
-    DepanFxNodeKeyColumnToolDialog.setNodeKeyColumnTooldataFilters(result);
+  private static DepanFxResourceChooser prepareChooser(
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+    DepanFxResourceChooser result =
+        new DepanFxResourceChooser(workspace, dialogRunner);
+    DepanFxResourcePerspectives.prepareResourceFinder(
+        result, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
+
+    result.getExtensionFilters().add(
+        DepanFxNodeKeyColumnToolDialog.NODE_KEY_COLUMN_RSRC_FILTER);
+    result.setSelectedExtensionFilter(
+        DepanFxNodeKeyColumnToolDialog.NODE_KEY_COLUMN_RSRC_FILTER);
     return result;
   }
 }
