@@ -4,6 +4,7 @@ import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
@@ -30,6 +31,12 @@ public class DepanFxFlatSectionToolDialog
   private static final ExtensionFilter FLAT_SECTION_FILTER =
       DepanFxSceneControls.buildExtFilter(
           "Flat Sections", DepanFxFlatSectionData.FLAT_SECTION_TOOL_EXT);
+
+  public static final DepanFxResourceFilter FLAT_SECTION_RSRC_FILTER =
+      DepanFxResourceFilter.buildResourceFilter(
+          "Flat Sections",
+          DepanFxFlatSectionData.FLAT_SECTION_TOOL_EXT,
+          DepanFxFlatSectionData.class);
 
   @FXML
   private ComboBox<OrderBy> orderByField;

@@ -7,6 +7,7 @@ import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.Orde
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData.ContainerOrder;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
@@ -35,6 +36,12 @@ public class DepanFxTreeSectionToolDialog
   private static final ExtensionFilter TREE_SECTION_FILTER =
       DepanFxSceneControls.buildExtFilter(
           "Tree Sections", DepanFxTreeSectionData.TREE_SECTION_TOOL_EXT);
+
+  public static final DepanFxResourceFilter TREE_SECTION_RSRC_FILTER =
+      DepanFxResourceFilter.buildResourceFilter(
+          "Tree Sections",
+          DepanFxTreeSectionData.TREE_SECTION_TOOL_EXT,
+          DepanFxTreeSectionData.class);
 
   private final DepanFxDialogRunner dialogRunner;
 

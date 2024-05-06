@@ -5,7 +5,6 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
-import com.pnambic.depanfx.perspective.DepanFxProctor;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -45,6 +44,8 @@ public class DepanFxFocusColumnToolDialog
           DepanFxFocusColumnData.FOCUS_COLUMN_TOOL_EXT,
           DepanFxFocusColumnData.class);
 
+  private final DepanFxDialogRunner dialogRunner;
+
   @FXML
   private TextField focusLabelField;
 
@@ -52,8 +53,10 @@ public class DepanFxFocusColumnToolDialog
   private TextField focusNodeListRsrcField;
 
   @Autowired
-  public DepanFxFocusColumnToolDialog(DepanFxWorkspace workspace) {
+  public DepanFxFocusColumnToolDialog(
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
     super(workspace, DepanFxFocusColumnData.class);
+    this.dialogRunner = dialogRunner;
   }
 
   public static Dialog<DepanFxFocusColumnToolDialog> runEditDialog(
@@ -111,8 +114,8 @@ public class DepanFxFocusColumnToolDialog
   }
 
   private void runNodeListFinder() {
-    DepanFxNodeListChooser.runNodeListFinder(
-        getWorkspace(), focusNodeListRsrcField.getScene().getWindow())
+    DepanFxNodeListChooser.runNodeListChooser(
+        getWorkspace(), dialogRunner, focusNodeListRsrcField.getScene())
         .ifPresent(this::updateNodeListFields);
   }
 

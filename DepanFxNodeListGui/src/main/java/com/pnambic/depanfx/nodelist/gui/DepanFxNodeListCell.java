@@ -13,17 +13,18 @@ import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeSectionToolDialog;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -34,7 +35,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.cell.CheckBoxTreeTableCell;
-import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
@@ -112,10 +112,10 @@ public class DepanFxNodeListCell
 
   private ContextMenu nodeListSectionMenu(DepanFxFlatSection member) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem(EDIT_FLAT_SECTION,
-        e -> openFlatSectionEditor(member));
     builder.appendActionItem(SELECT_FLAT_SECTION,
         e -> openFlatSectionFinder(member));
+    builder.appendActionItem(EDIT_FLAT_SECTION,
+        e -> openFlatSectionEditor(member));
 
     builder.appendSeparator();
     builder.appendActionItem(
@@ -186,15 +186,12 @@ public class DepanFxNodeListCell
 
   private void openTreeSectionFinder(DepanFxTreeSection member) {
     DepanFxWorkspace workspace = cellAdapter.getWorkspace();
-    FileChooser fileChooser = prepareTreeSectionFinder(workspace);
-    File selectedFile =
-        fileChooser.showOpenDialog(getScene().getWindow());
-    if (selectedFile != null) {
-       workspace.toProjectDocument(selectedFile.getAbsoluteFile().toURI())
-          .flatMap(p -> workspace.getWorkspaceResource(
-              p, DepanFxTreeSectionData.class))
-          .ifPresent(d -> updateSectionDataRsrc(member, d));
-    }
+
+    prepareTreeSectionChooser(workspace).showOpenDialog(getScene())
+        .map(DepanFxProjectDocument.class::cast)
+        .flatMap(p -> workspace.getWorkspaceResource(
+            p, DepanFxTreeSectionData.class))
+        .ifPresent(d -> updateSectionDataRsrc(member, d));
   }
 
   private void openFlatSectionEditor(DepanFxFlatSection member) {
@@ -210,16 +207,12 @@ public class DepanFxNodeListCell
 
   private void openFlatSectionFinder(DepanFxFlatSection member) {
     DepanFxWorkspace workspace = cellAdapter.getWorkspace();
-    FileChooser fileChooser = prepareFlatSectionFinder(workspace);
-    File selectedFile =
-        fileChooser.showOpenDialog(getScene().getWindow());
-    if (selectedFile != null) {
-       workspace
-          .toProjectDocument(selectedFile.getAbsoluteFile().toURI())
-          .flatMap(p -> workspace.getWorkspaceResource(
-              p, DepanFxFlatSectionData.class))
-          .ifPresent(d -> updateSectionDataRsrc(member, d));
-    }
+
+    prepareFlatSectionChooser(workspace).showOpenDialog(getScene())
+        .map(DepanFxProjectDocument.class::cast)
+        .flatMap(p -> workspace.getWorkspaceResource(
+            p, DepanFxFlatSectionData.class))
+        .ifPresent(d -> updateSectionDataRsrc(member, d));
   }
 
   private void updateSectionDataRsrc(
@@ -268,17 +261,26 @@ public class DepanFxNodeListCell
     cellAdapter.doSelectGraphNodesAction(nodes.stream(), value);
   }
 
-  private FileChooser prepareFlatSectionFinder(DepanFxWorkspace workspace) {
-    FileChooser result = DepanFxResourcePerspectives.prepareToolFinder(
-        workspace, DepanFxNodeListSectionData.SECTIONS_TOOL_PATH);
-    DepanFxFlatSectionToolDialog.setFlatSectionTooldataFilters(result);
-    return result;
+  private DepanFxResourceChooser prepareFlatSectionChooser(
+      DepanFxWorkspace workspace) {
+    return prepareSectionChooser(
+        workspace, DepanFxFlatSectionToolDialog.FLAT_SECTION_RSRC_FILTER);
   }
 
-  private FileChooser prepareTreeSectionFinder(DepanFxWorkspace workspace) {
-    FileChooser result = DepanFxResourcePerspectives.prepareToolFinder(
-        workspace, DepanFxNodeListSectionData.SECTIONS_TOOL_PATH);
-    DepanFxTreeSectionToolDialog.setTreeSectionTooldataFilters(result);
+  private DepanFxResourceChooser prepareTreeSectionChooser(
+      DepanFxWorkspace workspace) {
+    return prepareSectionChooser(
+        workspace, DepanFxTreeSectionToolDialog.TREE_SECTION_RSRC_FILTER);
+  }
+
+  private DepanFxResourceChooser prepareSectionChooser(
+      DepanFxWorkspace workspace, DepanFxResourceFilter rsrcFilter) {
+    DepanFxResourceChooser result =
+        new DepanFxResourceChooser(workspace, cellAdapter.getDialogRunner());
+    DepanFxResourcePerspectives.prepareResourceFinder(
+        result, DepanFxNodeListSectionData.SECTIONS_TOOL_PATH);
+    result.getExtensionFilters().add(rsrcFilter);
+    result.setSelectedExtensionFilter(rsrcFilter);
     return result;
   }
 

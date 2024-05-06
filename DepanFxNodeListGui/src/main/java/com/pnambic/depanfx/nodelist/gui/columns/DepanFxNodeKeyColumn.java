@@ -4,7 +4,6 @@ import com.pnambic.depanfx.graph.context.ContextNodeId;
 import com.pnambic.depanfx.graph.context.ContextNodeKindId;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData.KeyChoice;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
@@ -18,10 +17,7 @@ import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
-import java.io.File;
-
 import javafx.scene.control.ContextMenu;
-import javafx.stage.FileChooser;
 
 public class DepanFxNodeKeyColumn
     extends DepanFxAbstractColumn<DepanFxNodeKeyColumnData> {

@@ -63,14 +63,18 @@ public class DepanFxCategoryColumnToolDialog
           DepanFxCategoryColumnData.CATEGORY_COLUMN_TOOL_EXT,
           DepanFxCategoryColumnData.class);
 
+  private final DepanFxDialogRunner dialogRunner;
+
   @FXML
   private TableView<EditCategory> categoriesTable;
 
   private ObservableList<EditCategory> categoryTableData;
 
   @Autowired
-  public DepanFxCategoryColumnToolDialog(DepanFxWorkspace workspace) {
+  public DepanFxCategoryColumnToolDialog(
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
     super(workspace, DepanFxCategoryColumnData.class);
+    this.dialogRunner = dialogRunner;
   }
 
   public static Dialog<DepanFxCategoryColumnToolDialog> runEditDialog(
@@ -171,8 +175,8 @@ public class DepanFxCategoryColumnToolDialog
 
   private void runNodeListFinder(TableCell<?, ?> cell) {
     EditCategory editData =  categoryTableData.get(cell.getIndex());
-    DepanFxNodeListChooser.runNodeListFinder(
-        getWorkspace(), categoriesTable.getScene().getWindow())
+    DepanFxNodeListChooser.runNodeListChooser(
+        getWorkspace(), dialogRunner, categoriesTable.getScene())
         .ifPresent(editData::setNodeListResource);
   }
 
