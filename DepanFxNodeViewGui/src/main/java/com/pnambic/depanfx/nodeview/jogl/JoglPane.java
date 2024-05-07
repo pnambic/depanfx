@@ -1,10 +1,12 @@
-package com.pnambic.depanfx.nodeview.gui;
+package com.pnambic.depanfx.nodeview.jogl;
 
 import com.pnambic.depanfx.jogl.JoglModule;
 import com.pnambic.depanfx.jogl.JoglShape;
 import com.pnambic.depanfx.jogl.JoglMouseActionListener;
 import com.pnambic.depanfx.jogl.shapes.SquareShape;
-import com.pnambic.depanfx.nodeview.jogl.JoglCameras;
+import com.pnambic.depanfx.nodeview.gui.CameraControl;
+import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewKeyActions;
+import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewStatusPanel;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 
@@ -23,10 +25,10 @@ import javafx.scene.control.ScrollBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 
-public class DepanFxJoglView extends BorderPane {
+public class JoglPane extends BorderPane {
 
   private static final Logger LOG =
-      LoggerFactory.getLogger(DepanFxJoglView.class);
+      LoggerFactory.getLogger(JoglPane.class);
 
   private final JoglModule jogl;
 
@@ -42,18 +44,17 @@ public class DepanFxJoglView extends BorderPane {
 
   private Pane viewport;
 
-  public DepanFxJoglView(
-      JoglModule jogl, DepanFxDialogRunner dialogRunner) {
+  public JoglPane(JoglModule jogl, DepanFxDialogRunner dialogRunner) {
     this.jogl = jogl;
     this.dialogRunner = dialogRunner;
     this.cameraControl = new CameraControl(jogl);
     DepanFxNodeViewKeyActions.addActions(jogl, cameraControl);
   }
 
-  public static DepanFxJoglView createJoglView(
+  public static JoglPane createJoglView(
       DepanFxNodeViewCameraData cameraInfo,
       DepanFxDialogRunner dialogRunner) {
-    return new DepanFxJoglView(
+    return new JoglPane(
         new JoglModule(JoglCameras.of(cameraInfo)),
         dialogRunner);
   }

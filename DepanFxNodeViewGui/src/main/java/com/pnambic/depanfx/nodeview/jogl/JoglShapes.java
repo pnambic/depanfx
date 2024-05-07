@@ -4,7 +4,6 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.jogl.JoglColor;
 import com.pnambic.depanfx.jogl.JoglShape;
 import com.pnambic.depanfx.jogl.shapes.NodeShape;
-import com.pnambic.depanfx.nodeview.gui.DepanFxJoglView;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
@@ -21,30 +20,30 @@ import javafx.scene.paint.Color;
 public class JoglShapes {
 
   public static void installShape(
-      DepanFxJoglView view, GraphNode node,
+      JoglPane joglPane, GraphNode node,
       DepanFxNodeLocationData location, DepanFxNodeDisplayData display) {
     createShape(node, location, display)
-        .ifPresent(s -> view.updateShape(node, s));
+        .ifPresent(s -> joglPane.updateShape(node, s));
   }
 
   public static void updateLocation(
-      DepanFxJoglView view, GraphNode node,
+      JoglPane joglPane, GraphNode node,
       DepanFxNodeLocationData location) {
-    JoglShape joglShape = view.getShape(node);
+    JoglShape joglShape = joglPane.getShape(node);
     if (joglShape instanceof NodeShape nodeShape) {
       nodeShape.targetX = location.xPos;
       nodeShape.targetY = location.yPos;
       nodeShape.targetZ = location.zPos;
-      view.updateShape(node, nodeShape);
+      joglPane.updateShape(node, nodeShape);
     }
   }
 
   public static void updateSelection(
-      DepanFxJoglView view, GraphNode node, boolean isSelected) {
-    JoglShape joglShape = view.getShape(node);
+      JoglPane joglPane, GraphNode node, boolean isSelected) {
+    JoglShape joglShape = joglPane.getShape(node);
     if (joglShape instanceof NodeShape nodeShape) {
       updateNodeSelection(nodeShape, isSelected);
-      view.updateShape(node, nodeShape);
+      joglPane.updateShape(node, nodeShape);
     }
   }
 

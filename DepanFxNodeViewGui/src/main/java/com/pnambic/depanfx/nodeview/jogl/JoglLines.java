@@ -5,7 +5,6 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.jogl.JoglColor;
 import com.pnambic.depanfx.jogl.shapes.LineShape;
 import com.pnambic.depanfx.nodelist.link.DepanFxLink;
-import com.pnambic.depanfx.nodeview.gui.DepanFxJoglView;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
@@ -27,7 +26,7 @@ public class JoglLines {
    * For edges matched to a link, use the link to define source and target.
    */
   public static void installLine(
-      DepanFxJoglView joglView, GraphEdge edge,
+      JoglPane joglView, GraphEdge edge,
       DepanFxLink link, LinkDisplayEntry display) {
     LineShape shape = buildLineShape(
         link.getSource(), link.getTarget(),
@@ -36,7 +35,7 @@ public class JoglLines {
   }
 
   public static void installEdge(
-      DepanFxJoglView joglView, GraphEdge edge,
+      JoglPane joglView, GraphEdge edge,
       String lineLabel, DepanFxLineDisplayData lineInfo) {
     LineShape shape = buildLineShape(
         edge.getHead(), edge.getTail(), lineLabel, lineInfo);
@@ -44,7 +43,7 @@ public class JoglLines {
   }
 
   public static void setEdgeVisible(
-      DepanFxJoglView joglView, GraphEdge edge, boolean isVisible) {
+      JoglPane joglView, GraphEdge edge, boolean isVisible) {
     LineShape shape = (LineShape) joglView.getShape(edge);
     shape.isVisible = isVisible;
     joglView.updateShape(edge, shape);

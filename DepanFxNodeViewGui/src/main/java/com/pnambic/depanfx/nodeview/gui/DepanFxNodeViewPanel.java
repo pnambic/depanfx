@@ -12,6 +12,7 @@ import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.nodeview.jogl.JoglPane;
 import com.pnambic.depanfx.nodeview.jogl.JoglShapes;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxLayoutsChooser;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
@@ -134,7 +135,7 @@ public class DepanFxNodeViewPanel {
   private Map<DepanFxNodeListSection, BooleanProperty>
       sectionsCheckBoxStates = new HashMap<>();
 
-  private DepanFxJoglView joglView;
+  private JoglPane joglPane;
 
   /////////////////////////////////////
   // Link display state
@@ -174,20 +175,20 @@ public class DepanFxNodeViewPanel {
   }
 
   public Tab createWorkspaceTab(String tabTitle) {
-    joglView = createJoglView();
-    populateJoglView();
+    joglPane = createJoglPane();
+    populateJoglPane();
 
-    Tab result = new Tab(tabTitle, joglView);
+    Tab result = new Tab(tabTitle, joglPane);
 
     result.setOnSelectionChanged(new EventHandler<Event>() {
 
       @Override
       public void handle(Event event) {
         if (result.isSelected()) {
-          joglView.activate();
+          joglPane.activate();
           showSideViews();
         } else {
-          joglView.release();
+          joglPane.release();
           hideSideViews();
         }
       }
@@ -197,7 +198,7 @@ public class DepanFxNodeViewPanel {
 
       @Override
       public void handle(Event event) {
-        joglView.close();
+        joglPane.close();
         closeSideViews();
       }
     });
@@ -376,7 +377,7 @@ public class DepanFxNodeViewPanel {
     // make the screenshot first, so that the overlapping file selection window
     // does not Interfere with the process of taking the screenshot
     // (apparently, otherwise, it does)
-    BufferedImage screenshot = joglView.takeScreenshot();
+    BufferedImage screenshot = joglPane.takeScreenshot();
 
     // TODO: A real dialog with options for size, format, etc.
     // Ask the user a filename where to save the screenshot.
@@ -389,7 +390,7 @@ public class DepanFxNodeViewPanel {
     dstDlg.getExtensionFilters().add(ALL_GRAPHICS_FILTER);
     dstDlg.setSelectedExtensionFilter(ALL_GRAPHICS_FILTER);
 
-    File dstFile = dstDlg.showSaveDialog(joglView.getScene().getWindow());
+    File dstFile = dstDlg.showSaveDialog(joglPane.getScene().getWindow());
     if (dstFile == null) {
       LOG.info("User cancelled save of image");
       return;
@@ -486,7 +487,7 @@ public class DepanFxNodeViewPanel {
   private void doSelectEdgeDisplayAction() {
     DepanFxLinkDisplayDataChooser
         .runLinkDisplayFinder(
-            workspace, dialogRunner, joglView.getScene())
+            workspace, dialogRunner, joglPane.getScene())
         .ifPresent(this::setLinkDisplayResource);
   }
 
@@ -609,7 +610,7 @@ public class DepanFxNodeViewPanel {
   private void doSelectLayoutAction() {
     DepanFxLayoutsChooser
         .runLayoutFinder(
-            workspace, dialogRunner, joglView.getScene(), layoutRegistry)
+            workspace, dialogRunner, joglPane.getScene(), layoutRegistry)
         .ifPresent(this::layoutNodes);
   }
 
@@ -662,25 +663,26 @@ public class DepanFxNodeViewPanel {
 
   private DepanFxNodeViewSceneData buildSceneData() {
     DepanFxNodeViewCameraData cameraInfo =
-        joglView.getCameraData();
+        joglPane.getCameraData();
     DepanFxNodeViewSceneData result = new DepanFxNodeViewSceneData(
         viewData.getSceneData().getBackgroundColor(), cameraInfo);
     return result;
   }
 
-  private DepanFxJoglView createJoglView() {
+  private JoglPane createJoglPane() {
     DepanFxNodeViewCameraData cameraInfo =
         viewData.getSceneData().getCameraInfo();
-    DepanFxJoglView result =
-        DepanFxJoglView.createJoglView(cameraInfo, dialogRunner);
+    JoglPane result =
+        JoglPane.createJoglView(cameraInfo, dialogRunner);
+    result.addMouseActionListener(new ViewMouseActionListener());
     return result;
   }
 
-  private void populateJoglView() {
+  private void populateJoglPane() {
 
     viewNodes.stream().forEach(this::installShape);
 
-    edgeDisplay = new EdgeDisplayController(joglView,
+    edgeDisplay = new EdgeDisplayController(joglPane,
         viewData.getLinkDisplayDocRsrc().getResource(),
         viewData.getEdgeDisplay(),
         viewData.getRemainerVisible(), viewData.getRemainderLabel(),
@@ -689,13 +691,12 @@ public class DepanFxNodeViewPanel {
     linkDisplayDirty = false;
 
     getViewEdges().forEach(edgeDisplay::installEdge);
-    joglView.addMouseActionListener(new ViewMouseActionListener());
   }
 
   private void updateNodeLocation(
       GraphNode node, DepanFxNodeLocationData location) {
     if (viewNodes.contains(node)) {
-      JoglShapes.updateLocation(joglView, node, location);
+      JoglShapes.updateLocation(joglPane, node, location);
       nodeLocations.put(node, location);
     }
   }
@@ -710,7 +711,7 @@ public class DepanFxNodeViewPanel {
     if (displayInfo == null) {
       return;
     }
-    JoglShapes.installShape(joglView, node, location, displayInfo);
+    JoglShapes.installShape(joglPane, node, location, displayInfo);
   }
 
   private Stream<GraphEdge> getViewEdges() {
@@ -759,7 +760,7 @@ public class DepanFxNodeViewPanel {
 
   private void updateSelectedNodeRendering(GraphNode node, boolean value) {
     if (viewNodes.contains(node)) {
-      JoglShapes.updateSelection(joglView, node, value);
+      JoglShapes.updateSelection(joglPane, node, value);
     }
   }
 
@@ -784,10 +785,10 @@ public class DepanFxNodeViewPanel {
 
     @Override
     public void mouseDolly(double deltaX, double deltaY, double deltaZ) {
-      DepanFxNodeViewCameraData cameraInfo = joglView.getCameraData();
+      DepanFxNodeViewCameraData cameraInfo = joglPane.getCameraData();
       double viewScale = cameraInfo.zoom * cameraInfo.cameraZ * 2;
       LOG.debug("view scale {}", viewScale);
-      joglView.dolly(viewScale * deltaX, viewScale * deltaY, deltaZ);
+      joglPane.dolly(viewScale * deltaX, viewScale * deltaY, deltaZ);
     }
 
     @Override
