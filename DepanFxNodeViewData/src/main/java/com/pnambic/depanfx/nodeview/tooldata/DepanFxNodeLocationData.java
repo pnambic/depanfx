@@ -15,4 +15,11 @@ public class DepanFxNodeLocationData implements GraphNodeInfo {
     this.yPos = yPos;
     this.zPos = zPos;
   }
+
+  public static DepanFxNodeLocationData shift(
+      DepanFxNodeLocationData base,
+      double shiftX, double shiftY, double shiftZ) {
+    return new DepanFxNodeLocationData(
+        base.xPos + shiftX, base.yPos + shiftY, base.zPos + shiftZ);
+  }
 }

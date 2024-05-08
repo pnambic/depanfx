@@ -2,10 +2,11 @@ package com.pnambic.depanfx.jogl.shapes;
 
 import com.jogamp.opengl.GL2;
 import com.pnambic.depanfx.jogl.JoglColor;
+import com.pnambic.depanfx.jogl.JoglPickable;
 import com.pnambic.depanfx.jogl.JoglRenderer;
 import com.pnambic.depanfx.jogl.JoglShape;
 
-public class NodeShape implements JoglShape {
+public class NodeShape implements JoglShape, JoglPickable {
 
   public static final float SPEED = 10.0f;
 
@@ -33,8 +34,10 @@ public class NodeShape implements JoglShape {
 
   public String labelText;
 
+  public Object pickObject;
+
   /////////////////////////////////////
-  // Cached rendering entites
+  // Cached rendering entities
 
   private TextureLoader labelTexture;
 
@@ -42,7 +45,7 @@ public class NodeShape implements JoglShape {
       JoglColor fillColor, JoglColor borderColor, float borderWidth,
       double shapeX, double shapeY, double shapeZ,
       double targetX, double targetY, double targetZ,
-      boolean showLabel, String labelText) {
+      boolean showLabel, String labelText, Object pickObject) {
     this.fillColor = fillColor;
     this.borderColor = borderColor;
     this.borderWidth = borderWidth;
@@ -54,16 +57,17 @@ public class NodeShape implements JoglShape {
     this.targetZ = targetZ;
     this.showLabel = showLabel;
     this.labelText = labelText;
+    this.pickObject = pickObject;
   }
 
   public NodeShape(
       JoglColor fillColor, JoglColor borderColor, float borderWidth,
       double initialX, double initialY, double initialZ,
-      boolean showLabel, String labelText) {
+      boolean showLabel, String labelText, Object pickObject) {
     this(fillColor, borderColor, borderWidth,
         initialX, initialY, initialZ,
         initialX, initialY, initialZ,
-        showLabel, labelText);
+        showLabel, labelText, pickObject);
   }
 
   @Override
@@ -72,7 +76,7 @@ public class NodeShape implements JoglShape {
         fillColor, borderColor, borderWidth,
         shapeX, shapeY, shapeZ,
         targetX, targetY, targetZ,
-        showLabel, labelText);
+        showLabel, labelText, pickObject);
     result.labelTexture = labelTexture;
     return result;
   }
@@ -95,6 +99,22 @@ public class NodeShape implements JoglShape {
       return;
     }
     stepAnimation();
+  }
+
+  @Override // Pickable
+  public void draw(GL2 gl, JoglRenderer renderer, int name) {
+    gl.glPushName(name);
+    gl.glTranslated(shapeX, shapeY, shapeZ);
+    renderShape(gl);
+    renderBorder(gl);
+
+    // Don't draw the label
+    gl.glPushName(name);
+  }
+
+  @Override // Pickable
+  public Object getObject() {
+    return pickObject;
   }
 
   public void stepAnimation() {

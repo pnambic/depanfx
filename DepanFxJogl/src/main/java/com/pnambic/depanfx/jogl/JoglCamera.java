@@ -127,11 +127,37 @@ public class JoglCamera {
   }
 
   public void prepareCamera(GL2 gl) {
-     GLU glu = GLU.createGLU(gl);
+    GLU glu = GLU.createGLU(gl);
     renderCamera.capture(updateCamera);
 
     gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
     gl.glLoadIdentity();
+    double fh = renderCamera.zoom;
+    double fw = fh * aspect;
+    gl.glFrustum(-fw, fw, -fh, fh, HOME_Z_NEAR, HOME_Z_FAR);
+
+    gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
+    gl.glLoadIdentity();
+    glu.gluLookAt(
+        renderCamera.cameraX, renderCamera.cameraY, renderCamera.cameraZ,
+        renderCamera.lookAtX, renderCamera.lookAtY, renderCamera.lookAtZ,
+        0.0f, 1.0f, 0.0f);
+  }
+
+  public void preparePicker(
+      GL2 gl, float mouseX, float mouseY,
+      float selectionWidth, float selectionHeight) {
+    GLU glu = GLU.createGLU(gl);
+
+    gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
+    gl.glLoadIdentity();
+
+    int[] viewPort = new int[4];
+    gl.glGetIntegerv(GL2.GL_VIEWPORT, viewPort, 0);
+    glu.gluPickMatrix(
+        mouseX, mouseY, selectionWidth, selectionHeight,
+        viewPort, 0);
+
     double fh = renderCamera.zoom;
     double fw = fh * aspect;
     gl.glFrustum(-fw, fw, -fh, fh, HOME_Z_NEAR, HOME_Z_FAR);

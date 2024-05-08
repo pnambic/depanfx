@@ -15,9 +15,9 @@
  */
 package com.pnambic.depanfx.jogl;
 
-import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.MouseListener;
+import com.jogamp.newt.opengl.GLWindow;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,24 +27,36 @@ import java.util.List;
 
 public class JoglMouseListener implements MouseListener {
 
+  // The mouse button setup for a Microsoft Sculpt Ergonomic Mouse.
+  // Many alternatives are effectively compatible.
+  public static final int PRIMARY_BUTTON = 1;
+
+  public static final int WHEEL_BUTTON = 2;
+
+  public static final int CONTEXT_BUTTON = 3;
+
   private static final Logger LOG =
       LoggerFactory.getLogger(JoglMouseListener.class);
 
+  private GLWindow glWindow;
+
   private final JoglRenderer renderer;
 
-  /** Modifier keys states. */
-  private final JoglKeyListener keyListener;
-
-  private boolean keyAltState = false;
-
-  private boolean keyCtrlState = false;
-
-  private boolean keyShiftState = false;
-
-  /** mouse position at last mouseDown event */
+  /**
+   * Mouse position at last mouseDown event.
+   * The basis for drag and selection rectangles.
+   */
   int anchorX = -1;
 
   int anchorY = -1;
+
+  /**
+   * Mouse position at last actionable mouse event.
+   * The basis for incremental move actions.
+   */
+  int priorX = -1;
+
+  int priorY = -1;
 
   private enum State {
     None, Moving, MovingObject, RectangleSelection
@@ -54,10 +66,12 @@ public class JoglMouseListener implements MouseListener {
 
   private JoglMouseActionListener actionListener;
 
-  public JoglMouseListener(JoglRenderer renderer, JoglKeyListener keyListener) {
+  public JoglMouseListener(JoglRenderer renderer) {
     this.renderer = renderer;
-    this.keyListener = keyListener;
-    prepareKeyListener();
+  }
+
+  public void setWindow(GLWindow glWindow) {
+    this.glWindow = glWindow;
   }
 
   public void addMouseActionListener(JoglMouseActionListener actionListener) {
@@ -67,7 +81,7 @@ public class JoglMouseListener implements MouseListener {
 
   @Override
   public void mouseClicked(MouseEvent event) {
-    LOG.debug("mouse clicked {} type {}",
+    LOG.info("mouse clicked {} type {}",
         event.getClass().getName(), event.getEventType());
   }
 
@@ -84,27 +98,34 @@ public class JoglMouseListener implements MouseListener {
   }
 
   @Override
-  public void mouseDragged(MouseEvent event) {
-    LOG.debug("mouse dragged event {} type {}",
-        event.getClass().getName(), event.getEventType());
+  public void mouseMoved(MouseEvent event) {
+    LOG.debug("mouse moved to x:{}, y:{}", event.getX(), event.getY());
+  }
 
-    int deltaX = anchorX - event.getX();
-    int deltaY = anchorY - event.getY();
+  @Override
+  public void mouseDragged(MouseEvent event) {
+    LOG.debug("mouse dragged to x:{}, y:{} state {}",
+        event.getX(), event.getY(), state);
+
+    int deltaX = priorX - event.getX();
+    int deltaY = priorY - event.getY();
     double scaleX = renderer.scaleMouseX(deltaX);
     double scaleY = renderer.scaleMouseY(deltaY);
 
-    if (event.getButton() == 1) { // button1 pressed
+    if (event.getButton() == PRIMARY_BUTTON) { // button1 pressed
       switch (state) {
       case Moving:
         actionListener.mouseDolly(scaleX, -scaleY, 0);
 
-        anchorX = event.getX();
-        anchorY = event.getY();
-        break;
+        priorX = event.getX();
+        priorY = event.getY();
+        return;
       case MovingObject:
-        actionListener.moveSelection(scaleX, scaleY, 0);
-        // scene.moveSelectedObjectsTo(deltaX, deltaY);
-        break;
+        actionListener.moveSelection(-scaleX, scaleY, 0);
+
+        priorX = event.getX();
+        priorY = event.getY();
+        return;
       case RectangleSelection:
         int viewportHeight = renderer.getViewportHeight();
 
@@ -113,58 +134,54 @@ public class JoglMouseListener implements MouseListener {
             renderer.scaleMouseY(viewportHeight - anchorY),
             renderer.scaleMouseX(event.getX()),
             renderer.scaleMouseY(viewportHeight - event.getY()));
-        break;
+        return;
       default:
       }
     }
-    if (event.getButton() == 2) {
+    if (event.getButton() == CONTEXT_BUTTON) {
       switch (state) {
       case Moving:
         actionListener.rotateCamera(-deltaY / 10f, 0.0f, deltaX / 10f);
-        break;
+        return;
       default:
         // Explicitly ignore other state
-        break;
+        return;
       }
     }
-  }
-
-  @Override
-  public void mouseMoved(MouseEvent event) {
-    LOG.debug("mouse moved to ({}, {})", event.getX(), event.getY());
   }
 
   @Override
   public void mousePressed(MouseEvent event) {
     LOG.info("mouse pressed button {}", event.getButton());
 
-    anchorX = event.getX();
-    anchorY = event.getY();
+    anchorX = priorX = event.getX();
+    anchorY = priorY = event.getY();
 
-    int[] hits = getHits();
+    List<Object> hits = getMouseHits(anchorX, anchorY);
+    boolean hasHits = hits.size() > 0;
 
     // The user clicked on an object without control or shift
     // Entry move mode, and make the picked node the select node if it
     // is not part of the current selection.
-    if (hits.length > 0 && !keyCtrlState && !keyShiftState) {
-      actionListener.setSelection(renderer.pickObjectsAt(anchorX, anchorY));
+    if (hasHits && !event.isControlDown() && !event.isShiftDown()) {
+      actionListener.reviseSelection(hits);
       state = State.MovingObject;
     }
 
     // Start a rectangle selection
-    else if (hits.length > 0 && keyCtrlState) {
+    else if (hasHits && event.isControlDown()) {
       state = State.RectangleSelection;
     }
 
     // Clicked with shift: start selection area
-    else if (keyShiftState) {
+    else if (event.isShiftDown()) {
       state = State.RectangleSelection;
 
     // Clicked on the background: start moving camera
     } else {
       state = State.Moving;
     }
-    LOG.info("mouse state is {})", state);
+    LOG.info("mouse state is {}", state);
   }
 
   @Override
@@ -174,41 +191,40 @@ public class JoglMouseListener implements MouseListener {
     int eventX = event.getX();
     int eventY = event.getY();
 
-    if (event.getButton() == 1) {
+    if (event.getButton() == PRIMARY_BUTTON) {
       renderer.releaseSelectionRectangle();
       if (anchorX == eventX && anchorY == eventY
           && state == State.MovingObject) {
         // instead of moving the node, the mouse stayed at the same place.
         // we replace the selection.
-        actionListener.setSelection(
-            renderer.pickObjectsAt(eventX, eventY));
+        List<Object> hits = getMouseHits(anchorX, anchorY);
+        actionListener.setSelection(hits);
       }
       else if (anchorX == eventX && anchorY == eventY
           && state == State.RectangleSelection) {
         // a rectangle when the mouse hasn't moved... select nothing
-        if (!keyCtrlState) {
-          actionListener.setSelection(Collections.emptyList());
+        if (event.isControlDown()) {
+          List<Object> hits = getMouseHits(anchorX, anchorY);
+          actionListener.extendSelection(hits);
         }
-        else if (keyAltState) {
-          actionListener.reduceSelection(
-              renderer.pickObjectsAt(eventX, eventY));
+        else if (event.isAltDown()) {
+          List<Object> hits = getMouseHits(anchorX, anchorY);
+          actionListener.reduceSelection(hits);
         }
         else {
-          actionListener.extendSelection(
-              renderer.pickObjectsAt(eventX, eventY));
+          actionListener.setSelection(Collections.emptyList());
         }
       }
       else if (state == State.RectangleSelection) {
-        List<Object> picked =
-            renderer.pickObjectsIn(anchorX, anchorY, eventX, eventY);
-        if (keyCtrlState) {
-          actionListener.extendSelection(picked);
+        List<Object> hits = getRectangleHits(anchorX, anchorY, eventX, eventY);
+        if (event.isControlDown()) {
+          actionListener.extendSelection(hits);
         }
-        else if (keyAltState) {
-          actionListener.reduceSelection(picked);
+        else if (event.isAltDown()) {
+          actionListener.reduceSelection(hits);
         }
         else
-          actionListener.setSelection(picked);
+          actionListener.setSelection(hits);
       }
     }
     state = State.None;
@@ -224,52 +240,43 @@ public class JoglMouseListener implements MouseListener {
   }
 
   /////////////////////////////////////
+  // Hit tests
 
-  private void prepareKeyListener() {
-    keyListener.addPressAction(new KeyPressAction());
-    keyListener.addReleaseAction(new KeyPressAction());
+  private List<Object> getMouseHits(float mouseX, float mouseY) {
+    int viewportHeight = renderer.getViewportHeight();
+    return renderer.getHits(
+        glWindow, mouseX, viewportHeight - mouseY,
+        1.0f, 1.0f);
   }
 
-  private int[] getHits() {
-    // LEGACY: scene.pickObjectsAt(mouseDownX, mouseDownY);
-    return new int[0];
-  }
+  private List<Object> getRectangleHits(
+      float anchorX, float anchorY, float eventX, float eventY) {
+    int viewportHeight = renderer.getViewportHeight();
+    float selectX = (float) renderer.scaleMouseX(anchorX);
+    float selectY = (float) renderer.scaleMouseY(viewportHeight - anchorY);
+    float width = (float) renderer.scaleMouseX(eventX) - selectX;
+    float height = (float) renderer.scaleMouseX(viewportHeight - eventY) - selectY;
 
-  private class KeyPressAction implements JoglKeyListener.KeyAction {
-
-    @Override
-    public boolean matches(KeyEvent event) {
-      switch (event.getKeyCode()) {
-      case KeyEvent.VK_ALT:
-      case KeyEvent.VK_CONTROL:
-      case KeyEvent.VK_SHIFT:
-        return true;
-      }
-      return false;
+    // Prevent negative width
+    if (anchorX < eventX) {
+      selectX = anchorX;
+      width = eventX - anchorX;
+    }
+    else {
+      selectX = eventX;
+      width = anchorX - eventX;
     }
 
-    @Override
-    public void apply(KeyEvent event) {
-      LOG.info("Applying event type {} for key code {}",
-          event.getEventType(), event.getKeyCode());
-      // Confirm the expected event
-      boolean pressEvent = event.getEventType() == 300;
-      boolean releaseType = event.getEventType() == 301;
-      if (!pressEvent && !releaseType) {
-        return;
-      }
-      boolean keyState = pressEvent;
-      switch (event.getKeyCode()) {
-      case KeyEvent.VK_ALT:
-        keyAltState = keyState;
-        return;
-      case KeyEvent.VK_CONTROL:
-        keyCtrlState = keyState;
-        return;
-      case KeyEvent.VK_SHIFT:
-        keyShiftState = keyState;
-        return;
-      }
+    // Prevent negative height
+    if (anchorY > eventY) {
+      selectY = viewportHeight - anchorY;
+      height = anchorY - eventY;
     }
+    else {
+      selectY = viewportHeight - eventY;
+      height = eventY - anchorY;
+    }
+
+    return renderer.getHits(glWindow, selectX, selectY, width, height);
   }
 }

@@ -50,9 +50,9 @@ public class JoglModule {
   public JoglModule(CameraData cameraData) {
     camera = new JoglCamera(cameraData);
     renderer = new JoglRenderer(camera);
-    drawListener = new JoglDrawListener(renderer);
     keyListener = new JoglKeyListener();
-    mouseListener = new JoglMouseListener(renderer, keyListener);
+    drawListener = new JoglDrawListener(renderer);
+    mouseListener = new JoglMouseListener(renderer);
   }
 
   /**
@@ -68,6 +68,7 @@ public class JoglModule {
     glWindow.addGLEventListener(drawListener);
     glWindow.addKeyListener(keyListener);
     glWindow.addMouseListener(mouseListener);
+    mouseListener.setWindow(glWindow);
 
     canvas = new NewtCanvasJFX(glWindow);
     return canvas;

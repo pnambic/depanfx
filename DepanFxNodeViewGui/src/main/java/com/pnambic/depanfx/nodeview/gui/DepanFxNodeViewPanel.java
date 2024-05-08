@@ -307,23 +307,55 @@ public class DepanFxNodeViewPanel {
   // Actions
 
   public void doSelectAllAction() {
-    doSelectGraphNodesAction(viewNodes.stream(), true);
+    doSelectGraphNodesAction(streamViewNodes(), true);
   }
 
   public void doClearSelectionAction() {
-    doSelectGraphNodesAction(viewNodes.stream(), false);
+    doSelectGraphNodesAction(streamViewNodes(), false);
   }
 
   public void doInvertSelectionAction() {
-    viewNodes.stream()
-        .forEach(this::doInvertGraphNodeAction);
+    streamViewNodes().forEach(this::doInvertGraphNodeAction);
   }
 
+  /**
+   * View nodes in the supplied object list are selected based on the supplied
+   * value, and other view nodes are not changed.
+   */
   public void doSelectGraphNodesAction(
       Stream<GraphNode> nodes, boolean value) {
     nodes.forEach(n -> setSelectGraphNode(n, value));
   }
 
+  /**
+   * View nodes in the supplied object list are selected,
+   * and other view nodes are not.
+   */
+  public void doSelectGraphNodesAction(Collection<Object> selection) {
+    streamViewNodes()
+        .forEach(n -> setSelectGraphNode(n, selection.contains(n)));
+  }
+
+  /**
+   * If selected nodes includes all elements of the selection, leave
+   * the selected node unchanged.  Otherwise, change the selected nodes
+   * to the supplied selection.
+   */
+  public void doReviseSelectionAction(Collection<Object> selection) {
+    Optional<GraphNode> unChosen = selection.stream()
+        .filter(n -> n instanceof GraphNode)
+        .map(GraphNode.class::cast)
+        .filter(n -> !isSelected(n))
+        .findAny();
+
+    if (unChosen.isPresent()) {
+      doSelectGraphNodesAction(selection);
+    }
+  }
+
+  /**
+   * Set the selection state of a single node.
+   */
   public void doSelectGraphNodeAction(GraphNode node, boolean value) {
     setSelectGraphNode(node, value);
   }
@@ -672,15 +704,14 @@ public class DepanFxNodeViewPanel {
   private JoglPane createJoglPane() {
     DepanFxNodeViewCameraData cameraInfo =
         viewData.getSceneData().getCameraInfo();
-    JoglPane result =
-        JoglPane.createJoglView(cameraInfo, dialogRunner);
+    JoglPane result = JoglPane.createJoglView(cameraInfo, dialogRunner);
     result.addMouseActionListener(new ViewMouseActionListener());
     return result;
   }
 
   private void populateJoglPane() {
 
-    viewNodes.stream().forEach(this::installShape);
+    streamViewNodes().forEach(this::installShape);
 
     edgeDisplay = new EdgeDisplayController(joglPane,
         viewData.getLinkDisplayDocRsrc().getResource(),
@@ -739,10 +770,15 @@ public class DepanFxNodeViewPanel {
     Path selectPath = DepanFxProjects.getCurrentAnalysesPath(workspace)
         .map(p -> p.resolve(selectName))
         .get();
-    workspace.getCurrentProject()
+     Stage nodeSelectDialog = workspace.getCurrentProject()
         .flatMap(p -> p.asProjectDocument(selectPath))
-        .ifPresent(d -> DepanFxNodeViewNodeSelectDialog.runEditDialog(
-            this, d, dialogRunner));
+        .map(d -> DepanFxNodeViewNodeSelectDialog.runEditDialog(
+            this, d, dialogRunner))
+        .get();
+
+     sideViews.add(nodeSelectDialog);
+     nodeSelectDialog.setOnCloseRequest(
+         e -> sideViews.remove(nodeSelectDialog));
   }
 
   private Map<GraphNode, BooleanProperty>
@@ -781,6 +817,10 @@ public class DepanFxNodeViewPanel {
     return result;
   }
 
+  private boolean isSelected(GraphNode node) {
+    return nodesCheckBoxStates.get(node).get();
+  }
+
   private class ViewMouseActionListener implements JoglMouseActionListener {
 
     @Override
@@ -793,6 +833,21 @@ public class DepanFxNodeViewPanel {
 
     @Override
     public void moveSelection(double deltaX, double deltaY, double deltaZ) {
+      long selectCount = streamChosenNodes().count();
+      LOG.info("Selection move {} nodes: x:{}, y:{}, z:{}",
+          selectCount, deltaX, deltaY, deltaZ);
+      DepanFxNodeViewCameraData cameraInfo = joglPane.getCameraData();
+      double viewScale = cameraInfo.zoom * cameraInfo.cameraZ * 2;
+      Map<GraphNode, DepanFxNodeLocationData> moveLocation = new HashMap<>();
+      streamChosenNodes()
+          .filter(nodeLocations::containsKey)
+          .forEach(n -> {
+            DepanFxNodeLocationData shiftLoc =
+                DepanFxNodeLocationData.shift(nodeLocations.get(n),
+                    deltaX * viewScale, deltaY * viewScale, deltaZ);
+            moveLocation.put(n, shiftLoc);
+          });
+      updateNodeLocations(moveLocation);
     }
 
     @Override
@@ -801,20 +856,22 @@ public class DepanFxNodeViewPanel {
 
     @Override
     public void setSelection(List<Object> selection) {
-      streamNodes(selection)
-          .forEach(n -> setSelectGraphNode(n, true));
+      doSelectGraphNodesAction(selection);
     }
 
     @Override
     public void reduceSelection(List<Object> reduction) {
-      streamNodes(reduction)
-          .forEach(n -> setSelectGraphNode(n, false));
+      doSelectGraphNodesAction(streamNodes(reduction), false);
     }
 
     @Override
     public void extendSelection(List<Object> extension) {
-      streamNodes(extension)
-          .forEach(n -> setSelectGraphNode(n, true));
+      doSelectGraphNodesAction(streamNodes(extension), true);
+    }
+
+    @Override
+    public void reviseSelection(List<Object> selection) {
+      doReviseSelectionAction(selection);
     }
 
     private Stream<GraphNode> streamNodes(List<?> source) {

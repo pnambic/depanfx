@@ -68,7 +68,7 @@ public class JoglShapes {
     return Optional.of(new NodeShape(
         joglColor, joglColor, 1.0f,
         location.xPos, location.yPos, location.zPos,
-        true, nodeName));
+        true, nodeName, node));
   }
 
   private static String guessName(GraphNode node) {
