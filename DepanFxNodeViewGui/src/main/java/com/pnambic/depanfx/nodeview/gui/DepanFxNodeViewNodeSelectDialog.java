@@ -60,8 +60,6 @@ public class DepanFxNodeViewNodeSelectDialog
   private static final ExtensionFilter NODE_LIST_FILTER =
       DepanFxSaveNodeListDialog.EXT_FILTER;
 
-  private final DepanFxDialogRunner dialogRunner;
-
   private List<DepanFxNodeListSection> sections = new ArrayList<>();
 
   @FXML
@@ -79,10 +77,8 @@ public class DepanFxNodeViewNodeSelectDialog
    */
   private DepanFxNodeViewPanel viewPanel;
 
-  public DepanFxNodeViewNodeSelectDialog(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+  public DepanFxNodeViewNodeSelectDialog(DepanFxWorkspace workspace) {
     super(workspace, DepanFxNodeList.class);
-    this.dialogRunner = dialogRunner;
   }
 
   /**

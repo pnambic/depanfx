@@ -79,15 +79,15 @@ public class DepanFxFocusColumn
   @Override
   public ContextMenu buildColumnContextMenu(DepanFxDialogRunner dialogRunner) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem(SELECT_FOCUS_COLUMN,
-        e -> openColumnChooser(dialogRunner));
-    builder.appendActionItem(EDIT_FOCUS_COLUMN,
-        e -> openColumnEditor(dialogRunner));
+    builder.appendActionItem(
+        SELECT_FOCUS_COLUMN, e -> openColumnChooser(dialogRunner));
+    builder.appendActionItem(
+        EDIT_FOCUS_COLUMN, e -> openColumnEditor(dialogRunner));
 
     // These actions are hidden if the node list is unchanged.
     saveSeparator = builder.appendSeparator();
     saveAction = builder.appendActionItem(
-        SAVE_NODE_LIST, e1 -> runSaveNodeList());
+        SAVE_NODE_LIST, e -> runSaveNodeList());
 
     // Ensure initial visibility is correct.
     updateActions();
@@ -180,16 +180,13 @@ public class DepanFxFocusColumn
     DepanFxNodeList saveList =
         DepanFxNodeLists.buildRelatedNodeList(nodeList, editNodes);
 
-    Dialog<DepanFxSaveNodeListDialog> saveDlg =
-        listViewer.buildDialog(DepanFxSaveNodeListDialog.class);
-    saveDlg.getController().setNodeListDoc(saveList);
-    saveDlg.getController().setDestination(nodeListRsrc.getDocument());
-    saveDlg.runDialog("Save changes to node list");
-    saveDlg.getController().getSavedResource()
+    DepanFxSaveNodeListDialog
+        .runUpdateNodeList(
+            listViewer.getDialogRunner(), nodeListRsrc.getDocument(), saveList)
         .ifPresent(r -> {
-            updateNodeListRsrc(r);
-            refreshColumn();
-        });
+          updateNodeListRsrc(r);
+          refreshColumn();
+      });
   }
 
   private static void openColumnCreate(DepanFxDialogRunner dialogRunner) {

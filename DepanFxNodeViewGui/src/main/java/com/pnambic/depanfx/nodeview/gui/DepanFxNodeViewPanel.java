@@ -7,6 +7,7 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.jogl.JoglMouseActionListener;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
+import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
@@ -472,6 +473,7 @@ public class DepanFxNodeViewPanel {
     builder.appendActionItem(TAKE_SCREENSHOT, e -> takeScreenshot());
 
     builder.appendSeparator();
+    builder.appendActionItem(DepanFxSaveNodeListDialog., null)
     builder.appendActionItem(
         SAVE_NODE_VIEW_ITEM, e -> runSaveNodeViewDialog());
 

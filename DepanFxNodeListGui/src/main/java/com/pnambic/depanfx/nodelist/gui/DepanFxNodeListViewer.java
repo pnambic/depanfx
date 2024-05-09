@@ -72,8 +72,6 @@ public class DepanFxNodeListViewer
 
   private static final String SELECT_COLUMN = "Select Column...";
 
-  private static final String SAVE_NODE_LIST_ITEM = "Save as node list...";
-
   private static final String COLUMN_TOOL_EXT = "d*cti";
 
   private static final List<Class<?>> COLUMN_TYPES =
@@ -242,12 +240,10 @@ public class DepanFxNodeListViewer
   // Internal
 
   private void runSaveNodeListDialog() {
-    Dialog<DepanFxSaveNodeListDialog> saveDlg =
-        dialogRunner.createDialogAndParent(DepanFxSaveNodeListDialog.class);
     DepanFxNodeList saveList =
         DepanFxNodeLists.buildRelatedNodeList(nodeList, getSelectedNodes());
-    saveDlg.getController().setNodeListDoc(saveList);
-    saveDlg.runDialog("Save selection as node list");
+
+    DepanFxSaveNodeListDialog.runSaveNodeList(dialogRunner, saveList);
   }
 
   private void insertSection(int index, DepanFxNodeListSection insert) {
@@ -293,7 +289,8 @@ public class DepanFxNodeListViewer
     builder.appendSubMenu(newColumnMenu());
     builder.appendSeparator();
     builder.appendActionItem(
-        SAVE_NODE_LIST_ITEM, e -> runSaveNodeListDialog());
+        DepanFxSaveNodeListDialog.SAVE_NODE_LIST,
+        e -> runSaveNodeListDialog());
     return builder.build();
   }
 

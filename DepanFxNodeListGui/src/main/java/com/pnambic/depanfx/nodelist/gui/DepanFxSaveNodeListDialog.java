@@ -3,11 +3,12 @@ package com.pnambic.depanfx.nodelist.gui;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.perspective.DepanFxBaseDocumentDialog;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -31,6 +32,9 @@ public class DepanFxSaveNodeListDialog
 
   private static final String EXT = DepanFxNodeList.NODE_LIST_EXT;
 
+  public static final String SAVE_NODE_LIST =
+      "Save Node List...";
+
   public static final ExtensionFilter EXT_FILTER =
       DepanFxSceneControls.buildExtFilter("Node List", EXT);
 
@@ -53,6 +57,32 @@ public class DepanFxSaveNodeListDialog
     super(workspace, DepanFxNodeList.class);
   }
 
+  public static Optional<DepanFxWorkspaceResource<DepanFxNodeList>>
+      runSaveNodeList(
+          DepanFxDialogRunner dialogRunner,
+          DepanFxNodeList nodeList) {
+
+    Dialog<DepanFxSaveNodeListDialog> saveDlg =
+        dialogRunner.createDialogAndParent(DepanFxSaveNodeListDialog.class);
+    saveDlg.getController().setNodeListDoc(nodeList);
+    saveDlg.runDialog("Save node list");
+    return saveDlg.getController().getSavedResource();
+  }
+
+  public static Optional<DepanFxWorkspaceResource<DepanFxNodeList>>
+      runUpdateNodeList(
+          DepanFxDialogRunner dialogRunner,
+          DepanFxProjectDocument listDoc,
+          DepanFxNodeList nodeList) {
+
+    Dialog<DepanFxSaveNodeListDialog> saveDlg =
+        dialogRunner.createDialogAndParent(DepanFxSaveNodeListDialog.class);
+    saveDlg.getController().setDestination(listDoc);
+    saveDlg.getController().setNodeListDoc(nodeList);
+    saveDlg.runDialog("Update node list");
+    return saveDlg.getController().getSavedResource();
+  }
+
   public void setNodeListDoc(DepanFxNodeList nodeList) {
     this.nodeList = nodeList;
     nodeListNameField.setText(nodeList.getNodeListName());
@@ -68,8 +98,9 @@ public class DepanFxSaveNodeListDialog
         graphSource, nodeCount);
   }
 
-  public Optional<DepanFxWorkspaceResource<DepanFxNodeList>> getSavedResource() {
-    return savedRsrc;
+  public Optional<DepanFxWorkspaceResource<DepanFxNodeList>>
+      getSavedResource() {
+        return savedRsrc;
   }
 
   /////////////////////////////////////
@@ -89,10 +120,7 @@ public class DepanFxSaveNodeListDialog
 
   @Override
   protected File buildInitialDestinationFile() {
-    String docName = DepanFxWorkspaceFactory.buildDocumentTimestampName(
-        getDocumentName(), EXT);
-    return new File(
-        DepanFxProjects.getCurrentAnalyzes(getWorkspace()), docName);
+    return buildAnalysisInitialDestination(EXT);
   }
 
   @Override
