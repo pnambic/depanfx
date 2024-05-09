@@ -332,7 +332,8 @@ public class DepanFxNodeViewPanel {
    * View nodes in the supplied object list are selected,
    * and other view nodes are not.
    */
-  public void doSelectGraphNodesAction(Collection<Object> selection) {
+  public void doSelectGraphNodesAction(
+      Collection<? extends Object> selection) {
     streamViewNodes()
         .forEach(n -> setSelectGraphNode(n, selection.contains(n)));
   }
@@ -473,7 +474,9 @@ public class DepanFxNodeViewPanel {
     builder.appendActionItem(TAKE_SCREENSHOT, e -> takeScreenshot());
 
     builder.appendSeparator();
-    builder.appendActionItem(DepanFxSaveNodeListDialog., null)
+    builder.appendActionItem(
+        DepanFxSaveNodeListDialog.SAVE_NODE_LIST,
+        e -> runSaveNodeListDialog());
     builder.appendActionItem(
         SAVE_NODE_VIEW_ITEM, e -> runSaveNodeViewDialog());
 
@@ -653,6 +656,13 @@ public class DepanFxNodeViewPanel {
         streamChosenNodes().collect(Collectors.toList());
     updateNodeLocations(
         layoutRegistry.layoutNodes(layoutRsrc, getGraphDocRsrc(), updateNodes));
+  }
+
+  private void runSaveNodeListDialog() {
+    DepanFxSaveNodeListDialog.runSaveNodeList(
+            dialogRunner, buildSelectedAsNodeList())
+        .map(r -> r.getResource().getNodes())
+        .ifPresent(this::doSelectGraphNodesAction);
   }
 
   private void runSaveNodeViewDialog() {
