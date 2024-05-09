@@ -1,27 +1,24 @@
 package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.graph.context.ContextModelId;
-import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData.ContainerOrder;
-import com.pnambic.depanfx.nodelist.link.DepanFxLink;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
+import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatchers;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModelBuilder;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
-import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.TreeItem;
@@ -38,15 +34,6 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxTreeSection.class);
-
-  private static final DepanFxLinkMatcher EMPTY_MATCHER =
-      new DepanFxLinkMatcher() {
-
-        @Override
-        public Optional<DepanFxLink> match(GraphEdge edge) {
-          return Optional.empty();
-        }
-      };
 
   private final DepanFxNodeListTableAdapter tableAdapter;
 
@@ -189,9 +176,8 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
 
     // Use the context model from the viewer to find a good link matcher.
     ContextModelId modelId = tableAdapter.getGraphDoc().getContextModelId();
-    return DepanFxProjects.getBuiltIn(
-            tableAdapter.getWorkspace(), DepanFxLinkMatcherDocument.class,
-            c -> this.byMemberLinkMatcherDoc(c, modelId))
+    return DepanFxLinkMatcherGroup
+        .getMemberMatcherRsrc(tableAdapter.getWorkspace(), modelId)
         .map(r -> r.getResource().getMatcher())
         .orElseGet(this::getEmptyLinkMatcher);
   }
@@ -199,14 +185,7 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
   private DepanFxLinkMatcher getEmptyLinkMatcher() {
     LOG.warn("Unable to find link matcher for {} context model",
         tableAdapter.getGraphDoc().getContextModelId().getContextModelKey());
-    return EMPTY_MATCHER;
-  }
-
-  private boolean byMemberLinkMatcherDoc(
-      DepanFxBuiltInContribution<DepanFxLinkMatcherDocument> contrib,
-      ContextModelId modelId) {
-    return DepanFxLinkMatcherGroup.isContextModelMemberMatcher(
-        modelId, contrib.getDocument());
+    return DepanFxLinkMatchers.EMPTY_MATCHER;
   }
 
   /////////////////////////////////////

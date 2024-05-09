@@ -13,6 +13,15 @@ public class DepanFxLinkMatchers {
     // Prevent instantiation.
   }
 
+  public static final DepanFxLinkMatcher EMPTY_MATCHER =
+      new DepanFxLinkMatcher() {
+
+        @Override
+        public Optional<DepanFxLink> match(GraphEdge edge) {
+          return Optional.empty();
+        }
+      };
+
   public static final DepanFxLinkMatcher ALL_EDGES_FORWARD =
 
       new DepanFxLinkMatcher() {

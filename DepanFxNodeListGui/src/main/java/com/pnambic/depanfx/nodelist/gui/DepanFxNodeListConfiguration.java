@@ -195,7 +195,7 @@ public class DepanFxNodeListConfiguration {
   private static boolean byMemberLinkMatcherDoc(
       DepanFxBuiltInContribution<DepanFxTreeSectionData> contrib,
       ContextModelId modelId) {
-    return DepanFxLinkMatcherGroup.isContextModelMemberMatcher(
-        modelId, contrib.getDocument().getLinkMatcherRsrc().getResource());
+    return DepanFxLinkMatcherGroup.isContextModelMatcherResource(
+        modelId, contrib.getDocument().getLinkMatcherRsrc());
   }
 }

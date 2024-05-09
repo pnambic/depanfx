@@ -263,9 +263,7 @@ public class DepanFxNodeViewPanel {
   public Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
       getHierachyMatcherRsrc() {
     ContextModelId modelId = getGraphDoc().getContextModelId();
-    return DepanFxProjects.getBuiltIn(
-        workspace, DepanFxLinkMatcherDocument.class,
-        c -> byMemberLinkMatcherDoc(c, modelId));
+    return DepanFxLinkMatcherGroup.getMemberMatcherRsrc(workspace, modelId);
   }
 
   public void revertLinkDisplay() {
@@ -483,13 +481,6 @@ public class DepanFxNodeViewPanel {
     ContextMenu result = builder.build();
     result.setOnShowing(e -> populateEdgeVisibilityMenu(edgeVizMenu));
     return result;
-  }
-
-  private boolean byMemberLinkMatcherDoc(
-      DepanFxBuiltInContribution<DepanFxLinkMatcherDocument> contrib,
-      ContextModelId modelId) {
-    return DepanFxLinkMatcherGroup.isContextModelMemberMatcher(
-        modelId, contrib.getDocument());
   }
 
   /////////////////////////////////////

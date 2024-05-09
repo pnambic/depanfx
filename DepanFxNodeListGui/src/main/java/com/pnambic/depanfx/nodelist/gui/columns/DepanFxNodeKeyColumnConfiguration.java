@@ -47,12 +47,16 @@ public class DepanFxNodeKeyColumnConfiguration {
 
   private static final String NODE_KEY_COLUMN_LABEL = "Node Key";
 
-  private static final int COLUMN_WIDTH = 15;
+  private static final int MODEL_KEY_COLUMN_WIDTH = 8;
+
+  private static final int KIND_KEY_COLUMN_WIDTH = 8;
+
+  private static final int NODE_KEY_COLUMN_WIDTH = 15;
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeKeyColumnData> modelKeyColumn() {
     DepanFxNodeKeyColumnData toolData = buildNodeKeyColumnData(
-        KeyChoice.MODEL_KEY, MODEL_KEY_COLUMN_LABEL);
+        KeyChoice.MODEL_KEY, MODEL_KEY_COLUMN_LABEL, MODEL_KEY_COLUMN_WIDTH);
     return new DepanFxBuiltInContribution.Simple<>(
         MODEL_KEY_COLUMN_TOOL_PATH, toolData);
   }
@@ -60,7 +64,7 @@ public class DepanFxNodeKeyColumnConfiguration {
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeKeyColumnData> kindKeyColumn() {
     DepanFxNodeKeyColumnData toolData = buildNodeKeyColumnData(
-        KeyChoice.KIND_KEY, KIND_KEY_COLUMN_LABEL);
+        KeyChoice.KIND_KEY, KIND_KEY_COLUMN_LABEL, KIND_KEY_COLUMN_WIDTH);
     return new DepanFxBuiltInContribution.Simple<>(
         KIND_KEY_COLUMN_TOOL_PATH, toolData);
   }
@@ -68,7 +72,7 @@ public class DepanFxNodeKeyColumnConfiguration {
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeKeyColumnData> nodeKeyColumn() {
     DepanFxNodeKeyColumnData toolData = buildNodeKeyColumnData(
-        KeyChoice.NODE_KEY, NODE_KEY_COLUMN_LABEL);
+        KeyChoice.NODE_KEY, NODE_KEY_COLUMN_LABEL, NODE_KEY_COLUMN_WIDTH);
     return new DepanFxBuiltInContribution.Simple<>(
         NODE_KEY_COLUMN_TOOL_PATH, toolData);
   }
@@ -84,11 +88,11 @@ public class DepanFxNodeKeyColumnConfiguration {
   }
 
   private DepanFxNodeKeyColumnData buildNodeKeyColumnData(
-      KeyChoice keyChoice, String keyLabel) {
+      KeyChoice keyChoice, String keyLabel, int columnWidth) {
     String columnName = fmtNodeKeyName(keyLabel);
     String columnDescr = fmtNodeKeyDescr(keyLabel);
     return new DepanFxNodeKeyColumnData(
-        columnName, columnDescr, keyLabel, COLUMN_WIDTH, keyChoice);
+        columnName, columnDescr, keyLabel, columnWidth, keyChoice);
   }
 
   private String fmtNodeKeyName(String keyLabel) {

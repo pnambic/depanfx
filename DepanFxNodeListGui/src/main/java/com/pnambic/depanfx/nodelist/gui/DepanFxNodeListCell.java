@@ -234,14 +234,14 @@ public class DepanFxNodeListCell
 
     return DepanFxProjects.getBuiltIn(
         tableAdapter.getWorkspace(), DepanFxTreeSectionData.class,
-        c -> byMemberLinkMatcherDoc(c, modelId));
+        c -> isContextModelMatcherResource(c, modelId));
   }
 
-  private boolean byMemberLinkMatcherDoc(
+  private boolean isContextModelMatcherResource(
       DepanFxBuiltInContribution<DepanFxTreeSectionData> contrib,
       ContextModelId modelId) {
-    return DepanFxLinkMatcherGroup.isContextModelMemberMatcher(
-        modelId, contrib.getDocument().getLinkMatcherRsrc().getResource());
+    return DepanFxLinkMatcherGroup.isContextModelMatcherResource(
+        modelId, contrib.getDocument().getLinkMatcherRsrc());
   }
 
   private void runSelectRecursiveAction(DepanFxTreeFork fork, boolean value) {
