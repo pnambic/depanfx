@@ -1,9 +1,9 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeFork;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData.CategoryEntry;
@@ -60,9 +60,9 @@ public class DepanFxFocusColumn
   private MenuItem saveAction;
 
   public DepanFxFocusColumn(
-      DepanFxNodeListViewer listViewer,
+      DepanFxNodeListTableAdapter tableAdapter,
       DepanFxWorkspaceResource<DepanFxFocusColumnData> columnDataRsrc) {
-    super(listViewer, columnDataRsrc);
+    super(tableAdapter, columnDataRsrc);
     updateNodeListRsrc(getColumnData().getNodeListRsrc());
   }
 
@@ -144,14 +144,14 @@ public class DepanFxFocusColumn
     forkItem.getDecendants()
         .forEach(n -> categories.setListMembership(
             n, categories.getCategoryList()));
-    listViewer.refreshView();
+    tableAdapter.refreshTableView();
   }
 
   public void clearDecendantsCategories(DepanFxTreeFork forkItem) {
     forkItem.getDecendants()
         .forEach(n -> categories.setListMembership(
               n, Collections.emptyList()));
-    listViewer.refreshView();
+    tableAdapter.refreshTableView();
   }
 
   public void hoistMemberships(DepanFxTreeFork forkItem) {
@@ -161,7 +161,7 @@ public class DepanFxFocusColumn
     CategoryWinch winch = new CategoryWinch(
         sourceNodes, categories.getCategoryList(), categories, treeModel);
     winch.hoistCategories();
-    listViewer.refreshView();
+    tableAdapter.refreshTableView();
   }
 
   private void updateActions() {
@@ -182,7 +182,7 @@ public class DepanFxFocusColumn
 
     DepanFxSaveNodeListDialog
         .runUpdateNodeList(
-            listViewer.getDialogRunner(), nodeListRsrc.getDocument(), saveList)
+            tableAdapter.getDialogRunner(), nodeListRsrc.getDocument(), saveList)
         .ifPresent(r -> {
           updateNodeListRsrc(r);
           refreshColumn();
@@ -215,7 +215,7 @@ public class DepanFxFocusColumn
   }
 
   private void openColumnChooser(DepanFxDialogRunner dialogRunner) {
-    DepanFxWorkspace workspace = listViewer.getWorkspace();
+    DepanFxWorkspace workspace = tableAdapter.getWorkspace();
     DepanFxResourceChooser columnChooser =
         prepareChooser(workspace, dialogRunner);
     columnChooser.showOpenDialog(getScene())

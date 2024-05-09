@@ -2,6 +2,7 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.graph.context.ContextNodeId;
 import com.pnambic.depanfx.graph.context.ContextNodeKindId;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
@@ -40,9 +41,9 @@ public class DepanFxNodeKeyColumn
   private static final int COLUMN_WIDTH_MS = 15;
 
   public DepanFxNodeKeyColumn(
-      DepanFxNodeListViewer listViewer,
+      DepanFxNodeListTableAdapter tableAdapter,
       DepanFxWorkspaceResource<DepanFxNodeKeyColumnData> columnDataRsrc) {
-    super(listViewer, columnDataRsrc);
+    super(tableAdapter, columnDataRsrc);
   }
 
   @Override
@@ -111,7 +112,7 @@ public class DepanFxNodeKeyColumn
   }
 
   private void openColumnChooser(DepanFxDialogRunner dialogRunner) {
-    DepanFxWorkspace workspace = listViewer.getWorkspace();
+    DepanFxWorkspace workspace = tableAdapter.getWorkspace();
     DepanFxResourceChooser columnChooser =
         prepareChooser(workspace, dialogRunner);
     columnChooser.showOpenDialog(getScene())

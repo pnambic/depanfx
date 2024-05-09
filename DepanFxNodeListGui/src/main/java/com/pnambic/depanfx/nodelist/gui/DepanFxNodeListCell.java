@@ -10,6 +10,7 @@ import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeFork;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeSectionToolDialog;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData;
@@ -63,10 +64,10 @@ public class DepanFxNodeListCell
   private static final String EXPAND_CHILDREN = "Expand Children";
 
   // Allow cells to act on viewer (e.g. change sections, etc.)
-  private final DepanFxNodeListCellAdapter cellAdapter;
+  private final DepanFxNodeListTableAdapter tableAdapter;
 
-  public DepanFxNodeListCell(DepanFxNodeListCellAdapter cellAdapter) {
-    this.cellAdapter = cellAdapter;
+  public DepanFxNodeListCell(DepanFxNodeListTableAdapter tableAdapter) {
+    this.tableAdapter = tableAdapter;
     setConverter(new NameConverter());
     setSelectedStateCallback(new SelectionState());
   }
@@ -167,25 +168,25 @@ public class DepanFxNodeListCell
   }
 
   private void runExportToCsvAction(DepanFxFlatSection flatSection) {
-    DepanFxExportFlatSectionDialog.runExportDialog(flatSection, cellAdapter);
+    DepanFxExportFlatSectionDialog.runExportDialog(flatSection, tableAdapter);
   }
 
   private void runExportToCsvAction(DepanFxTreeSection treeSection) {
     DepanFxExportTreeSectionDialog.runExportDialog(
-        treeSection, cellAdapter.getDialogRunner());
+        treeSection, tableAdapter.getDialogRunner());
   }
 
   private void openTreeSectionEditor(DepanFxTreeSection member) {
     Dialog<DepanFxTreeSectionToolDialog> treeSectionEditor =
         DepanFxTreeSectionToolDialog.runEditDialog(
             member.getProjDoc(), member.getSectionData(),
-            cellAdapter.getDialogRunner());
+            tableAdapter.getDialogRunner());
     treeSectionEditor.getController().getWorkspaceResource()
         .ifPresent(d -> updateSectionDataRsrc(member, d));
   }
 
   private void openTreeSectionFinder(DepanFxTreeSection member) {
-    DepanFxWorkspace workspace = cellAdapter.getWorkspace();
+    DepanFxWorkspace workspace = tableAdapter.getWorkspace();
 
     prepareTreeSectionChooser(workspace).showOpenDialog(getScene())
         .map(DepanFxProjectDocument.class::cast)
@@ -199,14 +200,14 @@ public class DepanFxNodeListCell
     Dialog<DepanFxFlatSectionToolDialog> flatSectionEditor =
         DepanFxFlatSectionToolDialog.runEditDialog(
             member.getSectionDataRsrc().getDocument(), sectionData,
-            cellAdapter.getDialogRunner());
+            tableAdapter.getDialogRunner());
 
     flatSectionEditor.getController().getWorkspaceResource()
         .ifPresent(d -> updateSectionDataRsrc(member, d));
   }
 
   private void openFlatSectionFinder(DepanFxFlatSection member) {
-    DepanFxWorkspace workspace = cellAdapter.getWorkspace();
+    DepanFxWorkspace workspace = tableAdapter.getWorkspace();
 
     prepareFlatSectionChooser(workspace).showOpenDialog(getScene())
         .map(DepanFxProjectDocument.class::cast)
@@ -216,31 +217,23 @@ public class DepanFxNodeListCell
   }
 
   private void updateSectionDataRsrc(
-      DepanFxFlatSection member,
-      DepanFxWorkspaceResource<DepanFxFlatSectionData> dataRsrc) {
-    member.setSectionDataRsrc(dataRsrc);
-    cellAdapter.resetView();
-  }
-
-  private void updateSectionDataRsrc(
-      DepanFxTreeSection member,
-      DepanFxWorkspaceResource<DepanFxTreeSectionData>  dataRsrc) {
-    member.setSectionDataRsrc(dataRsrc);
-    cellAdapter.resetView();
+      DepanFxNodeListSection member,
+      DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>  dataRsrc) {
+    tableAdapter.updateSection(member, dataRsrc);
   }
 
   private void runInsertMemberTreeSectionAction(DepanFxNodeListSection before) {
     DepanFxTreeSection treeSection = new DepanFxTreeSection(
-        cellAdapter, getInitialTreeSectionResource().get());
-    cellAdapter.insertSection(before, treeSection);
+        tableAdapter, getInitialTreeSectionResource().get());
+    tableAdapter.insertSection(before, treeSection);
   }
 
   private Optional<DepanFxWorkspaceResource<DepanFxTreeSectionData>>
       getInitialTreeSectionResource() {
-    ContextModelId modelId = cellAdapter.getGraphDoc().getContextModelId();
+    ContextModelId modelId = tableAdapter.getGraphDoc().getContextModelId();
 
     return DepanFxProjects.getBuiltIn(
-        cellAdapter.getWorkspace(), DepanFxTreeSectionData.class,
+        tableAdapter.getWorkspace(), DepanFxTreeSectionData.class,
         c -> byMemberLinkMatcherDoc(c, modelId));
   }
 
@@ -254,11 +247,11 @@ public class DepanFxNodeListCell
   private void runSelectRecursiveAction(DepanFxTreeFork fork, boolean value) {
     // Do the root
     GraphNode selectNode = fork.getGraphNode();
-    cellAdapter.doSelectGraphNodeAction(selectNode, value);
+    tableAdapter.doSelectGraphNodeAction(selectNode, value);
 
     // Then all the reachable nodes.
     Collection<GraphNode> nodes = fork.getDecendants();
-    cellAdapter.doSelectGraphNodesAction(nodes.stream(), value);
+    tableAdapter.doSelectGraphNodesAction(nodes.stream(), value);
   }
 
   private DepanFxResourceChooser prepareFlatSectionChooser(
@@ -276,7 +269,7 @@ public class DepanFxNodeListCell
   private DepanFxResourceChooser prepareSectionChooser(
       DepanFxWorkspace workspace, DepanFxResourceFilter rsrcFilter) {
     DepanFxResourceChooser result =
-        new DepanFxResourceChooser(workspace, cellAdapter.getDialogRunner());
+        new DepanFxResourceChooser(workspace, tableAdapter.getDialogRunner());
     DepanFxResourcePerspectives.prepareResourceFinder(
         result, DepanFxNodeListSectionData.SECTIONS_TOOL_PATH);
     result.getExtensionFilters().add(rsrcFilter);
@@ -323,8 +316,8 @@ public class DepanFxNodeListCell
     @Override
     public ObservableValue<Boolean> call(Integer param) {
       TreeItem<DepanFxNodeListMember> item =
-          cellAdapter.getTreeItem(param.intValue());
-      return cellAdapter.getCheckBoxObservable(item.getValue());
+          tableAdapter.getTreeItem(param.intValue());
+      return tableAdapter.getCheckBoxObservable(item.getValue());
     }
   }
 

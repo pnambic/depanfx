@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseColumnData;
@@ -22,15 +23,15 @@ import javafx.util.Callback;
 public abstract class DepanFxAbstractColumn<T extends DepanFxBaseColumnData>
     implements DepanFxNodeListColumn {
 
-  protected final DepanFxNodeListViewer listViewer;
+  protected final DepanFxNodeListTableAdapter tableAdapter;
 
   protected TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember> column;
 
   private DepanFxWorkspaceResource<T> columnDataRsrc;
 
-  public DepanFxAbstractColumn(DepanFxNodeListViewer listViewer,
+  public DepanFxAbstractColumn(DepanFxNodeListTableAdapter tableAdapter,
       DepanFxWorkspaceResource<T> columnDataRsrc) {
-    this.listViewer = listViewer;
+    this.tableAdapter = tableAdapter;
     this.columnDataRsrc = columnDataRsrc;
   }
 
@@ -39,7 +40,7 @@ public abstract class DepanFxAbstractColumn<T extends DepanFxBaseColumnData>
     TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember> result =
         new TreeTableColumn<>(getColumnLabel());
     result.setPrefWidth(getWidthPx());
-    result.setContextMenu(buildColumnContextMenu(listViewer.getDialogRunner()));
+    result.setContextMenu(buildColumnContextMenu(tableAdapter.getDialogRunner()));
 
     result.setCellFactory(buildCellFactory());
     result.setCellValueFactory(new ColumnValueFactory());
@@ -75,7 +76,7 @@ public abstract class DepanFxAbstractColumn<T extends DepanFxBaseColumnData>
   }
 
   protected void refreshColumn() {
-    listViewer.refreshView();
+    tableAdapter.refreshTableView();
     column.setText(getColumnLabel());
     column.setPrefWidth(getWidthPx());
   }
@@ -94,7 +95,7 @@ public abstract class DepanFxAbstractColumn<T extends DepanFxBaseColumnData>
   protected <R> Optional<DepanFxWorkspaceResource<R>> saveDocument(
       DepanFxProjectDocument projDoc, R item) throws IOException {
 
-      return listViewer.getWorkspace().saveDocument(projDoc, item);
+      return tableAdapter.getWorkspace().saveDocument(projDoc, item);
   }
 
   protected void updateColumnDataRsrc(

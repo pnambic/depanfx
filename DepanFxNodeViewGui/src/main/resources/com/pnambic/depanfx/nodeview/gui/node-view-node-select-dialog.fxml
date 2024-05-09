@@ -18,7 +18,11 @@
          AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"
          AnchorPane.topAnchor="10" AnchorPane.bottomAnchor="10">
 
-         <Label text="Nodes"/>
+         <HBox spacing="10">
+            <Label text="Nodes"/>
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="nodeTableCommands" text="Commands..."/>
+         </HBox>
 
          <TreeTableView fx:id="nodeSelectTable"
             editable="true"
@@ -31,36 +35,8 @@
             </columns>
          </TreeTableView>
 
-         <Label text="Saved Node List Name"/>
-
          <HBox spacing="10">
-            <TextField fx:id="toolNameField" editable="true"
-                  promptText="Display label selected nodes."
-                  HBox.hgrow="ALWAYS"/>
-         </HBox>
-
-         <Label text="Saved Node List Description"/>
-
-         <HBox spacing="10">
-            <TextField fx:id="toolDescriptionField" editable="true"
-                  promptText="Description for selected nodes."
-                  HBox.hgrow="ALWAYS"/>
-         </HBox>
-
-         <Label text="Select Destination File"/>
-
-         <HBox spacing="10">
-            <TextField fx:id="destinationField" editable="false"
-                  promptText="No file selected"
-                  HBox.hgrow="ALWAYS"/>
-            <Button text="Browse" onAction="#openDestinationChooser"/>
-         </HBox>
-
-         <HBox spacing="10">
-            <Button text="Cancel" onAction="#handleRevert"/>
-            <Region HBox.hgrow="ALWAYS" />
-            <Button text="Apply" onAction="#handleApply"/>
-            <Button text="Confirm" onAction="#handleConfirm"/>
+            <Button text="Close" onAction="#handleCancel"/>
          </HBox>
 
    </VBox>

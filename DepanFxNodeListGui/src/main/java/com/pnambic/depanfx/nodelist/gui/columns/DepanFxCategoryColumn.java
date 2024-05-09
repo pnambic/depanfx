@@ -1,9 +1,9 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeFork;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData.CategoryEntry;
@@ -59,9 +59,9 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn<DepanFxCategory
   private MenuItem saveAction;
 
   public DepanFxCategoryColumn(
-      DepanFxNodeListViewer listViewer,
+      DepanFxNodeListTableAdapter tableAdapter,
       DepanFxWorkspaceResource<DepanFxCategoryColumnData> columnDataRsrc) {
-    super(listViewer, columnDataRsrc);
+    super(tableAdapter, columnDataRsrc);
     updateCategories(getColumnData().getCategories());
   }
 
@@ -143,14 +143,14 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn<DepanFxCategory
       DepanFxTreeFork forkItem, Collection<CategoryEntry> updateCategories) {
     forkItem.getDecendants()
         .forEach(n -> categories.setListMembership(n, updateCategories));
-    listViewer.refreshView();
+    tableAdapter.refreshTableView();
   }
 
   public void addDecendantsCategories(
       DepanFxTreeFork forkItem, Collection<CategoryEntry> updateCategories) {
     forkItem.getDecendants().stream()
           .forEach(n -> categories.adddListMembership(n, updateCategories));
-      listViewer.refreshView();
+      tableAdapter.refreshTableView();
   }
 
   public void hoistMemberships(
@@ -161,7 +161,7 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn<DepanFxCategory
     CategoryWinch winch = new CategoryWinch(
         sourceNodes, categories.getCategoryList(), categories, treeModel);
     winch.hoistCategories();
-    listViewer.refreshView();
+    tableAdapter.refreshTableView();
   }
 
   private void onColumnMenuShowing() {
@@ -208,7 +208,7 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn<DepanFxCategory
   }
 
   private void openColumnChooser(DepanFxDialogRunner dialogRunner) {
-    DepanFxWorkspace workspace = listViewer.getWorkspace();
+    DepanFxWorkspace workspace = tableAdapter.getWorkspace();
     DepanFxResourceChooser columnChooser =
         prepareChooser(workspace, dialogRunner);
     columnChooser.showOpenDialog(getScene())

@@ -34,7 +34,6 @@ public class DepanFxWorkspaceFactory {
 
   public static final char EXTENSION_DOT = '.';
 
-
   public static DepanFxProjectTree createDepanFxProjectTree(
       DepanFxProjectSpi projSpi) {
     return new BasicDepanFxProjectTree(projSpi);

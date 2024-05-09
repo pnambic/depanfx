@@ -1,32 +1,15 @@
 package com.pnambic.depanfx.perspective;
 
-import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
-import javafx.fxml.FXML;
-import javafx.scene.Scene;
-import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-
 /**
- * Base definitions for close, handleCancel, handleConfirm.
+ * Base definitions for error reporting with a proctor.
  */
-public abstract class DepanFxBaseDialog {
-
-  protected final DepanFxWorkspace workspace;
+public abstract class DepanFxBaseDialog extends DepanFxWorkspaceDialog {
 
   public DepanFxBaseDialog(DepanFxWorkspace workspace) {
-    this.workspace = workspace;
+    super(workspace);
   }
-
-  public DepanFxWorkspace getWorkspace() {
-    return workspace;
-  }
-
-  /**
-   * Any field on the form should do.
-   */
-  public abstract Scene getScene();
 
   /**
    * The main label to show if the input contains an error.
@@ -38,19 +21,6 @@ public abstract class DepanFxBaseDialog {
    * the supplied test (@link #proctor).
    */
   protected abstract void checkInput(DepanFxProctor proctor);
-
-  protected void closeDialog() {
-    ((Stage) getScene().getWindow()).close();
-  }
-
-  protected void updateBlankField(TextField updateField, String newValue) {
-    DepanFxSceneControls.updateBlankField(updateField, newValue);
-  }
-
-  @FXML
-  protected void handleCancel() {
-    closeDialog();
-  }
 
   /**
    * If the input fails validation ({@link #checkInput(DepanFxProctor)}),

@@ -4,7 +4,7 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.export.AbstractCsvExporter;
 import com.pnambic.depanfx.nodelist.export.ExportColumn;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListCellAdapter;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 public class DepanFxExportFlatSectionDialog
     extends DepanFxBaseExportSectionDialog {
 
-  private DepanFxNodeListCellAdapter cellAdapter;
+  private DepanFxNodeListTableAdapter tableAdapter;
 
   @Autowired
   public DepanFxExportFlatSectionDialog(DepanFxWorkspace workspace) {
@@ -32,17 +32,17 @@ public class DepanFxExportFlatSectionDialog
   }
 
   public static Dialog<DepanFxExportFlatSectionDialog> runExportDialog(
-      DepanFxFlatSection flatSection, DepanFxNodeListCellAdapter cellAdapter) {
+      DepanFxFlatSection flatSection, DepanFxNodeListTableAdapter tableAdapter) {
     Dialog<DepanFxExportFlatSectionDialog> dlg =
-        cellAdapter.buildDialog(DepanFxExportFlatSectionDialog.class);
-    dlg.getController().setFlatSectionInfo(flatSection, cellAdapter);
+        tableAdapter.buildDialog(DepanFxExportFlatSectionDialog.class);
+    dlg.getController().setFlatSectionInfo(flatSection, tableAdapter);
     dlg.runDialog("Export Flat Section");
     return dlg;
   }
 
   public void setFlatSectionInfo(
-      DepanFxFlatSection flatSection, DepanFxNodeListCellAdapter cellAdapter) {
-    this.cellAdapter = cellAdapter;
+      DepanFxFlatSection flatSection, DepanFxNodeListTableAdapter tableAdapter) {
+    this.tableAdapter = tableAdapter;
     super.setSectionDoc(flatSection);
   }
 
@@ -59,12 +59,12 @@ public class DepanFxExportFlatSectionDialog
 
   @Override
   protected Stream<DepanFxNodeListColumn> streamColumns() {
-    return cellAdapter.streamColumns();
+    return tableAdapter.streamColumns();
   }
 
   @Override
   protected GraphDocument getGraphDoc() {
-    return cellAdapter.getGraphDoc();
+    return tableAdapter.getGraphDoc();
   }
 
   /**

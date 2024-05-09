@@ -3,7 +3,7 @@ package com.pnambic.depanfx.nodelist.gui.sections;
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListCellAdapter;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
@@ -48,7 +48,7 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
         }
       };
 
-  private final DepanFxNodeListCellAdapter cellAdapter;
+  private final DepanFxNodeListTableAdapter tableAdapter;
 
   private DepanFxWorkspaceResource<DepanFxTreeSectionData> sectionDataRsrc;
 
@@ -64,9 +64,9 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
   static final String EDIT_TREE_SECTION_DATA = "Edit Tree Section Data...";
 
   public DepanFxTreeSection(
-      DepanFxNodeListCellAdapter cellAdapter,
+      DepanFxNodeListTableAdapter tableAdapter,
       DepanFxWorkspaceResource<DepanFxTreeSectionData> sectionDataRsrc) {
-    this.cellAdapter = cellAdapter;
+    this.tableAdapter = tableAdapter;
     this.sectionDataRsrc = sectionDataRsrc;
 
     this.treeMemberCompare = updateCompare();
@@ -91,7 +91,7 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
   }
 
   public List<DepanFxNodeListColumn> getColumns() {
-    return cellAdapter.streamColumns().collect(Collectors.toList());
+    return tableAdapter.streamColumns().collect(Collectors.toList());
   }
 
   @Override
@@ -188,9 +188,9 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
     }
 
     // Use the context model from the viewer to find a good link matcher.
-    ContextModelId modelId = cellAdapter.getGraphDoc().getContextModelId();
+    ContextModelId modelId = tableAdapter.getGraphDoc().getContextModelId();
     return DepanFxProjects.getBuiltIn(
-            cellAdapter.getWorkspace(), DepanFxLinkMatcherDocument.class,
+            tableAdapter.getWorkspace(), DepanFxLinkMatcherDocument.class,
             c -> this.byMemberLinkMatcherDoc(c, modelId))
         .map(r -> r.getResource().getMatcher())
         .orElseGet(this::getEmptyLinkMatcher);
@@ -198,7 +198,7 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
 
   private DepanFxLinkMatcher getEmptyLinkMatcher() {
     LOG.warn("Unable to find link matcher for {} context model",
-        cellAdapter.getGraphDoc().getContextModelId().getContextModelKey());
+        tableAdapter.getGraphDoc().getContextModelId().getContextModelKey());
     return EMPTY_MATCHER;
   }
 
