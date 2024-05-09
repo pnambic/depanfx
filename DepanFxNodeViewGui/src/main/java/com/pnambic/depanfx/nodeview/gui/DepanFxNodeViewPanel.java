@@ -548,6 +548,7 @@ public class DepanFxNodeViewPanel {
 
     // Toggles for each matcher
     edgeDisplay.streamVisibilityMatchers()
+        .sorted((a, b) -> a.getToolName().compareTo(b.getToolName()))
         .forEach(m -> items.add(buildEdgeVisibleItem(m)));
 
     // Add one for the remainders
