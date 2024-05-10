@@ -708,7 +708,7 @@ public class DepanFxNodeViewPanel {
   private JoglPane createJoglPane() {
     DepanFxNodeViewCameraData cameraInfo =
         viewData.getSceneData().getCameraInfo();
-    JoglPane result = JoglPane.createJoglView(cameraInfo, dialogRunner);
+    JoglPane result = JoglPane.createJoglPane(cameraInfo, dialogRunner);
     result.addMouseActionListener(new ViewMouseActionListener());
     return result;
   }

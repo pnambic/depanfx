@@ -51,7 +51,7 @@ public class JoglPane extends BorderPane {
     DepanFxNodeViewKeyActions.addActions(jogl, cameraControl);
   }
 
-  public static JoglPane createJoglView(
+  public static JoglPane createJoglPane(
       DepanFxNodeViewCameraData cameraInfo,
       DepanFxDialogRunner dialogRunner) {
     return new JoglPane(

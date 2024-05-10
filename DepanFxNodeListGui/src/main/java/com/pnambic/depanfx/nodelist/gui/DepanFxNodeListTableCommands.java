@@ -11,6 +11,7 @@ import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
@@ -43,6 +44,8 @@ public class DepanFxNodeListTableCommands {
   public static final String CLEAR_SELECTION_ITEM = "Clear Selection";
 
   public static final String INVERT_SELECTION_ITEM = "Invert Selection";
+
+  private static final String SELECT_NODE_LIST = "Select Node List...";
 
   public static final String ADD_COLUMN = "Add Column";
 
@@ -85,11 +88,17 @@ public class DepanFxNodeListTableCommands {
     builder.appendActionItem(
         INVERT_SELECTION_ITEM, e -> tableAdapter.doInvertSelectionAction());
     builder.appendSeparator();
-    builder.appendSubMenu(newColumnMenu());
-    builder.appendSeparator();
+    builder.appendActionItem(
+        SELECT_NODE_LIST, e -> runSelectionNodeListDialog());
     builder.appendActionItem(
         DepanFxSaveNodeListDialog.SAVE_NODE_LIST,
         e -> runSaveNodeListDialog());
+    builder.appendSeparator();
+    builder.appendSubMenu(newColumnMenu());
+    builder.appendSeparator();
+    builder.appendActionItem(
+        DepanFxNodeListTableViewSaveDialog.SAVE_TABLE_VIEW,
+        e -> runNodeListTableViewSaveDialog());
     return builder.build();
   }
 
@@ -112,9 +121,24 @@ public class DepanFxNodeListTableCommands {
     return result;
   }
 
+  private void runSelectionNodeListDialog() {
+    DepanFxNodeListChooser.runNodeListChooser(
+            workspace, dialogRunner, tableAdapter.getScene())
+        .map(r -> r.getResource().getNodes())
+        .ifPresent(l ->
+            tableAdapter.doSelectGraphNodesAction(l.stream(), true));
+  }
+
   private void runSaveNodeListDialog() {
     DepanFxSaveNodeListDialog.runSaveNodeList(
         dialogRunner, tableAdapter.getSelection());
+  }
+
+  private void runNodeListTableViewSaveDialog() {
+    DepanFxNodeListTableViewData table =
+        new DepanFxNodeListTableViewData("Table View", "Initial table view.");
+    DepanFxNodeListTableViewSaveDialog.runSaveTableView(
+        dialogRunner, table);
   }
 
   private void doSelectColumnAction() {
