@@ -102,16 +102,23 @@ public class DepanFxBuiltInRegistry {
    */
   private boolean installDependent(
       DepanFxBuiltInProject project, Dependent<?> contrib) {
-    Object contribDoc = contrib.installDocument(project);
-    if (contribDoc != null ) {
-      addContribution(project, contrib);
-      return true;
+    try {
+      if (contrib.installDocument(project) != null ) {
+        addContribution(project, contrib);
+        return true;
+      }
+    } catch (DepanFxBuiltInContribution.MissingDependencyException errDep) {
+      // Don't worry about it.  We'll get the dependency on a latter iteration.
+      LOG.debug(errDep.getMessage());
     }
     return false;
   }
 
   private void addContribution(
       DepanFxBuiltInProject project, DepanFxBuiltInContribution<?> contrib) {
+    LOG.debug("Adding built in {} of type {}",
+        contrib.getPath().toString(),
+        contrib.getDocument().getClass().getSimpleName());
     Path contribPath = contrib.getPath();
     Optional<DepanFxWorkspaceResource<Object>> priorRsrc =
         project.getResource(contribPath);

@@ -38,10 +38,10 @@ public class DepanFxNodeListSectionConfiguration {
 
   private static final String TREE_SECTION_KEY = "Tree Section";
 
-  private static final Path MEMBER_MATCHER_PATH =
+  public static final Path MEMBER_MATCHER_PATH =
       DepanFxLinkMatcherDocument.LINK_MATCHER_TOOL_PATH.resolve("Tree Member");
 
-  private static final Path MEMBER_TREE_SECTION_PATH =
+  public static final Path MEMBER_TREE_SECTION_PATH =
       DepanFxNodeListSectionData.SECTIONS_TOOL_PATH.resolve("Member Tree");
 
   @Autowired
@@ -161,7 +161,7 @@ public class DepanFxNodeListSectionConfiguration {
 
     @Override
     public void prepareCell(
-        DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace,
+        DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       builder.appendActionItem(
@@ -230,7 +230,7 @@ public class DepanFxNodeListSectionConfiguration {
 
     @Override
     public void prepareCell(
-        DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace,
+        DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       builder.appendActionItem(

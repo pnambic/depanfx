@@ -18,14 +18,14 @@ public class DepanFxNodeListTableViewData extends DepanFxBaseToolData {
   public static final Path TABLE_VIEW_TOOL_PATH =
       DepanFxNodeListData.NODE_LIST_TOOL_PATH.resolve(TABLE_VIEWS_TOOL_DIR);
 
-  private final List<DepanFxWorkspaceResource<DepanFxBaseSectionData>> sectionResources;
+  private final List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>> sectionResources;
 
-  private final List<DepanFxWorkspaceResource<DepanFxBaseColumnData>> columnResources;
+  private final List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>> columnResources;
 
   public DepanFxNodeListTableViewData(
       String toolName, String toolDescription,
-      List<DepanFxWorkspaceResource<DepanFxBaseSectionData>> sectionResources,
-      List<DepanFxWorkspaceResource<DepanFxBaseColumnData>> columnResources) {
+      List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>> sectionResources,
+      List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>> columnResources) {
 
     super(toolName, toolDescription);
 
@@ -35,18 +35,11 @@ public class DepanFxNodeListTableViewData extends DepanFxBaseToolData {
     this.columnResources = new ArrayList<>(columnResources);
   }
 
-  public DepanFxNodeListTableViewData(
-      String toolName, String toolDescription) {
-    this(
-        toolName, toolDescription,
-        Collections.emptyList(), Collections.emptyList());
-  }
-
   /**
    * Provided in bottom-to-top order to ensure that a flat section
    * terminates the table view.
    */
-  public List<DepanFxWorkspaceResource<DepanFxBaseSectionData>>
+  public List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
       getSectionResources() {
     return sectionResources;
   }
@@ -55,7 +48,7 @@ public class DepanFxNodeListTableViewData extends DepanFxBaseToolData {
    * Provided in bottom-to-top order to ensure that a flat section
    * terminates the table view.
    */
-  public List<DepanFxWorkspaceResource<DepanFxBaseColumnData>>
+  public List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
       getColumnResources() {
     return columnResources;
   }

@@ -1,8 +1,10 @@
 package com.pnambic.depanfx.workspace.projects;
 
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 public interface DepanFxBuiltInContribution<T> {
 
@@ -91,5 +93,18 @@ public interface DepanFxBuiltInContribution<T> {
     };
 
     protected abstract T buildDocument(DepanFxBuiltInProject project);
+
+    /**
+     * Obtain resources from the built-in project,
+     * with {@code MissingDependencyException} when a resource is not available.
+     */
+    protected <R> DepanFxWorkspaceResource<R> getResource(
+        DepanFxBuiltInProject project, Path resourcePath) {
+      Optional<DepanFxWorkspaceResource<R>> result =
+          project.getResource(resourcePath);
+      return result.orElseThrow(() ->
+          new DepanFxBuiltInContribution.MissingDependencyException(
+              getPath(), resourcePath));
+    }
   }
 }

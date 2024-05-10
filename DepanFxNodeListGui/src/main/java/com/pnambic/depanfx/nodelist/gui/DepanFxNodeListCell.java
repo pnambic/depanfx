@@ -225,7 +225,7 @@ public class DepanFxNodeListCell
   private void runInsertMemberTreeSectionAction(DepanFxNodeListSection before) {
     DepanFxTreeSection treeSection = new DepanFxTreeSection(
         tableAdapter, getInitialTreeSectionResource().get());
-    tableAdapter.insertSection(before, treeSection);
+    tableAdapter.insertSection(before, getInitialTreeSectionResource().get());
   }
 
   private Optional<DepanFxWorkspaceResource<DepanFxTreeSectionData>>

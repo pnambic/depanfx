@@ -7,6 +7,7 @@ import com.pnambic.depanfx.nodelist.gui.columns.DepanFxFocusColumnToolDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumnToolDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
@@ -46,6 +47,8 @@ public class DepanFxNodeListTableCommands {
   public static final String INVERT_SELECTION_ITEM = "Invert Selection";
 
   private static final String SELECT_NODE_LIST = "Select Node List...";
+
+  private static final String TABLE_VIEW = "Table View";
 
   public static final String ADD_COLUMN = "Add Column";
 
@@ -94,11 +97,7 @@ public class DepanFxNodeListTableCommands {
         DepanFxSaveNodeListDialog.SAVE_NODE_LIST,
         e -> runSaveNodeListDialog());
     builder.appendSeparator();
-    builder.appendSubMenu(newColumnMenu());
-    builder.appendSeparator();
-    builder.appendActionItem(
-        DepanFxNodeListTableViewSaveDialog.SAVE_TABLE_VIEW,
-        e -> runNodeListTableViewSaveDialog());
+    builder.appendSubMenu(buildTableViewMenu());
     return builder.build();
   }
 
@@ -121,6 +120,26 @@ public class DepanFxNodeListTableCommands {
     return result;
   }
 
+  private Menu buildTableViewMenu() {
+    Menu result = new Menu(TABLE_VIEW);
+    ObservableList<MenuItem> items = result.getItems();
+    items.add(newColumnMenu());
+    items.add(new SeparatorMenuItem());
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        DepanFxNodeListTableViewSaveDialog.SELECT_TABLE_VIEW,
+        e -> runNodeListTableViewChooser()));
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        DepanFxNodeListTableViewSaveDialog.SAVE_TABLE_VIEW,
+        e -> runNodeListTableViewSaveDialog()));
+    return result;
+  }
+
+  private void runNodeListTableViewChooser() {
+    DepanFxNodeListTableViewSaveDialog
+        .runTableViewChooser(workspace, dialogRunner, tableAdapter.getScene())
+        .ifPresent(r -> tableAdapter.setTableView(r.getResource()));
+  }
+
   private void runSelectionNodeListDialog() {
     DepanFxNodeListChooser.runNodeListChooser(
             workspace, dialogRunner, tableAdapter.getScene())
@@ -135,10 +154,9 @@ public class DepanFxNodeListTableCommands {
   }
 
   private void runNodeListTableViewSaveDialog() {
-    DepanFxNodeListTableViewData table =
-        new DepanFxNodeListTableViewData("Table View", "Initial table view.");
+    DepanFxNodeListTableViewData tableView = tableAdapter.getTableView();
     DepanFxNodeListTableViewSaveDialog.runSaveTableView(
-        dialogRunner, table);
+        dialogRunner, tableView);
   }
 
   private void doSelectColumnAction() {
@@ -158,8 +176,8 @@ public class DepanFxNodeListTableCommands {
 
     rsrcChooser.showOpenDialog(tableAdapter.getScene())
         .map(DepanFxProjectDocument.class::cast)
-        .flatMap(m -> workspace.getWorkspaceResource(m, "Column Definition"))
-        .map(this::toColumn)
+        .flatMap(m -> workspace.getWorkspaceResource(
+            m, DepanFxBaseColumnData.class))
         .ifPresent(tableAdapter::addColumn);
   }
 
@@ -170,7 +188,6 @@ public class DepanFxNodeListTableCommands {
         DepanFxNodeKeyColumnToolDialog.runCreateDialog(
             initialData, dialogRunner);
     createDlg.getController().getWorkspaceResource()
-        .map(r -> new DepanFxNodeKeyColumn(tableAdapter, r))
         .ifPresent(tableAdapter::addColumn);
   }
 
@@ -181,7 +198,6 @@ public class DepanFxNodeListTableCommands {
         DepanFxFocusColumnToolDialog.runCreateDialog(
             initialData, dialogRunner);
     createDlg.getController().getWorkspaceResource()
-        .map(r -> new DepanFxFocusColumn(tableAdapter, r))
         .ifPresent(tableAdapter::addColumn);
   }
 
@@ -192,29 +208,6 @@ public class DepanFxNodeListTableCommands {
         DepanFxCategoryColumnToolDialog.runCreateDialog(
             initialData, dialogRunner);
     createDlg.getController().getWorkspaceResource()
-        .map(r -> new DepanFxCategoryColumn(tableAdapter, r))
         .ifPresent(tableAdapter::addColumn);
-  }
-
-  @SuppressWarnings("unchecked")
-  private DepanFxNodeListColumn toColumn(
-      DepanFxWorkspaceResource<?> columnRsrc) {
-    switch (columnRsrc.getResource()) {
-    case DepanFxCategoryColumnData val:
-      return new DepanFxCategoryColumn(tableAdapter,
-          (DepanFxWorkspaceResource<DepanFxCategoryColumnData>) columnRsrc);
-    case DepanFxFocusColumnData val:
-      return new DepanFxFocusColumn(tableAdapter,
-          (DepanFxWorkspaceResource<DepanFxFocusColumnData>) columnRsrc);
-    case DepanFxNodeKeyColumnData val:
-      return new DepanFxNodeKeyColumn(tableAdapter,
-          (DepanFxWorkspaceResource<DepanFxNodeKeyColumnData>) columnRsrc);
-
-    default:
-      break;
-    }
-    LOG.warn("Unknown type {} for column construction",
-        columnRsrc.getResource().getClass().getName());
-    return null;
   }
 }

@@ -5,10 +5,12 @@ import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.jogl.JoglMouseActionListener;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListConfiguration;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
@@ -771,13 +773,19 @@ public class DepanFxNodeViewPanel {
   private void runNodeSelectionDialog() {
     String selectName =
         viewData.getToolName() + " nodes." + DepanFxNodeList.NODE_LIST_EXT;
+
+    DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc =
+        DepanFxProjects.getBuiltIn(
+            workspace,  DepanFxNodeListTableViewData.class,
+            DepanFxNodeListConfiguration.MEMBER_TABLE_VIEW_PATH).get();
+
     Path selectPath = DepanFxProjects.getCurrentAnalysesPath(workspace)
         .map(p -> p.resolve(selectName))
         .get();
      Stage nodeSelectDialog = workspace.getCurrentProject()
         .flatMap(p -> p.asProjectDocument(selectPath))
         .map(d -> DepanFxNodeViewNodeSelectDialog.runEditDialog(
-            this, d, dialogRunner))
+            dialogRunner, this, tableViewRsrc.getResource(), d))
         .get();
 
      sideViews.add(nodeSelectDialog);

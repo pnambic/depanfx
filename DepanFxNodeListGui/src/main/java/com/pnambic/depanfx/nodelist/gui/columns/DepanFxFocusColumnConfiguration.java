@@ -61,7 +61,7 @@ public class DepanFxFocusColumnConfiguration {
 
     @Override
     public void prepareCell(
-        DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace,
+        DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       DepanFxFocusColumn.addNewColumnAction(builder, dialogRunner);

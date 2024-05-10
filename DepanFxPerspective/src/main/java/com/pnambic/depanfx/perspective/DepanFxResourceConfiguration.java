@@ -57,8 +57,8 @@ public class DepanFxResourceConfiguration {
     }
 
     @Override
-    public void prepareCell(DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspace workspace, Cell<DepanFxWorkspaceMember> cell,
+    public void prepareCell(DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner, Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       builder.appendSubMenu(analysisContextMenu());
     }
@@ -93,8 +93,8 @@ public class DepanFxResourceConfiguration {
     }
 
     @Override
-    public void prepareCell(DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspace workspace, Cell<DepanFxWorkspaceMember> cell,
+    public void prepareCell(DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner, Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       builder.appendSubMenu(graphsContextMenu());
     }

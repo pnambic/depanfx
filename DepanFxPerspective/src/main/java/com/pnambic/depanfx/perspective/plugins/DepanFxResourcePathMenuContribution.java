@@ -16,8 +16,8 @@ public interface DepanFxResourcePathMenuContribution
   boolean acceptsPath(Path rsrcPath);
 
   void prepareCell(
-      DepanFxDialogRunner dialogRunner,
       DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner,
       Cell<DepanFxWorkspaceMember> cell,
       DepanFxProjectMember member,
       DepanFxContextMenuBuilder builder);

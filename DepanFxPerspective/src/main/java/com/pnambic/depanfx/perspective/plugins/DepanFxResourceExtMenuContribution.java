@@ -21,7 +21,7 @@ public interface DepanFxResourceExtMenuContribution
   boolean acceptsExt(String ext);
 
   void prepareCell(
-      DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace,
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
       Cell<DepanFxWorkspaceMember> cell, String ext,
       DepanFxProjectMember member, DepanFxContextMenuBuilder builder);
 
@@ -59,7 +59,7 @@ public interface DepanFxResourceExtMenuContribution
 
     @Override
     public void prepareCell(
-        DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace,
+        DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
         Cell<DepanFxWorkspaceMember> cell, String ext,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       Path docPath = member.getMemberPath();

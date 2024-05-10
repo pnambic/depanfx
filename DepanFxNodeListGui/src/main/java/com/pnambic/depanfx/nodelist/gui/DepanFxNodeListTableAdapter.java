@@ -4,7 +4,9 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseSectionData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -29,18 +31,24 @@ public interface DepanFxNodeListTableAdapter {
 
   void refreshTableView();
 
+  void setTableView(DepanFxNodeListTableViewData tableView);
+
+  DepanFxNodeListTableViewData getTableView();
+
   // Column columns
-  void addColumn(DepanFxNodeListColumn column);
+  void addColumn(
+      DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc);
 
   Stream<DepanFxNodeListColumn> streamColumns();
 
   // Section operations
-  void insertSection(
-      DepanFxNodeListSection before, DepanFxNodeListSection insert);
+  DepanFxNodeListSection insertSection(
+      DepanFxNodeListSection before,
+      DepanFxWorkspaceResource<? extends DepanFxBaseSectionData> sectionRsrc);
 
   void updateSection(
       DepanFxNodeListSection section,
-      DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>  dataRsrc);
+      DepanFxWorkspaceResource<? extends DepanFxBaseSectionData> sectionRsrc);
 
   // Subdialog support
   Scene getScene();

@@ -19,8 +19,8 @@ public interface DepanFxAnalysisExtMenuContribution
   boolean acceptsExt(String ext);
 
   void prepareCell(
-      DepanFxSceneController scene,
-      DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace,
+      DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner, DepanFxSceneController scene,
       Cell<DepanFxWorkspaceMember> cell, String ext,
       DepanFxProjectMember member, DepanFxContextMenuBuilder builder);
 }

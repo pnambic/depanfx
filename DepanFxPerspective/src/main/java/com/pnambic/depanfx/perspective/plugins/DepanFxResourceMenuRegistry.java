@@ -58,7 +58,7 @@ public class DepanFxResourceMenuRegistry {
           .filter(c -> c.acceptsExt(ext))
           .sorted(DepanFxOrderableContribution.CONTRIB_COMPARE)
           .forEach(c -> c.prepareCell(
-              scene, dialogRunner, workspace, cell, ext, document, builder));
+              workspace, dialogRunner, scene, cell, ext, document, builder));
     }
   }
 
@@ -82,7 +82,7 @@ public class DepanFxResourceMenuRegistry {
           .filter(c -> c.acceptsExt(ext))
           .sorted(DepanFxOrderableContribution.CONTRIB_COMPARE)
           .forEach(c -> c.prepareCell(
-              dialogRunner, workspace, cell, ext, document, builder));
+              workspace, dialogRunner, cell, ext, document, builder));
     }
   }
 
@@ -101,6 +101,6 @@ public class DepanFxResourceMenuRegistry {
         .filter(c -> c.acceptsPath(docPath))
         .sorted(DepanFxOrderableContribution.CONTRIB_COMPARE)
         .forEach(c -> c.prepareCell(
-            dialogRunner, workspace, cell, member, builder));
+            workspace, dialogRunner, cell, member, builder));
   }
 }

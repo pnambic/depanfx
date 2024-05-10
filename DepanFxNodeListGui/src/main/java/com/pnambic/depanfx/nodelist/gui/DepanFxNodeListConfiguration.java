@@ -1,13 +1,12 @@
 package com.pnambic.depanfx.nodelist.gui;
 
-import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
-import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSection;
-import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
-import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeSection;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumnConfiguration;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSectionConfiguration;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseColumnData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
@@ -21,6 +20,7 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
+import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import org.slf4j.Logger;
@@ -44,6 +44,14 @@ public class DepanFxNodeListConfiguration {
 
   private static final String OPEN_AS_LIST = "Open as Node List";
 
+  public static final Path FLAT_TABLE_VIEW_PATH =
+      DepanFxNodeListTableViewData.TABLE_VIEW_TOOL_PATH
+          .resolve("Flat Table View");
+
+  public static final Path MEMBER_TABLE_VIEW_PATH =
+      DepanFxNodeListTableViewData.TABLE_VIEW_TOOL_PATH
+          .resolve("Member Table View");
+
   @Autowired
   public DepanFxNodeListConfiguration() {
   }
@@ -56,6 +64,68 @@ public class DepanFxNodeListConfiguration {
   @Bean
   public DepanFxAnalysisExtMenuContribution nodeListExtMenu() {
     return new NodeListContribution();
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
+      flatTableView() {
+
+    return new DepanFxBuiltInContribution.Dependent<DepanFxNodeListTableViewData>(
+        FLAT_TABLE_VIEW_PATH) {
+
+      @Override
+      protected DepanFxNodeListTableViewData buildDocument(
+          DepanFxBuiltInProject project) {
+
+        // Flat Section
+        List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
+            sectionRsrcs = new ArrayList<>();
+        sectionRsrcs.add(getResource(project,
+            DepanFxNodeListSectionData.SIMPLE_SECTION_TOOL_PATH));
+
+        // Node Kind Column
+        List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
+            columnRsrcs = new ArrayList<>();
+        columnRsrcs.add(getResource(project,
+            DepanFxNodeKeyColumnConfiguration.KIND_KEY_COLUMN_TOOL_PATH));
+
+        return new DepanFxNodeListTableViewData(
+            "Flat Table View", "Flat node list table view",
+            sectionRsrcs, columnRsrcs);
+      }
+    };
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
+      memberTableView() {
+
+    return new DepanFxBuiltInContribution.Dependent<DepanFxNodeListTableViewData>(
+        MEMBER_TABLE_VIEW_PATH) {
+
+      @Override
+      protected DepanFxNodeListTableViewData buildDocument(
+          DepanFxBuiltInProject project) {
+
+        // Flat and Members Sections
+        List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
+            sectionRsrcs = new ArrayList<>();
+        sectionRsrcs.add(getResource(project,
+            DepanFxNodeListSectionConfiguration.MEMBER_TREE_SECTION_PATH));
+        sectionRsrcs.add(getResource(project,
+            DepanFxNodeListSectionData.SIMPLE_SECTION_TOOL_PATH));
+
+        // Node Kind Column
+        List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
+            columnRsrcs = new ArrayList<>();
+        columnRsrcs.add(getResource(project,
+            DepanFxNodeKeyColumnConfiguration.KIND_KEY_COLUMN_TOOL_PATH));
+
+        return new DepanFxNodeListTableViewData(
+            "Member Table View", "Table view membership",
+            sectionRsrcs, columnRsrcs);
+      }
+    };
   }
 
   private static class GraphAsListContribution
@@ -71,8 +141,8 @@ public class DepanFxNodeListConfiguration {
 
     @Override
     public void prepareCell(
-        DepanFxSceneController scene,
-        DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace,
+        DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner, DepanFxSceneController scene,
         Cell<DepanFxWorkspaceMember> cell, String ext,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       Path docPath = member.getMemberPath();
@@ -97,7 +167,7 @@ public class DepanFxNodeListConfiguration {
             .ifPresent(nl -> {
               String title = DepanFxWorkspaceFactory.buildDocTitle(
                   optWkspRsrc.get().getDocument()) + " nodes";
-              addNodeListViewToScene(scene, dialogRunner, workspace, nl, title);
+              addNodeListViewToScene(workspace, dialogRunner, scene, nl, title);
             });
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to open node list for {}",
@@ -124,22 +194,22 @@ public class DepanFxNodeListConfiguration {
 
     @Override
     public void prepareCell(
-        DepanFxSceneController scene,
-        DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace,
+        DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner, DepanFxSceneController scene,
         Cell<DepanFxWorkspaceMember> cell, String ext,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       Path docPath = member.getMemberPath();
       DepanFxResourcePerspectives.installOnOpen(cell, docPath,
-          p -> runOpenNodeListAction(scene, dialogRunner, workspace, p));
+          p -> runOpenNodeListAction(workspace, dialogRunner, scene, p));
       builder.appendActionItem(
           OPEN_AS_LIST,
-          e -> runOpenNodeListAction(scene, dialogRunner, workspace, docPath));
+          e -> runOpenNodeListAction(workspace, dialogRunner, scene, docPath));
     }
 
     private void runOpenNodeListAction(
-        DepanFxSceneController scene,
-        DepanFxDialogRunner dialogRunner,
         DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner,
+        DepanFxSceneController scene,
         Path docPath) {
       try {
         Optional<DepanFxWorkspaceResource<DepanFxNodeList>> optWkspRsrc =
@@ -150,7 +220,7 @@ public class DepanFxNodeListConfiguration {
             .ifPresent(nl -> {
               String title = DepanFxWorkspaceFactory.buildDocTitle(
                   optWkspRsrc.get().getDocument());
-              addNodeListViewToScene(scene, dialogRunner, workspace, nl, title);
+              addNodeListViewToScene(workspace, dialogRunner, scene, nl, title);
             });
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to open list view for {}",
@@ -165,37 +235,20 @@ public class DepanFxNodeListConfiguration {
   }
 
   private static void addNodeListViewToScene(
-      DepanFxSceneController scene, DepanFxDialogRunner dialogRunner,
       DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner,
+      DepanFxSceneController scene,
       DepanFxNodeList nodeList, String tabTitle) {
 
-    List<DepanFxNodeListSection> sections = new ArrayList<>();
-    Optional<DepanFxFlatSection> optFlatSection =
-        DepanFxNodeListSectionData.getBuiltinSimpleSectionResource(workspace)
-            .map(r -> new DepanFxFlatSection(r));
-    optFlatSection.ifPresent(sections::add);
+    DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc =
+        DepanFxProjects.getBuiltIn(
+            workspace,  DepanFxNodeListTableViewData.class,
+            DepanFxNodeListConfiguration.MEMBER_TABLE_VIEW_PATH).get();
 
-    DepanFxNodeListViewer viewer =
-        new DepanFxNodeListViewer(
-            workspace, dialogRunner, nodeList, sections);
-
-    ContextModelId contextModel =
-        nodeList.getGraphDocResource().getResource().getContextModelId();
-    DepanFxProjects.getBuiltIn(
-            workspace,  DepanFxTreeSectionData.class,
-            c -> byMemberLinkMatcherDoc(c, contextModel))
-      .map(t -> new DepanFxTreeSection(viewer, t))
-      .ifPresent(
-          s -> viewer.insertSection(optFlatSection.get(), s));
+    DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(
+        workspace, dialogRunner, nodeList, tableViewRsrc.getResource());
 
     Tab viewerTab = viewer.createWorkspaceTab(tabTitle);
     scene.addTab(viewerTab);
-  }
-
-  private static boolean byMemberLinkMatcherDoc(
-      DepanFxBuiltInContribution<DepanFxTreeSectionData> contrib,
-      ContextModelId modelId) {
-    return DepanFxLinkMatcherGroup.isContextModelMatcherResource(
-        modelId, contrib.getDocument().getLinkMatcherRsrc());
   }
 }

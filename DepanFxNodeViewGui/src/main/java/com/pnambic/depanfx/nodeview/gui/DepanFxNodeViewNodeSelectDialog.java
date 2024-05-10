@@ -4,20 +4,23 @@ import com.google.common.collect.ImmutableList;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListCell;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListConfiguration;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListRoot;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListRootItem;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
-import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeSection;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxSectionRegistry;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.perspective.DepanFxWorkspaceDialog;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -25,6 +28,7 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -34,6 +38,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -65,17 +70,25 @@ public class DepanFxNodeViewNodeSelectDialog
   private static final ExtensionFilter NODE_LIST_FILTER =
       DepanFxSaveNodeListDialog.EXT_FILTER;
 
-  private final DepanFxNodeListTableCommands tableCommand;
+  private final DepanFxNodeListTableCommands tableCommands;
+
+  private DepanFxNodeListTableViewData tableView;
+
+  private List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
+      sectionResources;
+
+  private List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
+      columnResources;
+
+  private List<DepanFxNodeListSection> sections;
+
+  private List<DepanFxNodeListColumn> columns;
 
   @FXML
   private Label nodeTableCommands;
 
   @FXML
   private TreeTableView<DepanFxNodeListMember> nodeSelectTable;
-
-  private List<DepanFxNodeListSection> sections = new ArrayList<>();
-
-  private List<DepanFxNodeListColumn> columns = new ArrayList<>();
 
   // Bound in initialize().
   private TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember> nameColumn;
@@ -86,24 +99,30 @@ public class DepanFxNodeViewNodeSelectDialog
    */
   private DepanFxNodeViewPanel viewPanel;
 
+  private DepanFxProjectDocument destDoc;
+
   public DepanFxNodeViewNodeSelectDialog(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+      DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner) {
     super(workspace);
-    tableCommand =
+    tableCommands =
         new DepanFxNodeListTableCommands(workspace, dialogRunner, this);
   }
 
   /**
    * Node Selection Editor is a modeless dialog coupled to the graph view.
    */
-  public static Stage runEditDialog(
+  static Stage runEditDialog(
+      DepanFxDialogRunner dialogRunner,
       DepanFxNodeViewPanel viewPanel,
-      DepanFxProjectDocument projDoc,
-      DepanFxDialogRunner dialogRunner) {
+      DepanFxNodeListTableViewData tableView,
+      DepanFxProjectDocument destDoc) {
 
     Dialog<DepanFxNodeViewNodeSelectDialog> dlg =
         dialogRunner.createDialogAndParent(
             DepanFxNodeViewNodeSelectDialog.class);
+    dlg.getController().setDestinationDocument(destDoc);
+    dlg.getController().setTableView(tableView);
     dlg.getController().setViewPanel(viewPanel);
     return dlg.runModeless(EDIT_NODE_SELECTION);
   }
@@ -116,7 +135,7 @@ public class DepanFxNodeViewNodeSelectDialog
   @FXML
   @SuppressWarnings("unchecked")
   public void initialize() {
-    nodeTableCommands.setContextMenu(tableCommand.buildViewContextMenu());
+    nodeTableCommands.setContextMenu(tableCommands.buildViewContextMenu());
 
     // In FXML
     // nodeSelectTable.setShowRoot(false);
@@ -133,16 +152,56 @@ public class DepanFxNodeViewNodeSelectDialog
             p.getValue().getValue()));
   }
 
+  public void setDestinationDocument(DepanFxProjectDocument destDoc) {
+    this.destDoc = destDoc;
+  }
+
   public void setViewPanel(DepanFxNodeViewPanel viewPanel) {
     this.viewPanel = viewPanel;
+    if (tableView == null) {
+      Optional<DepanFxWorkspaceResource<DepanFxNodeListTableViewData>> optFlatView =
+          ((DepanFxBuiltInProject) workspace.getBuiltInProject())
+              .getResource(DepanFxNodeListConfiguration.FLAT_TABLE_VIEW_PATH);
+      optFlatView.ifPresent(r -> tableView = r.getResource());
+    }
     populateNodeTable();
   }
 
   private void populateNodeTable() {
-    nodeSelectTable.setRoot(createTreeRoot());
 
-    DepanFxNodeListSectionData.getBuiltinSimpleSectionResource(getWorkspace())
-        .ifPresent(r -> sections.add(new DepanFxFlatSection(r)));
+    // Reset the table columns.
+    nodeSelectTable.getColumns().clear();
+    nodeSelectTable.getColumns().add(nameColumn);
+
+    // Prepare the table view's columns.
+    List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
+        srcColumnRsrcs = tableView.getColumnResources();
+    int srcColumnCnt = srcColumnRsrcs.size();
+    columnResources = new ArrayList<>(srcColumnCnt);
+    columns = new ArrayList<>(srcColumnCnt);
+
+    srcColumnRsrcs.stream().forEach(this::addColumn);
+
+    // Prepare the table view's sections.
+    List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
+        srcSectionRsrcs = tableView.getSectionResources();
+    int srcSectionCnt = srcSectionRsrcs.size();
+    sectionResources = new ArrayList<>(srcSectionCnt);
+    sections = new ArrayList<>(srcSectionCnt);
+
+    srcSectionRsrcs.stream().forEach(this::installSection);
+
+    // If the last one isn't a flat section, add one.
+    if ( !(sections.getLast() instanceof DepanFxFlatSection)) {
+      Optional<DepanFxWorkspaceResource<DepanFxFlatSectionData>> optFlatRsrc =
+          ((DepanFxBuiltInProject) workspace.getBuiltInProject())
+              .getResource(DepanFxNodeListSectionData.SIMPLE_SECTION_TOOL_PATH);
+
+      optFlatRsrc.ifPresent(this::installSection);
+    }
+
+    // 'cuz we changed the table's sections
+    resetTableRoot();
   }
 
   private TreeItem<DepanFxNodeListMember> createTreeRoot() {
@@ -152,10 +211,19 @@ public class DepanFxNodeViewNodeSelectDialog
     return new DepanFxNodeListRootItem(rootMember);
   }
 
+  private void installSection(
+      DepanFxWorkspaceResource<? extends DepanFxBaseSectionData> sectionRsrc) {
+    DepanFxNodeListSection result =
+        DepanFxSectionRegistry.createSection(this, sectionRsrc);
+
+    sections.add(result);
+    sectionResources.add(sectionRsrc);
+  }
+
   /////////////////////////////////////
   // Workspace dialog protected overrides
 
-  @Override // DepanFxWorkspaceDialog
+  @Override // DepanFxWorkspaceDialog, DepanFxNodeListTableAdapter
   public Scene getScene() {
     return nodeSelectTable.getScene();
   }
@@ -169,18 +237,36 @@ public class DepanFxNodeViewNodeSelectDialog
   }
 
   @Override // DepanFxNodeListTableAdapter
+  public void setTableView(DepanFxNodeListTableViewData tableView) {
+    this.tableView = tableView;
+    if (viewPanel != null) {
+      populateNodeTable();
+    }
+  }
+
+  @Override // DepanFxNodeListTableAdapter
+  public DepanFxNodeListTableViewData getTableView() {
+    return new DepanFxNodeListTableViewData(
+        tableView.getToolName(), tableView.getToolDescription(),
+        sectionResources, columnResources);
+  }
+
+  @Override // DepanFxNodeListTableAdapter
   public Stream<DepanFxNodeListColumn> streamColumns() {
     return columns.stream();
   }
 
   @Override // DepanFxNodeListTableAdapter
-  public void insertSection(
-      DepanFxNodeListSection before, DepanFxNodeListSection insert) {
+  public DepanFxNodeListSection insertSection(
+      DepanFxNodeListSection before,
+      DepanFxWorkspaceResource<? extends DepanFxBaseSectionData> sectionRsrc) {
 
     // Don't default to after the last slot, 'cuz that's the catch-all section
     int index = Integer.max(0, sections.indexOf(before));
-    sections.add(index, insert);
+    DepanFxNodeListSection result = installSectionAt(index, sectionRsrc);
+
     resetTableRoot();
+    return result;
   }
 
   @Override // DepanFxNodeListTableAdapter
@@ -218,7 +304,12 @@ public class DepanFxNodeViewNodeSelectDialog
   }
 
   @Override // DepanFxNodeListTableAdapter
-  public void addColumn(DepanFxNodeListColumn column) {
+  public void addColumn(
+      DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc) {
+
+    columnResources.add(columnRsrc);
+    DepanFxNodeListColumn column =
+        DepanFxColumnRegistry.toColumn(this, columnRsrc);
     columns.add(column);
     nodeSelectTable.getColumns().add(column.prepareColumn());
   }
@@ -243,33 +334,32 @@ public class DepanFxNodeViewNodeSelectDialog
     return viewPanel.buildSelectedAsNodeList();
   }
 
+  @Override // DepanFxNodeListTableAdapter
+  public void refreshTableView() {
+    nodeSelectTable.refresh();
+  }
+
+  @Override
+  public void updateSection(DepanFxNodeListSection section,
+      DepanFxWorkspaceResource<? extends DepanFxBaseSectionData> dataRsrc) {
+    if (DepanFxSectionRegistry.updateSection(section, dataRsrc)) {
+      resetTableRoot();
+    }
+  }
+
   private void resetTableRoot() {
     TreeItem<DepanFxNodeListMember> treeRoot = createTreeRoot();
     nodeSelectTable.setRoot(treeRoot);
   }
 
-  @Override
-  public void refreshTableView() {
-    nodeSelectTable.refresh();
-  }
+  private DepanFxNodeListSection installSectionAt(int index,
+      DepanFxWorkspaceResource<? extends DepanFxBaseSectionData> sectionRsrc) {
+    DepanFxNodeListSection result =
+        DepanFxSectionRegistry.createSection(this, sectionRsrc);
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public void updateSection(DepanFxNodeListSection section,
-      DepanFxWorkspaceResource<? extends DepanFxBaseSectionData> dataRsrc) {
-    switch (section) {
-    case DepanFxTreeSection tree:
-      tree.setSectionDataRsrc(
-          (DepanFxWorkspaceResource<DepanFxTreeSectionData>) dataRsrc);
-      break;
-    case DepanFxFlatSection flat:
-      flat.setSectionDataRsrc(
-          (DepanFxWorkspaceResource<DepanFxFlatSectionData>) dataRsrc);
-      break;
-    default:
-      // no need to refresh
-      return;
-    }
-    resetTableRoot();
+    sections.add(index, result);
+    sectionResources.add(index, sectionRsrc);
+
+    return result;
   }
 }
