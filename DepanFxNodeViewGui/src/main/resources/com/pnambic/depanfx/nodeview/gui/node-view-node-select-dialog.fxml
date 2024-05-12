@@ -24,16 +24,8 @@
             <Label fx:id="nodeTableCommands" text="Commands..."/>
          </HBox>
 
-         <TreeTableView fx:id="nodeSelectTable"
-            editable="true"
-            showRoot="false"
-            VBox.vgrow="ALWAYS">
-            <columns>
-                <TreeTableColumn text="Node Name"
-                    prefWidth="300">
-                </TreeTableColumn>
-            </columns>
-         </TreeTableView>
+         <!-- Placement by FXML, behaviors by DepanFXNodeListTableState etal. -->
+         <TreeTableView fx:id="nodeSelectTable" VBox.vgrow="ALWAYS"/>
 
          <HBox spacing="10">
             <Button text="Close" onAction="#handleCancel"/>

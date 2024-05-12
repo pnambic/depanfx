@@ -6,10 +6,8 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.jogl.JoglMouseActionListener;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListConfiguration;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
-import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
@@ -35,7 +33,6 @@ import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import org.slf4j.Logger;
@@ -49,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,9 +55,6 @@ import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -129,14 +124,11 @@ public class DepanFxNodeViewPanel {
 
   private Collection<GraphNode> viewNodes;
 
+  private DepanFxNodeListSelection nodeSelection;
+
   private Map<GraphNode, DepanFxNodeLocationData> nodeLocations;
 
   private Map<GraphNode, DepanFxNodeDisplayData> nodeDisplay;
-
-  private Map<GraphNode, BooleanProperty> nodesCheckBoxStates;
-
-  private Map<DepanFxNodeListSection, BooleanProperty>
-      sectionsCheckBoxStates = new HashMap<>();
 
   private JoglPane joglPane;
 
@@ -159,6 +151,9 @@ public class DepanFxNodeViewPanel {
    */
   private List<Stage> sideViews = new ArrayList<Stage>();
 
+  // Only need to do this once.
+  private DepanFxNodeList viewNodesAsNodeList;
+
   public DepanFxNodeViewPanel(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
@@ -174,7 +169,12 @@ public class DepanFxNodeViewPanel {
     this.nodeLocations = viewData.getNodeLocations();
     this.nodeDisplay = viewData.getNodeDisplay();
 
-    nodesCheckBoxStates = buildNodesCheckBoxStates(viewNodes);
+    // Handle node selections.
+    this.nodeSelection = DepanFxNodeListSelection.forNodes(viewNodes);
+    nodeSelection.setOnSelectionChange(
+        (n, b) -> onSelectionChange(n, b));
+
+    this.viewNodesAsNodeList = buildViewNodesAsNodeList();
   }
 
   public Tab createWorkspaceTab(String tabTitle) {
@@ -239,27 +239,10 @@ public class DepanFxNodeViewPanel {
   }
 
   /**
-   * All nodes in view.
-   */
-  public Stream<GraphNode> streamViewNodes() {
-    return viewNodes.stream();
-  }
-
-  public Stream<GraphNode> streamSelectedNodes() {
-    return nodesCheckBoxStates.entrySet().stream()
-        .filter(e -> e.getValue().getValue().booleanValue())
-        .map(e -> e.getKey());
-  }
-
-  /**
    * Might be selected nodes, or might by all nodes.
    */
   public Stream<GraphNode> streamChosenNodes() {
-    return nodesCheckBoxStates.values().stream()
-        .filter(b -> b.get())
-        .findFirst()
-        .map(v -> streamSelectedNodes())
-        .orElseGet(() -> streamViewNodes());
+    return nodeSelection.streamChosenNodes();
   }
 
   public Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
@@ -285,58 +268,31 @@ public class DepanFxNodeViewPanel {
     linkDisplayDirty = false;
   }
 
-  /**
-   * Provides the full set of view nodes as a node list.
-   */
-  public DepanFxNodeList buildViewNodesAsNodeList() {
-    return DepanFxNodeLists.buildNodeList(
-        getToolName() + " nodes",
-        "Nodes from " + getToolName(),
-        getGraphDocRsrc(),
-        new ArrayList<>(viewNodes));
-  }
-
-  protected DepanFxNodeList buildSelectedAsNodeList() {
+  public DepanFxNodeList buildSelectedAsNodeList() {
+    List<GraphNode> selectedNodes = nodeSelection.streamSelectedNodes()
+        .collect(Collectors.toList());
     return DepanFxNodeLists.buildNodeList(
         getToolName() + " selection",
         "Node selected from " + getToolName() + ".",
-        getGraphDocRsrc(),
-        streamSelectedNodes().collect(Collectors.toList()));
+        getGraphDocRsrc(), selectedNodes);
+  }
+
+  /////////////////////////////////////
+  // For NodeListTable integration
+
+  public DepanFxNodeListSelection getNodeSelection() {
+    return nodeSelection;
+  }
+
+  /**
+   * Provides the full set of view nodes as a node list.
+   */
+  public DepanFxNodeList getViewNodesAsNodeList() {
+    return viewNodesAsNodeList;
   }
 
   /////////////////////////////////////
   // Actions
-
-  public void doSelectAllAction() {
-    doSelectGraphNodesAction(streamViewNodes(), true);
-  }
-
-  public void doClearSelectionAction() {
-    doSelectGraphNodesAction(streamViewNodes(), false);
-  }
-
-  public void doInvertSelectionAction() {
-    streamViewNodes().forEach(this::doInvertGraphNodeAction);
-  }
-
-  /**
-   * View nodes in the supplied object list are selected based on the supplied
-   * value, and other view nodes are not changed.
-   */
-  public void doSelectGraphNodesAction(
-      Stream<GraphNode> nodes, boolean value) {
-    nodes.forEach(n -> setSelectGraphNode(n, value));
-  }
-
-  /**
-   * View nodes in the supplied object list are selected,
-   * and other view nodes are not.
-   */
-  public void doSelectGraphNodesAction(
-      Collection<? extends Object> selection) {
-    streamViewNodes()
-        .forEach(n -> setSelectGraphNode(n, selection.contains(n)));
-  }
 
   /**
    * If selected nodes includes all elements of the selection, leave
@@ -344,44 +300,16 @@ public class DepanFxNodeViewPanel {
    * to the supplied selection.
    */
   public void doReviseSelectionAction(Collection<Object> selection) {
-    Optional<GraphNode> unChosen = selection.stream()
+    Stream<GraphNode> choice = selection.stream()
         .filter(n -> n instanceof GraphNode)
-        .map(GraphNode.class::cast)
-        .filter(n -> !isSelected(n))
-        .findAny();
+        .map(GraphNode.class::cast);
 
-    if (unChosen.isPresent()) {
-      doSelectGraphNodesAction(selection);
+    if (nodeSelection.streamUnselectedOf(choice).findAny().isPresent()) {
+      Stream<GraphNode> process = selection.stream()
+          .filter(n -> n instanceof GraphNode)
+          .map(GraphNode.class::cast);
+      nodeSelection.doSelectGraphNodesAction(process, true);
     }
-  }
-
-  /**
-   * Set the selection state of a single node.
-   */
-  public void doSelectGraphNodeAction(GraphNode node, boolean value) {
-    setSelectGraphNode(node, value);
-  }
-
-  public ObservableValue<Boolean> getCheckBoxObservable(
-      DepanFxNodeListMember member) {
-    if (member instanceof DepanFxNodeListSection) {
-      return sectionsCheckBoxStates.computeIfAbsent(
-          (DepanFxNodeListSection) member,
-          s -> new SimpleBooleanProperty(false));
-    }
-    if (member instanceof DepanFxNodeListGraphNode) {
-      return nodesCheckBoxStates
-          .get(((DepanFxNodeListGraphNode) member).getGraphNode());
-    }
-    return null;
-  }
-
-  /**
-   * Since the previous state may have been unknown, provide the final
-   * state for interested parties.
-   */
-  public boolean doInvertGraphNodeAction(GraphNode node) {
-    return invertSelectGraphNode(node);
   }
 
   public void updateNodeLocations(
@@ -449,40 +377,46 @@ public class DepanFxNodeViewPanel {
   }
 
   /////////////////////////////////////
-  // Internal
+  // For NodeListTable integration
 
-  private ContextMenu buildViewContextMenu() {
-    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem(
-        SELECT_ALL_ITEM, e -> doSelectAllAction());
-    builder.appendActionItem(
-        CLEAR_SELECTION_ITEM, e -> doClearSelectionAction());
-    builder.appendActionItem(
-        INVERT_SELECTION_ITEM, e -> doInvertSelectionAction());
-    builder.appendActionItem(
-        NODE_SELECTION_ITEM, e -> runNodeSelectionDialog());
+  private void runNodeSelectionDialog() {
+    String selectName =
+        viewData.getToolName() + " nodes." + DepanFxNodeList.NODE_LIST_EXT;
 
-    builder.appendSeparator();
-    builder.appendSubMenu(buildEdgeDisplayMenu());
-    Menu edgeVizMenu = new Menu(EDGE_VISIBLITY);
-    builder.appendSubMenu(edgeVizMenu);
+    DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc =
+        DepanFxProjects.getBuiltIn(
+            workspace,  DepanFxNodeListTableViewData.class,
+            DepanFxNodeListConfiguration.MEMBER_TABLE_VIEW_PATH).get();
 
-    builder.appendSeparator();
-    builder.appendSubMenu(buildLayoutNodesMenu());
+    Path selectPath = DepanFxProjects.getCurrentAnalysesPath(workspace)
+        .map(p -> p.resolve(selectName))
+        .get();
+     Stage nodeSelectDialog = workspace.getCurrentProject()
+        .flatMap(p -> p.asProjectDocument(selectPath))
+        .map(d -> DepanFxNodeViewNodeSelectDialog.runEditDialog(
+            dialogRunner, this, tableViewRsrc.getResource(), d))
+        .get();
 
-    builder.appendSeparator();
-    builder.appendActionItem(TAKE_SCREENSHOT, e -> takeScreenshot());
+     sideViews.add(nodeSelectDialog);
+     nodeSelectDialog.setOnCloseRequest(
+         e -> sideViews.remove(nodeSelectDialog));
+  }
 
-    builder.appendSeparator();
-    builder.appendActionItem(
-        DepanFxSaveNodeListDialog.SAVE_NODE_LIST,
-        e -> runSaveNodeListDialog());
-    builder.appendActionItem(
-        SAVE_NODE_VIEW_ITEM, e -> runSaveNodeViewDialog());
+  /**
+   * Provides the full set of view nodes as a node list.
+   */
+  private DepanFxNodeList buildViewNodesAsNodeList() {
+    return DepanFxNodeLists.buildNodeList(
+        getToolName() + " nodes",
+        "Nodes from " + getToolName(),
+        getGraphDocRsrc(),
+        new ArrayList<>(viewNodes));
+  }
 
-    ContextMenu result = builder.build();
-    result.setOnShowing(e -> populateEdgeVisibilityMenu(edgeVizMenu));
-    return result;
+  private void onSelectionChange(GraphNode node, boolean value) {
+    if (viewNodes.contains(node)) {
+      JoglShapes.updateSelection(joglPane, node, value);
+    }
   }
 
   /////////////////////////////////////
@@ -530,6 +464,43 @@ public class DepanFxNodeViewPanel {
     sideViews.add(edgeDisplayDialog);
     edgeDisplayDialog.setOnCloseRequest(
         e -> sideViews.remove(edgeDisplayDialog));
+  }
+
+  /////////////////////////////////////
+  // Menus and UX
+
+  private ContextMenu buildViewContextMenu() {
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem(
+        SELECT_ALL_ITEM, e -> nodeSelection.doSelectAllAction());
+    builder.appendActionItem(
+        CLEAR_SELECTION_ITEM, e -> nodeSelection.doClearSelectionAction());
+    builder.appendActionItem(
+        INVERT_SELECTION_ITEM, e -> nodeSelection.doInvertSelectionAction());
+    builder.appendActionItem(
+        NODE_SELECTION_ITEM, e -> runNodeSelectionDialog());
+
+    builder.appendSeparator();
+    builder.appendSubMenu(buildEdgeDisplayMenu());
+    Menu edgeVizMenu = new Menu(EDGE_VISIBLITY);
+    builder.appendSubMenu(edgeVizMenu);
+
+    builder.appendSeparator();
+    builder.appendSubMenu(buildLayoutNodesMenu());
+
+    builder.appendSeparator();
+    builder.appendActionItem(TAKE_SCREENSHOT, e -> takeScreenshot());
+
+    builder.appendSeparator();
+    builder.appendActionItem(
+        DepanFxSaveNodeListDialog.SAVE_NODE_LIST,
+        e -> runSaveNodeListDialog());
+    builder.appendActionItem(
+        SAVE_NODE_VIEW_ITEM, e -> runSaveNodeViewDialog());
+
+    ContextMenu result = builder.build();
+    result.setOnShowing(e -> populateEdgeVisibilityMenu(edgeVizMenu));
+    return result;
   }
 
   /////////////////////////////////////
@@ -656,7 +627,7 @@ public class DepanFxNodeViewPanel {
     DepanFxSaveNodeListDialog.runSaveNodeList(
             dialogRunner, buildSelectedAsNodeList())
         .map(r -> r.getResource().getNodes())
-        .ifPresent(this::doSelectGraphNodesAction);
+        .ifPresent(nodeSelection::doSelectGraphNodesAction);
   }
 
   private void runSaveNodeViewDialog() {
@@ -717,7 +688,7 @@ public class DepanFxNodeViewPanel {
 
   private void populateJoglPane() {
 
-    streamViewNodes().forEach(this::installShape);
+    viewNodes.forEach(this::installShape);
 
     edgeDisplay = new EdgeDisplayController(joglPane,
         viewData.getLinkDisplayDocRsrc().getResource(),
@@ -767,72 +738,6 @@ public class DepanFxNodeViewPanel {
     return true;
   }
 
-  /////////////////////////////////////
-  // Selected nodes
-
-  private void runNodeSelectionDialog() {
-    String selectName =
-        viewData.getToolName() + " nodes." + DepanFxNodeList.NODE_LIST_EXT;
-
-    DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc =
-        DepanFxProjects.getBuiltIn(
-            workspace,  DepanFxNodeListTableViewData.class,
-            DepanFxNodeListConfiguration.MEMBER_TABLE_VIEW_PATH).get();
-
-    Path selectPath = DepanFxProjects.getCurrentAnalysesPath(workspace)
-        .map(p -> p.resolve(selectName))
-        .get();
-     Stage nodeSelectDialog = workspace.getCurrentProject()
-        .flatMap(p -> p.asProjectDocument(selectPath))
-        .map(d -> DepanFxNodeViewNodeSelectDialog.runEditDialog(
-            dialogRunner, this, tableViewRsrc.getResource(), d))
-        .get();
-
-     sideViews.add(nodeSelectDialog);
-     nodeSelectDialog.setOnCloseRequest(
-         e -> sideViews.remove(nodeSelectDialog));
-  }
-
-  private Map<GraphNode, BooleanProperty>
-      buildNodesCheckBoxStates(Collection<GraphNode> nodes) {
-    Map<GraphNode, BooleanProperty> result = new HashMap<>(nodes.size());
-    nodes.forEach(n -> result.put(n, buildNodeSelectState(n)));
-    return result;
-  }
-
-  private BooleanProperty buildNodeSelectState(GraphNode node) {
-    SimpleBooleanProperty result = new SimpleBooleanProperty(false);
-    result.addListener((e, o, n) -> updateSelectedNodeRendering(node, n));
-    return result;
-  }
-
-  private void updateSelectedNodeRendering(GraphNode node, boolean value) {
-    if (viewNodes.contains(node)) {
-      JoglShapes.updateSelection(joglPane, node, value);
-    }
-  }
-
-  private BooleanProperty setSelectGraphNode(GraphNode node, boolean value) {
-    BooleanProperty result = nodesCheckBoxStates.get(node);
-    result.set(value);
-    return result;
-  }
-
-  /**
-   * Since the previous state may have been unknown, provide the final
-   * state for interested parties.
-   */
-  private boolean invertSelectGraphNode(GraphNode node) {
-    BooleanProperty checkedProperty = nodesCheckBoxStates.get(node);
-    boolean result = !checkedProperty.get();
-    checkedProperty.set(result);
-    return result;
-  }
-
-  private boolean isSelected(GraphNode node) {
-    return nodesCheckBoxStates.get(node).get();
-  }
-
   private class ViewMouseActionListener implements JoglMouseActionListener {
 
     @Override
@@ -868,17 +773,20 @@ public class DepanFxNodeViewPanel {
 
     @Override
     public void setSelection(List<Object> selection) {
-      doSelectGraphNodesAction(selection);
+      // Used for lookups, so a set is appropriate here.
+      Collection<GraphNode> nodes = new HashSet<>(selection.size());
+      streamNodes(selection).forEach(nodes::add);
+      nodeSelection.doSelectGraphNodesAction(nodes);
     }
 
     @Override
     public void reduceSelection(List<Object> reduction) {
-      doSelectGraphNodesAction(streamNodes(reduction), false);
+      nodeSelection.doSelectGraphNodesAction(streamNodes(reduction), false);
     }
 
     @Override
     public void extendSelection(List<Object> extension) {
-      doSelectGraphNodesAction(streamNodes(extension), true);
+      nodeSelection.doSelectGraphNodesAction(streamNodes(extension), true);
     }
 
     @Override
@@ -890,7 +798,6 @@ public class DepanFxNodeViewPanel {
       return source.stream()
           .filter(o -> o instanceof GraphNode)
           .map(GraphNode.class::cast);
-          // .collect(Collectors.toList());
     }
   }
 }

@@ -6,7 +6,6 @@ import com.pnambic.depanfx.nodelist.gui.columns.DepanFxFocusColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxFocusColumnToolDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumnToolDialog;
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
@@ -21,7 +20,6 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +36,7 @@ import javafx.scene.control.SeparatorMenuItem;
 public class DepanFxNodeListTableCommands {
 
   private static final Logger LOG =
-      LoggerFactory.getLogger(DepanFxNodeListTableCommands.ADD_COLUMN);
+      LoggerFactory.getLogger(DepanFxNodeListTableCommands.class);
 
   public static final String SELECT_ALL_ITEM = "Select All";
 
@@ -71,25 +69,25 @@ public class DepanFxNodeListTableCommands {
 
   private final DepanFxDialogRunner dialogRunner;
 
-  private final DepanFxNodeListTableAdapter tableAdapter;
+  private final DepanFxNodeListTableState tableState;
 
   public DepanFxNodeListTableCommands(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
-      DepanFxNodeListTableAdapter tableAdapter) {
+      DepanFxNodeListTableState tableState) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
-    this.tableAdapter = tableAdapter;
+    this.tableState = tableState;
   }
 
   public ContextMenu buildViewContextMenu() {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
     builder.appendActionItem(
-        SELECT_ALL_ITEM, e -> tableAdapter.doSelectAllAction());
+        SELECT_ALL_ITEM, e -> tableState.doSelectAllAction());
     builder.appendActionItem(
-        CLEAR_SELECTION_ITEM, e -> tableAdapter.doClearSelectionAction());
+        CLEAR_SELECTION_ITEM, e -> tableState.doClearSelectionAction());
     builder.appendActionItem(
-        INVERT_SELECTION_ITEM, e -> tableAdapter.doInvertSelectionAction());
+        INVERT_SELECTION_ITEM, e -> tableState.doInvertSelectionAction());
     builder.appendSeparator();
     builder.appendActionItem(
         SELECT_NODE_LIST, e -> runSelectionNodeListDialog());
@@ -136,25 +134,25 @@ public class DepanFxNodeListTableCommands {
 
   private void runNodeListTableViewChooser() {
     DepanFxNodeListTableViewSaveDialog
-        .runTableViewChooser(workspace, dialogRunner, tableAdapter.getScene())
-        .ifPresent(r -> tableAdapter.setTableView(r.getResource()));
+        .runTableViewChooser(workspace, dialogRunner, tableState.getScene())
+        .ifPresent(r -> tableState.setTableView(r.getResource()));
   }
 
   private void runSelectionNodeListDialog() {
     DepanFxNodeListChooser.runNodeListChooser(
-            workspace, dialogRunner, tableAdapter.getScene())
+            workspace, dialogRunner, tableState.getScene())
         .map(r -> r.getResource().getNodes())
         .ifPresent(l ->
-            tableAdapter.doSelectGraphNodesAction(l.stream(), true));
+        tableState.doSelectGraphNodesAction(l.stream(), true));
   }
 
   private void runSaveNodeListDialog() {
     DepanFxSaveNodeListDialog.runSaveNodeList(
-        dialogRunner, tableAdapter.getSelection());
+        dialogRunner, tableState.getSelection());
   }
 
   private void runNodeListTableViewSaveDialog() {
-    DepanFxNodeListTableViewData tableView = tableAdapter.getTableView();
+    DepanFxNodeListTableViewData tableView = tableState.getTableView();
     DepanFxNodeListTableViewSaveDialog.runSaveTableView(
         dialogRunner, tableView);
   }
@@ -174,11 +172,11 @@ public class DepanFxNodeListTableCommands {
     filters.add(ANY_COLUMN_RSRC_FILTER);
     rsrcChooser.setSelectedExtensionFilter(ANY_COLUMN_RSRC_FILTER);
 
-    rsrcChooser.showOpenDialog(tableAdapter.getScene())
+    rsrcChooser.showOpenDialog(tableState.getScene())
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(m -> workspace.getWorkspaceResource(
             m, DepanFxBaseColumnData.class))
-        .ifPresent(tableAdapter::addColumn);
+        .ifPresent(tableState::addColumn);
   }
 
   private void doNewNodeKeyColumnAction() {
@@ -188,7 +186,7 @@ public class DepanFxNodeListTableCommands {
         DepanFxNodeKeyColumnToolDialog.runCreateDialog(
             initialData, dialogRunner);
     createDlg.getController().getWorkspaceResource()
-        .ifPresent(tableAdapter::addColumn);
+        .ifPresent(tableState::addColumn);
   }
 
   private void doNewFocusColumnAction() {
@@ -198,7 +196,7 @@ public class DepanFxNodeListTableCommands {
         DepanFxFocusColumnToolDialog.runCreateDialog(
             initialData, dialogRunner);
     createDlg.getController().getWorkspaceResource()
-        .ifPresent(tableAdapter::addColumn);
+        .ifPresent(tableState::addColumn);
   }
 
   private void doNewCategoryColumnAction() {
@@ -208,6 +206,6 @@ public class DepanFxNodeListTableCommands {
         DepanFxCategoryColumnToolDialog.runCreateDialog(
             initialData, dialogRunner);
     createDlg.getController().getWorkspaceResource()
-        .ifPresent(tableAdapter::addColumn);
+        .ifPresent(tableState::addColumn);
   }
 }

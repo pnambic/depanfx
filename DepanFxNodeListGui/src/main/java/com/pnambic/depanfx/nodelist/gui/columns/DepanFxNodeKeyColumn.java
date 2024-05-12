@@ -2,9 +2,8 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.graph.context.ContextNodeId;
 import com.pnambic.depanfx.graph.context.ContextNodeKindId;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewer;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData.KeyChoice;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;

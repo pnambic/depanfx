@@ -31,12 +31,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.cell.CheckBoxTreeTableCell;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 public class DepanFxNodeListCell
@@ -69,7 +67,8 @@ public class DepanFxNodeListCell
   public DepanFxNodeListCell(DepanFxNodeListTableAdapter tableAdapter) {
     this.tableAdapter = tableAdapter;
     setConverter(new NameConverter());
-    setSelectedStateCallback(new SelectionState());
+    setSelectedStateCallback(
+        p -> tableAdapter.getCheckBoxObservable(p.intValue()));
   }
 
   @Override
@@ -223,8 +222,6 @@ public class DepanFxNodeListCell
   }
 
   private void runInsertMemberTreeSectionAction(DepanFxNodeListSection before) {
-    DepanFxTreeSection treeSection = new DepanFxTreeSection(
-        tableAdapter, getInitialTreeSectionResource().get());
     tableAdapter.insertSection(before, getInitialTreeSectionResource().get());
   }
 
@@ -307,17 +304,6 @@ public class DepanFxNodeListCell
           currItem.setExpanded(true);
         }
       }
-    }
-  }
-
-  private class SelectionState
-      implements Callback<Integer, ObservableValue<Boolean>> {
-
-    @Override
-    public ObservableValue<Boolean> call(Integer param) {
-      TreeItem<DepanFxNodeListMember> item =
-          tableAdapter.getTreeItem(param.intValue());
-      return tableAdapter.getCheckBoxObservable(item.getValue());
     }
   }
 

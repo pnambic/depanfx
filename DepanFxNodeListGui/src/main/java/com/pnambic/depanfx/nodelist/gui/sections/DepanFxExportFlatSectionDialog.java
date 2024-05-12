@@ -34,7 +34,8 @@ public class DepanFxExportFlatSectionDialog
   public static Dialog<DepanFxExportFlatSectionDialog> runExportDialog(
       DepanFxFlatSection flatSection, DepanFxNodeListTableAdapter tableAdapter) {
     Dialog<DepanFxExportFlatSectionDialog> dlg =
-        tableAdapter.buildDialog(DepanFxExportFlatSectionDialog.class);
+        tableAdapter.getDialogRunner()
+            .createDialogAndParent(DepanFxExportFlatSectionDialog.class);
     dlg.getController().setFlatSectionInfo(flatSection, tableAdapter);
     dlg.runDialog("Export Flat Section");
     return dlg;
