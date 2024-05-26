@@ -22,6 +22,7 @@ module depanfx.app {
     requires depanfx.java.gui;
     requires depanfx.java.nodeview;
     requires depanfx.nodelist.gui;
+    requires depanfx.nodelist.viewer;
     requires depanfx.nodeview.gui;
     requires depanfx.perspective;
     requires depanfx.persistence;

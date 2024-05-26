@@ -8,6 +8,7 @@ import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
+import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
@@ -38,7 +39,6 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -103,29 +103,24 @@ public class DepanFxCategoryColumnToolDialog
   }
 
   @FXML
-  @SuppressWarnings("unchecked")
   public void initialize() {
-    TableColumn<EditCategory, String> labelColumn =
-        (TableColumn<EditCategory, String>) categoriesTable.getColumns().get(0);
+    DepanFxTableColumnBinder<EditCategory> columnBinder =
+        new DepanFxTableColumnBinder<>(categoriesTable);
 
+    TableColumn<EditCategory, String> labelColumn =
+        columnBinder.bind("categoryLabel");
     labelColumn.setCellFactory(TextFieldTableCell.forTableColumn());
     labelColumn.setOnEditCommit(this::onUpdateLabelEvent);
-    labelColumn.setCellValueFactory(
-        new PropertyValueFactory<>("categoryLabel"));
 
     TableColumn<EditCategory, String> filePathColumn =
-        (TableColumn<EditCategory, String>) categoriesTable.getColumns().get(1);
-    filePathColumn.setCellValueFactory(
-        new PropertyValueFactory<>("nodeListName"));
+        columnBinder.bind("nodeListName");
 
-    TableColumn<EditCategory, String> findActionColumn =
-        (TableColumn<EditCategory, String>) categoriesTable.getColumns().get(2);
+    TableColumn<EditCategory, String> findActionColumn = columnBinder.next();
     findActionColumn.setCellFactory(
         p -> new ButtonActionCell<EditCategory, String>(
             "Find...", this::runNodeListFinder));
 
-    TableColumn<EditCategory, String> deleteActionColumn =
-        (TableColumn<EditCategory, String>) categoriesTable.getColumns().get(3);
+    TableColumn<EditCategory, String> deleteActionColumn = columnBinder.next();
     deleteActionColumn.setCellFactory(
         p -> new ButtonActionCell<EditCategory, String>(
             "Delete", this::onDeleteEntryLabelEvent));

@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodeview.gui;
 
 import com.pnambic.depanfx.graph.model.GraphEdge;
+import com.pnambic.depanfx.graph.model.GraphModels;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
@@ -77,9 +78,7 @@ public class DepanFxNodeViews {
 
     GraphDocument graphDoc = graphDocRsrc.getResource();
 
-    Collection<GraphNode> nodes = graphDoc.getGraph().getNodes().stream()
-        .map(GraphNode.class::cast)
-        .collect(Collectors.toList());
+    Collection<GraphNode> nodes = graphDoc.getGraph().getGraphNodes();
 
     String baseName =
         DepanFxWorkspaceFactory.buildDocTitle(graphDocRsrc.getDocument());

@@ -29,7 +29,7 @@ dependencies {
   implementation project(':DepanFxJavaGui')
   implementation project(':DepanFxJavaNodeView')
   implementation project(':DepanFxNodeListGui')
-  implementation project(':DepanFxNodeListGui')
+  implementation project(':DepanFxNodeListViewer')
   implementation project(':DepanFxNodeViewGui')
   implementation project(':DepanFxPersistence')
   implementation project(':DepanFxPerspective')

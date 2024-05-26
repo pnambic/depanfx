@@ -1,12 +1,15 @@
 package com.pnambic.depanfx.nodeview.gui;
 
 import com.pnambic.depanfx.graph.context.ContextModelId;
+import com.pnambic.depanfx.graph.context.GraphContextKeys;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.jogl.JoglMouseActionListener;
+import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeViewNodeFiltersDialog;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListConfiguration;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
@@ -71,13 +74,9 @@ import javafx.stage.Stage;
 
 public class DepanFxNodeViewPanel {
 
-  private static final String SELECT_ALL_ITEM = "Select All";
-
-  private static final String CLEAR_SELECTION_ITEM = "Clear Selection";
-
-  private static final String INVERT_SELECTION_ITEM = "Invert Selection";
-
   private static final String NODE_SELECTION_ITEM = "Node Selection...";
+
+  private static final String FILTER_SELECTION_ITEM = "Filter Selection...";
 
   private static final String SAVE_NODE_VIEW_ITEM = "Save node view...";
 
@@ -287,6 +286,13 @@ public class DepanFxNodeViewPanel {
   /**
    * Provides the full set of view nodes as a node list.
    */
+  public DepanFxNodeList getNodeSelectionAsNodeList() {
+    return viewNodesAsNodeList;
+  }
+
+  /**
+   * Provides the full set of view nodes as a node list.
+   */
   public DepanFxNodeList getViewNodesAsNodeList() {
     return viewNodesAsNodeList;
   }
@@ -385,7 +391,7 @@ public class DepanFxNodeViewPanel {
 
     DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc =
         DepanFxProjects.getBuiltIn(
-            workspace,  DepanFxNodeListTableViewData.class,
+            workspace, DepanFxNodeListTableViewData.class,
             DepanFxNodeListConfiguration.MEMBER_TABLE_VIEW_PATH).get();
 
     Path selectPath = DepanFxProjects.getCurrentAnalysesPath(workspace)
@@ -414,9 +420,28 @@ public class DepanFxNodeViewPanel {
   }
 
   private void onSelectionChange(GraphNode node, boolean value) {
+    LOG.info("Node {} selection {}",
+        GraphContextKeys.toNodeKey(node.getId()), value);
     if (viewNodes.contains(node)) {
       JoglShapes.updateSelection(joglPane, node, value);
     }
+  }
+
+  private void runFilterSelectionDialog() {
+
+    DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc =
+        DepanFxProjects.getBuiltIn(
+            workspace,  DepanFxNodeListTableViewData.class,
+            DepanFxNodeListConfiguration.FLAT_TABLE_VIEW_PATH).get();
+    DepanFxNodeList filteredNodes = getNodeSelection().getSelection(getNodeSelectionAsNodeList());
+
+    Stage filterSelctionDialog = DepanFxNodeViewNodeFiltersDialog.runEditDialog(
+        dialogRunner, null, tableViewRsrc.getResource(), filteredNodes,
+        nl -> nodeSelection.doSelectGraphNodesAction(nl.getNodes()));
+
+     sideViews.add(filterSelctionDialog);
+     filterSelctionDialog.setOnCloseRequest(
+         e -> sideViews.remove(filterSelctionDialog));
   }
 
   /////////////////////////////////////
@@ -472,13 +497,20 @@ public class DepanFxNodeViewPanel {
   private ContextMenu buildViewContextMenu() {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
     builder.appendActionItem(
-        SELECT_ALL_ITEM, e -> nodeSelection.doSelectAllAction());
+        DepanFxNodeListTableCommands.SELECT_ALL_ITEM,
+        e -> nodeSelection.doSelectAllAction());
     builder.appendActionItem(
-        CLEAR_SELECTION_ITEM, e -> nodeSelection.doClearSelectionAction());
+        DepanFxNodeListTableCommands.CLEAR_SELECTION_ITEM,
+        e -> nodeSelection.doClearSelectionAction());
     builder.appendActionItem(
-        INVERT_SELECTION_ITEM, e -> nodeSelection.doInvertSelectionAction());
+        DepanFxNodeListTableCommands.INVERT_SELECTION_ITEM,
+        e -> nodeSelection.doInvertSelectionAction());
     builder.appendActionItem(
-        NODE_SELECTION_ITEM, e -> runNodeSelectionDialog());
+        NODE_SELECTION_ITEM,
+        e -> runNodeSelectionDialog());
+    builder.appendActionItem(
+        FILTER_SELECTION_ITEM,
+        e -> runFilterSelectionDialog());
 
     builder.appendSeparator();
     builder.appendSubMenu(buildEdgeDisplayMenu());

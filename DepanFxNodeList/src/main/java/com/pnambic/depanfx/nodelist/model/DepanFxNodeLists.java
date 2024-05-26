@@ -31,9 +31,7 @@ public class DepanFxNodeLists {
       DepanFxWorkspaceResource<GraphDocument> graphDocRsrc) {
 
     GraphDocument graphDoc = graphDocRsrc.getResource();
-    Collection<GraphNode> nodes = graphDoc.getGraph().getNodes().stream()
-        .map(GraphNode.class::cast)
-        .collect(Collectors.toList());
+    Collection<GraphNode> nodes = graphDoc.getGraph().getGraphNodes();
 
     String baseName =
         DepanFxWorkspaceFactory.buildDocTitle(graphDocRsrc.getDocument());

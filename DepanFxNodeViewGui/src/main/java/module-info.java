@@ -22,6 +22,8 @@ module depanfx.nodeview.gui {
   requires depanfx.workspace;
   requires depanfx.scene;
   requires java.desktop;
+  requires depanfx.nodefilters.gui;
+  requires depanfx.nodefilters;
 
   opens com.pnambic.depanfx.nodeview.gui
       to javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;

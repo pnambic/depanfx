@@ -24,9 +24,11 @@ import com.pnambic.depanfx.graph.info.GraphEdgeInfo;
 import com.pnambic.depanfx.graph.info.GraphModelInfo;
 import com.pnambic.depanfx.graph.info.GraphNodeInfo;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class GraphModel extends BasicGraph<ContextNodeId, ContextRelationId> {
@@ -47,6 +49,27 @@ public class GraphModel extends BasicGraph<ContextNodeId, ContextRelationId> {
     this.edgeInfoMap = edgeInfoMap;
     this.nodeInfoMap = nodeInfoMap;
     this.modelInfoMap = modelInfoMap;
+  }
+
+  /**
+   * Provides the generic nodes from the graph model as a stream of graph nodes.
+   * Simplifies type correct access to the nodes from the graph model.
+   */
+  public Stream<GraphNode> streamGraphNodes() {
+    return getNodes().stream().map(GraphNode.class::cast);
+  }
+
+  /**
+   * Provides the generic nodes from the graph model as a collection
+   * of graph nodes. Simplifies type correct access to the nodes
+   * from the graph model.
+   */
+  public Collection<GraphNode> getGraphNodes() {
+    return streamGraphNodes().collect(Collectors.toList());
+  }
+
+  public Stream<GraphEdge> streamEdges() {
+    return getEdges().stream().map(GraphEdge.class::cast);
   }
 
   public Optional<GraphEdgeInfo> getEdgeInfo(

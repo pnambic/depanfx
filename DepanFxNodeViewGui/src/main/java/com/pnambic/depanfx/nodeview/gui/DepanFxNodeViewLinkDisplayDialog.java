@@ -13,6 +13,7 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
@@ -45,8 +46,6 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.ComboBoxTableCell;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
@@ -124,8 +123,8 @@ public class DepanFxNodeViewLinkDisplayDialog
   @FXML
   @SuppressWarnings("unused")
   public void initialize() {
-    ColumnBinder<EditLinkDisplay> columnBinder =
-        new ColumnBinder<>(linksDisplayTable);
+    DepanFxTableColumnBinder<EditLinkDisplay> columnBinder =
+        new DepanFxTableColumnBinder<>(linksDisplayTable);
 
     TableColumn<EditLinkDisplay, String> labelColumn =
         columnBinder.bind("linkDisplayLabel");
@@ -312,37 +311,6 @@ public class DepanFxNodeViewLinkDisplayDialog
 
   private static enum LinkOrderOperation {
     NONE, UP, DOWN, DELETE;
-  }
-
-  private static class ColumnBinder<S> {
-
-    private final TableView<S> tableView;
-
-    private int next = 0;
-
-    public ColumnBinder(TableView<S> tableView) {
-      this.tableView = tableView;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> TableColumn<S, T> bind(String propName) {
-      TableColumn<S, T> result =
-          (TableColumn<S, T>) tableView.getColumns().get(next);
-      next ++;
-
-      result.setCellValueFactory(new PropertyValueFactory<>(propName));
-      return result;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> TableColumn<S, T> bind(String propName, Class<?> type) {
-      TableColumn<S, T> result = bind(propName);
-
-      T[] values = (T[]) type.getEnumConstants();
-      result.setCellFactory(
-          ComboBoxTableCell.forTableColumn(values));
-      return result;
-    }
   }
 
   private static class ColorCellFactory

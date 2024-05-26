@@ -33,10 +33,11 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
    * The resource associated with the destination is empty
    * unless there has been a successful save.
    */
-  Optional<DepanFxWorkspaceResource<T>> optResource = Optional.empty();
+  protected Optional<DepanFxWorkspaceResource<T>> optResource =
+      Optional.empty();
 
   @FXML
-  TextField destinationField;
+  private TextField destinationField;
 
   public DepanFxBaseDocumentDialog(
       DepanFxWorkspace workspace, Class<T> dataType) {

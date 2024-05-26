@@ -18,6 +18,8 @@ dependencies {
   implementation project(':DepanFxGraph')
   implementation project(':DepanFxGraphDoc')
   implementation project(':DepanFxJogl')
+  implementation project(':DepanFxNodeFilters')
+  implementation project(':DepanFxNodeFiltersGui')
   implementation project(':DepanFxNodeList')
   implementation project(':DepanFxNodeListGui')
   implementation project(':DepanFxNodeViewData')

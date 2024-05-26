@@ -69,8 +69,7 @@ public class DepanFxNodeListSelection {
 
   public DepanFxNodeList getSelection(DepanFxNodeList nodeList) {
     return DepanFxNodeLists.buildRelatedNodeList(
-        nodeList, streamSelectedNodes()
-        .collect(Collectors.toList()));
+        nodeList, streamSelectedNodes().collect(Collectors.toList()));
   }
 
   public void doSelectAllAction() {

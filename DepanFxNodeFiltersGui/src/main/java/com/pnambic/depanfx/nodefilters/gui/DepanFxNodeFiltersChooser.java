@@ -1,0 +1,195 @@
+/*
+ * Copyright 2024 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.pnambic.depanfx.nodefilters.gui;
+
+import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
+import com.pnambic.depanfx.nodefilters.tooldata.DepanFxMatcherFilterData;
+import com.pnambic.depanfx.nodefilters.tooldata.DepanFxSequenceFilterData;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
+import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
+
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+
+import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TextField;
+
+public class DepanFxNodeFiltersChooser {
+
+  public static final String SELECT_NODE_FILTER = "Select Node Filter ...";
+
+  public static final String ANY_FILTER_TOOL_EXT = "d*fti";
+
+  private static final Class<?>[] filterTypes = new Class<?>[]{
+      DepanFxMatcherFilterData.class,
+      DepanFxSequenceFilterData.class
+  };
+
+  public static final DepanFxResourceFilter NODE_FILTER_FILTER =
+      DepanFxResourceFilter.buildResourceFilter(
+          "Node Filter", ANY_FILTER_TOOL_EXT, Arrays.asList(filterTypes));
+
+  /**
+   * Bind a pop-up to text field for the resource name.
+   */
+  public static class NodeFilterControl {
+
+    public final DepanFxWorkspace workspace;
+
+    private final DepanFxDialogRunner dialogRunner;
+
+    private DepanFxWorkspaceResource<? extends DepanFxBaseFilterData> nodeFilterRsrc;
+
+    private final TextField nodeFilterField;
+
+    public NodeFilterControl(
+        DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner,
+        TextField nodeFilterField) {
+      this.workspace = workspace;
+      this.dialogRunner = dialogRunner;
+      this.nodeFilterField = nodeFilterField;
+      nodeFilterField.setContextMenu(buildContextMenu());
+    }
+
+    public void setNodeFilterRsrc(
+        DepanFxWorkspaceResource<? extends DepanFxBaseFilterData> nodeFilterRsrc) {
+      this.nodeFilterRsrc = nodeFilterRsrc;
+      nodeFilterField.setText(getNodeFilterRsrcName());
+    }
+
+    public DepanFxWorkspaceResource<? extends DepanFxBaseFilterData>
+        getNodeFilterResource() {
+
+      return nodeFilterRsrc;
+    }
+
+    public String getNodeFilterRsrcName() {
+      if (nodeFilterRsrc != null) {
+        return nodeFilterRsrc.getDocument().getMemberPath().toString();
+      }
+      // Let the text input field show a prompt text.
+      return null;
+    }
+
+    private ContextMenu buildContextMenu() {
+      DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+      builder.appendActionItem(
+          SELECT_NODE_FILTER, e -> runNodeFilterFinder());
+      return builder.build();
+    }
+
+    private void runNodeFilterFinder() {
+      DepanFxNodeFiltersChooser
+          .runNodeFiltersFinder(
+                workspace, dialogRunner, nodeFilterField.getScene())
+          .ifPresent(this::setNodeFilterRsrc);
+    }
+  }
+
+  /**
+   * Bind a pop-up to table cell for the resource name.
+   */
+  public static class NodeFilterCell<T>
+      extends TableCell<T, String> {
+
+    private final DepanFxWorkspace workspace;
+
+    private final DepanFxDialogRunner dialogRunner;
+
+    private final Scene scene;
+
+    private final BiConsumer<
+            T, DepanFxWorkspaceResource<? extends DepanFxBaseFilterData>>
+        matcherConsumer;
+
+    public NodeFilterCell(
+        DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner,
+        Scene scene,
+        BiConsumer<
+            T,
+            DepanFxWorkspaceResource<? extends DepanFxBaseFilterData>> matcherConsumer) {
+      this.workspace = workspace;
+      this.dialogRunner = dialogRunner;
+      this.scene = scene;
+      this.matcherConsumer = matcherConsumer;
+    }
+
+    @Override
+    protected void updateItem(String displayName, boolean empty) {
+      super.updateItem(displayName, empty);
+
+      if (empty) {
+        setGraphic(null);
+        setContextMenu(null);
+        return;
+      }
+      setText(displayName);
+      setContextMenu(buildContextMenu());
+    }
+
+    private ContextMenu buildContextMenu() {
+      DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+      builder.appendActionItem(
+          SELECT_NODE_FILTER, e -> runNodeFilterFinder());
+      return builder.build();
+    }
+
+    private void runNodeFilterFinder() {
+      DepanFxNodeFiltersChooser
+          .runNodeFiltersFinder(workspace, dialogRunner, scene)
+          .ifPresent(r -> matcherConsumer.accept(getTableRow().getItem(), r));
+    }
+  }
+
+  /**
+   * Provide an existing link matcher.
+   */
+  public static Optional<DepanFxWorkspaceResource<? extends DepanFxBaseFilterData>>
+      runNodeFiltersFinder(
+            DepanFxWorkspace workspace,
+            DepanFxDialogRunner dialogRunner,
+            Scene scene) {
+
+    DepanFxResourceChooser chooser = prepareChooser(workspace, dialogRunner);
+    return chooser.showOpenDialog(scene)
+        .map(DepanFxProjectDocument.class::cast)
+        .flatMap(p -> workspace.getWorkspaceResource(
+            p, DepanFxBaseFilterData.class));
+  }
+
+  private static DepanFxResourceChooser prepareChooser(
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+    DepanFxResourceChooser result =
+        new DepanFxResourceChooser(workspace, dialogRunner);
+    DepanFxResourcePerspectives.prepareResourceFinder(
+        result, DepanFxProjects.TOOLS_PATH);
+    result.getExtensionFilters().add(NODE_FILTER_FILTER);
+    result.setSelectedExtensionFilter(NODE_FILTER_FILTER);
+    return result;
+  }
+}

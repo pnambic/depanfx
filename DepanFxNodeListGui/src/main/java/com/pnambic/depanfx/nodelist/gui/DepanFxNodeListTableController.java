@@ -7,14 +7,16 @@ import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import java.util.Collection;
 import java.util.stream.Stream;
 
 import javafx.beans.value.ObservableValue;
-import javafx.scene.control.ContextMenu;
+import javafx.scene.Scene;
 import javafx.scene.control.TreeTableView;
 
 /**
@@ -32,14 +34,17 @@ public class DepanFxNodeListTableController
   private final DepanFxNodeListTableState tableState;
 
   public DepanFxNodeListTableController(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
-      DepanFxNodeList nodeList, DepanFxNodeListTableViewData tableView,
+      DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner,
+      DepanFxNodeList nodeList,
+      DepanFxNodeListSelection selectedNodes,
+      DepanFxNodeListTableViewData tableView,
       TreeTableView<DepanFxNodeListMember> treeTable) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
     this.nodeList = nodeList;
 
-    tableState = prepareNodeListTable(tableView, treeTable);
+    tableState = prepareNodeListTable(tableView, treeTable, selectedNodes);
   }
 
   @Override // DepanFxNodeListTableAdapter
@@ -57,18 +62,45 @@ public class DepanFxNodeListTableController
     return nodeList.getGraphDocResource().getResource();
   }
 
+  public DepanFxNodeList buildRelatedNodeList(Collection<GraphNode> relatedNodes) {
+    return DepanFxNodeLists.buildRelatedNodeList(nodeList, relatedNodes);
+  }
+
+  public Collection<GraphNode> getNodes() {
+    return nodeList.getNodes();
+  }
+
   public TreeTableView<DepanFxNodeListMember> getNodeListTable() {
     return tableState.getNodeListTable();
   }
 
-  public ContextMenu buildViewContextMenu() {
-    DepanFxNodeListTableCommands tableCommands =
-        new DepanFxNodeListTableCommands(workspace, dialogRunner, tableState);
-    return tableCommands.buildViewContextMenu();
+  public DepanFxNodeListTableCommands buildTableCommands() {
+    return new DepanFxNodeListTableCommands(
+        workspace, dialogRunner, tableState);
   }
 
   public void setTableView(DepanFxNodeListTableViewData tableView) {
     tableState.setTableView(tableView);
+  }
+
+  public void doSelectAllAction() {
+    tableState.doSelectAllAction();
+  }
+
+  public void doClearSelectionAction() {
+    tableState.doClearSelectionAction();
+  }
+
+  public void doInvertSelectionAction() {
+    tableState.doInvertSelectionAction();
+  }
+
+  public DepanFxNodeList getSelection() {
+    return tableState.getSelection();
+  }
+
+  public Scene getScene() {
+    return tableState.getScene();
   }
 
   @Override // DepanFxNodeListTableAdapter
@@ -108,14 +140,21 @@ public class DepanFxNodeListTableController
     tableState.updateSection(section, sectionRsrc);
   }
 
+  /**
+   * Nodes in the collections are selected, all other nodes are not.
+   */
+  public void doSelectGraphNodesAction(Collection<GraphNode> nodes) {
+    tableState.doSelectGraphNodesAction(nodes);
+  }
+
   private DepanFxNodeListTableState prepareNodeListTable(
       DepanFxNodeListTableViewData tableView,
-      TreeTableView<DepanFxNodeListMember> treeTable) {
+      TreeTableView<DepanFxNodeListMember> treeTable,
+      DepanFxNodeListSelection selectedNodes) {
 
     DepanFxNodeListTableState result =
         new DepanFxNodeListTableState(
-            workspace, nodeList,
-            DepanFxNodeListSelection.forNodes(nodeList.getNodes()),
+            workspace, nodeList, selectedNodes,
             treeTable, new DepanFxNodeListTableFactory(this));
 
     result.setTableView(tableView);

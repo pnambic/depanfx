@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javafx.collections.ObservableList;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
@@ -80,23 +79,37 @@ public class DepanFxNodeListTableCommands {
     this.tableState = tableState;
   }
 
-  public ContextMenu buildViewContextMenu() {
-    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem(
-        SELECT_ALL_ITEM, e -> tableState.doSelectAllAction());
-    builder.appendActionItem(
-        CLEAR_SELECTION_ITEM, e -> tableState.doClearSelectionAction());
-    builder.appendActionItem(
-        INVERT_SELECTION_ITEM, e -> tableState.doInvertSelectionAction());
+  /**
+   * Add the table view submenu to the context menu.
+   */
+  public void addTableViewItems(DepanFxContextMenuBuilder builder) {
+    builder.appendSeparator();
+    builder.appendSubMenu(buildTableViewMenu());
+  }
+
+  /**
+   * Add load and save items to the context menu.
+   */
+  public void addLoadSaveItems(DepanFxContextMenuBuilder builder) {
     builder.appendSeparator();
     builder.appendActionItem(
         SELECT_NODE_LIST, e -> runSelectionNodeListDialog());
     builder.appendActionItem(
         DepanFxSaveNodeListDialog.SAVE_NODE_LIST,
         e -> runSaveNodeListDialog());
-    builder.appendSeparator();
-    builder.appendSubMenu(buildTableViewMenu());
-    return builder.build();
+  }
+
+  /**
+   * Add select all, select none, and invert selection items
+   * to the context menu.
+   */
+  public void addSelectItems(DepanFxContextMenuBuilder builder) {
+    builder.appendActionItem(
+        SELECT_ALL_ITEM, e -> tableState.doSelectAllAction());
+    builder.appendActionItem(
+        CLEAR_SELECTION_ITEM, e -> tableState.doClearSelectionAction());
+    builder.appendActionItem(
+        INVERT_SELECTION_ITEM, e -> tableState.doInvertSelectionAction());
   }
 
   private Menu newColumnMenu() {
@@ -142,8 +155,7 @@ public class DepanFxNodeListTableCommands {
     DepanFxNodeListChooser.runNodeListChooser(
             workspace, dialogRunner, tableState.getScene())
         .map(r -> r.getResource().getNodes())
-        .ifPresent(l ->
-        tableState.doSelectGraphNodesAction(l.stream(), true));
+        .ifPresent(l -> tableState.doSelectGraphNodesAction(l.stream(), true));
   }
 
   private void runSaveNodeListDialog() {

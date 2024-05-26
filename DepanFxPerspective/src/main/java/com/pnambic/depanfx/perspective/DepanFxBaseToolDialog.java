@@ -34,12 +34,20 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData>
     return toolNameField.getText();
   }
 
+  protected void setToolName(String newValue) {
+    toolNameField.setText(newValue);
+  }
+
   protected void updateBlankToolName(String newValue) {
     updateBlankField(toolNameField, newValue);
   }
 
   protected String getToolDescription() {
     return toolDescriptionField.getText();
+  }
+
+  protected void setToolDescription(String newValue) {
+    toolDescriptionField.setText(newValue);
   }
 
   protected void updateBlankToolDescription(String newValue) {

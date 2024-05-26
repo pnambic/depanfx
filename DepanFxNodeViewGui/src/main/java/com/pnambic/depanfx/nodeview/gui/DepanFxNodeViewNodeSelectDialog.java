@@ -2,10 +2,12 @@ package com.pnambic.depanfx.nodeview.gui;
 
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListConfiguration;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableController;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.perspective.DepanFxWorkspaceDialog;
+import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
@@ -17,12 +19,14 @@ import net.rgielen.fxweaver.core.FxmlView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableView;
 import javafx.stage.FileChooser;
@@ -44,6 +48,8 @@ public class DepanFxNodeViewNodeSelectDialog
   private static final ExtensionFilter NODE_LIST_FILTER =
       DepanFxSaveNodeListDialog.EXT_FILTER;
 
+  private final DepanFxDialogRunner dialogRunner;
+
   /**
    * Place holder for the context menu.
    */
@@ -63,10 +69,12 @@ public class DepanFxNodeViewNodeSelectDialog
 
   private DepanFxNodeListTableController tableControl;
 
+  @Autowired
   public DepanFxNodeViewNodeSelectDialog(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner) {
     super(workspace);
+    this.dialogRunner = dialogRunner;
   }
 
   /**
@@ -105,9 +113,11 @@ public class DepanFxNodeViewNodeSelectDialog
     }
 
     tableControl = new DepanFxNodeListTableController(
-        workspace, viewPanel.getDialogRunner(),
-        viewPanel.getViewNodesAsNodeList(), tableView, nodeSelectTable);
-    nodeTableCommands.setContextMenu(tableControl.buildViewContextMenu());
+        workspace, dialogRunner,
+        viewPanel.getViewNodesAsNodeList(), viewPanel.getNodeSelection(),
+        tableView, nodeSelectTable);
+
+    nodeTableCommands.setContextMenu(buildContextMenu());
   }
 
   public void setTableView(DepanFxNodeListTableViewData tableView) {
@@ -124,5 +134,14 @@ public class DepanFxNodeViewNodeSelectDialog
   @Override // DepanFxWorkspaceDialog
   public Scene getScene() {
     return nodeSelectTable.getScene();
+  }
+
+  private ContextMenu buildContextMenu() {
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    DepanFxNodeListTableCommands cmds = tableControl.buildTableCommands();
+    cmds.addSelectItems(builder);
+    cmds.addLoadSaveItems(builder);
+    cmds.addTableViewItems(builder);
+    return builder.build();
   }
 }

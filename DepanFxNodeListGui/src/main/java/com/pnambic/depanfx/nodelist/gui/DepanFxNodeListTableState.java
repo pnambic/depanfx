@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,6 +122,13 @@ public class DepanFxNodeListTableState {
 
   public void doInvertSelectionAction() {
     selectedNodes.doInvertSelectionAction();
+  }
+
+  /**
+   * For performance, a {@code HashSet<GraphNode>} is preferred.
+   */
+  public void doSelectGraphNodesAction(Collection<GraphNode> nodes) {
+    selectedNodes.doSelectGraphNodesAction(nodes);
   }
 
   public void doSelectGraphNodesAction(Stream<GraphNode> nodes, boolean value) {
