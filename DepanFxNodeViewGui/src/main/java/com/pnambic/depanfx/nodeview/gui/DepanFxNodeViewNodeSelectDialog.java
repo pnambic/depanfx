@@ -1,17 +1,9 @@
 package com.pnambic.depanfx.nodeview.gui;
 
-import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListConfiguration;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableFactory;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableState;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableController;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
-import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.perspective.DepanFxWorkspaceDialog;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -28,9 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -42,8 +32,7 @@ import javafx.stage.Stage;
 @Component
 @FxmlView("node-view-node-select-dialog.fxml")
 public class DepanFxNodeViewNodeSelectDialog
-    extends DepanFxWorkspaceDialog
-    implements DepanFxNodeListTableAdapter {
+    extends DepanFxWorkspaceDialog {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeViewNodeSelectDialog.class);
@@ -54,8 +43,6 @@ public class DepanFxNodeViewNodeSelectDialog
 
   private static final ExtensionFilter NODE_LIST_FILTER =
       DepanFxSaveNodeListDialog.EXT_FILTER;
-
-  private DepanFxNodeListTableState tableState;
 
   /**
    * Place holder for the context menu.
@@ -70,15 +57,11 @@ public class DepanFxNodeViewNodeSelectDialog
   @FXML
   private TreeTableView<DepanFxNodeListMember> nodeSelectTable;
 
-  /**
-   * Where live changes happen.
-   * Source of the displayed node list, and the keeper of the current selection.
-   */
-  private DepanFxNodeViewPanel viewPanel;
-
   private DepanFxProjectDocument destDoc;
 
   private DepanFxNodeListTableViewData tableView;
+
+  private DepanFxNodeListTableController tableControl;
 
   public DepanFxNodeViewNodeSelectDialog(
       DepanFxWorkspace workspace,
@@ -114,7 +97,6 @@ public class DepanFxNodeViewNodeSelectDialog
   }
 
   public void setViewPanel(DepanFxNodeViewPanel viewPanel) {
-    this.viewPanel = viewPanel;
     if (tableView == null) {
       Optional<DepanFxWorkspaceResource<DepanFxNodeListTableViewData>> optFlatView =
           ((DepanFxBuiltInProject) workspace.getBuiltInProject())
@@ -122,26 +104,17 @@ public class DepanFxNodeViewNodeSelectDialog
       optFlatView.ifPresent(r -> tableView = r.getResource());
     }
 
-    tableState = new DepanFxNodeListTableState(
-        workspace,
-        viewPanel.getViewNodesAsNodeList(),
-        viewPanel.getNodeSelection(),
-        nodeSelectTable,
-        new DepanFxNodeListTableFactory(this));
-    tableState.setTableView(tableView);
-
-    DepanFxNodeListTableCommands tableCommands =
-        new DepanFxNodeListTableCommands(
-            viewPanel.getWorkspace(),
-            viewPanel.getDialogRunner(),
-            tableState);
-    nodeTableCommands.setContextMenu(tableCommands.buildViewContextMenu());
+    tableControl = new DepanFxNodeListTableController(
+        workspace, viewPanel.getDialogRunner(),
+        viewPanel.getViewNodesAsNodeList(), tableView, nodeSelectTable);
+    nodeTableCommands.setContextMenu(tableControl.buildViewContextMenu());
   }
 
   public void setTableView(DepanFxNodeListTableViewData tableView) {
     this.tableView = tableView;
-    if (tableState != null) {
-      tableState.setTableView(tableView);
+
+    if (tableControl != null) {
+      tableControl.setTableView(tableView);
     }
   }
 
@@ -151,57 +124,5 @@ public class DepanFxNodeViewNodeSelectDialog
   @Override // DepanFxWorkspaceDialog
   public Scene getScene() {
     return nodeSelectTable.getScene();
-  }
-
-  ////////////////////////////////////////////
-  // DepanFxNodeListTableAdapter
-
-  @Override // DepanFxNodeListTableAdapter
-  public GraphDocument getGraphDoc() {
-    return viewPanel.getGraphDoc();
-  }
-
-  @Override // DepanFxNodeListTableAdapter
-  public DepanFxDialogRunner getDialogRunner() {
-    return viewPanel.getDialogRunner();
-  }
-
-  @Override // DepanFxNodeListTableAdapter
-  public ObservableValue<Boolean> getCheckBoxObservable(int treeIndex) {
-    return tableState.getCheckBoxObservable(treeIndex);
-  }
-
-  @Override // DepanFxNodeListTableAdapter
-  public void doSelectGraphNodeAction(GraphNode selectNode, boolean value) {
-    tableState.doSelectGraphNodeAction(selectNode, value);
-  }
-
-  @Override // DepanFxNodeListTableAdapter
-  public void doSelectGraphNodesAction(
-      Stream<GraphNode> nodes, boolean value) {
-    tableState.doSelectGraphNodesAction(nodes, value);
-  }
-
-  @Override // DepanFxNodeListTableAdapter
-  public void refreshTableView() {
-    tableState.refreshTableView();
-  }
-
-  @Override
-  public Stream<DepanFxNodeListColumn> streamColumns() {
-    return tableState.streamColumns();
-  }
-
-  @Override // DepanFxNodeListTableAdapter
-  public DepanFxNodeListSection insertSection(
-      DepanFxNodeListSection before,
-      DepanFxWorkspaceResource<? extends DepanFxBaseSectionData> sectionRsrc) {
-    return tableState.insertSection(before, sectionRsrc);
-  }
-
-  @Override // DepanFxNodeListTableAdapter
-  public void updateSection(DepanFxNodeListSection section,
-      DepanFxWorkspaceResource<? extends DepanFxBaseSectionData> dataRsrc) {
-    tableState.updateSection(section, dataRsrc);
   }
 }
