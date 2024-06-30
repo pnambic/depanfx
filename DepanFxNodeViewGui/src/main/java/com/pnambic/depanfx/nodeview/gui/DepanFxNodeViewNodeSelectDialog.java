@@ -128,6 +128,12 @@ public class DepanFxNodeViewNodeSelectDialog
     }
   }
 
+  @FXML
+  public void handleSaveSelection() {
+    DepanFxSaveNodeListDialog.runSaveNodeList(
+        dialogRunner, tableControl.getSelection());
+  }
+
   /////////////////////////////////////
   // Workspace dialog protected overrides
 

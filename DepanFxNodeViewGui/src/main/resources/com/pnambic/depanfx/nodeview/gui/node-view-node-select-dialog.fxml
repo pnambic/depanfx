@@ -19,9 +19,8 @@
          AnchorPane.topAnchor="10" AnchorPane.bottomAnchor="10">
 
          <HBox spacing="10">
-            <Label text="Nodes"/>
+            <Label text="Nodes..." fx:id="nodeTableCommands"/>
             <Region HBox.hgrow="ALWAYS" />
-            <Label fx:id="nodeTableCommands" text="Commands..."/>
          </HBox>
 
          <!-- Placement by FXML, behaviors by DepanFXNodeListTableState etal. -->
@@ -29,6 +28,8 @@
 
          <HBox spacing="10">
             <Button text="Close" onAction="#handleCancel"/>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button text="Save Selection" onAction="#handleSaveSelection"/>
          </HBox>
 
    </VBox>
