@@ -271,7 +271,7 @@ public class JavaLinkMatchers {
       buildMatcherDoc(
           "Java Tree Members",
           "Java tree membership (packages, classes, fields, and methods).",
-          JAVA_PACKAGE_MEMBER_MATCH);
+          JAVA_TREE_MEMBER_MATCH);
 
   // Common notion of "use"
   public static final List<DepanFxLinkMatcher> JAVA_USE =
