@@ -22,25 +22,38 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 
 public class DepanFxNodeFiltersSequenceMember
-    extends DepanFxNodeFiltersDisplayMember<DepanFxSequenceFilterData> {
+    extends DepanFxNodeFiltersDisplayMember<DepanFxSequenceFilterData>
+    implements DepanFxNodeFiltersTableContainer {
+
+  private final ObservableList<DepanFxBaseFilterData> filterItems;
 
   public DepanFxNodeFiltersSequenceMember(
+      DepanFxNodeFiltersTableMember parentMember,
       DepanFxSequenceFilterData sequenceFilter) {
-    super(sequenceFilter);
+    super(parentMember, sequenceFilter);
+    List<? extends DepanFxBaseFilterData> sourceFilters =
+        sequenceFilter.streamFilters().collect(Collectors.toList());
+    filterItems = FXCollections.observableArrayList(sourceFilters);
   }
 
   public Stream<? extends DepanFxBaseFilterData> streamMembers() {
     return getFilterData().streamFilters();
   }
 
+  public void addMemberListener(
+      ListChangeListener<DepanFxBaseFilterData> chgListener) {
+    filterItems.addListener(chgListener);
+  }
+
   @Override
   public DepanFxBaseFilterData prepareFilterData() {
     List<? extends DepanFxBaseFilterData> filters =
-        getFilterData().streamFilters().collect(Collectors.toList());
+        filterItems.stream().collect(Collectors.toList());
     return new DepanFxSequenceFilterData(
         getToolNameProperty().get(), getToolDescriptionProperty().get(),
         getMergeModeProperty().get(), filters,
@@ -48,8 +61,12 @@ public class DepanFxNodeFiltersSequenceMember
   }
 
   @Override
-  protected BooleanProperty buildClosureProperty(
-      DepanFxSequenceFilterData baseFilter) {
-    return new SimpleBooleanProperty(baseFilter.useClosure());
+  public void addFilter(DepanFxBaseFilterData filterData) {
+    filterItems.add(filterData);
+  }
+
+  @Override
+  public void deleteFilter(DepanFxBaseFilterData filterData) {
+    filterItems.remove(filterData);
   }
 }

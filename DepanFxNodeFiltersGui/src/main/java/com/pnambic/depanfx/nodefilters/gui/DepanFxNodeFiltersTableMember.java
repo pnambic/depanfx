@@ -18,4 +18,6 @@ package com.pnambic.depanfx.nodefilters.gui;
 public interface DepanFxNodeFiltersTableMember {
 
   String getDisplayName();
+
+  DepanFxNodeFiltersTableMember getParent();
 }

@@ -15,15 +15,7 @@
  */
 package com.pnambic.depanfx.nodefilters.gui;
 
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.control.TreeItem;
-
 public class DepanFxNodeFiltersReferencedItem extends DepanFxNodeFiltersTableItem {
-
-  private boolean childrenLoaded = false;
 
   public DepanFxNodeFiltersReferencedItem(
       DepanFxNodeFiltersReferencedMember refMember) {
@@ -32,34 +24,6 @@ public class DepanFxNodeFiltersReferencedItem extends DepanFxNodeFiltersTableIte
 
   @Override
   public boolean isLeaf() {
-    return false;
-  }
-
-  @Override
-  public ObservableList<TreeItem<DepanFxNodeFiltersTableMember>> getChildren() {
-    if (!childrenLoaded ) {
-      childrenLoaded = true;
-      super.getChildren().setAll(buildChildren());
-    }
-
-    return super.getChildren();
-  }
-
-  private ObservableList<TreeItem<DepanFxNodeFiltersTableMember>> buildChildren() {
-
-    DepanFxNodeFiltersReferencedMember refMember =
-        (DepanFxNodeFiltersReferencedMember) getValue();
-
-    ObservableList<TreeItem<DepanFxNodeFiltersTableMember>> result =
-        FXCollections.observableArrayList();
-
-    DepanFxBaseFilterData refFilter = refMember.getFilter();
-    result.add(buildTableItem(refFilter));
-    return result;
-  }
-
-  private TreeItem<DepanFxNodeFiltersTableMember> buildTableItem(
-      DepanFxBaseFilterData filter) {
-    return DepanFxNodeFiltersTableItemFactory.buildTableItem(filter);
+    return true;
   }
 }

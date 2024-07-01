@@ -18,14 +18,13 @@ package com.pnambic.depanfx.nodefilters.gui;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxMatcherFilterData;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-
 public class DepanFxNodeFiltersMatcherMember
     extends DepanFxNodeFiltersDisplayMember<DepanFxMatcherFilterData> {
 
-  public DepanFxNodeFiltersMatcherMember(DepanFxMatcherFilterData matchFilter) {
-    super(matchFilter);
+  public DepanFxNodeFiltersMatcherMember(
+      DepanFxNodeFiltersTableMember parentMember,
+      DepanFxMatcherFilterData matchFilter) {
+    super(parentMember, matchFilter);
   }
 
   @Override
@@ -34,11 +33,5 @@ public class DepanFxNodeFiltersMatcherMember
         getToolNameProperty().get(), getToolDescriptionProperty().get(),
         getMergeModeProperty().get(), getFilterData().getMatcherResource(),
         getUseClosureProperty().get());
-  }
-
-  @Override
-  protected BooleanProperty buildClosureProperty(
-      DepanFxMatcherFilterData baseFilter) {
-    return new SimpleBooleanProperty(baseFilter.useClosure());
   }
 }

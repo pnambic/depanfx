@@ -83,6 +83,11 @@ public class BasicDepanFxProjectTree implements DepanFxProjectTree {
   }
 
   @Override
+  public String toLabel(DepanFxProjectDocument projDoc) {
+    return projectSpi.getProjectName() + ":" + projDoc.getMemberPath();
+  }
+
+  @Override
   public void createContainer(DepanFxProjectContainer projDir) {
     projectSpi.createContainer(projDir);
     notifyContainerAdded(projDir);

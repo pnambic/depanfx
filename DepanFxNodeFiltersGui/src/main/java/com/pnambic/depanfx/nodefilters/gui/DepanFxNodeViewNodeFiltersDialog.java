@@ -20,8 +20,8 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodefilters.model.DepanFxBaseFilter;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFilterFactory;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxMatcherFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxListFilterData;
+import com.pnambic.depanfx.nodefilters.tooldata.DepanFxMatcherFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxReferencedFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxSequenceFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.FilterMergeMode;
@@ -36,7 +36,9 @@ import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
-import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
+import com.pnambic.depanfx.perspective.DepanFxBaseDialog;
+import com.pnambic.depanfx.perspective.DepanFxProctor;
+import com.pnambic.depanfx.perspective.DepanFxWorkspaceDialog;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -53,7 +55,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -73,13 +74,11 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.CheckBoxTreeTableCell;
 import javafx.scene.control.cell.ComboBoxTreeTableCell;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 @Component
 @FxmlView("node-view-node-filters-dialog.fxml")
-public class DepanFxNodeViewNodeFiltersDialog
-    extends DepanFxBaseToolDialog<DepanFxBaseFilterData> {
+public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeViewNodeFiltersDialog.class);
@@ -95,6 +94,8 @@ public class DepanFxNodeViewNodeFiltersDialog
   public static final String ADD_SEQUENCE_FILTER = "Add Sequence Filter";
 
   private static final String SELECT_NODE_FILTER = "Select Filter...";
+
+  private static final String SAVE_NODE_FILTER = "Save Filter...";
 
   private final DepanFxDialogRunner dialogRunner;
 
@@ -129,19 +130,19 @@ public class DepanFxNodeViewNodeFiltersDialog
   @FXML
   private TreeTableView<DepanFxNodeListMember> nodeSelectTable;
 
-  private DepanFxProjectDocument destDoc;
-
   private DepanFxNodeListTableViewData tableView;
 
   private DepanFxNodeListTableController tableControl;
 
   private Consumer<DepanFxNodeList> onUpdate;
 
+  private DepanFxProjectDocument destDoc;
+
   @Autowired
   public DepanFxNodeViewNodeFiltersDialog(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner) {
-    super(workspace, DepanFxBaseFilterData.class);
+    super(workspace);
     this.dialogRunner = dialogRunner;
   }
 
@@ -165,6 +166,11 @@ public class DepanFxNodeViewNodeFiltersDialog
     return dlg.runModeless(EDIT_NODE_FILTERS);
   }
 
+  @Override // DepanFxWorkspaceDialog
+  public Scene getScene() {
+    return nodeFilterTable.getScene();
+  }
+
   @FXML
   public void initialize() {
     filtersCommands.setContextMenu(buildFiltersCommandMenu());
@@ -181,21 +187,25 @@ public class DepanFxNodeViewNodeFiltersDialog
         columnBinder.next();
     labelColumn.setCellValueFactory(
         f -> getColumnInfo(f.getValue()).getToolNameProperty());
-    labelColumn.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
+    // labelColumn.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
+    labelColumn.setCellFactory(
+        l -> new DepanFxNodeFiltersTableCell(dialogRunner));
 
     TreeTableColumn<DepanFxNodeFiltersTableMember, Boolean> closureColumn =
         columnBinder.next();
     closureColumn.setCellValueFactory(
         f -> getColumnInfo(f.getValue()).getUseClosureProperty());
     closureColumn.setCellFactory(CheckBoxTreeTableCell.forTreeTableColumn(
-        i -> getColumnInfo(nodeFilterTable.getTreeItem(i.intValue())).getUseClosureProperty()));
+        i -> getColumnInfo(nodeFilterTable.getTreeItem(i.intValue()))
+            .getUseClosureProperty()));
 
     TreeTableColumn<DepanFxNodeFiltersTableMember, FilterMergeMode> mergeColumn =
         columnBinder.next();
     mergeColumn.setCellValueFactory(
         f -> getColumnInfo(f.getValue()).getMergeModeProperty());
     mergeColumn.setCellFactory(
-        ComboBoxTreeTableCell.forTreeTableColumn(FilterMergeMode.class.getEnumConstants()));
+        ComboBoxTreeTableCell.forTreeTableColumn(
+            FilterMergeMode.class.getEnumConstants()));
 
     TreeTableColumn<DepanFxNodeFiltersTableMember, String> descrColumn =
         columnBinder.next();
@@ -212,56 +222,63 @@ public class DepanFxNodeViewNodeFiltersDialog
             .subtract(2));
   }
 
-  private DepanFxNodeFiltersTableColumns getColumnInfo(
-      TreeItem<DepanFxNodeFiltersTableMember> memberItem) {
+  public void setDestinationDocument(DepanFxProjectDocument destDoc) {
+    this.destDoc = destDoc;
+  }
 
-    return (DepanFxNodeFiltersTableColumns) memberItem.getValue();
+  public void setFilteredNodes(DepanFxNodeList filteredNodes) {
+    if (tableView == null) {
+      Optional<DepanFxWorkspaceResource<DepanFxNodeListTableViewData>> optFlatView =
+          ((DepanFxBuiltInProject) workspace.getBuiltInProject())
+              .getResource(DepanFxNodeListConfiguration.FLAT_TABLE_VIEW_PATH);
+      optFlatView.ifPresent(r -> tableView = r.getResource());
+    }
+
+    DepanFxNodeListSelection nodeSelection =
+        DepanFxNodeListSelection.forNodes(filteredNodes.getNodes());
+    nodeSelection.doSelectAllAction();
+    tableControl = new DepanFxNodeListTableController(
+        workspace, dialogRunner, filteredNodes, nodeSelection,
+        tableView, nodeSelectTable);
+    nodeTableCommands.setContextMenu(buildNodeTableCommandMenu());
+  }
+
+  public void setTableView(DepanFxNodeListTableViewData tableView) {
+    this.tableView = tableView;
+    if (tableControl != null) {
+      tableControl.setTableView(tableView);
+    }
+  }
+
+  public void setOnUpdate(Consumer<DepanFxNodeList> onUpdate) {
+    this.onUpdate = onUpdate;
   }
 
   @FXML
-  private void addMatcherFilterRow() {
-    matcherFilterChooser()
-        .map(this::createMatcherFilterData)
-        .ifPresent(nodeFilterRoot::add);
+  public void handleUpdateSelection() {
+    onUpdate.accept(tableControl.getSelection());
   }
 
   @FXML
-  private void addListFilterRow() {
-    listFilterChooser()
-        .map(this::createListFilterData)
-        .ifPresent(nodeFilterRoot::add);
+  public void handleSaveSelection() {
+    DepanFxSaveNodeListDialog.runSaveNodeList(
+        dialogRunner, tableControl.getSelection());
   }
 
   @FXML
-  private void addSequenceFilterRow() {
-    DepanFxSequenceFilterData seqFilter = createSequenceFilterData();
-    nodeFilterRoot.add(seqFilter);
-  }
-
-  @FXML
-  private void addSelectFilterRow() {
-    nodeFilterChooser()
-        .map(this::createReferenceFilterData)
-        .ifPresent(nodeFilterRoot::add);
-  }
-
-  private void loadNodeFilter() {
+  public void loadNodeFilter() {
     nodeFilterChooser()
         .ifPresent(this::updateFilterTableRoot);
   }
 
   @FXML
-  @Override // Don't close dialog
-  protected void handleConfirm() {
-    if (hasInputErrors()) {
-      return;
-    }
-
-    optResource = saveProjectDoc(prepareResult());
+  public void handleSaveFilters() {
+    DepanFxBaseFilterData saveFilter = prepareResult();
+    DepanFxNodeFiltersRegistry.runSaveFilters(dialogRunner, saveFilter);
   }
 
   @FXML
-  private void handleEvaluate() {
+  public void handleEvaluate() {
     DepanFxBaseFilterData filterData = prepareResult();
     GraphModel graphModel = tableControl.getGraphDoc().getGraph();
     Collection<GraphNode> targetNodes = graphModel.getGraphNodes();
@@ -275,6 +292,121 @@ public class DepanFxNodeViewNodeFiltersDialog
     DepanFxNodeList results = tableControl.buildRelatedNodeList(resultNodes);
 
     setFilteredNodes(results);
+  }
+
+  /////////////////////////////////////
+
+  private DepanFxNodeFiltersTableColumns getColumnInfo(
+      TreeItem<DepanFxNodeFiltersTableMember> memberItem) {
+
+    return (DepanFxNodeFiltersTableColumns) memberItem.getValue();
+  }
+
+  private ContextMenu buildFiltersCommandMenu() {
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem(SELECT_NODE_FILTER, e -> loadNodeFilter());
+    builder.appendActionItem(SAVE_NODE_FILTER, e -> handleSaveFilters());
+    return builder.build();
+  }
+
+  private ContextMenu buildNodeTableCommandMenu() {
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    DepanFxNodeListTableCommands commands = tableControl.buildTableCommands();
+    commands.addSelectItems(builder);
+    commands.addTableViewItems(builder);
+    return builder.build();
+  }
+
+  private ContextMenu buildFilterTableMenu() {
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem(
+        ADD_MATCHER_FILTER, e -> addMatcherFilterRow());
+    builder.appendActionItem(
+        ADD_LIST_FILTER, e -> addListFilterRow());
+    builder.appendActionItem(
+        ADD_REFERENCE_FILTER, e -> addSelectFilterRow());
+    builder.appendActionItem(
+        ADD_SEQUENCE_FILTER, e -> addSequenceFilterRow());
+
+    return builder.build();
+  }
+
+  private void updateFilterTableRoot(
+      DepanFxWorkspaceResource<? extends DepanFxBaseFilterData> filterRsrc) {
+    DepanFxBaseFilterData resource = filterRsrc.getResource();
+
+    // For sequence, put items in list
+    if (resource instanceof DepanFxSequenceFilterData seqData) {
+      List<? extends DepanFxBaseFilterData> seqFilters =
+          seqData.streamFilters().collect(Collectors.toList());
+      nodeFilterRoot.setAll(seqFilters);
+      setDestinationDocument(filterRsrc.getDocument());
+      return;
+    }
+
+    // For sequence, put items in list
+    nodeFilterRoot.set(resource);
+    setDestinationDocument(filterRsrc.getDocument());
+  }
+
+  private DepanFxBaseFilterData prepareResult() {
+    ObservableList<TreeItem<DepanFxNodeFiltersTableMember>> children =
+        nodeFilterTable.getRoot().getChildren();
+
+    List<DepanFxBaseFilterData> filters = children.stream()
+        .flatMap(i -> prepareFilterData(i).stream())
+        .collect(Collectors.toList());
+
+    if (filters.size() == 1) {
+      return filters.getFirst();
+    }
+
+    // Package an list as a sequence filter.
+    String nameBase = tableControl.getGraphDoc().getGraphName();
+    return new DepanFxSequenceFilterData(
+        String.format("%s Filter", nameBase),
+        String.format("Filter for %s graph.", nameBase),
+        FilterMergeMode.REPLACE, filters, false);
+  }
+
+  private Optional<DepanFxBaseFilterData> prepareFilterData(
+      TreeItem<DepanFxNodeFiltersTableMember> item) {
+    if (item.getValue() instanceof DepanFxNodeFiltersDataProvider provider) {
+      return Optional.of(provider.prepareFilterData());
+    }
+    LOG.info("Unrecognized item value type {} on filter tree.",
+        item.getValue().getClass().getName());
+    return Optional.empty();
+  }
+
+  /////////////////////////////////////
+  // Specific filters
+
+  @FXML
+  private void addMatcherFilterRow() {
+    matcherFilterChooser()
+        .map(this::createMatcherFilterData)
+        .ifPresent(nodeFilterRoot::addFilter);
+  }
+
+  @FXML
+  private void addListFilterRow() {
+    listFilterChooser()
+        .map(this::createListFilterData)
+        .ifPresent(nodeFilterRoot::addFilter);
+  }
+
+  @FXML
+  private void addSequenceFilterRow() {
+    DepanFxSequenceFilterData seqFilter = createSequenceFilterData();
+    nodeFilterRoot.addFilter(seqFilter);
+  }
+
+  @FXML
+  private void addSelectFilterRow() {
+    nodeFilterChooser()
+        .map(this::createReferenceFilterData)
+        .ifPresent(nodeFilterRoot::addFilter);
   }
 
   private DepanFxMatcherFilterData createMatcherFilterData(
@@ -311,28 +443,6 @@ public class DepanFxNodeViewNodeFiltersDialog
         FilterMergeMode.REPLACE, refFilter, false);
   }
 
-  private void updateFilterTableRoot(
-      DepanFxWorkspaceResource<? extends DepanFxBaseFilterData> filterRsrc) {
-    DepanFxBaseFilterData resource = filterRsrc.getResource();
-
-    // For sequence, put items in list
-    if (resource instanceof DepanFxSequenceFilterData seqData) {
-      List<? extends DepanFxBaseFilterData> seqFilters =
-          seqData.streamFilters().collect(Collectors.toList());
-      nodeFilterRoot.setAll(seqFilters);
-      setToolName(seqData.getToolName());
-      setToolDescription(seqData.getToolName());
-      setDestinationDocument(filterRsrc.getDocument());
-      return;
-    }
-
-    // For sequence, put items in list
-    nodeFilterRoot.set(resource);
-    setToolName(resource.getToolName());
-    setToolDescription(resource.getToolName());
-    setDestinationDocument(filterRsrc.getDocument());
-  }
-
   private Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
       matcherFilterChooser() {
 
@@ -352,153 +462,5 @@ public class DepanFxNodeViewNodeFiltersDialog
 
     return DepanFxNodeFiltersChooser.runNodeFiltersFinder(
         workspace, dialogRunner, getScene());
-  }
-
-  private ContextMenu buildFiltersCommandMenu() {
-    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem(SELECT_NODE_FILTER, e -> loadNodeFilter());
-    return builder.build();
-  }
-
-  private ContextMenu buildNodeTableCommandMenu() {
-    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    DepanFxNodeListTableCommands commands = tableControl.buildTableCommands();
-    commands.addSelectItems(builder);
-    commands.addTableViewItems(builder);
-    return builder.build();
-  }
-
-  private ContextMenu buildFilterTableMenu() {
-    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem(
-        ADD_MATCHER_FILTER, e -> addMatcherFilterRow());
-    builder.appendActionItem(
-        ADD_LIST_FILTER, e -> addListFilterRow());
-    builder.appendActionItem(
-        ADD_REFERENCE_FILTER, e -> addSelectFilterRow());
-    builder.appendActionItem(
-        ADD_SEQUENCE_FILTER, e -> addSequenceFilterRow());
-
-    return builder.build();
-  }
-
-  public void setDestinationDocument(DepanFxProjectDocument destDoc) {
-    this.destDoc = destDoc;
-  }
-
-  public void setFilteredNodes(DepanFxNodeList filteredNodes) {
-    if (tableView == null) {
-      Optional<DepanFxWorkspaceResource<DepanFxNodeListTableViewData>> optFlatView =
-          ((DepanFxBuiltInProject) workspace.getBuiltInProject())
-              .getResource(DepanFxNodeListConfiguration.FLAT_TABLE_VIEW_PATH);
-      optFlatView.ifPresent(r -> tableView = r.getResource());
-    }
-
-    DepanFxNodeListSelection nodeSelection =
-        DepanFxNodeListSelection.forNodes(filteredNodes.getNodes());
-    nodeSelection.doSelectAllAction();
-    tableControl = new DepanFxNodeListTableController(
-        workspace, dialogRunner, filteredNodes, nodeSelection,
-        tableView, nodeSelectTable);
-    nodeTableCommands.setContextMenu(buildNodeTableCommandMenu());
-  }
-
-  private void setOnUpdate(Consumer<DepanFxNodeList> onUpdate) {
-    this.onUpdate = onUpdate;
-  }
-
-  public void setTableView(DepanFxNodeListTableViewData tableView) {
-    this.tableView = tableView;
-    if (tableControl != null) {
-      tableControl.setTableView(tableView);
-    }
-  }
-
-  @FXML
-  public void handleUpdateSelection() {
-    onUpdate.accept(tableControl.getSelection());
-  }
-
-  @FXML
-  public void handleSaveSelection() {
-    DepanFxSaveNodeListDialog.runSaveNodeList(
-        dialogRunner, tableControl.getSelection());
-  }
-
-  /////////////////////////////////////
-  // Workspace dialog protected overrides
-
-  @Override // DepanFxWorkspaceDialog
-  public Scene getScene() {
-    return nodeFilterTable.getScene();
-  }
-
-  @Override
-  protected DepanFxBaseFilterData prepareResult() {
-    ObservableList<TreeItem<DepanFxNodeFiltersTableMember>> children =
-        nodeFilterTable.getRoot().getChildren();
-
-    List<DepanFxBaseFilterData> filters = children.stream()
-        .flatMap(i -> prepareFilterData(i).stream())
-        .collect(Collectors.toList());
-
-    if (filters.size() == 1) {
-      return filters.getFirst();
-    }
-
-    // Package an list as a sequence filter.
-    return new DepanFxSequenceFilterData(
-        getToolName(), getToolDescription(),
-        FilterMergeMode.REPLACE, filters, false);
-  }
-
-  private Optional<DepanFxBaseFilterData> prepareFilterData(
-      TreeItem<DepanFxNodeFiltersTableMember> item) {
-    if (item.getValue() instanceof DepanFxNodeFiltersDataProvider provider) {
-      return Optional.of(provider.prepareFilterData());
-    }
-    LOG.info("Unrecognized item value type {} on filter tree.",
-        item.getValue().getClass().getName());
-    return Optional.empty();
-  }
-
-  @Override
-  protected void setTooldataFilters(FileChooser result) {
-    // TODO Auto-generated method stub
-  }
-
-  @Override
-  protected File buildInitialDestinationFile() {
-    return buildToolInitialDestination(
-        guessExtension(),
-        DepanFxBaseFilterData.NODE_FILTERS_TOOL_PATH);
-  }
-
-  @Override
-  protected String getInputCheckFailureText() {
-    return  "Node Filter Save Confirmation Error";
-  }
-
-  private String guessExtension() {
-    ObservableList<TreeItem<DepanFxNodeFiltersTableMember>> children =
-        nodeFilterTable.getRoot().getChildren();
-
-    if (children.size() != 1 ) {
-      return DepanFxSequenceFilterData.SEQUENCE_FILTER_TOOL_EXT;
-    }
-    DepanFxNodeFiltersTableMember member = children.get(0).getValue();
-    switch (member) {
-    case DepanFxNodeFiltersMatcherMember matcher:
-      return DepanFxMatcherFilterData.MATCHER_FILTER_TOOL_EXT;
-    case DepanFxNodeFiltersListMember list:
-      return DepanFxListFilterData.LIST_FILTER_TOOL_EXT;
-    case DepanFxNodeFiltersReferencedMember ref:
-      return DepanFxMatcherFilterData.MATCHER_FILTER_TOOL_EXT;
-    // Anything else should be a sequence, including
-    // case DepanFxNodeFiltersSequenceMember seq:
-    default:
-      break;
-    }
-    return DepanFxSequenceFilterData.SEQUENCE_FILTER_TOOL_EXT;
   }
 }

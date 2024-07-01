@@ -64,7 +64,8 @@ public class DepanFxNodeFiltersRootItem extends DepanFxNodeFiltersTableItem {
 
   private TreeItem<DepanFxNodeFiltersTableMember> buildTableItem(
       DepanFxBaseFilterData filter) {
-    return DepanFxNodeFiltersTableItemFactory.buildTableItem(filter);
+    return DepanFxNodeFiltersRegistry.buildTableItem(
+        this.getValue(), filter);
   }
 
   private void onMembersChanged(

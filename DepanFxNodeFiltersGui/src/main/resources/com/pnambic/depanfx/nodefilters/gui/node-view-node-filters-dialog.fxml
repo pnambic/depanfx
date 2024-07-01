@@ -57,42 +57,10 @@
                      </columns>
                   </TreeTableView>
 
-                  <Accordion>
-                      <panes>
-                          <TitledPane text="Save Filter" expanded="false">
-                              <content>
-                                  <VBox>
-
-                                      <Label text="Tool Name"/>
-
-                                      <HBox spacing="10">
-                                         <TextField fx:id="toolNameField" editable="true"
-                                               promptText="Display label for data source"
-                                               HBox.hgrow="ALWAYS"/>
-                                      </HBox>
-
-                                      <Label text="Tool Description"/>
-
-                                      <HBox spacing="10">
-                                         <TextField fx:id="toolDescriptionField" editable="true"
-                                               promptText="Description"
-                                               HBox.hgrow="ALWAYS"/>
-                                      </HBox>
-
-                                      <Label text="Select Destination File"/>
-
-                                      <HBox spacing="10">
-                                         <TextField fx:id="destinationField" editable="false" promptText="No file selected"
-                                               HBox.hgrow="ALWAYS"/>
-                                         <Button text="Browse" onAction="#openDestinationChooser" />
-                                         <Button text="Save" onAction="#handleConfirm"/>
-                                      </HBox>
-
-                                  </VBox>
-                              </content>
-                          </TitledPane>
-                      </panes>
-                  </Accordion>
+                  <HBox spacing="10">
+                     <Region HBox.hgrow="ALWAYS" />
+                     <Button text="Save Filters..." onAction="#handleSaveFilters"/>
+                  </HBox>
 
                </VBox>
             </AnchorPane>
@@ -123,7 +91,7 @@
          <Button text="Close" onAction="#handleCancel"/>
          <Region HBox.hgrow="ALWAYS" />
          <Button text="Update Selection" onAction="#handleUpdateSelection"/>
-         <Button text="Save Selection" onAction="#handleSaveSelection"/>
+         <Button text="Save Selection..." onAction="#handleSaveSelection"/>
       </HBox>
 
    </VBox>

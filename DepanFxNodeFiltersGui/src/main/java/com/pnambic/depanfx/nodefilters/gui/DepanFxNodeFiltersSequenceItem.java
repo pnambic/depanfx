@@ -17,7 +17,11 @@ package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
@@ -28,6 +32,7 @@ public class DepanFxNodeFiltersSequenceItem extends DepanFxNodeFiltersTableItem 
   public DepanFxNodeFiltersSequenceItem(
       DepanFxNodeFiltersSequenceMember seqMember) {
     super(seqMember);
+    seqMember.addMemberListener(this::onMembersChanged);
   }
 
   @Override
@@ -61,6 +66,25 @@ public class DepanFxNodeFiltersSequenceItem extends DepanFxNodeFiltersTableItem 
 
   private TreeItem<DepanFxNodeFiltersTableMember> buildTableItem(
       DepanFxBaseFilterData filter) {
-    return DepanFxNodeFiltersTableItemFactory.buildTableItem(filter);
+    return DepanFxNodeFiltersRegistry.buildTableItem(
+        this.getValue(), filter);
+  }
+
+  private void onMembersChanged(
+      Change<? extends DepanFxBaseFilterData> memberChange) {
+    while (memberChange.next()) {
+      if (memberChange.wasAdded()) {
+        List<TreeItem<DepanFxNodeFiltersTableMember>> insertItems =
+            memberChange.getAddedSubList().stream()
+                .map(this::buildTableItem)
+                .collect(Collectors.toList());
+        getChildren().addAll(memberChange.getFrom(), insertItems);
+      }
+      if (memberChange.wasRemoved()) {
+        int fromIndex = memberChange.getFrom();
+        int toIndex = fromIndex + memberChange.getRemovedSize();
+        getChildren().remove(fromIndex, toIndex);
+      }
+    }
   }
 }

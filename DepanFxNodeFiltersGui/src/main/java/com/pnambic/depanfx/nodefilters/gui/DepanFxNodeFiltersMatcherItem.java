@@ -17,7 +17,8 @@ package com.pnambic.depanfx.nodefilters.gui;
 
 public class DepanFxNodeFiltersMatcherItem extends DepanFxNodeFiltersTableItem {
 
-  public DepanFxNodeFiltersMatcherItem(DepanFxNodeFiltersMatcherMember matchMember) {
+  public DepanFxNodeFiltersMatcherItem(
+      DepanFxNodeFiltersMatcherMember matchMember) {
     super(matchMember);
   }
 

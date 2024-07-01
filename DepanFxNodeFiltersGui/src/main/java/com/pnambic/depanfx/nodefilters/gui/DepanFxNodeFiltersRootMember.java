@@ -27,7 +27,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 public class DepanFxNodeFiltersRootMember
-    implements DepanFxNodeFiltersTableMember {
+    implements DepanFxNodeFiltersTableMember, DepanFxNodeFiltersTableContainer {
 
   private final DepanFxWorkspace workspace;
 
@@ -59,17 +59,31 @@ public class DepanFxNodeFiltersRootMember
     return "<root>";
   }
 
+  /**
+   * The root has no parent.
+   */
+  @Override
+  public DepanFxNodeFiltersTableMember getParent() {
+    return null;
+  }
+
   public Stream<DepanFxBaseFilterData> streamMembers() {
     return filterItems.stream();
   }
 
-  public void add(DepanFxBaseFilterData filterMember) {
+  @Override // DepanFxNodeFiltersTableContainer
+  public void addFilter(DepanFxBaseFilterData filterMember) {
     filterItems.add(filterMember);
   }
 
-  public void set(DepanFxBaseFilterData filterMember) {
+  @Override // DepanFxNodeFiltersTableContainer
+  public void deleteFilter(DepanFxBaseFilterData filterMember) {
+    filterItems.remove(filterMember);
+  }
+
+  public void set(DepanFxBaseFilterData filterData) {
     filterItems.clear();
-    filterItems.add(filterMember);
+    filterItems.add(filterData);
   }
 
   public void setAll(List<? extends DepanFxBaseFilterData> seqMemebers) {

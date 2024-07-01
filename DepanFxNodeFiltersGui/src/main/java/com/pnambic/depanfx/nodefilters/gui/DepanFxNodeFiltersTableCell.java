@@ -15,57 +15,43 @@
  */
 package com.pnambic.depanfx.nodefilters.gui;
 
+import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.cell.CheckBoxTreeTableCell;
-import javafx.util.StringConverter;
+import javafx.scene.control.cell.TextFieldTreeTableCell;
+import javafx.util.converter.DefaultStringConverter;
 
+/**
+ * Provide a context menu for filter rows.
+ */
 public class DepanFxNodeFiltersTableCell
-    extends CheckBoxTreeTableCell<DepanFxNodeFiltersTableMember, DepanFxNodeFiltersTableMember> {
+    extends TextFieldTreeTableCell<
+        DepanFxNodeFiltersTableMember, String> {
 
-  private static final String SELECT_FLAT_SECTION = "Select Flat Section...";
+  private static final String DELETE_FILTER = "Delete Filter";
 
-  private static final String EDIT_FLAT_SECTION = "Edit Flat Section...";
+  private static final String EDIT_FILTER = "Edit Filter...";
 
-  // Tree section actions
-  private static final String SELECT_TREE_SECTION = "Select Tree Section...";
+  private final DepanFxDialogRunner dialogRunner;
 
-  private static final String EDIT_TREE_SECTION = "Edit Tree Section...";
-
-  private static final String EXPORT_TO_CSV = "Export to CSV...";
-
-  private static final String INSERT_ABOVE_MEMBER_TREE_SECTION =
-      "Insert Member Tree Section";
-
-  // Fork/Directory actions
-  private static final String SELECT_RECURSIVE = "Select Recursive";
-
-  private static final String CLEAR_RECURSIVE = "Clear Recursive";
-
-  private static final String EXPAND_CHILDREN = "Expand Children";
-
-  private static final Logger LOG =
-      LoggerFactory.getLogger(DepanFxNodeFiltersTableCell.class);
-
-  public DepanFxNodeFiltersTableCell() {
-    setConverter(new NameConverter());
+  public DepanFxNodeFiltersTableCell(DepanFxDialogRunner dialogRunner) {
+    super(new DefaultStringConverter());
+    this.dialogRunner = dialogRunner;
   }
 
   @Override
-  public void updateItem(DepanFxNodeFiltersTableMember member, boolean empty) {
-    super.updateItem(member, empty);
+  public void updateItem(String filterName, boolean empty) {
+    super.updateItem(filterName, empty);
 
     // Visual space reserved for future use.
     if (empty) {
       return;
     }
     // The normal case.
-    if (member != null) {
-      stylizeCell(member);
+    if (filterName != null) {
+      stylizeCell(filterName);
       return;
     }
     // Something unexpected.
@@ -73,49 +59,48 @@ public class DepanFxNodeFiltersTableCell
     setGraphic(null);
   }
 
-  private void stylizeCell(DepanFxNodeFiltersTableMember tableMember) {
-    switch (tableMember) {
-    case DepanFxNodeFiltersMatcherMember link:
-      setContextMenu(linkFilterMenu(link));
-      return;
-
-    case DepanFxNodeFiltersSequenceMember seq:
-      setContextMenu(sequenceFilterMenu(seq));
-      return;
-
-    default:
-      LOG.warn("Unexpected filter member  {}", tableMember.getClass().getName());
+  private void stylizeCell(String filterName) {
+    DepanFxNodeFiltersTableMember filterItem = getTableRow().getItem();
+    if (filterItem instanceof DepanFxNodeFiltersDisplayMember<?> displayItem) {
+      setContextMenu(buildFilterMenu(displayItem));
     }
-
-    // Otherwise clear the context menu
-    setContextMenu(null);
   }
 
-  private ContextMenu linkFilterMenu(DepanFxNodeFiltersMatcherMember linkMember) {
+  private ContextMenu buildFilterMenu(
+      DepanFxNodeFiltersDisplayMember<?> filterMember) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    appendEditDocument(builder, filterMember);
+    appendDeleteDocument(builder, filterMember);
     return builder.build();
   }
 
-  private ContextMenu sequenceFilterMenu(
-      DepanFxNodeFiltersSequenceMember seqMember) {
-    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    return builder.build();
+  private void appendEditDocument(
+      DepanFxContextMenuBuilder builder,
+      DepanFxNodeFiltersDisplayMember<?> filterMember) {
+    builder.appendActionItem(EDIT_FILTER,
+        e -> runUpdateFilter(filterMember));
   }
 
-  private static class NameConverter
-      extends StringConverter<DepanFxNodeFiltersTableMember> {
+  private void appendDeleteDocument(
+      DepanFxContextMenuBuilder builder,
+      DepanFxNodeFiltersDisplayMember<?> filterMember) {
+    builder.appendConditionalSeparator();
+    builder.appendActionItem(DELETE_FILTER,
+        e -> runDeleteDocument(filterMember));
+  }
 
-    @Override
-    public String toString(DepanFxNodeFiltersTableMember member) {
-      if (member != null) {
-        return member.getDisplayName();
-      }
-      return "<empty>";
-    }
+  private void runUpdateFilter(
+      DepanFxNodeFiltersDisplayMember<?> filterMember) {
+    DepanFxBaseFilterData filterData = filterMember.prepareFilterData();
+    DepanFxNodeFiltersRegistry.runUpdateFilters( dialogRunner, filterData)
+        .ifPresent(filterMember::updateFilter);
+  }
 
-    @Override
-    public DepanFxNodeFiltersTableMember fromString(String string) {
-      throw new UnsupportedOperationException();
+  private void runDeleteDocument(
+      DepanFxNodeFiltersDisplayMember<?> filterMember) {
+    DepanFxNodeFiltersTableMember parent = filterMember.getParent();
+    if (parent instanceof DepanFxNodeFiltersTableContainer container) {
+      container.deleteFilter(filterMember.getFilterData());
     }
   }
 }

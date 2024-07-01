@@ -31,6 +31,12 @@ public interface DepanFxProjectTree extends DepanFxProjectContainer {
 
   Optional<DepanFxProjectDocument> asProjectDocument(Path path);
 
+  /**
+   * Provides a text label for the document that is intended
+   * for human comprehension.
+   */
+  String toLabel(DepanFxProjectDocument projDoc);
+
   void createContainer(DepanFxProjectContainer projDir);
 
   void deleteContainer(DepanFxProjectContainer projDir);
