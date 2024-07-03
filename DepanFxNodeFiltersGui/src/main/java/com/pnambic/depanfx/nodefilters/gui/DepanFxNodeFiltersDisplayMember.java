@@ -15,7 +15,6 @@
  */
 package com.pnambic.depanfx.nodefilters.gui;
 
-import com.pnambic.depanfx.nodefilters.model.DepanFxClosableFilter;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.FilterMergeMode;
 

@@ -54,6 +54,21 @@ public class DepanFxNodeFiltersListDialog
   }
 
   public static Optional<DepanFxWorkspaceResource<DepanFxListFilterData>>
+      runEditDialog(
+          DepanFxDialogRunner dialogRunner,
+          DepanFxWorkspaceResource<DepanFxListFilterData> filterRsrc) {
+
+    Dialog<DepanFxNodeFiltersListDialog> saveDlg =
+        dialogRunner.createDialogAndParent(
+            DepanFxNodeFiltersListDialog.class);
+    saveDlg.getController().setFilter(filterRsrc.getResource());
+    saveDlg.getController().setDestination(filterRsrc.getDocument());
+    saveDlg.getController().setForSave();
+    saveDlg.runDialog("Edit list filter");
+    return saveDlg.getController().getSavedResource();
+  }
+
+  public static Optional<DepanFxWorkspaceResource<DepanFxListFilterData>>
       runSaveFilter(
           DepanFxDialogRunner dialogRunner,
           DepanFxListFilterData saveFilter) {

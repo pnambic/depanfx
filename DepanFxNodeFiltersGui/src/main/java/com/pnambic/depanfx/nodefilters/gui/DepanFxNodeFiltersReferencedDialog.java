@@ -52,6 +52,21 @@ public class DepanFxNodeFiltersReferencedDialog
   }
 
   public static Optional<DepanFxWorkspaceResource<DepanFxReferencedFilterData>>
+      runEditFilter(
+          DepanFxDialogRunner dialogRunner,
+          DepanFxWorkspaceResource<DepanFxReferencedFilterData> filterRsrc) {
+
+    Dialog<DepanFxNodeFiltersReferencedDialog> saveDlg =
+        dialogRunner.createDialogAndParent(
+            DepanFxNodeFiltersReferencedDialog.class);
+    saveDlg.getController().setFilter(filterRsrc.getResource());
+    saveDlg.getController().setDestination(filterRsrc.getDocument());
+    saveDlg.getController().setForSave();
+    saveDlg.runDialog("Edit referenced filter");
+    return saveDlg.getController().getSavedResource();
+  }
+
+  public static Optional<DepanFxWorkspaceResource<DepanFxReferencedFilterData>>
       runSaveFilter(
           DepanFxDialogRunner dialogRunner,
           DepanFxReferencedFilterData referencedFilter) {

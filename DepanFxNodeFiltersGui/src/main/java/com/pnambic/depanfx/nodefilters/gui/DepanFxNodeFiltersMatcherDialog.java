@@ -54,6 +54,21 @@ public class DepanFxNodeFiltersMatcherDialog
   }
 
   public static Optional<DepanFxWorkspaceResource<DepanFxMatcherFilterData>>
+      runEditDialog(
+          DepanFxDialogRunner dialogRunner,
+          DepanFxWorkspaceResource<DepanFxMatcherFilterData> filterRsrc) {
+
+    Dialog<DepanFxNodeFiltersMatcherDialog> saveDlg =
+        dialogRunner.createDialogAndParent(
+            DepanFxNodeFiltersMatcherDialog.class);
+    saveDlg.getController().setFilter(filterRsrc.getResource());
+    saveDlg.getController().setDestination(filterRsrc.getDocument());
+    saveDlg.getController().setForSave();
+    saveDlg.runDialog("Edit link matcher filter");
+    return saveDlg.getController().getSavedResource();
+  }
+
+  public static Optional<DepanFxWorkspaceResource<DepanFxMatcherFilterData>>
       runSaveFilter(
           DepanFxDialogRunner dialogRunner,
           DepanFxMatcherFilterData matcherFilter) {

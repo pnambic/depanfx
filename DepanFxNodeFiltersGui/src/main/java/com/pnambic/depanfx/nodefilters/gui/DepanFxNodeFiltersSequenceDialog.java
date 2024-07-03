@@ -62,6 +62,21 @@ public class DepanFxNodeFiltersSequenceDialog
   }
 
   public static Optional<DepanFxWorkspaceResource<DepanFxSequenceFilterData>>
+      runEditFilter(
+          DepanFxDialogRunner dialogRunner,
+          DepanFxWorkspaceResource<DepanFxSequenceFilterData> filterRsrc) {
+
+    Dialog<DepanFxNodeFiltersSequenceDialog> saveDlg =
+        dialogRunner.createDialogAndParent(
+            DepanFxNodeFiltersSequenceDialog.class);
+    saveDlg.getController().setFilter(filterRsrc.getResource());
+    saveDlg.getController().setDestination(filterRsrc.getDocument());
+    saveDlg.getController().setForSave();
+    saveDlg.runDialog("Edit filter sequence");
+    return saveDlg.getController().getSavedResource();
+  }
+
+  public static Optional<DepanFxWorkspaceResource<DepanFxSequenceFilterData>>
       runSaveFilter(
           DepanFxDialogRunner dialogRunner,
           DepanFxSequenceFilterData seqFilter) {
