@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodefilters.tooldata;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -33,6 +34,14 @@ public class DepanFxSequenceFilterData extends DepanFxBaseFilterData {
     super(toolName, toolDescription, mergeMode);
     this.filters = filters;
     this.sequenceClosure = sequenceClosure;
+  }
+
+  public static DepanFxSequenceFilterData createSequenceFilterData() {
+    List<? extends DepanFxBaseFilterData> filterSeq = new ArrayList<>();
+    return new DepanFxSequenceFilterData(
+        "Sequence filter",
+        "Sequence filter description",
+        FilterMergeMode.REPLACE, filterSeq, false);
   }
 
   public Stream<? extends DepanFxBaseFilterData> streamFilters() {

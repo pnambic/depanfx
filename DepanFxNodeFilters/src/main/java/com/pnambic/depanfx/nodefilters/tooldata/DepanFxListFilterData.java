@@ -31,6 +31,15 @@ public class DepanFxListFilterData extends DepanFxBaseFilterData {
     this.nodeListRsrc = nodeListRsrc;
   }
 
+  public static DepanFxListFilterData createListFilterData(
+      DepanFxWorkspaceResource<DepanFxNodeList> listRsrc) {
+    DepanFxNodeList nodeList = listRsrc.getResource();
+    return new DepanFxListFilterData(
+        nodeList.getNodeListName() + " filter",
+        "Filter for " + nodeList.getNodeListDescription(),
+        FilterMergeMode.UNION, listRsrc);
+  }
+
   public DepanFxWorkspaceResource<DepanFxNodeList> getNodeListResource() {
     return nodeListRsrc;
   }

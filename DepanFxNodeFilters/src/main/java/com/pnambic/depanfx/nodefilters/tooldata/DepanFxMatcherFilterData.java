@@ -36,6 +36,15 @@ public class DepanFxMatcherFilterData extends DepanFxBaseFilterData {
     this.matcherClosure = matcherClosure;
   }
 
+  public static DepanFxMatcherFilterData createMatcherFilterData(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
+    DepanFxLinkMatcherDocument matcherInfo = matcherRsrc.getResource();
+    return new DepanFxMatcherFilterData(
+        matcherInfo.getToolName() + " filter",
+        "Filter for " + matcherInfo.getToolName(),
+        FilterMergeMode.REPLACE, matcherRsrc, false);
+  }
+
   public DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> getMatcherResource() {
     return matcherRsrc;
   }

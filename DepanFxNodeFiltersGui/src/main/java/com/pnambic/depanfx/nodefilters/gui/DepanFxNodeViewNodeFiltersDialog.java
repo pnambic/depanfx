@@ -36,8 +36,6 @@ import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
-import com.pnambic.depanfx.perspective.DepanFxBaseDialog;
-import com.pnambic.depanfx.perspective.DepanFxProctor;
 import com.pnambic.depanfx.perspective.DepanFxWorkspaceDialog;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -189,7 +187,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
         f -> getColumnInfo(f.getValue()).getToolNameProperty());
     // labelColumn.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
     labelColumn.setCellFactory(
-        l -> new DepanFxNodeFiltersTableCell(dialogRunner));
+        l -> new DepanFxNodeFiltersTableCell(getWorkspace(), dialogRunner));
 
     TreeTableColumn<DepanFxNodeFiltersTableMember, Boolean> closureColumn =
         columnBinder.next();
@@ -324,7 +322,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
     builder.appendActionItem(
         ADD_LIST_FILTER, e -> addListFilterRow());
     builder.appendActionItem(
-        ADD_REFERENCE_FILTER, e -> addSelectFilterRow());
+        ADD_REFERENCE_FILTER, e -> addReferencedFilterRow());
     builder.appendActionItem(
         ADD_SEQUENCE_FILTER, e -> addSequenceFilterRow());
 
@@ -385,62 +383,29 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
   @FXML
   private void addMatcherFilterRow() {
     matcherFilterChooser()
-        .map(this::createMatcherFilterData)
+        .map(DepanFxMatcherFilterData::createMatcherFilterData)
         .ifPresent(nodeFilterRoot::addFilter);
   }
 
   @FXML
   private void addListFilterRow() {
     listFilterChooser()
-        .map(this::createListFilterData)
+        .map(DepanFxListFilterData::createListFilterData)
+        .ifPresent(nodeFilterRoot::addFilter);
+  }
+
+  @FXML
+  private void addReferencedFilterRow() {
+    nodeFilterChooser()
+        .map(DepanFxReferencedFilterData::createReferenceFilterData)
         .ifPresent(nodeFilterRoot::addFilter);
   }
 
   @FXML
   private void addSequenceFilterRow() {
-    DepanFxSequenceFilterData seqFilter = createSequenceFilterData();
+    DepanFxSequenceFilterData seqFilter =
+        DepanFxSequenceFilterData.createSequenceFilterData();
     nodeFilterRoot.addFilter(seqFilter);
-  }
-
-  @FXML
-  private void addSelectFilterRow() {
-    nodeFilterChooser()
-        .map(this::createReferenceFilterData)
-        .ifPresent(nodeFilterRoot::addFilter);
-  }
-
-  private DepanFxMatcherFilterData createMatcherFilterData(
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
-    DepanFxLinkMatcherDocument matcherInfo = matcherRsrc.getResource();
-    return new DepanFxMatcherFilterData(
-        matcherInfo.getToolName() + " filter",
-        "Filter for " + matcherInfo.getToolName(),
-        FilterMergeMode.REPLACE, matcherRsrc, false);
-  }
-
-  private DepanFxListFilterData createListFilterData(
-      DepanFxWorkspaceResource<DepanFxNodeList> listRsrc) {
-    DepanFxNodeList nodeList = listRsrc.getResource();
-    return new DepanFxListFilterData(
-        nodeList.getNodeListName() + " filter",
-        "Filter for " + nodeList.getNodeListDescription(),
-        FilterMergeMode.UNION, listRsrc);
-  }
-
-  private DepanFxSequenceFilterData createSequenceFilterData() {
-    List<? extends DepanFxBaseFilterData> filterSeq = new ArrayList<>();
-    return new DepanFxSequenceFilterData(
-        "Sequence filter",
-        "Sequence filter description",
-        FilterMergeMode.REPLACE, filterSeq, false);
-  }
-
-  private DepanFxReferencedFilterData createReferenceFilterData(
-      DepanFxWorkspaceResource<? extends DepanFxBaseFilterData> refFilter) {
-    return new DepanFxReferencedFilterData(
-        "Use " + refFilter.getResource().getToolName(),
-        "Use of " + refFilter.getResource().getToolName(),
-        FilterMergeMode.REPLACE, refFilter, false);
   }
 
   private Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>

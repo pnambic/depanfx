@@ -35,6 +35,14 @@ public class DepanFxReferencedFilterData extends DepanFxBaseFilterData {
     this.sequenceClosure = sequenceClosure;
   }
 
+  public static DepanFxReferencedFilterData createReferenceFilterData(
+      DepanFxWorkspaceResource<? extends DepanFxBaseFilterData> refFilter) {
+    return new DepanFxReferencedFilterData(
+        "Use " + refFilter.getResource().getToolName(),
+        "Use of " + refFilter.getResource().getToolName(),
+        FilterMergeMode.REPLACE, refFilter, false);
+  }
+
   public DepanFxWorkspaceResource<? extends DepanFxBaseFilterData> getFilterResource() {
     return filterRsrc;
   }
