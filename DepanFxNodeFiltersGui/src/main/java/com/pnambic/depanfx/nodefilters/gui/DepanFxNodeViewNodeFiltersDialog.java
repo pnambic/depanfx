@@ -36,6 +36,7 @@ import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.perspective.DepanFxWorkspaceDialog;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -135,6 +136,8 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
 
   private DepanFxProjectDocument destDoc;
 
+  private DepanFxNodeList filteredNodes;
+
   @Autowired
   public DepanFxNodeViewNodeFiltersDialog(
       DepanFxWorkspace workspace,
@@ -231,6 +234,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
       optFlatView.ifPresent(r -> tableView = r.getResource());
     }
 
+    this.filteredNodes = filteredNodes;
     DepanFxNodeListSelection nodeSelection =
         DepanFxNodeListSelection.forNodes(filteredNodes.getNodes());
     nodeSelection.doSelectAllAction();
@@ -277,16 +281,18 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
   @FXML
   public void handleEvaluate() {
     DepanFxBaseFilterData filterData = prepareResult();
-    GraphModel graphModel = tableControl.getGraphDoc().getGraph();
+    GraphModel graphModel =
+        filteredNodes.getGraphDocResource().getResource().getGraph();
     Collection<GraphNode> targetNodes = graphModel.getGraphNodes();
 
     DepanFxBaseFilter<?> filter =
         DepanFxNodeFilterFactory.buildFilter(
             filterData, graphModel, targetNodes);
 
-    Collection<GraphNode> filterNodes = tableControl.getNodes();
-    Collection<GraphNode> resultNodes = filter.computeNodes(filterNodes);
-    DepanFxNodeList results = tableControl.buildRelatedNodeList(resultNodes);
+    Collection<GraphNode> resultNodes =
+        filter.computeNodes(filteredNodes.getNodes());
+    DepanFxNodeList results =
+        DepanFxNodeLists.buildRelatedNodeList(filteredNodes, resultNodes);
 
     setFilteredNodes(results);
   }
