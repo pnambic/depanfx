@@ -15,6 +15,9 @@
  */
 package com.pnambic.depanfx.nodefilters.gui;
 
+import com.pnambic.depanfx.graph.basic.BasicGraph;
+import com.pnambic.depanfx.graph.context.ContextNodeId;
+import com.pnambic.depanfx.graph.context.ContextRelationId;
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodefilters.model.DepanFxBaseFilter;
@@ -136,7 +139,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
 
   private DepanFxProjectDocument destDoc;
 
-  private DepanFxNodeList filteredNodes;
+  private DepanFxNodeList sourceNodes;
 
   @Autowired
   public DepanFxNodeViewNodeFiltersDialog(
@@ -153,7 +156,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
       DepanFxDialogRunner dialogRunner,
       DepanFxProjectDocument destDoc,
       DepanFxNodeListTableViewData tableView,
-      DepanFxNodeList filteredNodes,
+      DepanFxNodeList sourceNodes,
       Consumer<DepanFxNodeList> onUpdate) {
 
     Dialog<DepanFxNodeViewNodeFiltersDialog> dlg =
@@ -161,7 +164,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
             DepanFxNodeViewNodeFiltersDialog.class);
     dlg.getController().setDestinationDocument(destDoc);
     dlg.getController().setTableView(tableView);
-    dlg.getController().setFilteredNodes(filteredNodes);
+    dlg.getController().setSourceNodes(sourceNodes);
     dlg.getController().setOnUpdate(onUpdate);
     return dlg.runModeless(EDIT_NODE_FILTERS);
   }
@@ -219,14 +222,14 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
             .subtract(labelColumn.widthProperty())
             .subtract(closureColumn.widthProperty())
             .subtract(mergeColumn.widthProperty())
-            .subtract(2));
+            .subtract(1));
   }
 
   public void setDestinationDocument(DepanFxProjectDocument destDoc) {
     this.destDoc = destDoc;
   }
 
-  public void setFilteredNodes(DepanFxNodeList filteredNodes) {
+  public void setSourceNodes(DepanFxNodeList filteredNodes) {
     if (tableView == null) {
       Optional<DepanFxWorkspaceResource<DepanFxNodeListTableViewData>> optFlatView =
           ((DepanFxBuiltInProject) workspace.getBuiltInProject())
@@ -234,13 +237,9 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
       optFlatView.ifPresent(r -> tableView = r.getResource());
     }
 
-    this.filteredNodes = filteredNodes;
-    DepanFxNodeListSelection nodeSelection =
-        DepanFxNodeListSelection.forNodes(filteredNodes.getNodes());
-    nodeSelection.doSelectAllAction();
-    tableControl = new DepanFxNodeListTableController(
-        workspace, dialogRunner, filteredNodes, nodeSelection,
-        tableView, nodeSelectTable);
+    this.sourceNodes = filteredNodes;
+
+    tableControl = buildTable(filteredNodes);
     nodeTableCommands.setContextMenu(buildNodeTableCommandMenu());
   }
 
@@ -282,7 +281,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
   public void handleEvaluate() {
     DepanFxBaseFilterData filterData = prepareResult();
     GraphModel graphModel =
-        filteredNodes.getGraphDocResource().getResource().getGraph();
+        sourceNodes.getGraphDocResource().getResource().getGraph();
     Collection<GraphNode> targetNodes = graphModel.getGraphNodes();
 
     DepanFxBaseFilter<?> filter =
@@ -290,11 +289,12 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
             filterData, graphModel, targetNodes);
 
     Collection<GraphNode> resultNodes =
-        filter.computeNodes(filteredNodes.getNodes());
+        filter.computeNodes(sourceNodes.getNodes());
     DepanFxNodeList results =
-        DepanFxNodeLists.buildRelatedNodeList(filteredNodes, resultNodes);
+        DepanFxNodeLists.buildRelatedNodeList(sourceNodes, resultNodes);
 
-    setFilteredNodes(results);
+    tableControl = buildTable(results);
+    nodeTableCommands.setContextMenu(buildNodeTableCommandMenu());
   }
 
   /////////////////////////////////////
@@ -310,6 +310,17 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
     builder.appendActionItem(SELECT_NODE_FILTER, e -> loadNodeFilter());
     builder.appendActionItem(SAVE_NODE_FILTER, e -> handleSaveFilters());
     return builder.build();
+  }
+
+  private DepanFxNodeListTableController buildTable(
+      DepanFxNodeList tableNodes) {
+    DepanFxNodeListSelection nodeSelection =
+        DepanFxNodeListSelection.forNodes(tableNodes.getNodes());
+    nodeSelection.doSelectAllAction();
+
+    return new DepanFxNodeListTableController(
+        workspace, dialogRunner, tableNodes, nodeSelection,
+        tableView, nodeSelectTable);
   }
 
   private ContextMenu buildNodeTableCommandMenu() {

@@ -33,6 +33,7 @@ import java.io.File;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
@@ -46,6 +47,9 @@ public class DepanFxNodeFiltersMatcherDialog
 
   public static final ExtensionFilter EXT_FILTER =
       DepanFxSceneControls.buildExtFilter("Link Matcher Filter", EXT);
+
+  @FXML
+  private CheckBox useInverseCheckBox;
 
   @Autowired
   public DepanFxNodeFiltersMatcherDialog(
@@ -99,6 +103,7 @@ public class DepanFxNodeFiltersMatcherDialog
   public void setFilter(DepanFxMatcherFilterData matcherFilter) {
     super.setFilter(matcherFilter);
     setFilterResource(matcherFilter.getMatcherResource());
+    useInverseCheckBox.setSelected(matcherFilter.useInverse());
   }
 
   @FXML
@@ -116,6 +121,7 @@ public class DepanFxNodeFiltersMatcherDialog
     return new DepanFxMatcherFilterData(
         getToolName(), getToolDescription(),
         getMergeMode(), getFilterResource(DepanFxLinkMatcherDocument.class),
+        useInverseCheckBox.isSelected(),
         useClosure());
   }
 

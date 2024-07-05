@@ -134,7 +134,7 @@ public class DepanFxNodeFiltersTableCell
   private void runUpdateFilter(
       DepanFxNodeFiltersDisplayMember<?> filterMember) {
     DepanFxBaseFilterData filterData = filterMember.prepareFilterData();
-    DepanFxNodeFiltersRegistry.runUpdateFilters( dialogRunner, filterData)
+    DepanFxNodeFiltersRegistry.runUpdateFilters(dialogRunner, filterData)
         .ifPresent(filterMember::updateFilter);
   }
 

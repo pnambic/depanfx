@@ -132,7 +132,9 @@ public class DepanFxNodeListTableState {
   }
 
   public void doSelectGraphNodesAction(Stream<GraphNode> nodes, boolean value) {
-    nodes.forEach(n -> setSelectGraphNode(n, value));
+    nodes
+        .filter(nodeList.getNodes()::contains)
+        .forEach(n -> setSelectGraphNode(n, value));
   }
 
   public void doSelectGraphNodeAction(GraphNode node, boolean value) {

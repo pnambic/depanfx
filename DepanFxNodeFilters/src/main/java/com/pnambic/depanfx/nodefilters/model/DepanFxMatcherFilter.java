@@ -18,10 +18,12 @@ package com.pnambic.depanfx.nodefilters.model;
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxMatcherFilterData;
+import com.pnambic.depanfx.nodelist.link.DepanFxLink;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DepanFxMatcherFilter
     extends DepanFxBaseFilter<DepanFxMatcherFilterData>
@@ -49,14 +51,34 @@ public class DepanFxMatcherFilter
   protected Collection<GraphNode> computeResult(Collection<GraphNode> nodes) {
     DepanFxLinkMatcher matcher =
         getFilterData().getMatcherResource().getResource().getMatcher();
+    if (getFilterData().useInverse()) {
+      return computeToSource(matcher, nodes);
+    }
+    return computeToTarget(matcher, nodes);
+  }
 
-    return graphModel.streamEdges()
-        .map(e -> matcher.match(e))
-        .filter(o -> o.isPresent())
-        .map(o -> o.get())
+  private Collection<GraphNode> computeToTarget(
+      DepanFxLinkMatcher matcher, Collection<GraphNode> nodes) {
+
+    return streamMatchLinks(matcher)
         .filter(l -> nodes.contains(l.getSource()))
         .map(l -> l.getTarget())
         .filter(n -> targets.contains(n))
         .collect(Collectors.toSet());
+  }
+
+  private Collection<GraphNode> computeToSource(
+      DepanFxLinkMatcher matcher, Collection<GraphNode> nodes) {
+
+    return streamMatchLinks(matcher)
+        .filter(l -> nodes.contains(l.getTarget()))
+        .map(l -> l.getSource())
+        .filter(targets::contains)
+        .collect(Collectors.toSet());
+  }
+
+  private Stream<DepanFxLink> streamMatchLinks(DepanFxLinkMatcher matcher) {
+    return graphModel.streamEdges()
+        .flatMap(e -> matcher.match(e).stream());
   }
 }

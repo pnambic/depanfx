@@ -69,4 +69,17 @@ public class DepanFxNodeFiltersSequenceMember
   public void deleteFilter(DepanFxBaseFilterData filterData) {
     filterItems.remove(filterData);
   }
+
+  @Override
+  public void updateFilter(DepanFxBaseFilterData filterData) {
+    super.updateFilter(filterData);
+
+    DepanFxSequenceFilterData sequenceFilter =
+        (DepanFxSequenceFilterData) filterData;
+    List<? extends DepanFxBaseFilterData> updateFilters =
+        sequenceFilter .streamFilters().collect(Collectors.toList());
+
+    filterItems.clear();
+    filterItems.addAll(updateFilters);
+  }
 }

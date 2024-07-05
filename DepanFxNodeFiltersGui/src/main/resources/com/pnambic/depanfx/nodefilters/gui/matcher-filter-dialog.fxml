@@ -29,6 +29,11 @@
          </HBox>
 
          <HBox spacing="10">
+            <Label text="Reverse links"/>
+            <CheckBox fx:id="useInverseCheckBox"/>
+         </HBox>
+
+         <HBox spacing="10">
             <Label text="Use Closure"/>
             <CheckBox fx:id="useClosureCheckBox"/>
 
@@ -64,9 +69,9 @@
          <Region VBox.vgrow="ALWAYS" />
 
          <HBox fx:id="updateActionBox" spacing="10">
-            <Button text="Cancel" onAction="#handleCancel"/>
+            <Button text="Revert" onAction="#handleCancel"/>
             <Region HBox.hgrow="ALWAYS" />
-            <Button text="Apply" onAction="#handleApply"/>
+            <Button text="Update" onAction="#handleApply"/>
          </HBox>
          <HBox fx:id="saveActionBox" spacing="10">
             <Button text="Cancel" onAction="#handleCancel"/>

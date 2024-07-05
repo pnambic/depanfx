@@ -47,10 +47,10 @@
                              prefWidth="150.0"/>
                          <TreeTableColumn text="Closure"
                              editable="true"
-                             prefWidth="70.0"/>
+                             prefWidth="60.0"/>
                          <TreeTableColumn text="Merge"
                              editable="true"
-                             prefWidth="70.0"/>
+                             prefWidth="90.0"/>
                          <TreeTableColumn text="Description"
                              editable="true"
                              prefWidth="150.0"/>

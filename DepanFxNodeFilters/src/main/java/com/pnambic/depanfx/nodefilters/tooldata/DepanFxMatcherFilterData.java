@@ -24,15 +24,19 @@ public class DepanFxMatcherFilterData extends DepanFxBaseFilterData {
 
   private final DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc;
 
+  private final boolean matcherInverse;
+
   private final boolean matcherClosure;
 
   public DepanFxMatcherFilterData(
       String toolName, String toolDescription,
       FilterMergeMode mergeMode,
       DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc,
+      boolean matcherInverse,
       boolean matcherClosure) {
     super(toolName, toolDescription, mergeMode);
     this.matcherRsrc = matcherRsrc;
+    this.matcherInverse = matcherInverse;
     this.matcherClosure = matcherClosure;
   }
 
@@ -42,11 +46,15 @@ public class DepanFxMatcherFilterData extends DepanFxBaseFilterData {
     return new DepanFxMatcherFilterData(
         matcherInfo.getToolName() + " filter",
         "Filter for " + matcherInfo.getToolName(),
-        FilterMergeMode.REPLACE, matcherRsrc, false);
+        FilterMergeMode.REPLACE, matcherRsrc, false, false);
   }
 
   public DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> getMatcherResource() {
     return matcherRsrc;
+  }
+
+  public boolean useInverse() {
+    return matcherInverse;
   }
 
   public boolean useClosure() {
