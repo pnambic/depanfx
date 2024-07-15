@@ -120,7 +120,7 @@ public class DepanFxNodeFiltersReferencedDialog
 
   @Override
   protected File buildInitialDestinationFile() {
-    return buildAnalysisInitialDestination(EXT);
+    return buildFilterInitialDestinationFile(EXT);
   }
 
   @Override

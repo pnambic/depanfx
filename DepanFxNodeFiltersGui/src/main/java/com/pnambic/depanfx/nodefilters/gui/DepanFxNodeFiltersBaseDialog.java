@@ -23,6 +23,7 @@ import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import java.io.File;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
@@ -160,6 +161,11 @@ public abstract class DepanFxNodeFiltersBaseDialog<T extends DepanFxBaseFilterDa
   @SuppressWarnings("unchecked")
   protected <R> DepanFxWorkspaceResource<R> getFilterResource(Class<R> type) {
     return (DepanFxWorkspaceResource<R>) filterRsrc;
+  }
+
+  protected File buildFilterInitialDestinationFile(String toolExt) {
+    return buildToolInitialDestination(
+        toolExt, DepanFxBaseFilterData.NODE_FILTERS_TOOL_PATH);
   }
 
   private void showFields() {
