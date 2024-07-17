@@ -44,7 +44,7 @@ public class DepanFxNodeListTableFactory {
     // The first column is always the name, and it is not saved.
     TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember> result =
         new TreeTableColumn<>("Node Name");
-    result.setCellFactory(p -> new DepanFxNodeListCell(tableAdapter));
+    result.setCellFactory(p -> createTableCell());
     result.setCellValueFactory(
         p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue()));
     result.setPrefWidth(DepanFxSceneControls.layoutWidthMs(30));

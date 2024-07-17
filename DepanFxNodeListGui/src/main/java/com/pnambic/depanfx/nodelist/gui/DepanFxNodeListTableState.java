@@ -239,6 +239,8 @@ public class DepanFxNodeListTableState {
     // Start over with table columns.
     tableColumns.clear();
     tableColumns.add(nameColumn);
+    // Update name column cell to use new table controller.
+    nameColumn.setCellFactory(p -> tableFactory.createTableCell());
 
     // Prepare the table view's columns.
     List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
