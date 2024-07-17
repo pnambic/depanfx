@@ -2,10 +2,10 @@ package com.pnambic.depanfx.java.nodelist.link;
 
 import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemLinkMatchers;
 import com.pnambic.depanfx.java.context.JavaContextDefinition;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatchers.Composite;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcher;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 
 import org.springframework.context.annotation.Bean;

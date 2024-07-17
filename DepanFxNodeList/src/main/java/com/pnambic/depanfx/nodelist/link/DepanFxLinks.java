@@ -2,12 +2,13 @@ package com.pnambic.depanfx.nodelist.link;
 
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLink;
 
-public interface DepanFxLink {
+public class DepanFxLinks {
 
-  GraphNode getSource();
-
-  GraphNode getTarget();
+  private DepanFxLinks () {
+    // Prevent instantiation.
+  }
 
   public static class Simple implements DepanFxLink {
 

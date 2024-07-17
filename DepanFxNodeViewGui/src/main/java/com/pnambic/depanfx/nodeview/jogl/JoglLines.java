@@ -4,7 +4,7 @@ import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.jogl.JoglColor;
 import com.pnambic.depanfx.jogl.shapes.LineShape;
-import com.pnambic.depanfx.nodelist.link.DepanFxLink;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLink;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;

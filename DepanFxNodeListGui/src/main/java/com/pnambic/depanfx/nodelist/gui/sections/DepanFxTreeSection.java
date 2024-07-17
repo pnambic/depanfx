@@ -10,11 +10,11 @@ import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.Orde
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData.ContainerOrder;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatchers;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcher;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModelBuilder;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;

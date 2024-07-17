@@ -2,11 +2,11 @@ package com.pnambic.depanfx.filesystem.nodelist.link;
 
 import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
 import com.pnambic.depanfx.filesystem.graph.FileSystemRelation;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatchers.Composite;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatchers.ForwardRelation;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcher;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
 
 import java.util.Arrays;
 import java.util.Collections;

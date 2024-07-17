@@ -3,7 +3,7 @@ package com.pnambic.depanfx.java.nodeview;
 import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemLinkMatcherBuiltIns;
 import com.pnambic.depanfx.java.context.JavaContextDefinition;
 import com.pnambic.depanfx.java.nodelist.link.JavaLinkMatcherBuiltIns;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDirection;

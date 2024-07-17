@@ -18,7 +18,7 @@ public class NodeListPersistenceContribution
    * Standard extension to use when loading or saving {@code NodeList}s.
    * The characters represent "DepAn Graph Info".
    */
-  public static final String EXTENSION = "dnli";
+  public static final String EXTENSION = DepanFxNodeList.NODE_LIST_EXT;
 
   public static final String NODE_LIST_TAG = "node-list";
 

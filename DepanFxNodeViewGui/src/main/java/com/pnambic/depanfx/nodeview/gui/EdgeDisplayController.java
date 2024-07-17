@@ -1,8 +1,8 @@
 package com.pnambic.depanfx.nodeview.gui;
 
 import com.pnambic.depanfx.graph.model.GraphEdge;
-import com.pnambic.depanfx.nodelist.link.DepanFxLink;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLink;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodeview.jogl.JoglLines;
 import com.pnambic.depanfx.nodeview.jogl.JoglPane;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;

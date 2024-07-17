@@ -15,7 +15,7 @@
  */
 package com.pnambic.depanfx.nodefilters.tooldata;
 
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 public class DepanFxMatcherFilterData extends DepanFxBaseFilterData {

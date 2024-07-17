@@ -18,8 +18,8 @@ package com.pnambic.depanfx.nodelist.gui.tooldata;
 
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderDirection;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcher;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcher;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;

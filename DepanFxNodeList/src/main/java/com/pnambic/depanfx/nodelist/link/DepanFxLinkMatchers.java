@@ -3,13 +3,15 @@ package com.pnambic.depanfx.nodelist.link;
 import com.pnambic.depanfx.graph.api.Relation;
 import com.pnambic.depanfx.graph.context.ContextRelationId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLink;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcher;
 
 import java.util.List;
 import java.util.Optional;
 
 public class DepanFxLinkMatchers {
 
-  DepanFxLinkMatchers() {
+  private DepanFxLinkMatchers() {
     // Prevent instantiation.
   }
 
@@ -28,7 +30,7 @@ public class DepanFxLinkMatchers {
 
         @Override
         public Optional<DepanFxLink> match(GraphEdge edge) {
-          return Optional.of(new DepanFxLink.Forward(edge));
+          return Optional.of(new DepanFxLinks.Forward(edge));
         }
   };
 
@@ -38,7 +40,7 @@ public class DepanFxLinkMatchers {
 
         @Override
         public Optional<DepanFxLink> match(GraphEdge edge) {
-          return Optional.of(new DepanFxLink.Reverse(edge));
+          return Optional.of(new DepanFxLinks.Reverse(edge));
         }
   };
 
@@ -54,7 +56,7 @@ public class DepanFxLinkMatchers {
     @Override
     public Optional<DepanFxLink> match(GraphEdge edge) {
       if (edge.getRelation() == forwardRelation) {
-        return Optional.of(new DepanFxLink.Forward(edge));
+        return Optional.of(new DepanFxLinks.Forward(edge));
       }
       return Optional.empty();
     }
@@ -72,7 +74,7 @@ public class DepanFxLinkMatchers {
     @Override
     public Optional<DepanFxLink> match(GraphEdge edge) {
       if (edge.getRelation() == reverseRelation) {
-        return Optional.of(new DepanFxLink.Reverse(edge));
+        return Optional.of(new DepanFxLinks.Reverse(edge));
       }
       return Optional.empty();
     }

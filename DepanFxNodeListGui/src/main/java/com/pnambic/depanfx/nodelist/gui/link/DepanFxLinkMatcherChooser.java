@@ -1,6 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui.link;
 
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;

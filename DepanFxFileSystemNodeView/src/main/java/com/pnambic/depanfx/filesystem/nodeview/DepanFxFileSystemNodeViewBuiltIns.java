@@ -2,7 +2,7 @@ package com.pnambic.depanfx.filesystem.nodeview;
 
 import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemLinkMatcherBuiltIns;
 import com.pnambic.depanfx.graph.context.BaseContextDefinition;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDirection;

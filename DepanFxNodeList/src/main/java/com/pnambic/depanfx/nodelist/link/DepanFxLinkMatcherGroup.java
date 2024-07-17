@@ -2,9 +2,11 @@ package com.pnambic.depanfx.nodelist.link;
 
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLink;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcher;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package com.pnambic.depanfx.nodelist.link;
+package com.pnambic.depanfx.nodelist.tooldata;
 
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
