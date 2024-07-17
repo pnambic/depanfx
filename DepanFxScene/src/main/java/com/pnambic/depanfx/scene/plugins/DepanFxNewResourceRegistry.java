@@ -29,10 +29,10 @@ public class DepanFxNewResourceRegistry {
     int contribCnt = resourceContribs.size();
     if (contribCnt > 0) {
       List<MenuItem> result = new ArrayList<>(contribCnt);
-      for (DepanFxNewResourceContribution contribution : resourceContribs) {
-        result.add(contribution.createNewResourceMenuItem());
-      }
-      result.sort((a,b) -> a.getText().compareTo(b.getText()));
+      resourceContribs.stream()
+          .map(c -> c.createNewResourceMenuItem())
+          .sorted((a,b) -> a.getText().compareTo(b.getText()))
+          .forEach(result::add);
       return result;
     }
     return Collections.emptyList();
@@ -42,10 +42,10 @@ public class DepanFxNewResourceRegistry {
     int contribCnt = analysisContribs.size();
     if (contribCnt > 0) {
       List<MenuItem> result = new ArrayList<>(contribCnt);
-      for (DepanFxNewAnalysisContribution contribution : analysisContribs) {
-        result.add(contribution.createNewResourceMenuItem());
-      }
-      result.sort((a,b) -> a.getText().compareTo(b.getText()));
+      analysisContribs.stream()
+          .map(c -> c.createNewResourceMenuItem())
+          .sorted((a,b) -> a.getText().compareTo(b.getText()))
+          .forEach(result::add);
       return result;
     }
     return Collections.emptyList();

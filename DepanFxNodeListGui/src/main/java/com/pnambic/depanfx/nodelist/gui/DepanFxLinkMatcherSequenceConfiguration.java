@@ -1,0 +1,140 @@
+/*
+ * Copyright 2024 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.pnambic.depanfx.nodelist.gui;
+
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
+import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceContribution;
+import com.pnambic.depanfx.workspace.DepanFxProjectMember;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.nio.file.Path;
+import java.util.Collections;
+
+import javafx.scene.control.Cell;
+import javafx.scene.control.MenuItem;
+
+@Configuration
+public class DepanFxLinkMatcherSequenceConfiguration {
+
+  private static final String LINK_MATCHER_SEQUENCE = "Link Matcher Sequence";
+
+  public static final String EDIT_LINK_MATCHER_SEQUENCE_FILTER =
+      "Edit Link Matcher Sequence...";
+
+  public static final String NEW_LINK_MATCHER_FILTER =
+      "New Link Matcher Sequence...";
+
+  private static final String LINK_MATCHER_SEQUENCE_KEY =
+      "Link Matcher Sequence";
+
+  private static final String LINK_MATCHER_SEQUENCE_TOOL_NAME =
+      "Link Matcher Sequence";
+
+  private static final String LINK_MATCHER_SEQUENCE_TOOL_DESCR =
+      "Link matcher sequence.";
+
+  @Bean
+  public DepanFxResourceExtMenuContribution linkMatcherSequenceExtMenu() {
+    return new ExtContribution();
+  }
+
+  @Bean
+  public DepanFxResourcePathMenuContribution linkMatcherSequencePathMenu() {
+    return new PathContribution();
+  }
+
+  @Bean
+  public DepanFxNewResourceContribution linkMatcherSequenceNewMenu(
+      DepanFxDialogRunner dialogRunner) {
+    return new NewContribution(dialogRunner);
+  }
+
+  private static class ExtContribution
+      extends DepanFxResourceExtMenuContribution.Basic<DepanFxLinkMatcherSequenceDocument> {
+
+    public ExtContribution() {
+      super(DepanFxLinkMatcherSequenceDocument.class,
+          LINK_MATCHER_SEQUENCE_KEY, EDIT_LINK_MATCHER_SEQUENCE_FILTER,
+          DepanFxLinkMatcherSequenceDocument.LINK_MATCHER_SEQUENCE_TOOL_EXT);
+    }
+
+    @Override
+    protected void runDialog(
+        DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> wkspRsrc,
+        DepanFxDialogRunner dialogRunner) {
+      DepanFxLinkMatcherSequenceToolDialog.runEditDialog(
+          wkspRsrc.getDocument(), wkspRsrc.getResource(), dialogRunner);
+    }
+  }
+
+  private static class PathContribution
+      implements DepanFxResourcePathMenuContribution {
+
+    @Override
+    public boolean acceptsPath(Path rsrcPath) {
+      return DepanFxLinkMatcherSequenceDocument.LINK_MATCHER_SEQUENCE_TOOL_PATH
+          .equals(rsrcPath);
+    }
+
+    @Override
+    public void prepareCell(
+        DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
+        Cell<DepanFxWorkspaceMember> cell,
+        DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
+      builder.appendActionItem(NEW_LINK_MATCHER_FILTER,
+          e -> runCreateDialog(dialogRunner));
+    }
+
+    @Override
+    public String getOrderKey() {
+      return LINK_MATCHER_SEQUENCE_KEY;
+    }
+  }
+
+  private class NewContribution
+    implements DepanFxNewResourceContribution {
+
+    private final DepanFxDialogRunner dialogRunner;
+
+    public NewContribution(DepanFxDialogRunner dialogRunner) {
+      this.dialogRunner = dialogRunner;
+    }
+
+    @Override
+    public MenuItem createNewResourceMenuItem() {
+      return DepanFxContextMenuBuilder.createActionItem(
+          LINK_MATCHER_SEQUENCE, e -> runCreateDialog(dialogRunner));
+    }
+  }
+
+  private static void runCreateDialog(DepanFxDialogRunner dialogRunner) {
+    DepanFxLinkMatcherSequenceDocument newMatcherSeq =
+        new DepanFxLinkMatcherSequenceDocument(
+            LINK_MATCHER_SEQUENCE_TOOL_NAME, LINK_MATCHER_SEQUENCE_TOOL_DESCR,
+            null, Collections.emptyList());
+    DepanFxLinkMatcherSequenceToolDialog.runCreateDialog(
+        newMatcherSeq, dialogRunner);
+  }
+}

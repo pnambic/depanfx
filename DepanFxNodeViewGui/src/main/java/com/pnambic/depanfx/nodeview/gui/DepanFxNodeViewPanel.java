@@ -7,6 +7,7 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.jogl.JoglMouseActionListener;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeViewNodeFiltersDialog;
+import com.pnambic.depanfx.nodelist.gui.DepanFxLinkMatcherSequenceToolDialog;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListConfiguration;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
@@ -16,6 +17,7 @@ import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.nodeview.jogl.JoglPane;
 import com.pnambic.depanfx.nodeview.jogl.JoglShapes;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxLayoutsChooser;
@@ -617,13 +619,18 @@ public class DepanFxNodeViewPanel {
   }
 
   private void runEditVisibleEdgesDialog() {
-    // TODO: Should be a different dialog
-    DepanFxNodeViewLinkDisplayDialog.runEditDialog(
-        this, linkDisplayRsrc.getDocument(),
-        edgeDisplay.getLinkDisplayInfo(), dialogRunner);
+    List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> matcherSeq =
+        viewData.getLinkDisplayDocRsrc().getResource().streamLinkDisplay()
+            .map(d -> d.getLinkRsrc())
+            .collect(Collectors.toList());
 
-    // TODO: apply any outstanding changes from the dialog.
-    // However, most changes should be live modifications.
+    DepanFxLinkMatcherSequenceDocument matchSeqDoc =
+        new DepanFxLinkMatcherSequenceDocument(
+              "Test Sequence", "Test Description",
+              getContextModelId(), matcherSeq);
+
+    DepanFxLinkMatcherSequenceToolDialog.runCreateDialog(
+        matchSeqDoc, dialogRunner);
   }
 
   /////////////////////////////////////
