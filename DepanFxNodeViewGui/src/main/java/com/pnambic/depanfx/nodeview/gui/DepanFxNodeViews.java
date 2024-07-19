@@ -1,7 +1,6 @@
 package com.pnambic.depanfx.nodeview.gui;
 
 import com.pnambic.depanfx.graph.model.GraphEdge;
-import com.pnambic.depanfx.graph.model.GraphModels;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
@@ -94,8 +93,10 @@ public class DepanFxNodeViews {
   public static DepanFxNodeViewData updateNameDescr(
       DepanFxNodeViewData viewDoc, String nameText, String descrText) {
     return new DepanFxNodeViewData(
-        nameText, descrText, viewDoc.getSceneData(),
-        viewDoc.getGraphDocRsrc(), viewDoc.getLinkDisplayDocRsrc(),
+        nameText, descrText,
+        viewDoc.getSceneData(), viewDoc.getGraphDocRsrc(),
+        viewDoc.getAvailEdgeRsrc(), viewDoc.getVisibleEdgeRsrc(),
+        viewDoc.getLinkDisplayDocRsrc(),
         viewDoc.getViewNodes(),
         viewDoc.getNodeLocations(), viewDoc.getNodeDisplay(),
         viewDoc.getEdgeDisplay(),
@@ -120,7 +121,10 @@ public class DepanFxNodeViews {
     Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay =
         buildEdgeDisplay();
     return new DepanFxNodeViewData(viewName, viewDescr, sceneData,
-        graphDocRsrc, linkViewDocRsrc, nodes,
+        graphDocRsrc,
+        DepanFxNodeViewData.EMPTY_AVAILABLE_EDGES,
+        DepanFxNodeViewData.EMPTY_VISIBLE_EDGES,
+        linkViewDocRsrc, nodes,
         locations, nodeDisplay, edgeDisplay,
         DepanFxNodeViewData.DEFAULT_REMAINDER_VISIBLE,
         DepanFxNodeViewData.DEFAULT_REMAINDER_LABEL,

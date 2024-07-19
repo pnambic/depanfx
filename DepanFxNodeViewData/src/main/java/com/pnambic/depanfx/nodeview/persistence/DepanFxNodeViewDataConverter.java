@@ -6,6 +6,7 @@ import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.docdata.NodeInfoBlock;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.nodeview.builtins.DepanFxNodeViewLinkDisplayDataBuiltIns;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
@@ -45,6 +46,10 @@ public class DepanFxNodeViewDataConverter
 
   public static final String GRAPH_DOC = "graph-doc";
 
+  private static final String AVAILABLE_EDGE_DOC = "avail-edges-rsrc";
+
+  private static final String VISIBLE_EDGE_DOC = "visible-edges-rsrc";
+
   public static final String LINK_DISPLAY_DOC = "link-display-doc";
 
   public static final String NODE_VIEW_NAME = "node-view-name";
@@ -72,6 +77,10 @@ public class DepanFxNodeViewDataConverter
       new PersistTagDataLoader.TagDescriptor[] {
           new PersistTagDataLoader.TagDescriptor(
               GRAPH_DOC, DepanFxWorkspaceResource.class),
+          new PersistTagDataLoader.TagDescriptor(
+              AVAILABLE_EDGE_DOC, DepanFxWorkspaceResource.class),
+          new PersistTagDataLoader.TagDescriptor(
+              VISIBLE_EDGE_DOC, DepanFxWorkspaceResource.class),
           new PersistTagDataLoader.TagDescriptor(
               LINK_DISPLAY_DOC, DepanFxWorkspaceResource.class),
           new PersistTagDataLoader.TagDescriptor(NODE_VIEW_NAME, String.class),
@@ -118,6 +127,10 @@ public class DepanFxNodeViewDataConverter
     marshalObject(dstContext,
         GRAPH_DOC, viewData.getGraphDocRsrc());
     marshalObject(dstContext,
+        AVAILABLE_EDGE_DOC, viewData.getAvailEdgeRsrc());
+    marshalObject(dstContext,
+        VISIBLE_EDGE_DOC, viewData.getVisibleEdgeRsrc());
+    marshalObject(dstContext,
         LINK_DISPLAY_DOC, viewData.getLinkDisplayDocRsrc());
     marshalObject(dstContext,
         NODE_VIEW_NAME, viewData.getToolName());
@@ -150,6 +163,14 @@ public class DepanFxNodeViewDataConverter
     @SuppressWarnings("unchecked")
     DepanFxWorkspaceResource<GraphDocument> graphDocRsrc =
         metaData.getObject(GRAPH_DOC, DepanFxWorkspaceResource.class);
+
+    @SuppressWarnings("unchecked")
+    DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableEdgeRsrc =
+        metaData.getObject(AVAILABLE_EDGE_DOC, DepanFxWorkspaceResource.class);
+
+    @SuppressWarnings("unchecked")
+    DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visbibleEdgeRsrc =
+        metaData.getObject(VISIBLE_EDGE_DOC, DepanFxWorkspaceResource.class);
 
     @SuppressWarnings("unchecked")
     DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayDocRsrc =
@@ -204,8 +225,9 @@ public class DepanFxNodeViewDataConverter
               DepanFxNodeViewLinkDisplayDataBuiltIns.ALL_EDGES_DOC_PATH)
           .get();
     }
+
     return new DepanFxNodeViewData(toolName, toolDescr, sceneData,
-        graphDocRsrc, linkDisplayDocRsrc,
+        graphDocRsrc, availableEdgeRsrc, visbibleEdgeRsrc, linkDisplayDocRsrc,
         viewNodes, nodeLocations, nodeDisplay, edgeDisplay,
         remainderVisible, remainderLabel, remainderDisplay);
   }

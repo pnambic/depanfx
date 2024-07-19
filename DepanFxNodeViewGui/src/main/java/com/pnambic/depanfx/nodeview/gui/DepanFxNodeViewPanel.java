@@ -544,8 +544,9 @@ public class DepanFxNodeViewPanel {
     ObservableList<MenuItem> items = vizMenu.getItems();
     items.clear();
 
-    // Toggles for each matcher
+    // Toggles for each (non-zero) matcher
     edgeDisplay.streamVisibilityMatchers()
+        .filter(d -> edgeDisplay.getVisiblityMatcherEdgeCount(d) > 0)
         .sorted((a, b) -> a.getToolName().compareTo(b.getToolName()))
         .forEach(m -> items.add(buildEdgeVisibleItem(m)));
 
@@ -593,7 +594,7 @@ public class DepanFxNodeViewPanel {
   private MenuItem buildEdgeVisibleItem(DepanFxLinkMatcherDocument matcher) {
     String label = matcher.getToolName();
     boolean isVisible = edgeDisplay.getMatcherVisibility(matcher);
-    int edgeCount = edgeDisplay.getMatcherEdgeCount(matcher);
+    int edgeCount = edgeDisplay.getVisiblityMatcherEdgeCount(matcher);
     return buildEgdeVisibleItem(label, isVisible, edgeCount,
         e -> setMatcherVisible(matcher, !isVisible));
   }
@@ -700,8 +701,8 @@ public class DepanFxNodeViewPanel {
     DepanFxNodeViewData result = new DepanFxNodeViewData(
         viewData.getToolName(), viewData.getToolDescription(),
         buildSceneData(),
-        viewData.getGraphDocRsrc(),
-        linkDisplayRsrc,
+        viewData.getGraphDocRsrc(), viewData.getAvailEdgeRsrc(),
+        viewData.getVisibleEdgeRsrc(), linkDisplayRsrc,
         viewNodes, nodeLocations, nodeDisplay,
         edgeDisplay.getEdgeDisplay(),
         edgeDisplay.getRemainderVisible(), edgeDisplay.getRemainderLabel(),
@@ -729,11 +730,8 @@ public class DepanFxNodeViewPanel {
 
     viewNodes.forEach(this::installShape);
 
-    edgeDisplay = new EdgeDisplayController(joglPane,
-        viewData.getLinkDisplayDocRsrc().getResource(),
-        viewData.getEdgeDisplay(),
-        viewData.getRemainerVisible(), viewData.getRemainderLabel(),
-        viewData.getRemainerDisplay());
+    edgeDisplay = EdgeDisplayController.of(joglPane, viewData);
+
     linkDisplayRsrc = viewData.getLinkDisplayDocRsrc();
     linkDisplayDirty = false;
 
@@ -761,6 +759,11 @@ public class DepanFxNodeViewPanel {
     JoglShapes.installShape(joglPane, node, location, displayInfo);
   }
 
+
+  /**
+   * Provide edges that have both the head and tail
+   * in the set of {@code #viewNodes}.
+   */
   private Stream<GraphEdge> getViewEdges() {
     return getGraphDoc().getGraph().getEdges().stream()
         .map(GraphEdge.class::cast)

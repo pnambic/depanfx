@@ -3,6 +3,8 @@ package com.pnambic.depanfx.nodeview.tooldata;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javafx.scene.paint.Color;
 
@@ -20,6 +23,12 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   public static final boolean DEFAULT_REMAINDER_VISIBLE = true;
 
   public static final String DEFAULT_REMAINDER_LABEL = "Remainder";
+
+  public static final DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+      EMPTY_AVAILABLE_EDGES = null;
+
+  public static final DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+      EMPTY_VISIBLE_EDGES = null;
 
   public static final DepanFxLineDisplayData DEFAULT_REMAINDER_DISPLAY =
       buildRemainerDisplay();
@@ -36,6 +45,25 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   private final DepanFxNodeViewSceneData sceneData;
 
   private final DepanFxWorkspaceResource<GraphDocument> graphDocRsrc;
+
+  /**
+   * The set of edges shown as selectable for display.
+   *
+   * This set is often initialized from {@link #linkDisplayDocRsrc},
+   * but may be independent.
+   */
+  private final DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+      availEdgeRsrc;
+
+  /**
+   * The set of edges that are visible in the render.
+   *
+   * This set is often initialized from {@link #linkDisplayDocRsrc},
+   * and is typically a subset of the edges in {@link #availEdgeRsrc},
+   * but it may be independent from either.
+   */
+  private final DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+      visibleEdgeRsrc;
 
   /**
    * Source of default rendering data for edges.
@@ -65,6 +93,8 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
       String toolName, String toolDescription,
       DepanFxNodeViewSceneData sceneData,
       DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availEdgeRsrc,
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc,
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayDocRsrc,
       Collection<GraphNode> viewNodes,
       Map<GraphNode, DepanFxNodeLocationData> nodeLocations,
@@ -76,6 +106,8 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
     super(toolName, toolDescription);
     this.sceneData = sceneData;
     this.graphDocRsrc = graphDocRsrc;
+    this.availEdgeRsrc = availEdgeRsrc;
+    this.visibleEdgeRsrc = visibleEdgeRsrc;
     this.linkDisplayDocRsrc = linkDisplayDocRsrc;
     this.viewNodes = viewNodes;
     this.nodeLocations = nodeLocations;
@@ -94,7 +126,42 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
     return graphDocRsrc;
   }
 
-  public DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> getLinkDisplayDocRsrc() {
+  public DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+      getAvailEdgeRsrc() {
+    return availEdgeRsrc;
+  }
+
+  /**
+   * Provide matcher sequence document for the available edges.
+   * An implicit result derived from the link display matchers is provided
+   * if the view has not saved its available edges.
+   */
+  public DepanFxLinkMatcherSequenceDocument getAvailableEdgesDoc() {
+    if (availEdgeRsrc != null) {
+      return availEdgeRsrc.getResource();
+    }
+    return linkDisplayDocRsrc.getResource().asLinkMatcherSequenceDoc();
+  }
+
+  public DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+      getVisibleEdgeRsrc() {
+    return visibleEdgeRsrc;
+  }
+
+  /**
+   * Provide matcher sequence document for the visible edge.
+   * An implicit result derived from the available matches is used
+   * if the view has not saved its visible edges.
+   */
+  public DepanFxLinkMatcherSequenceDocument getVisibleEdgesDoc() {
+    if (visibleEdgeRsrc != null) {
+      return visibleEdgeRsrc.getResource();
+    }
+    return getAvailableEdgesDoc();
+  }
+
+  public DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData>
+      getLinkDisplayDocRsrc() {
     return linkDisplayDocRsrc;
   }
 

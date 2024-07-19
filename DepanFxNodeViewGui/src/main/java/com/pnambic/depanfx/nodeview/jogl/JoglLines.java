@@ -27,19 +27,30 @@ public class JoglLines {
    */
   public static void installLine(
       JoglPane joglView, GraphEdge edge,
-      DepanFxLink link, LinkDisplayEntry display) {
+      DepanFxLink link, LinkDisplayEntry display, boolean isVisible) {
     LineShape shape = buildLineShape(
         link.getSource(), link.getTarget(),
-        toLabel(display), display.getLineDisplay());
+        toLabel(display), display.getLineDisplay(), isVisible);
     joglView.updateShape(edge, shape);
   }
 
   public static void installEdge(
       JoglPane joglView, GraphEdge edge,
-      String lineLabel, DepanFxLineDisplayData lineInfo) {
+      String lineLabel, DepanFxLineDisplayData lineInfo, boolean isVisible) {
     LineShape shape = buildLineShape(
-        edge.getHead(), edge.getTail(), lineLabel, lineInfo);
+        edge.getHead(), edge.getTail(), lineLabel, lineInfo, isVisible);
     joglView.updateShape(edge, shape);
+  }
+
+  public static void updateLine(
+      JoglPane joglView, GraphEdge edge,
+      DepanFxLink link, LinkDisplayEntry display) {
+    LineShape priorShape = (LineShape) joglView.getShape(edge);
+    LineShape updateShape = buildLineShape(
+        link.getSource(), link.getTarget(),
+        toLabel(display), display.getLineDisplay(),
+        priorShape.isVisible);
+    joglView.updateShape(edge, updateShape);
   }
 
   public static void setEdgeVisible(
@@ -51,11 +62,12 @@ public class JoglLines {
 
   private static LineShape buildLineShape(
       GraphNode lineSource, GraphNode lineTarget,
-      String lineLabel,  DepanFxLineDisplayData lineInfo) {
+      String lineLabel,  DepanFxLineDisplayData lineInfo,
+      boolean isVisible) {
     LineShape result = new LineShape();
 
     // Use visibility from node view panel
-    result.isVisible = true;
+    result.isVisible = isVisible;
 
     switch (lineInfo.lineDir) {
     case FORWARD:

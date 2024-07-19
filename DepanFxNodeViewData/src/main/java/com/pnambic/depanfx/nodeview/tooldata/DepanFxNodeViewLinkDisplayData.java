@@ -3,12 +3,15 @@ package com.pnambic.depanfx.nodeview.tooldata;
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DepanFxNodeViewLinkDisplayData extends DepanFxBaseToolData {
@@ -83,6 +86,19 @@ public class DepanFxNodeViewLinkDisplayData extends DepanFxBaseToolData {
         .filter(d -> handlesEdge(d, edge))
         .map(d -> d.getLineDisplay())
         .findFirst();
+  }
+
+  public DepanFxLinkMatcherSequenceDocument asLinkMatcherSequenceDoc() {
+    List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> matcherSeq =
+        new ArrayList<>(linkDisplayEntries.size());
+    streamLinkDisplay()
+        .map(d -> d.getLinkRsrc())
+        .forEach(matcherSeq::add);
+
+    return new DepanFxLinkMatcherSequenceDocument(
+        getToolName() + " Sequence",
+        "Edge sequence from " + getToolDescription(),
+        getContextModelId(), matcherSeq);
   }
 
   public Stream<LinkDisplayEntry> streamLinkDisplay() {
