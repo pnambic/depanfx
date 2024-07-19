@@ -191,6 +191,15 @@ public class EdgeDisplayController {
     return visibleMatchers.contains(matcher);
   }
 
+  public void clearMatcherVisibility() {
+    // Skip over any increments, and just make all edges hidden.
+    edgeVisibleMatchers.forEach((e, c) -> {
+      edgeVisibleMatchers.put(e, Integer.valueOf(0));
+      setEdgeVisible(e, false);
+    });
+    visibleMatchers.clear();
+  }
+
   public void setMatcherVisibility(
       DepanFxLinkMatcherDocument matcher, boolean isVisible) {
     checkKnownMatcher(matcher);
@@ -223,6 +232,17 @@ public class EdgeDisplayController {
     edgeVisibleGroup.put(matcher, matcherEdges);
   }
 
+  public void updateAvailableMatchers(
+      Set<DepanFxLinkMatcherDocument> availableMatchers) {
+    clearMatcherVisibility();
+    edgeVisibleGroup.isEmpty();
+
+    // Initialize from provided set, so all matchers are initially known.
+    availableMatchers.forEach(m -> edgeVisibleGroup.put(m, new ArrayList<>()));
+    edgeVisibleMatchers.keySet().stream()
+        .forEach(e -> installEdgeVisible(e));
+  }
+
   public void updateEdgeDisplayByMatcher(
       DepanFxLinkMatcherDocument matcher,
       LinkDisplayEntry displayEntry) {
@@ -234,19 +254,7 @@ public class EdgeDisplayController {
   }
 
   public void installEdge(GraphEdge edge) {
-    List<DepanFxLinkMatcherDocument> edgeMatchers =
-        edgeVisibleGroup.keySet().stream()
-            .filter(m -> m.getMatcher().match(edge).isPresent())
-            .collect(Collectors.toList());
-
-    edgeMatchers.stream()
-        .forEach(m -> addMatcherEdge(m, edge));
-
-    int visibleCount = (int) edgeMatchers.stream()
-        .filter(m -> visibleMatchers.contains(m))
-        .count();
-
-    edgeVisibleMatchers.put(edge, visibleCount);
+    int visibleCount = installEdgeVisible(edge);
     installEdgeDisplay(edge, visibleCount > 0);
   }
 
@@ -338,6 +346,23 @@ public class EdgeDisplayController {
       DepanFxLinkMatcherDocument matcherDoc, GraphEdge edge) {
     Collection<GraphEdge> currEdges = edgeVisibleGroup.get(matcherDoc);
     currEdges.add(edge);
+  }
+
+  private int installEdgeVisible(GraphEdge edge) {
+    List<DepanFxLinkMatcherDocument> edgeMatchers =
+        edgeVisibleGroup.keySet().stream()
+            .filter(m -> m.getMatcher().match(edge).isPresent())
+            .collect(Collectors.toList());
+
+    edgeMatchers.stream()
+        .forEach(m -> addMatcherEdge(m, edge));
+
+    int visibleCount = (int) edgeMatchers.stream()
+        .filter(m -> visibleMatchers.contains(m))
+        .count();
+
+    edgeVisibleMatchers.put(edge, visibleCount);
+    return visibleCount;
   }
 
   private void installEdgeDisplay(GraphEdge edge, boolean isVisible) {

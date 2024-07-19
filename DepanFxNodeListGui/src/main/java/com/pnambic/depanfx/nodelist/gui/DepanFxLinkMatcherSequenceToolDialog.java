@@ -122,7 +122,7 @@ public class DepanFxLinkMatcherSequenceToolDialog
         CREATE_LINK_MATCHER_SEQUENCE);
   }
 
-  public static void setCategoryColumnTooldataFilters(FileChooser result) {
+  public static void setLinkMatcherSequenceTooldataFilters(FileChooser result) {
     result.getExtensionFilters().add(LINK_MATCHER_SEQUENCE_FILTER);
     result.setSelectedExtensionFilter(LINK_MATCHER_SEQUENCE_FILTER);
   }
@@ -186,7 +186,7 @@ public class DepanFxLinkMatcherSequenceToolDialog
 
   @Override
   protected void setTooldataFilters(FileChooser result) {
-    DepanFxLinkMatcherSequenceToolDialog.setCategoryColumnTooldataFilters(result);
+    DepanFxLinkMatcherSequenceToolDialog.setLinkMatcherSequenceTooldataFilters(result);
   }
 
   @Override

@@ -72,6 +72,19 @@ public class DepanFxResourcePerspectives {
     return result;
   }
 
+  /**
+   * Provides the {@link Dialog} entity for the supplied class
+   * {@code dialogType}, after the modal dialog completes.
+   *
+   * Callers are expected to extract any interesting result from the
+   * {@code Dialog}'s member.
+   *
+   * @param toolData - provided to dialog before start.
+   * @param dialogRunner - GUI context for dialog.
+   * @param dialogType - Class of dialog controller.
+   * @param title - Title to display on window frame.
+   * @return - Dialog entity with user selected state.
+   */
   public static <
         Dlg extends DepanFxBaseToolDialog<Data>,
         Data extends DepanFxBaseToolData>

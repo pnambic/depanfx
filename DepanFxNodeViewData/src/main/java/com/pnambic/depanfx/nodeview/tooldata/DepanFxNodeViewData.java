@@ -3,7 +3,6 @@ package com.pnambic.depanfx.nodeview.tooldata;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
@@ -14,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import javafx.scene.paint.Color;
 
@@ -52,7 +50,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
    * This set is often initialized from {@link #linkDisplayDocRsrc},
    * but may be independent.
    */
-  private final DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+  private DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
       availEdgeRsrc;
 
   /**
@@ -62,7 +60,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
    * and is typically a subset of the edges in {@link #availEdgeRsrc},
    * but it may be independent from either.
    */
-  private final DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+  private DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
       visibleEdgeRsrc;
 
   /**
@@ -127,8 +125,13 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   }
 
   public DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
-      getAvailEdgeRsrc() {
+      getAvailableEdgeRsrc() {
     return availEdgeRsrc;
+  }
+
+  public void setAvailableEdgeRsrc(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availEdgeRsrc) {
+    this.availEdgeRsrc = availEdgeRsrc;
   }
 
   /**
@@ -146,6 +149,11 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   public DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
       getVisibleEdgeRsrc() {
     return visibleEdgeRsrc;
+  }
+
+  public void setVisibleEdgeRsrc(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc) {
+    this.visibleEdgeRsrc = visibleEdgeRsrc;
   }
 
   /**

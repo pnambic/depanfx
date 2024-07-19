@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodelist.persistence;
 
+import com.pnambic.depanfx.graph_doc.persistence.ContextModelIdConverter;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
@@ -58,6 +59,7 @@ public class LinkMatcherSequencePersistenceContribution
 
   @Override
   public void prepareTransport(PersistDocumentTransportBuilder builder) {
+    ContextModelIdConverter.installIn(builder);
     builder.addAllowedType(ALLOW_TYPES);
 
     // Apply plugins for document elements.

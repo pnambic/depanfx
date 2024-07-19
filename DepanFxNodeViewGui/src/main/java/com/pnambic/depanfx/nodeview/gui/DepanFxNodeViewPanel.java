@@ -7,7 +7,6 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.jogl.JoglMouseActionListener;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeViewNodeFiltersDialog;
-import com.pnambic.depanfx.nodelist.gui.DepanFxLinkMatcherSequenceToolDialog;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListConfiguration;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
@@ -435,7 +434,8 @@ public class DepanFxNodeViewPanel {
         DepanFxProjects.getBuiltIn(
             workspace,  DepanFxNodeListTableViewData.class,
             DepanFxNodeListConfiguration.FLAT_TABLE_VIEW_PATH).get();
-    DepanFxNodeList filteredNodes = getNodeSelection().getSelection(getNodeSelectionAsNodeList());
+    DepanFxNodeList filteredNodes =
+        getNodeSelection().getSelection(getNodeSelectionAsNodeList());
 
     Stage filterSelctionDialog = DepanFxNodeViewNodeFiltersDialog.runEditDialog(
         dialogRunner, null, tableViewRsrc.getResource(), filteredNodes,
@@ -620,18 +620,30 @@ public class DepanFxNodeViewPanel {
   }
 
   private void runEditVisibleEdgesDialog() {
-    List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> matcherSeq =
-        viewData.getLinkDisplayDocRsrc().getResource().streamLinkDisplay()
-            .map(d -> d.getLinkRsrc())
-            .collect(Collectors.toList());
 
-    DepanFxLinkMatcherSequenceDocument matchSeqDoc =
-        new DepanFxLinkMatcherSequenceDocument(
-              "Test Sequence", "Test Description",
-              getContextModelId(), matcherSeq);
+    Dialog<DepanFxNodeViewEdgeVisibilityDialog> visibilty =
+        DepanFxNodeViewEdgeVisibilityDialog.runVisibilityDialog(
+            dialogRunner, viewData.getAvailableEdgesDoc(),
+            viewData.getVisibleEdgesDoc(), edgeDisplay,
+            r -> updateAvailableEdges(r));
+    visibilty.getController().getWorkspaceResource()
+        .ifPresent(this::updateVisibleEdges);
+  }
 
-    DepanFxLinkMatcherSequenceToolDialog.runCreateDialog(
-        matchSeqDoc, dialogRunner);
+  private void updateAvailableEdges(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableMatchersRsrc) {
+    viewData.setAvailableEdgeRsrc(availableMatchersRsrc);
+    edgeDisplay.setMatcherVisibility(null, linkDisplayDirty);
+  }
+
+  private void updateVisibleEdges(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleMatchersRsrc) {
+    viewData.setVisibleEdgeRsrc(visibleMatchersRsrc);
+
+    edgeDisplay.clearMatcherVisibility();
+    visibleMatchersRsrc.getResource().streamMatchers()
+        .map(r -> r.getResource())
+        .forEach(m -> edgeDisplay.setMatcherVisibility(m, true));
   }
 
   /////////////////////////////////////
@@ -701,7 +713,7 @@ public class DepanFxNodeViewPanel {
     DepanFxNodeViewData result = new DepanFxNodeViewData(
         viewData.getToolName(), viewData.getToolDescription(),
         buildSceneData(),
-        viewData.getGraphDocRsrc(), viewData.getAvailEdgeRsrc(),
+        viewData.getGraphDocRsrc(), viewData.getAvailableEdgeRsrc(),
         viewData.getVisibleEdgeRsrc(), linkDisplayRsrc,
         viewNodes, nodeLocations, nodeDisplay,
         edgeDisplay.getEdgeDisplay(),

@@ -124,12 +124,21 @@ public class DepanFxNodeViewDataConverter
   public void marshal(PersistMarshalContext dstContext, Object source) {
     DepanFxNodeViewData viewData = (DepanFxNodeViewData) source;
 
+    DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableEdgeRsrc =
+        viewData.getAvailableEdgeRsrc();
+    DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc =
+        viewData.getVisibleEdgeRsrc();
+
     marshalObject(dstContext,
         GRAPH_DOC, viewData.getGraphDocRsrc());
-    marshalObject(dstContext,
-        AVAILABLE_EDGE_DOC, viewData.getAvailEdgeRsrc());
-    marshalObject(dstContext,
-        VISIBLE_EDGE_DOC, viewData.getVisibleEdgeRsrc());
+
+    if (availableEdgeRsrc != null) {
+      marshalObject(dstContext, AVAILABLE_EDGE_DOC, availableEdgeRsrc);
+    }
+    if (visibleEdgeRsrc != null) {
+      marshalObject(dstContext, VISIBLE_EDGE_DOC, visibleEdgeRsrc);
+    }
+
     marshalObject(dstContext,
         LINK_DISPLAY_DOC, viewData.getLinkDisplayDocRsrc());
     marshalObject(dstContext,

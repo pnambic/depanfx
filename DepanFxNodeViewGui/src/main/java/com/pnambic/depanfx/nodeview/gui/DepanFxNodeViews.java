@@ -95,7 +95,7 @@ public class DepanFxNodeViews {
     return new DepanFxNodeViewData(
         nameText, descrText,
         viewDoc.getSceneData(), viewDoc.getGraphDocRsrc(),
-        viewDoc.getAvailEdgeRsrc(), viewDoc.getVisibleEdgeRsrc(),
+        viewDoc.getAvailableEdgeRsrc(), viewDoc.getVisibleEdgeRsrc(),
         viewDoc.getLinkDisplayDocRsrc(),
         viewDoc.getViewNodes(),
         viewDoc.getNodeLocations(), viewDoc.getNodeDisplay(),

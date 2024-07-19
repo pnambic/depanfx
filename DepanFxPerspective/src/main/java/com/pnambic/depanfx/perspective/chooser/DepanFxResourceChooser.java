@@ -16,11 +16,11 @@ import javafx.scene.Scene;
 
 public class DepanFxResourceChooser {
 
-  private DepanFxDialogRunner dialogRunner;
+  private final DepanFxWorkspace workspace;
+
+  private final DepanFxDialogRunner dialogRunner;
 
   private String title;
-
-  private DepanFxWorkspace workspace;
 
   private DepanFxProjectContainer initialContainer;
 
@@ -39,6 +39,8 @@ public class DepanFxResourceChooser {
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
+
+    title = "Open Resource";
   }
 
   public DepanFxWorkspace getWorkspace() {
@@ -47,20 +49,6 @@ public class DepanFxResourceChooser {
 
   public void setTitle(String title) {
     this.title = title;
-  }
-
-  public Optional<DepanFxWorkspaceMember> showOpenDialog(Scene scene) {
-    Dialog<DepanFxResourceChooserDialog> openDialog =
-        dialogRunner.createDialogAndParent(DepanFxResourceChooserDialog.class);
-    DepanFxResourceChooserDialog chooserCtrl = openDialog.getController();
-    chooserCtrl.setWorkspace(workspace);
-    chooserCtrl.setExtension(extensionFilters);
-    chooserCtrl.setActiveFilter(selectedExtensionFilter.getValue());
-    chooserCtrl.setInitialResourceName(initialResourceName);
-    chooserCtrl.setInitialContainer(initialContainer);
-
-    openDialog.runDialog("Open Resource");
-    return chooserCtrl.getSelectedResource();
   }
 
   public void setInitialResourceName(String initialResourceName) {
@@ -83,5 +71,19 @@ public class DepanFxResourceChooser {
   public void setSelectedExtensionFilter(
       DepanFxResourceFilter resourceFilter) {
     selectedExtensionFilter.set(resourceFilter);
+  }
+
+  public Optional<DepanFxWorkspaceMember> showOpenDialog(Scene scene) {
+    Dialog<DepanFxResourceChooserDialog> openDialog =
+        dialogRunner.createDialogAndParent(DepanFxResourceChooserDialog.class);
+    DepanFxResourceChooserDialog chooserCtrl = openDialog.getController();
+    chooserCtrl.setWorkspace(workspace);
+    chooserCtrl.setExtension(extensionFilters);
+    chooserCtrl.setActiveFilter(selectedExtensionFilter.getValue());
+    chooserCtrl.setInitialResourceName(initialResourceName);
+    chooserCtrl.setInitialContainer(initialContainer);
+
+    openDialog.runDialog(title);
+    return chooserCtrl.getSelectedResource();
   }
 }
