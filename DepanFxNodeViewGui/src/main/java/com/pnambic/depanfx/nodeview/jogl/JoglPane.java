@@ -1,9 +1,8 @@
 package com.pnambic.depanfx.nodeview.jogl;
 
 import com.pnambic.depanfx.jogl.JoglModule;
-import com.pnambic.depanfx.jogl.JoglShape;
 import com.pnambic.depanfx.jogl.JoglMouseActionListener;
-import com.pnambic.depanfx.jogl.shapes.SquareShape;
+import com.pnambic.depanfx.jogl.JoglShape;
 import com.pnambic.depanfx.nodeview.gui.CameraControl;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewKeyActions;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewStatusPanel;
@@ -20,7 +19,6 @@ import java.awt.image.BufferedImage;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -72,11 +70,10 @@ public class JoglPane extends BorderPane {
     statusPanel = createStatusPanel();
     setTop(statusPanel.getView().get());
 
-    viewport = createJoglViewport();
+    viewport = getJoglViewport();
     setCenter(viewport);
 
     jogl.demoDisplay();
-    updateShape(this, new SquareShape(0.8f, 0.8f, 0.8f));
 
     // JogAmp Bug #1504: Should start jogl rendering here,
     // not in viewport layout children.
@@ -85,7 +82,6 @@ public class JoglPane extends BorderPane {
 
   public void release() {
     jogl.stop();
-    viewport.getChildren().clear();
     statusPanel.getController().stop();
   }
 
@@ -116,6 +112,10 @@ public class JoglPane extends BorderPane {
 
   public BufferedImage takeScreenshot() {
     return jogl.takeScreenshot();
+  }
+
+  private Pane getJoglViewport() {
+    return jogl.getCanvasPane();
   }
 
   private ScrollBar createHScrollBar(double width) {
@@ -165,11 +165,6 @@ public class JoglPane extends BorderPane {
     return result;
   }
 
-  private Pane createJoglViewport() {
-    Canvas canvas = jogl.createCanvas();
-    return new NewtCanvasPane(canvas);
-  }
-
   private void updateLayoutX(double deltaX) {
     cameraControl.dolly(deltaX, 0.0d, 0.0d);
     LOG.info("X scroll by {}", deltaX);
@@ -178,55 +173,5 @@ public class JoglPane extends BorderPane {
   private void updateLayoutY(double deltaY) {
     cameraControl.dolly(0.0d, deltaY, 0.0d);
     LOG.info("Y scroll by {}", deltaY);
-  }
-
-  /**
-   * Handles details of packaging the NewtCanvas.
-   *
-   * Encapsulates much of the work around for JogAmp Bug #1504.
-   */
-  public class NewtCanvasPane extends Pane {
-
-    private final Canvas canvas;
-
-    private boolean firstLayout = true;
-
-    public NewtCanvasPane(Canvas canvas) {
-      this.canvas = canvas;
-
-      setPrefSize(0.0d, 0.0d);
-      setMinSize(0.0d, 0.0d);
-    }
-
-    @Override
-    protected void layoutChildren() {
-      super.layoutChildren();
-
-      if (firstLayout) {
-        firstLayout = false;
-        layoutJogAmpBug1504();
-      }
-    }
-
-    private void layoutJogAmpBug1504() {
-      double width = getWidth();
-      double height = getHeight();
-
-      canvas.setWidth(width);
-      canvas.setHeight(height);
-
-      widthProperty().addListener((obs, oldVal, newVal) ->
-          canvas.setWidth(newVal.doubleValue()));
-
-      heightProperty().addListener((obs, oldVal, newVal) ->
-          canvas.setHeight(newVal.doubleValue()));
-
-      // Work around #1504 with late reparent the NewtCanvas pane.
-      getChildren().add(canvas);
-
-      // Without JogAmp Bug #1504, this should happen in activate().
-      // Canvas canvas = prepareCanvasBug1504(jogl);
-      jogl.start();
-    }
   }
 }

@@ -73,14 +73,14 @@ public class DepanFxNodeListViewer {
             tableControl.getWorkspace(), DepanFxNodeListTableViewData.class,
             DepanFxNodeListConfiguration.FLAT_TABLE_VIEW_PATH).get();
 
-    Stage filterSelctionDialog =
+    Stage filterSelectionDialog =
         DepanFxNodeViewNodeFiltersDialog.runEditDialog(
             tableControl.getDialogRunner(), null,
             tableViewRsrc.getResource(), tableControl.getSelection(),
             nl -> tableControl.doSelectGraphNodesAction(nl.getNodes()));
 
-     sideViews.add(filterSelctionDialog);
-     filterSelctionDialog.setOnCloseRequest(
-         e -> sideViews.remove(filterSelctionDialog));
+     sideViews.add(filterSelectionDialog);
+     filterSelectionDialog.setOnCloseRequest(
+         e -> sideViews.remove(filterSelectionDialog));
   }
 }

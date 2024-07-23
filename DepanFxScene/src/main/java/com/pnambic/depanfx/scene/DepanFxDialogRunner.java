@@ -25,6 +25,13 @@ public class DepanFxDialogRunner {
     this.fxweaver = fxweaver;
   }
 
+  /**
+   * Construct the controller and the view (a {@link Node}) from the
+   * supplied type.
+   *
+   * The view can be used as a child of other UX elements
+   * (e.g. {@code BorderPane} areas).
+   */
   public <T> FxControllerAndView<T, Node> weaveFxmlView(Class<T> type) {
     return fxweaver.load(type);
   }

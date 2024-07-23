@@ -25,7 +25,15 @@ import java.awt.image.DataBufferByte;
 import java.nio.ByteBuffer;
 
 import javafx.scene.canvas.Canvas;
+import javafx.scene.layout.Pane;
 
+/**
+ * A DepanFX wrapper for an OpenGL GLWindow.
+ *
+ * The {@link Canvas} provides an API to the GLWindow that is compatible
+ * with the JavaFX window management behaviors
+ * (and almost works - see JogAmp Bug #1504).
+ */
 public class JoglModule {
 
   public static final int TARGET_FPS = 60;
@@ -47,40 +55,25 @@ public class JoglModule {
 
   private JoglMouseListener mouseListener;
 
+  private NewtCanvasPane canvasPane;
+
   public JoglModule(CameraData cameraData) {
     camera = new JoglCamera(cameraData);
     renderer = new JoglRenderer(camera);
     keyListener = new JoglKeyListener();
     drawListener = new JoglDrawListener(renderer);
     mouseListener = new JoglMouseListener(renderer);
+    canvas = createCanvas();
   }
 
-  /**
-   * Create the GLWindow and add it to the JavaFx Group.
-   */
-  public Canvas createCanvas() {
-    Display jfxNewtDisplay = NewtFactory.createDisplay(null, false);
-    Screen screen = NewtFactory.createScreen(jfxNewtDisplay, 0);
-    GLCapabilities caps =
-        new GLCapabilities(GLProfile.getMaxFixedFunc(true));
-
-    glWindow = GLWindow.create(screen, caps);
-    glWindow.addGLEventListener(drawListener);
-    glWindow.addKeyListener(keyListener);
-    glWindow.addMouseListener(mouseListener);
-    mouseListener.setWindow(glWindow);
-
-    canvas = new NewtCanvasJFX(glWindow);
-    return canvas;
-  }
-
-  public void start() {
-    if (glWindow.getAnimator() == null) {
-      // registers with window as a side effect
-      Animator animator = new Animator(glWindow);
-      animator.setUpdateFPSFrames(FRAME_CNT, null);
+  public Pane getCanvasPane() {
+    if (canvasPane == null) {
+      canvasPane = new NewtCanvasPane();
     }
-    glWindow.getAnimator().start();
+
+    // A recycled canvasPanes needs to repeat the layout step.
+    canvasPane.enableCanvas();
+    return canvasPane;
   }
 
   public double getFps() {
@@ -93,6 +86,7 @@ public class JoglModule {
 
   public void stop() {
     glWindow.getAnimator().stop();
+    canvasPane.disableCanvas();
   }
 
   /**
@@ -151,6 +145,33 @@ public class JoglModule {
   }
 
   /**
+   * Create the GLWindow and add it to the JavaFx Group.
+   */
+  private NewtCanvasJFX createCanvas() {
+    Display jfxNewtDisplay = NewtFactory.createDisplay(null, false);
+    Screen screen = NewtFactory.createScreen(jfxNewtDisplay, 0);
+    GLCapabilities caps =
+        new GLCapabilities(GLProfile.getMaxFixedFunc(true));
+
+    glWindow = GLWindow.create(screen, caps);
+    glWindow.addGLEventListener(drawListener);
+    glWindow.addKeyListener(keyListener);
+    glWindow.addMouseListener(mouseListener);
+    mouseListener.setWindow(glWindow);
+
+    return new NewtCanvasJFX(glWindow);
+  }
+
+  private void startAnimation() {
+    if (glWindow.getAnimator() == null) {
+      // registers with window as a side effect
+      Animator animator = new Animator(glWindow);
+      animator.setUpdateFPSFrames(FRAME_CNT, null);
+    }
+    glWindow.getAnimator().start();
+  }
+
+  /**
    * Stolen from com.jogamp.opengl.util.awt.Screenshot.readToBufferedImage()
    *
    * JOGL 2.1.2
@@ -188,4 +209,62 @@ public class JoglModule {
     return image;
   }
 
+  /**
+   * Handles details of packaging the NewtCanvas.
+   *
+   * Encapsulates much of the work around for JogAmp Bug #1504.
+   */
+  private class NewtCanvasPane extends Pane {
+
+    /**
+     * A new canvas pane is started enabled, as a convenience.
+     * Refresh that enabled state with {@link #enableCanvas()}.
+     */
+    private boolean firstLayout = true;
+
+    public NewtCanvasPane() {
+      setPrefSize(0.0d, 0.0d);
+      setMinSize(0.0d, 0.0d);
+    }
+
+    public void enableCanvas() {
+      firstLayout = true;
+      setNeedsLayout(true);
+    }
+
+    public void disableCanvas() {
+      getChildren().clear();
+    }
+
+    @Override
+    protected void layoutChildren() {
+      super.layoutChildren();
+
+      if (firstLayout) {
+        firstLayout = false;
+        layoutJogAmpBug1504();
+      }
+    }
+
+    private void layoutJogAmpBug1504() {
+      double width = getWidth();
+      double height = getHeight();
+
+      canvas.setWidth(width);
+      canvas.setHeight(height);
+
+      widthProperty().addListener((obs, oldVal, newVal) ->
+          canvas.setWidth(newVal.doubleValue()));
+
+      heightProperty().addListener((obs, oldVal, newVal) ->
+          canvas.setHeight(newVal.doubleValue()));
+
+      // Work around #1504 with a late reparent of the NewtCanvas pane.
+      getChildren().add(canvas);
+
+      // Without JogAmp Bug #1504, this should happen in activate().
+      // Canvas canvas = prepareCanvasBug1504(jogl);
+      startAnimation();
+    }
+  }
 }
