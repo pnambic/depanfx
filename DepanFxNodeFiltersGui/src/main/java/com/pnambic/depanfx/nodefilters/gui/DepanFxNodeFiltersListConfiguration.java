@@ -2,6 +2,7 @@ package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxListFilterData;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -15,11 +16,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
+import javafx.event.ActionEvent;
+import javafx.scene.Scene;
 import javafx.scene.control.Cell;
+import javafx.scene.control.TreeItem;
 
 @Configuration
 public class DepanFxNodeFiltersListConfiguration {
+
+  public static final String ADD_LIST_FILTER = "Add List Node Filter...";
 
   public static final String EDIT_NODE_LIST_FILTER = "Edit Node List Filter...";
 
@@ -35,6 +42,11 @@ public class DepanFxNodeFiltersListConfiguration {
   @Bean
   public DepanFxResourcePathMenuContribution nodeListFilterPathMenu() {
     return new NodeListFilterPathContribution();
+  }
+
+  @Bean
+  public DepanFxNodeFiltersContribution nodeFilterListContribution() {
+    return new DepanFxNodeFiltersListContribution();
   }
 
   private static class NodeListFilterExtContribution
@@ -79,6 +91,48 @@ public class DepanFxNodeFiltersListConfiguration {
     @Override
     public String getOrderKey() {
       return NODE_LIST_KEY;
+    }
+  }
+
+  private static class DepanFxNodeFiltersListContribution
+      extends DepanFxNodeFiltersContribution.Basic<DepanFxListFilterData> {
+
+    public DepanFxNodeFiltersListContribution() {
+      super(NODE_LIST_KEY, ADD_LIST_FILTER, DepanFxListFilterData.class);
+    }
+
+    @Override
+    public TreeItem<DepanFxNodeFiltersTableMember> buildTableMember(
+        DepanFxNodeFiltersTableMember parentMember,
+        DepanFxBaseFilterData filter,
+        DepanFxNodeFiltersRegistry filterRegistry) {
+      return new DepanFxNodeFiltersListItem(
+          new DepanFxNodeFiltersListMember(parentMember, asType(filter)));
+    }
+
+    @Override
+    public void runSaveFilter(
+        DepanFxDialogRunner dialogRunner, DepanFxBaseFilterData saveFilter) {
+      DepanFxNodeFiltersListDialog.runSaveFilter(
+          dialogRunner, asType(saveFilter));
+    }
+
+    @Override
+    public Optional<DepanFxListFilterData> runUpdateFilter(
+        DepanFxDialogRunner dialogRunner, DepanFxBaseFilterData updateFilter) {
+      return DepanFxNodeFiltersListDialog.runUpdateFilter(
+          dialogRunner, asType(updateFilter));
+    }
+
+    @Override
+    protected Optional<DepanFxListFilterData> runCreateFilter(
+        ActionEvent e,
+        DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner,
+        Scene scene) {
+      return DepanFxNodeListChooser.runNodeListChooser(
+                workspace, dialogRunner, scene)
+            .map(DepanFxListFilterData::createListFilterData);
     }
   }
 }

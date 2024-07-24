@@ -15,11 +15,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
+import javafx.event.ActionEvent;
+import javafx.scene.Scene;
 import javafx.scene.control.Cell;
+import javafx.scene.control.TreeItem;
 
 @Configuration
 public class DepanFxNodeFiltersReferencedConfiguration {
+
+  public static final String ADD_REFERENCE_FILTER = "Add Reference Filter...";
 
   public static final String EDIT_REFERENCED_FILTER =
       "Edit Filter Reference...";
@@ -36,6 +42,11 @@ public class DepanFxNodeFiltersReferencedConfiguration {
   @Bean
   public DepanFxResourcePathMenuContribution ReferencedFilterPathMenu() {
     return new ReferencedFilterPathContribution();
+  }
+
+  @Bean
+  public DepanFxNodeFiltersContribution nodeFilterReferencedContribution() {
+    return new DepanFxNodeFiltersReferencedContribution();
   }
 
   private static class ReferencedFilterExtContribution
@@ -81,6 +92,49 @@ public class DepanFxNodeFiltersReferencedConfiguration {
     @Override
     public String getOrderKey() {
       return REFERENCED_MATCHER_KEY;
+    }
+  }
+
+  private static class DepanFxNodeFiltersReferencedContribution
+      extends DepanFxNodeFiltersContribution.Basic<DepanFxReferencedFilterData> {
+
+    public DepanFxNodeFiltersReferencedContribution() {
+      super(REFERENCED_MATCHER_KEY, ADD_REFERENCE_FILTER,
+          DepanFxReferencedFilterData.class);
+    }
+
+    @Override
+    public TreeItem<DepanFxNodeFiltersTableMember> buildTableMember(
+        DepanFxNodeFiltersTableMember parentMember,
+        DepanFxBaseFilterData filter,
+        DepanFxNodeFiltersRegistry filterRegistry) {
+      return new DepanFxNodeFiltersReferencedItem(
+          new DepanFxNodeFiltersReferencedMember(parentMember, asType(filter)));
+    }
+
+    @Override
+    public void runSaveFilter(
+        DepanFxDialogRunner dialogRunner, DepanFxBaseFilterData saveFilter) {
+      DepanFxNodeFiltersReferencedDialog.runSaveFilter(
+          dialogRunner, asType(saveFilter));
+    }
+
+    @Override
+    public Optional<DepanFxReferencedFilterData> runUpdateFilter(
+        DepanFxDialogRunner dialogRunner, DepanFxBaseFilterData updateFilter) {
+      return DepanFxNodeFiltersReferencedDialog.runUpdateFilter(
+          dialogRunner, asType(updateFilter));
+    }
+
+    @Override
+    protected Optional<DepanFxReferencedFilterData> runCreateFilter(
+        ActionEvent e,
+        DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner,
+        Scene scene) {
+      return DepanFxNodeFiltersChooser.runNodeFiltersFinder(
+                workspace, dialogRunner, scene)
+            .map(DepanFxReferencedFilterData::createReferenceFilterData);
     }
   }
 }

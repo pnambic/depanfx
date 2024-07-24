@@ -23,6 +23,8 @@ import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.io.File;
 import java.util.Optional;
 
@@ -43,6 +45,8 @@ public abstract class DepanFxNodeFiltersBaseDialog<T extends DepanFxBaseFilterDa
   private enum DialogMode { FOR_SAVE, FOR_UPDATE };
 
   private final DepanFxDialogRunner dialogRunner;
+
+  private final DepanFxNodeFiltersRegistry nodeFiltersRegistry;
 
   @FXML
   private Label saveDestinationLabel;
@@ -77,10 +81,15 @@ public abstract class DepanFxNodeFiltersBaseDialog<T extends DepanFxBaseFilterDa
 
   private DialogMode dialogMode;
 
-  public DepanFxNodeFiltersBaseDialog(DepanFxWorkspace workspace,
-      DepanFxDialogRunner dialogRunner, Class<T> dataType) {
+  @Autowired
+  public DepanFxNodeFiltersBaseDialog(
+      DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner,
+      DepanFxNodeFiltersRegistry nodeFiltersRegistry,
+      Class<T> dataType) {
     super(workspace, dataType);
     this.dialogRunner = dialogRunner;
+    this.nodeFiltersRegistry = nodeFiltersRegistry;
   }
 
   @FXML
@@ -105,7 +114,7 @@ public abstract class DepanFxNodeFiltersBaseDialog<T extends DepanFxBaseFilterDa
     setMergeMode(filterData.getMergeMode());
 
     Optional<Boolean> hasClosure =
-        DepanFxNodeFiltersRegistry.getClosure(filterData);
+        nodeFiltersRegistry.getClosure(filterData);
     if (hasClosure.isPresent()) {
       setUseClosure(hasClosure.get());
     }

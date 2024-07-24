@@ -27,10 +27,15 @@ import javafx.scene.control.TreeItem;
 
 public class DepanFxNodeFiltersRootItem extends DepanFxNodeFiltersTableItem {
 
+  private final DepanFxNodeFiltersRegistry nodeFiltersRegistry;
+
   private boolean childrenLoaded = false;
 
-  public DepanFxNodeFiltersRootItem(DepanFxNodeFiltersRootMember rootInfo) {
+  public DepanFxNodeFiltersRootItem(
+      DepanFxNodeFiltersRootMember rootInfo,
+      DepanFxNodeFiltersRegistry nodeFiltersRegistry) {
     super(rootInfo);
+    this.nodeFiltersRegistry = nodeFiltersRegistry;
     rootInfo.addMemberListener(this::onMembersChanged);
   }
 
@@ -64,8 +69,7 @@ public class DepanFxNodeFiltersRootItem extends DepanFxNodeFiltersTableItem {
 
   private TreeItem<DepanFxNodeFiltersTableMember> buildTableItem(
       DepanFxBaseFilterData filter) {
-    return DepanFxNodeFiltersRegistry.buildTableItem(
-        this.getValue(), filter);
+    return nodeFiltersRegistry.buildTableItem(this.getValue(), filter);
   }
 
   private void onMembersChanged(

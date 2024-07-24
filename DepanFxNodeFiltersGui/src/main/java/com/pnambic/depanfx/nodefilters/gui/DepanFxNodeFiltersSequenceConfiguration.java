@@ -15,11 +15,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
+import javafx.event.ActionEvent;
+import javafx.scene.Scene;
 import javafx.scene.control.Cell;
+import javafx.scene.control.TreeItem;
 
 @Configuration
 public class DepanFxNodeFiltersSequenceConfiguration {
+
+  public static final String ADD_SEQUENCE_FILTER = "Add Sequence Filter";
 
   public static final String EDIT_SEQUENCE_FILTER =
       "Edit Filter Sequence...";
@@ -36,6 +42,11 @@ public class DepanFxNodeFiltersSequenceConfiguration {
   @Bean
   public DepanFxResourcePathMenuContribution sequenceFilterPathMenu() {
     return new SequenceFilterPathContribution();
+  }
+
+  @Bean
+  public DepanFxNodeFiltersContribution nodeFilterSequenceContribution() {
+    return new DepanFxNodeFiltersSequenceContribution();
   }
 
   private static class SequenceFilterExtContribution
@@ -81,6 +92,49 @@ public class DepanFxNodeFiltersSequenceConfiguration {
     @Override
     public String getOrderKey() {
       return SEQUENCE_MATCHER_KEY;
+    }
+  }
+
+  private static class DepanFxNodeFiltersSequenceContribution
+      extends DepanFxNodeFiltersContribution.Basic<DepanFxSequenceFilterData> {
+
+    public DepanFxNodeFiltersSequenceContribution() {
+      super(SEQUENCE_MATCHER_KEY, ADD_SEQUENCE_FILTER,
+          DepanFxSequenceFilterData.class);
+    }
+
+    @Override
+    public TreeItem<DepanFxNodeFiltersTableMember> buildTableMember(
+        DepanFxNodeFiltersTableMember parentMember,
+        DepanFxBaseFilterData filter,
+        DepanFxNodeFiltersRegistry filterRegistry) {
+      return new DepanFxNodeFiltersSequenceItem(
+          new DepanFxNodeFiltersSequenceMember(
+              parentMember, asType(filter)), filterRegistry);
+    }
+
+    @Override
+    public void runSaveFilter(
+        DepanFxDialogRunner dialogRunner, DepanFxBaseFilterData saveFilter) {
+      DepanFxNodeFiltersSequenceDialog.runSaveFilter(
+          dialogRunner, asType(saveFilter));
+    }
+
+    @Override
+    public Optional<DepanFxSequenceFilterData> runUpdateFilter(
+        DepanFxDialogRunner dialogRunner, DepanFxBaseFilterData updateFilter) {
+      return DepanFxNodeFiltersSequenceDialog.runUpdateFilter(
+          dialogRunner, asType(updateFilter));
+    }
+
+
+    @Override
+    protected Optional<DepanFxSequenceFilterData> runCreateFilter(
+        ActionEvent e,
+        DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner,
+        Scene scene) {
+      return Optional.of(DepanFxSequenceFilterData.createSequenceFilterData());
     }
   }
 }

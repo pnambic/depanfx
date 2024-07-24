@@ -53,8 +53,10 @@ public class DepanFxNodeFiltersMatcherDialog
 
   @Autowired
   public DepanFxNodeFiltersMatcherDialog(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
-    super(workspace, dialogRunner, DepanFxMatcherFilterData.class);
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
+      DepanFxNodeFiltersRegistry nodeFiltersRegistry) {
+    super(workspace, dialogRunner, nodeFiltersRegistry,
+        DepanFxMatcherFilterData.class);
   }
 
   public static Optional<DepanFxWorkspaceResource<DepanFxMatcherFilterData>>

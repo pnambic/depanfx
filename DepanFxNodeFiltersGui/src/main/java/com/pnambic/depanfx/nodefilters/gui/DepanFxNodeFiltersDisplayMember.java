@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodefilters.gui;
 
+import com.pnambic.depanfx.nodefilters.model.DepanFxClosableFilter;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.FilterMergeMode;
 
@@ -45,18 +46,18 @@ public abstract class DepanFxNodeFiltersDisplayMember<T extends DepanFxBaseFilte
   private final ObjectProperty<FilterMergeMode> mergeModeProperty;
 
   public DepanFxNodeFiltersDisplayMember(
-      DepanFxNodeFiltersTableMember parentMember, T baseFilter) {
+      DepanFxNodeFiltersTableMember parentMember, T filterData) {
     this.parentMember = parentMember;
-    this.baseFilter = baseFilter;
+    this.baseFilter = filterData;
 
     this.toolNameProperty =
-        new SimpleStringProperty(baseFilter.getToolName());
+        new SimpleStringProperty(filterData.getToolName());
     this.toolDescriptionProperty =
-        new SimpleStringProperty(baseFilter.getToolDescription());
+        new SimpleStringProperty(filterData.getToolDescription());
     this.mergeModeProperty =
-        new SimpleObjectProperty<>(baseFilter.getMergeMode());
+        new SimpleObjectProperty<>(filterData.getMergeMode());
     this.useClosureProperty =
-        new SimpleBooleanProperty(calcFilterClosureProperty(baseFilter));
+        new SimpleBooleanProperty(calcFilterClosureProperty(filterData));
   }
 
   @SuppressWarnings("unchecked")
@@ -65,7 +66,7 @@ public abstract class DepanFxNodeFiltersDisplayMember<T extends DepanFxBaseFilte
     toolNameProperty.setValue(filterData.getToolName());
     toolDescriptionProperty.setValue(filterData.getToolDescription());
     mergeModeProperty.setValue(filterData.getMergeMode());
-    useClosureProperty.setValue(calcFilterClosureProperty(baseFilter));
+    useClosureProperty.setValue(calcFilterClosureProperty(filterData));
   }
 
   @Override
@@ -110,6 +111,6 @@ public abstract class DepanFxNodeFiltersDisplayMember<T extends DepanFxBaseFilte
    * 'cuz sometimes it's immutable (e.g. don't use closure).
    */
   private boolean calcFilterClosureProperty(DepanFxBaseFilterData baseFilter) {
-    return DepanFxNodeFiltersRegistry.getClosure(baseFilter).orElse(false);
+    return DepanFxClosableFilter.getClosure(baseFilter).orElse(false);
   }
 }

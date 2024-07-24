@@ -15,6 +15,10 @@
  */
 package com.pnambic.depanfx.nodefilters.model;
 
+import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
+
+import java.util.Optional;
+
 /**
  * Indicates whether a node filter can be used as a closable element.
  *
@@ -25,4 +29,11 @@ package com.pnambic.depanfx.nodefilters.model;
 public interface DepanFxClosableFilter {
 
   boolean useClosure();
+
+  public static Optional<Boolean> getClosure(DepanFxBaseFilterData filter) {
+    if (filter instanceof DepanFxClosableFilter closable) {
+      return Optional.of(closable.useClosure());
+    }
+    return Optional.empty();
+  }
 }

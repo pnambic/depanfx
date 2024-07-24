@@ -47,8 +47,10 @@ public class DepanFxNodeFiltersReferencedDialog
 
   @Autowired
   public DepanFxNodeFiltersReferencedDialog(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
-    super(workspace, dialogRunner, DepanFxReferencedFilterData.class);
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
+      DepanFxNodeFiltersRegistry nodeFiltersRegistry) {
+    super(workspace, dialogRunner, nodeFiltersRegistry,
+        DepanFxReferencedFilterData.class);
   }
 
   public static Optional<DepanFxWorkspaceResource<DepanFxReferencedFilterData>>

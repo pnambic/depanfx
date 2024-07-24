@@ -57,8 +57,10 @@ public class DepanFxNodeFiltersSequenceDialog
 
   @Autowired
   public DepanFxNodeFiltersSequenceDialog(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
-    super(workspace, dialogRunner, DepanFxSequenceFilterData.class);
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
+      DepanFxNodeFiltersRegistry nodeFiltersRegistry) {
+    super(workspace, dialogRunner, nodeFiltersRegistry,
+        DepanFxSequenceFilterData.class);
   }
 
   public static Optional<DepanFxWorkspaceResource<DepanFxSequenceFilterData>>

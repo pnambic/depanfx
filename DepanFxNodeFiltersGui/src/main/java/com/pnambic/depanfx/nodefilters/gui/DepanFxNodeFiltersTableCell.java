@@ -16,20 +16,10 @@
 package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxListFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxMatcherFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxReferencedFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxSequenceFilterData;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
-import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser;
-import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-
-import java.util.Optional;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
@@ -46,23 +36,19 @@ public class DepanFxNodeFiltersTableCell
 
   public static final String EDIT_FILTER = "Edit Filter...";
 
-  public static final String ADD_MATCHER_FILTER = "Add Link Matcher Filter...";
-
-  public static final String ADD_LIST_FILTER = "Add List Node Filter...";
-
-  public static final String ADD_REFERENCE_FILTER = "Add Reference Filter...";
-
-  public static final String ADD_SEQUENCE_FILTER = "Add Sequence Filter";
-
   private final DepanFxWorkspace workspace;
 
   private final DepanFxDialogRunner dialogRunner;
 
+  private final DepanFxNodeFiltersRegistry nodeFiltersRegistry;
+
   public DepanFxNodeFiltersTableCell(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
+      DepanFxNodeFiltersRegistry nodeFiltersRegistry) {
     super(new DefaultStringConverter());
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
+    this.nodeFiltersRegistry = nodeFiltersRegistry;
   }
 
   @Override
@@ -112,14 +98,9 @@ public class DepanFxNodeFiltersTableCell
     DepanFxBaseFilterData filterData = filterMember.getFilterData();
     if (filterData instanceof DepanFxSequenceFilterData seqData) {
       builder.appendConditionalSeparator();
-      builder.appendActionItem(ADD_LIST_FILTER,
-          e -> addListFilterRow());
-      builder.appendActionItem(ADD_MATCHER_FILTER,
-          e -> addMatcherFilterRow());
-      builder.appendActionItem(ADD_REFERENCE_FILTER,
-          e -> addReferencedFilterRow());
-      builder.appendActionItem(ADD_SEQUENCE_FILTER,
-          e -> addSequenceFilterRow());
+      nodeFiltersRegistry.appendAddFilters(
+          builder, workspace, dialogRunner, getScene(),
+          this::addFilter);
     }
   }
 
@@ -134,7 +115,7 @@ public class DepanFxNodeFiltersTableCell
   private void runUpdateFilter(
       DepanFxNodeFiltersDisplayMember<?> filterMember) {
     DepanFxBaseFilterData filterData = filterMember.prepareFilterData();
-    DepanFxNodeFiltersRegistry.runUpdateFilters(dialogRunner, filterData)
+    nodeFiltersRegistry.runUpdateFilters(dialogRunner, filterData)
         .ifPresent(filterMember::updateFilter);
   }
 
@@ -151,50 +132,5 @@ public class DepanFxNodeFiltersTableCell
     if (filterItem instanceof DepanFxNodeFiltersTableContainer container) {
       container.addFilter(filter);
     }
-  }
-
-  private void addMatcherFilterRow() {
-    matcherFilterChooser()
-        .map(DepanFxMatcherFilterData::createMatcherFilterData)
-        .ifPresent(this::addFilter);
-  }
-
-  private void addListFilterRow() {
-    listFilterChooser()
-        .map(DepanFxListFilterData::createListFilterData)
-        .ifPresent(this::addFilter);
-  }
-
-  private void addReferencedFilterRow() {
-    nodeFilterChooser()
-        .map(DepanFxReferencedFilterData::createReferenceFilterData)
-        .ifPresent(this::addFilter);
-  }
-
-  private void addSequenceFilterRow() {
-    DepanFxSequenceFilterData seqFilter =
-        DepanFxSequenceFilterData.createSequenceFilterData();
-    addFilter(seqFilter);
-  }
-
-  private Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
-      matcherFilterChooser() {
-
-    return DepanFxLinkMatcherChooser.runLinkMatcherFinder(
-        workspace, dialogRunner, getScene());
-  }
-
-  private Optional<DepanFxWorkspaceResource<DepanFxNodeList>>
-      listFilterChooser() {
-
-    return DepanFxNodeListChooser.runNodeListChooser(
-        workspace, dialogRunner, getScene());
-  }
-
-  private Optional<DepanFxWorkspaceResource<? extends DepanFxBaseFilterData>>
-      nodeFilterChooser() {
-
-    return DepanFxNodeFiltersChooser.runNodeFiltersFinder(
-        workspace, dialogRunner, getScene());
   }
 }

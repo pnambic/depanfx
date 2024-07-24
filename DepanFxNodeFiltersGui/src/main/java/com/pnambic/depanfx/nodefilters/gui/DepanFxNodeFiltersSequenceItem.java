@@ -29,9 +29,13 @@ public class DepanFxNodeFiltersSequenceItem extends DepanFxNodeFiltersTableItem 
 
   private boolean childrenLoaded = false;
 
+  private DepanFxNodeFiltersRegistry nodeFiltersRegistry;
+
   public DepanFxNodeFiltersSequenceItem(
-      DepanFxNodeFiltersSequenceMember seqMember) {
+      DepanFxNodeFiltersSequenceMember seqMember,
+      DepanFxNodeFiltersRegistry nodeFiltersRegistry) {
     super(seqMember);
+    this.nodeFiltersRegistry = nodeFiltersRegistry;
     seqMember.addMemberListener(this::onMembersChanged);
   }
 
@@ -66,8 +70,7 @@ public class DepanFxNodeFiltersSequenceItem extends DepanFxNodeFiltersTableItem 
 
   private TreeItem<DepanFxNodeFiltersTableMember> buildTableItem(
       DepanFxBaseFilterData filter) {
-    return DepanFxNodeFiltersRegistry.buildTableItem(
-        this.getValue(), filter);
+    return nodeFiltersRegistry.buildTableItem(this.getValue(), filter);
   }
 
   private void onMembersChanged(

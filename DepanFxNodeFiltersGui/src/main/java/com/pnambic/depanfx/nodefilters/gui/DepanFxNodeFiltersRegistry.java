@@ -15,120 +15,90 @@
  */
 package com.pnambic.depanfx.nodefilters.gui;
 
+import com.pnambic.depanfx.nodefilters.model.DepanFxClosableFilter;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxListFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxMatcherFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxReferencedFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxSequenceFilterData;
+import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
+import javafx.scene.Scene;
 import javafx.scene.control.TreeItem;
 
 /**
  * Encapsulate common behaviors for node filters.
  */
+@Component
 public class DepanFxNodeFiltersRegistry {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeFiltersRegistry.class);
 
-  public static TreeItem<DepanFxNodeFiltersTableMember> buildTableItem(
+  private final List<DepanFxNodeFiltersContribution> contribs;
+
+  public DepanFxNodeFiltersRegistry(List<DepanFxNodeFiltersContribution> contribs) {
+    this.contribs = contribs;
+  }
+
+  public Optional<Boolean> getClosure(DepanFxBaseFilterData filter) {
+    return DepanFxClosableFilter.getClosure(filter);
+  }
+
+  public TreeItem<DepanFxNodeFiltersTableMember> buildTableItem(
       DepanFxNodeFiltersTableMember parentMember,
       DepanFxBaseFilterData filter) {
-
-    switch (filter) {
-    case DepanFxListFilterData list:
-      return new DepanFxNodeFiltersListItem(
-          new DepanFxNodeFiltersListMember(parentMember, list));
-
-    case DepanFxMatcherFilterData link:
-      return new DepanFxNodeFiltersMatcherItem(
-          new DepanFxNodeFiltersMatcherMember(parentMember, link));
-
-    case DepanFxReferencedFilterData ref:
-      return new DepanFxNodeFiltersReferencedItem(
-          new DepanFxNodeFiltersReferencedMember(parentMember, ref));
-
-    case DepanFxSequenceFilterData seq:
-      return new DepanFxNodeFiltersSequenceItem(
-          new DepanFxNodeFiltersSequenceMember(parentMember, seq));
-
-    default:
-      // fall through and out to failure
-    }
-    LOG.warn("Unexpected filter {}", filter.getClass().getName());
-    throw new IllegalArgumentException(
-        "Unexpected filter data " + filter.getClass().getName());
+    return lookupContrib(filter, "buildTableItem")
+        .map(c -> c.buildTableMember(parentMember, filter, this))
+        .orElseThrow(() -> new IllegalArgumentException(
+            "Unexpected filter data " + filter.getClass().getName()));
   }
 
-  public static Optional<Boolean> getClosure(DepanFxBaseFilterData filter) {
-    switch (filter) {
-    case DepanFxListFilterData listData:
-      return Optional.empty();
-    case DepanFxMatcherFilterData matcherData:
-      return Optional.of(matcherData.useClosure());
-    case DepanFxReferencedFilterData refData:
-      return Optional.of(refData.useClosure());
-    case DepanFxSequenceFilterData seqData:
-      return Optional.of(seqData.useClosure());
-    default:
-        // Fall-through any unhandled results
-    }
-    LOG.warn("Unsupported filter type {} for closure",
-        filter.getClass().getName());
-    return Optional.empty();
-  }
-
-  public static void runSaveFilters(
+  public void runSaveFilters(
       DepanFxDialogRunner dialogRunner, DepanFxBaseFilterData saveFilter) {
-    switch (saveFilter) {
-    case DepanFxListFilterData listData:
-      DepanFxNodeFiltersListDialog.runSaveFilter(dialogRunner, listData);
-      return;
-    case DepanFxMatcherFilterData matcherData:
-      DepanFxNodeFiltersMatcherDialog.runSaveFilter(dialogRunner, matcherData);
-      return;
-    case DepanFxReferencedFilterData refData:
-      DepanFxNodeFiltersReferencedDialog.runSaveFilter(dialogRunner, refData);
-      return;
-    case DepanFxSequenceFilterData seqData:
-      DepanFxNodeFiltersSequenceDialog.runSaveFilter(dialogRunner, seqData);
-      return;
-    default:
-        // Fall-through any unhandled results
-    }
-    LOG.warn("Unsupported filter type {} to save",
-        saveFilter.getClass().getName());
+    lookupContrib(saveFilter, "runSaveFilters")
+        .ifPresent( c -> c.runSaveFilter(dialogRunner, saveFilter));
   }
 
-  @SuppressWarnings("unchecked")
-  public static <T extends DepanFxBaseFilterData> Optional<T> runUpdateFilters(
+  public Optional<DepanFxBaseFilterData> runUpdateFilters(
+      DepanFxDialogRunner dialogRunner, DepanFxBaseFilterData updateFilter) {
+
+     return lookupContrib(updateFilter, "runUpdateFilters")
+        .flatMap(c -> c.runUpdateFilter(dialogRunner, updateFilter));
+  }
+
+  public void appendAddFilters(
+      DepanFxContextMenuBuilder builder,
+      DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
-      T updateFilter) {
-    // Consumer<DepanFxBaseFilterData> onUpdate = null;
-    switch (updateFilter) {
-    case DepanFxListFilterData listData:
-      return (Optional<T>) DepanFxNodeFiltersListDialog.runUpdateFilter(
-          dialogRunner, listData);
-    case DepanFxMatcherFilterData matcherData:
-      return (Optional<T>) DepanFxNodeFiltersMatcherDialog.runUpdateFilter(
-          dialogRunner, matcherData);
-    case DepanFxReferencedFilterData refData:
-      return (Optional<T>) DepanFxNodeFiltersReferencedDialog.runUpdateFilter(
-          dialogRunner, refData);
-    case DepanFxSequenceFilterData seqData:
-      return (Optional<T>) DepanFxNodeFiltersSequenceDialog.runUpdateFilter(
-          dialogRunner, seqData);
-    default:
-        // Fall-through any unhandled results
+      Scene scene,
+      Consumer<DepanFxBaseFilterData> onAddFilter) {
+    orderedContribs()
+        .forEach(c -> c.appendCreateActionItem(
+            builder, workspace, dialogRunner, scene, onAddFilter));
+  }
+
+  private Stream<DepanFxNodeFiltersContribution> orderedContribs() {
+    return contribs.stream()
+        .sorted((a, b) -> a.getOrderKey().compareTo(b.getOrderKey()));
+  }
+
+  private Optional<DepanFxNodeFiltersContribution> lookupContrib(
+      DepanFxBaseFilterData filter, String caller) {
+    Optional<DepanFxNodeFiltersContribution> result = contribs.stream()
+        .filter(c -> c.accepts(filter))
+        .findFirst();
+    if (result.isEmpty()) {
+      LOG.warn("Unexpected filter {} for {}",
+          filter.getClass().getName(), caller);
     }
-    LOG.warn("Unsupported filter type {} to update",
-        updateFilter.getClass().getName());
-    return Optional.empty();
+    return result;
   }
 }

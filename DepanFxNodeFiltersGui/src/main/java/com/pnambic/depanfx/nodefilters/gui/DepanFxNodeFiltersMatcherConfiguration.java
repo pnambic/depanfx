@@ -2,6 +2,7 @@ package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxMatcherFilterData;
+import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -15,11 +16,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
+import javafx.event.ActionEvent;
+import javafx.scene.Scene;
 import javafx.scene.control.Cell;
+import javafx.scene.control.TreeItem;
 
 @Configuration
 public class DepanFxNodeFiltersMatcherConfiguration {
+
+  public static final String ADD_MATCHER_FILTER = "Add Link Matcher Filter...";
 
   public static final String EDIT_LINK_MATCHER_FILTER =
       "Edit Link Matcher Filter...";
@@ -36,6 +43,11 @@ public class DepanFxNodeFiltersMatcherConfiguration {
   @Bean
   public DepanFxResourcePathMenuContribution linkMatcherFilterPathMenu() {
     return new LinkMatcherFilterPathContribution();
+  }
+
+  @Bean
+  public DepanFxNodeFiltersContribution nodeFilterMatcherContribution() {
+    return new DepanFxNodeFiltersMatcherContribution();
   }
 
   private static class LinkMatcherFilterExtContribution
@@ -81,6 +93,49 @@ public class DepanFxNodeFiltersMatcherConfiguration {
     @Override
     public String getOrderKey() {
       return LINK_MATCHER_KEY;
+    }
+  }
+
+  private static class DepanFxNodeFiltersMatcherContribution
+      extends DepanFxNodeFiltersContribution.Basic<DepanFxMatcherFilterData> {
+
+    public DepanFxNodeFiltersMatcherContribution() {
+      super(LINK_MATCHER_KEY, ADD_MATCHER_FILTER,
+          DepanFxMatcherFilterData.class);
+    }
+
+    @Override
+    public TreeItem<DepanFxNodeFiltersTableMember> buildTableMember(
+        DepanFxNodeFiltersTableMember parentMember,
+        DepanFxBaseFilterData filter,
+        DepanFxNodeFiltersRegistry filterRegistry) {
+      return new DepanFxNodeFiltersMatcherItem(
+          new DepanFxNodeFiltersMatcherMember(parentMember, asType(filter)));
+    }
+
+    @Override
+    public void runSaveFilter(DepanFxDialogRunner dialogRunner,
+        DepanFxBaseFilterData saveFilter) {
+      DepanFxNodeFiltersMatcherDialog.runSaveFilter(
+          dialogRunner, asType(saveFilter));
+    }
+
+    @Override
+    public Optional<DepanFxMatcherFilterData> runUpdateFilter(
+        DepanFxDialogRunner dialogRunner, DepanFxBaseFilterData updateFilter) {
+      return DepanFxNodeFiltersMatcherDialog.runUpdateFilter(
+          dialogRunner, asType(updateFilter));
+    }
+
+    @Override
+    protected Optional<DepanFxMatcherFilterData> runCreateFilter(
+        ActionEvent e,
+        DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner,
+        Scene scene) {
+      return DepanFxLinkMatcherChooser.runLinkMatcherFinder(
+                workspace, dialogRunner, scene)
+            .map(DepanFxMatcherFilterData::createMatcherFilterData);
     }
   }
 }
