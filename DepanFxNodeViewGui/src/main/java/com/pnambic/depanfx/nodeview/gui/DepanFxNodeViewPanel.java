@@ -197,16 +197,10 @@ public class DepanFxNodeViewPanel {
       }
     });
 
-    result.setOnClosed(new EventHandler<Event>() {
-
-      @Override
-      public void handle(Event event) {
-        joglPane.close();
-        closeSideViews();
-      }
-    });
-
     result.setContextMenu(buildViewContextMenu());
+
+    result.setOnClosed(e -> closeTab());
+    result.setOnCloseRequest(e -> closeTab());
     return result;
   }
 
@@ -448,6 +442,14 @@ public class DepanFxNodeViewPanel {
 
   /////////////////////////////////////
   // Subwindow management
+
+  /**
+   * Release all resources for the tab.
+   */
+  private void closeTab() {
+    joglPane.close();
+    closeSideViews();
+  }
 
   private void showSideViews() {
     sideViews.forEach(e -> e.show());

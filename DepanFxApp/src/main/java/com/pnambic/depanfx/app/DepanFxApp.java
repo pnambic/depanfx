@@ -41,14 +41,15 @@ public class DepanFxApp extends Application implements Closeable {
     stage.show();
   }
 
-  @Override // Application - Invoked from Platform.exit().
+  @Override
   public void stop() {
     applicationContext.close();
+    Platform.exit();
   }
 
-  @Override // Closable
+  @Override
   public void close() throws IOException {
-    Platform.exit();
+    stop();
   }
 
   /**
