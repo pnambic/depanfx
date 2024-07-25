@@ -26,7 +26,6 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -61,7 +60,7 @@ public class DepanFxNodeFiltersChooser {
 
     private final DepanFxDialogRunner dialogRunner;
 
-    private final DepanFxNodeFiltersRegistry filtersRegistry;
+    private final DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry;
 
     private final TextField nodeFilterField;
 
@@ -70,11 +69,11 @@ public class DepanFxNodeFiltersChooser {
     public NodeFilterControl(
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxNodeFiltersRegistry filtersRegistry,
+        DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry,
         TextField nodeFilterField) {
       this.workspace = workspace;
       this.dialogRunner = dialogRunner;
-      this.filtersRegistry = filtersRegistry;
+      this.nodeFiltersDialogRegistry = nodeFiltersDialogRegistry;
       this.nodeFilterField = nodeFilterField;
       nodeFilterField.setContextMenu(buildContextMenu());
     }
@@ -109,7 +108,7 @@ public class DepanFxNodeFiltersChooser {
     private void runNodeFilterFinder() {
       DepanFxNodeFiltersChooser
           .runNodeFiltersFinder(
-                workspace, dialogRunner, nodeFilterField.getScene(), filtersRegistry)
+                workspace, dialogRunner, nodeFilterField.getScene(), nodeFiltersDialogRegistry)
           .ifPresent(this::setNodeFilterRsrc);
     }
   }
@@ -126,7 +125,7 @@ public class DepanFxNodeFiltersChooser {
 
     private final Scene scene;
 
-    private final DepanFxNodeFiltersRegistry filtersRegistry;
+    private final DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry;
 
     private final BiConsumer<
             T, DepanFxWorkspaceResource<? extends DepanFxBaseFilterData>>
@@ -136,14 +135,14 @@ public class DepanFxNodeFiltersChooser {
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
         Scene scene,
-        DepanFxNodeFiltersRegistry filtersRegistry,
+        DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry,
         BiConsumer<
             T,
             DepanFxWorkspaceResource<? extends DepanFxBaseFilterData>> matcherConsumer) {
       this.workspace = workspace;
       this.dialogRunner = dialogRunner;
       this.scene = scene;
-      this.filtersRegistry = filtersRegistry;
+      this.nodeFiltersDialogRegistry = nodeFiltersDialogRegistry;
       this.matcherConsumer = matcherConsumer;
     }
 
@@ -169,7 +168,7 @@ public class DepanFxNodeFiltersChooser {
 
     private void runNodeFilterFinder() {
       DepanFxNodeFiltersChooser
-          .runNodeFiltersFinder(workspace, dialogRunner, scene, filtersRegistry)
+          .runNodeFiltersFinder(workspace, dialogRunner, scene, nodeFiltersDialogRegistry)
           .ifPresent(r -> matcherConsumer.accept(getTableRow().getItem(), r));
     }
   }
@@ -182,10 +181,10 @@ public class DepanFxNodeFiltersChooser {
             DepanFxWorkspace workspace,
             DepanFxDialogRunner dialogRunner,
             Scene scene,
-            DepanFxNodeFiltersRegistry filtersRegistry) {
+            DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
 
     DepanFxResourceChooser chooser = prepareChooser(workspace, dialogRunner);
-    DepanFxResourceFilter rsrcFilter = filtersRegistry.getResourceFilter();
+    DepanFxResourceFilter rsrcFilter = nodeFiltersDialogRegistry.getResourceFilter();
     chooser.getExtensionFilters().add(rsrcFilter);
     chooser.setSelectedExtensionFilter(rsrcFilter);
 

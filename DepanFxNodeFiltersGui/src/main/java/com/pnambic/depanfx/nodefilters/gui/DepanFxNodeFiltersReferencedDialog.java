@@ -48,8 +48,8 @@ public class DepanFxNodeFiltersReferencedDialog
   @Autowired
   public DepanFxNodeFiltersReferencedDialog(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
-      DepanFxNodeFiltersRegistry nodeFiltersRegistry) {
-    super(workspace, dialogRunner, nodeFiltersRegistry,
+      DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
+    super(workspace, dialogRunner, nodeFiltersDialogRegistry,
         DepanFxReferencedFilterData.class);
   }
 
@@ -106,7 +106,7 @@ public class DepanFxNodeFiltersReferencedDialog
   protected void handleBrowseRefFilter() {
     DepanFxNodeFiltersChooser.runNodeFiltersFinder(
             getWorkspace(), getDialogRunner(), getScene(),
-            getNodeFiltersRegistry())
+            getNodeFiltersDialogRegistry())
         .ifPresent(this::setFilterResource);
   }
 

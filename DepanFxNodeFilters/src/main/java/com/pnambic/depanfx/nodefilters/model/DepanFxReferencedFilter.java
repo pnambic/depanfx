@@ -17,7 +17,6 @@ package com.pnambic.depanfx.nodefilters.model;
 
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxReferencedFilterData;
 
 import java.util.Collection;
@@ -26,17 +25,16 @@ public class DepanFxReferencedFilter
     extends DepanFxBaseFilter<DepanFxReferencedFilterData>
     implements DepanFxClosableFilter {
 
-  private final GraphModel graphModel;
-
-  private final Collection<GraphNode> targets;
+  private final DepanFxBaseFilter<?> filter;
 
   public DepanFxReferencedFilter(
       DepanFxReferencedFilterData filterData,
+      DepanFxNodeFiltersRegistry nodeFiltersRegistry,
       GraphModel graphModel,
       Collection<GraphNode> targets) {
     super(filterData);
-    this.graphModel = graphModel;
-    this.targets = targets;
+    this.filter = nodeFiltersRegistry.buildFilter(
+        filterData.getFilterResource().getResource(), graphModel, targets);
   }
 
   @Override // DepanFxClosableFilter
@@ -46,9 +44,6 @@ public class DepanFxReferencedFilter
 
   @Override // DepanFxBaseFilter
   protected Collection<GraphNode> computeResult(Collection<GraphNode> nodes) {
-    DepanFxBaseFilterData filterData = getFilterData().getFilter();
-    DepanFxBaseFilter<?> filter =
-        DepanFxNodeFilterFactory.buildFilter(filterData, graphModel, targets);
     return filter.computeResult(nodes);
   }
 }

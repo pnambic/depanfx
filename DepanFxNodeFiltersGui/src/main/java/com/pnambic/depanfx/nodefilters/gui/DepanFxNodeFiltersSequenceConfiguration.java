@@ -45,7 +45,7 @@ public class DepanFxNodeFiltersSequenceConfiguration {
   }
 
   @Bean
-  public DepanFxNodeFiltersContribution nodeFilterSequenceContribution() {
+  public DepanFxNodeFiltersDialogContribution nodeFilterSequenceContribution() {
     return new DepanFxNodeFiltersSequenceContribution();
   }
 
@@ -96,7 +96,7 @@ public class DepanFxNodeFiltersSequenceConfiguration {
   }
 
   private static class DepanFxNodeFiltersSequenceContribution
-      extends DepanFxNodeFiltersContribution.Basic<DepanFxSequenceFilterData> {
+      extends DepanFxNodeFiltersDialogContribution.Basic<DepanFxSequenceFilterData> {
 
     public DepanFxNodeFiltersSequenceContribution() {
       super(SEQUENCE_MATCHER_KEY, ADD_SEQUENCE_FILTER,
@@ -107,10 +107,10 @@ public class DepanFxNodeFiltersSequenceConfiguration {
     public TreeItem<DepanFxNodeFiltersTableMember> buildTableMember(
         DepanFxNodeFiltersTableMember parentMember,
         DepanFxBaseFilterData filter,
-        DepanFxNodeFiltersRegistry filterRegistry) {
+        DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
       return new DepanFxNodeFiltersSequenceItem(
           new DepanFxNodeFiltersSequenceMember(
-              parentMember, asType(filter)), filterRegistry);
+              parentMember, asType(filter)), nodeFiltersDialogRegistry);
     }
 
     @Override
@@ -134,7 +134,7 @@ public class DepanFxNodeFiltersSequenceConfiguration {
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
         Scene scene,
-        DepanFxNodeFiltersRegistry nodeFilterRegistry) {
+        DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
       return Optional.of(DepanFxSequenceFilterData.createSequenceFilterData());
     }
   }

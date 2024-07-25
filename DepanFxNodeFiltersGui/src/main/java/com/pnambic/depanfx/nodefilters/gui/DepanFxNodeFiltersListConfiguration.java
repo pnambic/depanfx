@@ -45,7 +45,7 @@ public class DepanFxNodeFiltersListConfiguration {
   }
 
   @Bean
-  public DepanFxNodeFiltersContribution nodeFilterListContribution() {
+  public DepanFxNodeFiltersDialogContribution nodeFilterListContribution() {
     return new DepanFxNodeFiltersListContribution();
   }
 
@@ -95,7 +95,7 @@ public class DepanFxNodeFiltersListConfiguration {
   }
 
   private static class DepanFxNodeFiltersListContribution
-      extends DepanFxNodeFiltersContribution.Basic<DepanFxListFilterData> {
+      extends DepanFxNodeFiltersDialogContribution.Basic<DepanFxListFilterData> {
 
     public DepanFxNodeFiltersListContribution() {
       super(NODE_LIST_KEY, ADD_LIST_FILTER, DepanFxListFilterData.class);
@@ -105,7 +105,7 @@ public class DepanFxNodeFiltersListConfiguration {
     public TreeItem<DepanFxNodeFiltersTableMember> buildTableMember(
         DepanFxNodeFiltersTableMember parentMember,
         DepanFxBaseFilterData filter,
-        DepanFxNodeFiltersRegistry filterRegistry) {
+        DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
       return new DepanFxNodeFiltersListItem(
           new DepanFxNodeFiltersListMember(parentMember, asType(filter)));
     }
@@ -130,7 +130,7 @@ public class DepanFxNodeFiltersListConfiguration {
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
         Scene scene,
-        DepanFxNodeFiltersRegistry nodeFilterRegistry) {
+        DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
       return DepanFxNodeListChooser.runNodeListChooser(
                 workspace, dialogRunner, scene)
             .map(DepanFxListFilterData::createListFilterData);

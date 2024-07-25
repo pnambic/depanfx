@@ -50,8 +50,8 @@ public class DepanFxNodeFiltersListDialog
   @Autowired
   public DepanFxNodeFiltersListDialog(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
-      DepanFxNodeFiltersRegistry nodeFiltersRegistry) {
-    super(workspace, dialogRunner, nodeFiltersRegistry,
+      DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
+    super(workspace, dialogRunner, nodeFiltersDialogRegistry,
         DepanFxListFilterData.class);
   }
 

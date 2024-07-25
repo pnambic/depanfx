@@ -15,7 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 
-public interface DepanFxNodeFiltersContribution {
+public interface DepanFxNodeFiltersDialogContribution {
 
   /**
    * True if the contribution is suitable for the filter.
@@ -32,7 +32,7 @@ public interface DepanFxNodeFiltersContribution {
   TreeItem<DepanFxNodeFiltersTableMember> buildTableMember(
       DepanFxNodeFiltersTableMember parentMember,
       DepanFxBaseFilterData filter,
-      DepanFxNodeFiltersRegistry filterRegistry);
+      DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry);
 
   void runSaveFilter(
       DepanFxDialogRunner dialogRunner, DepanFxBaseFilterData saveFilter);
@@ -45,11 +45,11 @@ public interface DepanFxNodeFiltersContribution {
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       Scene scene,
-      DepanFxNodeFiltersRegistry nodeFilterRegistry,
+      DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry,
       Consumer<DepanFxBaseFilterData> onAddFilter);
 
   public abstract class Basic<T extends DepanFxBaseFilterData>
-      implements DepanFxNodeFiltersContribution {
+      implements DepanFxNodeFiltersDialogContribution {
 
     private final String orderKey;
 
@@ -79,11 +79,11 @@ public interface DepanFxNodeFiltersContribution {
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
         Scene scene,
-        DepanFxNodeFiltersRegistry nodeFilterRegistry,
+        DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry,
         Consumer<DepanFxBaseFilterData> onAddFilter) {
       return builder.appendActionItem(addLabel,
           e -> runCreateFilter(
-                    e, workspace, dialogRunner, scene, nodeFilterRegistry)
+                    e, workspace, dialogRunner, scene, nodeFiltersDialogRegistry)
                 .ifPresent(onAddFilter::accept));
     }
 
@@ -101,6 +101,7 @@ public interface DepanFxNodeFiltersContribution {
         ActionEvent e,
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        Scene scene, DepanFxNodeFiltersRegistry nodeFilterRegistry);
+        Scene scene,
+        DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry);
   }
 }

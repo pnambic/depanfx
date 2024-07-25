@@ -46,7 +46,7 @@ public abstract class DepanFxNodeFiltersBaseDialog<T extends DepanFxBaseFilterDa
 
   private final DepanFxDialogRunner dialogRunner;
 
-  private final DepanFxNodeFiltersRegistry nodeFiltersRegistry;
+  private final DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry;
 
   @FXML
   private Label saveDestinationLabel;
@@ -85,11 +85,11 @@ public abstract class DepanFxNodeFiltersBaseDialog<T extends DepanFxBaseFilterDa
   public DepanFxNodeFiltersBaseDialog(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
-      DepanFxNodeFiltersRegistry nodeFiltersRegistry,
+      DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry,
       Class<T> dataType) {
     super(workspace, dataType);
     this.dialogRunner = dialogRunner;
-    this.nodeFiltersRegistry = nodeFiltersRegistry;
+    this.nodeFiltersDialogRegistry = nodeFiltersDialogRegistry;
   }
 
   @FXML
@@ -114,7 +114,7 @@ public abstract class DepanFxNodeFiltersBaseDialog<T extends DepanFxBaseFilterDa
     setMergeMode(filterData.getMergeMode());
 
     Optional<Boolean> hasClosure =
-        nodeFiltersRegistry.getClosure(filterData);
+        nodeFiltersDialogRegistry.getClosure(filterData);
     if (hasClosure.isPresent()) {
       setUseClosure(hasClosure.get());
     }
@@ -136,8 +136,8 @@ public abstract class DepanFxNodeFiltersBaseDialog<T extends DepanFxBaseFilterDa
     return dialogRunner;
   }
 
-  protected DepanFxNodeFiltersRegistry getNodeFiltersRegistry() {
-    return nodeFiltersRegistry;
+  protected DepanFxNodeFiltersDialogRegistry getNodeFiltersDialogRegistry() {
+    return nodeFiltersDialogRegistry;
   }
 
   protected FilterMergeMode getMergeMode() {

@@ -18,7 +18,7 @@ package com.pnambic.depanfx.nodefilters.gui;
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodefilters.model.DepanFxBaseFilter;
-import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFilterFactory;
+import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxSequenceFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.FilterMergeMode;
@@ -85,6 +85,8 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
 
   private final DepanFxNodeFiltersRegistry nodeFiltersRegistry;
 
+  private final DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry;
+
   /**
    * Place holder for filters context menu.
    */
@@ -130,10 +132,12 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
   public DepanFxNodeViewNodeFiltersDialog(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
-      DepanFxNodeFiltersRegistry nodeFiltersRegistry) {
+      DepanFxNodeFiltersRegistry nodeFiltersRegistry,
+      DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
     super(workspace);
     this.dialogRunner = dialogRunner;
     this.nodeFiltersRegistry = nodeFiltersRegistry;
+    this.nodeFiltersDialogRegistry = nodeFiltersDialogRegistry;
   }
 
   /**
@@ -168,7 +172,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
 
     nodeFilterRoot = new DepanFxNodeFiltersRootMember(workspace);
     nodeFilterTable.setRoot(
-        new DepanFxNodeFiltersRootItem(nodeFilterRoot, nodeFiltersRegistry));
+        new DepanFxNodeFiltersRootItem(nodeFilterRoot, nodeFiltersDialogRegistry));
 
     DepanFxTreeColumnBinder<DepanFxNodeFiltersTableMember> columnBinder =
         new DepanFxTreeColumnBinder<>(nodeFilterTable);
@@ -179,7 +183,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
         f -> getColumnInfo(f.getValue()).getToolNameProperty());
     labelColumn.setCellFactory(
         l -> new DepanFxNodeFiltersTableCell(
-                getWorkspace(), dialogRunner, nodeFiltersRegistry));
+                getWorkspace(), dialogRunner, nodeFiltersDialogRegistry));
 
     TreeTableColumn<DepanFxNodeFiltersTableMember, Boolean> closureColumn =
         columnBinder.next();
@@ -261,7 +265,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
   @FXML
   public void handleSaveFilters() {
     DepanFxBaseFilterData saveFilter = prepareResult();
-    nodeFiltersRegistry.runSaveFilters(dialogRunner, saveFilter);
+    nodeFiltersDialogRegistry.runSaveFilters(dialogRunner, saveFilter);
   }
 
   @FXML
@@ -272,8 +276,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
     Collection<GraphNode> targetNodes = graphModel.getGraphNodes();
 
     DepanFxBaseFilter<?> filter =
-        DepanFxNodeFilterFactory.buildFilter(
-            filterData, graphModel, targetNodes);
+        nodeFiltersRegistry.buildFilter(filterData, graphModel, targetNodes);
 
     Collection<GraphNode> resultNodes =
         filter.computeNodes(sourceNodes.getNodes());
@@ -290,7 +293,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
       nodeFilterChooser() {
 
     return DepanFxNodeFiltersChooser.runNodeFiltersFinder(
-        workspace, dialogRunner, getScene(), nodeFiltersRegistry);
+        workspace, dialogRunner, getScene(), nodeFiltersDialogRegistry);
   }
 
   private ContextMenu buildFiltersCommandMenu() {
@@ -322,7 +325,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
   private ContextMenu buildFilterTableMenu() {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
     Scene scene = getScene();
-    nodeFiltersRegistry.appendAddFilters(
+    nodeFiltersDialogRegistry.appendAddFilters(
         builder, workspace, dialogRunner, scene, this::onAddFilter);
 
     return builder.build();

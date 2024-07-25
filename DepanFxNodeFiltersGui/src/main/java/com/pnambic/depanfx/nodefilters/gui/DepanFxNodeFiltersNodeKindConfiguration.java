@@ -25,7 +25,7 @@ import javafx.scene.control.TreeItem;
 @Configuration
 public class DepanFxNodeFiltersNodeKindConfiguration {
 
-  public static final String ADD_NODE_KIND_FILTER = "Add Node Kink Filter...";
+  public static final String ADD_NODE_KIND_FILTER = "Add Node Kind Filter...";
 
   public static final String EDIT_NODE_KIND_FILTER =
       "Edit Node Kind Filter...";
@@ -35,18 +35,18 @@ public class DepanFxNodeFiltersNodeKindConfiguration {
   private static final String NODE_KIND_KEY = "Node Kind";
 
   @Bean
-  public DepanFxResourceExtMenuContribution linkMatcherFilterExtMenu() {
+  public DepanFxResourceExtMenuContribution nodeKindFilterExtMenu() {
     return new NodeKindFilterExtContribution();
   }
 
   @Bean
-  public DepanFxResourcePathMenuContribution linkMatcherFilterPathMenu() {
-    return new LinkMatcherFilterPathContribution();
+  public DepanFxResourcePathMenuContribution nodeKindFilterPathMenu() {
+    return new NodeKindFilterPathContribution();
   }
 
   @Bean
-  public DepanFxNodeFiltersContribution nodeFilterMatcherContribution() {
-    return new DepanFxNodeFiltersMatcherContribution();
+  public DepanFxNodeFiltersDialogContribution nodeFilterNodeKindContribution() {
+    return new NodeKindNodeFiltersContribution();
   }
 
   private static class NodeKindFilterExtContribution
@@ -66,7 +66,7 @@ public class DepanFxNodeFiltersNodeKindConfiguration {
     }
   }
 
-  private static class LinkMatcherFilterPathContribution
+  private static class NodeKindFilterPathContribution
       implements DepanFxResourcePathMenuContribution {
 
     @Override
@@ -95,10 +95,10 @@ public class DepanFxNodeFiltersNodeKindConfiguration {
     }
   }
 
-  private static class DepanFxNodeFiltersMatcherContribution
-      extends DepanFxNodeFiltersContribution.Basic<DepanFxNodeKindFilterData> {
+  private static class NodeKindNodeFiltersContribution
+      extends DepanFxNodeFiltersDialogContribution.Basic<DepanFxNodeKindFilterData> {
 
-    public DepanFxNodeFiltersMatcherContribution() {
+    public NodeKindNodeFiltersContribution() {
       super(NODE_KIND_KEY, ADD_NODE_KIND_FILTER,
           DepanFxNodeKindFilterData.class);
     }
@@ -107,7 +107,7 @@ public class DepanFxNodeFiltersNodeKindConfiguration {
     public TreeItem<DepanFxNodeFiltersTableMember> buildTableMember(
         DepanFxNodeFiltersTableMember parentMember,
         DepanFxBaseFilterData filter,
-        DepanFxNodeFiltersRegistry filterRegistry) {
+        DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
       return new DepanFxNodeFiltersNodeKindItem(
           new DepanFxNodeFiltersNodeKindMember(parentMember, asType(filter)));
     }
@@ -133,7 +133,7 @@ public class DepanFxNodeFiltersNodeKindConfiguration {
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
         Scene scene,
-        DepanFxNodeFiltersRegistry nodeFilterRegistry) {
+        DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
       return Optional.empty();
       // return DepanFxLinkMatcherChooser.runLinkMatcherFinder(
       //           workspace, dialogRunner, scene)

@@ -39,16 +39,16 @@ import javafx.scene.control.TreeItem;
  * Encapsulate common behaviors for node filters.
  */
 @Component
-public class DepanFxNodeFiltersRegistry {
+public class DepanFxNodeFiltersDialogRegistry {
 
   private static final Logger LOG =
-      LoggerFactory.getLogger(DepanFxNodeFiltersRegistry.class);
+      LoggerFactory.getLogger(DepanFxNodeFiltersDialogRegistry.class);
 
   public static final String ANY_FILTER_TOOL_EXT = "d*fti";
 
-  private final List<DepanFxNodeFiltersContribution> contribs;
+  private final List<DepanFxNodeFiltersDialogContribution> contribs;
 
-  public DepanFxNodeFiltersRegistry(List<DepanFxNodeFiltersContribution> contribs) {
+  public DepanFxNodeFiltersDialogRegistry(List<DepanFxNodeFiltersDialogContribution> contribs) {
     this.contribs = contribs;
   }
 
@@ -89,14 +89,14 @@ public class DepanFxNodeFiltersRegistry {
             builder, workspace, dialogRunner, scene, this, onAddFilter));
   }
 
-  private Stream<DepanFxNodeFiltersContribution> orderedContribs() {
+  private Stream<DepanFxNodeFiltersDialogContribution> orderedContribs() {
     return contribs.stream()
         .sorted((a, b) -> a.getOrderKey().compareTo(b.getOrderKey()));
   }
 
-  private Optional<DepanFxNodeFiltersContribution> lookupContrib(
+  private Optional<DepanFxNodeFiltersDialogContribution> lookupContrib(
       DepanFxBaseFilterData filter, String caller) {
-    Optional<DepanFxNodeFiltersContribution> result = contribs.stream()
+    Optional<DepanFxNodeFiltersDialogContribution> result = contribs.stream()
         .filter(c -> c.accepts(filter))
         .findFirst();
     if (result.isEmpty()) {

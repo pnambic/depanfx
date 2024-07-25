@@ -46,7 +46,7 @@ public class DepanFxNodeFiltersMatcherConfiguration {
   }
 
   @Bean
-  public DepanFxNodeFiltersContribution nodeFilterMatcherContribution() {
+  public DepanFxNodeFiltersDialogContribution nodeFilterMatcherContribution() {
     return new DepanFxNodeFiltersMatcherContribution();
   }
 
@@ -97,7 +97,7 @@ public class DepanFxNodeFiltersMatcherConfiguration {
   }
 
   private static class DepanFxNodeFiltersMatcherContribution
-      extends DepanFxNodeFiltersContribution.Basic<DepanFxMatcherFilterData> {
+      extends DepanFxNodeFiltersDialogContribution.Basic<DepanFxMatcherFilterData> {
 
     public DepanFxNodeFiltersMatcherContribution() {
       super(LINK_MATCHER_KEY, ADD_MATCHER_FILTER,
@@ -108,7 +108,7 @@ public class DepanFxNodeFiltersMatcherConfiguration {
     public TreeItem<DepanFxNodeFiltersTableMember> buildTableMember(
         DepanFxNodeFiltersTableMember parentMember,
         DepanFxBaseFilterData filter,
-        DepanFxNodeFiltersRegistry filterRegistry) {
+        DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
       return new DepanFxNodeFiltersMatcherItem(
           new DepanFxNodeFiltersMatcherMember(parentMember, asType(filter)));
     }
@@ -133,7 +133,7 @@ public class DepanFxNodeFiltersMatcherConfiguration {
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
         Scene scene,
-        DepanFxNodeFiltersRegistry nodeFilterRegistry) {
+        DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
       return DepanFxLinkMatcherChooser.runLinkMatcherFinder(
                 workspace, dialogRunner, scene)
             .map(DepanFxMatcherFilterData::createMatcherFilterData);

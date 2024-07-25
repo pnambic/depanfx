@@ -40,15 +40,15 @@ public class DepanFxNodeFiltersTableCell
 
   private final DepanFxDialogRunner dialogRunner;
 
-  private final DepanFxNodeFiltersRegistry nodeFiltersRegistry;
+  private final DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry;
 
   public DepanFxNodeFiltersTableCell(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
-      DepanFxNodeFiltersRegistry nodeFiltersRegistry) {
+      DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
     super(new DefaultStringConverter());
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
-    this.nodeFiltersRegistry = nodeFiltersRegistry;
+    this.nodeFiltersDialogRegistry = nodeFiltersDialogRegistry;
   }
 
   @Override
@@ -98,7 +98,7 @@ public class DepanFxNodeFiltersTableCell
     DepanFxBaseFilterData filterData = filterMember.getFilterData();
     if (filterData instanceof DepanFxSequenceFilterData seqData) {
       builder.appendConditionalSeparator();
-      nodeFiltersRegistry.appendAddFilters(
+      nodeFiltersDialogRegistry.appendAddFilters(
           builder, workspace, dialogRunner, getScene(),
           this::addFilter);
     }
@@ -115,7 +115,7 @@ public class DepanFxNodeFiltersTableCell
   private void runUpdateFilter(
       DepanFxNodeFiltersDisplayMember<?> filterMember) {
     DepanFxBaseFilterData filterData = filterMember.prepareFilterData();
-    nodeFiltersRegistry.runUpdateFilters(dialogRunner, filterData)
+    nodeFiltersDialogRegistry.runUpdateFilters(dialogRunner, filterData)
         .ifPresent(filterMember::updateFilter);
   }
 

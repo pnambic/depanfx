@@ -25,6 +25,7 @@ module depanfx.nodefilters {
   requires depanfx.persistence;
   requires depanfx.workspace;
 
+  opens com.pnambic.depanfx.nodefilters.model to spring.core;
   opens com.pnambic.depanfx.nodefilters.persistence to spring.beans;
   opens com.pnambic.depanfx.nodefilters.tooldata;
 

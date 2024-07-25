@@ -26,24 +26,17 @@ import java.util.stream.Collectors;
 public class DepanFxNodeKindFilter
     extends DepanFxBaseFilter<DepanFxNodeKindFilterData> {
 
-  private final GraphModel graphModel;
-
-  private final Collection<GraphNode> targets;
-
   public DepanFxNodeKindFilter(
       DepanFxNodeKindFilterData filterData,
       GraphModel graphModel,
       Collection<GraphNode> targets) {
     super(filterData);
-    this.graphModel = graphModel;
-    this.targets = targets;
   }
 
   @Override // DepanFxBaseFilter
   protected Collection<GraphNode> computeResult(Collection<GraphNode> nodes) {
     Predicate<GraphNode> nodePredicate = getFilterPredicate();
     return nodes.stream()
-        .filter(targets::contains)
         .filter(nodePredicate)
         .collect(Collectors.toList());
   }
