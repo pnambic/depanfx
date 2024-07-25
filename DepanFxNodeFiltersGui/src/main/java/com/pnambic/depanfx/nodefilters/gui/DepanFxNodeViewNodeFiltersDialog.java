@@ -290,7 +290,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
       nodeFilterChooser() {
 
     return DepanFxNodeFiltersChooser.runNodeFiltersFinder(
-        workspace, dialogRunner, getScene());
+        workspace, dialogRunner, getScene(), nodeFiltersRegistry);
   }
 
   private ContextMenu buildFiltersCommandMenu() {

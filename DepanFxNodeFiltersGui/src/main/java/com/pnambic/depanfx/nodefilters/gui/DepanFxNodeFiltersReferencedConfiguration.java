@@ -131,9 +131,10 @@ public class DepanFxNodeFiltersReferencedConfiguration {
         ActionEvent e,
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        Scene scene) {
+        Scene scene,
+        DepanFxNodeFiltersRegistry nodeFilterRegistry) {
       return DepanFxNodeFiltersChooser.runNodeFiltersFinder(
-                workspace, dialogRunner, scene)
+                workspace, dialogRunner, scene, nodeFilterRegistry)
             .map(DepanFxReferencedFilterData::createReferenceFilterData);
     }
   }

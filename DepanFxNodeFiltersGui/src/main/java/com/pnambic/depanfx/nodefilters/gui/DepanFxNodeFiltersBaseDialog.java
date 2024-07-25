@@ -136,6 +136,10 @@ public abstract class DepanFxNodeFiltersBaseDialog<T extends DepanFxBaseFilterDa
     return dialogRunner;
   }
 
+  protected DepanFxNodeFiltersRegistry getNodeFiltersRegistry() {
+    return nodeFiltersRegistry;
+  }
+
   protected FilterMergeMode getMergeMode() {
     return mergeModeComboBox.getValue();
   }

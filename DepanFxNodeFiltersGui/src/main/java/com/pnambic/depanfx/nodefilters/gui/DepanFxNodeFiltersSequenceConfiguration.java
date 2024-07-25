@@ -133,7 +133,8 @@ public class DepanFxNodeFiltersSequenceConfiguration {
         ActionEvent e,
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        Scene scene) {
+        Scene scene,
+        DepanFxNodeFiltersRegistry nodeFilterRegistry) {
       return Optional.of(DepanFxSequenceFilterData.createSequenceFilterData());
     }
   }

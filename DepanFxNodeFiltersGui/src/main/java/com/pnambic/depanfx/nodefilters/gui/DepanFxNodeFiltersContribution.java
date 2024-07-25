@@ -5,6 +5,8 @@ import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -25,6 +27,8 @@ public interface DepanFxNodeFiltersContribution {
    */
   String getOrderKey();
 
+  List<Class<?>> getContribTypes();
+
   TreeItem<DepanFxNodeFiltersTableMember> buildTableMember(
       DepanFxNodeFiltersTableMember parentMember,
       DepanFxBaseFilterData filter,
@@ -41,6 +45,7 @@ public interface DepanFxNodeFiltersContribution {
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       Scene scene,
+      DepanFxNodeFiltersRegistry nodeFilterRegistry,
       Consumer<DepanFxBaseFilterData> onAddFilter);
 
   public abstract class Basic<T extends DepanFxBaseFilterData>
@@ -74,13 +79,18 @@ public interface DepanFxNodeFiltersContribution {
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
         Scene scene,
+        DepanFxNodeFiltersRegistry nodeFilterRegistry,
         Consumer<DepanFxBaseFilterData> onAddFilter) {
       return builder.appendActionItem(addLabel,
-          e -> {
-            runCreateFilter(e, workspace, dialogRunner, scene)
-                .ifPresent(onAddFilter::accept);
-          });
+          e -> runCreateFilter(
+                    e, workspace, dialogRunner, scene, nodeFilterRegistry)
+                .ifPresent(onAddFilter::accept));
     }
+
+    @Override
+    public List<Class<?>> getContribTypes() {
+      return Collections.singletonList(forType);
+    };
 
     protected T asType(DepanFxBaseFilterData filter) {
       return forType.cast(filter);
@@ -91,6 +101,6 @@ public interface DepanFxNodeFiltersContribution {
         ActionEvent e,
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        Scene scene);
+        Scene scene, DepanFxNodeFiltersRegistry nodeFilterRegistry);
   }
 }

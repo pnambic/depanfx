@@ -129,7 +129,8 @@ public class DepanFxNodeFiltersListConfiguration {
         ActionEvent e,
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        Scene scene) {
+        Scene scene,
+        DepanFxNodeFiltersRegistry nodeFilterRegistry) {
       return DepanFxNodeListChooser.runNodeListChooser(
                 workspace, dialogRunner, scene)
             .map(DepanFxListFilterData::createListFilterData);

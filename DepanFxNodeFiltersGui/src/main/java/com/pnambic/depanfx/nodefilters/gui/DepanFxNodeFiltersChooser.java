@@ -48,7 +48,7 @@ public class DepanFxNodeFiltersChooser {
       DepanFxSequenceFilterData.class
   };
 
-  public static final DepanFxResourceFilter NODE_FILTER_FILTER =
+  public static final DepanFxResourceFilter X_NODE_FILTER_FILTER =
       DepanFxResourceFilter.buildResourceFilter(
           "Node Filter", ANY_FILTER_TOOL_EXT, Arrays.asList(filterTypes));
 
@@ -61,16 +61,20 @@ public class DepanFxNodeFiltersChooser {
 
     private final DepanFxDialogRunner dialogRunner;
 
-    private DepanFxWorkspaceResource<? extends DepanFxBaseFilterData> nodeFilterRsrc;
+    private final DepanFxNodeFiltersRegistry filtersRegistry;
 
     private final TextField nodeFilterField;
+
+    private DepanFxWorkspaceResource<? extends DepanFxBaseFilterData> nodeFilterRsrc;
 
     public NodeFilterControl(
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
+        DepanFxNodeFiltersRegistry filtersRegistry,
         TextField nodeFilterField) {
       this.workspace = workspace;
       this.dialogRunner = dialogRunner;
+      this.filtersRegistry = filtersRegistry;
       this.nodeFilterField = nodeFilterField;
       nodeFilterField.setContextMenu(buildContextMenu());
     }
@@ -105,7 +109,7 @@ public class DepanFxNodeFiltersChooser {
     private void runNodeFilterFinder() {
       DepanFxNodeFiltersChooser
           .runNodeFiltersFinder(
-                workspace, dialogRunner, nodeFilterField.getScene())
+                workspace, dialogRunner, nodeFilterField.getScene(), filtersRegistry)
           .ifPresent(this::setNodeFilterRsrc);
     }
   }
@@ -122,6 +126,8 @@ public class DepanFxNodeFiltersChooser {
 
     private final Scene scene;
 
+    private final DepanFxNodeFiltersRegistry filtersRegistry;
+
     private final BiConsumer<
             T, DepanFxWorkspaceResource<? extends DepanFxBaseFilterData>>
         matcherConsumer;
@@ -130,12 +136,14 @@ public class DepanFxNodeFiltersChooser {
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
         Scene scene,
+        DepanFxNodeFiltersRegistry filtersRegistry,
         BiConsumer<
             T,
             DepanFxWorkspaceResource<? extends DepanFxBaseFilterData>> matcherConsumer) {
       this.workspace = workspace;
       this.dialogRunner = dialogRunner;
       this.scene = scene;
+      this.filtersRegistry = filtersRegistry;
       this.matcherConsumer = matcherConsumer;
     }
 
@@ -161,7 +169,7 @@ public class DepanFxNodeFiltersChooser {
 
     private void runNodeFilterFinder() {
       DepanFxNodeFiltersChooser
-          .runNodeFiltersFinder(workspace, dialogRunner, scene)
+          .runNodeFiltersFinder(workspace, dialogRunner, scene, filtersRegistry)
           .ifPresent(r -> matcherConsumer.accept(getTableRow().getItem(), r));
     }
   }
@@ -173,9 +181,14 @@ public class DepanFxNodeFiltersChooser {
       runNodeFiltersFinder(
             DepanFxWorkspace workspace,
             DepanFxDialogRunner dialogRunner,
-            Scene scene) {
+            Scene scene,
+            DepanFxNodeFiltersRegistry filtersRegistry) {
 
     DepanFxResourceChooser chooser = prepareChooser(workspace, dialogRunner);
+    DepanFxResourceFilter rsrcFilter = filtersRegistry.getResourceFilter();
+    chooser.getExtensionFilters().add(rsrcFilter);
+    chooser.setSelectedExtensionFilter(rsrcFilter);
+
     return chooser.showOpenDialog(scene)
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
@@ -187,9 +200,7 @@ public class DepanFxNodeFiltersChooser {
     DepanFxResourceChooser result =
         new DepanFxResourceChooser(workspace, dialogRunner);
     DepanFxResourcePerspectives.prepareResourceFinder(
-        result, DepanFxProjects.TOOLS_PATH);
-    result.getExtensionFilters().add(NODE_FILTER_FILTER);
-    result.setSelectedExtensionFilter(NODE_FILTER_FILTER);
+        result, DepanFxBaseFilterData.NODE_FILTERS_TOOL_PATH);
     return result;
   }
 }

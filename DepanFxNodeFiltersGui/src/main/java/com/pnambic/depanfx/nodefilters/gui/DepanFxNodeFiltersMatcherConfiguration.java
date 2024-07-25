@@ -132,7 +132,8 @@ public class DepanFxNodeFiltersMatcherConfiguration {
         ActionEvent e,
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        Scene scene) {
+        Scene scene,
+        DepanFxNodeFiltersRegistry nodeFilterRegistry) {
       return DepanFxLinkMatcherChooser.runLinkMatcherFinder(
                 workspace, dialogRunner, scene)
             .map(DepanFxMatcherFilterData::createMatcherFilterData);

@@ -105,7 +105,8 @@ public class DepanFxNodeFiltersReferencedDialog
   @FXML
   protected void handleBrowseRefFilter() {
     DepanFxNodeFiltersChooser.runNodeFiltersFinder(
-            getWorkspace(), getDialogRunner(), getScene())
+            getWorkspace(), getDialogRunner(), getScene(),
+            getNodeFiltersRegistry())
         .ifPresent(this::setFilterResource);
   }
 

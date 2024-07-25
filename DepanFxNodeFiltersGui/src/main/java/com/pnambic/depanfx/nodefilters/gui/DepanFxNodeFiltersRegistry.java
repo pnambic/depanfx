@@ -17,6 +17,7 @@ package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.nodefilters.model.DepanFxClosableFilter;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.scene.Scene;
@@ -41,6 +43,8 @@ public class DepanFxNodeFiltersRegistry {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeFiltersRegistry.class);
+
+  public static final String ANY_FILTER_TOOL_EXT = "d*fti";
 
   private final List<DepanFxNodeFiltersContribution> contribs;
 
@@ -82,7 +86,7 @@ public class DepanFxNodeFiltersRegistry {
       Consumer<DepanFxBaseFilterData> onAddFilter) {
     orderedContribs()
         .forEach(c -> c.appendCreateActionItem(
-            builder, workspace, dialogRunner, scene, onAddFilter));
+            builder, workspace, dialogRunner, scene, this, onAddFilter));
   }
 
   private Stream<DepanFxNodeFiltersContribution> orderedContribs() {
@@ -100,5 +104,14 @@ public class DepanFxNodeFiltersRegistry {
           filter.getClass().getName(), caller);
     }
     return result;
+  }
+
+  public DepanFxResourceFilter getResourceFilter() {
+    List<Class<?>> filterClasses = orderedContribs()
+        .flatMap(c -> c.getContribTypes().stream())
+        .collect(Collectors.toList());
+
+    return  DepanFxResourceFilter.buildResourceFilter(
+        "Node Filter", ANY_FILTER_TOOL_EXT, filterClasses);
   }
 }
