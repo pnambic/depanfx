@@ -23,11 +23,15 @@ public class DepanFxNodeKindFilterData extends DepanFxBaseFilterData {
 
   private final ContextNodeKindId nodeKind;
 
+  private final boolean exclusionFilter;
+
   public DepanFxNodeKindFilterData(
       String toolName, String toolDescription,
-      FilterMergeMode mergeMode, ContextNodeKindId nodeKind) {
+      FilterMergeMode mergeMode,
+      ContextNodeKindId nodeKind, boolean exclusionFilter) {
     super(toolName, toolDescription, mergeMode);
     this.nodeKind = nodeKind;
+    this.exclusionFilter = exclusionFilter;
   }
 
   public static DepanFxNodeKindFilterData createNodeKindFilterData(
@@ -36,10 +40,14 @@ public class DepanFxNodeKindFilterData extends DepanFxBaseFilterData {
     return new DepanFxNodeKindFilterData(
         nodeKindKey + " node kind filter",
         "Node kind filter for " + nodeKindKey,
-        FilterMergeMode.REPLACE, nodeKind);
+        FilterMergeMode.REPLACE, nodeKind, false);
   }
 
   public ContextNodeKindId getNodeKind() {
     return nodeKind;
+  }
+
+  public boolean isExclusionFilter() {
+    return exclusionFilter;
   }
 }

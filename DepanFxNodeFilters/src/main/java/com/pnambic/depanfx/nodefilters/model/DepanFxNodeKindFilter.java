@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodefilters.model;
 
+import com.google.common.base.Predicate;
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeKindFilterData;
@@ -40,9 +41,26 @@ public class DepanFxNodeKindFilter
 
   @Override // DepanFxBaseFilter
   protected Collection<GraphNode> computeResult(Collection<GraphNode> nodes) {
+    Predicate<GraphNode> nodePredicate = getFilterPredicate();
     return nodes.stream()
         .filter(targets::contains)
-        .filter(n -> getFilterData().getNodeKind().equals(n.getId().getContextNodeKindId()))
+        .filter(nodePredicate)
         .collect(Collectors.toList());
+  }
+
+  private Predicate<GraphNode> getFilterPredicate() {
+    if (getFilterData().isExclusionFilter()) {
+      return this::exclusionTest;
+    }
+    return this::inclusionTest;
+  }
+
+  private boolean inclusionTest(GraphNode node) {
+    return getFilterData().getNodeKind().equals(
+        node.getId().getContextNodeKindId());
+  }
+
+  private boolean exclusionTest(GraphNode node) {
+    return !inclusionTest(node);
   }
 }
