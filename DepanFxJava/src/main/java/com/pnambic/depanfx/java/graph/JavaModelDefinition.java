@@ -63,11 +63,11 @@ public class JavaModelDefinition {
       GraphContextDocument.CONTEXT_MODEL_PATH.resolve(
           JavaContextModelId.JAVA_KEY);
 
-  public static final DepanFxBuiltInContribution.Simple CONTRIBUTION =
-      new DepanFxBuiltInContribution.Simple(BUILTIN_PATH, DOCUMENT);
+  public static final DepanFxBuiltInContribution.Simple<GraphContextDocument> CONTRIBUTION =
+      new DepanFxBuiltInContribution.Simple<>(BUILTIN_PATH, DOCUMENT);
 
   @Bean
-  public DepanFxBuiltInContribution javaContextModel() {
+  public DepanFxBuiltInContribution<GraphContextDocument> javaContextModel() {
     return CONTRIBUTION;
   }
 }

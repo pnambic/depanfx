@@ -44,11 +44,11 @@ public class FileSystemModelDefinition {
       GraphContextDocument.CONTEXT_MODEL_PATH.resolve(
           FileSystemContextModelId.FILE_SYSTEM_KEY);
 
-  public static final DepanFxBuiltInContribution.Simple CONTRIBUTION =
-      new DepanFxBuiltInContribution.Simple(BUILTIN_PATH, DOCUMENT);
+  public static final DepanFxBuiltInContribution.Simple<GraphContextDocument> CONTRIBUTION =
+      new DepanFxBuiltInContribution.Simple<>(BUILTIN_PATH, DOCUMENT);
 
   @Bean
-  public DepanFxBuiltInContribution fileSystemContextModel() {
+  public DepanFxBuiltInContribution<GraphContextDocument> fileSystemContextModel() {
     return CONTRIBUTION;
   }
 }

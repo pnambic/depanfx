@@ -41,11 +41,11 @@ public class GraphContextlModelDefinition {
       GraphContextDocument.CONTEXT_MODEL_PATH.resolve(
           BaseContextModelId.BASE_CONTEXT_KEY);
 
-  public static final DepanFxBuiltInContribution.Simple CONTRIBUTION =
-      new DepanFxBuiltInContribution.Simple(BUILTIN_PATH, DOCUMENT);
+  public static final DepanFxBuiltInContribution.Simple<GraphContextDocument> CONTRIBUTION =
+      new DepanFxBuiltInContribution.Simple<>(BUILTIN_PATH, DOCUMENT);
 
   @Bean
-  public DepanFxBuiltInContribution baseContextModel() {
+  public DepanFxBuiltInContribution<GraphContextDocument> baseContextModel() {
     return CONTRIBUTION;
   }
 }
