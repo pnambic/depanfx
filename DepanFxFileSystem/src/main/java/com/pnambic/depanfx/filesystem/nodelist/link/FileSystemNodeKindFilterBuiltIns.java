@@ -51,7 +51,7 @@ public class FileSystemNodeKindFilterBuiltIns {
   private DepanFxBuiltInContribution<DepanFxNodeKindFilterData> createBuiltIn(
       String docName, ContextNodeKindId kindId, Path docPath) {
     DepanFxNodeKindFilterData kindFilter =
-        DepanFxNodeKindFilterData.createMatcherFilterData(kindId);
+        DepanFxNodeKindFilterData.createNodeKindFilterData(kindId);
     return new DepanFxBuiltInContribution.Simple<>(docPath, kindFilter);
   }
 }

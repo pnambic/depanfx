@@ -30,7 +30,7 @@ public class DepanFxNodeKindFilterData extends DepanFxBaseFilterData {
     this.nodeKind = nodeKind;
   }
 
-  public static DepanFxNodeKindFilterData createMatcherFilterData(
+  public static DepanFxNodeKindFilterData createNodeKindFilterData(
       ContextNodeKindId nodeKind) {
     String nodeKindKey = nodeKind.getNodeKindKey();
     return new DepanFxNodeKindFilterData(

@@ -67,7 +67,7 @@ public class JavaNodeKindFilterBuiltIns {
     Path docPath =
         JAVA_NODE_FILTERS_PATH.resolve(kindId.getNodeKindKey());
     DepanFxNodeKindFilterData kindFilter =
-        DepanFxNodeKindFilterData.createMatcherFilterData(kindId);
+        DepanFxNodeKindFilterData.createNodeKindFilterData(kindId);
     return new DepanFxBuiltInContribution.Simple<>(docPath, kindFilter);
   }
 }
