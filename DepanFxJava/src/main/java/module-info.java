@@ -7,6 +7,7 @@ module depanfx.java {
 
   requires depanfx.filesystem;
   requires depanfx.graph;
+  requires depanfx.nodefilters;
   requires depanfx.nodelist;
   requires depanfx.graph_doc;
   requires depanfx.persistence;

@@ -7,6 +7,7 @@ module depanfx.filesystem {
 
   requires depanfx.graph;
   requires depanfx.graph_doc;
+  requires depanfx.nodefilters;
   requires depanfx.nodelist;
   requires depanfx.persistence;
   requires depanfx.workspace;
