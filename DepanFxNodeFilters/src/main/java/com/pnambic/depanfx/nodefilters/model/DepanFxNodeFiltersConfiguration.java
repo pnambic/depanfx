@@ -17,12 +17,18 @@ package com.pnambic.depanfx.nodefilters.model;
 
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.nodefilters.persistence.ListFilterPersistenceContribution;
+import com.pnambic.depanfx.nodefilters.persistence.MatcherFilterPersistenceContribution;
+import com.pnambic.depanfx.nodefilters.persistence.NodeKindFilterPersistenceContribution;
+import com.pnambic.depanfx.nodefilters.persistence.ReferencedFilterPersistenceContribution;
+import com.pnambic.depanfx.nodefilters.persistence.SequenceFilterPersistenceContribution;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxListFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxMatcherFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeKindFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxReferencedFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxSequenceFilterData;
+import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,6 +50,13 @@ public class DepanFxNodeFiltersConfiguration {
           Collection<GraphNode> targetNodes) {
         return new DepanFxListFilter((DepanFxListFilterData) filterData);
       }
+
+      @Override
+      public void prepareTransport(PersistDocumentTransportBuilder builder) {
+        prepareTransport(builder,
+            ListFilterPersistenceContribution.LIST_FILTER_INFO_TAG,
+            DepanFxListFilterData.class);
+      }
     };
   }
 
@@ -60,6 +73,13 @@ public class DepanFxNodeFiltersConfiguration {
         return new DepanFxMatcherFilter(
             (DepanFxMatcherFilterData) filterData, graphModel, targetNodes);
       }
+
+      @Override
+      public void prepareTransport(PersistDocumentTransportBuilder builder) {
+        prepareTransport(builder,
+            MatcherFilterPersistenceContribution.MATCHER_FILTER_INFO_TAG,
+            DepanFxMatcherFilterData.class);
+      }
     };
   }
 
@@ -75,6 +95,13 @@ public class DepanFxNodeFiltersConfiguration {
           Collection<GraphNode> targetNodes) {
         return new DepanFxNodeKindFilter(
             (DepanFxNodeKindFilterData) filterData, graphModel, targetNodes);
+      }
+
+      @Override
+      public void prepareTransport(PersistDocumentTransportBuilder builder) {
+        prepareTransport(builder,
+            NodeKindFilterPersistenceContribution.NODE_KIND_FILTER_INFO_TAG,
+            DepanFxNodeKindFilterData.class);
       }
     };
   }
@@ -93,6 +120,13 @@ public class DepanFxNodeFiltersConfiguration {
             (DepanFxReferencedFilterData) filterData,
             nodeFilterRegistry, graphModel, targetNodes);
       }
+
+      @Override
+      public void prepareTransport(PersistDocumentTransportBuilder builder) {
+        prepareTransport(builder,
+            ReferencedFilterPersistenceContribution.REFERENCED_FILTER_INFO_TAG,
+            DepanFxReferencedFilterData.class);
+      }
     };
   }
 
@@ -110,6 +144,13 @@ public class DepanFxNodeFiltersConfiguration {
             (DepanFxSequenceFilterData) filterData,
             nodeFilterRegistry, graphModel, targetNodes);
       }
+
+      @Override
+      public void prepareTransport(PersistDocumentTransportBuilder builder) {
+        prepareTransport(builder,
+            SequenceFilterPersistenceContribution.SEQUENCE_FILTER_INFO_TAG,
+            DepanFxSequenceFilterData.class);
+      }
     };
   }
 
@@ -125,6 +166,13 @@ public class DepanFxNodeFiltersConfiguration {
     @Override
     public boolean accepts(DepanFxBaseFilterData filter) {
       return contribType.isAssignableFrom(filter.getClass());
+    }
+
+    protected void prepareTransport(PersistDocumentTransportBuilder builder,
+        String aliasTag, Class<?> transportType) {
+      Class<?>[] allowType = new Class<?>[] { transportType };
+      builder.addAllowedType(allowType);
+      builder.addAlias(aliasTag, transportType);
     }
   }
 }

@@ -18,6 +18,7 @@ package com.pnambic.depanfx.nodefilters.model;
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
+import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,8 @@ public class DepanFxNodeFiltersRegistry {
         DepanFxNodeFiltersRegistry nodeFilterRegistry,
         GraphModel graphModel,
         Collection<GraphNode> targetNodes);
+
+    void prepareTransport(PersistDocumentTransportBuilder builder);
   }
 
   private static final Logger LOG =
@@ -64,6 +67,10 @@ public class DepanFxNodeFiltersRegistry {
     return lookupContrib(filter, "buildFilter")
         .map(c -> c.buildFilter(filter, this, graphModel, targetNodes))
         .get();
+  }
+
+  public void prepareTransport(PersistDocumentTransportBuilder builder) {
+    contribs.forEach(c -> c.prepareTransport(builder));
   }
 
   private Optional<Contribution> lookupContrib(

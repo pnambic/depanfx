@@ -15,9 +15,7 @@
  */
 package com.pnambic.depanfx.nodefilters.persistence;
 
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxMatcherFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxListFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxReferencedFilterData;
+import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxSequenceFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.FilterMergeMode;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
@@ -43,19 +41,18 @@ public class SequenceFilterPersistenceContribution
   private static final Class<?>[] ALLOW_TYPES = new Class[] {
       DepanFxSequenceFilterData.class,
       FilterMergeMode.class,
-
-      // Embedded filters
-      DepanFxMatcherFilterData.class,
-      DepanFxListFilterData.class,
-      DepanFxReferencedFilterData.class
   };
 
   private final GraphNodePersistencePluginRegistry graphNodeRegistry;
 
+  private final DepanFxNodeFiltersRegistry nodeFiltersRegistry;
+
   @Autowired
   public SequenceFilterPersistenceContribution(
-      GraphNodePersistencePluginRegistry graphNodeRegistry) {
+      GraphNodePersistencePluginRegistry graphNodeRegistry,
+      DepanFxNodeFiltersRegistry nodeFiltersRegistry) {
     this.graphNodeRegistry = graphNodeRegistry;
+    this.nodeFiltersRegistry = nodeFiltersRegistry;
   }
 
   @Override
@@ -71,18 +68,7 @@ public class SequenceFilterPersistenceContribution
 
   @Override
   public void prepareTransport(PersistDocumentTransportBuilder builder) {
-    builder.addAlias(
-        MatcherFilterPersistenceContribution.MATCHER_FILTER_INFO_TAG,
-        DepanFxMatcherFilterData.class);
-    builder.addAlias(
-        ListFilterPersistenceContribution.LIST_FILTER_INFO_TAG,
-        DepanFxListFilterData.class);
-    builder.addAlias(
-        ReferencedFilterPersistenceContribution.REFERENCED_FILTER_INFO_TAG,
-        DepanFxReferencedFilterData.class);
-    builder.addAlias(
-        SEQUENCE_FILTER_INFO_TAG,
-        DepanFxSequenceFilterData.class);
+    nodeFiltersRegistry.prepareTransport(builder);
     builder.addAlias(MERGE_MODE_TAG, FilterMergeMode.class);
 
     builder.addAllowedType(ALLOW_TYPES);
