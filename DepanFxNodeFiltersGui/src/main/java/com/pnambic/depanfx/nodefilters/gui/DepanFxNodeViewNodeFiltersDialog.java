@@ -289,7 +289,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
 
   /////////////////////////////////////
 
-  private Optional<DepanFxWorkspaceResource<? extends DepanFxBaseFilterData>>
+  private Optional<DepanFxWorkspaceResource<DepanFxBaseFilterData>>
       nodeFilterChooser() {
 
     return DepanFxNodeFiltersChooser.runNodeFiltersFinder(

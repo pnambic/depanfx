@@ -176,7 +176,7 @@ public class DepanFxNodeFiltersChooser {
   /**
    * Provide an existing link matcher.
    */
-  public static Optional<DepanFxWorkspaceResource<? extends DepanFxBaseFilterData>>
+  public static Optional<DepanFxWorkspaceResource<DepanFxBaseFilterData>>
       runNodeFiltersFinder(
             DepanFxWorkspace workspace,
             DepanFxDialogRunner dialogRunner,
