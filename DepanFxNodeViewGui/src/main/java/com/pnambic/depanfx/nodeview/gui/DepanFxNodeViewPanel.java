@@ -50,7 +50,6 @@ import org.slf4j.LoggerFactory;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -58,7 +57,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -106,6 +104,14 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private static final String NODE_VISIBLITY = "Node Visibility";
 
+  private static final String ALL_NODES_VISIBLE = "Show All Nodes";
+
+  private static final String NO_NODES_VISIBLE = "Hide All Nodes";
+
+  private static final String INVERT_NODES_VISIBLE = "Invert Visible Nodes";
+
+  private static final String MORE_NODE_VIBILITY = "More Node Visibility...";
+
   private static final String SAVE_NODE_VIEW_ITEM = "Save Node View...";
 
   private static final String LAYOUT_NODES = "Layout Nodes";
@@ -126,14 +132,6 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
       new ExtensionFilter(ALL_GRAPHIC_LABEL, Arrays.asList(ALL_GRAPHIC_EXTS));
 
   private static final String PNG_EXT = "png";
-
-  private static final String ALL_NODES_VISIBLE = "Show All Nodes";
-
-  private static final String NO_NODES_VISIBLE = "Hide All Nodes";
-
-  private static final String INVERT_NODES_VISIBLE = "Invert Visible Nodes";
-
-  private static final String MORE_NODE_VIBILITY = "More Node Visibility...";
 
   private final DepanFxWorkspace workspace;
 
@@ -933,7 +931,8 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   private void populateJoglPane() {
     GraphModel model = getGraphDoc().getGraph();
     nodeDisplay = NodeDisplayController.of(
-        joglPane, viewData, filterRegistry.buildFilterFactory(model, model.getGraphNodes()));
+        joglPane, viewData,
+        filterRegistry.buildFilterFactory(model, model.getGraphNodes()));
     nodeDisplay.setNodeDisplayResource(viewData.getNodeDisplayDocRsrc());
 
     viewNodes.forEach(this::installShape);
