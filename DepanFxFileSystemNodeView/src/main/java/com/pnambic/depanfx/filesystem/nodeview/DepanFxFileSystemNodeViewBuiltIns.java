@@ -1,18 +1,30 @@
+/*
+ * Copyright 2024 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.pnambic.depanfx.filesystem.nodeview;
 
-import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemLinkMatcherBuiltIns;
-import com.pnambic.depanfx.graph.context.BaseContextDefinition;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
+import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemNodeKindFilterBuiltIns;
+import com.pnambic.depanfx.graph.context.ContextNodeKindId;
+import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDirection;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineForm;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineLabel;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineStyle;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData.NodeDisplayEntry;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxSizerModel;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
@@ -31,97 +43,88 @@ import javafx.scene.paint.Color;
 @Configuration
 public class DepanFxFileSystemNodeViewBuiltIns {
 
-  private static final String MEMBERS_LABEL = "File System Member";
+  private static final String FILE_SYSTEM_NODE_NAME =
+      "File System Node Display";
 
-  private static final String MEMBERS_DESCR =
-      "Files system edges, separated by relation type";
+  private static final String FILE_SYSTEM_NODE_KINDS_NAME =
+      "File System Nodes by Node Kind";
 
-  private static final String MEMBERS_NAME = "File System Members";
+  private static final String FILE_SYSTEM_NODE_KINDS_DESCR =
+      "File system nodes, separated by node kind.";
 
-  public static final Path NODE_VIEW_FILE_SYSTEM_MEMBERS_DOC_PATH =
-      DepanFxNodeViewData.NODE_VIEW_TOOL_PATH
-          .resolve(MEMBERS_NAME);
+  public static final Path FILE_SYSTEM_NODE_KIND_DISPLAY_DOC_PATH =
+      DepanFxNodeViewData.NODE_VIEW_TOOL_PATH.resolve(FILE_SYSTEM_NODE_NAME);
 
   @Autowired
   public DepanFxFileSystemNodeViewBuiltIns() {
   }
 
   @Bean
-  public DepanFxBuiltInContribution<DepanFxNodeViewLinkDisplayData>
-      fileSystemMembersEdgeLinkDisplayDoc() {
+  public DepanFxBuiltInContribution<DepanFxNodeViewNodeDisplayData>
+  fileSystemNodeKindDisplayDoc() {
     return new DepanFxBuiltInContribution.Dependent<>(
-        NODE_VIEW_FILE_SYSTEM_MEMBERS_DOC_PATH) {
+        FILE_SYSTEM_NODE_KIND_DISPLAY_DOC_PATH) {
 
       @Override
-      protected DepanFxNodeViewLinkDisplayData
-          buildDocument(DepanFxBuiltInProject project) {
-        return buildFileSystemLinkDisplayData(project);
+      protected DepanFxNodeViewNodeDisplayData
+      buildDocument(DepanFxBuiltInProject project) {
+        List<NodeDisplayEntry> kindDisplay = new ArrayList<>();
+
+        addFileSystemDisplay(kindDisplay, project);
+
+        return new DepanFxNodeViewNodeDisplayData(
+            FILE_SYSTEM_NODE_KINDS_NAME,
+            FILE_SYSTEM_NODE_KINDS_DESCR,
+            FileSystemContextDefinition.MODEL_ID,
+            kindDisplay);
       }
     };
   }
 
   /**
-   * Now that we have an established project for built ins,
-   * build the all edges display built in using the all edges matcher built in.
+   * Resusable by other display builders.
    */
-  private static DepanFxNodeViewLinkDisplayData buildFileSystemLinkDisplayData(
-      DepanFxBuiltInProject project) {
+  public static void addFileSystemDisplay(
+      List<NodeDisplayEntry> kindDisplay, DepanFxBuiltInProject project) {
 
-    DepanFxLineDisplayData directoryLine = new DepanFxLineDisplayData(
-        DepanFxLineForm.STRAIGHT,
-        DepanFxLineStyle.SOLID,
-        DepanFxJoglColor.of(Color.GREEN),
-        1.5d,  // width
-        DepanFxLineLabel.DEFAULT,
-        DepanFxLineArrow.NONE,
-        DepanFxLineArrow.OPEN,
-        DepanFxLineDirection.FORWARD);
-    LinkDisplayEntry directoryDisplayEntry =
-        buildDisplayEntry(project,
-            NODE_VIEW_FILE_SYSTEM_MEMBERS_DOC_PATH,
-            FileSystemLinkMatcherBuiltIns.DIRECTORY_NAME,
-            FileSystemLinkMatcherBuiltIns.FILE_SYSTEM_DIRECTORY_MATCHER_PATH,
-            directoryLine);
+    kindDisplay.add(buildFileSystemDisplayEntry(project,
+        FileSystemContextDefinition.DIRECTORY_NKID,
+        DepanFxJoglColor.of(Color.ORANGE)));
 
-    DepanFxLineDisplayData fileLine = new DepanFxLineDisplayData(
-        DepanFxLineForm.STRAIGHT,
-        DepanFxLineStyle.SOLID,
-        DepanFxJoglColor.of(Color.YELLOW),
-        1.0d,  // width
-        DepanFxLineLabel.DEFAULT,
-        DepanFxLineArrow.NONE,
-        DepanFxLineArrow.OPEN,
-        DepanFxLineDirection.FORWARD);
-    LinkDisplayEntry fileDisplayEntry =
-        buildDisplayEntry(project,
-            NODE_VIEW_FILE_SYSTEM_MEMBERS_DOC_PATH,
-            FileSystemLinkMatcherBuiltIns.FILE_NAME,
-            FileSystemLinkMatcherBuiltIns.FILE_SYSTEM_FILE_MATCHER_PATH,
-            fileLine);
+    kindDisplay.add(buildFileSystemDisplayEntry(project,
+        FileSystemContextDefinition.DOCUMENT_NKID,
+        DepanFxJoglColor.of(Color.GOLD)));
+  }
 
-    List<LinkDisplayEntry> displayInfo = new ArrayList<>();
-    displayInfo.add(fileDisplayEntry);
-    displayInfo.add(directoryDisplayEntry);
+  private static NodeDisplayEntry buildFileSystemDisplayEntry(
+      DepanFxBuiltInProject project,
+      ContextNodeKindId nodeKind,
+      DepanFxJoglColor color) {
 
-    DepanFxNodeViewLinkDisplayData result =
-        new DepanFxNodeViewLinkDisplayData(
-            MEMBERS_LABEL, MEMBERS_DESCR,
-            BaseContextDefinition.MODEL_ID, displayInfo);
-    return result;
-  };
+    return buildDisplayEntry(
+        project,
+        FileSystemNodeKindFilterBuiltIns.FILE_SYSTEM_NODE_FILTERS_PATH,
+        nodeKind, color);
+  }
 
-  private static LinkDisplayEntry buildDisplayEntry(
-      DepanFxBuiltInProject project, Path displayDataPath,
-      String entryName, Path matcherPath, DepanFxLineDisplayData lineDisplay) {
+  private static NodeDisplayEntry buildDisplayEntry(
+      DepanFxBuiltInProject project,
+      Path modelDirectoryPath,
+      ContextNodeKindId nodeKind,
+      DepanFxJoglColor color) {
 
-    Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
-        matcherRsrc = project.getResource(matcherPath);
-    DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> directoryMatcher =
-        matcherRsrc.orElseThrow(() ->
+    String kindId = nodeKind.getNodeKindKey();
+    Path kindFilterPath = modelDirectoryPath.resolve(kindId);
+
+    Optional<DepanFxWorkspaceResource<DepanFxBaseFilterData>> optFilterRsrc =
+        project.getResource(kindFilterPath);
+    DepanFxWorkspaceResource<DepanFxBaseFilterData> nodeFilterRsrc =
+        optFilterRsrc.orElseThrow(() ->
             new DepanFxBuiltInContribution.MissingDependencyException(
-                displayDataPath, matcherPath));
+                FILE_SYSTEM_NODE_KIND_DISPLAY_DOC_PATH, kindFilterPath));
 
-    return new LinkDisplayEntry(
-        entryName, directoryMatcher, lineDisplay);
+     return new NodeDisplayEntry(
+            kindId, nodeFilterRsrc,
+            new DepanFxNodeDisplayData(true, DepanFxSizerModel.DEFAULT, color));
   }
 }

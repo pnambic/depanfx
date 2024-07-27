@@ -3,10 +3,14 @@ package com.pnambic.depanfx.nodeview.gui;
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.context.GraphContextKeys;
 import com.pnambic.depanfx.graph.model.GraphEdge;
+import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.jogl.JoglMouseActionListener;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeViewNodeFiltersDialog;
+import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
+import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
+import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListConfiguration;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
@@ -21,7 +25,6 @@ import com.pnambic.depanfx.nodeview.jogl.JoglPane;
 import com.pnambic.depanfx.nodeview.jogl.JoglShapes;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxLayoutsChooser;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
@@ -79,7 +82,27 @@ public class DepanFxNodeViewPanel {
 
   private static final String FILTER_SELECTION_ITEM = "Filter Selection...";
 
-  private static final String SAVE_NODE_VIEW_ITEM = "Save node view...";
+  private static final String EDGE_DISPLAY = "Edge Display";
+
+  private static final String SELECT_EDGE_DISPLAY = "Select Edge Display...";
+
+  private static final String EDGE_VISIBLITY = "Edge Visibility";
+
+  private static final String ALL_EDGES_VISIBLE = "Show All Edges";
+
+  private static final String NO_EDGES_VISIBLE = "Hide All Edges";
+
+  private static final String INVERT_EDGES_VISIBLE = "Invert Visible Edges";
+
+  private static final String MORE_EDGE_VIBILITY = "More Edge Visibility...";
+
+  private static final String NODE_DISPLAY = "Node Display";
+
+  private static final String SELECT_NODE_DISPLAY = "Select Node Display...";
+
+  private static final String NODE_VISIBLITY = "Node Visibility";
+
+  private static final String SAVE_NODE_VIEW_ITEM = "Save Node View...";
 
   private static final String LAYOUT_NODES = "Layout Nodes";
 
@@ -100,19 +123,13 @@ public class DepanFxNodeViewPanel {
 
   private static final String PNG_EXT = "png";
 
-  private static final String EDGE_DISPLAY = "Edge Display";
+  private static final String ALL_NODES_VISIBLE = "Show All Nodes";
 
-  private static final String SELECT_EDGE_DISPLAY = "Select Edge Display...";
+  private static final String NO_NODES_VISIBLE = "Hide All Nodes";
 
-  private static final String EDGE_VISIBLITY = "Edge Visibility";
+  private static final String INVERT_NODES_VISIBLE = "Invert Visible Nodes";
 
-  private static final String ALL_EDGES_VISIBLE = "Show All Edges";
-
-  private static final String NO_EDGES_VISIBLE = "Hide All Edges";
-
-  private static final String INVERT_EDGES_VISIBLE = "Invert Visible";
-
-  private static final String MORE_EDGE_VIBILITY = "More Visibility...";
+  private static final String MORE_NODE_VIBILITY = "More Node Visibility...";
 
   private final DepanFxWorkspace workspace;
 
@@ -120,17 +137,22 @@ public class DepanFxNodeViewPanel {
 
   private final DepanFxNodeLayoutRegistry layoutRegistry;
 
-  private final DepanFxNodeViewData viewData;
+  private final DepanFxNodeFiltersRegistry filterRegistry;
 
   private Collection<GraphNode> viewNodes;
 
-  private DepanFxNodeListSelection nodeSelection;
-
   private Map<GraphNode, DepanFxNodeLocationData> nodeLocations;
 
-  private Map<GraphNode, DepanFxNodeDisplayData> nodeDisplay;
-
   private JoglPane joglPane;
+
+  private final DepanFxNodeViewData viewData;
+
+  private DepanFxNodeListSelection nodeSelection;
+
+  /////////////////////////////////////
+  // Node display state
+
+  private NodeDisplayController nodeDisplay;
 
   /////////////////////////////////////
   // Link display state
@@ -158,16 +180,17 @@ public class DepanFxNodeViewPanel {
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxNodeLayoutRegistry layoutRegistry,
+      DepanFxNodeFiltersRegistry filterRegistry,
       DepanFxNodeViewData viewData) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
     this.layoutRegistry = layoutRegistry;
+    this.filterRegistry = filterRegistry;
     this.viewData = viewData;
 
     // Unpack the interesting parts of the view data.
     this.viewNodes = viewData.getViewNodes();
     this.nodeLocations = viewData.getNodeLocations();
-    this.nodeDisplay = viewData.getNodeDisplay();
 
     // Handle node selections.
     this.nodeSelection = DepanFxNodeListSelection.forNodes(viewNodes);
@@ -245,6 +268,18 @@ public class DepanFxNodeViewPanel {
     return DepanFxLinkMatcherGroup.getMemberMatcherRsrc(workspace, modelId);
   }
 
+  public DepanFxNodeList buildSelectedAsNodeList() {
+    List<GraphNode> selectedNodes = nodeSelection.streamSelectedNodes()
+        .collect(Collectors.toList());
+    return DepanFxNodeLists.buildNodeList(
+        getToolName() + " selection",
+        "Node selected from " + getToolName() + ".",
+        getGraphDocRsrc(), selectedNodes);
+  }
+
+  /////////////////////////////////////
+  // for Edge Display Integration
+
   public void revertLinkDisplay() {
     edgeDisplay.revertLinkDisplay();
     // reverting should not change the state of dirty
@@ -260,15 +295,6 @@ public class DepanFxNodeViewPanel {
     edgeDisplay.setLinkDisplayInfo(displayRsrc.getResource());
     linkDisplayRsrc = displayRsrc;
     linkDisplayDirty = false;
-  }
-
-  public DepanFxNodeList buildSelectedAsNodeList() {
-    List<GraphNode> selectedNodes = nodeSelection.streamSelectedNodes()
-        .collect(Collectors.toList());
-    return DepanFxNodeLists.buildNodeList(
-        getToolName() + " selection",
-        "Node selected from " + getToolName() + ".",
-        getGraphDocRsrc(), selectedNodes);
   }
 
   /////////////////////////////////////
@@ -495,6 +521,38 @@ public class DepanFxNodeViewPanel {
         e -> sideViews.remove(edgeDisplayDialog));
   }
 
+  private Menu buildNodeDisplayMenu() {
+    Menu result = new Menu(NODE_DISPLAY);
+
+    ObservableList<MenuItem> items = result.getItems();
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        SELECT_NODE_DISPLAY, e -> doSelectNodeDisplayAction()));
+
+    items.add(new SeparatorMenuItem());
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        DepanFxNodeViewNodeDisplayDialog.EDIT_NODE_DISPLAY,
+        e -> runEditNodeDisplayDialog()));
+
+    return result;
+  }
+
+  private void doSelectNodeDisplayAction() {
+    DepanFxNodeDisplayDataChooser
+        .runNodeDisplayFinder(
+            workspace, dialogRunner, joglPane.getScene())
+        .ifPresent(nodeDisplay::setNodeDisplayResource);
+  }
+
+  private void runEditNodeDisplayDialog() {
+    Stage nodeDisplayDialog =
+        DepanFxNodeViewNodeDisplayDialog.runEditDialog(
+            nodeDisplay, dialogRunner);
+
+    sideViews.add(nodeDisplayDialog);
+    nodeDisplayDialog.setOnCloseRequest(
+        e -> sideViews.remove(nodeDisplayDialog));
+  }
+
   /////////////////////////////////////
   // Menus and UX
 
@@ -522,6 +580,11 @@ public class DepanFxNodeViewPanel {
     builder.appendSubMenu(edgeVizMenu);
 
     builder.appendSeparator();
+    builder.appendSubMenu(buildNodeDisplayMenu());
+    Menu nodeVizMenu = new Menu(NODE_VISIBLITY);
+    builder.appendSubMenu(nodeVizMenu);
+
+    builder.appendSeparator();
     builder.appendSubMenu(buildLayoutNodesMenu());
 
     builder.appendSeparator();
@@ -535,7 +598,10 @@ public class DepanFxNodeViewPanel {
         SAVE_NODE_VIEW_ITEM, e -> runSaveNodeViewDialog());
 
     ContextMenu result = builder.build();
-    result.setOnShowing(e -> populateEdgeVisibilityMenu(edgeVizMenu));
+    result.setOnShowing(e -> {
+      populateEdgeVisibilityMenu(edgeVizMenu);
+      populateNodeVisibilityMenu(nodeVizMenu);
+    });
     return result;
   }
 
@@ -649,6 +715,101 @@ public class DepanFxNodeViewPanel {
   }
 
   /////////////////////////////////////
+  // Node Visibility Menu
+
+  private void populateNodeVisibilityMenu(Menu vizMenu) {
+    ObservableList<MenuItem> items = vizMenu.getItems();
+    items.clear();
+
+    // Toggles for each (non-zero) matcher
+    nodeDisplay.streamVisibilityFilters()
+        .filter(d -> nodeDisplay.getVisiblityFilterNodeCount(d) > 0)
+        .sorted((a, b) -> a.getToolName().compareTo(b.getToolName()))
+        .forEach(m -> items.add(buildNodeVisibleItem(m)));
+
+    // Add one for the remainders
+    items.add(buildEgdeVisibleItem(
+        edgeDisplay.getRemainderLabel(),
+        edgeDisplay.getRemainderVisibility(),
+        edgeDisplay.getRemainderCount(),
+        e -> doToggleRemainderVisibleAction()));
+
+    items.add(new SeparatorMenuItem());
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        ALL_NODES_VISIBLE, e -> doAllNodesVisibleAction()));
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        NO_NODES_VISIBLE, e -> doNoNodeVisibleAction()));
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        INVERT_NODES_VISIBLE, e -> doInvertNodesVisibleAction()));
+
+    items.add(new SeparatorMenuItem());
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        MORE_NODE_VIBILITY, e -> runEditVisibleNodesDialog()));
+  }
+
+  private void doAllNodesVisibleAction() {
+    nodeDisplay.streamVisibilityFilters()
+        .forEach(f -> nodeDisplay.setFilterVisibility(f, true));
+    nodeDisplay.setRemainderVisibility(true);
+  }
+
+  private void doNoNodeVisibleAction() {
+    nodeDisplay.streamVisibilityFilters()
+        .forEach(f -> nodeDisplay.setFilterVisibility(f, false));
+    nodeDisplay.setRemainderVisibility(false);
+  }
+
+  private void doInvertNodesVisibleAction() {
+    nodeDisplay.streamVisibilityFilters()
+        .forEach(f -> {
+          boolean isVisible = nodeDisplay.getFilterVisibility(f);
+          nodeDisplay.setFilterVisibility(f, isVisible);
+        });
+    doToggleRemainderVisibleAction();
+  }
+
+  private void runEditVisibleNodesDialog() {
+
+    Dialog<DepanFxNodeViewNodeVisibilityDialog> visibiltyDlg =
+        DepanFxNodeViewNodeVisibilityDialog.runVisibilityDialog(
+            dialogRunner, viewData.getAvailableNodesDoc(),
+            viewData.getVisibleNodesDoc(), nodeDisplay,
+            r -> updateAvailableNodes(r));
+    visibiltyDlg.getController().getWorkspaceResource()
+        .ifPresent(this::updateVisibleNodes);
+  }
+
+  private void updateAvailableNodes(
+      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> filterSeqRsrc) {
+    viewData.setAvailableNodeRsrc(filterSeqRsrc);
+    edgeDisplay.setMatcherVisibility(null, linkDisplayDirty);
+  }
+
+  private MenuItem buildNodeVisibleItem(DepanFxBaseFilterData filter) {
+    String label = filter.getToolName();
+    boolean isVisible = nodeDisplay.getFilterVisibility(filter);
+    int nodeCount = nodeDisplay.getVisiblityFilterNodeCount(filter);
+    return buildEgdeVisibleItem(label, isVisible, nodeCount,
+        e -> setFilterVisible(filter, !isVisible));
+  }
+
+  private void updateVisibleNodes(
+      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleFilterRsrc) {
+    viewData.setVisibleNodeRsrc(visibleFilterRsrc);
+
+    nodeDisplay.clearFilterVisibility();
+    visibleFilterRsrc.getResource().streamFilterRefs()
+        .map(r -> r.getResource())
+        .forEach(m -> nodeDisplay.setFilterVisibility(m, true));
+  }
+
+
+  private void setFilterVisible(
+      DepanFxBaseFilterData filter, boolean isVisible) {
+    nodeDisplay.setFilterVisibility(filter, isVisible);
+  }
+
+  /////////////////////////////////////
   // Layouts Menu
 
   private Menu buildLayoutNodesMenu() {
@@ -714,12 +875,22 @@ public class DepanFxNodeViewPanel {
   private DepanFxNodeViewData buildSaveView() {
     DepanFxNodeViewData result = new DepanFxNodeViewData(
         viewData.getToolName(), viewData.getToolDescription(),
+        viewData.getGraphDocRsrc(), viewNodes, nodeLocations,
+        viewData.getNodeDisplay(), viewData.getEdgeDisplay(),
+
         buildSceneData(),
-        viewData.getGraphDocRsrc(), viewData.getAvailableEdgeRsrc(),
-        viewData.getVisibleEdgeRsrc(), linkDisplayRsrc,
-        viewNodes, nodeLocations, nodeDisplay,
-        edgeDisplay.getEdgeDisplay(),
-        edgeDisplay.getRemainderVisible(), edgeDisplay.getRemainderLabel(),
+
+        viewData.getAvailableNodeRsrc(),
+        viewData.getVisibleNodeRsrc(),
+        nodeDisplay.getNodeDisplayResource(),
+        nodeDisplay.getRemainderVisibility(),
+        nodeDisplay.getRemainderDisplay(),
+
+        viewData.getAvailableEdgeRsrc(),
+        viewData.getVisibleEdgeRsrc(),
+        linkDisplayRsrc,
+        edgeDisplay.getRemainderVisible(),
+        edgeDisplay.getRemainderLabel(),
         edgeDisplay.getRemainderDisplay());
     return result;
   }
@@ -741,6 +912,10 @@ public class DepanFxNodeViewPanel {
   }
 
   private void populateJoglPane() {
+    GraphModel model = getGraphDoc().getGraph();
+    nodeDisplay = NodeDisplayController.of(
+        joglPane, viewData, filterRegistry.buildFilterFactory(model, model.getGraphNodes()));
+    nodeDisplay.setNodeDisplayResource(viewData.getNodeDisplayDocRsrc());
 
     viewNodes.forEach(this::installShape);
 
@@ -766,11 +941,7 @@ public class DepanFxNodeViewPanel {
     if (location == null) {
       return;
     }
-    DepanFxNodeDisplayData displayInfo = nodeDisplay.get(node);
-    if (displayInfo == null) {
-      return;
-    }
-    JoglShapes.installShape(joglPane, node, location, displayInfo);
+    nodeDisplay.installNode(node, location);
   }
 
 

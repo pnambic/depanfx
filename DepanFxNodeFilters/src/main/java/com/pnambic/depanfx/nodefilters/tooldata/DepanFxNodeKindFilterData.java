@@ -21,6 +21,9 @@ public class DepanFxNodeKindFilterData extends DepanFxBaseFilterData {
 
   public static final String NODE_KIND_FILTER_TOOL_EXT = "dnkfti";
 
+  /**
+   * A null node kind matches every node.
+   */
   private final ContextNodeKindId nodeKind;
 
   private final boolean exclusionFilter;

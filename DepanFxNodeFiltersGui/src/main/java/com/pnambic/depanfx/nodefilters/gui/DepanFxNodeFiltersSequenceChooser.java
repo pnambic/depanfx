@@ -16,8 +16,7 @@
 package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxMatcherFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxSequenceFilterData;
+import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
@@ -27,7 +26,6 @@ import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
@@ -36,20 +34,21 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 
-public class DepanFxNodeFiltersChooser {
+public class DepanFxNodeFiltersSequenceChooser {
 
-  public static final String SELECT_NODE_FILTER = "Select Node Filter ...";
+  public static final String NODE_FILTER_SEQUENCE =
+      "Node Filter Sequence";
 
-  public static final String ANY_FILTER_TOOL_EXT = "d*fti";
+  public static final String SELECT_NODE_FILTER_SEQUENCE =
+      "Select Node Filter Sequence...";
 
-  private static final Class<?>[] filterTypes = new Class<?>[]{
-      DepanFxMatcherFilterData.class,
-      DepanFxSequenceFilterData.class
-  };
+  public static final String FILTER_SEQUENCE_TOOL_EXT =
+      DepanFxNodeFilterSequenceData.NODE_FILTER_SEQUENCE_TOOL_EXT;
 
-  public static final DepanFxResourceFilter X_NODE_FILTER_FILTER =
+  public static final DepanFxResourceFilter NODE_FILTER_SEQUENCE_FILTER =
       DepanFxResourceFilter.buildResourceFilter(
-          "Node Filter", ANY_FILTER_TOOL_EXT, Arrays.asList(filterTypes));
+          NODE_FILTER_SEQUENCE, FILTER_SEQUENCE_TOOL_EXT,
+          DepanFxNodeFilterSequenceData.class);
 
   /**
    * Bind a pop-up to text field for the resource name.
@@ -64,7 +63,8 @@ public class DepanFxNodeFiltersChooser {
 
     private final TextField nodeFilterField;
 
-    private DepanFxWorkspaceResource<? extends DepanFxBaseFilterData> nodeFilterRsrc;
+    private DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
+        nodeFilterRsrc;
 
     public NodeFilterControl(
         DepanFxWorkspace workspace,
@@ -79,12 +79,12 @@ public class DepanFxNodeFiltersChooser {
     }
 
     public void setNodeFilterRsrc(
-        DepanFxWorkspaceResource<? extends DepanFxBaseFilterData> nodeFilterRsrc) {
+        DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> nodeFilterRsrc) {
       this.nodeFilterRsrc = nodeFilterRsrc;
       nodeFilterField.setText(getNodeFilterRsrcName());
     }
 
-    public DepanFxWorkspaceResource<? extends DepanFxBaseFilterData>
+    public DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
         getNodeFilterResource() {
 
       return nodeFilterRsrc;
@@ -101,12 +101,12 @@ public class DepanFxNodeFiltersChooser {
     private ContextMenu buildContextMenu() {
       DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
       builder.appendActionItem(
-          SELECT_NODE_FILTER, e -> runNodeFilterFinder());
+          SELECT_NODE_FILTER_SEQUENCE, e -> runNodeFilterFinder());
       return builder.build();
     }
 
     private void runNodeFilterFinder() {
-      DepanFxNodeFiltersChooser
+      DepanFxNodeFiltersSequenceChooser
           .runNodeFiltersFinder(
                 workspace, dialogRunner, nodeFilterField.getScene(), nodeFiltersDialogRegistry)
           .ifPresent(this::setNodeFilterRsrc);
@@ -128,7 +128,7 @@ public class DepanFxNodeFiltersChooser {
     private final DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry;
 
     private final BiConsumer<
-            T, DepanFxWorkspaceResource<DepanFxBaseFilterData>> filterConsumer;
+            T, DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>> filterConsumer;
 
     public NodeFilterCell(
         DepanFxWorkspace workspace,
@@ -137,7 +137,7 @@ public class DepanFxNodeFiltersChooser {
         DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry,
         BiConsumer<
             T,
-            DepanFxWorkspaceResource<DepanFxBaseFilterData>> filterConsumer) {
+            DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>> filterConsumer) {
       this.workspace = workspace;
       this.dialogRunner = dialogRunner;
       this.scene = scene;
@@ -161,21 +161,21 @@ public class DepanFxNodeFiltersChooser {
     private ContextMenu buildContextMenu() {
       DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
       builder.appendActionItem(
-          SELECT_NODE_FILTER, e -> runNodeFilterFinder());
+          SELECT_NODE_FILTER_SEQUENCE, e -> runNodeFilterFinder());
       return builder.build();
     }
 
     private void runNodeFilterFinder() {
-      DepanFxNodeFiltersChooser
+      DepanFxNodeFiltersSequenceChooser
           .runNodeFiltersFinder(workspace, dialogRunner, scene, nodeFiltersDialogRegistry)
           .ifPresent(r -> filterConsumer.accept(getTableRow().getItem(), r));
     }
   }
 
   /**
-   * Provide an existing link matcher.
+   * Provide an existing node filter.
    */
-  public static Optional<DepanFxWorkspaceResource<DepanFxBaseFilterData>>
+  public static Optional<DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>>
       runNodeFiltersFinder(
             DepanFxWorkspace workspace,
             DepanFxDialogRunner dialogRunner,
@@ -190,7 +190,7 @@ public class DepanFxNodeFiltersChooser {
     return chooser.showOpenDialog(scene)
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
-            p, DepanFxBaseFilterData.class));
+            p, DepanFxNodeFilterSequenceData.class));
   }
 
   private static DepanFxResourceChooser prepareChooser(

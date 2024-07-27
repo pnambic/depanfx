@@ -1,13 +1,11 @@
 package com.pnambic.depanfx.nodeview.gui;
 
-import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.graph_doc.persistence.GraphDocPersistenceContribution;
+import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
-import com.pnambic.depanfx.nodeview.builtins.DepanFxNodeViewLinkDisplayDataBuiltIns;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.plugins.DepanFxAnalysisExtMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -17,8 +15,6 @@ import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
-import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,25 +38,29 @@ public class DepanFxNodeViewConfiguration {
 
   private final DepanFxNodeLayoutRegistry layoutRegistry;
 
+  private final DepanFxNodeFiltersRegistry filterRegistry;
+
   @Autowired
   public DepanFxNodeViewConfiguration(
-      DepanFxNodeLayoutRegistry layoutRegistry) {
+      DepanFxNodeLayoutRegistry layoutRegistry,
+      DepanFxNodeFiltersRegistry filterRegistry) {
     this.layoutRegistry = layoutRegistry;
+    this.filterRegistry = filterRegistry;
   }
 
   @Bean
   public DepanFxAnalysisExtMenuContribution graphNodeViewExtMenu() {
-    return new GraphContribution(layoutRegistry);
+    return new GraphContribution(layoutRegistry, filterRegistry);
   }
 
   @Bean
   public DepanFxAnalysisExtMenuContribution listNodeViewExtMenu() {
-    return new NodeListContribution(layoutRegistry);
+    return new NodeListContribution(layoutRegistry, filterRegistry);
   }
 
   @Bean
   public DepanFxAnalysisExtMenuContribution nodeViewExtMenu() {
-    return new NodeViewContribution(layoutRegistry);
+    return new NodeViewContribution(layoutRegistry, filterRegistry);
   }
 
   private static abstract class BaseNodeViewExtMenuContribution<T>
@@ -77,10 +77,14 @@ public class DepanFxNodeViewConfiguration {
 
     private final DepanFxNodeLayoutRegistry layoutRegistry;
 
+    private final DepanFxNodeFiltersRegistry filterRegistry;
+
     public BaseNodeViewExtMenuContribution(
         DepanFxNodeLayoutRegistry layoutRegistry,
+        DepanFxNodeFiltersRegistry filterRegistry,
         Class<T> resourceType, String menuLabel, String viewExt) {
       this.layoutRegistry = layoutRegistry;
+      this.filterRegistry = filterRegistry;
       this.resourceType = resourceType;
       this.menuLabel = menuLabel;
       this.viewExt = viewExt;
@@ -141,7 +145,7 @@ public class DepanFxNodeViewConfiguration {
         DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace,
         DepanFxNodeViewData viewData) {
       DepanFxNodeViewPanel viewPanel = new DepanFxNodeViewPanel(
-          workspace, dialogRunner, layoutRegistry, viewData);
+          workspace, dialogRunner, layoutRegistry, filterRegistry, viewData);
       scene.addTab(viewPanel.createWorkspaceTab(viewData.getToolName()));
     }
   }
@@ -149,9 +153,11 @@ public class DepanFxNodeViewConfiguration {
   private class GraphContribution
       extends BaseNodeViewExtMenuContribution<GraphDocument> {
 
-    public GraphContribution(DepanFxNodeLayoutRegistry layoutRegistry) {
+    public GraphContribution(
+        DepanFxNodeLayoutRegistry layoutRegistry,
+        DepanFxNodeFiltersRegistry filterRegistry) {
       super(
-          layoutRegistry,
+          layoutRegistry, filterRegistry,
           GraphDocument.class, OPEN_AS_VIEW,
           GraphDocPersistenceContribution.EXTENSION);
     }
@@ -164,12 +170,8 @@ public class DepanFxNodeViewConfiguration {
       DepanFxWorkspaceResource<GraphDocument> graphDocResource =
           (DepanFxWorkspaceResource<GraphDocument>) rsrc;
 
-      GraphDocument graphDoc = graphDocResource.getResource();
-      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayDocRsrc =
-          getContextLinkDisplay(workspace, graphDoc.getContextModelId());
-
       return DepanFxNodeViews.fromGraphDocument(
-          graphDocResource, linkDisplayDocRsrc);
+          graphDocResource, workspace);
     }
 
     @Override
@@ -181,9 +183,11 @@ public class DepanFxNodeViewConfiguration {
   private class NodeListContribution
       extends BaseNodeViewExtMenuContribution<DepanFxNodeList> {
 
-    public NodeListContribution(DepanFxNodeLayoutRegistry layoutRegistry) {
+    public NodeListContribution(
+        DepanFxNodeLayoutRegistry layoutRegistry,
+        DepanFxNodeFiltersRegistry filterRegistry) {
       super(
-          layoutRegistry,
+          layoutRegistry, filterRegistry,
           DepanFxNodeList.class, OPEN_AS_VIEW,
           DepanFxNodeList.NODE_LIST_EXT);
     }
@@ -196,15 +200,8 @@ public class DepanFxNodeViewConfiguration {
       DepanFxWorkspaceResource<DepanFxNodeList> nodeListResource =
           (DepanFxWorkspaceResource<DepanFxNodeList>) rsrc;
 
-      DepanFxNodeList nodeList = nodeListResource.getResource();
-      GraphDocument graphDoc =
-          (GraphDocument) nodeList.getGraphDocResource().getResource();
-      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData>
-          linkDisplayDocRsrc =
-              getContextLinkDisplay(workspace, graphDoc.getContextModelId());
-
       return DepanFxNodeViews.fromNodeList(
-          nodeListResource, linkDisplayDocRsrc);
+          nodeListResource, workspace);
     }
 
     @Override
@@ -216,9 +213,11 @@ public class DepanFxNodeViewConfiguration {
   private static class NodeViewContribution
       extends BaseNodeViewExtMenuContribution<DepanFxNodeViewData> {
 
-    public NodeViewContribution(DepanFxNodeLayoutRegistry layoutRegistry) {
+    public NodeViewContribution(
+        DepanFxNodeLayoutRegistry layoutRegistry,
+        DepanFxNodeFiltersRegistry filterRegistry) {
       super(
-          layoutRegistry,
+          layoutRegistry, filterRegistry,
           DepanFxNodeViewData.class, OPEN_VIEW,
           DepanFxNodeViewData.NODE_VIEW_TOOL_EXT);
     }
@@ -246,26 +245,5 @@ public class DepanFxNodeViewConfiguration {
     public String getOrderKey() {
       return NODE_VIEW_KEY;
     }
-  }
-
-  private DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData>
-      getContextLinkDisplay(
-            DepanFxWorkspace workspace, ContextModelId contextModelId) {
-
-    return DepanFxProjects.getBuiltIn(
-            workspace, DepanFxNodeViewLinkDisplayData.class,
-            c -> byContextModel(c, contextModelId))
-        .orElseGet(() ->
-            DepanFxProjects.getBuiltIn(
-                workspace, DepanFxNodeViewLinkDisplayData.class,
-                DepanFxNodeViewLinkDisplayDataBuiltIns.ALL_EDGES_DOC_PATH)
-            .get());
-  }
-
-  private boolean byContextModel(
-      DepanFxBuiltInContribution<DepanFxNodeViewLinkDisplayData> viewDisplayContrib,
-      ContextModelId contextModelId) {
-    return viewDisplayContrib.getDocument()
-        .getContextModelId().equals(contextModelId);
   }
 }

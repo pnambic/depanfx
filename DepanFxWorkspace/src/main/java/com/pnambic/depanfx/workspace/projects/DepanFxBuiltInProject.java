@@ -133,6 +133,7 @@ public class DepanFxBuiltInProject implements DepanFxProjectSpi {
   public <T> Stream<DepanFxBuiltInContribution<T>> getContributions(
       Class<T> targetType) {
     return builtIns.getContribs()
+        .filter(c -> c.getDocument() != null)
         .filter(c -> targetType.isAssignableFrom(c.getDocument().getClass()))
         .map(c -> (DepanFxBuiltInContribution<T>) c);
   }

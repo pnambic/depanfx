@@ -20,28 +20,29 @@ import java.util.Collections;
 import java.util.Optional;
 
 @Configuration
-public class DepanFxNodeViewLinkDisplayDataBuiltIns {
+public class DepanFxGraphLinkViewBuiltIns {
 
-  private static final String ALL_EDGES_LABEL = "All Edges";
+  private static final String ALL_EDGES_DOC_NAME = "All Edges Display";
 
-  private static final String ALL_EDGES_DESCR = "All Edges";
+  private static final String ALL_EDGES_NAME= "All Edges";
 
-  private static final String ALL_EDGES_DOC_NAME = "All Edges";
+  private static final String ALL_EDGES_DESCR = "All edges.";
 
-  public static final Path ALL_EDGES_DOC_PATH =
+  public static final Path ALL_EDGES_DISPLAY_DOC_PATH =
       DepanFxNodeViewData.NODE_VIEW_TOOL_PATH
           .resolve(ALL_EDGES_DOC_NAME);
 
   @Autowired
-  public DepanFxNodeViewLinkDisplayDataBuiltIns() {
+  public DepanFxGraphLinkViewBuiltIns() {
   }
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeViewLinkDisplayData> allEdgeLinkDisplayDoc() {
-    return new DepanFxBuiltInContribution.Dependent<>(ALL_EDGES_DOC_PATH) {
+    return new DepanFxBuiltInContribution.Dependent<>(ALL_EDGES_DISPLAY_DOC_PATH) {
 
       @Override
-      protected DepanFxNodeViewLinkDisplayData buildDocument(DepanFxBuiltInProject project) {
+      protected DepanFxNodeViewLinkDisplayData buildDocument(
+          DepanFxBuiltInProject project) {
         return buildAllEdgesLinkDisplayData(project);
       }
     };
@@ -64,15 +65,15 @@ public class DepanFxNodeViewLinkDisplayDataBuiltIns {
     DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> allEdgeMatcher =
         optMatcherRsrc.orElseThrow(() ->
             new DepanFxBuiltInContribution.MissingDependencyException(
-                ALL_EDGES_DOC_PATH,
+                ALL_EDGES_DISPLAY_DOC_PATH,
                 DepanFxLinkMatcherBuiltIns.MATCH_ALL_DOC_PATH));
 
     LinkDisplayEntry linkDisplayEntry =
-        new LinkDisplayEntry(ALL_EDGES_LABEL, allEdgeMatcher, lineDisplayData);
+        new LinkDisplayEntry(ALL_EDGES_NAME, allEdgeMatcher, lineDisplayData);
 
     DepanFxNodeViewLinkDisplayData result =
         new DepanFxNodeViewLinkDisplayData(
-            ALL_EDGES_LABEL, ALL_EDGES_DESCR,
+            ALL_EDGES_NAME, ALL_EDGES_DESCR,
             BaseContextDefinition.MODEL_ID,
             Collections.singletonList(linkDisplayEntry));
     return result;

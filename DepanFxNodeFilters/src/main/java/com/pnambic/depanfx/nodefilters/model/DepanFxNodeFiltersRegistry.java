@@ -47,6 +47,10 @@ public class DepanFxNodeFiltersRegistry {
     void prepareTransport(PersistDocumentTransportBuilder builder);
   }
 
+  public interface NodeFilterFactory {
+    DepanFxBaseFilter<?> buildFilter(DepanFxBaseFilterData filterData);
+  }
+
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeFiltersRegistry.class);
 
@@ -69,6 +73,11 @@ public class DepanFxNodeFiltersRegistry {
         .get();
   }
 
+  public NodeFilterFactory buildFilterFactory(
+      GraphModel graphModel, Collection<GraphNode> targetNodes) {
+    return new RegistryFactory(graphModel, targetNodes);
+  }
+
   public void prepareTransport(PersistDocumentTransportBuilder builder) {
     contribs.forEach(c -> c.prepareTransport(builder));
   }
@@ -83,5 +92,25 @@ public class DepanFxNodeFiltersRegistry {
           filter.getClass().getName(), caller);
     }
     return result;
+  }
+
+  private class RegistryFactory implements NodeFilterFactory {
+
+    private final GraphModel graphModel;
+
+    private final Collection<GraphNode> targetNodes;
+
+    public RegistryFactory(
+        GraphModel graphModel,
+        Collection<GraphNode> targetNodes) {
+      this.graphModel = graphModel;
+      this.targetNodes = targetNodes;
+    }
+
+    @Override
+    public DepanFxBaseFilter<?> buildFilter(DepanFxBaseFilterData filterData) {
+      return DepanFxNodeFiltersRegistry.this.buildFilter(
+          filterData, graphModel, targetNodes);
+    }
   }
 }

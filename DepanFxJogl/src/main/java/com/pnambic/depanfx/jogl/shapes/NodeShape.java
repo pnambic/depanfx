@@ -12,6 +12,8 @@ public class NodeShape implements JoglShape, JoglPickable {
 
   public static final float STEP_TOLERANCE = 10.0f;
 
+  public boolean isVisible;
+
   public JoglColor fillColor;
 
   public JoglColor borderColor;
@@ -42,10 +44,12 @@ public class NodeShape implements JoglShape, JoglPickable {
   private TextureLoader labelTexture;
 
   private NodeShape(
+      boolean isVisible,
       JoglColor fillColor, JoglColor borderColor, float borderWidth,
       double shapeX, double shapeY, double shapeZ,
       double targetX, double targetY, double targetZ,
       boolean showLabel, String labelText, Object pickObject) {
+    this.isVisible = isVisible;
     this.fillColor = fillColor;
     this.borderColor = borderColor;
     this.borderWidth = borderWidth;
@@ -61,10 +65,12 @@ public class NodeShape implements JoglShape, JoglPickable {
   }
 
   public NodeShape(
+      boolean isVisible,
       JoglColor fillColor, JoglColor borderColor, float borderWidth,
       double initialX, double initialY, double initialZ,
       boolean showLabel, String labelText, Object pickObject) {
-    this(fillColor, borderColor, borderWidth,
+    this(isVisible,
+        fillColor, borderColor, borderWidth,
         initialX, initialY, initialZ,
         initialX, initialY, initialZ,
         showLabel, labelText, pickObject);
@@ -73,6 +79,7 @@ public class NodeShape implements JoglShape, JoglPickable {
   @Override
   public NodeShape forUpdate() {
     NodeShape result = new NodeShape(
+        isVisible,
         fillColor, borderColor, borderWidth,
         shapeX, shapeY, shapeZ,
         targetX, targetY, targetZ,
@@ -83,6 +90,10 @@ public class NodeShape implements JoglShape, JoglPickable {
 
   @Override
   public void draw(GL2 gl, JoglRenderer renderer) {
+    if (!isVisible) {
+      return;
+    }
+
     gl.glTranslated(shapeX, shapeY, shapeZ);
     renderShape(gl);
     renderBorder(gl);

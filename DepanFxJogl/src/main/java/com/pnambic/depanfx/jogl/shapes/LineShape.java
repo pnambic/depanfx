@@ -77,8 +77,11 @@ public class LineShape implements JoglShape {
 
   private NodeShape getShape(Object end, JoglRenderer renderer) {
     JoglShape sourceShape = renderer.getRenderShape(end);
-    if (sourceShape instanceof NodeShape) {
-      return (NodeShape) sourceShape;
+    if (sourceShape instanceof NodeShape node) {
+      if (node.isVisible) {
+        return node;
+      }
+      return null;
     }
     return null;
   }

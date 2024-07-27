@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DepanFxNodeViewLinkDisplayData extends DepanFxBaseToolData {
@@ -73,7 +72,6 @@ public class DepanFxNodeViewLinkDisplayData extends DepanFxBaseToolData {
   public boolean isFor(ContextModelId modelId) {
     return this.contextModelId.equals(modelId);
   }
-
 
   public Optional<LinkDisplayEntry> getLinkDisplayEntry(GraphEdge edge) {
     return linkDisplayEntries.stream()

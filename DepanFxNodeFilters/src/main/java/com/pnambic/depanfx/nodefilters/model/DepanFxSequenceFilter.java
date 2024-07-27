@@ -18,7 +18,6 @@ package com.pnambic.depanfx.nodefilters.model;
 import com.google.common.collect.ImmutableSet;
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxSequenceFilterData;
 
 import java.util.Collection;
@@ -73,32 +72,10 @@ public class DepanFxSequenceFilter
   private List<DepanFxBaseFilter<?>> buildFilters(
       DepanFxNodeFiltersRegistry nodeFiltersRegistry,
       GraphModel graphModel, Collection<GraphNode> filterNodes) {
-    NodeFilterFactory factory = new NodeFilterFactory(
-            nodeFiltersRegistry, graphModel, filterNodes);
+    DepanFxNodeFiltersRegistry.NodeFilterFactory factory =
+            nodeFiltersRegistry.buildFilterFactory(graphModel, filterNodes);
     return getFilterData().streamFilters()
         .map(factory::buildFilter)
         .collect(Collectors.toList());
-  }
-
-  public static class NodeFilterFactory {
-
-    private final DepanFxNodeFiltersRegistry nodeFiltersRegistry;
-
-    private final GraphModel graphModel;
-
-    private final Collection<GraphNode> targetNodes;
-
-    public NodeFilterFactory(
-        DepanFxNodeFiltersRegistry nodeFiltersRegistry,
-        GraphModel graphModel,
-        Collection<GraphNode> targetNodes) {
-      this.nodeFiltersRegistry = nodeFiltersRegistry;
-      this.graphModel = graphModel;
-      this.targetNodes = targetNodes;
-    }
-
-    public DepanFxBaseFilter<?> buildFilter(DepanFxBaseFilterData filterData) {
-      return nodeFiltersRegistry.buildFilter(filterData, graphModel, targetNodes);
-    }
   }
 }

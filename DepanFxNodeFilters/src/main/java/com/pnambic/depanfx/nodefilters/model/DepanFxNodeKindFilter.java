@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.nodefilters.model;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeKindFilterData;
@@ -42,10 +43,16 @@ public class DepanFxNodeKindFilter
   }
 
   private Predicate<GraphNode> getFilterPredicate() {
-    if (getFilterData().isExclusionFilter()) {
-      return this::exclusionTest;
+    if (getFilterData().getNodeKind() != null) {
+      if (getFilterData().isExclusionFilter()) {
+        return this::exclusionTest;
+      }
+      return this::inclusionTest;
     }
-    return this::inclusionTest;
+    if (getFilterData().isExclusionFilter()) {
+      return Predicates.alwaysFalse();
+    }
+    return Predicates.alwaysTrue();
   }
 
   private boolean inclusionTest(GraphNode node) {

@@ -21,8 +21,10 @@ public class JoglShapes {
 
   public static void installShape(
       JoglPane joglPane, GraphNode node,
-      DepanFxNodeLocationData location, DepanFxNodeDisplayData display) {
-    createShape(node, location, display)
+      DepanFxNodeLocationData location,
+      DepanFxNodeDisplayData display,
+      boolean isVisible) {
+    createShape(node, location, display, isVisible)
         .ifPresent(s -> joglPane.updateShape(node, s));
   }
 
@@ -47,6 +49,24 @@ public class JoglShapes {
     }
   }
 
+  public static void updateDisplay(
+      JoglPane joglPane, GraphNode node, DepanFxNodeDisplayData display) {
+    JoglShape joglShape = joglPane.getShape(node);
+    if (joglShape instanceof NodeShape nodeShape) {
+      nodeShape.fillColor = JoglColors.toJogl(display.color);
+      joglPane.updateShape(node, nodeShape);
+    }
+  }
+
+  public static void updateVisibility(
+      JoglPane joglPane, GraphNode node, boolean isVisible) {
+    JoglShape joglShape = joglPane.getShape(node);
+    if (joglShape instanceof NodeShape nodeShape) {
+      nodeShape.isVisible = isVisible;
+      joglPane.updateShape(node, nodeShape);
+    }
+  }
+
   private static void updateNodeSelection(
       NodeShape nodeShape, boolean isSelected) {
     if (isSelected) {
@@ -59,13 +79,15 @@ public class JoglShapes {
   }
 
   private static Optional<JoglShape> createShape(
-      GraphNode node, DepanFxNodeLocationData location, DepanFxNodeDisplayData display) {
+      GraphNode node, DepanFxNodeLocationData location,
+      DepanFxNodeDisplayData display, boolean isVisible) {
 
     DepanFxJoglColor viewColor = display.color;
     JoglColor joglColor = JoglColors.toJogl(viewColor);
 
     String nodeName = guessName(node);
     return Optional.of(new NodeShape(
+        isVisible,
         joglColor, joglColor, 1.0f,
         location.xPos, location.yPos, location.zPos,
         true, nodeName, node));

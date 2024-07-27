@@ -6,8 +6,9 @@ import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.docdata.NodeInfoBlock;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
-import com.pnambic.depanfx.nodeview.builtins.DepanFxNodeViewLinkDisplayDataBuiltIns;
+import com.pnambic.depanfx.nodeview.builtins.DepanFxGraphLinkViewBuiltIns;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
@@ -15,6 +16,7 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewSceneData;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
 import com.pnambic.depanfx.persistence.PersistMarshalContext;
@@ -44,7 +46,23 @@ public class DepanFxNodeViewDataConverter
 
   public static final String NODE_VIEW_TAG = "node-view";
 
+  public static final String NODE_VIEW_NAME = "node-view-name";
+
+  public static final String NODE_VIEW_DESCR = "node-view-descr";
+
   public static final String GRAPH_DOC = "graph-doc";
+
+  public static final String SCENE_DATA = "scene-data";
+
+  private static final String AVAILABLE_NODE_DOC = "avail-nodes-rsrc";
+
+  private static final String VISIBLE_NODE_DOC = "visible-nodes-rsrc";
+
+  public static final String NODE_DISPLAY_DOC = "node-display-doc";
+
+  private static final String REMAINDER_NODES_VISIBLE = "remainder-nodes-visible";
+
+  private static final String REMAINDER_NODES_DISPLAY = "remainder-nodes-display";
 
   private static final String AVAILABLE_EDGE_DOC = "avail-edges-rsrc";
 
@@ -52,17 +70,11 @@ public class DepanFxNodeViewDataConverter
 
   public static final String LINK_DISPLAY_DOC = "link-display-doc";
 
-  public static final String NODE_VIEW_NAME = "node-view-name";
+  private static final String REMAINDER_EDGES_VISIBLE = "remainder-edges-visible";
 
-  public static final String NODE_VIEW_DESCR = "node-view-descr";
+  private static final String REMAINDER_EDGES_LABEL = "remainder-edges-label";
 
-  public static final String SCENE_DATA = "scene-data";
-
-  private static final String REMAINDER_VISIBLE = "remainder-visible";
-
-  private static final String REMAINDER_LABEL = "remainder-label";
-
-  private static final String REMAINDER_DISPLAY = "remainder-display";
+  private static final String REMAINDER_EDGES_DISPLAY = "remainder-edges-display";
 
   private static final Class<?>[] ALLOWED_TYPES = new Class[] {
       DepanFxNodeViewData.class,
@@ -75,24 +87,34 @@ public class DepanFxNodeViewDataConverter
 
   private static final PersistTagDataLoader.TagDescriptor[] TAG_DATA_DESCR =
       new PersistTagDataLoader.TagDescriptor[] {
+          new PersistTagDataLoader.TagDescriptor(NODE_VIEW_NAME, String.class),
+          new PersistTagDataLoader.TagDescriptor(NODE_VIEW_DESCR, String.class),
           new PersistTagDataLoader.TagDescriptor(
               GRAPH_DOC, DepanFxWorkspaceResource.class),
+          new PersistTagDataLoader.TagDescriptor(
+              SCENE_DATA, DepanFxNodeViewSceneData.class),
+          new PersistTagDataLoader.TagDescriptor(
+              AVAILABLE_NODE_DOC, DepanFxWorkspaceResource.class),
+          new PersistTagDataLoader.TagDescriptor(
+              VISIBLE_NODE_DOC, DepanFxWorkspaceResource.class),
+          new PersistTagDataLoader.TagDescriptor(
+              NODE_DISPLAY_DOC, DepanFxWorkspaceResource.class),
+          new PersistTagDataLoader.TagDescriptor(
+              REMAINDER_NODES_VISIBLE, Boolean.class),
+          new PersistTagDataLoader.TagDescriptor(
+              REMAINDER_NODES_DISPLAY, DepanFxNodeDisplayData.class),
           new PersistTagDataLoader.TagDescriptor(
               AVAILABLE_EDGE_DOC, DepanFxWorkspaceResource.class),
           new PersistTagDataLoader.TagDescriptor(
               VISIBLE_EDGE_DOC, DepanFxWorkspaceResource.class),
           new PersistTagDataLoader.TagDescriptor(
               LINK_DISPLAY_DOC, DepanFxWorkspaceResource.class),
-          new PersistTagDataLoader.TagDescriptor(NODE_VIEW_NAME, String.class),
-          new PersistTagDataLoader.TagDescriptor(NODE_VIEW_DESCR, String.class),
           new PersistTagDataLoader.TagDescriptor(
-              SCENE_DATA, DepanFxNodeViewSceneData.class),
+              REMAINDER_EDGES_VISIBLE, Boolean.class),
           new PersistTagDataLoader.TagDescriptor(
-              REMAINDER_VISIBLE, Boolean.class),
+              REMAINDER_EDGES_LABEL, String.class),
           new PersistTagDataLoader.TagDescriptor(
-              REMAINDER_LABEL, String.class),
-          new PersistTagDataLoader.TagDescriptor(
-              REMAINDER_DISPLAY, DepanFxLineDisplayData.class)
+              REMAINDER_EDGES_DISPLAY, DepanFxLineDisplayData.class)
       };
 
   private static final Map<String, String> TAGS_ALIAS = Collections.emptyMap();
@@ -101,8 +123,13 @@ public class DepanFxNodeViewDataConverter
       new PersistTagDataLoader(TAG_DATA_DESCR, TAGS_ALIAS);
 
   private static final String[] META_TAGS = new String[] {
-      GRAPH_DOC, LINK_DISPLAY_DOC, NODE_VIEW_NAME, NODE_VIEW_DESCR, SCENE_DATA,
-      REMAINDER_VISIBLE, REMAINDER_LABEL, REMAINDER_DISPLAY
+      NODE_VIEW_NAME, NODE_VIEW_DESCR,
+      GRAPH_DOC,
+      SCENE_DATA,
+      AVAILABLE_NODE_DOC, VISIBLE_NODE_DOC, NODE_DISPLAY_DOC,
+      REMAINDER_NODES_VISIBLE, REMAINDER_NODES_DISPLAY,
+      AVAILABLE_EDGE_DOC, VISIBLE_EDGE_DOC, LINK_DISPLAY_DOC,
+      REMAINDER_EDGES_VISIBLE, REMAINDER_EDGES_LABEL, REMAINDER_EDGES_DISPLAY
   };
 
   @Override
@@ -124,13 +151,39 @@ public class DepanFxNodeViewDataConverter
   public void marshal(PersistMarshalContext dstContext, Object source) {
     DepanFxNodeViewData viewData = (DepanFxNodeViewData) source;
 
+    DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableNodeRsrc =
+        viewData.getAvailableNodeRsrc();
+    DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc =
+        viewData.getVisibleNodeRsrc();
+
     DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableEdgeRsrc =
         viewData.getAvailableEdgeRsrc();
     DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc =
         viewData.getVisibleEdgeRsrc();
 
     marshalObject(dstContext,
+        NODE_VIEW_NAME, viewData.getToolName());
+    marshalObject(dstContext,
+        NODE_VIEW_DESCR, viewData.getToolDescription());
+
+    marshalObject(dstContext,
         GRAPH_DOC, viewData.getGraphDocRsrc());
+
+    marshalObject(dstContext,
+        SCENE_DATA, viewData.getSceneData());
+
+    if (availableNodeRsrc != null) {
+      marshalObject(dstContext, AVAILABLE_NODE_DOC, availableNodeRsrc);
+    }
+    if (visibleEdgeRsrc != null) {
+      marshalObject(dstContext, VISIBLE_NODE_DOC, visibleNodeRsrc);
+    }
+    marshalObject(dstContext,
+        NODE_DISPLAY_DOC, viewData.getNodeDisplayDocRsrc());
+    marshalObject(dstContext,
+        REMAINDER_NODES_VISIBLE, viewData.getRemainderNodesVisible());
+    marshalObject(dstContext,
+        REMAINDER_NODES_DISPLAY, viewData.getRemainderNodesDisplay());
 
     if (availableEdgeRsrc != null) {
       marshalObject(dstContext, AVAILABLE_EDGE_DOC, availableEdgeRsrc);
@@ -142,17 +195,11 @@ public class DepanFxNodeViewDataConverter
     marshalObject(dstContext,
         LINK_DISPLAY_DOC, viewData.getLinkDisplayDocRsrc());
     marshalObject(dstContext,
-        NODE_VIEW_NAME, viewData.getToolName());
+        REMAINDER_EDGES_VISIBLE, viewData.getRemainderEdgesVisible());
     marshalObject(dstContext,
-        NODE_VIEW_DESCR, viewData.getToolDescription());
+        REMAINDER_EDGES_LABEL, viewData.getRemainderEdgesLabel());
     marshalObject(dstContext,
-        SCENE_DATA, viewData.getSceneData());
-    marshalObject(dstContext,
-        REMAINDER_VISIBLE, viewData.getRemainerVisible());
-    marshalObject(dstContext,
-        REMAINDER_LABEL, viewData.getRemainderLabel());
-    marshalObject(dstContext,
-        REMAINDER_DISPLAY, viewData.getRemainerDisplay());
+        REMAINDER_EDGES_DISPLAY, viewData.getRemainderEdgeDisplay());
 
     viewData.getViewNodes().stream()
         .forEach(n -> marshalNodeInfo(dstContext, n, viewData));
@@ -174,25 +221,47 @@ public class DepanFxNodeViewDataConverter
         metaData.getObject(GRAPH_DOC, DepanFxWorkspaceResource.class);
 
     @SuppressWarnings("unchecked")
+    DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableNodeRsrc =
+        metaData.getObject(AVAILABLE_NODE_DOC, DepanFxWorkspaceResource.class);
+
+    @SuppressWarnings("unchecked")
+    DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> nodeDisplayDocRsrc =
+        metaData.getObject(NODE_DISPLAY_DOC, DepanFxWorkspaceResource.class);
+
+    boolean remainderNodesVisible = metaData.getBoolean(
+        REMAINDER_NODES_VISIBLE,
+        DepanFxNodeViewData.DEFAULT_REMAINDER_NODES_VISIBLE);
+    DepanFxNodeDisplayData remainderNodeDisplay =
+        metaData.getObject(
+            REMAINDER_NODES_DISPLAY, DepanFxNodeDisplayData.class,
+            DepanFxNodeViewData.DEFAULT_REMAINDER_NODE_DISPLAY);
+
+    @SuppressWarnings("unchecked")
+    DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc =
+        metaData.getObject(VISIBLE_NODE_DOC, DepanFxWorkspaceResource.class);
+
+    @SuppressWarnings("unchecked")
     DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableEdgeRsrc =
         metaData.getObject(AVAILABLE_EDGE_DOC, DepanFxWorkspaceResource.class);
 
     @SuppressWarnings("unchecked")
-    DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visbibleEdgeRsrc =
+    DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc =
         metaData.getObject(VISIBLE_EDGE_DOC, DepanFxWorkspaceResource.class);
 
     @SuppressWarnings("unchecked")
     DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayDocRsrc =
         metaData.getObject(LINK_DISPLAY_DOC, DepanFxWorkspaceResource.class);
 
-    // [Apr-2024] Remainder fields newly added.
-    boolean remainderVisible = metaData.getBoolean(
-        REMAINDER_VISIBLE, DepanFxNodeViewData.DEFAULT_REMAINDER_VISIBLE);
-    String remainderLabel = metaData.getString(
-        REMAINDER_LABEL, DepanFxNodeViewData.DEFAULT_REMAINDER_LABEL);
-    DepanFxLineDisplayData remainderDisplay =
-        metaData.getObject(REMAINDER_DISPLAY, DepanFxLineDisplayData.class,
-            DepanFxNodeViewData.DEFAULT_REMAINDER_DISPLAY);
+    boolean remainderEdgesVisible = metaData.getBoolean(
+        REMAINDER_EDGES_VISIBLE,
+        DepanFxNodeViewData.DEFAULT_REMAINDER_NODES_VISIBLE);
+    String remainderEdgesLabel = metaData.getString(
+        REMAINDER_EDGES_LABEL,
+        DepanFxNodeViewData.DEFAULT_REMAINDER_EDGES_LABEL);
+    DepanFxLineDisplayData remainderEdgeDisplay =
+        metaData.getObject(
+            REMAINDER_EDGES_DISPLAY, DepanFxLineDisplayData.class,
+            DepanFxNodeViewData.DEFAULT_REMAINDER_EDGE_DISPLAY);
 
     // Extract the basis for model mapping.
     GraphModel graphModel = graphDocRsrc.getResource().getGraph();
@@ -231,14 +300,17 @@ public class DepanFxNodeViewDataConverter
       linkDisplayDocRsrc =
           DepanFxProjects.getBuiltIn(workspace,
               DepanFxNodeViewLinkDisplayData.class,
-              DepanFxNodeViewLinkDisplayDataBuiltIns.ALL_EDGES_DOC_PATH)
+              DepanFxGraphLinkViewBuiltIns.ALL_EDGES_DISPLAY_DOC_PATH)
           .get();
     }
 
-    return new DepanFxNodeViewData(toolName, toolDescr, sceneData,
-        graphDocRsrc, availableEdgeRsrc, visbibleEdgeRsrc, linkDisplayDocRsrc,
-        viewNodes, nodeLocations, nodeDisplay, edgeDisplay,
-        remainderVisible, remainderLabel, remainderDisplay);
+    return new DepanFxNodeViewData(toolName, toolDescr,
+        graphDocRsrc, viewNodes, nodeLocations, nodeDisplay, edgeDisplay,
+        sceneData,
+        availableNodeRsrc, visibleNodeRsrc, nodeDisplayDocRsrc,
+        remainderNodesVisible, remainderNodeDisplay,
+        availableEdgeRsrc, visibleEdgeRsrc, linkDisplayDocRsrc,
+        remainderEdgesVisible, remainderEdgesLabel, remainderEdgeDisplay);
   }
 
   private void marshalNodeInfo(

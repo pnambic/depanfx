@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewNodeDisplayDialog" >
+   <VBox spacing="10" layoutX="10" layoutY="10"
+         AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"
+         AnchorPane.topAnchor="10" AnchorPane.bottomAnchor="10">
+
+         <Label text="Display Filters"/>
+
+         <TableView fx:id="nodesDisplayTable" editable="true"
+            VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn text="Label"
+                    editable="true"
+                    prefWidth="100" minWidth="50">
+                </TableColumn>
+                <TableColumn text="Filter"
+                    editable="false"
+                    prefWidth="200" minWidth="80">
+                </TableColumn>
+                <TableColumn text="Node Count"
+                    editable="false"
+                    prefWidth="80" minWidth="80">
+                </TableColumn>
+                <TableColumn text="Color"
+                    prefWidth="60"
+                    editable="true" resizable="false" sortable="false">
+                </TableColumn>
+                <TableColumn text="Edit"
+                    prefWidth="50"
+                    editable="true" resizable="false" sortable="false">
+                </TableColumn>
+            </columns>
+         </TableView>
+
+         <HBox>
+            <Button text="Add Row" onAction="#addNodeDisplayRow" />
+         </HBox>
+
+         <Label text="Tool Name"/>
+
+         <HBox spacing="10">
+            <TextField fx:id="toolNameField" editable="true"
+                  promptText="Display label for link display choices."
+                  HBox.hgrow="ALWAYS"/>
+         </HBox>
+
+         <Label text="Tool Description"/>
+
+         <HBox spacing="10">
+            <TextField fx:id="toolDescriptionField" editable="true"
+                  promptText="Description for link display choices."
+                  HBox.hgrow="ALWAYS"/>
+         </HBox>
+
+         <Label text="Select Destination File"/>
+
+         <HBox spacing="10">
+            <TextField fx:id="destinationField" editable="false" promptText="No file selected"
+                  HBox.hgrow="ALWAYS"/>
+            <Button text="Browse" onAction="#openDestinationChooser"
+                  HBox.hgrow="ALWAYS"/>
+         </HBox>
+
+         <HBox spacing="10">
+            <Button text="Cancel" onAction="#handleRevert"/>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button text="Apply" onAction="#handleApply"/>
+            <Button text="Confirm" onAction="#handleConfirm"/>
+         </HBox>
+
+   </VBox>
+
+</AnchorPane>

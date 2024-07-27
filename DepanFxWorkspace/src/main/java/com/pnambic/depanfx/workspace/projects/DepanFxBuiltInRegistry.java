@@ -78,8 +78,9 @@ public class DepanFxBuiltInRegistry {
       DepanFxBuiltInProject project,
       List<DepanFxBuiltInContribution<?>> dependContribs) {
 
-    int prevSize = dependContribs.size();
     while (dependContribs.size() > 0) {
+      int prevSize = dependContribs.size();
+
       // Avoid complexities of generic resolution with Collectors.toList()
       List<DepanFxBuiltInContribution<?>> nextContribs = new ArrayList<>();
       dependContribs.stream()
@@ -109,7 +110,7 @@ public class DepanFxBuiltInRegistry {
       }
     } catch (DepanFxBuiltInContribution.MissingDependencyException errDep) {
       // Don't worry about it.  We'll get the dependency on a latter iteration.
-      LOG.debug(errDep.getMessage());
+      LOG.info(errDep.getMessage());
     }
     return false;
   }

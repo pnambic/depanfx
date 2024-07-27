@@ -3,6 +3,7 @@ package com.pnambic.depanfx.nodeview.tooldata;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
@@ -18,9 +19,16 @@ import javafx.scene.paint.Color;
 
 public class DepanFxNodeViewData extends DepanFxBaseToolData {
 
-  public static final boolean DEFAULT_REMAINDER_VISIBLE = true;
+  public static final DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
+      EMPTY_AVAILABLE_NODES = null;
 
-  public static final String DEFAULT_REMAINDER_LABEL = "Remainder";
+  public static final DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
+      EMPTY_VISIBLE_NODES = null;
+
+  public static final boolean DEFAULT_REMAINDER_NODES_VISIBLE = true;
+
+  public static final DepanFxNodeDisplayData DEFAULT_REMAINDER_NODE_DISPLAY =
+      buildRemainerNodeDisplay();
 
   public static final DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
       EMPTY_AVAILABLE_EDGES = null;
@@ -28,8 +36,12 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   public static final DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
       EMPTY_VISIBLE_EDGES = null;
 
-  public static final DepanFxLineDisplayData DEFAULT_REMAINDER_DISPLAY =
-      buildRemainerDisplay();
+  public static final boolean DEFAULT_REMAINDER_EDGES_VISIBLE = true;
+
+  public static final String DEFAULT_REMAINDER_EDGES_LABEL = "Remainder";
+
+  public static final DepanFxLineDisplayData DEFAULT_REMAINDER_EDGE_DISPLAY =
+      buildRemainerEdgeDisplay();
 
   public static final String NODE_VIEW_TOOL_EXT = "dnvi";
 
@@ -40,9 +52,52 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   public static final Path NODE_VIEW_TOOL_PATH =
       DepanFxProjects.TOOLS_PATH.resolve(NODE_VIEW_DIR);
 
+  private final DepanFxWorkspaceResource<GraphDocument> graphDocRsrc;
+
+  private final Collection<GraphNode> viewNodes;
+
+  private final Map<GraphNode, DepanFxNodeLocationData> nodeLocations;
+
+  private final Map<GraphNode, DepanFxNodeDisplayData> nodeDisplay;
+
+  private final Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay;
+
+  /**
+   * How the graph is observed.
+   */
   private final DepanFxNodeViewSceneData sceneData;
 
-  private final DepanFxWorkspaceResource<GraphDocument> graphDocRsrc;
+  /**
+   * The set of nodes shown as selectable for display.
+   */
+  private DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
+      availableNodeRsrc;
+
+  // cached from nodeDisplayDocRsrc if needed.
+  private DepanFxNodeFilterSequenceData availableNodesDoc;
+
+  /**
+   * The set of nodes that are visible in the render.
+   *
+   * This is typically a subset of the nodes in {@link #availableNodeRsrc},
+   * but it may be independent.
+   */
+  private DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
+      visibleNodeRsrc;
+
+  /**
+   * Source of default rendering data for nodes.
+   *
+   * Nodes are matched to a filter, then rendered with that filters's selections.
+   * Provides a {@link DepanFxNodeViewNodeDisplayData},
+   * with a stream of {@code NodeDisplayEnity} values.
+   */
+  private final DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData>
+      nodeDisplayDocRsrc;
+
+  private boolean remainderNodesVisible;
+
+  private DepanFxNodeDisplayData remainderNodesDisplay;
 
   /**
    * The set of edges shown as selectable for display.
@@ -51,13 +106,16 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
    * but may be independent.
    */
   private DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
-      availEdgeRsrc;
+      availableEdgeRsrc;
+
+  // cached from linkDisplayDocRsrc if needed.
+  private DepanFxLinkMatcherSequenceDocument availableEdgeDoc;
 
   /**
    * The set of edges that are visible in the render.
    *
    * This set is often initialized from {@link #linkDisplayDocRsrc},
-   * and is typically a subset of the edges in {@link #availEdgeRsrc},
+   * and is typically a subset of the edges in {@link #availableEdgeRsrc},
    * but it may be independent from either.
    */
   private DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
@@ -73,65 +131,176 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   private final DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData>
       linkDisplayDocRsrc;
 
-  private final Collection<GraphNode> viewNodes;
+  private boolean remainerEdgesVisible;
 
-  private final Map<GraphNode, DepanFxNodeLocationData> nodeLocations;
+  private String remainderEdgesLabel;
 
-  private final Map<GraphNode, DepanFxNodeDisplayData> nodeDisplay;
-
-  private final Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay;
-
-  private boolean remainerVisible;
-
-  private String remainderLabel;
-
-  private DepanFxLineDisplayData remainderDisplay;
+  private DepanFxLineDisplayData remainderEdgesDisplay;
 
   public DepanFxNodeViewData(
       String toolName, String toolDescription,
-      DepanFxNodeViewSceneData sceneData,
+
       DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
-      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availEdgeRsrc,
-      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc,
-      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayDocRsrc,
       Collection<GraphNode> viewNodes,
       Map<GraphNode, DepanFxNodeLocationData> nodeLocations,
       Map<GraphNode, DepanFxNodeDisplayData> nodeDisplay,
       Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay,
-      boolean remainerVisible,
-      String remainderLabel,
-      DepanFxLineDisplayData remainderDisplay) {
+
+      DepanFxNodeViewSceneData sceneData,
+
+      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableNodeRsrc,
+      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc,
+      DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> nodeDisplayDocRsrc,
+      boolean remainerNodesVisible,
+      DepanFxNodeDisplayData remainderNodesDisplay,
+
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableEdgeRsrc,
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc,
+      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayDocRsrc,
+      boolean remainerEdgesVisible,
+      String remainderEdgesLabel,
+      DepanFxLineDisplayData remainderEdgesDisplay) {
+
     super(toolName, toolDescription);
-    this.sceneData = sceneData;
     this.graphDocRsrc = graphDocRsrc;
-    this.availEdgeRsrc = availEdgeRsrc;
-    this.visibleEdgeRsrc = visibleEdgeRsrc;
-    this.linkDisplayDocRsrc = linkDisplayDocRsrc;
     this.viewNodes = viewNodes;
     this.nodeLocations = nodeLocations;
     this.nodeDisplay = nodeDisplay;
     this.edgeDisplay = edgeDisplay;
-    this.remainerVisible = remainerVisible;
-    this.remainderLabel = remainderLabel;
-    this.remainderDisplay = remainderDisplay;
-  }
 
-  public DepanFxNodeViewSceneData getSceneData() {
-    return sceneData;
+    this.sceneData = sceneData;
+
+    this.availableNodeRsrc = availableNodeRsrc;
+    this.visibleNodeRsrc = visibleNodeRsrc;
+    this.nodeDisplayDocRsrc = nodeDisplayDocRsrc;
+    this.remainderNodesVisible = remainerNodesVisible;
+    this.remainderNodesDisplay = remainderNodesDisplay;
+
+    this.availableNodeRsrc = availableNodeRsrc;
+    this.visibleEdgeRsrc = visibleEdgeRsrc;
+    this.linkDisplayDocRsrc = linkDisplayDocRsrc;
+    this.remainerEdgesVisible = remainerEdgesVisible;
+    this.remainderEdgesLabel = remainderEdgesLabel;
+    this.remainderEdgesDisplay = remainderEdgesDisplay;
   }
 
   public DepanFxWorkspaceResource<GraphDocument> getGraphDocRsrc() {
     return graphDocRsrc;
   }
 
+  /** Provide defensive copy. */
+  public Collection<GraphNode> getViewNodes() {
+    return new ArrayList<>(viewNodes);
+  }
+
+  /** Provide defensive copy. */
+  public Map<GraphNode, DepanFxNodeLocationData> getNodeLocations() {
+    return new HashMap<>(nodeLocations);
+  }
+
+  /** Provide defensive copy. */
+  public Map<GraphNode, DepanFxNodeDisplayData> getNodeDisplay() {
+    return new HashMap<>(nodeDisplay);
+  }
+
+  /** Provide defensive copy. */
+  public Map<GraphEdge, DepanFxLineDisplayData> getEdgeDisplay() {
+    return new HashMap<>(edgeDisplay);
+  }
+
+  public DepanFxNodeLocationData getNodeLocation(GraphNode node) {
+    return nodeLocations.get(node);
+  }
+
+  public DepanFxNodeDisplayData getNodeDisplay(GraphNode node) {
+    return nodeDisplay.get(node);
+  }
+
+  public DepanFxLineDisplayData getLineDisplay(GraphEdge edge) {
+    return edgeDisplay.get(edge);
+  }
+
+  public DepanFxNodeViewSceneData getSceneData() {
+    return sceneData;
+  }
+
+  /////////////////////////////////////
+  // Nodes and Filters
+
+  public DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
+      getAvailableNodeRsrc() {
+    return availableNodeRsrc;
+  }
+
+  public void setAvailableNodeRsrc(
+      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableNodeRsrc) {
+    this.availableNodeRsrc = availableNodeRsrc;
+    this.availableNodesDoc = null;
+  }
+
+  /**
+   * Provide filter sequence document for the available nodes.
+   * An implicit result derived from the node display matchers is provided
+   * if the view has not saved its available nodes.
+   */
+  public DepanFxNodeFilterSequenceData getAvailableNodesDoc() {
+    if (availableNodeRsrc != null) {
+      return availableNodeRsrc.getResource();
+    }
+    if (availableNodesDoc == null) {
+      availableNodesDoc =
+          nodeDisplayDocRsrc.getResource().asNodeFilterSequenceDoc();
+    }
+    return availableNodesDoc;
+  }
+
+  public DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
+      getVisibleNodeRsrc() {
+    return visibleNodeRsrc;
+  }
+
+  public void setVisibleNodeRsrc(
+      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc) {
+    this.visibleNodeRsrc = visibleNodeRsrc;
+  }
+
+  /**
+   * Provide filter sequence document for the visible nodes.
+   * An implicit result derived from the available filters is used
+   * if the view has not saved its visible nodes.
+   */
+  public DepanFxNodeFilterSequenceData getVisibleNodesDoc() {
+    if (visibleNodeRsrc != null) {
+      return visibleNodeRsrc.getResource();
+    }
+    return getAvailableNodesDoc();
+  }
+
+  public DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData>
+      getNodeDisplayDocRsrc() {
+    return nodeDisplayDocRsrc;
+  }
+
+  public boolean getRemainderNodesVisible() {
+    return remainderNodesVisible;
+  }
+
+  public DepanFxNodeDisplayData getRemainderNodesDisplay() {
+    return remainderNodesDisplay;
+  }
+
+  /////////////////////////////////////
+  // Links, Edges, and Matchers
+
   public DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
       getAvailableEdgeRsrc() {
-    return availEdgeRsrc;
+    return availableEdgeRsrc;
   }
 
   public void setAvailableEdgeRsrc(
       DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availEdgeRsrc) {
-    this.availEdgeRsrc = availEdgeRsrc;
+    this.availableEdgeRsrc = availEdgeRsrc;
+    availableEdgeDoc = null;
   }
 
   /**
@@ -140,10 +309,14 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
    * if the view has not saved its available edges.
    */
   public DepanFxLinkMatcherSequenceDocument getAvailableEdgesDoc() {
-    if (availEdgeRsrc != null) {
-      return availEdgeRsrc.getResource();
+    if (availableEdgeRsrc != null) {
+      return availableEdgeRsrc.getResource();
     }
-    return linkDisplayDocRsrc.getResource().asLinkMatcherSequenceDoc();
+    if (availableEdgeDoc == null) {
+      availableEdgeDoc =
+          linkDisplayDocRsrc.getResource().asLinkMatcherSequenceDoc();
+    }
+    return availableEdgeDoc;
   }
 
   public DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
@@ -173,57 +346,31 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
     return linkDisplayDocRsrc;
   }
 
-  /** Provide defensive copy. */
-  public Collection<GraphNode> getViewNodes() {
-    return new ArrayList<>(viewNodes);
+  public boolean getRemainderEdgesVisible() {
+    return remainerEdgesVisible;
   }
 
-  /** Provide defensive copy. */
-  public Map<GraphNode, DepanFxNodeLocationData> getNodeLocations() {
-    return new HashMap<>(nodeLocations);
+  public String getRemainderEdgesLabel() {
+    return remainderEdgesLabel;
   }
 
-  /** Provide defensive copy. */
-  public Map<GraphNode, DepanFxNodeDisplayData> getNodeDisplay() {
-    return new HashMap<>(nodeDisplay);
+  public DepanFxLineDisplayData getRemainderEdgeDisplay() {
+    return remainderEdgesDisplay;
   }
 
-  /** Provide defensive copy. */
-  public Map<GraphEdge, DepanFxLineDisplayData> getEdgeDisplay() {
-    return new HashMap<>(edgeDisplay);
+  /////////////////////////////////////
+  // For constructor
+
+  private static DepanFxNodeDisplayData buildRemainerNodeDisplay() {
+    DepanFxNodeDisplayData result =
+        DepanFxNodeDisplayData.buildSimpleNodeDisplayData();
+    return result;
   }
 
-  /** Provide defensive copy. */
-  public DepanFxNodeLocationData getNodeLocation(GraphNode node) {
-    return nodeLocations.get(node);
-  }
-
-  /** Provide defensive copy. */
-  public DepanFxNodeDisplayData getNodeDisplay(GraphNode node) {
-    return nodeDisplay.get(node);
-  }
-
-  /** Provide defensive copy. */
-  public DepanFxLineDisplayData getLineDisplay(GraphEdge edge) {
-    return edgeDisplay.get(edge);
-  }
-
-  public boolean getRemainerVisible() {
-    return remainerVisible;
-  }
-
-  public String getRemainderLabel() {
-    return remainderLabel;
-  }
-
-  public DepanFxLineDisplayData getRemainerDisplay() {
-    return remainderDisplay;
-  }
-
-  private static DepanFxLineDisplayData buildRemainerDisplay() {
+  private static DepanFxLineDisplayData buildRemainerEdgeDisplay() {
     DepanFxLineDisplayData result =
         DepanFxLineDisplayData.buildSimpleLineDisplayData();
     result.lineColor = DepanFxJoglColor.of(Color.GRAY);
-    return result ;
+    return result;
   }
 }
