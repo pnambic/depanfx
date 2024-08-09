@@ -149,6 +149,10 @@ public class DepanFxNodeViewNodeDisplayDialog
 
     TableColumn<EditNodeDisplay, String> filterPathColumn =
         columnBinder.bind("displayFilterName");
+    filterPathColumn.setCellFactory(c ->
+        new DepanFxNodeFiltersChooser.NodeFilterCell<>(
+            workspace, dialogRunner, getScene(), filtersRegistry,
+            (t, r) -> updateFilter(t, r)));
 
     TableColumn<EditNodeDisplay, Number> countColumn =
         columnBinder.next();
@@ -354,8 +358,14 @@ public class DepanFxNodeViewNodeDisplayDialog
   }
 
   private void updateFilter(
+      EditNodeDisplay editNodeDisplay,
+      DepanFxWorkspaceResource<DepanFxBaseFilterData> filterRsrc) {
+    editNodeDisplay.setDisplayFilterRsrc(filterRsrc);
+  }
+
+  private void updateFilter(
       int index, DepanFxWorkspaceResource<DepanFxBaseFilterData> filterRsrc) {
-    nodesDisplayData.get(index).setDisplayFilterRsrc(filterRsrc);
+    updateFilter(nodesDisplayData.get(index), filterRsrc);
   }
 
   private static class ColorCellFactory

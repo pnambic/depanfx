@@ -136,7 +136,7 @@ public class DepanFxNodeViewLinkDisplayDialog
         columnBinder.bind("linkDisplayName");
 
     // filePathColumn.setCellFactory(column -> new DisplayNameCellFactory());
-    filePathColumn.setCellFactory(column ->
+    filePathColumn.setCellFactory(c ->
         new DepanFxLinkMatcherChooser.LinkMatcherCell<>(
             getWorkspace(), dialogRunner,
             linksDisplayTable.getScene(),
