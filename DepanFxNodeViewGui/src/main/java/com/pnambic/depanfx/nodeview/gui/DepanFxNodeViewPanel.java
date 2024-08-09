@@ -513,8 +513,7 @@ public class DepanFxNodeViewPanel {
   private void runEditLinkDisplayDialog() {
     Stage edgeDisplayDialog =
         DepanFxNodeViewLinkDisplayDialog.runEditDialog(
-            this, linkDisplayRsrc.getDocument(),
-            edgeDisplay.getLinkDisplayInfo(), dialogRunner);
+            edgeDisplay, linkDisplayRsrc.getDocument(), dialogRunner);
 
     sideViews.add(edgeDisplayDialog);
     edgeDisplayDialog.setOnCloseRequest(

@@ -354,14 +354,8 @@ public class DepanFxNodeViewNodeDisplayDialog
   }
 
   private void updateFilter(
-      EditNodeDisplay editNodeDisplay,
-      DepanFxWorkspaceResource<DepanFxBaseFilterData> filterRsrc) {
-    editNodeDisplay.setDisplayFilterRsrc(filterRsrc);
-  }
-
-  private void updateFilter(
       int index, DepanFxWorkspaceResource<DepanFxBaseFilterData> filterRsrc) {
-    updateFilter(nodesDisplayData.get(index), filterRsrc);
+    nodesDisplayData.get(index).setDisplayFilterRsrc(filterRsrc);
   }
 
   private static class ColorCellFactory

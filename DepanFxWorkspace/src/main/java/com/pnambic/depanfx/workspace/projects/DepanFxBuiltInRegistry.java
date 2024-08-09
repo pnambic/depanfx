@@ -95,6 +95,7 @@ public class DepanFxBuiltInRegistry {
       dependContribs = nextContribs;
     }
     // Loaded all dependent contributions.
+    LOG.info("All built-ins loaded successfully");
     return Collections.emptyList();
   }
 

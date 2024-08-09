@@ -13,10 +13,11 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
-import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
+import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
+import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -89,7 +91,7 @@ public class DepanFxNodeViewLinkDisplayDialog
   /**
    * Where live changes happen.
    */
-  private DepanFxNodeViewPanel viewPanel;
+  private EdgeDisplayController displayControl;
 
   public DepanFxNodeViewLinkDisplayDialog(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
@@ -101,16 +103,15 @@ public class DepanFxNodeViewLinkDisplayDialog
    * Edge Display Editor is a modeless dialog coupled to the graph view.
    */
   public static Stage runEditDialog(
-      DepanFxNodeViewPanel viewPanel,
+      EdgeDisplayController displayControl,
       DepanFxProjectDocument projDoc,
-      DepanFxNodeViewLinkDisplayData viewLinkData,
       DepanFxDialogRunner dialogRunner) {
 
     Dialog<DepanFxNodeViewLinkDisplayDialog> dlg =
         DepanFxResourcePerspectives.prepareDialog(
-            viewLinkData, dialogRunner,
+            displayControl.getLinkDisplayInfo(), dialogRunner,
             DepanFxNodeViewLinkDisplayDialog.class);
-    dlg.getController().setViewPanel(viewPanel);
+    dlg.getController().setEdgeDisplayControl(displayControl);
     dlg.getController().setDestination(projDoc);
     return dlg.runModeless(EDIT_LINK_DISPLAY);
   }
@@ -141,6 +142,14 @@ public class DepanFxNodeViewLinkDisplayDialog
             linksDisplayTable.getScene(),
             (t, r) -> updateMatcher(t, r)));
 
+    TableColumn<EditLinkDisplay, Number> countColumn = columnBinder.next();
+    countColumn.setStyle("-fx-alignment: CENTER-RIGHT;");
+    Object blix;
+    countColumn.setCellValueFactory(
+        r -> new SimpleIntegerProperty(
+            displayControl.getDisplayMatcherEdgeCount(
+                r.getValue().linkDisplayRsrc.getResource())));
+
     TableColumn<EditLinkDisplay, DepanFxLineForm> lineFormColumn =
         columnBinder.bind("lineForm", DepanFxLineForm.class);
 
@@ -168,16 +177,16 @@ public class DepanFxNodeViewLinkDisplayDialog
     TableColumn<EditLinkDisplay, DepanFxLineDirection> lineDirectionColumn =
         columnBinder.bind("lineDirection", DepanFxLineDirection.class);
 
-    TableColumn<EditLinkDisplay, LinkOrderOperation> linkOperationColumn =
-        columnBinder.bind("linkOrderOperation", LinkOrderOperation.class);
-    linkOperationColumn.setOnEditCommit(this::onLinkOperationEvent);
+    TableColumn<EditLinkDisplay, String> rowActionColumn =
+        columnBinder.next();
+    rowActionColumn.setCellFactory(p -> new ActionCell());
   }
 
   /**
    * Both tooldata and view panel are required to populate the display table.
    */
-  public void setViewPanel(DepanFxNodeViewPanel viewPanel) {
-    this.viewPanel = viewPanel;
+  public void setEdgeDisplayControl(EdgeDisplayController displayControl) {
+    this.displayControl = displayControl;
     prepareDisplayTable();
   }
 
@@ -193,12 +202,12 @@ public class DepanFxNodeViewLinkDisplayDialog
 
   private void prepareDisplayTable() {
     // Wait for both to be configured.
-    if ((viewPanel == null) || (linkDisplayData == null)) {
+    if ((displayControl == null) || (linkDisplayData == null)) {
       return;
     }
     List<EditLinkDisplay> editLinkDisplay =
         linkDisplayData.streamLinkDisplay()
-        .map(e -> new EditLinkDisplay(viewPanel, e))
+        .map(e -> new EditLinkDisplay(displayControl, e))
         .collect(Collectors.toList());
 
     linksDiplayTableData = FXCollections.observableArrayList(editLinkDisplay);
@@ -207,43 +216,24 @@ public class DepanFxNodeViewLinkDisplayDialog
 
   @FXML
   private void addLinkDisplayRow() {
+    DepanFxLinkMatcherChooser.runLinkMatcherFinder(
+        workspace, dialogRunner, getScene())
+        .ifPresent(this::addLinkDisplayRow);
+  }
+
+  private void addLinkDisplayRow(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
     DepanFxLineDisplayData lineDisplay =
         DepanFxLineDisplayData.buildSimpleLineDisplayData();
-    LinkDisplayEntry rowDisplay = new LinkDisplayEntry("", null, lineDisplay);
-    linksDiplayTableData.add(new EditLinkDisplay(viewPanel, rowDisplay));
+    LinkDisplayEntry rowDisplay = new LinkDisplayEntry(
+        matcherRsrc.getResource().getToolName(), matcherRsrc, lineDisplay);
+    linksDiplayTableData.add(new EditLinkDisplay(displayControl, rowDisplay));
   }
 
   private void onUpdateLabelEvent(
       CellEditEvent<EditLinkDisplay, String> updateEvent) {
     getEventLinkDisplay(updateEvent)
         .linkDisplayLabelProp.set(updateEvent.getNewValue());
-  }
-
-  private void onLinkOperationEvent(
-      CellEditEvent<EditLinkDisplay, LinkOrderOperation> updateEvent) {
-    EditLinkDisplay editRow = updateEvent.getRowValue();
-    int rowIndex = updateEvent.getTablePosition().getRow();
-    switch (updateEvent.getNewValue()) {
-    case DOWN:
-      if (rowIndex < linksDiplayTableData.size() - 1) {
-        EditLinkDisplay moveRow = linksDiplayTableData.remove(rowIndex);
-        linksDiplayTableData.add(rowIndex + 1, moveRow);
-      }
-      editRow.linkOrderOperationProp.set(LinkOrderOperation.NONE);
-      return;
-    case UP:
-      if (rowIndex > 0) {
-        EditLinkDisplay moveRow = linksDiplayTableData.remove(rowIndex);
-        linksDiplayTableData.add(rowIndex - 1, moveRow);
-      }
-      editRow.linkOrderOperationProp.set(LinkOrderOperation.NONE);
-      return;
-    case DELETE:
-      linksDiplayTableData.remove(rowIndex);
-      return;
-    case NONE:
-      return;
-    }
   }
 
   /////////////////////////////////////
@@ -284,34 +274,39 @@ public class DepanFxNodeViewLinkDisplayDialog
         updateEvent.getTablePosition().getRow());
   }
 
+  private void updateMatcher(
+      EditLinkDisplay editLinkDisplay,
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
+    editLinkDisplay.setLinkDisplayRsrc(matcherRsrc);
+  }
+
   /////////////////////////////////////
   // FXML handlers.
 
   @FXML
   protected void handleRevert() {
     closeDialog();
-    viewPanel.revertLinkDisplay();
+    displayControl.revertLinkDisplay();
   }
 
   @FXML
   protected void handleApply() {
-    closeDialog();
     DepanFxNodeViewLinkDisplayData toolData = prepareResult();
-    viewPanel.setLinkDisplayInfo(toolData);
+    displayControl.setLinkDisplayInfo(toolData);
   }
 
+  @Override
   @FXML
   protected void handleConfirm() {
     super.handleConfirm();
-    getWorkspaceResource().ifPresent(viewPanel::setLinkDisplayResource);
+    getWorkspaceResource().ifPresent(displayControl::setLinkDisplayResource);
   }
 
   /////////////////////////////////////
-  // Internal Table Classes
+  // Table Cell Classes
 
-  private static enum LinkOrderOperation {
-    NONE, UP, DOWN, DELETE;
-  }
+  /////////////////////////////////////
+  // Internal Table Classes
 
   private static class ColorCellFactory
       extends TableCell<EditLinkDisplay, Color> {
@@ -366,21 +361,91 @@ public class DepanFxNodeViewLinkDisplayDialog
     }
   }
 
-  private void updateMatcher(
-      EditLinkDisplay editLinkDisplay,
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
-    editLinkDisplay.setLinkDisplayRsrc(matcherRsrc);
+  public class ActionCell extends TableCell<EditLinkDisplay, String> {
+
+    @Override
+    protected void updateItem(String item, boolean empty) {
+      super.updateItem(item, empty);
+
+      if (!empty) {
+        setText("...");
+        setGraphic(null);
+        stylizeCell();
+        return;
+      }
+      setText(null);
+      setGraphic(null);
+    }
+
+    private void stylizeCell() {
+      DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+      builder.appendActionItem("Select Matcher...",
+          e -> runMatcherChooser(getIndex()));
+      appendMoveOps(builder);
+      builder.appendSeparator();
+      builder.appendActionItem("Delete",
+          e -> deleteFilter(getIndex()));
+      setContextMenu(builder.build());
+    }
+
+    private void appendMoveOps(DepanFxContextMenuBuilder builder) {
+      int index = getIndex();
+      boolean hasUp = index > 0;
+      boolean hasDown = index < linksDiplayTableData.size() - 1;
+      if (!hasUp && !hasDown ) {
+        return;
+      }
+      builder.appendSeparator();
+      if (hasUp) {
+        builder.appendActionItem("Up", e -> moveDisplayEntry(getIndex(), -1));
+      }
+      if (hasDown) {
+        builder.appendActionItem("Down", e -> moveDisplayEntry(getIndex(), 1));
+      }
+    }
   }
+
+  private void runMatcherChooser(int index) {
+    DepanFxLinkMatcherChooser.runLinkMatcherFinder(
+        workspace, dialogRunner, getScene())
+    .ifPresent(r -> updateMatcher(index, r));
+  }
+
+  private void moveDisplayEntry(int srcIndex, int moveBy) {
+
+    int dstIndex = srcIndex + moveBy;
+    if (dstIndex < 0 || dstIndex >= linksDiplayTableData.size()) {
+      LOG.error("Bad filter move to {} from {} by {}",
+          dstIndex, srcIndex, moveBy);
+      return;
+    }
+    EditLinkDisplay moveItem = linksDiplayTableData.remove(srcIndex);
+    linksDiplayTableData.add(dstIndex, moveItem);
+  }
+
+  private void deleteFilter(int index) {
+    linksDiplayTableData.remove(index);
+  }
+
+  private void updateMatcher(
+      int index,
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
+
+    updateMatcher(linksDiplayTableData.get(index), matcherRsrc);
+  }
+
+  /////////////////////////////////////
+  // Editable Link properties, with helpers
 
   private static class LinkDisplayUpdater implements ChangeListener<Object> {
 
-    private final DepanFxNodeViewPanel viewPanel;
+    private final EdgeDisplayController displayControl;
 
     private final EditLinkDisplay linkDisplay;
 
     public LinkDisplayUpdater(
-        DepanFxNodeViewPanel viewPanel, EditLinkDisplay linkDisplay) {
-      this.viewPanel = viewPanel;
+        EdgeDisplayController displayControl, EditLinkDisplay linkDisplay) {
+      this.displayControl = displayControl;
       this.linkDisplay = linkDisplay;
     }
 
@@ -391,8 +456,8 @@ public class DepanFxNodeViewLinkDisplayDialog
       LOG.info("update display for {}",
           linkDisplay.linkDisplayLabelProp.getValue());
       LinkDisplayEntry display = toLinkDisplayEntry(linkDisplay);
-      viewPanel.updateEdgeDisplayByMatcher(
-          linkDisplay.linkDisplayRsrc, display);
+      displayControl.updateEdgeDisplayByMatcher(
+          linkDisplay.linkDisplayRsrc.getResource(), display);
     }
   }
 
@@ -411,7 +476,7 @@ public class DepanFxNodeViewLinkDisplayDialog
     LinkDisplayEntry result = new LinkDisplayEntry(
         editData.linkDisplayLabelProperty().getValue(),
         editData.linkDisplayRsrc,
-        lineDisplayData );
+        lineDisplayData);
     return result ;
   }
 
@@ -447,11 +512,9 @@ public class DepanFxNodeViewLinkDisplayDialog
 
     public ObjectProperty<DepanFxLineDirection> lineDirectionProp;
 
-    public ObjectProperty<LinkOrderOperation> linkOrderOperationProp;
-
     public EditLinkDisplay(
-        DepanFxNodeViewPanel viewPanel, LinkDisplayEntry linkDisplay) {
-      updater = new LinkDisplayUpdater(viewPanel, this);
+        EdgeDisplayController displayControl, LinkDisplayEntry linkDisplay) {
+      updater = new LinkDisplayUpdater(displayControl, this);
 
       // Unpack data from source.
       linkDisplayLabelProp =
@@ -486,10 +549,6 @@ public class DepanFxNodeViewLinkDisplayDialog
 
       lineDirectionProp = new SimpleObjectProperty<>(lineDisplay.lineDir);
       lineDirectionProp.addListener(updater);
-
-      linkOrderOperationProp =
-          new SimpleObjectProperty<>(LinkOrderOperation.NONE);
-      linkOrderOperationProp.addListener(updater);
     }
 
     public void setLinkDisplayRsrc(
@@ -545,10 +604,6 @@ public class DepanFxNodeViewLinkDisplayDialog
 
     public ObjectProperty<DepanFxLineDirection> lineDirectionProperty() {
       return lineDirectionProp;
-    }
-
-    public ObjectProperty<LinkOrderOperation> linkOrderOperationProperty() {
-      return linkOrderOperationProp;
     }
   }
 }

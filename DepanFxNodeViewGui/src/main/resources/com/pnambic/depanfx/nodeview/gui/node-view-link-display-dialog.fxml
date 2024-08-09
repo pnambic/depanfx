@@ -14,7 +14,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            prefWidth="900"
+            prefWidth="960"
             fx:controller="com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewLinkDisplayDialog" >
    <VBox spacing="10" layoutX="10" layoutY="10"
          AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"
@@ -32,6 +32,10 @@
                 <TableColumn text="Matcher"
                     editable="false"
                     prefWidth="160" minWidth="80">
+                </TableColumn>
+                <TableColumn text="Edge Count"
+                    editable="false"
+                    prefWidth="80" minWidth="80">
                 </TableColumn>
                 <TableColumn text="Form"
                     prefWidth="60"
@@ -65,8 +69,8 @@
                     prefWidth="80"
                     editable="true" resizable="false" sortable="false">
                 </TableColumn>
-                <TableColumn text="Order"
-                    prefWidth="60"
+                <TableColumn text="Edit"
+                    prefWidth="50" minWidth="50"
                     editable="true" resizable="false" sortable="false">
                 </TableColumn>
             </columns>

@@ -187,7 +187,7 @@ public class EdgeDisplayController {
     return edgeVisibleGroup.keySet().stream();
   }
 
-  public void setLinkDisplayRsrc(
+  public void setLinkDisplayResource(
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc) {
     setLinkDisplayInfo(displayRsrc.getResource());
   }
