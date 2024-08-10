@@ -18,6 +18,8 @@ public class NodeShape implements JoglShape, JoglPickable {
 
   public JoglColor borderColor;
 
+  public JoglColor highlightColor;
+
   public float borderWidth;
 
   public double shapeX;
@@ -41,17 +43,19 @@ public class NodeShape implements JoglShape, JoglPickable {
   /////////////////////////////////////
   // Cached rendering entities
 
-  private TextureLoader labelTexture;
+  protected TextureLoader labelTexture;
 
-  private NodeShape(
+  protected NodeShape(
       boolean isVisible,
-      JoglColor fillColor, JoglColor borderColor, float borderWidth,
+      JoglColor fillColor, JoglColor borderColor, JoglColor highlightColor,
+      float borderWidth,
       double shapeX, double shapeY, double shapeZ,
       double targetX, double targetY, double targetZ,
       boolean showLabel, String labelText, Object pickObject) {
     this.isVisible = isVisible;
     this.fillColor = fillColor;
     this.borderColor = borderColor;
+    this.highlightColor = highlightColor;
     this.borderWidth = borderWidth;
     this.shapeX = shapeX;
     this.shapeY = shapeY;
@@ -66,11 +70,13 @@ public class NodeShape implements JoglShape, JoglPickable {
 
   public NodeShape(
       boolean isVisible,
-      JoglColor fillColor, JoglColor borderColor, float borderWidth,
+      JoglColor fillColor, JoglColor borderColor, JoglColor highlightColor,
+      float borderWidth,
       double initialX, double initialY, double initialZ,
       boolean showLabel, String labelText, Object pickObject) {
     this(isVisible,
-        fillColor, borderColor, borderWidth,
+        fillColor, borderColor, highlightColor,
+        borderWidth,
         initialX, initialY, initialZ,
         initialX, initialY, initialZ,
         showLabel, labelText, pickObject);
@@ -80,7 +86,8 @@ public class NodeShape implements JoglShape, JoglPickable {
   public NodeShape forUpdate() {
     NodeShape result = new NodeShape(
         isVisible,
-        fillColor, borderColor, borderWidth,
+        fillColor, borderColor, highlightColor,
+        borderWidth,
         shapeX, shapeY, shapeZ,
         targetX, targetY, targetZ,
         showLabel, labelText, pickObject);
@@ -140,17 +147,21 @@ public class NodeShape implements JoglShape, JoglPickable {
     shapeZ = targetZ;
   }
 
-  private void renderShape(GL2 gl) {
+  protected void renderShape(GL2 gl) {
+    setColor(gl, fillColor);
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
-    gl.glColor3d(fillColor.red, fillColor.green, fillColor.blue);
     renderVertices(gl);
     gl.glEnd();
   }
 
-  private void renderBorder(GL2 gl) {
-    gl.glBegin(GL2.GL_LINE_LOOP);
-    gl.glColor3d(borderColor.red, borderColor.green, borderColor.blue);
+  protected void setColor(GL2 gl, JoglColor toColor) {
+    gl.glColor3d(toColor.red, toColor.green, toColor.blue);
+  }
+
+  protected void renderBorder(GL2 gl) {
+    setColor(gl, borderColor);
     gl.glLineWidth(borderWidth);
+    gl.glBegin(GL2.GL_LINE_LOOP);
     renderVertices(gl);
     gl.glEnd();
   }

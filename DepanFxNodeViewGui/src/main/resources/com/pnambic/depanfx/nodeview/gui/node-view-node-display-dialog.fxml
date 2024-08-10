@@ -36,13 +36,30 @@
                     editable="false"
                     prefWidth="80" minWidth="80">
                 </TableColumn>
-                <TableColumn text="Color"
-                    prefWidth="60"
-                    editable="true" resizable="false" sortable="false">
+                <TableColumn text="Shape"
+                    prefWidth="90"
+                    editable="true"
+                    sortable="false">
+                </TableColumn>
+                <TableColumn text="Fill"
+                    prefWidth="80"
+                    editable="true"
+                    resizable="false" sortable="false">
+                </TableColumn>
+                <TableColumn text="Border"
+                    prefWidth="80"
+                    editable="true"
+                    resizable="false" sortable="false">
+                </TableColumn>
+                <TableColumn text="Highlight"
+                    prefWidth="80"
+                    editable="true"
+                    resizable="false" sortable="false">
                 </TableColumn>
                 <TableColumn text="Edit"
-                    prefWidth="50" minWidth="50"
-                    editable="true" resizable="false" sortable="false">
+                    prefWidth="50" minWidth="30"
+                    editable="true"
+                    resizable="false" sortable="false">
                 </TableColumn>
             </columns>
          </TableView>

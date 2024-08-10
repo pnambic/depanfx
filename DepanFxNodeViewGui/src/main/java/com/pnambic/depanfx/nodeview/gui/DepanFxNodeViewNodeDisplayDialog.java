@@ -19,6 +19,7 @@ import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersChooser;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersDialogRegistry;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodeview.jogl.JoglColors;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglShape;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData.NodeDisplayEntry;
@@ -162,10 +163,20 @@ public class DepanFxNodeViewNodeDisplayDialog
             displayControl.getDisplayFilterNodeCount(
                 r.getValue().getFilterData())));
 
-    TableColumn<EditNodeDisplay, Color> nodeColorColumn =
-        columnBinder.bind("nodeColor");
-    nodeColorColumn.setEditable(true);
-    nodeColorColumn.setCellFactory(column -> new ColorCellFactory());
+    TableColumn<EditNodeDisplay, DepanFxJoglShape> shapeColumn =
+        columnBinder.bind("shape", DepanFxJoglShape.class);
+
+    TableColumn<EditNodeDisplay, Color> fillColorColumn =
+        columnBinder.bind("fillColor");
+    fillColorColumn.setCellFactory(c -> new ColorCellFactory());
+
+    TableColumn<EditNodeDisplay, Color> borderColorColumn =
+        columnBinder.bind("borderColor");
+    borderColorColumn.setCellFactory(c -> new ColorCellFactory());
+
+    TableColumn<EditNodeDisplay, Color> highlightColorColumn =
+        columnBinder.bind("highlightColor");
+    highlightColorColumn.setCellFactory(c -> new ColorCellFactory());
 
     TableColumn<EditNodeDisplay, String> rowActionColumn =
         columnBinder.next();
@@ -383,9 +394,12 @@ public class DepanFxNodeViewNodeDisplayDialog
       }
       colorPicker.setValue(color != null ? color : Color.WHITE);
       setGraphic(colorPicker);
+      // getTableColumn().getCellObservableValue(getIndex()).s;
       colorPicker.setOnAction(event -> {
-        EditNodeDisplay nodeDisplay = getTableRow().getItem();
-        nodeDisplay.nodeColorProp.setValue(colorPicker.getValue());
+        if (getTableColumn().getCellObservableValue(getIndex())
+            instanceof ObjectProperty<Color> objProp) {
+          objProp.setValue(colorPicker.getValue());
+        }
       });
     }
   }
@@ -416,8 +430,10 @@ public class DepanFxNodeViewNodeDisplayDialog
 
   private static NodeDisplayEntry toNodeDisplayEntry(EditNodeDisplay editData) {
     DepanFxNodeDisplayData nodeDisplayData = new DepanFxNodeDisplayData(
-        true, DepanFxSizerModel.DEFAULT,
-        JoglColors.of(editData.nodeColorProperty().getValue()));
+        true, DepanFxJoglShape.SQUARE, DepanFxSizerModel.DEFAULT,
+        JoglColors.of(editData.fillColorProperty().getValue()),
+        JoglColors.of(editData.borderColorProperty().getValue()),
+        JoglColors.of(editData.highlightColorProperty().getValue()));
 
     NodeDisplayEntry result = new NodeDisplayEntry(
         editData.nodeDisplayLabelProperty().getValue(),
@@ -441,7 +457,13 @@ public class DepanFxNodeViewNodeDisplayDialog
 
     public DepanFxWorkspaceResource<DepanFxBaseFilterData> displayFilterRsrc;
 
-    public ObjectProperty<Color> nodeColorProp;
+    public ObjectProperty<DepanFxJoglShape> shapeProp;
+
+    public ObjectProperty<Color> fillColorProp;
+
+    public ObjectProperty<Color> borderColorProp;
+
+    public ObjectProperty<Color> highlightColorProp;
 
     public EditNodeDisplay(
         NodeDisplayController displayControl, NodeDisplayEntry nodeDisplay) {
@@ -457,9 +479,17 @@ public class DepanFxNodeViewNodeDisplayDialog
 
       DepanFxNodeDisplayData displayInfo = nodeDisplay.getNodeDisplay();
 
-      nodeColorProp =
-          new SimpleObjectProperty<>(JoglColors.of(displayInfo.color));
-      nodeColorProp.addListener(updater);
+      fillColorProp =
+          new SimpleObjectProperty<>(JoglColors.of(displayInfo.fillColor));
+      fillColorProp.addListener(updater);
+
+      borderColorProp =
+          new SimpleObjectProperty<>(JoglColors.of(displayInfo.borderColor));
+      borderColorProp.addListener(updater);
+
+      highlightColorProp =
+          new SimpleObjectProperty<>(JoglColors.of(displayInfo.highlightColor));
+      highlightColorProp.addListener(updater);
 
       // nodeDisplay.getNodeDisplay().nodeSizer;
     }
@@ -491,8 +521,16 @@ public class DepanFxNodeViewNodeDisplayDialog
       return displayFilterNameProp;
     }
 
-    public ObjectProperty<Color> nodeColorProperty() {
-      return nodeColorProp;
+    public ObjectProperty<Color> fillColorProperty() {
+      return fillColorProp;
+    }
+
+    public ObjectProperty<Color> borderColorProperty() {
+      return borderColorProp;
+    }
+
+    public ObjectProperty<Color> highlightColorProperty() {
+      return highlightColorProp;
     }
   }
 }

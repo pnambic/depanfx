@@ -20,11 +20,11 @@ import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemNodeKindFilterBuil
 import com.pnambic.depanfx.graph.context.ContextNodeKindId;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglShape;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData.NodeDisplayEntry;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxSizerModel;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
@@ -89,28 +89,32 @@ public class DepanFxFileSystemNodeViewBuiltIns {
 
     kindDisplay.add(buildFileSystemDisplayEntry(project,
         FileSystemContextDefinition.DIRECTORY_NKID,
+        DepanFxJoglShape.ROUNDED_RECTANGLE,
         DepanFxJoglColor.of(Color.ORANGE)));
 
     kindDisplay.add(buildFileSystemDisplayEntry(project,
         FileSystemContextDefinition.DOCUMENT_NKID,
+        DepanFxJoglShape.RECTANGLE,
         DepanFxJoglColor.of(Color.GOLD)));
   }
 
   private static NodeDisplayEntry buildFileSystemDisplayEntry(
       DepanFxBuiltInProject project,
       ContextNodeKindId nodeKind,
+      DepanFxJoglShape shape,
       DepanFxJoglColor color) {
 
     return buildDisplayEntry(
         project,
         FileSystemNodeKindFilterBuiltIns.FILE_SYSTEM_NODE_FILTERS_PATH,
-        nodeKind, color);
+        nodeKind, shape, color);
   }
 
   private static NodeDisplayEntry buildDisplayEntry(
       DepanFxBuiltInProject project,
       Path modelDirectoryPath,
       ContextNodeKindId nodeKind,
+      DepanFxJoglShape shape,
       DepanFxJoglColor color) {
 
     String kindId = nodeKind.getNodeKindKey();
@@ -125,6 +129,6 @@ public class DepanFxFileSystemNodeViewBuiltIns {
 
      return new NodeDisplayEntry(
             kindId, nodeFilterRsrc,
-            new DepanFxNodeDisplayData(true, DepanFxSizerModel.DEFAULT, color));
+            DepanFxNodeDisplayData.buildSimpleNodeDisplayData(shape, color));
   }
 }

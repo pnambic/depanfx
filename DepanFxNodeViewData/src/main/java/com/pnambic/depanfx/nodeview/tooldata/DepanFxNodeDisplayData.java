@@ -9,19 +9,38 @@ public class DepanFxNodeDisplayData implements GraphNodeInfo {
 
   public boolean isVisible;
 
+  public DepanFxJoglShape nodeShape;
+
   public DepanFxSizerModel nodeSizer;
 
-  public DepanFxJoglColor color;
+  public DepanFxJoglColor fillColor;
+
+  public DepanFxJoglColor borderColor;
+
+  public DepanFxJoglColor highlightColor;
 
   public DepanFxNodeDisplayData(
-      boolean isVisible, DepanFxSizerModel nodeSizer, DepanFxJoglColor color) {
+      boolean isVisible,
+      DepanFxJoglShape nodeShape, DepanFxSizerModel nodeSizer,
+      DepanFxJoglColor fillColor, DepanFxJoglColor borderColor,
+      DepanFxJoglColor highlightColor) {
     this.isVisible = isVisible;
+    this.nodeShape = nodeShape;
     this.nodeSizer = nodeSizer;
-    this.color = color;
+    this.fillColor = fillColor;
+    this.borderColor = borderColor;
+    this.highlightColor = highlightColor;
   }
 
   public static DepanFxNodeDisplayData buildSimpleNodeDisplayData() {
-    DepanFxJoglColor nodeColor = DepanFxJoglColor.of(Color.BLUE);
-    return new DepanFxNodeDisplayData(true, DepanFxSizerModel.FIXED, nodeColor);
+    return buildSimpleNodeDisplayData(
+        DepanFxJoglShape.SQUARE, DepanFxJoglColor.of(Color.BLUE));
+  }
+
+  public static DepanFxNodeDisplayData buildSimpleNodeDisplayData(
+      DepanFxJoglShape nodeShape, DepanFxJoglColor nodeColor) {
+    return new DepanFxNodeDisplayData(
+        true, nodeShape, DepanFxSizerModel.FIXED,
+        nodeColor, nodeColor.shift(0.7d), nodeColor.complement());
   }
 }

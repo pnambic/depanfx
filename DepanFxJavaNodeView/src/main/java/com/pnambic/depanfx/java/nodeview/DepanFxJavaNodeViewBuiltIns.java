@@ -22,11 +22,11 @@ import com.pnambic.depanfx.java.context.JavaContextDefinition;
 import com.pnambic.depanfx.java.nodelist.link.JavaNodeKindFilterBuiltIns;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglShape;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData.NodeDisplayEntry;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxSizerModel;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
@@ -86,10 +86,12 @@ public class DepanFxJavaNodeViewBuiltIns {
 
     kindDisplay.add(buildFileSystemDisplayEntry(project,
         FileSystemContextDefinition.DIRECTORY_NKID,
+        DepanFxJoglShape.ROUNDED_RECTANGLE,
         DepanFxJoglColor.of(Color.ORANGE)));
 
     kindDisplay.add(buildFileSystemDisplayEntry(project,
         FileSystemContextDefinition.DOCUMENT_NKID,
+        DepanFxJoglShape.RECTANGLE,
         DepanFxJoglColor.of(Color.GOLD)));
   }
 
@@ -98,55 +100,64 @@ public class DepanFxJavaNodeViewBuiltIns {
 
     kindDisplay.add(buildJavaDisplayEntry(project,
         JavaContextDefinition.CLASS_NKID,
+        DepanFxJoglShape.ROUNDED_RECTANGLE,
         DepanFxJoglColor.of(Color.BLACK)));
 
     kindDisplay.add(buildJavaDisplayEntry(project,
         JavaContextDefinition.FIELD_NKID,
+        DepanFxJoglShape.RECTANGLE,
         DepanFxJoglColor.of(Color.GREEN)));
 
     kindDisplay.add(buildJavaDisplayEntry(project,
         JavaContextDefinition.METHOD_NKID,
+        DepanFxJoglShape.ELLIPSE,
         DepanFxJoglColor.of(Color.LIGHTSALMON)));
 
     kindDisplay.add(buildJavaDisplayEntry(project,
         JavaContextDefinition.MODULE_NKID,
+        DepanFxJoglShape.HEXAGON,
         DepanFxJoglColor.of(Color.SKYBLUE)));
 
     kindDisplay.add(buildJavaDisplayEntry(project,
         JavaContextDefinition.PACKAGE_NKID,
+        DepanFxJoglShape.CIRCLE,
         DepanFxJoglColor.of(Color.BLUE)));
 
     kindDisplay.add(buildJavaDisplayEntry(project,
         JavaContextDefinition.PARAMETER_NKID,
+        DepanFxJoglShape.RECTANGLE,
         DepanFxJoglColor.of(Color.LIGHTPINK)));
   }
 
   private static NodeDisplayEntry buildFileSystemDisplayEntry(
       DepanFxBuiltInProject project,
       ContextNodeKindId nodeKind,
+      DepanFxJoglShape shape,
       DepanFxJoglColor color) {
 
     return buildDisplayEntry(
         project,
         FileSystemNodeKindFilterBuiltIns.FILE_SYSTEM_NODE_FILTERS_PATH,
-        nodeKind, color);
+        nodeKind, shape, color);
   }
 
   private static NodeDisplayEntry buildJavaDisplayEntry(
       DepanFxBuiltInProject project,
       ContextNodeKindId nodeKind,
+      DepanFxJoglShape shape,
       DepanFxJoglColor color) {
 
     return buildDisplayEntry(
         project,
         JavaNodeKindFilterBuiltIns.JAVA_NODE_FILTERS_PATH,
-        nodeKind, color);
+        nodeKind, shape, color);
   }
 
   private static NodeDisplayEntry buildDisplayEntry(
       DepanFxBuiltInProject project,
       Path modelDirectoryPath,
       ContextNodeKindId nodeKind,
+      DepanFxJoglShape shape,
       DepanFxJoglColor color) {
 
     String kindId = nodeKind.getNodeKindKey();
@@ -161,6 +172,6 @@ public class DepanFxJavaNodeViewBuiltIns {
 
      return new NodeDisplayEntry(
             kindId, nodeFilterRsrc,
-            new DepanFxNodeDisplayData(true, DepanFxSizerModel.DEFAULT, color));
+            DepanFxNodeDisplayData.buildSimpleNodeDisplayData(shape, color));
   }
 }

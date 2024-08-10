@@ -4,10 +4,14 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.jogl.JoglColor;
 import com.pnambic.depanfx.jogl.JoglShape;
 import com.pnambic.depanfx.jogl.shapes.NodeShape;
+import com.pnambic.depanfx.jogl.shapes.AwtShape;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglShape;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 
+import java.awt.Shape;
+import java.awt.geom.RoundRectangle2D;
 import java.util.Optional;
 
 import javafx.scene.paint.Color;
@@ -53,7 +57,9 @@ public class JoglShapes {
       JoglPane joglPane, GraphNode node, DepanFxNodeDisplayData display) {
     JoglShape joglShape = joglPane.getShape(node);
     if (joglShape instanceof NodeShape nodeShape) {
-      nodeShape.fillColor = JoglColors.toJogl(display.color);
+      nodeShape.fillColor = JoglColors.toJogl(display.fillColor);
+      nodeShape.borderColor = JoglColors.toJogl(display.borderColor);
+      nodeShape.highlightColor = JoglColors.toJogl(display.highlightColor);
       joglPane.updateShape(node, nodeShape);
     }
   }
@@ -70,11 +76,11 @@ public class JoglShapes {
   private static void updateNodeSelection(
       NodeShape nodeShape, boolean isSelected) {
     if (isSelected) {
-      nodeShape.borderColor = highlightColor(nodeShape.fillColor);
+      nodeShape.borderColor = nodeShape.highlightColor;
       nodeShape.borderWidth = 5.0f;
       return;
     }
-    nodeShape.borderColor = nodeShape.fillColor;
+    nodeShape.borderColor = nodeShape.borderColor;
     nodeShape.borderWidth = 1.0f;
   }
 
@@ -82,13 +88,14 @@ public class JoglShapes {
       GraphNode node, DepanFxNodeLocationData location,
       DepanFxNodeDisplayData display, boolean isVisible) {
 
-    DepanFxJoglColor viewColor = display.color;
-    JoglColor joglColor = JoglColors.toJogl(viewColor);
-
+    JoglColor fillColor = JoglColors.toJogl(display.fillColor);
+    JoglColor borderColor = JoglColors.toJogl(display.borderColor);
+    JoglColor highlightColor = JoglColors.toJogl(display.highlightColor);
     String nodeName = guessName(node);
-    return Optional.of(new NodeShape(
-        isVisible,
-        joglColor, joglColor, 1.0f,
+
+    return Optional.of(new AwtShape(
+        getShape(display.nodeShape), isVisible,
+        fillColor, borderColor, highlightColor, 1.0f,
         location.xPos, location.yPos, location.zPos,
         true, nodeName, node));
   }
@@ -104,10 +111,22 @@ public class JoglShapes {
     return nameWords[lastSplit];
   }
 
-  private static JoglColor highlightColor(JoglColor joglColor) {
-    DepanFxJoglColor viewColor =
-        new DepanFxJoglColor(joglColor.red, joglColor.green, joglColor.blue);
-    Color sysColor = JoglColors.of(viewColor).brighter().brighter();
-    return JoglColors.toJogl(JoglColors.of(sysColor));
+  private static Shape getShape(DepanFxJoglShape joglShape) {
+    switch (joglShape) {
+    case CIRCLE:
+      return JoglShapeKinds.CIRCLE.buildAwtShape();
+    case ELLIPSE:
+      return JoglShapeKinds.ELLIPSE.buildAwtShape();
+    case HEXAGON:
+      return JoglShapeKinds.HEXAGON.buildAwtShape();
+    case RECTANGLE:
+      return JoglShapeKinds.RECTANGLE.buildAwtShape();
+    case ROUNDED_RECTANGLE:
+      return JoglShapeKinds.ROUNDED_RECTANGLE.buildAwtShape();
+    case SQUARE:
+      return JoglShapeKinds.SQUARE.buildAwtShape();
+    default:
+    }
+    return JoglShapeKinds.SQUARE.buildAwtShape();
   }
 }
