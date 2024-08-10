@@ -47,6 +47,8 @@ public class LineShape implements JoglShape {
 
   public Arrow targetArrow;
 
+  public LineRender lineRender;
+
   @Override
   public void draw(GL2 gl, JoglRenderer renderer) {
     if (!isVisible) {
@@ -61,14 +63,19 @@ public class LineShape implements JoglShape {
       return;
     }
 
-    // Render the line.
-    gl.glColor3d(lineColor.red, lineColor.green, lineColor.blue);
-    gl.glLineWidth((float) lineWidth);
+    if (lineRender == null) {
+      lineRender = buildRenderer();
+    }
+    lineRender.prepare(this, sourceShape, targetShape);
+    lineRender.draw(this, gl);
+  }
 
-    gl.glBegin(GL2.GL_LINES);
-    gl.glVertex3d(sourceShape.shapeX, sourceShape.shapeY, sourceShape.shapeZ);
-    gl.glVertex3d(targetShape.shapeX, targetShape.shapeY, targetShape.shapeZ);
-    gl.glEnd();
+  private LineRender buildRenderer() {
+    if (Form.ARCED == lineForm) {
+      return new ArcedLineRender();
+    }
+    // TODO Auto-generated method stub
+    return new StraightLineRender();
   }
 
   @Override
@@ -101,6 +108,8 @@ public class LineShape implements JoglShape {
     result.sourceArrow = sourceArrow;
     result.targetArrow = targetArrow;
 
+    // Expect to regenerate renderer after an update.
+    result.lineRender = null;
     return result;
   }
 }
