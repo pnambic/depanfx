@@ -63,6 +63,7 @@ public enum JoglShapeKinds {
           double yPos = radius * Math.sin(i * stepSize);
           result.lineTo(xPos, yPos);
       }
+      result.closePath();
       return result;
     }
   };
