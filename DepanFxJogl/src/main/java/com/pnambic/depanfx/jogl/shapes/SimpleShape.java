@@ -12,13 +12,14 @@ public class SimpleShape extends NodeShape {
 
   protected SimpleShape(
       boolean isVisible,
-      JoglColor fillColor, JoglColor borderColor, JoglColor highlightColor,
+      JoglColor shapeColor, JoglColor edgeColor,
+      JoglColor borderColor, JoglColor highlightColor,
       float borderWidth,
       double shapeX, double shapeY, double shapeZ,
       double targetX, double targetY, double targetZ,
       boolean showLabel, String labelText, Object pickObject) {
 
-    super(isVisible, fillColor, borderColor, highlightColor,
+    super(isVisible, shapeColor, edgeColor, borderColor, highlightColor,
         borderWidth,
         shapeX, shapeY, shapeZ, targetX, targetY, targetZ,
         showLabel, labelText, pickObject);
@@ -26,12 +27,12 @@ public class SimpleShape extends NodeShape {
 
   public SimpleShape(
       boolean isVisible,
-      JoglColor fillColor, JoglColor borderColor, JoglColor highlightColor,
+      JoglColor shapeColor, JoglColor borderColor, JoglColor highlightColor,
       float borderWidth,
       double initialX, double initialY, double initialZ,
       boolean showLabel, String labelText, Object pickObject) {
     this(isVisible,
-        fillColor, borderColor, highlightColor,
+        shapeColor, borderColor, borderColor, highlightColor,
         borderWidth,
         initialX, initialY, initialZ,
         initialX, initialY, initialZ,
@@ -42,7 +43,7 @@ public class SimpleShape extends NodeShape {
   public SimpleShape forUpdate() {
     SimpleShape result = new SimpleShape(
         isVisible,
-        fillColor, borderColor, highlightColor,
+        shapeColor, edgeColor, borderColor, highlightColor,
         borderWidth,
         shapeX, shapeY, shapeZ,
         targetX, targetY, targetZ,
@@ -53,7 +54,7 @@ public class SimpleShape extends NodeShape {
 
   @Override
   protected void renderShape(GL2 gl) {
-    setColor(gl, fillColor);
+    setShapeColor(gl);
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
     renderVertices(gl);
     gl.glEnd();
@@ -61,7 +62,7 @@ public class SimpleShape extends NodeShape {
 
   @Override
   protected void renderBorder(GL2 gl) {
-    setColor(gl, borderColor);
+    setEdgeColor(gl);
     gl.glLineWidth(borderWidth);
     gl.glBegin(GL2.GL_LINE_LOOP);
     renderVertices(gl);

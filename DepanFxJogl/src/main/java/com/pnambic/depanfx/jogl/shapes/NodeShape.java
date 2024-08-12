@@ -19,7 +19,9 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
 
   public boolean isVisible;
 
-  public JoglColor fillColor;
+  public JoglColor shapeColor;
+
+  public JoglColor edgeColor;
 
   public JoglColor borderColor;
 
@@ -52,13 +54,15 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
 
   protected NodeShape(
       boolean isVisible,
-      JoglColor fillColor, JoglColor borderColor, JoglColor highlightColor,
+      JoglColor shapeColor, JoglColor edgeColor,
+      JoglColor borderColor, JoglColor highlightColor,
       float borderWidth,
       double shapeX, double shapeY, double shapeZ,
       double targetX, double targetY, double targetZ,
       boolean showLabel, String labelText, Object pickObject) {
     this.isVisible = isVisible;
-    this.fillColor = fillColor;
+    this.shapeColor = shapeColor;
+    this.edgeColor = edgeColor;
     this.borderColor = borderColor;
     this.highlightColor = highlightColor;
     this.borderWidth = borderWidth;
@@ -80,7 +84,7 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
       double initialX, double initialY, double initialZ,
       boolean showLabel, String labelText, Object pickObject) {
     this(isVisible,
-        fillColor, borderColor, highlightColor,
+        fillColor, borderColor, borderColor, highlightColor,
         borderWidth,
         initialX, initialY, initialZ,
         initialX, initialY, initialZ,
@@ -153,15 +157,28 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
     updateShape.labelTexture = labelTexture;
   }
 
-  protected void setColor(GL2 gl, JoglColor toColor) {
+  protected void setShapeColor(GL2 gl) {
+    setColor(gl, shapeColor);
+  }
+
+  protected void setEdgeColor(GL2 gl) {
+    setColor(gl, edgeColor);
+  }
+
+  protected void setHighlightColor(GL2 gl) {
+    setColor(gl, highlightColor);
+  }
+
+  private void setColor(GL2 gl, JoglColor toColor) {
     gl.glColor3d(toColor.red, toColor.green, toColor.blue);
   }
 
   private void renderText(GL2 gl) {
     if (labelTexture == null) {
       labelTexture = new TextureLoader(gl);
-      labelTexture.loadTexture(labelText, fillColor.complement().toAwtColor());
+      labelTexture.loadTexture(labelText);
     }
+    setHighlightColor(gl);
     labelTexture.draw(gl, 0.5d, -0.9d, -0.5d, 0.9d);
   }
 

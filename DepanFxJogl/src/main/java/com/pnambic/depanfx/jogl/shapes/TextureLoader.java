@@ -6,11 +6,15 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLContext;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
 public class TextureLoader {
+
+  private static Font TEXT_FONT =
+      new Font("SansSerif", Font.BOLD, 36);
 
   private static final int BORDER_WIDTH = 0;
 
@@ -29,12 +33,14 @@ public class TextureLoader {
       textureId = ids[0];
   }
 
-  void loadTexture(String text, Color color) {
+  void loadTexture(String text) {
       BufferedImage image =
           new BufferedImage(256, 64, BufferedImage.TYPE_INT_ARGB);
       Graphics2D g2d = image.createGraphics();
-      g2d.setColor(color);
-      g2d.drawString(text, 10, 40);
+      // Use color of graphic context, no mixing.
+      g2d.setColor(Color.WHITE);
+      g2d.setFont(TEXT_FONT);
+      g2d.drawString(text, 10, 45);
       g2d.dispose();
 
       ByteBuffer buffer = Buffers.newDirectByteBuffer(

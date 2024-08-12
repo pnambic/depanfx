@@ -42,13 +42,13 @@ public class AwtShape extends NodeShape {
   public AwtShape(
       Shape shapeAwt,
       boolean isVisible,
-      JoglColor fillColor, JoglColor borderColor, JoglColor highlightColor,
+      JoglColor fillColor, JoglColor edgeColor, JoglColor borderColor, JoglColor highlightColor,
       float borderWidth,
       double shapeX, double shapeY, double shapeZ,
       double targetX, double targetY, double targetZ,
       boolean showLabel, String labelText, Object pickObject) {
 
-    super(isVisible, fillColor, borderColor, highlightColor,
+    super(isVisible, fillColor, edgeColor, borderColor, highlightColor,
         borderWidth,
         shapeX, shapeY, shapeZ, targetX, targetY, targetZ,
         showLabel, labelText, pickObject);
@@ -64,7 +64,7 @@ public class AwtShape extends NodeShape {
       double initialX, double initialY, double initialZ,
       boolean showLabel, String labelText, Object pickObject) {
     this(shape, isVisible,
-        fillColor, borderColor, highlightColor,
+        fillColor, borderColor, borderColor, highlightColor,
         borderWidth,
         initialX, initialY, initialZ,
         initialX, initialY, initialZ,
@@ -75,7 +75,7 @@ public class AwtShape extends NodeShape {
   public AwtShape forUpdate() {
     AwtShape result = new AwtShape(
         shapeAwt, isVisible,
-        fillColor, borderColor, highlightColor,
+        shapeColor, edgeColor, borderColor, highlightColor,
         borderWidth,
         shapeX, shapeY, shapeZ,
         targetX, targetY, targetZ,
@@ -89,7 +89,7 @@ public class AwtShape extends NodeShape {
     float[] lastMoveTo = new float[6];
     float[] currSegment = new float[6];
 
-    setColor(gl, fillColor);
+    setShapeColor(gl);
 
     PathIterator it = shapeAwt.getPathIterator(null, SHAPE_FLATNESS);
     int opened = 0;
@@ -129,7 +129,7 @@ public class AwtShape extends NodeShape {
     float[] lastMoveTo = new float[6];
     float[] currSegment = new float[6];
 
-    setColor(gl, borderColor);
+    setEdgeColor(gl);
     gl.glLineWidth(borderWidth);
 
     PathIterator it = shapeAwt.getPathIterator(null, SHAPE_FLATNESS);

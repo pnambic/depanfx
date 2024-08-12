@@ -3,18 +3,14 @@ package com.pnambic.depanfx.nodeview.jogl;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.jogl.JoglColor;
 import com.pnambic.depanfx.jogl.JoglShape;
-import com.pnambic.depanfx.jogl.shapes.NodeShape;
 import com.pnambic.depanfx.jogl.shapes.AwtShape;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
+import com.pnambic.depanfx.jogl.shapes.NodeShape;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglShape;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 
 import java.awt.Shape;
-import java.awt.geom.RoundRectangle2D;
 import java.util.Optional;
-
-import javafx.scene.paint.Color;
 
 /**
  * Hold references to shape entities from the {@code Automatic-Module-Name}
@@ -57,9 +53,19 @@ public class JoglShapes {
       JoglPane joglPane, GraphNode node, DepanFxNodeDisplayData display) {
     JoglShape joglShape = joglPane.getShape(node);
     if (joglShape instanceof NodeShape nodeShape) {
-      nodeShape.fillColor = JoglColors.toJogl(display.fillColor);
+      // test before any changes
+      boolean isHighlit = nodeShape.edgeColor == nodeShape.highlightColor;
+
+      nodeShape.shapeColor = JoglColors.toJogl(display.fillColor);
       nodeShape.borderColor = JoglColors.toJogl(display.borderColor);
       nodeShape.highlightColor = JoglColors.toJogl(display.highlightColor);
+
+      // Mimic the current selection rendering for the borders
+      if (isHighlit) {
+        nodeShape.edgeColor = nodeShape.highlightColor;
+      } else {
+        nodeShape.edgeColor = nodeShape.borderColor;;
+      }
       joglPane.updateShape(node, nodeShape);
     }
   }
@@ -76,11 +82,11 @@ public class JoglShapes {
   private static void updateNodeSelection(
       NodeShape nodeShape, boolean isSelected) {
     if (isSelected) {
-      nodeShape.borderColor = nodeShape.highlightColor;
+      nodeShape.edgeColor = nodeShape.highlightColor;
       nodeShape.borderWidth = 5.0f;
       return;
     }
-    nodeShape.borderColor = nodeShape.borderColor;
+    nodeShape.edgeColor = nodeShape.borderColor;
     nodeShape.borderWidth = 1.0f;
   }
 
