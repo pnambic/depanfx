@@ -7,7 +7,9 @@ import com.pnambic.depanfx.jogl.JoglRenderer;
 import com.pnambic.depanfx.jogl.JoglShape;
 
 /**
- * Basic node properties, handles animation.
+ * Basic node properties.
+ *
+ * Handles placement (translation), animation, and picking.
  */
 public abstract class NodeShape implements JoglShape, JoglPickable {
 
@@ -158,7 +160,7 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
   private void renderText(GL2 gl) {
     if (labelTexture == null) {
       labelTexture = new TextureLoader(gl);
-      labelTexture.loadTexture(labelText);
+      labelTexture.loadTexture(labelText, fillColor.complement().toAwtColor());
     }
     labelTexture.draw(gl, 0.5d, -0.9d, -0.5d, 0.9d);
   }

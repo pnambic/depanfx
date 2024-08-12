@@ -29,11 +29,11 @@ public class TextureLoader {
       textureId = ids[0];
   }
 
-  void loadTexture(String text) {
+  void loadTexture(String text, Color color) {
       BufferedImage image =
           new BufferedImage(256, 64, BufferedImage.TYPE_INT_ARGB);
       Graphics2D g2d = image.createGraphics();
-      g2d.setColor(Color.WHITE);
+      g2d.setColor(color);
       g2d.drawString(text, 10, 40);
       g2d.dispose();
 

@@ -29,9 +29,9 @@ import java.awt.geom.PathIterator;
 
 public class AwtShape extends NodeShape {
 
-  public static final float FLOAT_ZERO = 0.2f;
+  public static final float FLOAT_ZERO = 0.0f;
 
-  public static final double DOUBLE_ZERO = 0.2d;
+  public static final double DOUBLE_ZERO = 0.0d;
 
   public static final double SHAPE_FLATNESS = 0.05d;
 
@@ -98,7 +98,7 @@ public class AwtShape extends NodeShape {
       int res = it.currentSegment(currSegment);
       switch (res) {
         case PathIterator.SEG_CLOSE:
-          gl.glVertex3f(lastMoveTo[0], lastMoveTo[1], FLOAT_ZERO);
+          // gl.glVertex3f(lastMoveTo[0], lastMoveTo[1], FLOAT_ZERO);
           gl.glEnd();
           closed++;
           break;
@@ -139,7 +139,7 @@ public class AwtShape extends NodeShape {
       int res = it.currentSegment(currSegment);
       switch (res) {
         case PathIterator.SEG_CLOSE:
-          gl.glVertex3f(lastMoveTo[0], lastMoveTo[1], FLOAT_ZERO);
+          // gl.glVertex3f(lastMoveTo[0], lastMoveTo[1], FLOAT_ZERO);
           gl.glEnd();
           closed++;
           break;
