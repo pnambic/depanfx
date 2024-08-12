@@ -12,7 +12,15 @@ import java.nio.ByteBuffer;
 
 public class TextureLoader {
 
-  private int textureId;
+  private static final int BORDER_WIDTH = 0;
+
+  private static final int BUFFER_WIDTH = 256;
+
+  private static final int BUFFER_HEIGHT = 64;
+
+  private static final int BYTES_PER_INT = 4;
+
+  private final int textureId;
 
   TextureLoader(GL2 gl) {
       // Generate texture id
@@ -22,15 +30,17 @@ public class TextureLoader {
   }
 
   void loadTexture(String text) {
-      BufferedImage image = new BufferedImage(256, 64, BufferedImage.TYPE_INT_ARGB);
+      BufferedImage image =
+          new BufferedImage(256, 64, BufferedImage.TYPE_INT_ARGB);
       Graphics2D g2d = image.createGraphics();
       g2d.setColor(Color.WHITE);
       g2d.drawString(text, 10, 40);
       g2d.dispose();
 
-      ByteBuffer buffer = Buffers.newDirectByteBuffer(256 * 64 * 4);
-      for (int y = 0; y < 64; y++) {
-          for (int x = 0; x < 256; x++) {
+      ByteBuffer buffer = Buffers.newDirectByteBuffer(
+          BUFFER_WIDTH * BUFFER_HEIGHT * BYTES_PER_INT);
+      for (int y = 0; y < BUFFER_HEIGHT; y++) {
+          for (int x = 0; x < BUFFER_WIDTH; x++) {
               int argb = image.getRGB(x, y);
               buffer.putInt(argb << 8 | argb >>> 24);
           }
@@ -43,7 +53,9 @@ public class TextureLoader {
       gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
       gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE);
       gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE);
-      gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, 256, 64, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, buffer);
+      gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA,
+          BUFFER_WIDTH, BUFFER_HEIGHT, BORDER_WIDTH,
+          GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, buffer);
   }
 
   void draw(GL2 gl, double top, double left, double bottom, double right) {

@@ -6,7 +6,10 @@ import com.pnambic.depanfx.jogl.JoglPickable;
 import com.pnambic.depanfx.jogl.JoglRenderer;
 import com.pnambic.depanfx.jogl.JoglShape;
 
-public class NodeShape implements JoglShape, JoglPickable {
+/**
+ * Basic node properties, handles animation.
+ */
+public abstract class NodeShape implements JoglShape, JoglPickable {
 
   public static final float SPEED = 10.0f;
 
@@ -83,19 +86,6 @@ public class NodeShape implements JoglShape, JoglPickable {
   }
 
   @Override
-  public NodeShape forUpdate() {
-    NodeShape result = new NodeShape(
-        isVisible,
-        fillColor, borderColor, highlightColor,
-        borderWidth,
-        shapeX, shapeY, shapeZ,
-        targetX, targetY, targetZ,
-        showLabel, labelText, pickObject);
-    result.labelTexture = labelTexture;
-    return result;
-  }
-
-  @Override
   public void draw(GL2 gl, JoglRenderer renderer) {
     if (!isVisible) {
       return;
@@ -147,30 +137,22 @@ public class NodeShape implements JoglShape, JoglPickable {
     shapeZ = targetZ;
   }
 
-  protected void renderShape(GL2 gl) {
-    setColor(gl, fillColor);
-    gl.glBegin(GL2.GL_TRIANGLE_FAN);
-    renderVertices(gl);
-    gl.glEnd();
+  /////////////////////////////////////
+  // Hook methods for derived types
+
+  abstract protected void renderShape(GL2 gl);
+
+  abstract protected void  renderBorder(GL2 gl);
+
+  /**
+   * Allow derived types to create update clones.
+   */
+  protected void fillUpdate(NodeShape updateShape) {
+    updateShape.labelTexture = labelTexture;
   }
 
   protected void setColor(GL2 gl, JoglColor toColor) {
     gl.glColor3d(toColor.red, toColor.green, toColor.blue);
-  }
-
-  protected void renderBorder(GL2 gl) {
-    setColor(gl, borderColor);
-    gl.glLineWidth(borderWidth);
-    gl.glBegin(GL2.GL_LINE_LOOP);
-    renderVertices(gl);
-    gl.glEnd();
-  }
-
-  private void renderVertices(GL2 gl) {
-    gl.glVertex3f(-1.0f, 1.0f, 0.0f);
-    gl.glVertex3f( 1.0f, 1.0f, 0.0f);
-    gl.glVertex3f( 1.0f,-1.0f, 0.0f);
-    gl.glVertex3f(-1.0f,-1.0f, 0.0f);
   }
 
   private void renderText(GL2 gl) {

@@ -80,7 +80,7 @@ public class AwtShape extends NodeShape {
         shapeX, shapeY, shapeZ,
         targetX, targetY, targetZ,
         showLabel, labelText, pickObject);
-    result.labelTexture = labelTexture;
+    super.fillUpdate(result);
     return result;
   }
 
