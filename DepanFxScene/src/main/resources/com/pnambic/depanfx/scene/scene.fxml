@@ -24,7 +24,9 @@
                         <Menu fx:id="fileNewItem" text="New"/>
                         <SeparatorMenuItem />
                         <MenuItem text="Open"/>
-                        <MenuItem fx:id="fileOpenProjectItem" text="Open Project..."/>
+                        <MenuItem fx:id="fileOpenProjectItem"
+                            text="Open Project..."
+                            onAction="#handleByRegistry"/>
                         <MenuItem fx:id="fileOpenResourceItem" text="Open Resource..."/>
                         <SeparatorMenuItem />
                         <MenuItem text="Save"/>

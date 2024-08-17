@@ -101,6 +101,11 @@ public class DepanFxSceneController {
   }
 
   @FXML
+  public void handleByRegistry(ActionEvent event) {
+    menuRegistry.dispatch(event);
+  }
+
+  @FXML
   public void handleImportItem(ActionEvent event) {
     menuRegistry.dispatch(event);
   }

@@ -14,7 +14,6 @@ import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.function.Predicate;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SelectionMode;
@@ -79,20 +78,11 @@ public class DepanFxProjectListViewer {
   }
 
   public void openProject() {
-    DirectoryChooser directoryChooser = new DirectoryChooser();
-    directoryChooser.setTitle(OPEN_PROJECT_CONTEXT_ITEM);
-    File selectedDirectory = directoryChooser.showDialog(null);
-
-    if (selectedDirectory != null) {
-      String projectName = selectedDirectory.getName();
-      Path projectPath = selectedDirectory.toPath();
-      DepanFxFileSystemProject projectSpi =
-          new DepanFxFileSystemProject(projectName, projectPath);
-      DepanFxProjectTree project =
-          DepanFxWorkspaceFactory.createDepanFxProjectTree(projectSpi);
-      workspace.addProject(project);
-      workspace.setCurrentProject(project);
-    }
+    DepanFxProjectChooser.runProjectFinder()
+      .ifPresent(p -> {
+          workspace.addProject(p);
+          workspace.setCurrentProject(p);
+      });
   }
 
   public void resetView() {
