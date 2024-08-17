@@ -72,7 +72,7 @@ public class LineShape implements JoglShape {
 
   private LineRender buildRenderer() {
     if (Form.ARCED == lineForm) {
-      return new ArcedLineRender();
+      return new RichLineRender();
     }
     return new RichLineRender();
   }

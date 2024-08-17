@@ -15,7 +15,7 @@
  */
 package com.pnambic.depanfx.jogl.shapes;
 
-import java.awt.geom.Line2D;
+import java.awt.Shape;
 import java.awt.geom.PathIterator;
 import java.util.ArrayList;
 import java.util.List;
@@ -141,28 +141,25 @@ public class LinePointsBuilder {
     }
   }
 
-  private ShapeBoundary sourceBoundary;
-
-  private ShapeBoundary targetBoundary;
-
   /**
    * Accumulates the vertices as the shape's path iterator is traversed.
    */
   private List<float[]> shapeVertices = new ArrayList<>();
 
   public LinePoints prepare(
-      Line2D lineShape, NodeShape sourceShape, NodeShape targetShape) {
+      Shape lineShape, NodeShape sourceShape, NodeShape targetShape) {
 
       buildVertexList(lineShape);
-      sourceBoundary = new ShapeBoundary(1, 1);
+      ShapeBoundary sourceBoundary = new ShapeBoundary(1, 1);
       sourceBoundary.calcShapeBoundary(sourceShape);
 
-      targetBoundary = new ShapeBoundary(shapeVertices.size() - 2, -1);
+      ShapeBoundary targetBoundary = new ShapeBoundary(shapeVertices.size() - 2, -1);
       targetBoundary.calcShapeBoundary(targetShape);
-      return buildLinePoints();
+      return buildLinePoints(sourceBoundary, targetBoundary);
   }
 
-  private LinePoints buildLinePoints() {
+  private LinePoints buildLinePoints(
+      ShapeBoundary sourceBoundary, ShapeBoundary targetBoundary) {
     // The two endpoints (2), plus any intervening points (delta + 1).
     int pointCount = 3 +
         targetBoundary.getFrontierIndex() - sourceBoundary.getFrontierIndex();
@@ -174,10 +171,10 @@ public class LinePointsBuilder {
         linePoints, insert, sourceBoundary.getConnectionVertex());
 
     for (int index = sourceBoundary.getFrontierIndex();
-        index < targetBoundary.getFrontierIndex();
+        index <= targetBoundary.getFrontierIndex();
         index++) {
       insert = installLineVertex(
-          linePoints, insert, targetBoundary.getConnectionVertex());
+          linePoints, insert, shapeVertices.get(index));
     }
 
     installLineVertex(
@@ -193,7 +190,7 @@ public class LinePointsBuilder {
     return insert;
   }
 
-  private void buildVertexList(Line2D lineShape) {
+  private void buildVertexList(Shape lineShape) {
     float[] currSegment = new float[6];
 
     PathIterator it = lineShape.getPathIterator(null, AwtShape.SHAPE_FLATNESS);
@@ -201,7 +198,6 @@ public class LinePointsBuilder {
       int res = it.currentSegment(currSegment);
       switch (res) {
         case PathIterator.SEG_CLOSE:
-          addShapeVertex(currSegment);
           break;
         case PathIterator.SEG_MOVETO:
           addShapeVertex(currSegment);

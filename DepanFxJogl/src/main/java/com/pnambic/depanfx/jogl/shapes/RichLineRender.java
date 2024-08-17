@@ -17,7 +17,10 @@ package com.pnambic.depanfx.jogl.shapes;
 
 import com.jogamp.opengl.GL2;
 
+import java.awt.Shape;
+import java.awt.geom.Arc2D;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 
 /**
  * Render lines with richer properties:
@@ -28,6 +31,8 @@ public class RichLineRender implements LineRender {
 
   /////////////////////////////////////
   // Track location of connected nodes
+
+  private static final double ARC_THROW = 0.95;
 
   private double sourcePosX;
 
@@ -47,7 +52,7 @@ public class RichLineRender implements LineRender {
       LineShape line, NodeShape sourceShape, NodeShape targetShape) {
 
     if (haveChanged(sourceShape, targetShape)) {
-      Line2D lineShape = buildLineShape(
+      Shape lineShape = buildLineShape(
           line, sourceShape, targetShape);
       LinePointsBuilder builder = new LinePointsBuilder();
       linePoints =
@@ -63,6 +68,9 @@ public class RichLineRender implements LineRender {
 
   @Override
   public void draw(LineShape line, GL2 gl) {
+    gl.glColor3d(line.lineColor.red, line.lineColor.green, line.lineColor.blue);
+    gl.glLineWidth((float) line.lineWidth);
+
     gl.glBegin(GL2.GL_LINE_STRIP);
     float[] vertices = linePoints.linePoints;
 
@@ -90,11 +98,11 @@ public class RichLineRender implements LineRender {
     return false;
   }
 
-  private Line2D.Double buildLineShape(
+  private Shape buildLineShape(
       LineShape line, NodeShape sourceShape, NodeShape targetShape) {
     switch (line.lineForm) {
     case ARCED:
-      break;
+      return buildArcLine(sourceShape, targetShape);
     case STRAIGHT:
       break;
     default:
@@ -104,5 +112,41 @@ public class RichLineRender implements LineRender {
     return new Line2D.Double(
         sourceShape.shapeX, sourceShape.shapeY,
         targetShape.shapeX, targetShape.shapeY);
+  }
+
+  private Arc2D buildArcLine(NodeShape sourceShape, NodeShape targetShape) {
+
+    // Calculate the midpoint
+    double midX = (sourceShape.shapeX + targetShape.shapeX) / 2.0d;
+    double midY = (sourceShape.shapeY + targetShape.shapeY) / 2.0d;
+
+    // Determine the right hand perpendicular to the connecting line.
+    double perpX = sourceShape.shapeY - targetShape.shapeY;
+    double perpY = targetShape.shapeX - sourceShape.shapeX;
+
+    double centerX = midX + (ARC_THROW * perpX);
+    double centerY = midY + (ARC_THROW * perpY);
+
+    double radius = Point2D.distance(
+        sourceShape.shapeX, sourceShape.shapeY, centerX, centerY);
+
+    double x = centerX - radius;
+    double y = centerY - radius;
+    double diam = radius * 2.0d;
+
+    // Calculate the start angle and angular extent
+    double startAngle = Math.toDegrees(
+        Math.atan2(sourceShape.shapeY - centerY, sourceShape.shapeX - centerX));
+    double endAngle = Math.toDegrees(
+        Math.atan2(targetShape.shapeY - centerY, targetShape.shapeX - centerX));
+    double extent = endAngle - startAngle;
+
+    // Configure Arc2D.
+    // Since AWT Y is reversed (increases downward) compared
+    // to OGL Y (increases upward):
+    // - negate start angle and extent
+    // - or y = centerY + radius and -diam below.
+    return new Arc2D.Double(
+        x, y, diam, diam, -startAngle, -extent, Arc2D.OPEN);
   }
 }
