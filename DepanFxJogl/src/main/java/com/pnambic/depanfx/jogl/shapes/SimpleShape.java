@@ -75,4 +75,15 @@ public class SimpleShape extends NodeShape {
     gl.glVertex3f( 1.0f,-1.0f, 0.0f);
     gl.glVertex3f(-1.0f,-1.0f, 0.0f);
   }
+
+  @Override
+  public boolean contains(double posX, double posY) {
+    if (Math.abs(posX) > 1.0d) {
+      return false;
+    }
+    if (Math.abs(posY) > 1.0d) {
+      return false;
+    }
+    return true;
+  }
 }

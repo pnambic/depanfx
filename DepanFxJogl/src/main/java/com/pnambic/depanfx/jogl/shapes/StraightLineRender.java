@@ -5,6 +5,7 @@ import com.jogamp.opengl.GL2;
 public class StraightLineRender implements LineRender {
 
   private NodeShape sourceShape;
+
   private NodeShape targetShape;
 
   @Override

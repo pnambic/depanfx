@@ -74,8 +74,7 @@ public class LineShape implements JoglShape {
     if (Form.ARCED == lineForm) {
       return new ArcedLineRender();
     }
-    // TODO Auto-generated method stub
-    return new StraightLineRender();
+    return new RichLineRender();
   }
 
   @Override

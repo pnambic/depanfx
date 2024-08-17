@@ -84,6 +84,12 @@ public class AwtShape extends NodeShape {
     return result;
   }
 
+
+  @Override
+  public boolean contains(double posX, double posY) {
+    return shapeAwt.contains(posX, posY);
+  }
+
   @Override
   protected void renderShape(GL2 gl) {
     float[] lastMoveTo = new float[6];

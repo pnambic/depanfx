@@ -143,6 +143,8 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
     shapeZ = targetZ;
   }
 
+  abstract public boolean contains(double posX, double posY);
+
   /////////////////////////////////////
   // Hook methods for derived types
 
