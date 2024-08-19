@@ -182,17 +182,17 @@ public class DepanFxJavaLinkViewBuiltIns {
     displayInfo.add(
         buildDisplayEntry(project,
             JavaLinkMatcherBuiltIns.CALL_MATCHER_PATH,
-            buildMemberLine(Color.RED, 1.5)));
+            buildUsageLine(Color.RED, 1.5)));
 
     displayInfo.add(
         buildDisplayEntry(project,
             JavaLinkMatcherBuiltIns.READ_MATCHER_PATH,
-            buildMemberLine(Color.ORANGERED, 1.0)));
+            buildUsageLine(Color.ORANGERED, 1.0)));
 
     displayInfo.add(
         buildDisplayEntry(project,
             JavaLinkMatcherBuiltIns.WRITE_MATCHER_PATH,
-            buildMemberLine(Color.ORANGERED, 1.5)));
+            buildUsageLine(Color.ORANGERED, 1.5)));
   }
 
   private static void addAnnotateRelations(
@@ -305,6 +305,19 @@ public class DepanFxJavaLinkViewBuiltIns {
       Color color, double width) {
     return new DepanFxLineDisplayData(
         DepanFxLineForm.STRAIGHT,
+        DepanFxLineStyle.SOLID,
+        DepanFxJoglColor.of(color),
+        width,
+        DepanFxLineLabel.DEFAULT,
+        DepanFxLineArrow.NONE,
+        DepanFxLineArrow.OPEN,
+        DepanFxLineDirection.FORWARD);
+  };
+
+  private static DepanFxLineDisplayData buildUsageLine(
+      Color color, double width) {
+    return new DepanFxLineDisplayData(
+        DepanFxLineForm.ARCED,
         DepanFxLineStyle.SOLID,
         DepanFxJoglColor.of(color),
         width,
