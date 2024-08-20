@@ -202,7 +202,6 @@ public class RichLineRender implements LineRender {
         Math.atan2(sourceShape.shapeY - centerY, sourceShape.shapeX - centerX));
     double endAngle = Math.toDegrees(
         Math.atan2(targetShape.shapeY - centerY, targetShape.shapeX - centerX));
-    double extent = endAngle - startAngle;
 
     // Configure Arc2D.
     // Since AWT Y is reversed (increases downward) compared
@@ -210,6 +209,19 @@ public class RichLineRender implements LineRender {
     // - negate start angle and extent
     // - or y = centerY + radius and -diam below.
     return new Arc2D.Double(
-        x, y, diam, diam, -startAngle, -extent, Arc2D.OPEN);
+        x, y, diam, diam,
+        -startAngle, -calcExtent(startAngle, endAngle),
+        Arc2D.OPEN);
+  }
+
+  private double calcExtent(double startAngle, double endAngle) {
+    double extent = endAngle - startAngle;
+    if (extent > 180.d) {
+      return extent - 180.0d;
+    }
+    if (extent < -180.d) {
+      return 360 + extent;
+    }
+    return extent;
   }
 }
