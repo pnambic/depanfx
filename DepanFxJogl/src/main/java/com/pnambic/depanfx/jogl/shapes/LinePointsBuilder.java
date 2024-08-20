@@ -43,15 +43,26 @@ public class LinePointsBuilder {
      */
     private float[] connectionVertex;
 
-    public ShapeBoundary(int frontierIndex, int direction) {
+    /*
+     * Remaining tries to find an outer vertex.
+     */
+    private int vertexLimit;
+
+    public ShapeBoundary(int frontierIndex, int direction, int vertexLimit) {
       this.frontierIndex = frontierIndex;
       this.direction = direction;
+      this.vertexLimit = vertexLimit;
     }
 
     public void calcShapeBoundary(NodeShape boundaryShape) {
       float[] anchorVertex = shapeVertices.get(frontierIndex);
       while (isInside(boundaryShape, anchorVertex[0], anchorVertex[1])) {
         frontierIndex = frontierIndex + direction;
+        if (vertexLimit <= 0) {
+          connectionVertex = null;
+          return;
+        }
+        --vertexLimit;
         anchorVertex = shapeVertices.get(frontierIndex);
       }
 
@@ -131,17 +142,28 @@ public class LinePointsBuilder {
       Shape lineShape, NodeShape sourceShape, NodeShape targetShape) {
 
       buildVertexList(lineShape);
-      ShapeBoundary sourceBoundary = new ShapeBoundary(1, 1);
+      int vertexCount = shapeVertices.size();
+      if (vertexCount < 2) {
+        return LinePoints.EMPTY;
+      }
+      int vertexLimit = vertexCount - 2;
+      ShapeBoundary sourceBoundary = new ShapeBoundary(1, 1, vertexLimit);
       sourceBoundary.calcShapeBoundary(sourceShape);
 
       ShapeBoundary targetBoundary =
-          new ShapeBoundary(shapeVertices.size() - 2, -1);
+          new ShapeBoundary(vertexCount - 2, -1, vertexLimit);
       targetBoundary.calcShapeBoundary(targetShape);
       return buildLinePoints(sourceBoundary, targetBoundary);
   }
 
   private LinePoints buildLinePoints(
       ShapeBoundary sourceBoundary, ShapeBoundary targetBoundary) {
+
+    // Too much overlap of the boundary shapes.
+    if (targetBoundary.getFrontierIndex() + 1 < sourceBoundary.getFrontierIndex()) {
+      return LinePoints.EMPTY;
+    };
+
     // The two endpoints (2), plus any intervening points (delta + 1).
     int pointCount = 3 +
         targetBoundary.getFrontierIndex() - sourceBoundary.getFrontierIndex();

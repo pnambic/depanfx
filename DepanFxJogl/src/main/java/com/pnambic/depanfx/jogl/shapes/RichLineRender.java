@@ -62,10 +62,17 @@ public class RichLineRender implements LineRender {
       LinePointsBuilder builder = new LinePointsBuilder();
       linePoints =
           builder.prepare(lineShape, sourceShape, targetShape);
-      sourceArrow = buildArrow(line.sourceArrow, 1, 0);
 
-      int targetIndex = linePoints.pointCount - 1;
-      targetArrow = buildArrow(line.targetArrow, targetIndex - 1, targetIndex);
+      // Attach arrowheads if there is a line
+      if (linePoints.pointCount >= 2) {
+        sourceArrow = buildArrow(line.sourceArrow, 1, 0);
+
+        int targetIndex = linePoints.pointCount - 1;
+        targetArrow = buildArrow(line.targetArrow, targetIndex - 1, targetIndex);
+      } else {
+        sourceArrow = ArrowShapes.NONE;
+        targetArrow = ArrowShapes.NONE;
+      }
 
       // And capture current position, again.
       sourcePosX = sourceShape.shapeX;
@@ -112,13 +119,16 @@ public class RichLineRender implements LineRender {
 
   @Override
   public void draw(GL2 gl, LineShape line) {
-    gl.glColor3d(
-        line.lineColor.red, line.lineColor.green, line.lineColor.blue);
-    gl.glLineWidth((float) line.lineWidth);
 
-    drawLinePoints(gl);
-    drawHeadArrow(gl);
-    drawTailArrow(gl);
+    // Skip it all if there is nothing to draw.
+    if (linePoints.pointCount > 0) {
+      gl.glColor3d(
+          line.lineColor.red, line.lineColor.green, line.lineColor.blue);
+      gl.glLineWidth((float) line.lineWidth);
+      drawLinePoints(gl);
+      drawHeadArrow(gl);
+      drawTailArrow(gl);
+    }
   }
 
   private boolean haveChanged(NodeShape sourceShape, NodeShape targetShape) {

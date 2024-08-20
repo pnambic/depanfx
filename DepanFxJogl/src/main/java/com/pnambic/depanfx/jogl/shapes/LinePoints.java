@@ -17,6 +17,14 @@ public class LinePoints {
 
   public final float[] linePoints;
 
+  public static final LinePoints EMPTY = new LinePoints(0, null) {
+
+    @Override
+    public void glVertex(GL2 gl, int mode) {
+      // do nothing - avoid glBegin and glEnd calls.
+    }
+  };
+
   LinePoints(int pointCount, float[] linePoints) {
     this.pointCount = pointCount;
     this.linePoints = linePoints;
