@@ -6,5 +6,5 @@ public interface LineRender {
 
   void prepare(LineShape line, NodeShape sourceShape, NodeShape targetShape);
 
-  void draw(LineShape line, GL2 gl);
+  void draw(GL2 gl, LineShape line);
 }

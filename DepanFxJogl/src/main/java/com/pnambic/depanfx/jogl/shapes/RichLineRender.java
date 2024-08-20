@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.jogl.shapes;
 
 import com.jogamp.opengl.GL2;
+import com.pnambic.depanfx.jogl.shapes.LineShape.Arrow;
 
 import java.awt.Shape;
 import java.awt.geom.Arc2D;
@@ -45,7 +46,11 @@ public class RichLineRender implements LineRender {
   /**
    * Cache points to render as a line strip.
    */
-  private LinePointsBuilder.LinePoints linePoints;
+  private LinePoints linePoints;
+
+  private ArrowShape sourceArrow;
+
+  private ArrowShape targetArrow;
 
   @Override
   public void prepare(
@@ -57,6 +62,10 @@ public class RichLineRender implements LineRender {
       LinePointsBuilder builder = new LinePointsBuilder();
       linePoints =
           builder.prepare(lineShape, sourceShape, targetShape);
+      sourceArrow = buildArrow(line.sourceArrow, 1, 0);
+
+      int targetIndex = linePoints.pointCount - 1;
+      targetArrow = buildArrow(line.targetArrow, targetIndex - 1, targetIndex);
 
       // And capture current position, again.
       sourcePosX = sourceShape.shapeX;
@@ -66,20 +75,50 @@ public class RichLineRender implements LineRender {
     }
   }
 
+  private ArrowShape buildArrow(
+      Arrow sourceArrow, int sourceIndex, int targetIndex) {
+    // Short-circuit transform computation if not used.
+    if (sourceArrow == Arrow.NONE) {
+      return ArrowShapes.NONE;
+    }
+
+    int sourceOffset = LinePoints.getOffset(sourceIndex);
+    float sourceX = linePoints.linePoints[sourceOffset++];
+    float sourceY = linePoints.linePoints[sourceOffset++];
+    float sourceZ = linePoints.linePoints[sourceOffset++];
+
+    int targetOffset = LinePoints.getOffset(targetIndex);
+    float targetX = linePoints.linePoints[targetOffset++];
+    float targetY = linePoints.linePoints[targetOffset++];
+    float targetZ = linePoints.linePoints[targetOffset++];
+
+    float[] transform = ArrowShapes.buildTransform(
+        sourceX, sourceY, sourceZ, targetX, targetY, targetZ);
+
+    switch (sourceArrow) {
+    case ARTISTIC:
+      return new ArrowShapes.Artistic(transform);
+    case FILLED:
+      return new ArrowShapes.Filled(transform);
+    case OPEN:
+      return new ArrowShapes.Open(transform);
+    case TRIANGLE:
+      return new ArrowShapes.Triangle(transform);
+    default: // mostly Arrow.NONE
+      break;
+    }
+    return ArrowShapes.NONE;
+  }
+
   @Override
-  public void draw(LineShape line, GL2 gl) {
-    gl.glColor3d(line.lineColor.red, line.lineColor.green, line.lineColor.blue);
+  public void draw(GL2 gl, LineShape line) {
+    gl.glColor3d(
+        line.lineColor.red, line.lineColor.green, line.lineColor.blue);
     gl.glLineWidth((float) line.lineWidth);
 
-    gl.glBegin(GL2.GL_LINE_STRIP);
-    float[] vertices = linePoints.linePoints;
-
-    int index = 0;  // Stride by 3
-    for (int count = 0; count < linePoints.pointCount; ++count) {
-      gl.glVertex3fv(vertices, index);
-      index += 3;
-    }
-    gl.glEnd();
+    drawLinePoints(gl);
+    drawHeadArrow(gl);
+    drawTailArrow(gl);
   }
 
   private boolean haveChanged(NodeShape sourceShape, NodeShape targetShape) {
@@ -96,6 +135,20 @@ public class RichLineRender implements LineRender {
       return true;
     }
     return false;
+  }
+
+  private void drawLinePoints(GL2 gl) {
+    linePoints.glVertex(gl, GL2.GL_LINE_STRIP);
+  }
+
+  private void drawHeadArrow(GL2 gl) {
+    gl.glPushMatrix();
+    sourceArrow.draw(gl);
+    gl.glPopMatrix();
+  }
+
+  private void drawTailArrow(GL2 gl) {
+    targetArrow.draw(gl);
   }
 
   private Shape buildLineShape(

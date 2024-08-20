@@ -25,25 +25,6 @@ import java.util.List;
  */
 public class LinePointsBuilder {
 
-  /**
-   * Provide a sequence of line coordinates as a vector of float values.
-   * Each point is accessed with a stride of 3.
-   *
-   * Each triplet of floats is a 3D point (x, y, z).  The pointCount value
-   * is 1/3 the size of linePoints.
-   */
-  public class LinePoints {
-
-    public final int pointCount;
-
-    public final float[] linePoints;
-
-    private LinePoints(int pointCount, float[] linePoints) {
-      this.pointCount = pointCount;
-      this.linePoints = linePoints;
-    }
-  }
-
   private class ShapeBoundary {
 
     /**
@@ -153,7 +134,8 @@ public class LinePointsBuilder {
       ShapeBoundary sourceBoundary = new ShapeBoundary(1, 1);
       sourceBoundary.calcShapeBoundary(sourceShape);
 
-      ShapeBoundary targetBoundary = new ShapeBoundary(shapeVertices.size() - 2, -1);
+      ShapeBoundary targetBoundary =
+          new ShapeBoundary(shapeVertices.size() - 2, -1);
       targetBoundary.calcShapeBoundary(targetShape);
       return buildLinePoints(sourceBoundary, targetBoundary);
   }

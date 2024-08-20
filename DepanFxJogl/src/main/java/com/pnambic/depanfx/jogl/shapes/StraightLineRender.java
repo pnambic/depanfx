@@ -16,7 +16,7 @@ public class StraightLineRender implements LineRender {
   }
 
   @Override
-  public void draw(LineShape line, GL2 gl) {
+  public void draw(GL2 gl, LineShape line) {
 
     // Render the line.
     gl.glColor3d(line.lineColor.red, line.lineColor.green, line.lineColor.blue);
