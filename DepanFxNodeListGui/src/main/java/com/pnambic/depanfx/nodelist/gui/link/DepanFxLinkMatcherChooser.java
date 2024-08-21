@@ -73,18 +73,18 @@ public class DepanFxLinkMatcherChooser {
       return null;
     }
 
+    public void runLinkMatcherFinder() {
+      DepanFxLinkMatcherChooser
+          .runLinkMatcherFinder(
+                workspace, dialogRunner, linkMatcherField.getScene())
+          .ifPresent(this::setLinkMatcherRsrc);
+    }
+
     private ContextMenu buildContextMenu() {
       DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
       builder.appendActionItem(
           SELECT_LINK_MATCHER, e -> runLinkMatcherFinder());
       return builder.build();
-    }
-
-    private void runLinkMatcherFinder() {
-      DepanFxLinkMatcherChooser
-          .runLinkMatcherFinder(
-                workspace, dialogRunner, linkMatcherField.getScene())
-          .ifPresent(this::setLinkMatcherRsrc);
     }
   }
 

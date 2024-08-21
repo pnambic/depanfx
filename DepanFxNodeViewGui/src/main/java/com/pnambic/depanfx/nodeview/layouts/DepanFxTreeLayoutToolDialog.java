@@ -87,6 +87,11 @@ public class DepanFxTreeLayoutToolDialog
         treeLayoutData.getHierarchyMatcherRsrc());
   }
 
+  @FXML
+  private void handleBrowseLinkMatcher() {
+    hierarchyMatcherControl.runLinkMatcherFinder();
+  }
+
   /////////////////////////////////////
   // Tool Dialog protected overrides
 

@@ -89,6 +89,11 @@ public class DepanFxRadialLayoutToolDialog
         radialLayoutData.getHierarchyMatcherRsrc());
   }
 
+  @FXML
+  private void handleBrowseLinkMatcher() {
+    hierarchyMatcherControl.runLinkMatcherFinder();
+  }
+
   /////////////////////////////////////
   // Tool Dialog protected overrides
 

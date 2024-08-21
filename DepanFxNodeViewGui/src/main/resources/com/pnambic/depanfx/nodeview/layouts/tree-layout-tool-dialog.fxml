@@ -24,6 +24,7 @@
             <TextField fx:id="hierarchyMatcherRsrcField" editable="false"
                   promptText="No matcher selected"
                   HBox.hgrow="ALWAYS"/>
+            <Button text="Browse..." onAction="#handleBrowseLinkMatcher"/>
          </HBox>
 
          <Label text="Tool Name"/>
@@ -47,8 +48,7 @@
          <HBox spacing="10">
             <TextField fx:id="destinationField" editable="false" promptText="No file selected"
                   HBox.hgrow="ALWAYS"/>
-            <Button text="Browse" onAction="#openDestinationChooser"
-                  HBox.hgrow="ALWAYS"/>
+            <Button text="Browse..." onAction="#openDestinationChooser"/>
          </HBox>
 
          <Region VBox.vgrow="ALWAYS" />
