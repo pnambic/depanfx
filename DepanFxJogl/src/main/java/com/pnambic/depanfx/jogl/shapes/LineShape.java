@@ -14,7 +14,7 @@ public class LineShape implements JoglShape {
   }
 
   public enum Arrow {
-    NONE, OPEN, TRIANGLE, FILLED, ARTISTIC;
+    NONE, OPEN, TRIANGLE, FILLED, CHEVRON, ARTISTIC;
 
     public static final Arrow SOURCE_DEFAULT = NONE;
 

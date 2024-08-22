@@ -105,6 +105,8 @@ public class RichLineRender implements LineRender {
     switch (sourceArrow) {
     case ARTISTIC:
       return new ArrowShapes.Artistic(transform);
+    case CHEVRON:
+      return new ArrowShapes.Chevron(transform);
     case FILLED:
       return new ArrowShapes.Filled(transform);
     case OPEN:

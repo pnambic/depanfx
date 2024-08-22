@@ -18,11 +18,39 @@
  */
 package com.pnambic.depanfx.jogl.shapes;
 
+/**
+ * Define the vertexes for different line-based arrow heads.
+ *
+ * Artistic arrowheads are based on a four control-point model:
+ *
+ * {@snippet:
+ *     1
+ *     .
+ *    / \
+ *   /.^.\
+ *  2  3  4   3 = middlePoint.
+ * }
+ *
+ * This sequence points works well for closed lines and triangle fans, but
+ * not for open line segments (i.e. {@code GL_LINE_STRIP}).
+ *
+ * Triangular arrowheads are based on a three point control-point model that
+ * drops the 3/middlePoint from the artistic shape.  The remaining control
+ * point vertices remain in the same location, but are rendered in a different
+ * order.  In order to support open line strips, closed line loops,
+ * and triangle fans, the vertices are sequenced in the order [ 2, 1, 4 ].
+ */
 public class ArrowLinePoints {
 
-  public static final double ANGLE = 20.0;
+  public static final double SEMI_CIRCLE = 180.0d;
 
-  public static final double DEPTH = 0.7;
+  public static final double NOSE_ANGLE = 20.0d;
+
+  public static final double NOTCH_DEPTH = 0.7d;
+
+  public static final double ARROW_TIP_X = 0.0d;
+
+  public static final double ARROW_TIP_Y = 0.0d;
 
   public static final LinePoints ARTISTIC_ARROW_POINTS = buildArtisticPoints();
 
@@ -35,94 +63,65 @@ public class ArrowLinePoints {
   /**
    * Use a different order for the points (2, 1, 4), so GL_LINE_STRIP,
    * LINE_LOOP, and GL_TRIANGLE_FAN all work.
-   * @return
    */
   public static LinePoints buildTrianglePoints() {
-    // TODO(tugrul): Convert this to use a list of x,y pairs that are rotated
-    // into position as needed.
-    //
-    // initialize from one list or the other.
-    // arrow3Point = {{1, 0}, {0, 4}, {-1, 0}};
-    // arrow4Point = {{1, 0}, {0, 4}, {-1, 0}, {0, 1}};
 
-    float x = 0f;
-    float y = 0f;
-    float size = 1f;
-    double rotation = 0;
-
-    //   1
-    //   .
-    //  / \
-    // /.^.\
-    //2  3  4   3 = middlePoint.
-    final float secondPointAngle = (float) ((270.0 - ANGLE) * 2.0 * Math.PI
-        / 360.0 + rotation); // in rad.
-    final float fourthPointAngle = (float) ((270.0 + ANGLE) * 2.0 * Math.PI
-        / 360.0 + rotation); // in rad.
+    double secondPointAngle = calcSecondPointAngle();
+    double fourthPointAngle = calcFourthPointAngle();
 
     float[] arrowPoints = new float[3 * 3];
     int insert = 0;
 
     // Push Point 2
     insert = insertPoint(arrowPoints, insert,
-        x + Math.cos(secondPointAngle) * size,
-        y + Math.sin(secondPointAngle) * size);
+        Math.cos(secondPointAngle), Math.sin(secondPointAngle));
 
     // Push Point 1
-    insert = insertPoint(arrowPoints, insert, x, y);
+    insert = insertPoint(arrowPoints, insert, ARROW_TIP_X, ARROW_TIP_Y);
 
     // Push Point 4
     insert = insertPoint(arrowPoints, insert,
-        x + Math.cos(fourthPointAngle) * size,
-        y + Math.sin(fourthPointAngle) * size);
+        Math.cos(fourthPointAngle), Math.sin(fourthPointAngle));
     return new LinePoints(3, arrowPoints);
   }
 
+
+  /**
+   * Provide four vertices (1, 2, 3, 4) that work for LINE_LOOP
+   * and GL_TRIANGLE_FAN.
+   *
+   * This vertex sequence is not useful with GL_LINE_STRIP
+   */
   public static LinePoints buildArtisticPoints() {
-    // TODO(tugrul): Convert this to use a list of x,y pairs that are rotated
-    // into position as needed.
-    //
-    // initialize from one list or the other.
-    // arrow3Point = {{1, 0}, {0, 4}, {-1, 0}};
-    // arrow4Point = {{1, 0}, {0, 4}, {-1, 0}, {0, 1}};
 
-    float x = 0f;
-    float y = 0f;
-    float size = 1f;
-    double rotation = 0;
-
-    //   1
-    //   .
-    //  / \
-    // /.^.\
-    //2  3  4   3 = middlePoint.
-    final float secondPointAngle = (float) ((270.0 - ANGLE) * 2.0 * Math.PI
-        / 360.0 + rotation); // in rad.
-    final float fourthPointAngle = (float) ((270.0 + ANGLE) * 2.0 * Math.PI
-        / 360.0 + rotation); // in rad.
+    double secondPointAngle = calcSecondPointAngle();
+    double fourthPointAngle = calcFourthPointAngle();
 
     float[] arrowPoints = new float[4 * 3];
     int insert = 0;
 
     // Push Point 1
-    insertPoint(arrowPoints, insert, x, y);
+    insert = insertPoint(arrowPoints, insert, ARROW_TIP_X, ARROW_TIP_Y);
 
     // Push Point 2
-    insertPoint(arrowPoints, insert,
-        x + Math.cos(secondPointAngle) * size,
-        y + Math.sin(secondPointAngle) * size);
+    insert = insertPoint(arrowPoints, insert,
+        Math.cos(secondPointAngle), Math.sin(secondPointAngle));
 
-      final float middlePointAngle =
-          (float) (270.0 * 2.0 * Math.PI / 360.0 + rotation); // in rad.
-      insertPoint(arrowPoints, insert,
-          x + Math.cos(middlePointAngle) * DEPTH * size,
-          y + Math.sin(middlePointAngle) * DEPTH * size);
+    // Push Point 3
+    insert = insertPoint(arrowPoints, insert, -NOTCH_DEPTH, ARROW_TIP_Y);
 
     // Push Point 4
     insertPoint(arrowPoints, insert,
-        x + Math.cos(fourthPointAngle) * size,
-        y + Math.sin(fourthPointAngle) * size);
+        Math.cos(fourthPointAngle), Math.sin(fourthPointAngle));
     return new LinePoints(4, arrowPoints);
+  }
+
+  private static double calcSecondPointAngle() {
+    return Math.toRadians(SEMI_CIRCLE - NOSE_ANGLE);
+  }
+
+  private static double calcFourthPointAngle() {
+    return Math.toRadians(SEMI_CIRCLE + NOSE_ANGLE);
   }
 
   private static int insertPoint(

@@ -112,7 +112,7 @@ public class ArrowShapes {
     }
   }
 
-  public static class Open extends FilledLineArrow {
+  public static class Open extends OpenLineArrow {
 
     protected Open(float[] transformationMatrix) {
       super(ArrowLinePoints.TRIANGLE_ARROW_POINTS, transformationMatrix);
@@ -128,7 +128,7 @@ public class ArrowShapes {
 
     float deltaX = targetX - sourceX;
     float deltaY = targetY - sourceY;
-    double angle = Math.atan2(deltaY, deltaX) - ( Math.PI / 2.0d);
+    double angle = Math.atan2(deltaY, deltaX);
 
     Matrix4 matrix = new Matrix4();
     matrix.loadIdentity();

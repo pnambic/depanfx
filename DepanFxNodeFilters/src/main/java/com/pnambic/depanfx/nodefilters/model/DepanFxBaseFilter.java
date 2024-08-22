@@ -36,6 +36,10 @@ public abstract class DepanFxBaseFilter<T extends DepanFxBaseFilterData> {
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxBaseFilter.class);
 
+  /**
+   * Carries the merge mode, which {@link #computeNodes(Collection)} uses
+   * to compute the filter's result.
+   */
   private final T filterData;
 
   protected DepanFxBaseFilter(T filterData) {
