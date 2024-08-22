@@ -73,6 +73,7 @@ public class JoglLines {
     case FORWARD:
       result.lineSource = lineSource;
       result.lineTarget = lineTarget;
+      break;
     case REVERSE:
       result.lineSource = lineTarget;
       result.lineTarget = lineSource;
