@@ -106,6 +106,8 @@ public class JoglLines {
     switch (arrow) {
     case ARTISTIC:
       return LineShape.Arrow.ARTISTIC;
+    case CHEVRON:
+      return LineShape.Arrow.CHEVRON;
     case FILLED:
       return LineShape.Arrow.FILLED;
     case NONE:

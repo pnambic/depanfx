@@ -1,7 +1,7 @@
 package com.pnambic.depanfx.nodeview.tooldata;
 
 public enum DepanFxLineArrow {
-  NONE, OPEN, TRIANGLE, FILLED, ARTISTIC;
+  NONE, OPEN, TRIANGLE, FILLED, CHEVRON, ARTISTIC;
 
   public static final DepanFxLineArrow SOURCE_DEFAULT = NONE;
 
