@@ -48,7 +48,8 @@ public class DepanFxNodeFiltersDialogRegistry {
 
   private final List<DepanFxNodeFiltersDialogContribution> contribs;
 
-  public DepanFxNodeFiltersDialogRegistry(List<DepanFxNodeFiltersDialogContribution> contribs) {
+  public DepanFxNodeFiltersDialogRegistry(
+      List<DepanFxNodeFiltersDialogContribution> contribs) {
     this.contribs = contribs;
   }
 

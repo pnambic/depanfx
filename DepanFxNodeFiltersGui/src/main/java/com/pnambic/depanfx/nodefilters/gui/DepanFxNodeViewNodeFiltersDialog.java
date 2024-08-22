@@ -59,7 +59,6 @@ import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.SplitPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
@@ -98,9 +97,6 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
    */
   @FXML
   private Label nodeTableCommands;
-
-  @FXML
-  private SplitPane splitPane;
 
   /**
    * Let FXML place the table.  Other behavior is implemented by the
