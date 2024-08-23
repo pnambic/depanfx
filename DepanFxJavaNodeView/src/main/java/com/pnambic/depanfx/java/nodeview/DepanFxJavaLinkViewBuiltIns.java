@@ -323,7 +323,7 @@ public class DepanFxJavaLinkViewBuiltIns {
         width,
         DepanFxLineLabel.DEFAULT,
         DepanFxLineArrow.NONE,
-        DepanFxLineArrow.OPEN,
+        DepanFxLineArrow.ARTISTIC,
         DepanFxLineDirection.FORWARD);
   };
 

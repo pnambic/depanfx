@@ -136,6 +136,9 @@ public class JavaLinkMatcherBuiltIns {
   public static final Path MODULE_USES_MATCHER_PATH =
       buildMatcherPath(JavaLinkMatchers.MODULE_USES_FORWARD_DOC);
 
+  public static final Path JAVA_CLASS_DERIVED_MATCHER_PATH =
+      buildMatcherPath(JavaLinkMatchers.JAVA_CLASS_DERIVED_DOC);
+
   public static final Path JAVA_CLASS_MEMBER_MATCHER_PATH =
       buildMatcherPath(JavaLinkMatchers.JAVA_CLASS_MEMBER_DOC);
 
@@ -367,7 +370,14 @@ public class JavaLinkMatcherBuiltIns {
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxLinkMatcherDocument>
-      classMembersUsesMatcherJava() {
+      classDerivedMatcherJava() {
+    return createBuiltIn(
+        JAVA_CLASS_DERIVED_MATCHER_PATH, JavaLinkMatchers.JAVA_CLASS_DERIVED_DOC);
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxLinkMatcherDocument>
+      classMembersMatcherJava() {
     return createBuiltIn(
         JAVA_CLASS_MEMBER_MATCHER_PATH, JavaLinkMatchers.JAVA_CLASS_MEMBER_DOC);
   }

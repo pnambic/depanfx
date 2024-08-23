@@ -239,6 +239,21 @@ public class JavaLinkMatchers {
           "Java class membership (classes, inner classes, field, methods).",
           JAVA_CLASS_MEMBER_MATCH);
 
+  // Derived classes: Extending or implementing
+  public static final List<DepanFxLinkMatcher> JAVA_CLASS_DERIVED =
+      Arrays.asList(new DepanFxLinkMatcher [] {
+          IMPLEMENTS_FORWARD, EXTENDS_FORWARD
+      });
+
+  public static final Composite JAVA_CLASS_DERIVED_MATCH =
+      new Composite(JAVA_CLASS_DERIVED);
+
+ public static final DepanFxLinkMatcherDocument JAVA_CLASS_DERIVED_DOC =
+     buildMatcherDoc(
+         "Java Derived Class",
+         "Java class derivation hierarchy (implmements, extends).",
+         JAVA_CLASS_DERIVED_MATCH);
+
   // Just members of packages
   public static final List<DepanFxLinkMatcher> JAVA_PACKAGE_MEMBERS =
       Arrays.asList(new DepanFxLinkMatcher [] {
