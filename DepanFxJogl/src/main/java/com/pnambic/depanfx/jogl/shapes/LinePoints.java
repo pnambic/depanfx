@@ -47,4 +47,12 @@ public class LinePoints {
   public static int getOffset(int index) {
     return index * STRIDE;
   }
+
+  public boolean hasEndpoints() {
+    return pointCount >= 2;
+  }
+
+  public boolean hasPoints() {
+    return pointCount > 0;
+  }
 }

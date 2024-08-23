@@ -46,7 +46,7 @@ public class RichLineRender implements LineRender {
   /**
    * Cache points to render as a line strip.
    */
-  private LinePoints linePoints;
+  private LinePoints linePoints = LinePoints.EMPTY;
 
   private ArrowShape sourceArrow;
 
@@ -64,7 +64,7 @@ public class RichLineRender implements LineRender {
           builder.prepare(lineShape, sourceShape, targetShape);
 
       // Attach arrowheads if there is a line
-      if (linePoints.pointCount >= 2) {
+      if (linePoints.hasEndpoints()) {
         sourceArrow = buildArrow(line.sourceArrow, 1, 0);
 
         int targetIndex = linePoints.pointCount - 1;
@@ -80,6 +80,52 @@ public class RichLineRender implements LineRender {
       targetPosX = targetShape.shapeX;
       targetPosY = targetShape.shapeY;
     }
+  }
+
+  @Override
+  public void draw(GL2 gl, LineShape line) {
+
+    // Skip it all if there are no vertices to draw.
+    if (linePoints.hasPoints()) {
+      gl.glColor3d(
+          line.lineColor.red, line.lineColor.green, line.lineColor.blue);
+      gl.glLineWidth((float) line.lineWidth);
+      drawLinePoints(gl);
+      drawHeadArrow(gl);
+      drawTailArrow(gl);
+    }
+  }
+
+  private boolean haveChanged(NodeShape sourceShape, NodeShape targetShape) {
+    if (sourceShape.shapeX != sourcePosX) {
+      return true;
+    }
+    if (sourceShape.shapeY != sourcePosY) {
+      return true;
+    }
+    if (targetShape.shapeX != targetPosX) {
+      return true;
+    }
+    if (targetShape.shapeY != targetPosY) {
+      return true;
+    }
+    return false;
+  }
+
+  private void drawLinePoints(GL2 gl) {
+    linePoints.glVertex(gl, GL2.GL_LINE_STRIP);
+  }
+
+  private void drawHeadArrow(GL2 gl) {
+    gl.glPushMatrix();
+    sourceArrow.draw(gl);
+    gl.glPopMatrix();
+  }
+
+  private void drawTailArrow(GL2 gl) {
+    gl.glPushMatrix();
+    targetArrow.draw(gl);
+    gl.glPopMatrix();
   }
 
   private ArrowShape buildArrow(
@@ -117,50 +163,6 @@ public class RichLineRender implements LineRender {
       break;
     }
     return ArrowShapes.NONE;
-  }
-
-  @Override
-  public void draw(GL2 gl, LineShape line) {
-
-    // Skip it all if there is nothing to draw.
-    if (linePoints.pointCount > 0) {
-      gl.glColor3d(
-          line.lineColor.red, line.lineColor.green, line.lineColor.blue);
-      gl.glLineWidth((float) line.lineWidth);
-      drawLinePoints(gl);
-      drawHeadArrow(gl);
-      drawTailArrow(gl);
-    }
-  }
-
-  private boolean haveChanged(NodeShape sourceShape, NodeShape targetShape) {
-    if (sourceShape.shapeX != sourcePosX) {
-      return true;
-    }
-    if (sourceShape.shapeY != sourcePosY) {
-      return true;
-    }
-    if (targetShape.shapeX != targetPosX) {
-      return true;
-    }
-    if (targetShape.shapeY != targetPosY) {
-      return true;
-    }
-    return false;
-  }
-
-  private void drawLinePoints(GL2 gl) {
-    linePoints.glVertex(gl, GL2.GL_LINE_STRIP);
-  }
-
-  private void drawHeadArrow(GL2 gl) {
-    gl.glPushMatrix();
-    sourceArrow.draw(gl);
-    gl.glPopMatrix();
-  }
-
-  private void drawTailArrow(GL2 gl) {
-    targetArrow.draw(gl);
   }
 
   private Shape buildLineShape(
