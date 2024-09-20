@@ -1,3 +1,7 @@
 site_name: DepanFX User Documentation
 nav:
   - Home: index.md
+  - Introduction:
+    - Welcome: introduction/Welcome.md
+    - Installation: introduction/Installation.md
+    - Getting Started: introduction/GettingStarted.md

@@ -2,7 +2,7 @@
 
 Welcome to DepanFX.  DepanFX is a direct manipulation tool for visualization,
 analysis, and refactoring of dependencies in large applications.
-
+![DepanFX initial startup](img/Depan Startup.png "Welcome from Code Inspector Gonzo")<br/>
 DepanFX allows software engineers to group software components
 into flexible categories.
 These categories can be based on analysis requirements,
