@@ -1,0 +1,36 @@
+name: Build and Deploy DepanFX
+
+on:
+  push:
+    tags:
+    - 'releases/**'
+
+  workflow_dispatch:
+
+
+env:
+  JAVA_DISTRO: 'temurin'
+  JAVA_VERSION: '21'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@v4
+
+    - name: Setup Java Sdk ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        distribution: ${{ env.JAVA_DISTRO }}
+        java-version: ${{ env.JAVA_VERSION }}
+
+    - name: Create distribution zip
+      run: ./gradlew :DepanFxApp:distZip
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: DepanFxApp/build/distributions/DepanFxApp.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
