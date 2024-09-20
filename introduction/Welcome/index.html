@@ -4,27 +4,27 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="None">
         
         
-        <link rel="shortcut icon" href="img/favicon.ico">
-        <title>DepanFX User Documentation</title>
-        <link href="css/bootstrap.min.css" rel="stylesheet">
-        <link href="css/fontawesome.min.css" rel="stylesheet">
-        <link href="css/brands.min.css" rel="stylesheet">
-        <link href="css/solid.min.css" rel="stylesheet">
-        <link href="css/v4-font-face.min.css" rel="stylesheet">
-        <link href="css/base.css" rel="stylesheet">
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Welcome - DepanFX User Documentation</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
         <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
         <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
         <script>hljs.highlightAll();</script> 
     </head>
 
-    <body class="homepage">
+    <body>
         <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href=".">DepanFX User Documentation</a>
+                <a class="navbar-brand" href="../..">DepanFX User Documentation</a>
                 <!-- Expander button -->
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -35,22 +35,22 @@
                         <!-- Main navigation -->
                         <ul class="nav navbar-nav">
                             <li class="nav-item">
-                                <a href="." class="nav-link active" aria-current="page">Home</a>
+                                <a href="../.." class="nav-link">Home</a>
                             </li>
                             <li class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Introduction</a>
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Introduction</a>
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="introduction/Welcome/" class="dropdown-item">Welcome</a>
+    <a href="./" class="dropdown-item active" aria-current="page">Welcome</a>
 </li>
                                     
 <li>
-    <a href="introduction/Installation/" class="dropdown-item">Installation</a>
+    <a href="../Installation/" class="dropdown-item">Installation</a>
 </li>
                                     
 <li>
-    <a href="introduction/GettingStarted/" class="dropdown-item">Getting Started</a>
+    <a href="../GettingStarted/" class="dropdown-item">Getting Started</a>
 </li>
                                 </ul>
                             </li>
@@ -63,12 +63,12 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" class="nav-link disabled">
+                                <a rel="prev" href="../.." class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="introduction/Welcome/" class="nav-link">
+                                <a rel="next" href="../Installation/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -92,6 +92,14 @@
             
             <li class="nav-item" data-bs-level="1"><a href="#welcome-to-depanfx" class="nav-link">Welcome to DepanFX</a>
               <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#key-features" class="nav-link">Key Features</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#history-and-authors" class="nav-link">History and Authors</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
               </ul>
             </li>
         </ul>
@@ -100,24 +108,45 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="welcome-to-depanfx">Welcome to DepanFX</h1>
-<p>Welcome to DepanFX.  DepanFX is a direct manipulation tool for visualization,
-analysis, and refactoring of dependencies in large applications.
-<img alt="DepanFX initial startup" src="img/Depan%20Startup.png" title="Welcome from Code Inspector Gonzo" /><br/>
-DepanFX allows software engineers to group software components
-into flexible categories.
+<p>Welcome to DepanFX.
+DepanFX is a direct manipulation tool for visualization, analysis,
+and refactoring of dependencies in large applications.</p>
+<p>DepanFX allows software engineers to group software components into flexible categories.
 These categories can be based on analysis requirements,
 not a priori classification strategies.</p>
 <p>DepanFX is based on Java software components, and should run on many platforms.
 Since a key use of DepanFX is the analysis of large software systems,
 a large amount of memory is required for effective use.</p>
-<h3 id="status">Status</h3>
-<p>DepanFX is currently in active development.  It should be useful for a number
-of analysis tasks, but the UX hasn't been well tuned.  The development to date
-has focused on expanding the features.</p>
-<p>Some features with controls in the UX don't work, or they are quite simplistic.
-For example, the infer parents option for tree sections is stubbed out.
-You have a need for any of these, let me know.
-It's a great way to help set development priorities.</p></div>
+<h2 id="key-features">Key Features</h2>
+<p><img alt="DepanFX initial startup" src="../../img/Depan%20Startup.png" title="Welcome from Code Inspector Gonzo" /></p>
+<h3 id="user-interface">User Interface</h3>
+<p>DepanFX provides a rich user interface for interacting with dependency graphs.
+The interface is designed to facilitate extended interactions with the dependency data.
+Dependency analysis can be a long term project,
+with lots of effort over an extended period of time.</p>
+<p>One of goals for DepanFX to coordinate and track this analysis effort.
+Obtaining and displaying the data is not enough.
+Software engineers need to develop analysis models incrementally,
+augment component information,
+and return to their work over time as requirements evolve.</p>
+<h2 id="history-and-authors">History and Authors</h2>
+<p>The original version of DepAn was developed as OSS at Google by Lee Carver,
+Yohan Coppel, and a handful of other contributors (2008?).
+ One of the original intentions was to explore the space of dependency analysis options.</p>
+<p>DepAn provided a powerful visualization system based on OpenGL.
+The absence of predefined structure for relations enabled the discovery of unexpected structures (e.g. the Incestuos Classes antipattern).
+Its architecture of components and extensions excelled at supporting other languages.</p>
+<p>However, DepAn was beginning to be long in the tooth.
+Some of the data structures were failing to adapt to more general uses,
+advanced Java structuring (e.g. modules)  was impossible,
+and other components felt too heavyweight (e.g. Eclipse extensions).
+Even though desktop applications are passé,
+the implementation of DepanFX began in 2023.</p>
+<p>DepanFX is largely built by Pnambic Computing,
+with parts taken from the early Google version.
+It remains free OSS, under an Apache 2.0 license.
+The primary contributor has been Lee Carver.
+Additional contributors are welcome.</p></div>
             </div>
         </div>
 
@@ -125,13 +154,13 @@ It's a great way to help set development priorities.</p></div>
             <hr>
             <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
-        <script src="js/bootstrap.bundle.min.js"></script>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
         <script>
-            var base_url = ".",
+            var base_url = "../..",
                 shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
         </script>
-        <script src="js/base.js"></script>
-        <script src="search/main.js"></script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -196,8 +225,3 @@ It's a great way to help set development priorities.</p></div>
 
     </body>
 </html>
-
-<!--
-MkDocs version : 1.6.0
-Build Date UTC : 2024-09-20 20:20:12.803108+00:00
--->
