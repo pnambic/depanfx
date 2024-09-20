@@ -7,7 +7,6 @@ on:
 
   workflow_dispatch:
 
-
 env:
   JAVA_DISTRO: 'temurin'
   JAVA_VERSION: '21'
@@ -29,7 +28,7 @@ jobs:
       run: ./gradlew :DepanFxApp:distZip
 
     - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         files: DepanFxApp/build/distributions/DepanFxApp.zip
       env:
