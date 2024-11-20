@@ -1,11 +1,20 @@
 package com.pnambic.depanfx.scene.plugins;
 
-import com.pnambic.depanfx.scene.DepanFxSceneController;
+import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 
-import javafx.scene.control.Tab;
+import java.io.IOException;
 
 public interface DepanFxSceneStarterContribution {
+
+  @SuppressWarnings("serial")
+  public class LoadViewerException extends RuntimeException {
+
+    public LoadViewerException(IOException errIo) {
+      super(errIo);
+    }
+  }
+
   String getLabel();
 
-  Tab createStarterTab(String label, DepanFxSceneController scene);
+  DepanFxSceneViewer getSceneViewer();
 }

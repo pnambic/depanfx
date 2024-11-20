@@ -9,6 +9,8 @@ import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxSceneController;
+import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
@@ -24,10 +26,13 @@ import javafx.stage.Stage;
 /**
  * Places a node list table into a workspace tab.
  */
-public class DepanFxNodeListViewer {
+public class DepanFxNodeListViewer implements DepanFxSceneViewer {
 
   private static final String FILTER_SELECTION_ITEM = "Filter Selection...";
 
+  private final String viewerTitle;
+
+  // Created in the constructor
   private final DepanFxNodeListTableController tableControl;
 
   /**
@@ -36,15 +41,24 @@ public class DepanFxNodeListViewer {
   private List<Stage> sideViews = new ArrayList<Stage>();
 
   public DepanFxNodeListViewer(
+      String viewerTitle,
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxNodeList nodeList,
       DepanFxNodeListSelection selectedNodes,
       DepanFxNodeListTableViewData tableView) {
 
+    this.viewerTitle = viewerTitle;
     tableControl = new DepanFxNodeListTableController(
         workspace, dialogRunner, nodeList, selectedNodes,
         tableView, new TreeTableView<>());
+  }
+
+  @Override
+  public Tab getSceneTab(DepanFxSceneController scene) {
+    Tab result = new Tab(viewerTitle, tableControl.getNodeListTable());
+    result.setContextMenu(buildContextMenu());
+    return result;
   }
 
   public Tab createWorkspaceTab(String tabName) {

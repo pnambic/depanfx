@@ -1,12 +1,12 @@
 package com.pnambic.depanfx.scene.plugins;
 
-import java.util.List;
+import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javafx.scene.control.Tab;
-import com.pnambic.depanfx.scene.DepanFxSceneController;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class DepanFxSceneStarterRegistry {
@@ -18,10 +18,10 @@ public class DepanFxSceneStarterRegistry {
     this.contributions = contributions;
   }
 
-  public void addStarterTabs(DepanFxSceneController scene) {
-    for (DepanFxSceneStarterContribution contribution : contributions) {
-      Tab contributionTab = contribution.createStarterTab(contribution.getLabel(), scene);
-      scene.addTab(contributionTab);
-    }
+  public List<DepanFxSceneViewer> getStarterViews() {
+    return contributions.stream()
+        .sorted((a,b) -> a.getLabel().compareTo(b.getLabel()))
+        .map(c -> c.getSceneViewer())
+        .collect(Collectors.toList());
   }
 }

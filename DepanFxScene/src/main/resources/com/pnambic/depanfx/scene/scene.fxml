@@ -71,18 +71,6 @@
         </MenuBar>
     </top>
     <center>
-        <TabPane
-            fx:id="viewRoot">
-            <tabs>
-                <Tab text="Welcome">
-                    <VBox fillWidth="true" alignment="CENTER">
-                        <Label fx:id="welcomeLabel" text="Welcome to DepanFX!" />
-                        <ImageView fx:id="welcomeImage"
-                            fitHeight="256" fitWidth="256">
-                        </ImageView>
-                    </VBox>
-                </Tab>
-            </tabs>
-        </TabPane>
+        <TabPane fx:id="viewRoot"/>
     </center>
 </BorderPane>

@@ -1,10 +1,9 @@
 package com.pnambic.depanfx.app;
 
 import com.pnambic.depanfx.DepanFxApplication;
-import com.pnambic.depanfx.scene.DepanFxAppIcons;
-import com.pnambic.depanfx.scene.DepanFxSceneController;
-
-import net.rgielen.fxweaver.core.FxWeaver;
+import com.pnambic.depanfx.session.DepanFxSession;
+import com.pnambic.depanfx.session.DepanFxSessionCliArgs;
+import com.pnambic.depanfx.session.DepanFxSessionData;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -15,15 +14,15 @@ import java.io.IOException;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class DepanFxApp extends Application implements Closeable {
 
-  private ConfigurableApplicationContext applicationContext;
+  private DepanFxSession session;
 
-  /** Get a reusable one up front. */
-  private FxWeaver fxWeaver;
+  private DepanFxSessionData sessionInfo;
+
+  private ConfigurableApplicationContext applicationContext;
 
   @Override
   public void init() {
@@ -33,12 +32,8 @@ public class DepanFxApp extends Application implements Closeable {
   @Override
   public void start(Stage stage) throws Exception {
     Platform.setImplicitExit(true);
-    Scene scene = DepanFxSceneController.createDepanScene(fxWeaver, this);
 
-    stage.setTitle("DepanFX");
-    DepanFxAppIcons.installDepanIcons(stage.getIcons());
-    stage.setScene(scene);
-    stage.show();
+    DepanFxSession.startSession(stage, session, sessionInfo);
   }
 
   @Override
@@ -70,6 +65,11 @@ public class DepanFxApp extends Application implements Closeable {
         .sources(DepanFxApplication.class)
         .run(args);
 
-    this.fxWeaver = applicationContext.getBean(FxWeaver.class);
+    this.session = applicationContext.getBean(DepanFxSession.class);
+    session.setOnClose(applicationContext::close);
+
+    DepanFxSessionCliArgs sessionArgs =
+        applicationContext.getBean(DepanFxSessionCliArgs.class);
+    this.sessionInfo = sessionArgs.getSessionInfo();
   }
 }

@@ -2,15 +2,16 @@ module depanfx.app {
     requires javafx.controls;
     requires javafx.fxml;
     requires transitive javafx.graphics;
+    requires net.rgielen.fxweaver.core;
 
     requires spring.boot;
     requires spring.boot.autoconfigure;
     requires spring.context;
 
-    requires net.rgielen.fxweaver.core;
     requires org.slf4j;
 
     requires depanfx.scene;
+    requires depanfx.session;
 
     // For Spring @Component discovery
     requires depanfx.filesystem.gui;
@@ -27,6 +28,7 @@ module depanfx.app {
     requires depanfx.perspective;
     requires depanfx.persistence;
     requires depanfx.workspace.gui;
+    requires depanfx.workspace;
 
     opens com.pnambic.depanfx to spring.core;
     opens com.pnambic.depanfx.app to spring.core;

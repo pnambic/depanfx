@@ -1,9 +1,7 @@
 package com.pnambic.depanfx.scene;
 
-import com.pnambic.depanfx.scene.DepanFxAppIcons.IconSize;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuRegistry;
-import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterRegistry;
 
 import net.rgielen.fxweaver.core.FxControllerAndView;
 import net.rgielen.fxweaver.core.FxWeaver;
@@ -14,6 +12,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,9 +36,9 @@ public class DepanFxSceneController {
 
   private final DepanFxNewResourceRegistry newResourceRegistry;
 
-  private final DepanFxSceneStarterRegistry starterRegistry;
-
   private final DepanFxDialogRunner dialogRunner;
+
+  private final Map<DepanFxSceneViewer, Tab> sceneViewers = new HashMap<>();
 
   private Closeable onClose;
 
@@ -56,11 +57,16 @@ public class DepanFxSceneController {
   @FXML
   private MenuItem fileOpenResourceItem;
 
-  public static Scene createDepanScene(FxWeaver fxWeaver, Closeable onClose) throws IOException {
+  public static Scene createDepanScene(
+      FxWeaver fxWeaver,
+      List<DepanFxSceneViewer> initViewers,
+      Closeable onClose)
+      throws IOException {
 
     FxControllerAndView<DepanFxSceneController, Node> root =
        fxWeaver.load(DepanFxSceneController.class);
     root.getController().onClose = onClose;
+    initViewers.forEach(root.getController()::addViewer);
 
     Scene scene = new Scene((Parent) root.getView().get());
     scene.getStylesheets().add(
@@ -72,21 +78,14 @@ public class DepanFxSceneController {
   public DepanFxSceneController(
       DepanFxSceneMenuRegistry menuRegistry,
       DepanFxNewResourceRegistry newResourceRegistry,
-      DepanFxSceneStarterRegistry starterRegistry,
       DepanFxDialogRunner dialogRunner) {
     this.menuRegistry = menuRegistry;
     this.newResourceRegistry = newResourceRegistry;
-    this.starterRegistry = starterRegistry;
     this.dialogRunner = dialogRunner;
   }
 
   @FXML
   public void initialize() {
-    DepanFxAppIcons.loadDepanIcon(IconSize.ICON_256x256)
-        .ifPresent(welcomeImage::setImage);
-
-    // Start any initial tabs
-    starterRegistry.addStarterTabs(this);
     fileNewItem.getItems().addAll(newResourceRegistry.buildNewResourceItems());
     fileOpenResourceItem.setOnAction(this::handleByMenuRegistry);
   }
@@ -120,7 +119,10 @@ public class DepanFxSceneController {
     dialogRunner.runDialog(DepanFxAboutDialog.class, "About DepanFX");
   }
 
-  public void addTab(Tab tab) {
+  public void addViewer(DepanFxSceneViewer viewer) {
+    Tab tab = viewer.getSceneTab(this);
+    sceneViewers.put(viewer, tab);
+
     viewRoot.getTabs().add(tab);
   }
 

@@ -36,7 +36,9 @@ import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
+import com.pnambic.depanfx.scene.DepanFxSceneController;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
+import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -76,7 +78,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
-public class DepanFxNodeViewPanel {
+public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private static final String NODE_SELECTION_ITEM = "Node Selection...";
 
@@ -200,11 +202,12 @@ public class DepanFxNodeViewPanel {
     this.viewNodesAsNodeList = buildViewNodesAsNodeList();
   }
 
-  public Tab createWorkspaceTab(String tabTitle) {
+  @Override // DepanFxSceneViewer
+  public Tab getSceneTab(DepanFxSceneController scene) {
     joglPane = createJoglPane();
     populateJoglPane();
 
-    Tab result = new Tab(tabTitle, joglPane);
+    Tab result = new Tab(viewData.getToolName(), joglPane);
 
     result.setOnSelectionChanged(new EventHandler<Event>() {
 

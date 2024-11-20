@@ -28,7 +28,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import javafx.scene.control.Cell;
-import javafx.scene.control.Tab;
 
 @Configuration
 public class DepanFxNodeListViewerConfiguration {
@@ -161,7 +160,7 @@ public class DepanFxNodeListViewerConfiguration {
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxSceneController scene,
-      DepanFxNodeList nodeList, String tabTitle) {
+      DepanFxNodeList nodeList, String viewerTitle) {
 
     DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc =
         DepanFxProjects.getBuiltIn(
@@ -169,11 +168,10 @@ public class DepanFxNodeListViewerConfiguration {
             DepanFxNodeListConfiguration.MEMBER_TABLE_VIEW_PATH).get();
 
     DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(
-        workspace, dialogRunner,
+        viewerTitle, workspace, dialogRunner,
         nodeList, DepanFxNodeListSelection.forNodes(nodeList.getNodes()),
         tableViewRsrc.getResource());
 
-    Tab viewerTab = viewer.createWorkspaceTab(tabTitle);
-    scene.addTab(viewerTab);
+    scene.addViewer(viewer);
   }
 }

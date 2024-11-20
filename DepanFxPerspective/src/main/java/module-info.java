@@ -25,5 +25,6 @@ module depanfx.perspective {
     exports com.pnambic.depanfx.perspective.chooser;
     exports com.pnambic.depanfx.perspective.graphdoc;
     exports com.pnambic.depanfx.perspective.plugins;
+    exports com.pnambic.depanfx.perspective.scene.tooldata;
     exports com.pnambic.depanfx.perspective.workspace.controls;
 }

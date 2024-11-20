@@ -146,7 +146,7 @@ public class DepanFxNodeViewConfiguration {
         DepanFxNodeViewData viewData) {
       DepanFxNodeViewPanel viewPanel = new DepanFxNodeViewPanel(
           workspace, dialogRunner, layoutRegistry, filterRegistry, viewData);
-      scene.addTab(viewPanel.createWorkspaceTab(viewData.getToolName()));
+      scene.addViewer(viewPanel);
     }
   }
 
