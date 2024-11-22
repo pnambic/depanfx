@@ -11,9 +11,13 @@ module depanfx.workspace.gui {
     requires depanfx.graph_doc;
     requires depanfx.perspective;
     requires depanfx.scene;
+    requires depanfx.session.data;
     requires depanfx.workspace;
+    requires depanfx.persistence;
 
-    opens com.pnambic.depanfx.workspace.gui to javafx.fxml, net.rgielen.fxweaver.core, spring.beans;
+    opens com.pnambic.depanfx.workspace.gui 
+        to javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;
+    opens com.pnambic.depanfx.workspace.viewdata;
 
     exports com.pnambic.depanfx.workspace.gui;
 }

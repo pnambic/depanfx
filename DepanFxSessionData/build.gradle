@@ -11,13 +11,14 @@ javafx {
 }
 
 dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter'
   implementation 'org.springframework.boot:spring-boot-autoconfigure'
   implementation "net.rgielen:javafx-weaver-core:${javafxWeaverVersion}"
 
-  implementation project(':DepanFxGraphDoc')
   implementation project(':DepanFxPersistence')
   implementation project(':DepanFxPerspective')
   implementation project(':DepanFxScene')
-  implementation project(':DepanFxSessionData')
   implementation project(':DepanFxWorkspace')
+
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

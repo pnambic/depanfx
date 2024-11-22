@@ -35,6 +35,7 @@ dependencies {
   implementation project(':DepanFxPerspective')
   implementation project(':DepanFxScene')
   implementation project(':DepanFxSession')
+  implementation project(':DepanFxSessionData')
   implementation project(':DepanFxWorkspace')
   implementation project(':DepanFxWorkspaceGui')
 

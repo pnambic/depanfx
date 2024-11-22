@@ -40,6 +40,8 @@
                         <MenuItem text="Print"/>
                         <SeparatorMenuItem />
                         <MenuItem text="Close"/>
+                        <MenuItem text="Save Session..."
+                            onAction="#handleSaveSession"/>
                         <SeparatorMenuItem />
                         <MenuItem text="Exit" onAction="#handleClose"/>
                     </items>

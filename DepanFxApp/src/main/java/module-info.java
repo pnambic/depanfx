@@ -12,6 +12,7 @@ module depanfx.app {
 
     requires depanfx.scene;
     requires depanfx.session;
+    requires depanfx.session.data;
 
     // For Spring @Component discovery
     requires depanfx.filesystem.gui;

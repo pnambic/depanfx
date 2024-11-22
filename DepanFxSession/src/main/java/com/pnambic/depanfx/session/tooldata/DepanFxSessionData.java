@@ -1,10 +1,9 @@
-package com.pnambic.depanfx.session;
+package com.pnambic.depanfx.session.tooldata;
 
-import com.pnambic.depanfx.perspective.scene.tooldata.DepanFxSceneData;
 import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 public class DepanFxSessionData extends DepanFxBaseToolData {
 
@@ -12,16 +11,16 @@ public class DepanFxSessionData extends DepanFxBaseToolData {
       new DepanFxSessionData(
           "Empty Session", "Empty DepanFx session", Collections.emptyList());
 
-  private final List<DepanFxSceneData> scenes;
+  private final Collection<DepanFxSceneData> scenes;
 
   public DepanFxSessionData(
       String toolName, String toolDescription,
-      List<DepanFxSceneData> scenes) {
+      Collection<DepanFxSceneData> scenes) {
     super(toolName, toolDescription);
     this.scenes = scenes;
   }
 
-  public List<DepanFxSceneData> getScenes() {
+  public Collection<DepanFxSceneData> getScenes() {
     return scenes;
   }
 }

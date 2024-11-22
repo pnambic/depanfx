@@ -13,43 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.pnambic.depanfx.scene;
 
 import com.pnambic.depanfx.scene.DepanFxAppIcons.IconSize;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterContribution;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Tab;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
 /**
- * Provides a welcome scene as a starter scene contribution.
+ * Provides a welcome scene from atomic parts.
+ *
+ * Loads a simple VBox from FXML, installs an icon image, with the intent
+ * of showing that content in the "Welcome" tab.
  */
 @Component
-public class DepanFxWelcomeSceneContribution
-    implements DepanFxSceneStarterContribution {
+public class DepanFxWelcomeViewLoader {
 
   private static final String WELCOME_VIEWER_FXML = "welcome-viewer.fxml";
 
-  private static final String WELCOME_TAB = "Welcome";
+  private final DepanFxWelcomeViewer welcomeViewer;
 
-  @Override
-  public String getLabel() {
-    return WELCOME_TAB;
+  @Autowired
+  public DepanFxWelcomeViewLoader() {
+    welcomeViewer = buildSceneViewer();
   }
 
-  @Override
-  public DepanFxSceneViewer getSceneViewer() {
-    return buildSceneViewer();
+  public DepanFxSceneViewer getWelcomeViewer() {
+    return welcomeViewer;
   }
 
-  private DepanFxSceneViewer buildSceneViewer() {
+  private DepanFxWelcomeViewer buildSceneViewer() {
     VBox resource = getWelcomeContent();
 
     // Dynamically lookup the ImageView
@@ -57,13 +57,7 @@ public class DepanFxWelcomeSceneContribution
     DepanFxAppIcons.loadDepanIcon(IconSize.ICON_256x256)
        .ifPresent(welcomeImage::setImage);
 
-    return new DepanFxSceneViewer() {
-
-      @Override
-      public Tab getSceneTab(DepanFxSceneController scene) {
-        return new Tab(WELCOME_TAB, resource);
-      }
-    };
+    return new DepanFxWelcomeViewer(resource);
   }
 
   /**
@@ -71,7 +65,7 @@ public class DepanFxWelcomeSceneContribution
    */
   private <T> T getWelcomeContent() {
     FXMLLoader loader =
-        new FXMLLoader(DepanFxWelcomeSceneContribution.class
+        new FXMLLoader(DepanFxWelcomeViewLoader.class
             .getResource(WELCOME_VIEWER_FXML));
 
     try {

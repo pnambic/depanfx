@@ -4,17 +4,18 @@ import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuRegistry;
 
 import net.rgielen.fxweaver.core.FxControllerAndView;
-import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.Closeable;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -27,10 +28,18 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 @Component
 @FxmlView("scene.fxml")
 public class DepanFxSceneController {
+
+  public static interface SceneOwner { // extends Closeable {
+    void saveSession() throws IOException;
+
+    void closeScene(DepanFxSceneController depanFxSceneController)
+        throws IOException;
+  }
 
   private final DepanFxSceneMenuRegistry menuRegistry;
 
@@ -38,9 +47,10 @@ public class DepanFxSceneController {
 
   private final DepanFxDialogRunner dialogRunner;
 
-  private final Map<DepanFxSceneViewer, Tab> sceneViewers = new HashMap<>();
+  private final Map<DepanFxSceneViewer, Tab> sceneViewers =
+      new LinkedHashMap<>();
 
-  private Closeable onClose;
+  private SceneOwner owner;
 
   @FXML
   private TabPane viewRoot;
@@ -57,21 +67,21 @@ public class DepanFxSceneController {
   @FXML
   private MenuItem fileOpenResourceItem;
 
-  public static Scene createDepanScene(
-      FxWeaver fxWeaver,
+  public static DepanFxSceneController createDepanScene(
+      DepanFxDialogRunner dialogRunner,
       List<DepanFxSceneViewer> initViewers,
-      Closeable onClose)
+      SceneOwner owner)
       throws IOException {
 
     FxControllerAndView<DepanFxSceneController, Node> root =
-       fxWeaver.load(DepanFxSceneController.class);
-    root.getController().onClose = onClose;
+        dialogRunner.weaveFxmlView(DepanFxSceneController.class);
+    root.getController().owner = owner;
     initViewers.forEach(root.getController()::addViewer);
 
     Scene scene = new Scene((Parent) root.getView().get());
     scene.getStylesheets().add(
         DepanFxSceneController.class.getResource("styles.css").toExternalForm());
-    return scene;
+    return root.getController();
   }
 
   @Autowired
@@ -84,6 +94,10 @@ public class DepanFxSceneController {
     this.dialogRunner = dialogRunner;
   }
 
+  public Stream<DepanFxSceneViewer> streamViewers() {
+    return sceneViewers.keySet().stream();
+  }
+
   @FXML
   public void initialize() {
     fileNewItem.getItems().addAll(newResourceRegistry.buildNewResourceItems());
@@ -93,7 +107,16 @@ public class DepanFxSceneController {
   @FXML
   public void handleClose() {
     try {
-      onClose.close();
+      owner.closeScene(this);
+    } catch (IOException errIo) {
+      throw new RuntimeException("Unable to shutdown", errIo);
+    }
+  }
+
+  @FXML
+  public void handleSaveSession() {
+    try {
+      owner.saveSession();
     } catch (IOException errIo) {
       throw new RuntimeException("Unable to shutdown", errIo);
     }
@@ -117,6 +140,10 @@ public class DepanFxSceneController {
   @FXML
   public void handleAbout() {
     dialogRunner.runDialog(DepanFxAboutDialog.class, "About DepanFX");
+  }
+
+  public Scene getScene() {
+    return viewRoot.getScene();
   }
 
   public void addViewer(DepanFxSceneViewer viewer) {

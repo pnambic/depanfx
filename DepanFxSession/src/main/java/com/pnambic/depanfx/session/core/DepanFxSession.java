@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.session;
+package com.pnambic.depanfx.session.core;
 
-import com.pnambic.depanfx.perspective.scene.tooldata.DepanFxSceneData;
 import com.pnambic.depanfx.scene.DepanFxAppIcons;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
+import com.pnambic.depanfx.session.gui.DepanFxSessionSaveDialog;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-
-import net.rgielen.fxweaver.core.FxWeaver;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,10 +29,9 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
@@ -41,44 +39,48 @@ import javafx.stage.Stage;
  * and UX elements (JavaFX scenes) are contained here.
  */
 @Component
-public class DepanFxSession {
+public class DepanFxSession implements DepanFxSceneController.SceneOwner {
 
-  public static DepanFxSceneData EMPTY_SESSION_SCENE =
-      new DepanFxSceneData("Empty Session", "Empty", Collections.emptyList());
-
-  private final FxWeaver fxWeaver;
+  public static DepanFxSceneConfig EMPTY_SESSION_SCENE =
+      new DepanFxSceneConfig("Empty Session", "Empty", Collections.emptyList());
 
   private final DepanFxWorkspace workspace;
 
-  private final Map<DepanFxSceneData, Scene> sceneMap = new HashMap<>();
+  private final DepanFxDialogRunner dialogRunner;
+
+  private final Map<DepanFxSceneController, DepanFxSceneConfig> sceneMap =
+      new HashMap<>();
 
   private Closeable onClose;
 
   public static void startSession(
-      Stage stage, DepanFxSession session, DepanFxSessionData sessionInfo)
+      Stage stage, DepanFxSession session, DepanFxSessionConfig  sessionConfig)
       throws Exception {
 
-    List<DepanFxSceneData> scenes = sessionInfo.getScenes();
+    Collection<DepanFxSceneConfig> scenes = sessionConfig.getSceneConfigs();
+    Iterator<DepanFxSceneConfig> sceneSeq = scenes.iterator();
 
-    if (scenes.isEmpty()) {
+    if (!sceneSeq.hasNext()) {
       session.addScene(stage, EMPTY_SESSION_SCENE);
       return;
     }
 
     // Start the first scene on the initial stage.
-    session.addScene(stage, scenes.get(0));
+    DepanFxSceneConfig baseScene = sceneSeq.next();
+    session.addScene(stage, baseScene);
 
     // Start additional scenes on secondary stages.
-    int sceneCnt = scenes.size();
-    for (DepanFxSceneData sceneInfo : scenes.subList(1, sceneCnt)) {
+    while (sceneSeq.hasNext()) {
+      DepanFxSceneConfig sceneInfo = sceneSeq.next();
       Stage sceneStage = new Stage();
       session.addScene(sceneStage, sceneInfo);
     }
   }
 
   @Autowired
-  public DepanFxSession(FxWeaver fxWeaver, DepanFxWorkspace workspace) {
-    this.fxWeaver = fxWeaver;
+  public DepanFxSession(
+      DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace) {
+    this.dialogRunner = dialogRunner;
     this.workspace = workspace;
   }
 
@@ -90,33 +92,43 @@ public class DepanFxSession {
     return workspace;
   }
 
-  public Collection<Scene> getScenes() {
+  public Collection<DepanFxSceneController> getScenes() {
+    return sceneMap.keySet();
+  }
+
+  public Collection<DepanFxSceneConfig> getSceneConfigs() {
     return sceneMap.values();
   }
 
-  public void addScene(Stage stage, DepanFxSceneData sceneInfo)
+  public void addScene(Stage stage, DepanFxSceneConfig sceneConfig)
       throws Exception {
-    Scene scene = DepanFxSceneController.createDepanScene(
-        fxWeaver, sceneInfo.getViewers(), () -> sceneClose(sceneInfo));
-    sceneMap.put(sceneInfo, scene);
+    DepanFxSceneController scene = DepanFxSceneController.createDepanScene(
+        dialogRunner, sceneConfig.getViewers(), this);
+    sceneMap.put(scene, sceneConfig);
 
     stage.setTitle("DepanFX");
     DepanFxAppIcons.installDepanIcons(stage.getIcons());
-    stage.setScene(scene);
+    stage.setScene(scene.getScene());
     stage.show();
   }
 
-  public void addScene(DepanFxSceneData sceneInfo)
+  public void addScene(DepanFxSceneConfig sceneInfo)
       throws Exception {
     Stage sceneState = new Stage();
     addScene(sceneState, sceneInfo);
   }
 
-  private void sceneClose(DepanFxSceneData sceneInfo) {
-    sceneMap.remove(sceneInfo);
+  @Override // DepanFxSceneController.SceneOwner
+  public void closeScene(DepanFxSceneController scene) {
+    sceneMap.remove(scene);
     if (sceneMap.isEmpty()) {
       closeParent();
     }
+  }
+
+  @Override // DepanFxSceneController.SceneOwner
+  public void saveSession() throws IOException {
+    DepanFxSessionSaveDialog.runSaveSessionDialog(dialogRunner);
   }
 
   private void closeParent() {

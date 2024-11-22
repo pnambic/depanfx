@@ -9,7 +9,8 @@ module depanfx.scene {
     requires spring.context;
     requires spring.beans;
 
-    opens com.pnambic.depanfx.scene to javafx.fxml, net.rgielen.fxweaver.core, spring.beans;
+    opens com.pnambic.depanfx.scene to
+      javafx.fxml, net.rgielen.fxweaver.core, spring.beans;
 
     exports com.pnambic.depanfx.scene;
     exports com.pnambic.depanfx.scene.plugins;

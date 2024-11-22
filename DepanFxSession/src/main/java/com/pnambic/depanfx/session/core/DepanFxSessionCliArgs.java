@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.pnambic.depanfx.session.core;
 
-package com.pnambic.depanfx.session;
-
-import com.pnambic.depanfx.perspective.scene.tooldata.DepanFxSceneData;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterRegistry;
 
@@ -36,7 +34,7 @@ public class DepanFxSessionCliArgs implements ApplicationRunner {
 
   private final DepanFxSceneStarterRegistry starterRegistry;
 
-  private DepanFxSessionData sessionInfo;
+  private DepanFxSessionConfig sessionConfig;
 
   @Autowired
   private DepanFxSessionCliArgs(DepanFxSceneStarterRegistry starterRegistry) {
@@ -47,16 +45,16 @@ public class DepanFxSessionCliArgs implements ApplicationRunner {
   public void run(ApplicationArguments args) {
     if (args.containsOption("session")) {
       String sessionPath = args.getOptionValues("session").get(0);
-      sessionInfo = restoreSession(sessionPath);
-      if (sessionInfo == null) {
+      sessionConfig = restoreSession(sessionPath);
+      if (sessionConfig == null) {
         return;
       }
       // Fall through to default.
     }
-    sessionInfo = defaultSession();
+    sessionConfig = defaultSession();
   }
 
-  private DepanFxSessionData restoreSession(String sessionPath) {
+  private DepanFxSessionConfig restoreSession(String sessionPath) {
     return defaultSession();
     // LATER: more like this
     //if (sessionPath == null) {
@@ -64,29 +62,27 @@ public class DepanFxSessionCliArgs implements ApplicationRunner {
     //}
   }
 
-  private DepanFxSessionData defaultSession() {
+  private DepanFxSessionConfig defaultSession() {
     List<DepanFxSceneViewer> defaultViewers =
         starterRegistry.getStarterViews();
 
-    DepanFxSceneData sceneInfo = new DepanFxSceneData(
+    DepanFxSceneConfig sceneInfo = new DepanFxSceneConfig(
         "Initial Startup Scene",
         "Initial scene created at DepanFX startup.",
         defaultViewers);
 
-    List<DepanFxSceneData> scenes = new ArrayList<>(1);
+    List<DepanFxSceneConfig> scenes = new ArrayList<>(1);
     scenes.add(sceneInfo);
 
-    DepanFxSessionData result = new DepanFxSessionData(
-        "Default Startup Session",
-        "Initial session created at DepanFX startup.",
+    DepanFxSessionConfig result = new DepanFxSessionConfig(
         scenes);
     return result;
   }
 
-  public DepanFxSessionData getSessionInfo() {
-    if (sessionInfo == null) {
-      return DepanFxSessionData.EMPTY_SESSION_DATA;
+  public DepanFxSessionConfig getSessionConfig() {
+    if (sessionConfig == null) {
+      return DepanFxSessionConfig.EMPTY_SESSION_DATA;
     }
-    return sessionInfo;
+    return sessionConfig;
   }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.perspective.scene.tooldata;
+package com.pnambic.depanfx.session.core;
 
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
@@ -23,17 +23,17 @@ import java.util.List;
 /**
  * Encapsulates the persisted data for a scene.
  */
-public class DepanFxSceneData extends DepanFxBaseToolData {
+public class DepanFxSceneConfig extends DepanFxBaseToolData {
 
-  private final List<DepanFxSceneViewer> viewers;
+  private final List<DepanFxSceneViewer> viewersInfo;
 
-  public DepanFxSceneData(String toolName, String toolDescr,
-      List<DepanFxSceneViewer> viewers) {
+  public DepanFxSceneConfig(String toolName, String toolDescr,
+      List<DepanFxSceneViewer> viewersInfo) {
     super(toolName, toolDescr);
-    this.viewers = viewers;
+    this.viewersInfo = viewersInfo;
   }
 
   public List<DepanFxSceneViewer> getViewers() {
-    return viewers;
+    return viewersInfo;
   }
 }

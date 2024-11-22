@@ -28,9 +28,9 @@ public class DepanFxProjectListViewer {
 
   private static final String PROJECTS = "Projects";
 
-  private static final String NEW_PROJECT_CONTEXT_ITEM = "New Project ..";
+  private static final String OPEN_PROJECT_CONTEXT_ITEM = "Open Project...";
 
-  private static final String OPEN_PROJECT_CONTEXT_ITEM = "Open Project ..";
+  private static final String NEW_PROJECT_CONTEXT_ITEM = "New Project...";
 
   private static final String REFRESH_CONTEXT_ITEM = "Refresh";
 
@@ -109,9 +109,9 @@ public class DepanFxProjectListViewer {
     DepanFxContextMenuBuilder menuBuilder = new DepanFxContextMenuBuilder();
 
     menuBuilder.appendActionItem(
-        NEW_PROJECT_CONTEXT_ITEM, e -> newProject());
-    menuBuilder.appendActionItem(
         OPEN_PROJECT_CONTEXT_ITEM, e -> openProject());
+    menuBuilder.appendActionItem(
+        NEW_PROJECT_CONTEXT_ITEM, e -> newProject());
 
     menuBuilder.appendSeparator();
     menuBuilder.appendActionItem(
