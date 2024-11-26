@@ -87,9 +87,7 @@ public class DepanFxNodeListViewerConfiguration {
                     workspace.getWorkspaceResource(r, GraphDocument.class));
         optWkspRsrc.map(DepanFxNodeLists::buildNodeList)
             .ifPresent(nl -> {
-              String title = DepanFxWorkspaceFactory.buildDocTitle(
-                  optWkspRsrc.get().getDocument()) + " nodes";
-              addNodeListViewToScene(workspace, dialogRunner, scene, nl, title);
+              addGraphDocViewToScene(workspace, dialogRunner, scene, nl);
             });
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to open node list for {}",
@@ -134,16 +132,11 @@ public class DepanFxNodeListViewerConfiguration {
         DepanFxSceneController scene,
         Path docPath) {
       try {
-        Optional<DepanFxWorkspaceResource<DepanFxNodeList>> optWkspRsrc =
-            workspace.toProjectDocument(docPath.toUri())
-                .flatMap(r -> workspace.getWorkspaceResource(
-                      r, DepanFxNodeList.class));
-        optWkspRsrc.map(r -> r.getResource())
-            .ifPresent(nl -> {
-              String title = DepanFxWorkspaceFactory.buildDocTitle(
-                  optWkspRsrc.get().getDocument());
-              addNodeListViewToScene(workspace, dialogRunner, scene, nl, title);
-            });
+        workspace.toProjectDocument(docPath.toUri())
+            .flatMap(r ->
+                workspace.getWorkspaceResource(r, DepanFxNodeList.class))
+            .ifPresent(nl -> 
+                addNodeListDocViewToScene(workspace, dialogRunner, scene, nl));
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to open list view for {}",
             docPath.toUri(), errCaught);
@@ -156,11 +149,39 @@ public class DepanFxNodeListViewerConfiguration {
     }
   }
 
+  private static void addGraphDocViewToScene(
+      DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner,
+      DepanFxSceneController scene,
+      DepanFxWorkspaceResource<GraphDocument> graphRsrc) {
+
+    DepanFxNodeList nodeList = DepanFxNodeLists.buildNodeList(graphRsrc);
+    DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc
+    String viewerTitle = DepanFxWorkspaceFactory.buildDocTitle(
+        nodeListRsrc.getDocument()) + " nodes";
+
+    addNodeListViewToScene(
+        workspace, dialogRunner, scene, viewerTitle, nodeListRsrc);
+  }
+
+  private static void addNodeListDocViewToScene(
+      DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner,
+      DepanFxSceneController scene,
+      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
+
+    String viewerTitle =
+        DepanFxWorkspaceFactory.buildDocTitle(nodeListRsrc.getDocument());
+    addNodeListViewToScene(
+        workspace, dialogRunner, scene, viewerTitle, nodeListRsrc);
+  }
+
   private static void addNodeListViewToScene(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxSceneController scene,
-      DepanFxNodeList nodeList, String viewerTitle) {
+      String viewerTitle,
+      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
 
     DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc =
         DepanFxProjects.getBuiltIn(
@@ -169,8 +190,7 @@ public class DepanFxNodeListViewerConfiguration {
 
     DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(
         viewerTitle, workspace, dialogRunner,
-        nodeList, DepanFxNodeListSelection.forNodes(nodeList.getNodes()),
-        tableViewRsrc.getResource());
+        nodeListRsrc, tableViewRsrc);
 
     scene.addViewer(viewer);
   }

@@ -23,6 +23,7 @@ dependencies {
   implementation project(':DepanFxNodeListGui')
   implementation project(':DepanFxPersistence')
   implementation project(':DepanFxPerspective')
+  implementation project(':DepanFxSessionData')
   implementation project(':DepanFxScene')
   implementation project(':DepanFxWorkspace')
 }

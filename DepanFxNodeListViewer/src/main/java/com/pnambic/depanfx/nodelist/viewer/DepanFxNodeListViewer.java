@@ -32,6 +32,8 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
 
   private final String viewerTitle;
 
+  private final DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc;
+
   // Created in the constructor
   private final DepanFxNodeListTableController tableControl;
 
@@ -40,18 +42,25 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
    */
   private List<Stage> sideViews = new ArrayList<Stage>();
 
+  private DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc;
+
   public DepanFxNodeListViewer(
       String viewerTitle,
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
-      DepanFxNodeList nodeList,
-      DepanFxNodeListSelection selectedNodes,
-      DepanFxNodeListTableViewData tableView) {
+      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc,
+      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc) {
 
     this.viewerTitle = viewerTitle;
+    this.nodeListRsrc = nodeListRsrc;
+    this.tableViewRsrc = tableViewRsrc;
+
+    DepanFxNodeList nodeList = nodeListRsrc.getResource();
+
     tableControl = new DepanFxNodeListTableController(
-        workspace, dialogRunner, nodeList, selectedNodes,
-        tableView, new TreeTableView<>());
+        workspace, dialogRunner, nodeList,
+        DepanFxNodeListSelection.forNodes(nodeList.getNodes()),
+        tableViewRsrc.getResource(), new TreeTableView<>());
   }
 
   @Override
@@ -61,10 +70,16 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
     return result;
   }
 
-  public Tab createWorkspaceTab(String tabName) {
-    Tab result = new Tab(tabName, tableControl.getNodeListTable());
-    result.setContextMenu(buildContextMenu());
-    return result;
+  public String getViewerTitle() {
+    return viewerTitle;
+  }
+
+  public DepanFxWorkspaceResource<DepanFxNodeList> getNodeListResource() {
+    return nodeListRsrc;
+  }
+
+  public DepanFxWorkspaceResource<DepanFxNodeListTableViewData> getTableViewResource() {
+    return tableViewRsrc;
   }
 
   private ContextMenu buildContextMenu() {

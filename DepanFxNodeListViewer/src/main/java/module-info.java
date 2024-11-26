@@ -16,6 +16,7 @@ module depanfx.nodelist.viewer {
   requires depanfx.nodelist.gui;
   requires depanfx.persistence;
   requires depanfx.perspective;
+  requires depanfx.session.data;
   requires depanfx.workspace;
   requires depanfx.graph_doc;
   requires depanfx.scene;
