@@ -2,6 +2,7 @@ package com.pnambic.depanfx.session.gui;
 
 import com.pnambic.depanfx.persistence.PersistDocumentTransport;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
+import com.pnambic.depanfx.persistence.plugins.GraphNodePersistencePluginRegistry;
 import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
 import com.pnambic.depanfx.perspective.DepanFxProctor;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
@@ -16,6 +17,7 @@ import com.pnambic.depanfx.session.tooldata.DepanFxSessionData;
 import com.pnambic.depanfx.session.viewdata.DepanFxBaseViewerData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -54,6 +56,8 @@ public class DepanFxSessionSaveDialog {
 
   private final DepanFxSceneViewerRegistry viewerRegistry;
 
+  private final GraphNodePersistencePluginRegistry graphNodeRegistry;
+
   @FXML
   private Label sessionDetailsLabel;
 
@@ -62,9 +66,11 @@ public class DepanFxSessionSaveDialog {
 
   @Autowired
   public DepanFxSessionSaveDialog(
-      DepanFxSession session, DepanFxSceneViewerRegistry viewerRegistry) {
+      DepanFxSession session, DepanFxSceneViewerRegistry viewerRegistry,
+      GraphNodePersistencePluginRegistry graphNodeRegistry) {
     this.session = session;
     this.viewerRegistry = viewerRegistry;
+    this.graphNodeRegistry = graphNodeRegistry;
   }
 
   public static Dialog<DepanFxSessionSaveDialog> runSaveSessionDialog(
@@ -155,6 +161,9 @@ public class DepanFxSessionSaveDialog {
         new PersistDocumentTransportBuilder();
     transportBuilder.addImplicitCollection(DepanFxSessionData.class, "scenes");
     transportBuilder.addAllowedType(ALLOWED_TYPES);
+    graphNodeRegistry.applyExtensions(
+        transportBuilder, DepanFxWorkspaceResource.class);
+
     PersistDocumentTransport transport =
         transportBuilder.buildDocumentXmlPersist();
 

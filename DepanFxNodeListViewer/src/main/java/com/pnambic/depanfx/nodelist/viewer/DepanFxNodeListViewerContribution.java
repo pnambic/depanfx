@@ -24,6 +24,7 @@ import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.session.plugins.DepanFxSceneViewerRegistry;
 import com.pnambic.depanfx.session.viewdata.DepanFxBaseViewerData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -62,17 +63,14 @@ public class DepanFxNodeListViewerContribution
 
   @Override
   public Optional<DepanFxSceneViewer> buildViewer(
-      DepanFxBaseViewerData viewData) {
+      DepanFxBaseViewerData baseData) {
 
-    DepanFxNodeListViewerData listData = (DepanFxNodeListViewerData) viewData;
-    DepanFxNodeList nodeList = listData.getNodeList();
-    DepanFxNodeListSelection selection =
-        DepanFxNodeListSelection.forNodes(nodeList.getNodes());
-
+    DepanFxNodeListViewerData viewerData = (DepanFxNodeListViewerData) baseData;
     return Optional.of(new DepanFxNodeListViewer(
-        listData.getViewerTitle(),
+        viewerData.getViewerTitle(),
         workspace, dialogRunner,
-        nodeList, selection, listData.getTableView()));
+        viewerData.getNodeListRsrc(),
+        viewerData.getTableViewRsrc()));
   }
 
   @Override
@@ -82,8 +80,8 @@ public class DepanFxNodeListViewerContribution
 
     DepanFxBaseViewerData result = new DepanFxNodeListViewerData(
         listViewer.getViewerTitle(),
-        listViewer.getNodeListRsrc(),
-        listViewer.getTableViewRsrc());
+        listViewer.getNodeListResource(),
+        listViewer.getTableViewResource());
     return Optional.of(result);
   }
 

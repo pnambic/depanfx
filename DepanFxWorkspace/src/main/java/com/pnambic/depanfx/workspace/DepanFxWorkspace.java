@@ -28,7 +28,11 @@ public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
 
   DepanFxProjectTree getBuiltInProjectTree();
 
+  DepanFxProjectTree getScratchProjectTree();
+
   void addProject(DepanFxProjectTree project);
+
+  <T> DepanFxWorkspaceResource<T> addScratchResource(T resource);
 
   /**
    * Save the document in the persistent store.  The saved document is added
@@ -68,6 +72,8 @@ public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
   Optional<DepanFxProjectContainer> toProjectContainer(URI uri);
 
   Optional<DepanFxProjectDocument> toProjectDocument(URI uri);
+
+  Optional<DepanFxProjectDocument> createScratchDocument();
 
   Optional<DepanFxProjectDocument> toProjectDocument(
       String projectName, String resourcePath);

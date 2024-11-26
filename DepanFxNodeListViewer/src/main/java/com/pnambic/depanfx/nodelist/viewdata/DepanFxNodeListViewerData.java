@@ -15,15 +15,14 @@
  */
 package com.pnambic.depanfx.nodelist.viewdata;
 
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.session.viewdata.DepanFxBaseViewerData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 /**
- * A simple marker class for the workspace viewer.  It is always constructed the
- * same way,so there are no data elements to persist.
+ * The table view viewer includes the node list and the table view resources.
+ * The active selection in the viewer is not persisted.
  */
 public class DepanFxNodeListViewerData extends DepanFxBaseViewerData{
 
@@ -33,7 +32,8 @@ public class DepanFxNodeListViewerData extends DepanFxBaseViewerData{
 
   private final DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc;
 
-  private DepanFxNodeListViewerData(String viewTitle,
+  public DepanFxNodeListViewerData(
+      String viewTitle,
       DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc,
       DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc) {
     this.viewTitle = viewTitle;
@@ -45,15 +45,11 @@ public class DepanFxNodeListViewerData extends DepanFxBaseViewerData{
     return viewTitle;
   }
 
-  public DepanFxNodeList getNodeList() {
-    return nodeListRsrc.getResource();
+  public DepanFxWorkspaceResource<DepanFxNodeList> getNodeListRsrc() {
+    return nodeListRsrc;
   }
 
-  public DepanFxNodeListSelection getSelection() {
-    return null;
-  }
-
-  public DepanFxNodeListTableViewData getTableView() {
-    return tableViewRsrc.getResource();
+  public DepanFxWorkspaceResource<DepanFxNodeListTableViewData> getTableViewRsrc() {
+    return tableViewRsrc;
   }
 }

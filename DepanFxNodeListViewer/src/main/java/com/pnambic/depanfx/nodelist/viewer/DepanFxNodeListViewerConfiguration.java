@@ -2,7 +2,6 @@ package com.pnambic.depanfx.nodelist.viewer;
 
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListConfiguration;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
@@ -25,7 +24,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
-import java.util.Optional;
 
 import javafx.scene.control.Cell;
 
@@ -81,14 +79,12 @@ public class DepanFxNodeListViewerConfiguration {
         DepanFxWorkspace workspace,
         Path docPath) {
       try {
-        Optional<DepanFxWorkspaceResource<GraphDocument>> optWkspRsrc =
-            workspace.toProjectDocument(docPath.toUri())
-                .flatMap(r ->
-                    workspace.getWorkspaceResource(r, GraphDocument.class));
-        optWkspRsrc.map(DepanFxNodeLists::buildNodeList)
+        workspace.toProjectDocument(docPath.toUri())
+            .flatMap(r ->
+                workspace.getWorkspaceResource(r, GraphDocument.class))
             .ifPresent(nl -> {
-              addGraphDocViewToScene(workspace, dialogRunner, scene, nl);
-            });
+                addGraphDocViewToScene(workspace, dialogRunner, scene, nl);
+        });
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to open node list for {}",
             docPath.toUri(), errCaught);
@@ -156,9 +152,11 @@ public class DepanFxNodeListViewerConfiguration {
       DepanFxWorkspaceResource<GraphDocument> graphRsrc) {
 
     DepanFxNodeList nodeList = DepanFxNodeLists.buildNodeList(graphRsrc);
-    DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc
+    DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc =
+        workspace.addScratchResource(nodeList);
+
     String viewerTitle = DepanFxWorkspaceFactory.buildDocTitle(
-        nodeListRsrc.getDocument()) + " nodes";
+        graphRsrc.getDocument()) + " nodes";
 
     addNodeListViewToScene(
         workspace, dialogRunner, scene, viewerTitle, nodeListRsrc);

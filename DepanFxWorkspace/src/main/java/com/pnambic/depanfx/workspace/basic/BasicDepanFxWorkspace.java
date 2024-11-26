@@ -11,11 +11,11 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.documents.DocumentRegistry;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
+import com.pnambic.depanfx.workspace.projects.DepanFxScratchProject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -46,7 +46,9 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
 
   private final DocumentPersistenceRegistry persistRegistry;
 
-  private final DepanFxProjectSpi builtInProj;
+  private final DepanFxBuiltInProject builtInProj;
+
+  private final DepanFxScratchProject scratchProj;
 
   private final List<DepanFxProjectTree> projectList = new ArrayList<>();
 
@@ -59,18 +61,20 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   @Autowired
   public BasicDepanFxWorkspace(
       DocumentPersistenceRegistry persistRegistry,
-      @Qualifier("BuiltIn Workspace")
-      DepanFxProjectSpi builtInProj) {
-    this(WORKSPACE_NAME, persistRegistry, builtInProj);
+      DepanFxBuiltInProject builtInProj,
+      DepanFxScratchProject scratchProj) {
+    this(WORKSPACE_NAME, persistRegistry, builtInProj, scratchProj);
   }
 
   public BasicDepanFxWorkspace(
       String workspaceName,
       DocumentPersistenceRegistry persistRegistry,
-      DepanFxProjectSpi builtInProj) {
+      DepanFxBuiltInProject builtInProj,
+      DepanFxScratchProject scratchProj) {
     this.workspaceName = workspaceName;
     this.persistRegistry = persistRegistry;
     this.builtInProj = builtInProj;
+    this.scratchProj = scratchProj;
   }
 
   @Override
@@ -118,7 +122,20 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
 
   @Override
   public DepanFxProjectTree getBuiltInProjectTree() {
-    return ((DepanFxBuiltInProject) builtInProj).getProjectTree();
+    return builtInProj.getProjectTree();
+  }
+
+  @Override
+  public DepanFxProjectTree getScratchProjectTree() {
+    return scratchProj.getProjectTree();
+  }
+
+  @Override
+  public <T> DepanFxWorkspaceResource<T> addScratchResource(T resource) {
+    return scratchProj.installScratchResource(
+        scratchProj.getProjectTree(),
+        scratchProj.createScratchDocument(),
+        resource);
   }
 
   @Override
@@ -187,6 +204,11 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   }
 
   @Override
+  public Optional<DepanFxProjectDocument> createScratchDocument() {
+    return Optional.of(scratchProj.createScratchDocument());
+  }
+
+  @Override
   public Optional<DepanFxProjectDocument> toProjectDocument(
       String projectName, String resourcePath) {
 
@@ -200,10 +222,10 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
       DepanFxProjectDocument resourceDoc, Class<T> type) {
     return
         getWorkspaceResource(resourceDoc, type.getName())
-        .filter(r ->expectType(type, r))
-        .map(r -> (DepanFxWorkspaceResource<T>) r)
-        .map(Optional::of)
-        .orElse(Optional.empty());
+            .filter(r ->expectType(type, r))
+            .map(r -> (DepanFxWorkspaceResource<T>) r)
+            .map(Optional::of)
+            .orElse(Optional.empty());
   }
 
   /**
@@ -218,8 +240,10 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
       DepanFxProjectDocument resourceDoc, String expectedContent) {
     // Check for a built in resource.
     if (getBuiltInProjectTree().equals(resourceDoc.getProject())) {
-      return ((DepanFxBuiltInProject) getBuiltInProject())
-          .getResource(resourceDoc);
+      return builtInProj.getResource(resourceDoc);
+    }
+    if (getScratchProjectTree().equals(resourceDoc.getProject())) {
+      return scratchProj.getResource(resourceDoc);
     }
     // Check if the resource has already been loaded.
     if (findResource(resourceDoc).isPresent()) {
@@ -351,4 +375,5 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
       return (T) findResource(document).get();
     }
   }
+
 }
