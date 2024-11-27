@@ -7,6 +7,8 @@ import com.pnambic.depanfx.xstream.XstreamDocumentTransportBuilder;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class PersistDocumentTransportBuilder {
 
@@ -16,6 +18,7 @@ public class PersistDocumentTransportBuilder {
   public PersistDocumentTransportBuilder() {
     builder.setXStream();
     builder.setNoReferences();
+    builder.addDefaultImplementation(ArrayList.class, Collection.class);
   }
 
   public void addAlias(String alias, Class<?> type) {

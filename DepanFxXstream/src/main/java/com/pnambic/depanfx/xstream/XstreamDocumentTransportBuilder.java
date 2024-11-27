@@ -2,9 +2,6 @@ package com.pnambic.depanfx.xstream;
 
 import com.thoughtworks.xstream.XStream;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 public class XstreamDocumentTransportBuilder {
 
   private XStream xstream;
@@ -44,9 +41,12 @@ public class XstreamDocumentTransportBuilder {
         new DelegateObjectXmlConverter(contrib, xstream.getMapper()));
   }
 
+  public void addDefaultImplementation(Class<?> useType, Class<?> forType) {
+    xstream.addDefaultImplementation(useType, forType);
+  }
+
   public void addImplicitCollection(Class<?> type, String fieldName) {
     xstream.addImplicitCollection(type, fieldName);
-    xstream.addDefaultImplementation(ArrayList.class, Collection.class);
   }
 
   public void processAnnotations(Class<?> type) {
