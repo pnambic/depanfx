@@ -12,9 +12,11 @@ import com.pnambic.depanfx.scene.DepanFxSceneController;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.session.core.DepanFxSession;
 import com.pnambic.depanfx.session.plugins.DepanFxSceneViewerRegistry;
+import com.pnambic.depanfx.session.tooldata.DepanFxProjectData;
 import com.pnambic.depanfx.session.tooldata.DepanFxSceneData;
 import com.pnambic.depanfx.session.tooldata.DepanFxSessionData;
 import com.pnambic.depanfx.session.viewdata.DepanFxBaseViewerData;
+import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -135,9 +137,25 @@ public class DepanFxSessionSaveDialog {
   }
 
   private DepanFxSessionData buildSessionData(DepanFxSession session) {
+    List<DepanFxProjectData> projectInfo = buildSessionProjects(session);
     Collection<DepanFxSceneData> sceneInfo = buildSessionScenes(session);
     return new DepanFxSessionData(
-        "DepanFX Session", "DepanFX session.", sceneInfo);
+        "DepanFX Session", "DepanFX session.", projectInfo, sceneInfo);
+  }
+
+  private List<DepanFxProjectData> buildSessionProjects(
+      DepanFxSession session) {
+    DepanFxProjectTree builtInTree = session.getWorkspace().getBuiltInProjectTree();
+
+    return session.getWorkspace().getProjectList().stream()
+        .filter(p -> p != builtInTree)
+        .map(this::buildProjectData)
+        .toList();
+  }
+
+  private DepanFxProjectData buildProjectData(DepanFxProjectTree tree) {
+    return new DepanFxProjectData(
+      tree.getMemberName(), "DepanFX project.", tree.getMemberPath());
   }
 
   private Collection<DepanFxSceneData> buildSessionScenes(
@@ -159,6 +177,7 @@ public class DepanFxSessionSaveDialog {
 
     PersistDocumentTransportBuilder transportBuilder = 
         new PersistDocumentTransportBuilder();
+    transportBuilder.addImplicitCollection(DepanFxSessionData.class, "projects");
     transportBuilder.addImplicitCollection(DepanFxSessionData.class, "scenes");
     transportBuilder.addAllowedType(ALLOWED_TYPES);
     graphNodeRegistry.applyExtensions(
