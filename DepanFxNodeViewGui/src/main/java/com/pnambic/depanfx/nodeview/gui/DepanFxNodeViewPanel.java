@@ -141,13 +141,15 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private final DepanFxNodeFiltersRegistry filterRegistry;
 
+  private DepanFxWorkspaceResource<DepanFxNodeViewData> viewDataRsrc;
+
+  private DepanFxNodeViewData viewData;
+
   private Collection<GraphNode> viewNodes;
 
   private Map<GraphNode, DepanFxNodeLocationData> nodeLocations;
 
   private JoglPane joglPane;
-
-  private final DepanFxNodeViewData viewData;
 
   private DepanFxNodeListSelection nodeSelection;
 
@@ -183,15 +185,16 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
       DepanFxDialogRunner dialogRunner,
       DepanFxNodeLayoutRegistry layoutRegistry,
       DepanFxNodeFiltersRegistry filterRegistry,
-      DepanFxNodeViewData viewData) {
+      DepanFxWorkspaceResource<DepanFxNodeViewData> viewDataRsrc) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
     this.layoutRegistry = layoutRegistry;
     this.filterRegistry = filterRegistry;
-    this.viewData = viewData;
+    this.viewDataRsrc = viewDataRsrc;
 
     // Unpack the interesting parts of the view data.
-    this.viewNodes = viewData.getViewNodes();
+    this.viewData = viewDataRsrc.getResource();
+    this.viewNodes = viewData .getViewNodes();
     this.nodeLocations = viewData.getNodeLocations();
 
     // Handle node selections.
@@ -207,7 +210,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     joglPane = createJoglPane();
     populateJoglPane();
 
-    Tab result = new Tab(viewData.getToolName(), joglPane);
+    Tab result = new Tab(viewDataRsrc.getResource().getToolName(), joglPane);
 
     result.setOnSelectionChanged(new EventHandler<Event>() {
 
@@ -232,6 +235,10 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   public DepanFxWorkspace getWorkspace() {
     return workspace;
+  }
+
+  public DepanFxWorkspaceResource<DepanFxNodeViewData> getViewDataRsrc() {
+    return viewDataRsrc;
   }
 
   public DepanFxWorkspaceResource<GraphDocument> getGraphDocRsrc() {
@@ -805,7 +812,6 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
         .forEach(m -> nodeDisplay.setFilterVisibility(m, true));
   }
 
-
   private void setFilterVisible(
       DepanFxBaseFilterData filter, boolean isVisible) {
     nodeDisplay.setFilterVisibility(filter, isVisible);
@@ -856,9 +862,20 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     }
     DepanFxNodeViewData saveView = buildSaveView();
 
-    DepanFxResourcePerspectives.runCreateDialog(
-        saveView, dialogRunner,
-        DepanFxSaveNodeViewDialog.class, "Save node view");
+    Dialog<DepanFxSaveNodeViewDialog> dlg =
+        DepanFxResourcePerspectives.runCreateDialog(
+            saveView, dialogRunner,
+            DepanFxSaveNodeViewDialog.class, "Save node view");
+    dlg.getController().getWorkspaceResource()
+        .ifPresent(this::updateSavedResource);
+  }
+
+  private void updateSavedResource(
+      DepanFxWorkspaceResource<DepanFxNodeViewData> viewDataRsrc) {
+    // The underlying data (e.g. node lists and locations) stays the same
+    // but the access paths change if a new resource was saved.
+    this.viewDataRsrc = viewDataRsrc;
+    this.viewData = viewDataRsrc.getResource();
   }
 
   /////////////////////////////////////

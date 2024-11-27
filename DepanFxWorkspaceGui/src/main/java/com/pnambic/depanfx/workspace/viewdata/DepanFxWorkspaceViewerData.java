@@ -21,7 +21,7 @@ import com.pnambic.depanfx.session.viewdata.DepanFxBaseViewerData;
  * A simple marker class for the workspace viewer.  It is always constructed the
  * same way,so there are no data elements to persist.
  */
-public class DepanFxWorkspaceViewerData extends DepanFxBaseViewerData{
+public class DepanFxWorkspaceViewerData implements DepanFxBaseViewerData {
 
   /** Only need one instance. */
   public static final DepanFxWorkspaceViewerData MARKER =

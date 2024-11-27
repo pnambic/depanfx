@@ -20,5 +20,6 @@ dependencies {
   implementation project(':DepanFxNodeFilters')
   implementation project(':DepanFxNodeList')
   implementation project(':DepanFxPersistence')
+  implementation project(':DepanFxSessionData')
   implementation project(':DepanFxWorkspace')
 }

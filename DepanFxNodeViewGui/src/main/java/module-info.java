@@ -23,6 +23,7 @@ module depanfx.nodeview.gui {
   requires depanfx.perspective;
   requires depanfx.workspace;
   requires depanfx.scene;
+  requires depanfx.session.data;
   requires java.desktop;
 
   opens com.pnambic.depanfx.nodeview.gui
@@ -30,6 +31,7 @@ module depanfx.nodeview.gui {
   opens com.pnambic.depanfx.nodeview.layouts
       to javafx.fxml, net.rgielen.fxweaver.core,
           spring.beans, spring.context, spring.core;
+  opens com.pnambic.depanfx.nodeview.viewdata;
 
   exports com.pnambic.depanfx.nodeview.gui;
 }

@@ -15,6 +15,9 @@
  */
 package com.pnambic.depanfx.session.viewdata;
 
-public class DepanFxBaseViewerData {
+/**
+ * Marker interface for viewer data types
+ */
+public interface DepanFxBaseViewerData {
 
 }

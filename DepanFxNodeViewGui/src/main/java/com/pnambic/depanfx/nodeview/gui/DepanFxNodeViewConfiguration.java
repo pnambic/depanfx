@@ -90,8 +90,11 @@ public class DepanFxNodeViewConfiguration {
       this.viewExt = viewExt;
     }
 
-    abstract protected DepanFxNodeViewData getNodeViewData(
+    abstract protected DepanFxWorkspaceResource<DepanFxNodeViewData> getNodeViewRsrc(
         DepanFxWorkspace workspace, DepanFxWorkspaceResource<?> rsrc);
+
+    // abstract protected DepanFxWorkspaceResource<DepanFxNodeViewData> XgetNodeViewData(
+    //    DepanFxWorkspace workspace, DepanFxWorkspaceResource<?> rsrc);
 
     @Override
     public boolean acceptsExt(String ext) {
@@ -127,14 +130,12 @@ public class DepanFxNodeViewConfiguration {
         Path docPath) {
 
       try {
-        Optional<DepanFxWorkspaceResource<T>> optWkspRsrc =
-            workspace.toProjectDocument(docPath.toUri())
-                .flatMap(r ->
-                    workspace.getWorkspaceResource(r, resourceType));
-        optWkspRsrc
-            .map(r -> getNodeViewData(workspace, r))
-            .ifPresent(nv ->
-                addNodeViewPanelToScene(scene, dialogRunner, workspace, nv));
+        workspace.toProjectDocument(docPath.toUri())
+            .flatMap(r ->
+                workspace.getWorkspaceResource(r, resourceType))
+            .map(r -> getNodeViewRsrc(workspace, r))
+            .ifPresent(r ->
+                addNodeViewPanelToScene(scene, dialogRunner, workspace, r));
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to open node view for {}",
             docPath.toUri(), errCaught);
@@ -143,9 +144,9 @@ public class DepanFxNodeViewConfiguration {
 
     private void addNodeViewPanelToScene(DepanFxSceneController scene,
         DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace,
-        DepanFxNodeViewData viewData) {
+        DepanFxWorkspaceResource<DepanFxNodeViewData> nodeViewRsrc) {
       DepanFxNodeViewPanel viewPanel = new DepanFxNodeViewPanel(
-          workspace, dialogRunner, layoutRegistry, filterRegistry, viewData);
+          workspace, dialogRunner, layoutRegistry, filterRegistry, nodeViewRsrc);
       scene.addViewer(viewPanel);
     }
   }
@@ -163,7 +164,17 @@ public class DepanFxNodeViewConfiguration {
     }
 
     @Override
-    protected DepanFxNodeViewData getNodeViewData(
+    public String getOrderKey() {
+      return NODE_VIEW_KEY;
+    }
+
+    @Override
+    protected DepanFxWorkspaceResource<DepanFxNodeViewData> getNodeViewRsrc(
+        DepanFxWorkspace workspace, DepanFxWorkspaceResource<?> rsrc) {
+      return workspace.addScratchResource(getNodeViewData(workspace, rsrc));
+    }
+
+    private DepanFxNodeViewData getNodeViewData(
         DepanFxWorkspace workspace,
         DepanFxWorkspaceResource<?> rsrc) {
       @SuppressWarnings("unchecked")
@@ -172,11 +183,6 @@ public class DepanFxNodeViewConfiguration {
 
       return DepanFxNodeViews.fromGraphDocument(
           graphDocResource, workspace);
-    }
-
-    @Override
-    public String getOrderKey() {
-      return NODE_VIEW_KEY;
     }
   }
 
@@ -193,7 +199,17 @@ public class DepanFxNodeViewConfiguration {
     }
 
     @Override
-    protected DepanFxNodeViewData getNodeViewData(
+    public String getOrderKey() {
+      return NODE_VIEW_KEY;
+    }
+
+    @Override
+    protected DepanFxWorkspaceResource<DepanFxNodeViewData> getNodeViewRsrc(
+        DepanFxWorkspace workspace, DepanFxWorkspaceResource<?> rsrc) {
+      return workspace.addScratchResource(getNodeViewData(workspace, rsrc));
+    }
+
+    private DepanFxNodeViewData getNodeViewData(
         DepanFxWorkspace workspace,
         DepanFxWorkspaceResource<?> rsrc) {
       @SuppressWarnings("unchecked")
@@ -202,11 +218,6 @@ public class DepanFxNodeViewConfiguration {
 
       return DepanFxNodeViews.fromNodeList(
           nodeListResource, workspace);
-    }
-
-    @Override
-    public String getOrderKey() {
-      return NODE_VIEW_KEY;
     }
   }
 
@@ -223,6 +234,11 @@ public class DepanFxNodeViewConfiguration {
     }
 
     @Override
+    public String getOrderKey() {
+      return NODE_VIEW_KEY;
+    }
+
+    @Override
     protected void installOnOpen(
         DepanFxSceneController scene,
         DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace,
@@ -232,18 +248,10 @@ public class DepanFxNodeViewConfiguration {
     }
 
     @Override
-    protected DepanFxNodeViewData getNodeViewData(
+    @SuppressWarnings("unchecked")
+    protected DepanFxWorkspaceResource<DepanFxNodeViewData> getNodeViewRsrc(
         DepanFxWorkspace workspace, DepanFxWorkspaceResource<?> rsrc) {
-      @SuppressWarnings("unchecked")
-      DepanFxWorkspaceResource<DepanFxNodeViewData> nodeViewResource =
-          (DepanFxWorkspaceResource<DepanFxNodeViewData>) rsrc;
-
-      return nodeViewResource.getResource();
-    }
-
-    @Override
-    public String getOrderKey() {
-      return NODE_VIEW_KEY;
+      return (DepanFxWorkspaceResource<DepanFxNodeViewData>) rsrc;
     }
   }
 }

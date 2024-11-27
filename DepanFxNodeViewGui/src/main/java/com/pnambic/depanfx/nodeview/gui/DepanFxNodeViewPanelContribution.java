@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.nodelist.viewer;
+package com.pnambic.depanfx.nodeview.gui;
 
-import com.pnambic.depanfx.nodelist.viewdata.DepanFxNodeListViewerData;
+import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
+import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
+import com.pnambic.depanfx.nodeview.viewdata.DepanFxNodeViewPanelData;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
@@ -32,29 +34,38 @@ import java.util.Optional;
  * Define how the welcome view is serialized.
  */
 @Component
-public class DepanFxNodeListViewerContribution
+public class DepanFxNodeViewPanelContribution
     implements DepanFxSceneViewerRegistry.Contribution {
 
   private final DepanFxWorkspace workspace;
 
   private final DepanFxDialogRunner dialogRunner;
 
+  private final DepanFxNodeLayoutRegistry layoutRegistry;
+
+  private final DepanFxNodeFiltersRegistry filterRegistry;
+
   @Autowired
-  private DepanFxNodeListViewerContribution(DepanFxWorkspace workspace,
-      DepanFxDialogRunner dialogRunner) {
+  private DepanFxNodeViewPanelContribution(
+      DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner,
+    DepanFxNodeLayoutRegistry layoutRegistry,
+    DepanFxNodeFiltersRegistry filterRegistry) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
+    this.layoutRegistry = layoutRegistry;
+    this.filterRegistry = filterRegistry;
   }
 
   @Override
   public boolean accepts(DepanFxBaseViewerData viewerData) {
-    return DepanFxNodeListViewerData.class.isAssignableFrom(
+    return DepanFxNodeViewPanelData.class.isAssignableFrom(
         viewerData.getClass());
   }
 
   @Override
   public boolean accepts(DepanFxSceneViewer viewer) {
-    return DepanFxNodeListViewer.class.isAssignableFrom(
+    return DepanFxNodeViewPanel.class.isAssignableFrom(
         viewer.getClass());
   }
 
@@ -62,24 +73,19 @@ public class DepanFxNodeListViewerContribution
   public Optional<DepanFxSceneViewer> buildViewer(
       DepanFxBaseViewerData baseData) {
 
-    DepanFxNodeListViewerData viewerData = (DepanFxNodeListViewerData) baseData;
-    return Optional.of(new DepanFxNodeListViewer(
-        viewerData.getViewerTitle(),
-        workspace, dialogRunner,
-        viewerData.getNodeListRsrc(),
-        viewerData.getTableViewRsrc()));
+    DepanFxNodeViewPanelData viewerData = (DepanFxNodeViewPanelData) baseData;
+    return Optional.of(new DepanFxNodeViewPanel(
+        workspace, dialogRunner, layoutRegistry, filterRegistry,
+        viewerData.getNodeViewRsrc()));
   }
 
   @Override
   public Optional<DepanFxBaseViewerData> getViewerData(
       DepanFxSceneViewer viewer) {
-    DepanFxNodeListViewer listViewer = (DepanFxNodeListViewer) viewer;
+    DepanFxNodeViewPanel listViewer = (DepanFxNodeViewPanel) viewer;
 
-    DepanFxBaseViewerData result = new DepanFxNodeListViewerData(
-        listViewer.getViewerTitle(),
-        listViewer.getNodeListResource(),
-        listViewer.getTableViewResource());
-    return Optional.of(result);
+    return Optional.of(
+        new DepanFxNodeViewPanelData(listViewer.getViewDataRsrc()));
   }
 
   @Override

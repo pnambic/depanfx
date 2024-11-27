@@ -26,7 +26,7 @@ import com.pnambic.depanfx.session.viewdata.DepanFxBaseViewerData;
  * module does not know about persistence, and the session module maintains
  * persistence across all screens.
  */
-public class DepanFxWelcomeViewerData extends DepanFxBaseViewerData{
+public class DepanFxWelcomeViewerData implements DepanFxBaseViewerData {
 
   /** Only need one instance. */
   public static final DepanFxWelcomeViewerData MARKER =

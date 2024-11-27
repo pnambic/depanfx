@@ -12,6 +12,7 @@ module depanfx.nodeview.data {
   requires depanfx.nodefilters;
   requires depanfx.nodelist;
   requires depanfx.persistence;
+  requires depanfx.session.data;
   requires depanfx.workspace;
 
   opens com.pnambic.depanfx.nodeview.builtins

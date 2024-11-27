@@ -24,7 +24,7 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
  * The table view viewer includes the node list and the table view resources.
  * The active selection in the viewer is not persisted.
  */
-public class DepanFxNodeListViewerData extends DepanFxBaseViewerData{
+public class DepanFxNodeListViewerData implements DepanFxBaseViewerData {
 
   private final String viewTitle;
 
