@@ -47,7 +47,8 @@ public class DepanFxWorkspaceViewerContribution
   private final DepanFxResourceMenuRegistry rsrcMenuRegistry;
 
   @Autowired
-  private DepanFxWorkspaceViewerContribution(DepanFxWorkspace workspace,
+  private DepanFxWorkspaceViewerContribution(
+      DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxResourceMenuRegistry rsrcMenuRegistry) {
     this.workspace = workspace;

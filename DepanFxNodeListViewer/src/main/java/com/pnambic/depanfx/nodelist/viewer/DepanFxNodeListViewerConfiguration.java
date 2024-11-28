@@ -131,7 +131,7 @@ public class DepanFxNodeListViewerConfiguration {
         workspace.toProjectDocument(docPath.toUri())
             .flatMap(r ->
                 workspace.getWorkspaceResource(r, DepanFxNodeList.class))
-            .ifPresent(nl -> 
+            .ifPresent(nl ->
                 addNodeListDocViewToScene(workspace, dialogRunner, scene, nl));
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to open list view for {}",

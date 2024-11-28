@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +26,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.ImageView;
-import javafx.stage.FileChooser.ExtensionFilter;
 
 @Component
 @FxmlView("scene.fxml")
@@ -75,13 +72,14 @@ public class DepanFxSceneController {
 
     FxControllerAndView<DepanFxSceneController, Node> root =
         dialogRunner.weaveFxmlView(DepanFxSceneController.class);
-    root.getController().owner = owner;
-    initViewers.forEach(root.getController()::addViewer);
+    DepanFxSceneController controller = root.getController();
+    controller.owner = owner;
+    initViewers.forEach(controller::addViewer);
 
     Scene scene = new Scene((Parent) root.getView().get());
     scene.getStylesheets().add(
         DepanFxSceneController.class.getResource("styles.css").toExternalForm());
-    return root.getController();
+    return controller;
   }
 
   @Autowired

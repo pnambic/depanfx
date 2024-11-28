@@ -73,8 +73,6 @@ public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
 
   Optional<DepanFxProjectDocument> toProjectDocument(URI uri);
 
-  Optional<DepanFxProjectDocument> createScratchDocument();
-
   Optional<DepanFxProjectDocument> toProjectDocument(
       String projectName, String resourcePath);
 

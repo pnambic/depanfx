@@ -204,11 +204,6 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   }
 
   @Override
-  public Optional<DepanFxProjectDocument> createScratchDocument() {
-    return Optional.of(scratchProj.createScratchDocument());
-  }
-
-  @Override
   public Optional<DepanFxProjectDocument> toProjectDocument(
       String projectName, String resourcePath) {
 

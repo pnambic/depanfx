@@ -8,7 +8,6 @@ module depanfx.session.data {
     requires org.slf4j;
 
     requires depanfx.persistence;
-    requires depanfx.perspective;
     requires depanfx.scene;
 
     opens com.pnambic.depanfx.session.viewdata;
