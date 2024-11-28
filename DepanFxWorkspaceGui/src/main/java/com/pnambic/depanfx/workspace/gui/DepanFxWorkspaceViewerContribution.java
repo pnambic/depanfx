@@ -36,6 +36,10 @@ import java.util.Optional;
 public class DepanFxWorkspaceViewerContribution
     implements DepanFxSceneViewerRegistry.Contribution {
 
+  private static final Class<?>[] ALLOWED_TYPES = new Class<?>[] {
+    DepanFxWorkspaceViewerData.class
+  };
+
   private final DepanFxWorkspace workspace;
 
   private final DepanFxDialogRunner dialogRunner;
@@ -80,6 +84,6 @@ public class DepanFxWorkspaceViewerContribution
 
   @Override
   public void prepareTransport(PersistDocumentTransportBuilder builder) {
-    // TODO Auto-generated method stub
+    builder.addAllowedType(ALLOWED_TYPES);
   }
 }

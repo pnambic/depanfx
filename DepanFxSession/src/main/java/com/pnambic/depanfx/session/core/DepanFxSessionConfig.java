@@ -15,18 +15,31 @@
  */
 package com.pnambic.depanfx.session.core;
 
+import com.pnambic.depanfx.workspace.DepanFxProjectTree;
+
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public class DepanFxSessionConfig {
 
   public static final DepanFxSessionConfig EMPTY_SESSION_DATA =
-      new DepanFxSessionConfig(Collections.emptyList());
+      new DepanFxSessionConfig(
+          Collections.emptyList(), Collections.emptyList());
+
+  private final List<DepanFxProjectTree> projectTrees;
 
   private final Collection<DepanFxSceneConfig> sceneConfigs;
 
-  public DepanFxSessionConfig(Collection<DepanFxSceneConfig> sceneConfigs) {
+  public DepanFxSessionConfig(
+      List<DepanFxProjectTree> projectTrees,
+      Collection<DepanFxSceneConfig> sceneConfigs) {
+    this.projectTrees = projectTrees;
     this.sceneConfigs = sceneConfigs;
+  }
+
+  public List<DepanFxProjectTree> getProjectTrees() {
+    return projectTrees;
   }
 
   public Collection<DepanFxSceneConfig> getSceneConfigs() {

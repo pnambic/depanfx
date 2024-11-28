@@ -25,12 +25,42 @@ import java.util.List;
  */
 public class DepanFxSceneData extends DepanFxBaseToolData {
 
+  private final int top;
+
+  private final int left;
+
+  private final int width;
+
+  private final int height;
+
   private final List<DepanFxBaseViewerData> viewersInfo;
 
-  public DepanFxSceneData(String toolName, String toolDescr,
+  public DepanFxSceneData(
+      String toolName, String toolDescr,
+      int top, int left, int width, int height,
       List<DepanFxBaseViewerData> viewersInfo) {
     super(toolName, toolDescr);
+    this.top = top;
+    this.left = left;
+    this.width = width;
+    this.height = height;
     this.viewersInfo = viewersInfo;
+  }
+
+  public int getTop() {
+    return top;
+  }
+
+  public int getLeft() {
+    return left;
+  }
+
+  public int getWidth() {
+    return width;
+  }
+
+  public int getHeight() {
+    return height;
   }
 
   public List<DepanFxBaseViewerData> getViewers() {

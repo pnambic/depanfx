@@ -15,16 +15,14 @@
  */
 package com.pnambic.depanfx.session.core;
 
-import com.pnambic.depanfx.scene.DepanFxSceneViewer;
-import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterRegistry;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Path;
 
 /**
  * Configure the session startup information form the command line.
@@ -32,57 +30,46 @@ import java.util.List;
 @Component
 public class DepanFxSessionCliArgs implements ApplicationRunner {
 
-  private final DepanFxSceneStarterRegistry starterRegistry;
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxSessionCliArgs.class);
+
+  private static final String SESSION_OPTION = "session";
+
+  private final DepanFxSessionDataTransport transport;
 
   private DepanFxSessionConfig sessionConfig;
 
   @Autowired
-  private DepanFxSessionCliArgs(DepanFxSceneStarterRegistry starterRegistry) {
-    this.starterRegistry = starterRegistry;
+  private DepanFxSessionCliArgs(
+      DepanFxSessionDataTransport transport) {
+    this.transport = transport;
   }
 
   @Override
   public void run(ApplicationArguments args) {
-    if (args.containsOption("session")) {
-      String sessionPath = args.getOptionValues("session").get(0);
-      sessionConfig = restoreSession(sessionPath);
-      if (sessionConfig == null) {
+    if (args.containsOption(SESSION_OPTION)) {
+      String sessionSrc = args.getOptionValues(SESSION_OPTION).get(0);
+
+      try {
+        sessionConfig = restoreSession(sessionSrc);
         return;
-      }
+      } catch (RuntimeException errAny) {
+        LOG.error("Unable to load session data at {}", sessionSrc, errAny);
       // Fall through to default.
+      }
     }
-    sessionConfig = defaultSession();
+    sessionConfig = transport.defaultSessionConfig();
   }
 
-  private DepanFxSessionConfig restoreSession(String sessionPath) {
-    return defaultSession();
-    // LATER: more like this
-    //if (sessionPath == null) {
-    //  sessionInfo = restoreSession(sessionPath);
-    //}
-  }
-
-  private DepanFxSessionConfig defaultSession() {
-    List<DepanFxSceneViewer> defaultViewers =
-        starterRegistry.getStarterViews();
-
-    DepanFxSceneConfig sceneInfo = new DepanFxSceneConfig(
-        "Initial Startup Scene",
-        "Initial scene created at DepanFX startup.",
-        defaultViewers);
-
-    List<DepanFxSceneConfig> scenes = new ArrayList<>(1);
-    scenes.add(sceneInfo);
-
-    DepanFxSessionConfig result = new DepanFxSessionConfig(
-        scenes);
-    return result;
+  private DepanFxSessionConfig restoreSession(String sessionSrc) {
+    Path sessionPath = Path.of(sessionSrc);
+    return transport.loadSessionConfig(sessionPath);
   }
 
   public DepanFxSessionConfig getSessionConfig() {
-    if (sessionConfig == null) {
-      return DepanFxSessionConfig.EMPTY_SESSION_DATA;
+    if (sessionConfig != null) {
+      return sessionConfig;
     }
-    return sessionConfig;
+    return DepanFxSessionConfig.EMPTY_SESSION_DATA;
   }
 }

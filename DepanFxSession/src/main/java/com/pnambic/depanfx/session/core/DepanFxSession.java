@@ -42,7 +42,9 @@ import javafx.stage.Stage;
 public class DepanFxSession implements DepanFxSceneController.SceneOwner {
 
   public static DepanFxSceneConfig EMPTY_SESSION_SCENE =
-      new DepanFxSceneConfig("Empty Session", "Empty", Collections.emptyList());
+      new DepanFxSceneConfig("Empty Session", "Empty",
+          -1.0d, -1.0d, -1.0d, -1.0d,
+          Collections.emptyList());
 
   private final DepanFxWorkspace workspace;
 
@@ -56,8 +58,16 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
   public static void startSession(
       Stage stage, DepanFxSession session, DepanFxSessionConfig  sessionConfig)
       throws Exception {
+    // Projects are installed during deserialization.
+    startScenes(stage, session, sessionConfig.getSceneConfigs());
+  }
 
-    Collection<DepanFxSceneConfig> scenes = sessionConfig.getSceneConfigs();
+  private static void startScenes(
+      Stage stage,
+      DepanFxSession session,
+      Collection<DepanFxSceneConfig> scenes)
+      throws Exception {
+
     Iterator<DepanFxSceneConfig> sceneSeq = scenes.iterator();
 
     if (!sceneSeq.hasNext()) {
@@ -106,6 +116,8 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
         dialogRunner, sceneConfig.getViewers(), this);
     sceneMap.put(scene, sceneConfig);
 
+    positionScreen(stage, sceneConfig);
+
     stage.setTitle("DepanFX");
     DepanFxAppIcons.installDepanIcons(stage.getIcons());
     stage.setScene(scene.getScene());
@@ -137,5 +149,21 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
     } catch (IOException errIo) {
       // Something better ..
     }
+  }
+
+  private void positionScreen(Stage stage, DepanFxSceneConfig sceneConfig) {
+    double top = sceneConfig.getTop();
+    double left = sceneConfig.getLeft();
+    double width = sceneConfig.getWidth();
+    double height = sceneConfig.getHeight();
+
+    if (width < 100 || height < 100) {
+      return;
+    }
+
+    stage.setX(top);
+    stage.setY(left);
+    stage.setWidth(width);
+    stage.setHeight(height);
   }
 }

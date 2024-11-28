@@ -35,6 +35,10 @@ import java.util.Optional;
 public class DepanFxWelcomeViewerContribution
     implements DepanFxSceneViewerRegistry.Contribution {
 
+  private static final Class<?>[] ALLOWED_TYPES = new Class<?>[] {
+    DepanFxWelcomeViewerData.class
+  };
+
   private final DepanFxWelcomeViewLoader welcomeLoader;
 
   @Autowired
@@ -67,6 +71,6 @@ public class DepanFxWelcomeViewerContribution
 
   @Override
   public void prepareTransport(PersistDocumentTransportBuilder builder) {
-    // TODO Auto-generated method stub
+    builder.addAllowedType(ALLOWED_TYPES);
   }
 }
