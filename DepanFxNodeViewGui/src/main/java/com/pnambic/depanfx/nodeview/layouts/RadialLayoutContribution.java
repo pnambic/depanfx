@@ -48,8 +48,8 @@ public class RadialLayoutContribution
 
   @Override
   public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
+      DepanFxNodeViewPanel view,
       DepanFxWorkspaceResource<?> layoutRsrc,
-      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
       List<GraphNode> updateNodes) {
     DepanFxRadialLayoutData radialData =
         (DepanFxRadialLayoutData) layoutRsrc.getResource();
@@ -58,7 +58,8 @@ public class RadialLayoutContribution
         (DepanFxLinkMatcherDocument) radialData.getHierarchyMatcherRsrc().getResource();
     DepanFxLinkMatcher linkMatcher = matcherDoc.getMatcher();
 
-    return buildNodeLocations(graphDocRsrc, updateNodes, linkMatcher);
+    return buildNodeLocations(
+        view.getGraphDocRsrc(), updateNodes, linkMatcher);
   }
 
   @Override
@@ -72,14 +73,12 @@ public class RadialLayoutContribution
         DepanFxRadialLayoutToolDialog.runCreateDialog(
             initialData, view.getDialogRunner());
 
-    DepanFxWorkspaceResource<GraphDocument> graphDocRsrc =
-        view.getGraphDocRsrc();
     List<GraphNode> updateNodes =
         view.streamChosenNodes().collect(Collectors.toList());
 
     layoutDlg.getController().getWorkspaceResource()
         .ifPresent(r -> view.updateNodeLocations(
-            layoutNodes(r, graphDocRsrc, updateNodes)));
+            layoutNodes(view, r, updateNodes)));
   }
 
   private Map<GraphNode, DepanFxNodeLocationData> buildNodeLocations(

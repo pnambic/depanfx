@@ -843,7 +843,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     List<GraphNode> updateNodes =
         streamChosenNodes().collect(Collectors.toList());
     updateNodeLocations(
-        layoutRegistry.layoutNodes(layoutRsrc, getGraphDocRsrc(), updateNodes));
+        layoutRegistry.layoutNodes(this, layoutRsrc, updateNodes));
   }
 
   private void runSaveNodeListDialog() {

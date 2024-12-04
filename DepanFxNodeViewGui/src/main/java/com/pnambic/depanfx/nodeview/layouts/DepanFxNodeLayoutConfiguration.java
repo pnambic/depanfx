@@ -60,8 +60,8 @@ public class DepanFxNodeLayoutConfiguration {
 
     @Override
     public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
+        DepanFxNodeViewPanel view,
         DepanFxWorkspaceResource<?> layoutRsrc,
-        DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
         List<GraphNode> updateNodes) {
       return GridLayoutRunner.buildNodeLocations(updateNodes);
     }
@@ -90,8 +90,8 @@ public class DepanFxNodeLayoutConfiguration {
 
     @Override
     public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
+        DepanFxNodeViewPanel view,
         DepanFxWorkspaceResource<?> layoutRsrc,
-        DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
         List<GraphNode> updateNodes) {
       return GridLayoutRunner.buildNodeLocations(updateNodes);
     }

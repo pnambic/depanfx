@@ -53,8 +53,8 @@ public class TreeLayoutContribution
 
   @Override
   public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
+      DepanFxNodeViewPanel view,
       DepanFxWorkspaceResource<?> layoutRsrc,
-      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
       List<GraphNode> updateNodes) {
     DepanFxTreeLayoutData treeData =
         (DepanFxTreeLayoutData) layoutRsrc.getResource();
@@ -63,7 +63,7 @@ public class TreeLayoutContribution
         treeData.getHierarchyMatcherRsrc().getResource();
     DepanFxLinkMatcher linkMatcher = matcherDoc.getMatcher();
 
-    return buildNodeLocations(graphDocRsrc, updateNodes, linkMatcher);
+    return buildNodeLocations(view.getGraphDocRsrc(), updateNodes, linkMatcher);
   }
 
   @Override
@@ -77,14 +77,12 @@ public class TreeLayoutContribution
         DepanFxTreeLayoutToolDialog.runCreateDialog(
             initialData, view.getDialogRunner());
 
-    DepanFxWorkspaceResource<GraphDocument> graphDocRsrc =
-        view.getGraphDocRsrc();
     List<GraphNode> updateNodes =
         view.streamChosenNodes().collect(Collectors.toList());
 
     layoutDlg.getController().getWorkspaceResource()
         .ifPresent(r -> view.updateNodeLocations(
-            layoutNodes(r, graphDocRsrc, updateNodes)));
+            layoutNodes(view, r, updateNodes)));
   }
 
   private Map<GraphNode, DepanFxNodeLocationData> buildNodeLocations(

@@ -1,7 +1,6 @@
 package com.pnambic.depanfx.nodeview.layouts;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewPanel;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
@@ -57,8 +56,8 @@ public class DepanFxNodeLayoutRegistry {
      * to their underlying data type.
      */
     Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
+        DepanFxNodeViewPanel view,
         DepanFxWorkspaceResource<?> layoutRsrc,
-        DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
         List<GraphNode> updateNodes);
   }
 
@@ -104,15 +103,15 @@ public class DepanFxNodeLayoutRegistry {
   }
 
   public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
+      DepanFxNodeViewPanel view,
       DepanFxWorkspaceResource<?> layoutRsrc,
-      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
       List<GraphNode> updateNodes) {
     return layoutContribs.stream()
         .map(this::examine)
         .filter(c -> c.getResourceFilter() != null)
         .filter(c -> c.getResourceFilter().matchDocument(layoutRsrc.getResource()))
         .findFirst()
-        .map(l -> l.layoutNodes(layoutRsrc, graphDocRsrc, updateNodes))
+        .map(l -> l.layoutNodes(view, layoutRsrc, updateNodes))
         .orElse(Collections.emptyMap());
     }
 
