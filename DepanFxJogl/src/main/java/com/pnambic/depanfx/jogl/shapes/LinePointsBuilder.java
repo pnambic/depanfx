@@ -81,7 +81,8 @@ public class LinePointsBuilder {
         float moveY = (outerY + innerY) / 2;
 
         if (atBoundary(moveX, lastX, moveY, lastY)) {
-          connectionVertex = new float[] { moveX, moveY, 0.0f };
+          connectionVertex =
+              new float[] { moveX, moveY, (float) boundaryShape.shapeZ };
           return;
         }
 
@@ -171,26 +172,36 @@ public class LinePointsBuilder {
     float[] linePoints = new float[pointCount * 3];
     int insert = 0;
 
-    insert = installLineVertex(
-        linePoints, insert, sourceBoundary.getConnectionVertex());
+    // Slope the line from the source to the target.
+    float sourceZ = sourceBoundary.getConnectionVertex()[2];
+    float targetZ = targetBoundary.getConnectionVertex()[2];
 
+    insert = installLineVertex(
+        linePoints, insert, sourceBoundary.getConnectionVertex(), sourceZ);
+
+    // Because AWT shapes are 2D, a sloping z coordinate calculated here.
+    float deltaZ = targetZ - sourceZ;
+    float incrZ = deltaZ / (pointCount - 1);
+    float vertexZ = sourceZ;
     for (int index = sourceBoundary.getFrontierIndex();
         index <= targetBoundary.getFrontierIndex();
         index++) {
+      vertexZ += incrZ;
       insert = installLineVertex(
-          linePoints, insert, shapeVertices.get(index));
+          linePoints, insert, shapeVertices.get(index), vertexZ);
     }
 
     installLineVertex(
-        linePoints, insert, targetBoundary.getConnectionVertex());
+        linePoints, insert, targetBoundary.getConnectionVertex(), targetZ);
     return new LinePoints(pointCount, linePoints);
   }
 
+  // Because AWT shapes are 2D, the sloping z coordinate is added here.
   private int installLineVertex(
-      float[] linePoints, int insert, float[] boundaryVertex) {
+      float[] linePoints, int insert, float[] boundaryVertex, float vertexZ) {
     linePoints[insert++] = boundaryVertex[0];
     linePoints[insert++] = boundaryVertex[1];
-    linePoints[insert++] = boundaryVertex[2];
+    linePoints[insert++] = vertexZ;
     return insert;
   }
 
