@@ -10,7 +10,6 @@ import com.pnambic.depanfx.perspective.DepanFxWorkspaceDialog;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
@@ -63,8 +62,6 @@ public class DepanFxNodeViewNodeSelectDialog
   @FXML
   private TreeTableView<DepanFxNodeListMember> nodeSelectTable;
 
-  private DepanFxProjectDocument destDoc;
-
   private DepanFxNodeListTableViewData tableView;
 
   private DepanFxNodeListTableController tableControl;
@@ -83,13 +80,11 @@ public class DepanFxNodeViewNodeSelectDialog
   static Stage runEditDialog(
       DepanFxDialogRunner dialogRunner,
       DepanFxNodeViewPanel viewPanel,
-      DepanFxNodeListTableViewData tableView,
-      DepanFxProjectDocument destDoc) {
+      DepanFxNodeListTableViewData tableView) {
 
     Dialog<DepanFxNodeViewNodeSelectDialog> dlg =
         dialogRunner.createDialogAndParent(
             DepanFxNodeViewNodeSelectDialog.class);
-    dlg.getController().setDestinationDocument(destDoc);
     dlg.getController().setTableView(tableView);
     dlg.getController().setViewPanel(viewPanel);
     return dlg.runModeless(EDIT_NODE_SELECTION);
@@ -98,10 +93,6 @@ public class DepanFxNodeViewNodeSelectDialog
   public static void setNodeViewNodeListFilters(FileChooser chooser) {
     chooser.getExtensionFilters().add(NODE_LIST_FILTER);
     chooser.setSelectedExtensionFilter(NODE_LIST_FILTER);
-  }
-
-  public void setDestinationDocument(DepanFxProjectDocument destDoc) {
-    this.destDoc = destDoc;
   }
 
   public void setViewPanel(DepanFxNodeViewPanel viewPanel) {

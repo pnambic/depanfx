@@ -417,26 +417,17 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   // For NodeListTable integration
 
   private void runNodeSelectionDialog() {
-    String selectName =
-        viewData.getToolName() + " nodes." + DepanFxNodeList.NODE_LIST_EXT;
-
     DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc =
         DepanFxProjects.getBuiltIn(
             workspace, DepanFxNodeListTableViewData.class,
             DepanFxNodeListConfiguration.MEMBER_TABLE_VIEW_PATH).get();
 
-    Path selectPath = DepanFxProjects.getCurrentAnalysesPath(workspace)
-        .map(p -> p.resolve(selectName))
-        .get();
-     Stage nodeSelectDialog = workspace.getCurrentProject()
-        .flatMap(p -> p.asProjectDocument(selectPath))
-        .map(d -> DepanFxNodeViewNodeSelectDialog.runEditDialog(
-            dialogRunner, this, tableViewRsrc.getResource(), d))
-        .get();
+    Stage nodeSelectDialog = DepanFxNodeViewNodeSelectDialog.runEditDialog(
+        dialogRunner, this, tableViewRsrc.getResource());
 
-     sideViews.add(nodeSelectDialog);
-     nodeSelectDialog.setOnCloseRequest(
-         e -> sideViews.remove(nodeSelectDialog));
+    sideViews.add(nodeSelectDialog);
+    nodeSelectDialog.setOnCloseRequest(
+        e -> sideViews.remove(nodeSelectDialog));
   }
 
   /**
