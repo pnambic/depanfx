@@ -1,7 +1,6 @@
 package com.pnambic.depanfx.nodeview.layouts;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewPanel;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry.Contribution;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
