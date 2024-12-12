@@ -52,7 +52,7 @@ public class DepanFxProjects {
   }
 
   /////////////////////////////////////
-  // Resources by Container, prefered
+  // Resources by Container, preferred
 
   public static Optional<DepanFxProjectContainer> getCurrentGraphsDir(
       DepanFxWorkspace workspace) {
@@ -78,7 +78,7 @@ public class DepanFxProjects {
   }
 
   /////////////////////////////////////
-  // Resources by Path, prefered
+  // Resources by Path, preferred
 
   public static Optional<Path> getCurrentGraphsPath(
       DepanFxWorkspace workspace) {
@@ -100,6 +100,30 @@ public class DepanFxProjects {
     return workspace.getCurrentProject()
         .map(t -> t.getMemberPath())
         .map(p -> p.resolve(container));
+  }
+
+  /////////////////////////////////////
+  // "Active" locations never fail .. may be out of workspace
+
+  public static Path getActiveGraphsPath(
+      DepanFxWorkspace workspace) {
+    return getActivePath(workspace, GRAPHS_PATH);
+  }
+
+  public static Path getActiveAnalysesPath(
+      DepanFxWorkspace workspace) {
+    return getActivePath(workspace, ANALYSES_PATH);
+  }
+
+  public static Path getActiveToolsPath(
+      DepanFxWorkspace workspace) {
+    return getActivePath(workspace, TOOLS_PATH);
+  }
+
+  public static Path getActivePath(
+      DepanFxWorkspace workspace, Path resourcePath) {
+    return getCurrentPath(workspace, resourcePath.toString())
+        .orElse(resourcePath);
   }
 
   /////////////////////////////////////

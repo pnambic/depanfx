@@ -62,6 +62,11 @@ public class DepanFxNodeListTableController
     return nodeList.getGraphDocResource().getResource();
   }
 
+  @Override // DepanFxNodeListTableAdapter
+  public DepanFxNodeList buildEmptyList() {
+    return DepanFxNodeLists.buildEmptyNodeList(nodeList);
+  }
+
   public DepanFxNodeList buildRelatedNodeList(Collection<GraphNode> relatedNodes) {
     return DepanFxNodeLists.buildRelatedNodeList(nodeList, relatedNodes);
   }
@@ -76,7 +81,7 @@ public class DepanFxNodeListTableController
 
   public DepanFxNodeListTableCommands buildTableCommands() {
     return new DepanFxNodeListTableCommands(
-        workspace, dialogRunner, tableState);
+        workspace, dialogRunner, this, tableState);
   }
 
   public void setTableView(DepanFxNodeListTableViewData tableView) {
@@ -95,10 +100,6 @@ public class DepanFxNodeListTableController
     tableState.doInvertSelectionAction();
   }
 
-  public DepanFxNodeList getSelection() {
-    return tableState.getSelection();
-  }
-
   public Scene getScene() {
     return tableState.getScene();
   }
@@ -106,6 +107,11 @@ public class DepanFxNodeListTableController
   @Override // DepanFxNodeListTableAdapter
   public void refreshTableView() {
     tableState.refreshTableView();
+  }
+
+  @Override // DepanFxNodeListTableAdapter
+  public DepanFxNodeList getSelection() {
+    return tableState.getSelection();
   }
 
   @Override // DepanFxNodeListTableAdapter

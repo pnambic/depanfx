@@ -2,16 +2,20 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.google.common.base.Strings;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
+import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData.CategoryEntry;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
-import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
+import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
+import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -25,16 +29,16 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -70,6 +74,13 @@ public class DepanFxCategoryColumnToolDialog
 
   private ObservableList<EditCategory> categoryTableData;
 
+  // If null, avoid creating node lists for categories.
+  private DepanFxNodeListTableAdapter tableAdapter;
+
+  private MenuItem sectionItem;
+
+  private MenuItem newItem;
+
   @Autowired
   public DepanFxCategoryColumnToolDialog(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
@@ -80,21 +91,30 @@ public class DepanFxCategoryColumnToolDialog
   public static Dialog<DepanFxCategoryColumnToolDialog> runEditDialog(
       DepanFxProjectDocument projDoc,
       DepanFxCategoryColumnData categoryColumnData,
-      DepanFxDialogRunner dialogRunner) {
+      DepanFxDialogRunner dialogRunner,
+      DepanFxNodeListTableAdapter tableAdapter) {
 
-    return DepanFxResourcePerspectives.runEditDialog(
-        projDoc, categoryColumnData, dialogRunner,
-        DepanFxCategoryColumnToolDialog.class,
-        DepanFxCategoryColumn.EDIT_CATEGORY_COLUMN);
+    Dialog<DepanFxCategoryColumnToolDialog> result =
+        DepanFxResourcePerspectives.prepareDialog(
+            categoryColumnData, dialogRunner,
+            DepanFxCategoryColumnToolDialog.class);
+    result.getController().setDestination(projDoc);
+    result.getController().setTableAdapter(tableAdapter);
+    result.runDialog(DepanFxCategoryColumn.EDIT_CATEGORY_COLUMN);
+    return result;
   }
 
   public static Dialog<DepanFxCategoryColumnToolDialog> runCreateDialog(
-      DepanFxCategoryColumnData columnData, DepanFxDialogRunner dialogRunner) {
+      DepanFxCategoryColumnData columnData, DepanFxDialogRunner dialogRunner,
+      DepanFxNodeListTableAdapter tableAdapter) {
 
-    return DepanFxResourcePerspectives.runCreateDialog(
-        columnData, dialogRunner,
-        DepanFxCategoryColumnToolDialog.class,
-        DepanFxCategoryColumn.NEW_CATEGORY_COLUMN);
+    Dialog<DepanFxCategoryColumnToolDialog> result =
+        DepanFxResourcePerspectives.prepareDialog(
+            columnData, dialogRunner,
+            DepanFxCategoryColumnToolDialog.class);
+    result.getController().setTableAdapter(tableAdapter);
+    result.runDialog(DepanFxCategoryColumn.NEW_CATEGORY_COLUMN);
+    return result;
   }
 
   public static void setCategoryColumnTooldataFilters(FileChooser result) {
@@ -102,8 +122,15 @@ public class DepanFxCategoryColumnToolDialog
     result.setSelectedExtensionFilter(CATEGORY_COLUMN_FILTER);
   }
 
+  public void setTableAdapter(DepanFxNodeListTableAdapter tableAdapter) {
+    this.tableAdapter = tableAdapter;
+  }
+
   @FXML
   public void initialize() {
+    categoriesTable.setContextMenu(buildCategoriesTableMenu());
+    categoriesTable.setOnContextMenuRequested(e -> enableTableMenuItems());
+
     DepanFxTableColumnBinder<EditCategory> columnBinder =
         new DepanFxTableColumnBinder<>(categoriesTable);
 
@@ -114,23 +141,21 @@ public class DepanFxCategoryColumnToolDialog
 
     TableColumn<EditCategory, String> filePathColumn =
         columnBinder.bind("nodeListName");
+    filePathColumn.setCellFactory(c ->
+        new DepanFxNodeListChooser.NodeListCell<>(
+            getWorkspace(), dialogRunner,
+            categoriesTable.getScene(),
+            (t, r) -> updateNodeList(t, r)));
 
-    TableColumn<EditCategory, String> findActionColumn = columnBinder.next();
-    findActionColumn.setCellFactory(
-        p -> new ButtonActionCell<EditCategory, String>(
-            "Find...", this::runNodeListFinder));
-
-    TableColumn<EditCategory, String> deleteActionColumn = columnBinder.next();
-    deleteActionColumn.setCellFactory(
-        p -> new ButtonActionCell<EditCategory, String>(
-            "Delete", this::onDeleteEntryLabelEvent));
+    TableColumn<EditCategory, String> rowActionColumn =
+        columnBinder.next();
+    rowActionColumn.setCellFactory(p -> new ActionCell());
 
     // Size filePath to remaining room
     filePathColumn.prefWidthProperty().bind(
         categoriesTable.widthProperty()
             .subtract(labelColumn.widthProperty())
-            .subtract(findActionColumn.widthProperty())
-            .subtract(deleteActionColumn.widthProperty())
+            .subtract(rowActionColumn.widthProperty())
             .subtract(2));
   }
 
@@ -144,35 +169,6 @@ public class DepanFxCategoryColumnToolDialog
 
     categoryTableData = FXCollections.observableArrayList(editCategories);
     categoriesTable.setItems(categoryTableData);
-  }
-
-  @FXML
-  private void addCategoryRow() {
-    categoryTableData.add(new EditCategory("", null));
-  }
-
-  private void onUpdateLabelEvent(
-      CellEditEvent<EditCategory, String> updateEvent) {
-    EditCategory editEntry = updateEvent.getTableView().getItems().get(
-        updateEvent.getTablePosition().getRow());
-    editEntry.categoryLabelProperty().set(updateEvent.getNewValue());
-  }
-
-  private void onDeleteEntryLabelEvent(TableCell<?, ?> cell) {
-    categoriesTable.getItems().remove(cell.getIndex());
-  }
-
-  private List<CategoryEntry> buildCategories() {
-    return categoryTableData.stream()
-        .map(c -> c.toData())
-        .collect(Collectors.toList());
-  }
-
-  private void runNodeListFinder(TableCell<?, ?> cell) {
-    EditCategory editData =  categoryTableData.get(cell.getIndex());
-    DepanFxNodeListChooser.runNodeListChooser(
-        getWorkspace(), dialogRunner, categoriesTable.getScene())
-        .ifPresent(editData::setNodeListResource);
   }
 
   /////////////////////////////////////
@@ -203,34 +199,129 @@ public class DepanFxCategoryColumnToolDialog
     return  "Node Key Column Save Confirmation Error";
   }
 
+  @FXML
+  private void addCategoryRow() {
+    addEmptyCategory();
+  }
+
+  private void onUpdateLabelEvent(
+      CellEditEvent<EditCategory, String> updateEvent) {
+    EditCategory editEntry = updateEvent.getTableView().getItems().get(
+        updateEvent.getTablePosition().getRow());
+    editEntry.categoryLabelProperty().set(updateEvent.getNewValue());
+  }
+
+  private List<CategoryEntry> buildCategories() {
+    return categoryTableData.stream()
+        .map(c -> c.toData())
+        .collect(Collectors.toList());
+  }
+
+  private void updateNodeList(
+      EditCategory editCategory,
+      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
+    editCategory.setNodeListResource(nodeListRsrc);
+  }
+
+  /////////////////////////////////////
+  // Actions for add category menu
+
+  private void enableTableMenuItems() {
+    boolean hasAdapter = tableAdapter != null;
+    sectionItem.setVisible(hasAdapter);
+    newItem.setVisible(hasAdapter);
+  }
+
+  private ContextMenu buildCategoriesTableMenu() {
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem("Node List category", this::addNewList);
+    sectionItem = builder.appendActionItem("Selection category", this::addSelectionCategory);
+    newItem = builder.appendActionItem("New category", this::addNewCategory);
+    builder.appendActionItem("Empty category", this::addEmptyCategory);
+    return builder.build();
+  }
+
+  private void addNewList(Event event) {
+    DepanFxNodeListChooser.runNodeListChooser(
+        getWorkspace(), dialogRunner, categoriesTable.getScene())
+        .map(this::toEditCategory)
+        .ifPresent(categoryTableData::add);
+  }
+
+  private void addSelectionCategory(Event event) {
+    DepanFxNodeList selectList = tableAdapter.getSelection();
+    DepanFxSaveNodeListDialog.runSaveNodeList(dialogRunner, selectList)
+        .map(this::toEditCategory)
+        .ifPresent(categoryTableData::add);
+  }
+
+  private void addNewCategory(Event event) {
+    DepanFxNodeList emptyList = tableAdapter.buildEmptyList();
+    DepanFxSaveNodeListDialog.runSaveNodeList(dialogRunner, emptyList)
+        .map(this::toEditCategory)
+        .ifPresent(categoryTableData::add);
+  }
+
+  private void addEmptyCategory(Event event) {
+    addEmptyCategory();
+  }
+
+  private void addEmptyCategory() {
+    categoryTableData.add(new EditCategory("", null));
+  }
+
+  private EditCategory toEditCategory(
+      DepanFxWorkspaceResource<DepanFxNodeList> listRsrc) {
+    return new EditCategory(listRsrc.getResource().getNodeListName(), listRsrc);
+  }
+
   /////////////////////////////////////
   // Internal Table Classes
 
-  private static class ButtonActionCell<S, T> extends TableCell<S, T> {
+  private class ActionCell extends TableCell<EditCategory, String> {
 
-    private final Consumer<TableCell<S, T>> cellAction;
-
-    private final Button actionButton;
-
-    public ButtonActionCell(String label, Consumer<TableCell<S, T>> cellAction) {
-      this.actionButton = new Button(label);
-      this.cellAction = cellAction;
-      actionButton.setOnAction(this::onAction);
-    }
+    private static final String HAMBURGER_MENU = "\u2261";
 
     @Override
-    protected void updateItem(T item, boolean empty) {
-        super.updateItem(item, empty);
-        setText(null);
-        if (empty) {
-            setGraphic(null);
-        } else {
-            setGraphic(actionButton);
-        }
+    protected void updateItem(String item, boolean empty) {
+      super.updateItem(item, empty);
+
+      if (!empty) {
+        setText(HAMBURGER_MENU);
+        setGraphic(null);
+        stylizeCell();
+        return;
+      }
+      setText(null);
+      setGraphic(null);
     }
 
-    private void onAction(ActionEvent event) {
-      cellAction.accept(this);
+    private void stylizeCell() {
+      DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+      builder.appendActionItem(DepanFxNodeListTableCommands.SELECT_NODE_LIST,
+          e -> runNodeListChooser(getIndex()));
+      builder.appendSeparator();
+      builder.appendActionItem("Delete",
+          e -> deleteCategory(getIndex()));
+      setContextMenu(builder.build());
+    }
+
+    private void runNodeListChooser(int index) {
+      DepanFxNodeListChooser.runNodeListChooser(
+          workspace, dialogRunner, getScene())
+      .ifPresent(r -> updateCellResource(index, r));
+    }
+
+    private void deleteCategory(int index) {
+      categoryTableData.remove(index);
+    }
+
+    private void updateCellResource(
+        int cellIndex,
+        DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
+
+      updateNodeList(
+          categoryTableData.get(cellIndex), nodeListRsrc);
     }
   }
 

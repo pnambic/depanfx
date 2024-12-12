@@ -48,12 +48,8 @@
                     editable="false"
                     prefWidth="160" minWidth="80">
                 </TableColumn>
-                <TableColumn
-                    prefWidth="60"
-                    editable="false" resizable="false" sortable="false">
-                </TableColumn>
-                <TableColumn
-                    prefWidth="60"
+                <TableColumn text="Edit"
+                    prefWidth="40"
                     editable="false" resizable="false" sortable="false">
                 </TableColumn>
             </columns>

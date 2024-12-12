@@ -47,9 +47,6 @@ public class DepanFxSaveNodeListDialog
   @FXML
   private TextField nodeListDescriptionField;
 
-  private Optional<DepanFxWorkspaceResource<DepanFxNodeList>> savedRsrc =
-      Optional.empty();
-
   private DepanFxNodeList nodeList;
 
   @Autowired
@@ -66,7 +63,7 @@ public class DepanFxSaveNodeListDialog
         dialogRunner.createDialogAndParent(DepanFxSaveNodeListDialog.class);
     saveDlg.getController().setNodeListDoc(nodeList);
     saveDlg.runDialog("Save node list");
-    return saveDlg.getController().getSavedResource();
+    return saveDlg.getController().getWorkspaceResource();
   }
 
   public static Optional<DepanFxWorkspaceResource<DepanFxNodeList>>
@@ -80,7 +77,7 @@ public class DepanFxSaveNodeListDialog
     saveDlg.getController().setDestination(listDoc);
     saveDlg.getController().setNodeListDoc(nodeList);
     saveDlg.runDialog("Update node list");
-    return saveDlg.getController().getSavedResource();
+    return saveDlg.getController().getWorkspaceResource();
   }
 
   public void setNodeListDoc(DepanFxNodeList nodeList) {
@@ -96,11 +93,6 @@ public class DepanFxSaveNodeListDialog
     int nodeCount = nodeList.getNodes().size();
     return MessageFormat.format("Node list from {0} with {1} nodes.",
         graphSource, nodeCount);
-  }
-
-  public Optional<DepanFxWorkspaceResource<DepanFxNodeList>>
-      getSavedResource() {
-        return savedRsrc;
   }
 
   /////////////////////////////////////

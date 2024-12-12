@@ -35,7 +35,8 @@ import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.util.Callback;
 
-public class DepanFxCategoryColumn extends DepanFxAbstractColumn<DepanFxCategoryColumnData> {
+public class DepanFxCategoryColumn
+    extends DepanFxAbstractColumn<DepanFxCategoryColumnData> {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxCategoryColumn.class);
@@ -70,9 +71,11 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn<DepanFxCategory
   }
 
   public static void addNewColumnAction(
-      DepanFxContextMenuBuilder builder, DepanFxDialogRunner dialogRunner) {
+      DepanFxContextMenuBuilder builder,
+      DepanFxDialogRunner dialogRunner,
+      DepanFxNodeListTableAdapter tableAdapter) {
     builder.appendActionItem(NEW_CATEGORY_COLUMN,
-        e -> openColumnCreate(dialogRunner));
+        e -> openColumnCreate(dialogRunner, tableAdapter));
   }
 
   @Override
@@ -91,7 +94,7 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn<DepanFxCategory
     builder.appendActionItem(SELECT_CATEGORY_COLUMN,
         e -> openColumnChooser(dialogRunner));
     builder.appendActionItem(EDIT_CATEGORY_COLUMN,
-        e -> openColumnEditor(dialogRunner));
+        e -> openColumnEditor(dialogRunner, tableAdapter));
 
     // These actions are hidden if the node list is unchanged.
     saveSeparator = builder.appendSeparator();
@@ -183,16 +186,21 @@ public class DepanFxCategoryColumn extends DepanFxAbstractColumn<DepanFxCategory
         .forEach(this::saveCategory);
   }
 
-  private static void openColumnCreate(DepanFxDialogRunner dialogRunner) {
+  private static void openColumnCreate(
+      DepanFxDialogRunner dialogRunner,
+      DepanFxNodeListTableAdapter tableAdapter) {
     DepanFxCategoryColumnData initialData =
         DepanFxCategoryColumnData.buildInitialCategoryColumnData();
-    DepanFxCategoryColumnToolDialog.runCreateDialog(initialData, dialogRunner);
+    DepanFxCategoryColumnToolDialog.runCreateDialog(
+        initialData, dialogRunner, tableAdapter);
   }
 
-  private void openColumnEditor(DepanFxDialogRunner dialogRunner) {
+  private void openColumnEditor(
+      DepanFxDialogRunner dialogRunner,
+      DepanFxNodeListTableAdapter tableAdapter) {
     Dialog<DepanFxCategoryColumnToolDialog> categoryColumnEditor =
           DepanFxCategoryColumnToolDialog.runEditDialog(
-              getColumnProjectDoc(), buildEditData(), dialogRunner);
+              getColumnProjectDoc(), buildEditData(), dialogRunner, tableAdapter);
 
     categoryColumnEditor.getController().getWorkspaceResource()
         .ifPresent(this::updateColumnDataRsrc);

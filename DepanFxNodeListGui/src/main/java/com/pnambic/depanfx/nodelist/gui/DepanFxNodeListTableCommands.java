@@ -43,9 +43,9 @@ public class DepanFxNodeListTableCommands {
 
   public static final String INVERT_SELECTION_ITEM = "Invert Selection";
 
-  private static final String SELECT_NODE_LIST = "Select Node List...";
+  public static final String SELECT_NODE_LIST = "Select Node List...";
 
-  private static final String TABLE_VIEW = "Table View";
+  public static final String TABLE_VIEW = "Table View";
 
   public static final String ADD_COLUMN = "Add Column";
 
@@ -68,14 +68,18 @@ public class DepanFxNodeListTableCommands {
 
   private final DepanFxDialogRunner dialogRunner;
 
+  private final DepanFxNodeListTableAdapter tableAdapter;
+
   private final DepanFxNodeListTableState tableState;
 
   public DepanFxNodeListTableCommands(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
+      DepanFxNodeListTableAdapter tableAdpater,
       DepanFxNodeListTableState tableState) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
+    this.tableAdapter = tableAdpater;
     this.tableState = tableState;
   }
 
@@ -216,7 +220,7 @@ public class DepanFxNodeListTableCommands {
         DepanFxCategoryColumnData.buildInitialCategoryColumnData();
     Dialog<DepanFxCategoryColumnToolDialog> createDlg =
         DepanFxCategoryColumnToolDialog.runCreateDialog(
-            initialData, dialogRunner);
+            initialData, dialogRunner, tableAdapter);
     createDlg.getController().getWorkspaceResource()
         .ifPresent(tableState::addColumn);
   }

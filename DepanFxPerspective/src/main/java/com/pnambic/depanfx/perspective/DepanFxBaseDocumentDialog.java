@@ -80,7 +80,7 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
   protected File buildGraphInitialDestination(String targetExt) {
     return DepanFxWorkspaceFactory.bestDocumentFile(
         getDocumentName(), targetExt, workspace,
-        DepanFxProjects.getCurrentGraphsPath(workspace).orElse(null),
+        DepanFxProjects.getActiveGraphsPath(workspace),
         DepanFxProjects.getCurrentGraphs(workspace));
   }
 
@@ -91,7 +91,19 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
   protected File buildAnalysisInitialDestination(String targetExt) {
     return DepanFxWorkspaceFactory.bestDocumentFile(
         getDocumentName(), targetExt, workspace,
-        DepanFxProjects.getCurrentAnalysesPath(workspace).orElse(null),
+        DepanFxProjects.getActiveAnalysesPath(workspace),
+        DepanFxProjects.getCurrentAnalyzes(workspace));
+  }
+
+  protected File buildAnalysisInitialDestination(
+      DepanFxProjectDocument relatedDoc, String targetExt) {
+    Path initialDir = relatedDoc.getParent()
+        .map(c -> c.getMemberPath())
+        .filter(p -> p.startsWith(DepanFxProjects.ANALYSES_PATH))
+        .orElse(DepanFxProjects.getActiveAnalysesPath(workspace));
+
+    return DepanFxWorkspaceFactory.bestDocumentFile(
+        getDocumentName(), targetExt, workspace, initialDir,
         DepanFxProjects.getCurrentAnalyzes(workspace));
   }
 

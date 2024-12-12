@@ -12,6 +12,7 @@ import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
@@ -143,6 +144,10 @@ public class DepanFxNodeListTableState {
 
   public DepanFxNodeList getSelection() {
     return selectedNodes.getSelection(nodeList);
+  }
+
+  public DepanFxNodeList buildEmptyList() {
+    return DepanFxNodeLists.buildEmptyNodeList(nodeList);
   }
 
   /**

@@ -47,7 +47,7 @@ public class DepanFxCategoryColumnConfiguration {
         DepanFxWorkspaceResource<DepanFxCategoryColumnData> wkspRsrc,
         DepanFxDialogRunner dialogRunner) {
       DepanFxCategoryColumnToolDialog.runEditDialog(
-          wkspRsrc.getDocument(), wkspRsrc.getResource(), dialogRunner);
+          wkspRsrc.getDocument(), wkspRsrc.getResource(), dialogRunner, null);
     }
   }
 
@@ -64,7 +64,7 @@ public class DepanFxCategoryColumnConfiguration {
         DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
-      DepanFxCategoryColumn.addNewColumnAction(builder, dialogRunner);
+      DepanFxCategoryColumn.addNewColumnAction(builder, dialogRunner, null);
     }
 
     @Override

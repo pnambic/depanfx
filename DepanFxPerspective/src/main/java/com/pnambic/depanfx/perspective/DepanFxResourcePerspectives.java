@@ -119,7 +119,7 @@ public class DepanFxResourcePerspectives {
     DepanFxWorkspace workspace = chooser.getWorkspace();
     Path initPath = DepanFxWorkspaceFactory.bestDocumentPath(
         "temp", workspace, targetPath,
-        DepanFxProjects.getCurrentToolsPath(workspace).orElse(null));
+        DepanFxProjects.getActiveToolsPath(workspace));
 
     workspace.toProjectDocument(initPath.toUri())
         .ifPresent(d -> {

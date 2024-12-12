@@ -33,6 +33,13 @@ public abstract class DepanFxBaseColumnToolDialog<T extends DepanFxBaseColumnDat
     super(workspace, dataType);
   }
 
+  @Override
+  public void setTooldata(T columnData) {
+    super.setTooldata(columnData);
+    columnLabelField.setText(columnData.getColumnLabel());
+    widthMsField.setText(Integer.toString(columnData.getWidthMs()));
+  }
+
   /////////////////////////////////////
   // Hook methods for derived classes.
 
