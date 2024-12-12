@@ -150,6 +150,7 @@ public class DepanFxCategoryColumnToolDialog
     TableColumn<EditCategory, String> rowActionColumn =
         columnBinder.next();
     rowActionColumn.setCellFactory(p -> new ActionCell());
+    rowActionColumn.setStyle("-fx-alignment: BASELINE-CENTER;");
 
     // Size filePath to remaining room
     filePathColumn.prefWidthProperty().bind(
