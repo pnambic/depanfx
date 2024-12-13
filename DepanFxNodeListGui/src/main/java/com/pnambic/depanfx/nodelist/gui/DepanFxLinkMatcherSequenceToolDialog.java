@@ -21,6 +21,7 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
+import com.pnambic.depanfx.scene.DepanFxActionCell;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -40,7 +41,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -48,7 +48,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.FileChooser;
@@ -147,8 +146,15 @@ public class DepanFxLinkMatcherSequenceToolDialog
             r.getValue().getResource().getToolName()));
 
     TableColumn<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>, String>
-    findActionColumn = columnBinder.next();
-    findActionColumn.setCellFactory(p -> new ActionCell());
+    rowActionColumn = columnBinder.next();
+    DepanFxActionCell.prepareColumn(rowActionColumn, p -> new MatcherActions());
+
+    // Size the resource column to remaining room
+    resourceColumn.prefWidthProperty().bind(
+        linkMatcherSequenceTable.widthProperty()
+            .subtract(filePathColumn.widthProperty())
+            .subtract(rowActionColumn.widthProperty())
+            .subtract(2));
   }
 
   @Override // DepanFxBaseColumnToolDialog
@@ -210,76 +216,24 @@ public class DepanFxLinkMatcherSequenceToolDialog
     return builder.build();
   }
 
-  public class ActionCell
-      extends TableCell<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>, String> {
+  private class MatcherActions
+      extends DepanFxActionCell<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> {
 
-    @Override
-    protected void updateItem(String item, boolean empty) {
-      super.updateItem(item, empty);
-
-      if (!empty) {
-        setText("...");
-        setGraphic(null);
-        stylizeCell();
-        return;
-      }
-      setText(null);
-      setGraphic(null);
+    public MatcherActions() {
+      super(linkMatcherSequenceTableData);
     }
 
-    private void stylizeCell() {
-      DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    @Override
+    protected void populateContextMenu(DepanFxContextMenuBuilder builder) {
       builder.appendActionItem("Select Matcher...",
           e -> runMatcherChooser(getIndex()));
       appendMoveOps(builder);
-      builder.appendSeparator();
-      builder.appendActionItem("Delete",
-          e -> deleteMatcher(getIndex()));
-      setContextMenu(builder.build());
     }
 
-    private void appendMoveOps(DepanFxContextMenuBuilder builder) {
-      int index = getIndex();
-      boolean hasUp = index > 0;
-      boolean hasDown = index < linkMatcherSequenceTableData.size() - 1;
-      if (!hasUp && !hasDown ) {
-        return;
-      }
-      builder.appendSeparator();
-      if (hasUp) {
-        builder.appendActionItem("Up", e -> moveMatcher(getIndex(), -1));
-      }
-      if (hasDown) {
-        builder.appendActionItem("Down", e -> moveMatcher(getIndex(), 1));
-      }
+    private void runMatcherChooser(int index) {
+      DepanFxLinkMatcherChooser.runLinkMatcherFinder(
+          getWorkspace(), dialogRunner, getScene())
+          .ifPresent(r -> setRow(index, r));
     }
-  }
-
-  private void runMatcherChooser(int index) {
-    Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> matcher =
-        DepanFxLinkMatcherChooser.runLinkMatcherFinder(
-            getWorkspace(), dialogRunner, getScene());
-    matcher.ifPresent(r -> updateMatcher(index, r));
-  }
-
-  private void moveMatcher(int srcIndex, int moveBy) {
-    int dstIndex = srcIndex + moveBy;
-    if (dstIndex < 0 || dstIndex >= linkMatcherSequenceTableData.size()) {
-      LOG.error("Bad matcher move to {} from {} by {}",
-          dstIndex, srcIndex, moveBy);
-      return;
-    }
-    DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> moveItem =
-        linkMatcherSequenceTableData.remove(srcIndex);
-    linkMatcherSequenceTableData.add(dstIndex, moveItem);
-  }
-
-  private void deleteMatcher(int index) {
-    linkMatcherSequenceTableData.remove(index);
-  }
-
-  private void updateMatcher(int index,
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
-    linkMatcherSequenceTableData.set(index, matcherRsrc);
   }
 }

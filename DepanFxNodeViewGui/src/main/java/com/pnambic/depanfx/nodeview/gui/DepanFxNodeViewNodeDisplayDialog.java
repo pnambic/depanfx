@@ -26,6 +26,7 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData.Node
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxSizerModel;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.scene.DepanFxActionCell;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -180,7 +181,7 @@ public class DepanFxNodeViewNodeDisplayDialog
 
     TableColumn<EditNodeDisplay, String> rowActionColumn =
         columnBinder.next();
-    rowActionColumn.setCellFactory(p -> new ActionCell());
+    DepanFxActionCell.prepareColumn(rowActionColumn,  p -> new DisplayActions());
   }
 
   /**
@@ -301,82 +302,35 @@ public class DepanFxNodeViewNodeDisplayDialog
   /////////////////////////////////////
   // Internal Table Classes
 
-  public class ActionCell
-      extends TableCell<EditNodeDisplay, String> {
+  private class DisplayActions extends DepanFxActionCell<EditNodeDisplay> {
 
-    @Override
-    protected void updateItem(String item, boolean empty) {
-      super.updateItem(item, empty);
-
-      if (!empty) {
-        setText("...");
-        setGraphic(null);
-        stylizeCell();
-        return;
-      }
-      setText(null);
-      setGraphic(null);
+    public DisplayActions() {
+      super(nodesDisplayData);
     }
 
-    private void stylizeCell() {
-      DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    @Override
+    protected void populateContextMenu(DepanFxContextMenuBuilder builder) {
       builder.appendActionItem("Select Filter...",
           e -> runFilterChooser(getIndex()));
       appendMoveOps(builder);
-      builder.appendSeparator();
-      builder.appendActionItem("Delete",
-          e -> deleteFilter(getIndex()));
-      setContextMenu(builder.build());
     }
 
-    private void appendMoveOps(DepanFxContextMenuBuilder builder) {
-      int index = getIndex();
-      boolean hasUp = index > 0;
-      boolean hasDown = index < nodesDisplayData.size() - 1;
-      if (!hasUp && !hasDown ) {
-        return;
-      }
-      builder.appendSeparator();
-      if (hasUp) {
-        builder.appendActionItem("Up", e -> moveFilter(getIndex(), -1));
-      }
-      if (hasDown) {
-        builder.appendActionItem("Down", e -> moveFilter(getIndex(), 1));
-      }
+    private void runFilterChooser(int index) {
+      DepanFxNodeFiltersChooser.runNodeFiltersFinder(
+          workspace, dialogRunner, getScene(), filtersRegistry)
+      .ifPresent(r -> updateRow(index, r));
     }
-  }
 
-  private void runFilterChooser(int index) {
-    DepanFxNodeFiltersChooser.runNodeFiltersFinder(
-        workspace, dialogRunner, getScene(), filtersRegistry)
-    .ifPresent(r -> updateFilter(index, r));
-  }
-
-  private void moveFilter(int srcIndex, int moveBy) {
-
-    int dstIndex = srcIndex + moveBy;
-    if (dstIndex < 0 || dstIndex >= nodesDisplayData.size()) {
-      LOG.error("Bad filter move to {} from {} by {}",
-          dstIndex, srcIndex, moveBy);
-      return;
+    private void updateRow(
+        int index, DepanFxWorkspaceResource<DepanFxBaseFilterData> filterRsrc) {
+      updateFilter(getRowData(index), filterRsrc);
     }
-    EditNodeDisplay moveItem = nodesDisplayData.remove(srcIndex);
-    nodesDisplayData.add(dstIndex, moveItem);
-  }
-
-  private void deleteFilter(int index) {
-    nodesDisplayData.remove(index);
   }
 
   private void updateFilter(
       EditNodeDisplay editNodeDisplay,
       DepanFxWorkspaceResource<DepanFxBaseFilterData> filterRsrc) {
     editNodeDisplay.setDisplayFilterRsrc(filterRsrc);
-  }
-
-  private void updateFilter(
-      int index, DepanFxWorkspaceResource<DepanFxBaseFilterData> filterRsrc) {
-    updateFilter(nodesDisplayData.get(index), filterRsrc);
   }
 
   private static class ColorCellFactory

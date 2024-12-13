@@ -11,6 +11,7 @@ import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
+import com.pnambic.depanfx.scene.DepanFxActionCell;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -39,7 +40,6 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
@@ -149,8 +149,8 @@ public class DepanFxCategoryColumnToolDialog
 
     TableColumn<EditCategory, String> rowActionColumn =
         columnBinder.next();
-    rowActionColumn.setCellFactory(p -> new ActionCell());
-    rowActionColumn.setStyle("-fx-alignment: BASELINE-CENTER;");
+    DepanFxActionCell.prepareColumn(
+        rowActionColumn, p -> new CategoryActions());
 
     // Size filePath to remaining room
     filePathColumn.prefWidthProperty().bind(
@@ -279,32 +279,16 @@ public class DepanFxCategoryColumnToolDialog
   /////////////////////////////////////
   // Internal Table Classes
 
-  private class ActionCell extends TableCell<EditCategory, String> {
+  private class CategoryActions extends DepanFxActionCell<EditCategory> {
 
-    private static final String HAMBURGER_MENU = "\u2261";
-
-    @Override
-    protected void updateItem(String item, boolean empty) {
-      super.updateItem(item, empty);
-
-      if (!empty) {
-        setText(HAMBURGER_MENU);
-        setGraphic(null);
-        stylizeCell();
-        return;
-      }
-      setText(null);
-      setGraphic(null);
+    CategoryActions() {
+      super(categoryTableData);
     }
 
-    private void stylizeCell() {
-      DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    @Override
+    protected void populateContextMenu(DepanFxContextMenuBuilder builder) {
       builder.appendActionItem(DepanFxNodeListTableCommands.SELECT_NODE_LIST,
           e -> runNodeListChooser(getIndex()));
-      builder.appendSeparator();
-      builder.appendActionItem("Delete",
-          e -> deleteCategory(getIndex()));
-      setContextMenu(builder.build());
     }
 
     private void runNodeListChooser(int index) {
@@ -313,16 +297,10 @@ public class DepanFxCategoryColumnToolDialog
       .ifPresent(r -> updateCellResource(index, r));
     }
 
-    private void deleteCategory(int index) {
-      categoryTableData.remove(index);
-    }
-
     private void updateCellResource(
         int cellIndex,
         DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
-
-      updateNodeList(
-          categoryTableData.get(cellIndex), nodeListRsrc);
+      updateNodeList(getRowData(cellIndex), nodeListRsrc);
     }
   }
 

@@ -13,6 +13,7 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.scene.DepanFxActionCell;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -179,7 +180,7 @@ public class DepanFxNodeViewLinkDisplayDialog
 
     TableColumn<EditLinkDisplay, String> rowActionColumn =
         columnBinder.next();
-    rowActionColumn.setCellFactory(p -> new ActionCell());
+    DepanFxActionCell.prepareColumn(rowActionColumn, p -> new DisplayActions());
   }
 
   /**
@@ -361,77 +362,31 @@ public class DepanFxNodeViewLinkDisplayDialog
     }
   }
 
-  public class ActionCell extends TableCell<EditLinkDisplay, String> {
+  private class DisplayActions extends DepanFxActionCell<EditLinkDisplay> {
 
-    @Override
-    protected void updateItem(String item, boolean empty) {
-      super.updateItem(item, empty);
-
-      if (!empty) {
-        setText("...");
-        setGraphic(null);
-        stylizeCell();
-        return;
-      }
-      setText(null);
-      setGraphic(null);
+    public DisplayActions() {
+      super(linksDiplayTableData);
     }
 
-    private void stylizeCell() {
-      DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    @Override
+    protected void populateContextMenu(DepanFxContextMenuBuilder builder) {
       builder.appendActionItem("Select Matcher...",
           e -> runMatcherChooser(getIndex()));
       appendMoveOps(builder);
-      builder.appendSeparator();
-      builder.appendActionItem("Delete",
-          e -> deleteFilter(getIndex()));
-      setContextMenu(builder.build());
     }
 
-    private void appendMoveOps(DepanFxContextMenuBuilder builder) {
-      int index = getIndex();
-      boolean hasUp = index > 0;
-      boolean hasDown = index < linksDiplayTableData.size() - 1;
-      if (!hasUp && !hasDown ) {
-        return;
-      }
-      builder.appendSeparator();
-      if (hasUp) {
-        builder.appendActionItem("Up", e -> moveDisplayEntry(getIndex(), -1));
-      }
-      if (hasDown) {
-        builder.appendActionItem("Down", e -> moveDisplayEntry(getIndex(), 1));
-      }
+    private void runMatcherChooser(int index) {
+      DepanFxLinkMatcherChooser.runLinkMatcherFinder(
+          workspace, dialogRunner, getScene())
+      .ifPresent(r -> updateRow(index, r));
     }
-  }
 
-  private void runMatcherChooser(int index) {
-    DepanFxLinkMatcherChooser.runLinkMatcherFinder(
-        workspace, dialogRunner, getScene())
-    .ifPresent(r -> updateMatcher(index, r));
-  }
+    private void updateRow(
+        int index,
+        DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
 
-  private void moveDisplayEntry(int srcIndex, int moveBy) {
-
-    int dstIndex = srcIndex + moveBy;
-    if (dstIndex < 0 || dstIndex >= linksDiplayTableData.size()) {
-      LOG.error("Bad filter move to {} from {} by {}",
-          dstIndex, srcIndex, moveBy);
-      return;
+      updateMatcher(linksDiplayTableData.get(index), matcherRsrc);
     }
-    EditLinkDisplay moveItem = linksDiplayTableData.remove(srcIndex);
-    linksDiplayTableData.add(dstIndex, moveItem);
-  }
-
-  private void deleteFilter(int index) {
-    linksDiplayTableData.remove(index);
-  }
-
-  private void updateMatcher(
-      int index,
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
-
-    updateMatcher(linksDiplayTableData.get(index), matcherRsrc);
   }
 
   /////////////////////////////////////

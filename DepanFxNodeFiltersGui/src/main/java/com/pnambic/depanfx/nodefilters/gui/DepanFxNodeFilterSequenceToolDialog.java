@@ -20,6 +20,7 @@ import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
+import com.pnambic.depanfx.scene.DepanFxActionCell;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -39,7 +40,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -47,7 +47,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.FileChooser;
@@ -150,8 +149,15 @@ public class DepanFxNodeFilterSequenceToolDialog
             r.getValue().getResource().getToolName()));
 
     TableColumn<DepanFxWorkspaceResource<DepanFxBaseFilterData>, String>
-    findActionColumn = columnBinder.next();
-    findActionColumn.setCellFactory(p -> new ActionCell());
+    rowActionColumn = columnBinder.next();
+    DepanFxActionCell.prepareColumn(rowActionColumn, p -> new FilterActions());
+
+    // Size the resource column to remaining room
+    resourceColumn.prefWidthProperty().bind(
+        nodeFiltersSequenceTable.widthProperty()
+            .subtract(filePathColumn.widthProperty())
+            .subtract(rowActionColumn.widthProperty())
+            .subtract(2));
   }
 
   @Override // DepanFxBaseColumnToolDialog
@@ -212,76 +218,26 @@ public class DepanFxNodeFilterSequenceToolDialog
     return builder.build();
   }
 
-  public class ActionCell
-      extends TableCell<DepanFxWorkspaceResource<DepanFxBaseFilterData>, String> {
+  private class FilterActions
+      extends DepanFxActionCell<DepanFxWorkspaceResource<DepanFxBaseFilterData>> {
+
+    public FilterActions() {
+      super(nodeFiltersSequenceData);
+    }
 
     @Override
-    protected void updateItem(String item, boolean empty) {
-      super.updateItem(item, empty);
+    protected void populateContextMenu(DepanFxContextMenuBuilder builder) {
 
-      if (!empty) {
-        setText("...");
-        setGraphic(null);
-        stylizeCell();
-        return;
-      }
-      setText(null);
-      setGraphic(null);
-    }
-
-    private void stylizeCell() {
-      DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
       builder.appendActionItem("Select Filter...",
           e -> runFilterChooser(getIndex()));
+
       appendMoveOps(builder);
-      builder.appendSeparator();
-      builder.appendActionItem("Delete",
-          e -> deleteFilter(getIndex()));
-      setContextMenu(builder.build());
     }
 
-    private void appendMoveOps(DepanFxContextMenuBuilder builder) {
-      int index = getIndex();
-      boolean hasUp = index > 0;
-      boolean hasDown = index < nodeFiltersSequenceData.size() - 1;
-      if (!hasUp && !hasDown ) {
-        return;
-      }
-      builder.appendSeparator();
-      if (hasUp) {
-        builder.appendActionItem("Up", e -> moveFilter(getIndex(), -1));
-      }
-      if (hasDown) {
-        builder.appendActionItem("Down", e -> moveFilter(getIndex(), 1));
-      }
+    private void runFilterChooser(int index) {
+      DepanFxNodeFiltersChooser.runNodeFiltersFinder(
+          getWorkspace(), dialogRunner, getScene(), nodeFilterDialogRegistry)
+          .ifPresent(r -> setRow(index, r));
     }
-  }
-
-  private void runFilterChooser(int index) {
-    Optional<DepanFxWorkspaceResource<DepanFxBaseFilterData>> filter =
-        DepanFxNodeFiltersChooser.runNodeFiltersFinder(
-              getWorkspace(), dialogRunner, getScene(), nodeFilterDialogRegistry);
-    filter.ifPresent(r -> updateFilter(index, r));
-  }
-
-  private void moveFilter(int srcIndex, int moveBy) {
-    int dstIndex = srcIndex + moveBy;
-    if (dstIndex < 0 || dstIndex >= nodeFiltersSequenceData.size()) {
-      LOG.error("Bad filter move to {} from {} by {}",
-          dstIndex, srcIndex, moveBy);
-      return;
-    }
-    DepanFxWorkspaceResource<DepanFxBaseFilterData> moveItem =
-        nodeFiltersSequenceData.remove(srcIndex);
-    nodeFiltersSequenceData.add(dstIndex, moveItem);
-  }
-
-  private void deleteFilter(int index) {
-    nodeFiltersSequenceData.remove(index);
-  }
-
-  private void updateFilter(int index,
-      DepanFxWorkspaceResource<DepanFxBaseFilterData> filterRsrc) {
-    nodeFiltersSequenceData.set(index, filterRsrc);
   }
 }
