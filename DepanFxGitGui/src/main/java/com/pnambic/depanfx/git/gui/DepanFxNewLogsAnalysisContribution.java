@@ -5,7 +5,10 @@ import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewAnalysisContribution;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javafx.scene.control.MenuItem;
@@ -14,9 +17,14 @@ import javafx.scene.control.MenuItem;
 public class DepanFxNewLogsAnalysisContribution
     implements DepanFxNewAnalysisContribution {
 
+  private final DepanFxWorkspace workspace;
+
   private final DepanFxDialogRunner dialogRunner;
 
-  public DepanFxNewLogsAnalysisContribution(DepanFxDialogRunner dialogRunner) {
+  @Autowired
+  public DepanFxNewLogsAnalysisContribution(
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+    this.workspace = workspace;
     this.dialogRunner = dialogRunner;
   }
 
@@ -27,11 +35,14 @@ public class DepanFxNewLogsAnalysisContribution
   }
 
   private void runGitLogsDialog() {
-    Dialog<DepanFxNewGitLogsDialog> newLogsDialog =
-        dialogRunner.createDialogAndParent(DepanFxNewGitLogsDialog.class);
     DepanFxGitRepoData repoData =
         DepanFxGitRepoToolDialogs.buildInitialGitRepoData();
-    newLogsDialog.getController().setRepoData(repoData);
+    DepanFxWorkspaceResource<DepanFxGitRepoData> repoRsrc =
+        workspace.addScratchResource(repoData);
+
+    Dialog<DepanFxNewGitLogsDialog> newLogsDialog =
+        dialogRunner.createDialogAndParent(DepanFxNewGitLogsDialog.class);
+    newLogsDialog.getController().setRepoResource(repoRsrc);
     newLogsDialog.runDialog("Create new theory from git logs");
   }
 }

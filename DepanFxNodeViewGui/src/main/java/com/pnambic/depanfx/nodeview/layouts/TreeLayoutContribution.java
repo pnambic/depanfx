@@ -11,8 +11,10 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxTreeLayoutData;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -72,15 +74,17 @@ public class TreeLayoutContribution
         new DepanFxTreeLayoutData(
             "Tree layout", "Tree layout by membership hierarchy.",
             view.getHierachyMatcherRsrc().get());
+    DepanFxWorkspaceResource<DepanFxTreeLayoutData> layoutRsrc =
+        view.getWorkspace().addScratchResource(initialData);
 
     Dialog<DepanFxTreeLayoutToolDialog> layoutDlg =
         DepanFxTreeLayoutToolDialog.runCreateDialog(
-            initialData, view.getDialogRunner());
+            layoutRsrc, view.getDialogRunner());
 
     List<GraphNode> updateNodes =
         view.streamChosenNodes().collect(Collectors.toList());
 
-    layoutDlg.getController().getWorkspaceResource()
+    layoutDlg.getController().getToolResource()
         .ifPresent(r -> view.updateNodeLocations(
             layoutNodes(view, r, updateNodes)));
   }

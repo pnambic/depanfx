@@ -23,8 +23,8 @@ import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -76,22 +76,21 @@ public class DepanFxShiftLayoutToolDialog
   }
 
   public static Dialog<DepanFxShiftLayoutToolDialog> runEditDialog(
-      DepanFxProjectDocument projDoc,
-      DepanFxShiftLayoutData shiftLayoutData,
+      DepanFxWorkspaceResource<DepanFxShiftLayoutData> shiftLayoutRsrc,
       DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runEditDialog(
-        projDoc, shiftLayoutData, dialogRunner,
+        shiftLayoutRsrc, dialogRunner,
         DepanFxShiftLayoutToolDialog.class,
         "Edit Shift Layout");
   }
 
   public static Dialog<DepanFxShiftLayoutToolDialog> runCreateDialog(
-      DepanFxShiftLayoutData shiftLayoutData,
+      DepanFxWorkspaceResource<DepanFxShiftLayoutData> shiftLayoutRsrc,
       DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runCreateDialog(
-        shiftLayoutData, dialogRunner,
+        shiftLayoutRsrc, dialogRunner,
         DepanFxShiftLayoutToolDialog.class,
         "New Shift Layout");
   }
@@ -103,10 +102,13 @@ public class DepanFxShiftLayoutToolDialog
     configureShiftField(shiftZField);
   }
 
-  @Override // DepanFxBaseColumnToolDialog
-  public void setTooldata(DepanFxShiftLayoutData shiftLayoutData) {
-    super.setTooldata(shiftLayoutData);
+  
+  @Override
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxShiftLayoutData> toolRsrc) {
+    super.setToolResource(toolRsrc);
 
+    DepanFxShiftLayoutData shiftLayoutData = toolRsrc.getResource();
     setShiftField(shiftXField, shiftLayoutData.getShiftX());
     setShiftField(shiftYField, shiftLayoutData.getShiftY());
     setShiftField(shiftZField, shiftLayoutData.getShiftZ());

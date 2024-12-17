@@ -535,6 +535,7 @@ public class NodeDisplayController {
           .map(e -> e.getKey());
     }
 
+    @SuppressWarnings("unused")
     public Optional<DepanFxBaseFilterData> lookupFirst(GraphNode node) {
       return filterInfos.entrySet().stream()
           .filter(e -> e.getValue().inFilter(node))

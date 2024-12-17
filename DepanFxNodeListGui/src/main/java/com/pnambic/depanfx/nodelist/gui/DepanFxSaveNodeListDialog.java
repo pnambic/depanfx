@@ -6,7 +6,6 @@ import com.pnambic.depanfx.perspective.DepanFxBaseDocumentDialog;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -47,8 +46,6 @@ public class DepanFxSaveNodeListDialog
   @FXML
   private TextField nodeListDescriptionField;
 
-  private DepanFxNodeList nodeList;
-
   @Autowired
   public DepanFxSaveNodeListDialog(DepanFxWorkspace workspace) {
     super(workspace, DepanFxNodeList.class);
@@ -57,32 +54,34 @@ public class DepanFxSaveNodeListDialog
   public static Optional<DepanFxWorkspaceResource<DepanFxNodeList>>
       runSaveNodeList(
           DepanFxDialogRunner dialogRunner,
-          DepanFxNodeList nodeList) {
+          DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
 
     Dialog<DepanFxSaveNodeListDialog> saveDlg =
         dialogRunner.createDialogAndParent(DepanFxSaveNodeListDialog.class);
-    saveDlg.getController().setNodeListDoc(nodeList);
+    saveDlg.getController().setToolResource(nodeListRsrc);
     saveDlg.runDialog("Save node list");
-    return saveDlg.getController().getWorkspaceResource();
+    return saveDlg.getController().getToolResource();
   }
 
   public static Optional<DepanFxWorkspaceResource<DepanFxNodeList>>
       runUpdateNodeList(
           DepanFxDialogRunner dialogRunner,
-          DepanFxProjectDocument listDoc,
-          DepanFxNodeList nodeList) {
+          DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
 
     Dialog<DepanFxSaveNodeListDialog> saveDlg =
         dialogRunner.createDialogAndParent(DepanFxSaveNodeListDialog.class);
-    saveDlg.getController().setDestination(listDoc);
-    saveDlg.getController().setNodeListDoc(nodeList);
+    saveDlg.getController().setToolResource(nodeListRsrc);
     saveDlg.runDialog("Update node list");
-    return saveDlg.getController().getWorkspaceResource();
+    return saveDlg.getController().getToolResource();
   }
 
-  public void setNodeListDoc(DepanFxNodeList nodeList) {
-    this.nodeList = nodeList;
-    nodeListNameField.setText(nodeList.getNodeListName());
+  @Override
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
+    super.setToolResource(nodeListRsrc);
+
+    DepanFxNodeList nodeList = nodeListRsrc.getResource();
+    nodeListNameField.setText(nodeList .getNodeListName());
     nodeListDescriptionField.setText(nodeList.getNodeListDescription());
     nodeListDetailsLabel.setText(buildDetailsLabel(nodeList));
   }
@@ -105,6 +104,7 @@ public class DepanFxSaveNodeListDialog
 
   @Override
   protected DepanFxNodeList prepareResult() {
+    DepanFxNodeList nodeList = getToolResource().get().getResource();
     return DepanFxNodeLists.buildNodeList(
         nodeListNameField.getText(), nodeListDescriptionField.getText(),
         nodeList.getGraphDocResource(), nodeList.getNodes());

@@ -18,6 +18,7 @@ package com.pnambic.depanfx.nodefilters.gui;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxListFilterData;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
@@ -61,47 +62,51 @@ public class DepanFxNodeFiltersListDialog
           DepanFxWorkspaceResource<DepanFxListFilterData> filterRsrc) {
 
     Dialog<DepanFxNodeFiltersListDialog> saveDlg =
-        dialogRunner.createDialogAndParent(
+        DepanFxResourcePerspectives.prepareDialog(
+            filterRsrc, dialogRunner,
             DepanFxNodeFiltersListDialog.class);
-    saveDlg.getController().setFilter(filterRsrc.getResource());
-    saveDlg.getController().setDestination(filterRsrc.getDocument());
     saveDlg.getController().setForSave();
     saveDlg.runDialog("Edit list filter");
-    return saveDlg.getController().getSavedResource();
+    return saveDlg.getController().getToolResource();
   }
 
   public static Optional<DepanFxWorkspaceResource<DepanFxListFilterData>>
       runSaveFilter(
           DepanFxDialogRunner dialogRunner,
-          DepanFxListFilterData saveFilter) {
+          DepanFxWorkspaceResource<DepanFxListFilterData> filterRsrc) {
 
     Dialog<DepanFxNodeFiltersListDialog> saveDlg =
-        dialogRunner.createDialogAndParent(
+        DepanFxResourcePerspectives.prepareDialog(
+            filterRsrc, dialogRunner,
             DepanFxNodeFiltersListDialog.class);
-    saveDlg.getController().setFilter(saveFilter);
     saveDlg.getController().setForSave();
     saveDlg.runDialog("Save list filter");
-    return saveDlg.getController().getSavedResource();
+    return saveDlg.getController().getToolResource();
   }
 
   public static Optional<DepanFxListFilterData>
       runUpdateFilter(
+          DepanFxWorkspace workspace,
           DepanFxDialogRunner dialogRunner,
           DepanFxListFilterData updateFilter) {
 
+    DepanFxWorkspaceResource<DepanFxListFilterData> listFilterRsrc =
+        workspace.addScratchResource(updateFilter);
+
     Dialog<DepanFxNodeFiltersListDialog> saveDlg =
-        dialogRunner.createDialogAndParent(
+        DepanFxResourcePerspectives.prepareDialog(
+            listFilterRsrc, dialogRunner,
             DepanFxNodeFiltersListDialog.class);
-    saveDlg.getController().setFilter(updateFilter);
     saveDlg.getController().setForUpdate();
     saveDlg.runDialog("Update list filter");
-    return saveDlg.getController().getUpdateFilterData();
+    return saveDlg.getController().getToolResource().map(null);
   }
 
   @Override
-  public void setFilter(DepanFxListFilterData listFilter) {
-    super.setFilter(listFilter);
-    setFilterResource(listFilter.getNodeListResource());
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxListFilterData> listFilterRsrc) {
+    super.setToolResource(listFilterRsrc);
+    setFilterResource(listFilterRsrc.getResource().getNodeListResource());
   }
 
   @FXML

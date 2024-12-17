@@ -52,27 +52,22 @@ public class DepanFxNodeListTableViewSaveDialog
   @FXML
   private Label tableDetailsLabel;
 
-  private Optional<DepanFxWorkspaceResource<DepanFxNodeListTableViewData>>
-      savedRsrc = Optional.empty();
-
-  private DepanFxNodeListTableViewData tableView;
-
   @Autowired
   public DepanFxNodeListTableViewSaveDialog(DepanFxWorkspace workspace) {
     super(workspace, DepanFxNodeListTableViewData.class);
   }
 
   public static Optional<DepanFxWorkspaceResource<DepanFxNodeListTableViewData>>
-      runSaveTableView(
-          DepanFxDialogRunner dialogRunner,
-          DepanFxNodeListTableViewData tableView) {
+  runSaveTableView(
+      DepanFxDialogRunner dialogRunner,
+      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc) {
 
     Dialog<DepanFxNodeListTableViewSaveDialog> saveDlg =
-        dialogRunner.createDialogAndParent(
-             DepanFxNodeListTableViewSaveDialog.class);
-    saveDlg.getController().setTableViewDoc(tableView);
-    saveDlg.runDialog("Save node list table view");
-    return saveDlg.getController().getSavedResource();
+        DepanFxResourcePerspectives.runCreateDialog(
+            tableViewRsrc, dialogRunner,
+            DepanFxNodeListTableViewSaveDialog.class,
+            "Save node list table view");
+    return saveDlg.getController().getToolResource();
   }
 
   /**
@@ -91,15 +86,12 @@ public class DepanFxNodeListTableViewSaveDialog
             p, DepanFxNodeListTableViewData.class));
   }
 
-  public void setTableViewDoc(DepanFxNodeListTableViewData tableView) {
-    this.tableView = tableView;
-    tableDetailsLabel.setText(buildDetailsLabel(tableView));
-    super.setTooldata(tableView);
-  }
+  @Override
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc) {
+    super.setToolResource(tableViewRsrc);
 
-  public Optional<DepanFxWorkspaceResource<DepanFxNodeListTableViewData>>
-      getSavedResource() {
-        return savedRsrc;
+    tableDetailsLabel.setText(buildDetailsLabel(tableViewRsrc.getResource()));
   }
 
   /////////////////////////////////////
@@ -107,9 +99,13 @@ public class DepanFxNodeListTableViewSaveDialog
 
   @Override
   protected DepanFxNodeListTableViewData prepareResult() {
+    DepanFxNodeListTableViewData tableView =
+        getToolResource().get().getResource();
+
     return new DepanFxNodeListTableViewData(
         getToolName(), getToolDescription(),
-        tableView.getSectionResources(), tableView.getColumnResources());
+        tableView.getSectionResources(),
+        tableView.getColumnResources());
   }
 
   @Override

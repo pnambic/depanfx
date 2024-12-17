@@ -141,7 +141,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private final DepanFxNodeFiltersRegistry filterRegistry;
 
-  private DepanFxWorkspaceResource<DepanFxNodeViewData> viewDataRsrc;
+  private DepanFxWorkspaceResource<DepanFxNodeViewData> nodeViewRsrc;
 
   private DepanFxNodeViewData viewData;
 
@@ -167,9 +167,6 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
    */
   private boolean linkDisplayDirty;
 
-  private DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData>
-      linkDisplayRsrc;
-
   private EdgeDisplayController edgeDisplay;
 
   /**
@@ -185,15 +182,15 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
       DepanFxDialogRunner dialogRunner,
       DepanFxNodeLayoutRegistry layoutRegistry,
       DepanFxNodeFiltersRegistry filterRegistry,
-      DepanFxWorkspaceResource<DepanFxNodeViewData> viewDataRsrc) {
+      DepanFxWorkspaceResource<DepanFxNodeViewData> nodeViewRsrc) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
     this.layoutRegistry = layoutRegistry;
     this.filterRegistry = filterRegistry;
-    this.viewDataRsrc = viewDataRsrc;
+    this.nodeViewRsrc = nodeViewRsrc;
 
     // Unpack the interesting parts of the view data.
-    this.viewData = viewDataRsrc.getResource();
+    this.viewData = nodeViewRsrc.getResource();
     this.viewNodes = viewData .getViewNodes();
     this.nodeLocations = viewData.getNodeLocations();
 
@@ -210,7 +207,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     joglPane = createJoglPane();
     populateJoglPane();
 
-    Tab result = new Tab(viewDataRsrc.getResource().getToolName(), joglPane);
+    Tab result = new Tab(nodeViewRsrc.getResource().getToolName(), joglPane);
 
     result.setOnSelectionChanged(new EventHandler<Event>() {
 
@@ -238,7 +235,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   }
 
   public DepanFxWorkspaceResource<DepanFxNodeViewData> getViewDataRsrc() {
-    return viewDataRsrc;
+    return nodeViewRsrc;
   }
 
   public DepanFxWorkspaceResource<GraphDocument> getGraphDocRsrc() {
@@ -295,15 +292,9 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     // reverting should not change the state of dirty
   }
 
-  public void setLinkDisplayInfo(DepanFxNodeViewLinkDisplayData displayInfo) {
-    edgeDisplay.setLinkDisplayInfo(displayInfo);
-    linkDisplayDirty = true;
-  }
-
   public void setLinkDisplayResource(
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc) {
-    edgeDisplay.setLinkDisplayInfo(displayRsrc.getResource());
-    linkDisplayRsrc = displayRsrc;
+    edgeDisplay.setLinkDisplayResource(displayRsrc);
     linkDisplayDirty = false;
   }
 
@@ -521,7 +512,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   private void runEditLinkDisplayDialog() {
     Stage edgeDisplayDialog =
         DepanFxNodeViewLinkDisplayDialog.runEditDialog(
-            edgeDisplay, linkDisplayRsrc.getDocument(), dialogRunner);
+            edgeDisplay, dialogRunner);
 
     sideViews.add(edgeDisplayDialog);
     edgeDisplayDialog.setOnCloseRequest(
@@ -699,9 +690,9 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     Dialog<DepanFxNodeViewEdgeVisibilityDialog> visibilty =
         DepanFxNodeViewEdgeVisibilityDialog.runVisibilityDialog(
             dialogRunner, viewData.getAvailableEdgesDoc(),
-            viewData.getVisibleEdgesDoc(), edgeDisplay,
+            viewData.getVisibleEdgeResource(), edgeDisplay,
             r -> updateAvailableEdges(r));
-    visibilty.getController().getWorkspaceResource()
+    visibilty.getController().getToolResource()
         .ifPresent(this::updateVisibleEdges);
   }
 
@@ -780,9 +771,9 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     Dialog<DepanFxNodeViewNodeVisibilityDialog> visibiltyDlg =
         DepanFxNodeViewNodeVisibilityDialog.runVisibilityDialog(
             dialogRunner, viewData.getAvailableNodesDoc(),
-            viewData.getVisibleNodesDoc(), nodeDisplay,
-            r -> updateAvailableNodes(r));
-    visibiltyDlg.getController().getWorkspaceResource()
+            viewData.getVisibleNodeRsrc(), nodeDisplay,
+            this::updateAvailableNodes);
+    visibiltyDlg.getController().getToolResource()
         .ifPresent(this::updateVisibleNodes);
   }
 
@@ -846,7 +837,8 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private void runSaveNodeListDialog() {
     DepanFxSaveNodeListDialog.runSaveNodeList(
-            dialogRunner, buildSelectedAsNodeList())
+            dialogRunner,
+            workspace.addScratchResource(buildSelectedAsNodeList()))
         .map(r -> r.getResource().getNodes())
         .ifPresent(nodeSelection::doSelectGraphNodesAction);
   }
@@ -862,9 +854,9 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
     Dialog<DepanFxSaveNodeViewDialog> dlg =
         DepanFxResourcePerspectives.runCreateDialog(
-            saveView, dialogRunner,
+            workspace.addScratchResource(saveView), dialogRunner,
             DepanFxSaveNodeViewDialog.class, "Save node view");
-    dlg.getController().getWorkspaceResource()
+    dlg.getController().getToolResource()
         .ifPresent(this::updateSavedResource);
   }
 
@@ -872,7 +864,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
       DepanFxWorkspaceResource<DepanFxNodeViewData> viewDataRsrc) {
     // The underlying data (e.g. node lists and locations) stays the same
     // but the access paths change if a new resource was saved.
-    this.viewDataRsrc = viewDataRsrc;
+    this.nodeViewRsrc = viewDataRsrc;
     this.viewData = viewDataRsrc.getResource();
   }
 
@@ -904,8 +896,8 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
         nodeDisplay.getRemainderDisplay(),
 
         viewData.getAvailableEdgeRsrc(),
-        viewData.getVisibleEdgeRsrc(),
-        linkDisplayRsrc,
+        viewData.getVisibleEdgeResource(),
+        edgeDisplay.getLinkDisplayResource(),
         edgeDisplay.getRemainderVisible(),
         edgeDisplay.getRemainderLabel(),
         edgeDisplay.getRemainderDisplay());
@@ -939,7 +931,6 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
     edgeDisplay = EdgeDisplayController.of(joglPane, viewData);
 
-    linkDisplayRsrc = viewData.getLinkDisplayDocRsrc();
     linkDisplayDirty = false;
 
     getViewEdges().forEach(edgeDisplay::installEdge);

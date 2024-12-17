@@ -116,8 +116,7 @@ public class DepanFxNodeKeyColumnConfiguration {
     protected void runDialog(
         DepanFxWorkspaceResource<DepanFxNodeKeyColumnData> wkspRsrc,
         DepanFxDialogRunner dialogRunner) {
-      DepanFxNodeKeyColumnToolDialog.runEditDialog(
-          wkspRsrc.getDocument(), wkspRsrc.getResource(), dialogRunner);
+      DepanFxNodeKeyColumnToolDialog.runEditDialog(wkspRsrc, dialogRunner);
     }
   }
 
@@ -134,7 +133,7 @@ public class DepanFxNodeKeyColumnConfiguration {
         DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
-      DepanFxNodeKeyColumn.addNewColumnAction(builder, dialogRunner);
+      DepanFxNodeKeyColumn.addNewColumnAction(builder, workspace, dialogRunner);
     }
 
     @Override

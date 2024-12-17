@@ -65,6 +65,10 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
     this.treeMemberCompare = updateCompare();
   }
 
+  public DepanFxWorkspaceResource<DepanFxTreeSectionData> getSectionResource() {
+    return sectionDataRsrc;
+  }
+
   public DepanFxTreeSectionData getSectionData() {
     return sectionDataRsrc.getResource();
   }

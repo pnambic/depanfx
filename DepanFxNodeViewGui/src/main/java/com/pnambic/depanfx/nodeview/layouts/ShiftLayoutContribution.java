@@ -21,8 +21,10 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxShiftLayoutData;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -37,6 +39,13 @@ public class ShiftLayoutContribution
     implements DepanFxNodeLayoutRegistry.Contribution {
 
   public static final String SHIFT_LAYOUT = "Shift Layout...";
+
+  private final DepanFxWorkspace workspace;
+
+  @Autowired
+  private ShiftLayoutContribution(DepanFxWorkspace workspace) {
+    this.workspace = workspace;
+  }
 
   @Override
   public String getLabel() {
@@ -68,15 +77,17 @@ public class ShiftLayoutContribution
         new DepanFxShiftLayoutData(
             "Shift layout", "Shift nodes by indicated amounts.",
             0.0d, 0.0d, 0.0d);
+    DepanFxWorkspaceResource<DepanFxShiftLayoutData> initialRsrc =
+        workspace.addScratchResource(initialData);
 
     Dialog<DepanFxShiftLayoutToolDialog> layoutDlg =
-        DepanFxShiftLayoutToolDialog.runCreateDialog(
-            initialData, view.getDialogRunner());
+        DepanFxShiftLayoutToolDialog.runEditDialog(
+            initialRsrc, view.getDialogRunner());
 
     List<GraphNode> updateNodes =
         view.streamChosenNodes().collect(Collectors.toList());
 
-    layoutDlg.getController().getWorkspaceResource()
+    layoutDlg.getController().getToolResource()
         .ifPresent(r -> view.updateNodeLocations(
             layoutNodes(view, r, updateNodes)));
   }

@@ -95,9 +95,11 @@ public class DepanFxFocusColumn
   }
 
   public static void addNewColumnAction(
-      DepanFxContextMenuBuilder builder, DepanFxDialogRunner dialogRunner) {
+      DepanFxContextMenuBuilder builder,
+      DepanFxDialogRunner dialogRunner,
+      DepanFxNodeListTableAdapter tableAdapter) {
     builder.appendActionItem(NEW_FOCUS_COLUMN,
-        e -> openColumnCreate(dialogRunner));
+        e -> openColumnCreate(dialogRunner, tableAdapter));
   }
 
   public void toggleNode(GraphNode graphNode) {
@@ -179,28 +181,36 @@ public class DepanFxFocusColumn
     Collection<GraphNode> editNodes = categories.getCurrentNodes(focusEntry);
     DepanFxNodeList saveList =
         DepanFxNodeLists.buildRelatedNodeList(nodeList, editNodes);
+    DepanFxWorkspaceResource<DepanFxNodeList> saveListRsrc =
+        tableAdapter.getWorkspace().addScratchResource(saveList);
 
     DepanFxSaveNodeListDialog
         .runUpdateNodeList(
-            tableAdapter.getDialogRunner(), nodeListRsrc.getDocument(), saveList)
+            tableAdapter.getDialogRunner(), saveListRsrc)
         .ifPresent(r -> {
           updateNodeListRsrc(r);
           refreshColumn();
       });
   }
 
-  private static void openColumnCreate(DepanFxDialogRunner dialogRunner) {
+  private static void openColumnCreate(
+      DepanFxDialogRunner dialogRunner,
+      DepanFxNodeListTableAdapter tableAdapter) {
     DepanFxFocusColumnData initialData =
         DepanFxFocusColumnData.buildInitialFocusColumnData(null);
-    DepanFxFocusColumnToolDialog.runCreateDialog(initialData, dialogRunner);
+    DepanFxWorkspaceResource<DepanFxFocusColumnData> columnRsrc =
+        tableAdapter.getWorkspace().addScratchResource(initialData);
+    DepanFxFocusColumnToolDialog.runCreateDialog(columnRsrc, dialogRunner);
   }
 
   private void openColumnEditor(DepanFxDialogRunner dialogRunner) {
-    Dialog<DepanFxFocusColumnToolDialog> focusColumnEditor =
+    DepanFxWorkspaceResource<DepanFxFocusColumnData> columnRsrc =
+        tableAdapter.getWorkspace().addScratchResource(buildEditData());
+    Dialog<DepanFxFocusColumnToolDialog> focusColumnDlg =
           DepanFxFocusColumnToolDialog.runEditDialog(
-              getColumnProjectDoc(), buildEditData(), dialogRunner);
+              columnRsrc, dialogRunner);
 
-    focusColumnEditor.getController().getWorkspaceResource()
+    focusColumnDlg.getController().getToolResource()
         .ifPresent(this::updateColumnDataRsrc);
   }
 

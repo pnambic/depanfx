@@ -10,8 +10,8 @@ import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -54,21 +54,21 @@ public class DepanFxRadialLayoutToolDialog
   }
 
   public static Dialog<DepanFxRadialLayoutToolDialog> runEditDialog(
-      DepanFxProjectDocument projDoc,
-      DepanFxRadialLayoutData radialLayoutData,
+      DepanFxWorkspaceResource<DepanFxRadialLayoutData> radialLayoutRsrc,
       DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runEditDialog(
-        projDoc, radialLayoutData, dialogRunner,
+        radialLayoutRsrc, dialogRunner,
         DepanFxRadialLayoutToolDialog.class,
         "Edit Radial Layout");
   }
 
   public static Dialog<DepanFxRadialLayoutToolDialog> runCreateDialog(
-      DepanFxRadialLayoutData radialLayoutData, DepanFxDialogRunner dialogRunner) {
+      DepanFxWorkspaceResource<DepanFxRadialLayoutData> radialLayoutRsrc,
+      DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runCreateDialog(
-        radialLayoutData, dialogRunner,
+        radialLayoutRsrc, dialogRunner,
         DepanFxRadialLayoutToolDialog.class,
         "New Radial Layout");
   }
@@ -81,12 +81,13 @@ public class DepanFxRadialLayoutToolDialog
 
   }
 
-  @Override // DepanFxBaseToolDialog
-  public void setTooldata(DepanFxRadialLayoutData radialLayoutData) {
-    super.setTooldata(radialLayoutData);
+  @Override
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxRadialLayoutData> toolRsrc) {
+    super.setToolResource(toolRsrc);
 
     hierarchyMatcherControl.setLinkMatcherRsrc(
-        radialLayoutData.getHierarchyMatcherRsrc());
+        toolRsrc.getResource().getHierarchyMatcherRsrc());
   }
 
   @FXML

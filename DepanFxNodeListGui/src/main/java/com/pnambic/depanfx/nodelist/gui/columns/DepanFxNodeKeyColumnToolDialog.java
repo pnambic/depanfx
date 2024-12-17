@@ -8,8 +8,8 @@ import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -47,21 +47,21 @@ public class DepanFxNodeKeyColumnToolDialog
   }
 
   public static Dialog<DepanFxNodeKeyColumnToolDialog> runEditDialog(
-      DepanFxProjectDocument projDoc,
-      DepanFxNodeKeyColumnData columnData,
+      DepanFxWorkspaceResource<DepanFxNodeKeyColumnData> columnRsrc,
       DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runEditDialog(
-        projDoc, columnData, dialogRunner,
+        columnRsrc, dialogRunner,
         DepanFxNodeKeyColumnToolDialog.class,
         DepanFxNodeKeyColumn.EDIT_NODE_KEY_COLUMN);
   }
 
   public static Dialog<DepanFxNodeKeyColumnToolDialog> runCreateDialog(
-      DepanFxNodeKeyColumnData columnData, DepanFxDialogRunner dialogRunner) {
+      DepanFxWorkspaceResource<DepanFxNodeKeyColumnData> columnRsrc,
+      DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runCreateDialog(
-        columnData, dialogRunner,
+        columnRsrc, dialogRunner,
         DepanFxNodeKeyColumnToolDialog.class,
         DepanFxNodeKeyColumn.NEW_NODE_KEY_COLUMN);
   }
@@ -78,11 +78,11 @@ public class DepanFxNodeKeyColumnToolDialog
     keyChoiceField.getItems().add(KeyChoice.NODE_KEY);
   }
 
-  @Override // DepanFxBaseColumnToolDialog
-  public void setTooldata(DepanFxNodeKeyColumnData columnData) {
-    super.setTooldata(columnData);
+  @Override
+  public void setToolResource(DepanFxWorkspaceResource<DepanFxNodeKeyColumnData> columnRsrc) {
+    super.setToolResource(columnRsrc);
 
-    keyChoiceField.setValue(columnData.getKeyChoice());
+    keyChoiceField.setValue(columnRsrc.getResource().getKeyChoice());
   }
 
   /////////////////////////////////////

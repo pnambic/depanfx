@@ -73,9 +73,6 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   private DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
       availableNodeRsrc;
 
-  // cached from nodeDisplayDocRsrc if needed.
-  private DepanFxNodeFilterSequenceData availableNodesDoc;
-
   /**
    * The set of nodes that are visible in the render.
    *
@@ -235,7 +232,6 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   public void setAvailableNodeRsrc(
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableNodeRsrc) {
     this.availableNodeRsrc = availableNodeRsrc;
-    this.availableNodesDoc = null;
   }
 
   /**
@@ -247,11 +243,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
     if (availableNodeRsrc != null) {
       return availableNodeRsrc.getResource();
     }
-    if (availableNodesDoc == null) {
-      availableNodesDoc =
-          nodeDisplayDocRsrc.getResource().asNodeFilterSequenceDoc();
-    }
-    return availableNodesDoc;
+    return nodeDisplayDocRsrc.getResource().asNodeFilterSequenceDoc();
   }
 
   public DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
@@ -320,7 +312,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   }
 
   public DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
-      getVisibleEdgeRsrc() {
+      getVisibleEdgeResource() {
     return visibleEdgeRsrc;
   }
 

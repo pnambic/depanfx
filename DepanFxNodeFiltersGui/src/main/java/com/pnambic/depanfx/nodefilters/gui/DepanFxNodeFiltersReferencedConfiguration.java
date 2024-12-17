@@ -45,8 +45,9 @@ public class DepanFxNodeFiltersReferencedConfiguration {
   }
 
   @Bean
-  public DepanFxNodeFiltersDialogContribution nodeFilterReferencedContribution() {
-    return new DepanFxNodeFiltersReferencedContribution();
+  public DepanFxNodeFiltersDialogContribution nodeFilterReferencedContribution(
+      DepanFxWorkspace workspace) {
+    return new DepanFxNodeFiltersReferencedContribution(workspace);
   }
 
   private static class ReferencedFilterExtContribution
@@ -80,13 +81,15 @@ public class DepanFxNodeFiltersReferencedConfiguration {
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       builder.appendActionItem(NEW_REFERENCED_FILTER,
-          e -> runCreateReferencedFilter(dialogRunner));
+          e -> runCreateReferencedFilter(workspace, dialogRunner));
     }
 
-    private void runCreateReferencedFilter(DepanFxDialogRunner dialogRunner) {
+    private void runCreateReferencedFilter(
+        DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
       DepanFxReferencedFilterData filterData =
           DepanFxReferencedFilterData.createReferenceFilterData(null);
-      DepanFxNodeFiltersReferencedDialog.runSaveFilter(dialogRunner, filterData);
+      DepanFxNodeFiltersReferencedDialog.runSaveFilter(
+          dialogRunner, workspace.addScratchResource(filterData));
     }
 
     @Override
@@ -98,9 +101,12 @@ public class DepanFxNodeFiltersReferencedConfiguration {
   private static class DepanFxNodeFiltersReferencedContribution
       extends DepanFxNodeFiltersDialogContribution.Basic<DepanFxReferencedFilterData> {
 
-    public DepanFxNodeFiltersReferencedContribution() {
+    private final DepanFxWorkspace workspace;
+
+    public DepanFxNodeFiltersReferencedContribution(DepanFxWorkspace workspace) {
       super(REFERENCED_MATCHER_KEY, ADD_REFERENCE_FILTER,
           DepanFxReferencedFilterData.class);
+      this.workspace = workspace;
     }
 
     @Override
@@ -115,15 +121,17 @@ public class DepanFxNodeFiltersReferencedConfiguration {
     @Override
     public void runSaveFilter(
         DepanFxDialogRunner dialogRunner, DepanFxBaseFilterData saveFilter) {
+      DepanFxWorkspaceResource<DepanFxReferencedFilterData> updateRsrc =
+          workspace.addScratchResource(asType(saveFilter));
       DepanFxNodeFiltersReferencedDialog.runSaveFilter(
-          dialogRunner, asType(saveFilter));
+          dialogRunner, updateRsrc);
     }
 
     @Override
     public Optional<DepanFxReferencedFilterData> runUpdateFilter(
         DepanFxDialogRunner dialogRunner, DepanFxBaseFilterData updateFilter) {
       return DepanFxNodeFiltersReferencedDialog.runUpdateFilter(
-          dialogRunner, asType(updateFilter));
+          workspace, dialogRunner, asType(updateFilter));
     }
 
     @Override

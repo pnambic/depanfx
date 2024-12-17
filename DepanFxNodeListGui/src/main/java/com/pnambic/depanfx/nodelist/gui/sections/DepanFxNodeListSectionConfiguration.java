@@ -139,8 +139,7 @@ public class DepanFxNodeListSectionConfiguration {
     protected void runDialog(
         DepanFxWorkspaceResource<DepanFxFlatSectionData> wkspRsrc,
         DepanFxDialogRunner dialogRunner) {
-      DepanFxFlatSectionToolDialog.runEditDialog(
-          wkspRsrc.getDocument(), wkspRsrc.getResource(), dialogRunner);
+      DepanFxFlatSectionToolDialog.runEditDialog(wkspRsrc, dialogRunner);
     }
   }
 
@@ -166,11 +165,11 @@ public class DepanFxNodeListSectionConfiguration {
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       builder.appendActionItem(
           DepanFxFlatSection.NEW_FLAT_SECTION_DATA,
-          e -> runNewFlatSectionDataAction(dialogRunner));
+          e -> runNewFlatSectionDataAction(workspace, dialogRunner));
     }
 
     private void runNewFlatSectionDataAction(
-        DepanFxDialogRunner dialogRunner) {
+        DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
       try {
         DepanFxFlatSectionData sectionData =
             new DepanFxFlatSectionData(
@@ -178,7 +177,10 @@ public class DepanFxNodeListSectionConfiguration {
                 DepanFxFlatSectionData.BASE_SECTION_LABEL, true,
                 OrderBy.NODE_KEY, OrderDirection.FORWARD);
 
-        DepanFxFlatSectionToolDialog.runCreateDialog(sectionData, dialogRunner);
+        DepanFxWorkspaceResource<DepanFxFlatSectionData> sectionRsrc =
+            workspace.addScratchResource(sectionData);
+        DepanFxFlatSectionToolDialog.runCreateDialog(
+            sectionRsrc, dialogRunner);
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to create flat section data", errCaught);
       }
@@ -206,8 +208,7 @@ public class DepanFxNodeListSectionConfiguration {
     protected void runDialog(
         DepanFxWorkspaceResource<DepanFxTreeSectionData> wkspRsrc,
         DepanFxDialogRunner dialogRunner) {
-      DepanFxTreeSectionToolDialog.runEditDialog(
-          wkspRsrc.getDocument(), wkspRsrc.getResource(), dialogRunner);
+      DepanFxTreeSectionToolDialog.runEditDialog(wkspRsrc, dialogRunner);
     }
   }
 
@@ -235,14 +236,15 @@ public class DepanFxNodeListSectionConfiguration {
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       builder.appendActionItem(
           DepanFxTreeSection.NEW_TREE_SECTION_DATA,
-          e -> runNewTreeSectionDataAction(dialogRunner, workspace));
+          e -> runNewTreeSectionDataAction(workspace, dialogRunner));
     }
 
     private void runNewTreeSectionDataAction(
-        DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace) {
+        DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
       try {
-        DepanFxTreeSectionData sectionData = buildInitialTreeSection(workspace);
-        DepanFxTreeSectionToolDialog.runCreateDialog(sectionData, dialogRunner);
+        DepanFxWorkspaceResource<DepanFxTreeSectionData> sectionRsrc =
+            workspace.addScratchResource(buildInitialTreeSection(workspace));
+        DepanFxTreeSectionToolDialog.runCreateDialog(sectionRsrc, dialogRunner);
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to create tree section data", errCaught);
       }

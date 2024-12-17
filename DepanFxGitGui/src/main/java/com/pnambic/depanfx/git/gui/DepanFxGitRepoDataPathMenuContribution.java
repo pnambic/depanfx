@@ -7,9 +7,11 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
@@ -24,6 +26,13 @@ public class DepanFxGitRepoDataPathMenuContribution
 
   private static Logger LOG =
       LoggerFactory.getLogger(DepanFxGitRepoDataPathMenuContribution.class);
+
+  private final DepanFxWorkspace workspace;
+
+  @Autowired
+  public DepanFxGitRepoDataPathMenuContribution(DepanFxWorkspace workspace) {
+    this.workspace = workspace;
+  }
 
   @Override
   public boolean acceptsPath(Path rsrcPath) {
@@ -43,9 +52,11 @@ public class DepanFxGitRepoDataPathMenuContribution
 
   private void runNewGitRepoAction(DepanFxDialogRunner dialogRunner) {
     try {
-      DepanFxGitRepoData baseData =
+      DepanFxGitRepoData repoData =
           DepanFxGitRepoToolDialogs.buildInitialGitRepoData();
-      DepanFxGitRepoToolDialog.runCreateDialog(baseData, dialogRunner);
+      DepanFxWorkspaceResource<DepanFxGitRepoData> repoRsrc =
+          workspace.addScratchResource(repoData);
+      DepanFxGitRepoToolDialog.runCreateDialog(repoRsrc, dialogRunner);
     } catch (RuntimeException errCaught) {
       LOG.error("Unable to create git repo data", errCaught);
     }

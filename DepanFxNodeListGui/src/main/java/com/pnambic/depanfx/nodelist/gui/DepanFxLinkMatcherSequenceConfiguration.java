@@ -67,8 +67,8 @@ public class DepanFxLinkMatcherSequenceConfiguration {
 
   @Bean
   public DepanFxNewResourceContribution linkMatcherSequenceNewMenu(
-      DepanFxDialogRunner dialogRunner) {
-    return new NewContribution(dialogRunner);
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+    return new NewContribution(workspace, dialogRunner);
   }
 
   private static class ExtContribution
@@ -85,7 +85,7 @@ public class DepanFxLinkMatcherSequenceConfiguration {
         DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> wkspRsrc,
         DepanFxDialogRunner dialogRunner) {
       DepanFxLinkMatcherSequenceToolDialog.runEditDialog(
-          wkspRsrc.getDocument(), wkspRsrc.getResource(), dialogRunner);
+          wkspRsrc, dialogRunner);
     }
   }
 
@@ -104,7 +104,7 @@ public class DepanFxLinkMatcherSequenceConfiguration {
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       builder.appendActionItem(NEW_LINK_MATCHER_FILTER,
-          e -> runCreateDialog(dialogRunner));
+          e -> runCreateDialog(workspace, dialogRunner));
     }
 
     @Override
@@ -116,25 +116,31 @@ public class DepanFxLinkMatcherSequenceConfiguration {
   private class NewContribution
     implements DepanFxNewResourceContribution {
 
+    private final DepanFxWorkspace workspace;
+
     private final DepanFxDialogRunner dialogRunner;
 
-    public NewContribution(DepanFxDialogRunner dialogRunner) {
+    public NewContribution(
+        DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+      this.workspace = workspace;
       this.dialogRunner = dialogRunner;
     }
 
     @Override
     public MenuItem createNewResourceMenuItem() {
       return DepanFxContextMenuBuilder.createActionItem(
-          LINK_MATCHER_SEQUENCE, e -> runCreateDialog(dialogRunner));
+          LINK_MATCHER_SEQUENCE, e -> runCreateDialog(workspace, dialogRunner));
     }
   }
 
-  private static void runCreateDialog(DepanFxDialogRunner dialogRunner) {
+  private static void runCreateDialog(
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
     DepanFxLinkMatcherSequenceDocument newMatcherSeq =
         new DepanFxLinkMatcherSequenceDocument(
             LINK_MATCHER_SEQUENCE_TOOL_NAME, LINK_MATCHER_SEQUENCE_TOOL_DESCR,
             null, Collections.emptyList());
+
     DepanFxLinkMatcherSequenceToolDialog.runCreateDialog(
-        newMatcherSeq, dialogRunner);
+        workspace.addScratchResource(newMatcherSeq), dialogRunner);
   }
 }

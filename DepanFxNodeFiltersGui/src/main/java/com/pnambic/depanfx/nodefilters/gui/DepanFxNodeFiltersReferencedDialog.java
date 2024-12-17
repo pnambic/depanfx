@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxReferencedFilterData;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
@@ -59,47 +60,53 @@ public class DepanFxNodeFiltersReferencedDialog
           DepanFxWorkspaceResource<DepanFxReferencedFilterData> filterRsrc) {
 
     Dialog<DepanFxNodeFiltersReferencedDialog> saveDlg =
-        dialogRunner.createDialogAndParent(
-            DepanFxNodeFiltersReferencedDialog.class);
-    saveDlg.getController().setFilter(filterRsrc.getResource());
-    saveDlg.getController().setDestination(filterRsrc.getDocument());
+        DepanFxResourcePerspectives.prepareDialog(
+            filterRsrc, dialogRunner, DepanFxNodeFiltersReferencedDialog.class);
     saveDlg.getController().setForSave();
     saveDlg.runDialog("Edit referenced filter");
-    return saveDlg.getController().getSavedResource();
+    return saveDlg.getController().getToolResource();
   }
 
   public static Optional<DepanFxWorkspaceResource<DepanFxReferencedFilterData>>
       runSaveFilter(
           DepanFxDialogRunner dialogRunner,
-          DepanFxReferencedFilterData referencedFilter) {
+          DepanFxWorkspaceResource<DepanFxReferencedFilterData> filterRsrc) {
 
     Dialog<DepanFxNodeFiltersReferencedDialog> saveDlg =
-        dialogRunner.createDialogAndParent(
-            DepanFxNodeFiltersReferencedDialog.class);
-    saveDlg.getController().setFilter(referencedFilter);
+        DepanFxResourcePerspectives.prepareDialog(
+            filterRsrc, dialogRunner, DepanFxNodeFiltersReferencedDialog.class);
     saveDlg.getController().setForSave();
     saveDlg.runDialog("Save referenced filter");
-    return saveDlg.getController().getSavedResource();
+    return saveDlg.getController().getToolResource();
   }
 
+  /**
+   * Update a filter without requiring a resource save.
+   */
   public static Optional<DepanFxReferencedFilterData>
       runUpdateFilter(
+          DepanFxWorkspace workspace,
           DepanFxDialogRunner dialogRunner,
-          DepanFxReferencedFilterData referencedFilter) {
+          DepanFxReferencedFilterData filterInfo) {
 
+    DepanFxWorkspaceResource<DepanFxReferencedFilterData> refFilterRsrc =
+        workspace.addScratchResource(filterInfo);
     Dialog<DepanFxNodeFiltersReferencedDialog> saveDlg =
-        dialogRunner.createDialogAndParent(
+        DepanFxResourcePerspectives.prepareDialog(
+            refFilterRsrc, dialogRunner,
             DepanFxNodeFiltersReferencedDialog.class);
-    saveDlg.getController().setFilter(referencedFilter);
     saveDlg.getController().setForUpdate();
     saveDlg.runDialog("Update referenced filter");
-    return saveDlg.getController().getUpdateFilterData();
+    return saveDlg.getController().getToolResource()
+        .map(DepanFxWorkspaceResource::getResource);
   }
 
   @Override
-  public void setFilter(DepanFxReferencedFilterData referencedFilter) {
-    super.setFilter(referencedFilter);
-    setFilterResource(referencedFilter.getFilterResource());
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxReferencedFilterData> refFilterRsrc) {
+    super.setToolResource(refFilterRsrc);
+
+    setFilterResource(refFilterRsrc.getResource().getFilterResource());
   }
 
   @FXML

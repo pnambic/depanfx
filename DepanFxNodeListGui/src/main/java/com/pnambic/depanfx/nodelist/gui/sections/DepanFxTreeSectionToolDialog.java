@@ -13,6 +13,7 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -67,21 +68,21 @@ public class DepanFxTreeSectionToolDialog
   }
 
   public static Dialog<DepanFxTreeSectionToolDialog> runEditDialog(
-      DepanFxProjectDocument projDoc,
-      DepanFxTreeSectionData sectionData,
+      DepanFxWorkspaceResource<DepanFxTreeSectionData> sectionRsrc,
       DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runEditDialog(
-        projDoc, sectionData, dialogRunner,
+        sectionRsrc, dialogRunner,
         DepanFxTreeSectionToolDialog.class,
         DepanFxTreeSection.EDIT_TREE_SECTION_DATA);
   }
 
   public static Dialog<DepanFxTreeSectionToolDialog> runCreateDialog(
-      DepanFxTreeSectionData sectionData, DepanFxDialogRunner dialogRunner) {
+      DepanFxWorkspaceResource<DepanFxTreeSectionData> sectionRsrc,
+      DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runCreateDialog(
-        sectionData, dialogRunner,
+        sectionRsrc, dialogRunner,
         DepanFxTreeSectionToolDialog.class,
         DepanFxTreeSection.NEW_TREE_SECTION_DATA);
   }
@@ -106,10 +107,13 @@ public class DepanFxTreeSectionToolDialog
     containerOrderField.getItems().add(ContainerOrder.MIXED);
   }
 
-  @Override // DepanFxBaseSectionToolDialog
-  public void setTooldata(DepanFxTreeSectionData sectionData) {
-    super.setTooldata(sectionData);
-    linkMatcherControl.setLinkMatcherRsrc(sectionData.getLinkMatcherRsrc());
+  @Override
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxTreeSectionData> sectionRsrc) {
+    super.setToolResource(sectionRsrc);
+
+    DepanFxTreeSectionData sectionData = sectionRsrc.getResource();
+    linkMatcherControl.setLinkMatcherRsrc(sectionData .getLinkMatcherRsrc());
 
     inferMissingParentsField.setSelected(sectionData.inferMissingParents());
 

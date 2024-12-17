@@ -19,7 +19,6 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -85,11 +84,6 @@ public class DepanFxNodeViewLinkDisplayDialog
   private ObservableList<EditLinkDisplay> linksDiplayTableData;
 
   /**
-   * Source of non-mutated data (e.g. context model)
-   */
-  private DepanFxNodeViewLinkDisplayData linkDisplayData;
-
-  /**
    * Where live changes happen.
    */
   private EdgeDisplayController displayControl;
@@ -105,15 +99,13 @@ public class DepanFxNodeViewLinkDisplayDialog
    */
   public static Stage runEditDialog(
       EdgeDisplayController displayControl,
-      DepanFxProjectDocument projDoc,
       DepanFxDialogRunner dialogRunner) {
 
     Dialog<DepanFxNodeViewLinkDisplayDialog> dlg =
         DepanFxResourcePerspectives.prepareDialog(
-            displayControl.getLinkDisplayInfo(), dialogRunner,
+            displayControl.getLinkDisplayResource(), dialogRunner,
             DepanFxNodeViewLinkDisplayDialog.class);
     dlg.getController().setEdgeDisplayControl(displayControl);
-    dlg.getController().setDestination(projDoc);
     return dlg.runModeless(EDIT_LINK_DISPLAY);
   }
 
@@ -194,18 +186,22 @@ public class DepanFxNodeViewLinkDisplayDialog
   /**
    * Both view panel and tooldata are required to populate the display table.
    */
-  @Override // DepanFxBaseToolDialog
-  public void setTooldata(DepanFxNodeViewLinkDisplayData linkDisplayData) {
-    super.setTooldata(linkDisplayData);
-    this.linkDisplayData = linkDisplayData;
+  @Override
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> toolRsrc) {
+    super.setToolResource(toolRsrc);
     prepareDisplayTable();
   }
 
   private void prepareDisplayTable() {
-    // Wait for both to be configured.
-    if ((displayControl == null) || (linkDisplayData == null)) {
+    // Wait for both display control and link display to be configured.
+    DepanFxNodeViewLinkDisplayData linkDisplayData = getToolResource()
+        .map(DepanFxWorkspaceResource::getResource)
+        .orElse(null);
+    if ((displayControl == null) || (linkDisplayData  == null)) {
       return;
     }
+
     List<EditLinkDisplay> editLinkDisplay =
         linkDisplayData.streamLinkDisplay()
         .map(e -> new EditLinkDisplay(displayControl, e))
@@ -246,6 +242,8 @@ public class DepanFxNodeViewLinkDisplayDialog
         .map(e -> toLinkDisplayEntry(e))
         .collect(Collectors.toList());
 
+    DepanFxNodeViewLinkDisplayData linkDisplayData =
+        getToolResource().get().getResource();
     return new DepanFxNodeViewLinkDisplayData(
             getToolName(), getToolDescription(),
             linkDisplayData.getContextModelId(), displayEntries);
@@ -292,15 +290,15 @@ public class DepanFxNodeViewLinkDisplayDialog
 
   @FXML
   protected void handleApply() {
-    DepanFxNodeViewLinkDisplayData toolData = prepareResult();
-    displayControl.setLinkDisplayInfo(toolData);
+    displayControl.setLinkDisplayResource(
+        workspace.addScratchResource(prepareResult()));
   }
 
   @Override
   @FXML
   protected void handleConfirm() {
     super.handleConfirm();
-    getWorkspaceResource().ifPresent(displayControl::setLinkDisplayResource);
+    getToolResource().ifPresent(displayControl::setLinkDisplayResource);
   }
 
   /////////////////////////////////////

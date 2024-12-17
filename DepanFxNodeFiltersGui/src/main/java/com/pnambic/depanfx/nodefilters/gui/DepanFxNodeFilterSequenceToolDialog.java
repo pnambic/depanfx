@@ -26,7 +26,6 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -90,7 +89,7 @@ public class DepanFxNodeFilterSequenceToolDialog
       nodeFiltersSequenceData;
 
   // Retain for internal properties, like graph model.
-  private DepanFxNodeFilterSequenceData filterSeqDoc;
+  // private DepanFxNodeFilterSequenceData filterSeqDoc;
 
   private final DepanFxNodeFiltersDialogRegistry nodeFilterDialogRegistry;
 
@@ -104,22 +103,21 @@ public class DepanFxNodeFilterSequenceToolDialog
   }
 
   public static Dialog<DepanFxNodeFilterSequenceToolDialog> runEditDialog(
-      DepanFxProjectDocument projDoc,
-      DepanFxNodeFilterSequenceData filterSeqDoc,
+      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> filterSeqRsrc,
       DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runEditDialog(
-        projDoc, filterSeqDoc, dialogRunner,
+        filterSeqRsrc, dialogRunner,
         DepanFxNodeFilterSequenceToolDialog.class,
         EDIT_NODE_FILTER_SEQUENCE);
   }
 
   public static Dialog<DepanFxNodeFilterSequenceToolDialog> runCreateDialog(
-      DepanFxNodeFilterSequenceData filterSeqDoc,
+      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> filterSeqRsrc,
       DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runCreateDialog(
-        filterSeqDoc, dialogRunner,
+        filterSeqRsrc, dialogRunner,
         DepanFxNodeFilterSequenceToolDialog.class,
         CREATE_NODE_FILTER_SEQUENCE);
   }
@@ -160,13 +158,14 @@ public class DepanFxNodeFilterSequenceToolDialog
             .subtract(2));
   }
 
-  @Override // DepanFxBaseColumnToolDialog
-  public void setTooldata(DepanFxNodeFilterSequenceData filterSeqDoc) {
-    super.setTooldata(filterSeqDoc);
-    this.filterSeqDoc = filterSeqDoc;
+  @Override
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> filterSeqRsrc) {
+    super.setToolResource(filterSeqRsrc);
 
     nodeFiltersSequenceData = FXCollections.observableArrayList();
-    filterSeqDoc.streamFilterRefs().forEach(nodeFiltersSequenceData::add);
+    filterSeqRsrc.getResource().streamFilterRefs()
+        .forEach(nodeFiltersSequenceData::add);
     nodeFiltersSequenceTable.setItems(nodeFiltersSequenceData);
   }
 
@@ -180,9 +179,11 @@ public class DepanFxNodeFilterSequenceToolDialog
         new ArrayList<>(nodeFiltersSequenceData.size());
     nodeFiltersSequenceData.forEach(filters::add);
 
+    DepanFxNodeFilterSequenceData filterSeqInfo =
+        getToolResource().get().getResource();
     return new DepanFxNodeFilterSequenceData(
             getToolName(), getToolDescription(),
-            filterSeqDoc.getContextModelId(), filters);
+            filterSeqInfo .getContextModelId(), filters);
   }
 
   @Override

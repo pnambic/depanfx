@@ -122,7 +122,8 @@ public class DepanFxNodeViewNodeSelectDialog
   @FXML
   public void handleSaveSelection() {
     DepanFxSaveNodeListDialog.runSaveNodeList(
-        dialogRunner, tableControl.getSelection());
+        dialogRunner,
+        workspace.addScratchResource(tableControl.getSelection()));
   }
 
   /////////////////////////////////////

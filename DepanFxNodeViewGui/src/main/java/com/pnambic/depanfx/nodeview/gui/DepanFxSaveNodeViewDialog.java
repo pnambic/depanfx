@@ -4,6 +4,7 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -31,17 +32,17 @@ public class DepanFxSaveNodeViewDialog
   @FXML
   private Label nodeViewDetailsLabel;
 
-  private DepanFxNodeViewData viewDoc;
-
   @Autowired
   public DepanFxSaveNodeViewDialog(DepanFxWorkspace workspace) {
     super(workspace, DepanFxNodeViewData.class);
   }
 
   @Override
-  public void setTooldata(DepanFxNodeViewData viewDoc) {
-    super.setTooldata(viewDoc);
-    this.viewDoc = viewDoc;
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxNodeViewData> toolRsrc) {
+    super.setToolResource(toolRsrc);
+
+    DepanFxNodeViewData viewDoc = toolRsrc.getResource();
     nodeViewDetailsLabel.setText(buildDetailsLabel(viewDoc));
   }
 
@@ -59,7 +60,8 @@ public class DepanFxSaveNodeViewDialog
   @Override
   protected DepanFxNodeViewData prepareResult() {
     return DepanFxNodeViews.updateNameDescr(
-        viewDoc, getToolName(), getToolDescription());
+        getToolResource().get().getResource(),
+        getToolName(), getToolDescription());
   }
 
   @Override

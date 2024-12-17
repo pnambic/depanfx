@@ -104,7 +104,7 @@ public class DepanFxNodeViewNodeVisibilityDialog
 
   private DepanFxNodeFilterSequenceData availableFilterDoc;
 
-  private DepanFxNodeFilterSequenceData visibleFilterDoc;
+  // private DepanFxNodeFilterSequenceData visibleFilterDoc;
 
   private NodeDisplayController nodeDisplay;
 
@@ -123,14 +123,14 @@ public class DepanFxNodeViewNodeVisibilityDialog
   public static Dialog<DepanFxNodeViewNodeVisibilityDialog> runVisibilityDialog(
       DepanFxDialogRunner dialogRunner,
       DepanFxNodeFilterSequenceData availableFilterDoc,
-      DepanFxNodeFilterSequenceData visibleFilterDoc,
+      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleFilterRsrc,
       NodeDisplayController nodeDisplay,
       Consumer<DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>>
           onAvailableNodesUpdate) {
 
     Dialog<DepanFxNodeViewNodeVisibilityDialog> result =
         DepanFxResourcePerspectives.prepareDialog(
-            visibleFilterDoc, dialogRunner,
+            visibleFilterRsrc, dialogRunner,
             DepanFxNodeViewNodeVisibilityDialog.class);
 
     DepanFxNodeViewNodeVisibilityDialog dlgCtrl = result.getController();
@@ -191,10 +191,9 @@ public class DepanFxNodeViewNodeVisibilityDialog
    * filters, those are separate from the "tool dialog".
    */
   @Override
-  public void setTooldata(
-      DepanFxNodeFilterSequenceData visibleFilterDoc) {
-    super.setTooldata(visibleFilterDoc);
-    this.visibleFilterDoc = visibleFilterDoc;
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleFilterRsrc) {
+    super.setToolResource(visibleFilterRsrc);
 
     installVisibleFilters();
   }
@@ -225,6 +224,10 @@ public class DepanFxNodeViewNodeVisibilityDialog
 
   @Override
   protected DepanFxNodeFilterSequenceData prepareResult() {
+    DepanFxNodeFilterSequenceData visibleFilterDoc = getToolResource()
+        .map(DepanFxWorkspaceResource::getResource)
+        .get();
+
     return new DepanFxNodeFilterSequenceData(
             getToolName(), getToolDescription(),
             visibleFilterDoc.getContextModelId(), prepareVisibleFilters());
@@ -257,6 +260,9 @@ public class DepanFxNodeViewNodeVisibilityDialog
   /////////////////////////////////////
 
   private void installVisibleFilters() {
+    DepanFxNodeFilterSequenceData visibleFilterDoc = getToolResource()
+        .map(DepanFxWorkspaceResource::getResource)
+        .orElse(null);
     if (visibleFilterDoc == null || availableFilterDoc == null) {
       return;
     }
@@ -300,7 +306,7 @@ public class DepanFxNodeViewNodeVisibilityDialog
   private void handleSelectVisibleNodes() {
     DepanFxNodeFiltersSequenceChooser.runNodeFiltersFinder(
             workspace, dialogRunner, getScene(), filterRegistry)
-        .ifPresent(r -> setTooldata(r.getResource()));
+        .ifPresent(this::setToolResource);
   }
 
   @FXML
@@ -319,9 +325,10 @@ public class DepanFxNodeViewNodeVisibilityDialog
   private void handleSaveAvailableNodes() {
     Dialog<DepanFxNodeFilterSequenceToolDialog> saveAvailDlg =
         DepanFxNodeFilterSequenceToolDialog.runCreateDialog(
-            prepareAvailableNodesResult(), dialogRunner);
+            workspace.addScratchResource(prepareAvailableNodesResult()),
+            dialogRunner);
 
-    saveAvailDlg.getController().getWorkspaceResource()
+    saveAvailDlg.getController().getToolResource()
         .ifPresent(this::updateAvailableNodes);
   }
 

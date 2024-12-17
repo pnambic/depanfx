@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.perspective;
 
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import javafx.fxml.FXML;
@@ -25,7 +26,11 @@ public abstract class DepanFxBaseToolDialog<T extends DepanFxBaseToolData>
   /**
    * Extendible, {@code @Override} with {@code super.setTooldata()}.
    */
-  public void setTooldata(T toolData) {
+  @Override
+  public void setToolResource(DepanFxWorkspaceResource<T> toolRsrc) {
+    super.setToolResource(toolRsrc);
+
+    T toolData = toolRsrc.getResource();
     toolNameField.setText(toolData.getToolName());
     toolDescriptionField.setText(toolData.getToolDescription());
   }

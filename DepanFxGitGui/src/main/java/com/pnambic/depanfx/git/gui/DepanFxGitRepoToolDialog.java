@@ -7,9 +7,9 @@ import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import net.rgielen.fxweaver.core.FxmlView;
@@ -73,12 +73,11 @@ public class DepanFxGitRepoToolDialog
    * Modify an existing git repo tooldata with the git repo tool dialog.
    */
   public static Dialog<DepanFxGitRepoToolDialog> runEditDialog(
-      DepanFxProjectDocument projDoc,
-      DepanFxGitRepoData repoData,
+      DepanFxWorkspaceResource<DepanFxGitRepoData> repoRsrc,
       DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runEditDialog(
-        projDoc, repoData, dialogRunner,
+        repoRsrc, dialogRunner,
         DepanFxGitRepoToolDialog.class,
         "Edit git Repository");
   }
@@ -87,10 +86,11 @@ public class DepanFxGitRepoToolDialog
    * Create a new git repo tooldata with the git repo tool dialog.
    */
   public static Dialog<DepanFxGitRepoToolDialog> runCreateDialog(
-      DepanFxGitRepoData repoData, DepanFxDialogRunner dialogRunner) {
+      DepanFxWorkspaceResource<DepanFxGitRepoData> repoRsrc,
+      DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runCreateDialog(
-        repoData, dialogRunner,
+        repoRsrc, dialogRunner,
         DepanFxGitRepoToolDialog.class,
         "Create git Repository");
   }
@@ -111,10 +111,12 @@ public class DepanFxGitRepoToolDialog
   }
 
   @Override
-  public void setTooldata(DepanFxGitRepoData repoData) {
-    super.setTooldata(repoData);
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxGitRepoData> toolRsrc) {
+    super.setToolResource(toolRsrc);
 
-    gitExeField.setText(repoData.getGitExe());
+    DepanFxGitRepoData repoData = toolRsrc.getResource();
+    gitExeField.setText(repoData .getGitExe());
     repoDirectoryField.setText(repoData.getGitRepoPath());
     repoNameField.setText(repoData.getGitRepoName());
   }

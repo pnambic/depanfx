@@ -33,7 +33,7 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
    * The resource associated with the destination is empty
    * unless there has been a successful save.
    */
-  protected Optional<DepanFxWorkspaceResource<T>> optResource =
+  private Optional<DepanFxWorkspaceResource<T>> optResource =
       Optional.empty();
 
   @FXML
@@ -45,21 +45,57 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
     this.dataType = dataType;
   }
 
+  @Deprecated // Use {@link #setToolResource(DepanFxWorkspaceResource<T>)}
   public void setDestination(DepanFxProjectDocument projDoc) {
-    // Don't allow a destination in the built-in project.
-    if (workspace.getBuiltInProjectTree().equals(projDoc.getProject())) {
+
+    // Don't allow a destination in the built-in or scratch project.
+    if (projDoc.getProject().equals(workspace.getBuiltInProjectTree())) {
       destinationField.setText(null);
       return;
     }
+    if (projDoc.getProject().equals(workspace.getScratchProjectTree())) {
+      destinationField.setText(null);
+      return;
+    }
+
     destinationField.setText(projDoc.getMemberPath().toString());
   }
 
-  public Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource() {
+  public Optional<DepanFxWorkspaceResource<T>> getToolResource() {
     return optResource;
+  }
+
+  /**
+   * Extendible, {@code @Override} with {@code super.setTooldata()}.
+   */
+  public void setToolResource(DepanFxWorkspaceResource<T> toolRsrc) {
+    optResource = Optional.of(toolRsrc);
+    updateDestinationField();
   }
 
   /////////////////////////////////////
   // Hook methods for derived classes.
+
+  private void updateDestinationField() {
+    if (optResource.isEmpty()) {
+      destinationField.setText(null);
+      return;
+    }
+
+    DepanFxWorkspaceResource<T> resource = optResource.get();
+    DepanFxProjectDocument document = resource.getDocument();
+
+    // Don't allow a destination in the built-in or scratch project.
+    if (document.getProject().equals(workspace.getBuiltInProjectTree())) {
+      destinationField.setText(null);
+      return;
+    }
+    if (document.getProject().equals(workspace.getScratchProjectTree())) {
+      destinationField.setText(null);
+      return;
+    }
+    destinationField.setText(document.getMemberPath().toString());
+  }
 
   protected String getDestination() {
     return destinationField.getText();

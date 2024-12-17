@@ -11,7 +11,6 @@ import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -60,21 +59,21 @@ public class DepanFxFocusColumnToolDialog
   }
 
   public static Dialog<DepanFxFocusColumnToolDialog> runEditDialog(
-      DepanFxProjectDocument projDoc,
-      DepanFxFocusColumnData focusColumnData,
+      DepanFxWorkspaceResource<DepanFxFocusColumnData> focusColumnRsrc,
       DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runEditDialog(
-        projDoc, focusColumnData, dialogRunner,
+        focusColumnRsrc, dialogRunner,
         DepanFxFocusColumnToolDialog.class,
         DepanFxFocusColumn.EDIT_FOCUS_COLUMN);
   }
 
   public static Dialog<DepanFxFocusColumnToolDialog> runCreateDialog(
-      DepanFxFocusColumnData columnData, DepanFxDialogRunner dialogRunner) {
+      DepanFxWorkspaceResource<DepanFxFocusColumnData> focusColumnRsrc,
+      DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runCreateDialog(
-        columnData, dialogRunner,
+        focusColumnRsrc, dialogRunner,
         DepanFxFocusColumnToolDialog.class,
         DepanFxFocusColumn.NEW_FOCUS_COLUMN);
   }
@@ -89,10 +88,12 @@ public class DepanFxFocusColumnToolDialog
     focusNodeListRsrcField.setContextMenu(buildNodeListChoiceMenu());
   }
 
-  @Override // DepanFxBaseColumnToolDialog
-  public void setTooldata(DepanFxFocusColumnData columnData) {
-    super.setTooldata(columnData);
+  @Override
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxFocusColumnData> columnRsrc) {
+    super.setToolResource(columnRsrc);
 
+    DepanFxFocusColumnData columnData = columnRsrc.getResource();
     focusLabelField.setText(columnData.getFocusLabel());
     focusNodeListRsrcField.setText(getNodeListRsrcName(columnData));
   }

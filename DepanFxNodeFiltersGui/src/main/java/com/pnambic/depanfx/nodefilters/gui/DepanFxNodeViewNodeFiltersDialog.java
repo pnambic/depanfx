@@ -248,8 +248,10 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
 
   @FXML
   public void handleSaveSelection() {
+
     DepanFxSaveNodeListDialog.runSaveNodeList(
-        dialogRunner, tableControl.getSelection());
+        dialogRunner,
+        workspace.addScratchResource(tableControl.getSelection()));
   }
 
   @FXML

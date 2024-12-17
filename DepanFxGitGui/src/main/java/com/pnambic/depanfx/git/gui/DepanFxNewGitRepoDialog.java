@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
@@ -44,7 +43,7 @@ public class DepanFxNewGitRepoDialog
 
   private final DepanFxDialogRunner dialogRunner;
 
-  private DepanFxGitRepoData repoData;
+  private DepanFxWorkspaceResource<DepanFxGitRepoData> repoRsrc;
 
   @FXML
   private TextField gitRepoNameField;
@@ -55,9 +54,6 @@ public class DepanFxNewGitRepoDialog
   @FXML
   private TextInputControl graphDescriptionField;
 
-  private Optional<DepanFxWorkspaceResource<GraphDocument>> graphDocRsrc =
-      Optional.empty();
-
   @Autowired
   public DepanFxNewGitRepoDialog(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
@@ -65,23 +61,20 @@ public class DepanFxNewGitRepoDialog
     this.dialogRunner = dialogRunner;
   }
 
-  public Optional<DepanFxWorkspaceResource<GraphDocument>> getGraphDocRsrc() {
-    return graphDocRsrc;
-  }
-
   @FXML
   public void initialize() {
     gitRepoNameField.setContextMenu(
         DepanFxGitRepoToolDialogs.buildRepoChoiceMenu(
             workspace, dialogRunner, gitRepoNameField.getScene(),
-            () -> { return repoData; }, this::setRepoData));
+            () -> { return repoRsrc; }, this::setRepoResource));
     gitRepoNameField.textProperty().addListener(
         (observable, oldValue, newValue) -> updateGraphMetaFromDir(newValue));
   }
 
-  public void setRepoData(DepanFxGitRepoData repoData) {
-    this.repoData = repoData;
-    gitRepoNameField.setText(repoData.getToolName());
+  public void setRepoResource(
+      DepanFxWorkspaceResource<DepanFxGitRepoData> repoRsrc) {
+    this.repoRsrc = repoRsrc;
+    gitRepoNameField.setText(repoRsrc.getResource().getToolName());
   }
 
   @Override
@@ -118,15 +111,15 @@ public class DepanFxNewGitRepoDialog
       }
     }
     if (graphDescriptionField.getText().isBlank()) {
-      String descr = "Graph of git repository from "
-          + repoData.getGitRepoPath().toString();
+      String repoLabel = repoRsrc.getResource().getGitRepoPath().toString();
+      String descr = "Graph of git repository from " + repoLabel;
       graphDescriptionField.setText(descr);
     }
   }
 
   private GraphDocument buildGraphDoc() {
     DepanFxGraphModelBuilder modelBuilder = new SimpleGraphModelBuilder();
-    GitCommandRunner cmdRunner = new GitCommandRunner(repoData);
+    GitCommandRunner cmdRunner = new GitCommandRunner(repoRsrc.getResource());
     analyzeRepo(modelBuilder, cmdRunner);
 
     GraphModel graphModel = modelBuilder.createGraphModel();
@@ -156,6 +149,6 @@ public class DepanFxNewGitRepoDialog
     if (!Strings.isNullOrEmpty(graphName)) {
       return graphName;
     }
-    return repoData.getToolName();
+    return repoRsrc.getResource().getToolName();
   }
 }

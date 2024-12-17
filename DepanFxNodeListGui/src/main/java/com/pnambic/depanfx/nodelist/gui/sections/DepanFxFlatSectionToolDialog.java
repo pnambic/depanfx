@@ -8,8 +8,8 @@ import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -47,21 +47,21 @@ public class DepanFxFlatSectionToolDialog
   }
 
   public static Dialog<DepanFxFlatSectionToolDialog> runEditDialog(
-      DepanFxProjectDocument projDoc,
-      DepanFxFlatSectionData sectionDataData,
+      DepanFxWorkspaceResource<DepanFxFlatSectionData> flatSectionRsrc,
       DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runEditDialog(
-        projDoc, sectionDataData, dialogRunner,
+        flatSectionRsrc, dialogRunner,
         DepanFxFlatSectionToolDialog.class,
         DepanFxFlatSection.EDIT_FLAT_SECTION_DATA);
   }
 
   public static Dialog<DepanFxFlatSectionToolDialog> runCreateDialog(
-      DepanFxFlatSectionData sectionData, DepanFxDialogRunner dialogRunner) {
+      DepanFxWorkspaceResource<DepanFxFlatSectionData> flatSectionRsrc,
+      DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runCreateDialog(
-        sectionData, dialogRunner,
+        flatSectionRsrc, dialogRunner,
         DepanFxFlatSectionToolDialog.class,
         DepanFxFlatSection.EDIT_FLAT_SECTION_DATA);
   }
@@ -79,10 +79,11 @@ public class DepanFxFlatSectionToolDialog
   }
 
   @Override
-  public void setTooldata(DepanFxFlatSectionData sectionData) {
-    super.setTooldata(sectionData);
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxFlatSectionData> sectionRsrc) {
+    super.setToolResource(sectionRsrc);
 
-    orderByField.setValue(sectionData.getOrderBy());
+    orderByField.setValue(sectionRsrc.getResource().getOrderBy());
   }
 
   /////////////////////////////////////

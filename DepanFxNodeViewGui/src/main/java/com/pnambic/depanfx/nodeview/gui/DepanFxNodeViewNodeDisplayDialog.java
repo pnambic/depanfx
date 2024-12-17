@@ -32,7 +32,6 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -96,12 +95,11 @@ public class DepanFxNodeViewNodeDisplayDialog
   /**
    * Source of non-mutated data (e.g. context model)
    */
-  private DepanFxNodeViewNodeDisplayData sourceDisplayData;
+  // private DepanFxNodeViewNodeDisplayData sourceDisplayData;
 
   /**
    * Where live changes happen.
    */
-
   private NodeDisplayController displayControl;
 
   public DepanFxNodeViewNodeDisplayDialog(
@@ -119,16 +117,13 @@ public class DepanFxNodeViewNodeDisplayDialog
   public static Stage runEditDialog(
       NodeDisplayController displayControl,
       DepanFxDialogRunner dialogRunner) {
-    DepanFxProjectDocument projDoc =
-        displayControl.getNodeDisplayResource().getDocument();
 
     Dialog<DepanFxNodeViewNodeDisplayDialog> dlg =
         DepanFxResourcePerspectives.prepareDialog(
-            displayControl.getNodeDisplayInfo(), dialogRunner,
+            displayControl.getNodeDisplayResource(), dialogRunner,
             DepanFxNodeViewNodeDisplayDialog.class);
 
     dlg.getController().setNodeDisplayController(displayControl);
-    dlg.getController().setDestination(projDoc);
     return dlg.runModeless(EDIT_NODE_DISPLAY);
   }
 
@@ -195,14 +190,20 @@ public class DepanFxNodeViewNodeDisplayDialog
   /**
    * Both view panel and tooldata are required to populate the display table.
    */
-  @Override // DepanFxBaseToolDialog
-  public void setTooldata(DepanFxNodeViewNodeDisplayData nodeDisplayData) {
-    super.setTooldata(nodeDisplayData);
-    this.sourceDisplayData = nodeDisplayData;
+
+  @Override
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> displayRsrc) {
+    super.setToolResource(displayRsrc);
+
     prepareDisplayTable();
   }
 
   private void prepareDisplayTable() {
+    DepanFxNodeViewNodeDisplayData sourceDisplayData = getToolResource()
+        .map(DepanFxWorkspaceResource::getResource)
+        .orElse(null);
+
     // Wait for both to be configured.
     if ((displayControl == null) || (sourceDisplayData == null)) {
       return;
@@ -248,6 +249,8 @@ public class DepanFxNodeViewNodeDisplayDialog
         .map(e -> toNodeDisplayEntry(e))
         .collect(Collectors.toList());
 
+    DepanFxNodeViewNodeDisplayData sourceDisplayData =
+        getToolResource().get().getResource();
     return new DepanFxNodeViewNodeDisplayData(
             getToolName(), getToolDescription(),
             sourceDisplayData.getContextModelId(), displayEntries);
@@ -296,7 +299,7 @@ public class DepanFxNodeViewNodeDisplayDialog
   @FXML
   protected void handleConfirm() {
     super.handleConfirm();
-    getWorkspaceResource().ifPresent(displayControl::setNodeDisplayResource);
+    getToolResource().ifPresent(displayControl::setNodeDisplayResource);
   }
 
   /////////////////////////////////////

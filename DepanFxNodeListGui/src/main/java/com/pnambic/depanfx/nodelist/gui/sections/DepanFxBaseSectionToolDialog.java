@@ -5,6 +5,7 @@ import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.Orde
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -37,10 +38,11 @@ public abstract class DepanFxBaseSectionToolDialog<T extends DepanFxBaseSectionD
   }
 
   @Override
-  public void setTooldata(T sectionData) {
-    super.setTooldata(sectionData);
+  public void setToolResource(DepanFxWorkspaceResource<T> sectionRsrc) {
+    super.setToolResource(sectionRsrc);
 
-    sectionLabelField.setText(sectionData.getSectionLabel());
+    DepanFxBaseSectionData sectionData = sectionRsrc.getResource();
+    sectionLabelField.setText(sectionData .getSectionLabel());
     displayNodeCountField.setSelected(sectionData.displayNodeCount());
 
     orderDirectionField.setValue(sectionData.getOrderDirection());

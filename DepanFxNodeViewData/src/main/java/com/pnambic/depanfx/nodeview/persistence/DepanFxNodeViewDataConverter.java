@@ -159,7 +159,7 @@ public class DepanFxNodeViewDataConverter
     DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableEdgeRsrc =
         viewData.getAvailableEdgeRsrc();
     DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc =
-        viewData.getVisibleEdgeRsrc();
+        viewData.getVisibleEdgeResource();
 
     marshalObject(dstContext,
         NODE_VIEW_NAME, viewData.getToolName());

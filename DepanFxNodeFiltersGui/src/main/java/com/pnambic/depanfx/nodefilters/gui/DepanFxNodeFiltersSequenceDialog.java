@@ -16,7 +16,9 @@
 package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
+import com.pnambic.depanfx.nodefilters.tooldata.DepanFxReferencedFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxSequenceFilterData;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
@@ -69,48 +71,50 @@ public class DepanFxNodeFiltersSequenceDialog
           DepanFxWorkspaceResource<DepanFxSequenceFilterData> filterRsrc) {
 
     Dialog<DepanFxNodeFiltersSequenceDialog> saveDlg =
-        dialogRunner.createDialogAndParent(
-            DepanFxNodeFiltersSequenceDialog.class);
-    saveDlg.getController().setFilter(filterRsrc.getResource());
-    saveDlg.getController().setDestination(filterRsrc.getDocument());
+        DepanFxResourcePerspectives.prepareDialog(
+            filterRsrc, dialogRunner, DepanFxNodeFiltersSequenceDialog.class);
     saveDlg.getController().setForSave();
     saveDlg.runDialog("Edit filter sequence");
-    return saveDlg.getController().getSavedResource();
+    return saveDlg.getController().getToolResource();
   }
 
   public static Optional<DepanFxWorkspaceResource<DepanFxSequenceFilterData>>
       runSaveFilter(
           DepanFxDialogRunner dialogRunner,
-          DepanFxSequenceFilterData seqFilter) {
+          DepanFxWorkspaceResource<DepanFxSequenceFilterData> filterRsrc) {
 
     Dialog<DepanFxNodeFiltersSequenceDialog> saveDlg =
-        dialogRunner.createDialogAndParent(
-            DepanFxNodeFiltersSequenceDialog.class);
-    saveDlg.getController().setFilter(seqFilter);
+        DepanFxResourcePerspectives.prepareDialog(
+          filterRsrc, dialogRunner, DepanFxNodeFiltersSequenceDialog.class);
     saveDlg.getController().setForSave();
     saveDlg.runDialog("Save sequence filter");
-    return saveDlg.getController().getSavedResource();
+    return saveDlg.getController().getToolResource();
   }
 
   public static Optional<DepanFxSequenceFilterData> runUpdateFilter(
+      DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
-      DepanFxSequenceFilterData seqFilter) {
+      DepanFxSequenceFilterData filterInfo) {
+
+    DepanFxWorkspaceResource<DepanFxSequenceFilterData> seqFilterRsrc =
+        workspace.addScratchResource(filterInfo);
 
     Dialog<DepanFxNodeFiltersSequenceDialog> saveDlg =
-        dialogRunner.createDialogAndParent(
+        DepanFxResourcePerspectives.prepareDialog(
+            seqFilterRsrc, dialogRunner,
             DepanFxNodeFiltersSequenceDialog.class);
-    saveDlg.getController().setFilter(seqFilter);
-    saveDlg.getController().setForUpdate();
     saveDlg.runDialog("Update sequence seqFilter");
-    return saveDlg.getController().getUpdateFilterData();
+    return saveDlg.getController().getToolResource()
+        .map(DepanFxWorkspaceResource::getResource);
   }
 
   @Override
-  public void setFilter(DepanFxSequenceFilterData seqFilter) {
-    this.seqFilter = seqFilter;
-    super.setFilter(seqFilter);
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxSequenceFilterData> seqFilterRsrc) {
+    super.setToolResource(seqFilterRsrc);
 
-    seqFilterDetailsLabel.setText(buildDetailsLabel(seqFilter));
+    seqFilterDetailsLabel.setText(
+        buildDetailsLabel(seqFilterRsrc.getResource()));
   }
 
   private String buildDetailsLabel(DepanFxSequenceFilterData seqFilter) {

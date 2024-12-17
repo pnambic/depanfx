@@ -206,18 +206,22 @@ public class DepanFxCategoryColumn
       DepanFxNodeListTableAdapter tableAdapter) {
     DepanFxCategoryColumnData initialData =
         DepanFxCategoryColumnData.buildInitialCategoryColumnData();
+    DepanFxWorkspaceResource<DepanFxCategoryColumnData> columnRsrc =
+        tableAdapter.getWorkspace().addScratchResource(initialData);
     DepanFxCategoryColumnToolDialog.runCreateDialog(
-        initialData, dialogRunner, tableAdapter);
+        columnRsrc, dialogRunner, tableAdapter);
   }
 
   private void openColumnEditor(
       DepanFxDialogRunner dialogRunner,
       DepanFxNodeListTableAdapter tableAdapter) {
-    Dialog<DepanFxCategoryColumnToolDialog> categoryColumnEditor =
-          DepanFxCategoryColumnToolDialog.runEditDialog(
-              getColumnProjectDoc(), buildEditData(), dialogRunner, tableAdapter);
+    DepanFxWorkspaceResource<DepanFxCategoryColumnData> columnRsrc =
+        tableAdapter.getWorkspace().addScratchResource(buildEditData());
+    Dialog<DepanFxCategoryColumnToolDialog> categoryColumnDlg =
+        DepanFxCategoryColumnToolDialog.runEditDialog(
+            columnRsrc, dialogRunner, tableAdapter);
 
-    categoryColumnEditor.getController().getWorkspaceResource()
+    categoryColumnDlg.getController().getToolResource()
         .ifPresent(this::updateColumnDataRsrc);
   }
 

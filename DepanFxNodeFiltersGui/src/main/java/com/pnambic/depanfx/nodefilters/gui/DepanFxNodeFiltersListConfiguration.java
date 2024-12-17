@@ -79,13 +79,16 @@ public class DepanFxNodeFiltersListConfiguration {
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       builder.appendActionItem(NEW_NODE_LIST_FILTER,
-          e -> runCreateNodeListFilter(dialogRunner));
+          e -> runCreateNodeListFilter(workspace, dialogRunner));
     }
 
-    private void runCreateNodeListFilter(DepanFxDialogRunner dialogRunner) {
-      DepanFxListFilterData filterData =
-          DepanFxListFilterData.createListFilterData(null);
-      DepanFxNodeFiltersListDialog.runSaveFilter(dialogRunner, filterData);
+    private void runCreateNodeListFilter(
+        DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+      DepanFxWorkspaceResource<DepanFxListFilterData> filterRsrc =
+          workspace.addScratchResource(
+              DepanFxListFilterData.createListFilterData(null));
+      DepanFxNodeFiltersListDialog.runSaveFilter(
+          dialogRunner, filterRsrc);
     }
 
     @Override
@@ -96,6 +99,8 @@ public class DepanFxNodeFiltersListConfiguration {
 
   private static class DepanFxNodeFiltersListContribution
       extends DepanFxNodeFiltersDialogContribution.Basic<DepanFxListFilterData> {
+
+    private DepanFxWorkspace workspace;
 
     public DepanFxNodeFiltersListContribution() {
       super(NODE_LIST_KEY, ADD_LIST_FILTER, DepanFxListFilterData.class);
@@ -113,15 +118,17 @@ public class DepanFxNodeFiltersListConfiguration {
     @Override
     public void runSaveFilter(
         DepanFxDialogRunner dialogRunner, DepanFxBaseFilterData saveFilter) {
+      DepanFxWorkspaceResource<DepanFxListFilterData> filterRsrc =
+          workspace.addScratchResource(asType(saveFilter));
       DepanFxNodeFiltersListDialog.runSaveFilter(
-          dialogRunner, asType(saveFilter));
+          dialogRunner, filterRsrc);
     }
 
     @Override
     public Optional<DepanFxListFilterData> runUpdateFilter(
         DepanFxDialogRunner dialogRunner, DepanFxBaseFilterData updateFilter) {
       return DepanFxNodeFiltersListDialog.runUpdateFilter(
-          dialogRunner, asType(updateFilter));
+          workspace, dialogRunner, asType(updateFilter));
     }
 
     @Override

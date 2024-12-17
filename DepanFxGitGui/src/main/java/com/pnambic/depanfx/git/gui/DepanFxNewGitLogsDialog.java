@@ -40,7 +40,7 @@ public class DepanFxNewGitLogsDialog extends DepanFxBaseDialog {
 
   private final DepanFxDialogRunner dialogRunner;
 
-  private DepanFxGitRepoData repoData;
+  private DepanFxWorkspaceResource<DepanFxGitRepoData> repoRsrc;
 
   @FXML
   private TextField gitRepoNameField;
@@ -75,12 +75,13 @@ public class DepanFxNewGitLogsDialog extends DepanFxBaseDialog {
     gitRepoNameField.setContextMenu(
         DepanFxGitRepoToolDialogs.buildRepoChoiceMenu(
             workspace, dialogRunner, gitRepoNameField.getScene(),
-            () -> { return repoData; }, this::setRepoData));
+            () -> { return repoRsrc; }, this::setRepoResource));
   }
 
-  public void setRepoData(DepanFxGitRepoData repoData) {
-    this.repoData = repoData;
-    gitRepoNameField.setText(repoData.getToolName());
+  public void setRepoResource(
+      DepanFxWorkspaceResource<DepanFxGitRepoData> repoRsrc) {
+    this.repoRsrc = repoRsrc;
+    gitRepoNameField.setText(repoRsrc.getResource().getToolName());
   }
 
   @FXML
@@ -111,6 +112,7 @@ public class DepanFxNewGitLogsDialog extends DepanFxBaseDialog {
 
     closeDialog();
 
+    DepanFxGitRepoData repoData = repoRsrc.getResource();
     GitCommandRunner cmdRunner = new GitCommandRunner(repoData);
 
     File graphDocFile = new File(graphDocumentField.getText());

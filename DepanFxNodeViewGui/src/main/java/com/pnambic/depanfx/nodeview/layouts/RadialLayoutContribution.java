@@ -68,15 +68,17 @@ public class RadialLayoutContribution
         new DepanFxRadialLayoutData(
             "Radial Layout", "Radial layout by membership hierarchy.",
             view.getHierachyMatcherRsrc().get());
+    DepanFxWorkspaceResource<DepanFxRadialLayoutData> layoutRsrc =
+        view.getWorkspace().addScratchResource(initialData);
 
     Dialog<DepanFxRadialLayoutToolDialog> layoutDlg =
         DepanFxRadialLayoutToolDialog.runCreateDialog(
-            initialData, view.getDialogRunner());
+            layoutRsrc, view.getDialogRunner());
 
     List<GraphNode> updateNodes =
         view.streamChosenNodes().collect(Collectors.toList());
 
-    layoutDlg.getController().getWorkspaceResource()
+    layoutDlg.getController().getToolResource()
         .ifPresent(r -> view.updateNodeLocations(
             layoutNodes(view, r, updateNodes)));
   }

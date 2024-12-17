@@ -44,10 +44,10 @@ public class DepanFxFocusColumnConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxFocusColumnData> wkspRsrc,
+        DepanFxWorkspaceResource<DepanFxFocusColumnData> columnRsrc,
         DepanFxDialogRunner dialogRunner) {
       DepanFxFocusColumnToolDialog.runEditDialog(
-          wkspRsrc.getDocument(), wkspRsrc.getResource(), dialogRunner);
+          columnRsrc, dialogRunner);
     }
   }
 
@@ -64,7 +64,7 @@ public class DepanFxFocusColumnConfiguration {
         DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
-      DepanFxFocusColumn.addNewColumnAction(builder, dialogRunner);
+      DepanFxFocusColumn.addNewColumnAction(builder, dialogRunner, null);
     }
 
     @Override

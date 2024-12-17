@@ -91,7 +91,7 @@ public class DepanFxLinkMatcherSequenceToolDialog
       linkMatcherSequenceTableData;
 
   // Retain for internal properties, like graph model.
-  private DepanFxLinkMatcherSequenceDocument matcherSeqDoc;
+  //private DepanFxLinkMatcherSequenceDocument matcherSeqDoc;
 
   @Autowired
   public DepanFxLinkMatcherSequenceToolDialog(
@@ -101,22 +101,21 @@ public class DepanFxLinkMatcherSequenceToolDialog
   }
 
   public static Dialog<DepanFxLinkMatcherSequenceToolDialog> runEditDialog(
-      DepanFxProjectDocument projDoc,
-      DepanFxLinkMatcherSequenceDocument matcherSeqDoc,
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> matcherSeqRsrc,
       DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runEditDialog(
-        projDoc, matcherSeqDoc, dialogRunner,
+        matcherSeqRsrc, dialogRunner,
         DepanFxLinkMatcherSequenceToolDialog.class,
         EDIT_LINK_MATCHER_SEQUENCE);
   }
 
   public static Dialog<DepanFxLinkMatcherSequenceToolDialog> runCreateDialog(
-      DepanFxLinkMatcherSequenceDocument matcherSeqDoc,
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> matcherSeqRsrc,
       DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runCreateDialog(
-        matcherSeqDoc, dialogRunner,
+        matcherSeqRsrc, dialogRunner,
         DepanFxLinkMatcherSequenceToolDialog.class,
         CREATE_LINK_MATCHER_SEQUENCE);
   }
@@ -157,14 +156,15 @@ public class DepanFxLinkMatcherSequenceToolDialog
             .subtract(2));
   }
 
-  @Override // DepanFxBaseColumnToolDialog
-  public void setTooldata(DepanFxLinkMatcherSequenceDocument matcherSeqDoc) {
-    super.setTooldata(matcherSeqDoc);
-    this.matcherSeqDoc = matcherSeqDoc;
+  @Override
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> matcherSeqRsrc) {
+    super.setToolResource(matcherSeqRsrc);
 
     linkMatcherSequenceTableData =
         FXCollections.observableArrayList();
-    matcherSeqDoc.streamMatchers().forEach(linkMatcherSequenceTableData::add);
+    matcherSeqRsrc.getResource().streamMatchers()
+        .forEach(linkMatcherSequenceTableData::add);
     linkMatcherSequenceTable.setItems(linkMatcherSequenceTableData);
   }
 
@@ -178,9 +178,11 @@ public class DepanFxLinkMatcherSequenceToolDialog
         new ArrayList<>(linkMatcherSequenceTableData.size());
     linkMatcherSequenceTableData.forEach(matchers::add);
 
+    DepanFxLinkMatcherSequenceDocument matchSeqInfo =
+        getToolResource().get().getResource();
     return new DepanFxLinkMatcherSequenceDocument(
             getToolName(), getToolDescription(),
-            matcherSeqDoc.getModelId(), matchers);
+            matchSeqInfo.getModelId(), matchers);
   }
 
   @Override

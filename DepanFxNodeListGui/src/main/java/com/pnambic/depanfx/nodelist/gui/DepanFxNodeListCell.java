@@ -178,9 +178,8 @@ public class DepanFxNodeListCell
   private void openTreeSectionEditor(DepanFxTreeSection member) {
     Dialog<DepanFxTreeSectionToolDialog> treeSectionEditor =
         DepanFxTreeSectionToolDialog.runEditDialog(
-            member.getProjDoc(), member.getSectionData(),
-            tableAdapter.getDialogRunner());
-    treeSectionEditor.getController().getWorkspaceResource()
+            member.getSectionResource(), tableAdapter.getDialogRunner());
+    treeSectionEditor.getController().getToolResource()
         .ifPresent(d -> updateSectionDataRsrc(member, d));
   }
 
@@ -195,13 +194,12 @@ public class DepanFxNodeListCell
   }
 
   private void openFlatSectionEditor(DepanFxFlatSection member) {
-    DepanFxFlatSectionData sectionData = member.getSectionData();
     Dialog<DepanFxFlatSectionToolDialog> flatSectionEditor =
         DepanFxFlatSectionToolDialog.runEditDialog(
-            member.getSectionDataRsrc().getDocument(), sectionData,
+            member.getSectionResource(),
             tableAdapter.getDialogRunner());
 
-    flatSectionEditor.getController().getWorkspaceResource()
+    flatSectionEditor.getController().getToolResource()
         .ifPresent(d -> updateSectionDataRsrc(member, d));
   }
 

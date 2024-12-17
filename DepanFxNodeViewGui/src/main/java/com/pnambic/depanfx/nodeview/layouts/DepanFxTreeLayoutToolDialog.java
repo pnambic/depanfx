@@ -10,8 +10,8 @@ import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -54,21 +54,21 @@ public class DepanFxTreeLayoutToolDialog
   }
 
   public static Dialog<DepanFxTreeLayoutToolDialog> runEditDialog(
-      DepanFxProjectDocument projDoc,
-      DepanFxTreeLayoutData treeLayoutData,
+      DepanFxWorkspaceResource<DepanFxTreeLayoutData> treeLayoutRsrc,
       DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runEditDialog(
-        projDoc, treeLayoutData, dialogRunner,
+        treeLayoutRsrc, dialogRunner,
         DepanFxTreeLayoutToolDialog.class,
         "Edit Tree Layout");
   }
 
   public static Dialog<DepanFxTreeLayoutToolDialog> runCreateDialog(
-      DepanFxTreeLayoutData treeLayoutData, DepanFxDialogRunner dialogRunner) {
+      DepanFxWorkspaceResource<DepanFxTreeLayoutData> treeLayoutRsrc,
+      DepanFxDialogRunner dialogRunner) {
 
     return DepanFxResourcePerspectives.runCreateDialog(
-        treeLayoutData, dialogRunner,
+        treeLayoutRsrc, dialogRunner,
         DepanFxTreeLayoutToolDialog.class,
         "New Tree Layout");
   }
@@ -79,12 +79,13 @@ public class DepanFxTreeLayoutToolDialog
         getWorkspace(), dialogRunner, hierarchyMatcherRsrcField);
   }
 
-  @Override // DepanFxBaseColumnToolDialog
-  public void setTooldata(DepanFxTreeLayoutData treeLayoutData) {
-    super.setTooldata(treeLayoutData);
+  @Override
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxTreeLayoutData> toolRsrc) {
+    super.setToolResource(toolRsrc);
 
     hierarchyMatcherControl.setLinkMatcherRsrc(
-        treeLayoutData.getHierarchyMatcherRsrc());
+        toolRsrc.getResource().getHierarchyMatcherRsrc());
   }
 
   @FXML

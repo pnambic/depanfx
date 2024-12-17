@@ -3,6 +3,7 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +35,11 @@ public abstract class DepanFxBaseColumnToolDialog<T extends DepanFxBaseColumnDat
   }
 
   @Override
-  public void setTooldata(T columnData) {
-    super.setTooldata(columnData);
-    columnLabelField.setText(columnData.getColumnLabel());
+  public void setToolResource(DepanFxWorkspaceResource<T> columnRsrc) {
+    super.setToolResource(columnRsrc);
+
+    DepanFxBaseColumnData columnData = columnRsrc.getResource();
+    columnLabelField.setText(columnData .getColumnLabel());
     widthMsField.setText(Integer.toString(columnData.getWidthMs()));
   }
 

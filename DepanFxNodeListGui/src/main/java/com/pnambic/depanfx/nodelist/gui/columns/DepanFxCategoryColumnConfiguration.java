@@ -44,10 +44,10 @@ public class DepanFxCategoryColumnConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxCategoryColumnData> wkspRsrc,
+        DepanFxWorkspaceResource<DepanFxCategoryColumnData> columnRsrc,
         DepanFxDialogRunner dialogRunner) {
       DepanFxCategoryColumnToolDialog.runEditDialog(
-          wkspRsrc.getDocument(), wkspRsrc.getResource(), dialogRunner, null);
+          columnRsrc, dialogRunner, null);
     }
   }
 

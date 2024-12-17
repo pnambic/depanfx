@@ -77,8 +77,6 @@ public abstract class DepanFxNodeFiltersBaseDialog<T extends DepanFxBaseFilterDa
 
   private DepanFxWorkspaceResource<?> filterRsrc;
 
-  private Optional<DepanFxWorkspaceResource<T>> savedRsrc = Optional.empty();
-
   private DialogMode dialogMode;
 
   @Autowired
@@ -108,7 +106,11 @@ public abstract class DepanFxNodeFiltersBaseDialog<T extends DepanFxBaseFilterDa
     showFields();
   }
 
-  public void setFilter(T filterData) {
+  @Override
+  public void setToolResource(DepanFxWorkspaceResource<T> toolRsrc) {
+    super.setToolResource(toolRsrc);
+
+    T filterData = toolRsrc.getResource();
     setToolName(filterData.getToolName());
     setToolDescription(filterData.getToolDescription());
     setMergeMode(filterData.getMergeMode());
@@ -126,10 +128,6 @@ public abstract class DepanFxNodeFiltersBaseDialog<T extends DepanFxBaseFilterDa
 
   public Optional<T> getUpdateFilterData() {
     return optUpdateFilter;
-  }
-
-  public Optional<DepanFxWorkspaceResource<T>> getSavedResource() {
-    return savedRsrc;
   }
 
   protected  DepanFxDialogRunner getDialogRunner() {

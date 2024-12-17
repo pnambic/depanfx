@@ -45,8 +45,9 @@ public class DepanFxNodeFiltersSequenceConfiguration {
   }
 
   @Bean
-  public DepanFxNodeFiltersDialogContribution nodeFilterSequenceContribution() {
-    return new DepanFxNodeFiltersSequenceContribution();
+  public DepanFxNodeFiltersDialogContribution nodeFilterSequenceContribution(
+      DepanFxWorkspace workspace) {
+    return new DepanFxNodeFiltersSequenceContribution(workspace);
   }
 
   private static class SequenceFilterExtContribution
@@ -80,13 +81,15 @@ public class DepanFxNodeFiltersSequenceConfiguration {
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       builder.appendActionItem(NEW_SEQUENCE_FILTER,
-          e -> runCreateSequenceFilter(dialogRunner));
+          e -> runCreateSequenceFilter(workspace, dialogRunner));
     }
 
-    private void runCreateSequenceFilter(DepanFxDialogRunner dialogRunner) {
+    private void runCreateSequenceFilter(
+        DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
       DepanFxSequenceFilterData filterData =
           DepanFxSequenceFilterData.createSequenceFilterData();
-      DepanFxNodeFiltersSequenceDialog.runSaveFilter(dialogRunner, filterData);
+      DepanFxNodeFiltersSequenceDialog.runSaveFilter(
+          dialogRunner, workspace.addScratchResource(filterData));
     }
 
     @Override
@@ -98,9 +101,13 @@ public class DepanFxNodeFiltersSequenceConfiguration {
   private static class DepanFxNodeFiltersSequenceContribution
       extends DepanFxNodeFiltersDialogContribution.Basic<DepanFxSequenceFilterData> {
 
-    public DepanFxNodeFiltersSequenceContribution() {
+    private final DepanFxWorkspace workspace;
+
+
+    public DepanFxNodeFiltersSequenceContribution(DepanFxWorkspace workspace) {
       super(SEQUENCE_MATCHER_KEY, ADD_SEQUENCE_FILTER,
           DepanFxSequenceFilterData.class);
+      this.workspace = workspace;
     }
 
     @Override
@@ -116,17 +123,18 @@ public class DepanFxNodeFiltersSequenceConfiguration {
     @Override
     public void runSaveFilter(
         DepanFxDialogRunner dialogRunner, DepanFxBaseFilterData saveFilter) {
+      DepanFxWorkspaceResource<DepanFxSequenceFilterData> saveRsrc =
+          workspace.addScratchResource(asType(saveFilter));
       DepanFxNodeFiltersSequenceDialog.runSaveFilter(
-          dialogRunner, asType(saveFilter));
+          dialogRunner, saveRsrc);
     }
 
     @Override
     public Optional<DepanFxSequenceFilterData> runUpdateFilter(
         DepanFxDialogRunner dialogRunner, DepanFxBaseFilterData updateFilter) {
       return DepanFxNodeFiltersSequenceDialog.runUpdateFilter(
-          dialogRunner, asType(updateFilter));
+          workspace, dialogRunner, asType(updateFilter));
     }
-
 
     @Override
     protected Optional<DepanFxSequenceFilterData> runCreateFilter(

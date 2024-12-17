@@ -68,8 +68,8 @@ public class DepanFxNodeFilterSequenceConfiguration {
 
   @Bean
   public DepanFxNewResourceContribution nodeFilterSequenceNewMenu(
-      DepanFxDialogRunner dialogRunner) {
-    return new NewContribution(dialogRunner);
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+    return new NewContribution(workspace, dialogRunner);
   }
 
   private static class ExtContribution
@@ -86,7 +86,7 @@ public class DepanFxNodeFilterSequenceConfiguration {
         DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> wkspRsrc,
         DepanFxDialogRunner dialogRunner) {
       DepanFxNodeFilterSequenceToolDialog.runEditDialog(
-          wkspRsrc.getDocument(), wkspRsrc.getResource(), dialogRunner);
+          wkspRsrc, dialogRunner);
     }
   }
 
@@ -104,7 +104,7 @@ public class DepanFxNodeFilterSequenceConfiguration {
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       builder.appendActionItem(NEW_NODE_FILTER_SEQUENCE_FILTER,
-          e -> runCreateDialog(dialogRunner));
+          e -> runCreateDialog(workspace, dialogRunner));
     }
 
     @Override
@@ -116,25 +116,30 @@ public class DepanFxNodeFilterSequenceConfiguration {
   private class NewContribution
     implements DepanFxNewResourceContribution {
 
+    private final DepanFxWorkspace workspace;
+
     private final DepanFxDialogRunner dialogRunner;
 
-    public NewContribution(DepanFxDialogRunner dialogRunner) {
+    public NewContribution(
+        DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+      this.workspace = workspace;
       this.dialogRunner = dialogRunner;
     }
 
     @Override
     public MenuItem createNewResourceMenuItem() {
       return DepanFxContextMenuBuilder.createActionItem(
-          NODE_FILTER_SEQUENCE, e -> runCreateDialog(dialogRunner));
+          NODE_FILTER_SEQUENCE, e -> runCreateDialog(workspace, dialogRunner));
     }
   }
 
-  private static void runCreateDialog(DepanFxDialogRunner dialogRunner) {
+  private static void runCreateDialog(
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
     DepanFxNodeFilterSequenceData newFilterSeq =
         new DepanFxNodeFilterSequenceData(
             NODE_FILTER_SEQUENCE_TOOL_NAME, NODE_FILTER_SEQUENCE_TOOL_DESCR,
             null, Collections.emptyList());
     DepanFxNodeFilterSequenceToolDialog.runCreateDialog(
-        newFilterSeq, dialogRunner);
+        workspace.addScratchResource(newFilterSeq), dialogRunner);
   }
 }

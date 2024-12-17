@@ -80,23 +80,29 @@ public class DepanFxNodeKeyColumn
   }
 
   public static void addNewColumnAction(
-      DepanFxContextMenuBuilder builder, DepanFxDialogRunner dialogRunner) {
+      DepanFxContextMenuBuilder builder,
+      DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner) {
     builder.appendActionItem(NEW_NODE_KEY_COLUMN,
-        e -> openColumnCreate(dialogRunner));
+        e -> openColumnCreate(workspace, dialogRunner));
   }
 
-  private static void openColumnCreate(DepanFxDialogRunner dialogRunner) {
+  private static void openColumnCreate(
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
     DepanFxNodeKeyColumnData initialData = buildInitialNodeKeyColumnData();
-    DepanFxNodeKeyColumnToolDialog.runCreateDialog(initialData, dialogRunner);
+    DepanFxWorkspaceResource<DepanFxNodeKeyColumnData> columnRsrc =
+        workspace.addScratchResource(initialData);
+    DepanFxNodeKeyColumnToolDialog.runCreateDialog(columnRsrc, dialogRunner);
   }
 
   private void openColumnEditor(DepanFxDialogRunner dialogRunner) {
+    DepanFxWorkspaceResource<DepanFxNodeKeyColumnData> columnRsrc =
+        tableAdapter.getWorkspace().addScratchResource(buildEditResource());
     Dialog<DepanFxNodeKeyColumnToolDialog> nodeKeyColumnEditor =
           DepanFxNodeKeyColumnToolDialog.runEditDialog(
-              getColumnProjectDoc(), buildEditResource(),
-              dialogRunner);
+              columnRsrc, dialogRunner);
 
-    nodeKeyColumnEditor.getController().getWorkspaceResource()
+    nodeKeyColumnEditor.getController().getToolResource()
         .ifPresent(this::updateColumnDataRsrc);
   }
 

@@ -18,6 +18,7 @@ package com.pnambic.depanfx.nodefilters.gui;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxMatcherFilterData;
 import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
@@ -65,45 +66,50 @@ public class DepanFxNodeFiltersMatcherDialog
           DepanFxWorkspaceResource<DepanFxMatcherFilterData> filterRsrc) {
 
     Dialog<DepanFxNodeFiltersMatcherDialog> saveDlg =
-        dialogRunner.createDialogAndParent(
+        DepanFxResourcePerspectives.prepareDialog(
+            filterRsrc, dialogRunner,
             DepanFxNodeFiltersMatcherDialog.class);
-    saveDlg.getController().setFilter(filterRsrc.getResource());
-    saveDlg.getController().setDestination(filterRsrc.getDocument());
     saveDlg.getController().setForSave();
     saveDlg.runDialog("Edit link matcher filter");
-    return saveDlg.getController().getSavedResource();
+    return saveDlg.getController().getToolResource();
   }
 
   public static Optional<DepanFxWorkspaceResource<DepanFxMatcherFilterData>>
       runSaveFilter(
           DepanFxDialogRunner dialogRunner,
-          DepanFxMatcherFilterData matcherFilter) {
+          DepanFxWorkspaceResource<DepanFxMatcherFilterData> filterRsrc) {
 
     Dialog<DepanFxNodeFiltersMatcherDialog> saveDlg =
-        dialogRunner.createDialogAndParent(
+        DepanFxResourcePerspectives.prepareDialog(
+            filterRsrc, dialogRunner,
             DepanFxNodeFiltersMatcherDialog.class);
-    saveDlg.getController().setFilter(matcherFilter);
     saveDlg.getController().setForSave();
     saveDlg.runDialog("Save link matcher filter");
-    return saveDlg.getController().getSavedResource();
+    return saveDlg.getController().getToolResource();
   }
 
   public static Optional<DepanFxMatcherFilterData> runUpdateFilter(
+      DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxMatcherFilterData updateFilter) {
 
+    DepanFxWorkspaceResource<DepanFxMatcherFilterData> updateRsrc =
+        workspace.addScratchResource(updateFilter);
     Dialog<DepanFxNodeFiltersMatcherDialog> saveDlg =
-        dialogRunner.createDialogAndParent(
+        DepanFxResourcePerspectives.prepareDialog(
+            updateRsrc, dialogRunner,
             DepanFxNodeFiltersMatcherDialog.class);
-    saveDlg.getController().setFilter(updateFilter);
     saveDlg.getController().setForUpdate();
     saveDlg.runDialog("Update link matcher filter");
     return saveDlg.getController().getUpdateFilterData();
   }
 
   @Override
-  public void setFilter(DepanFxMatcherFilterData matcherFilter) {
-    super.setFilter(matcherFilter);
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxMatcherFilterData> matcherRsrc) {
+    super.setToolResource(matcherRsrc);
+
+    DepanFxMatcherFilterData matcherFilter = matcherRsrc.getResource();
     setFilterResource(matcherFilter.getMatcherResource());
     useInverseCheckBox.setSelected(matcherFilter.useInverse());
   }

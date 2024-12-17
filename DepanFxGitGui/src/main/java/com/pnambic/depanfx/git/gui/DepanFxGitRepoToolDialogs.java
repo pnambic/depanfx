@@ -31,17 +31,15 @@ public class DepanFxGitRepoToolDialogs {
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       Scene scene,
-      Supplier<DepanFxGitRepoData> srcRepoData,
-      Consumer<DepanFxGitRepoData> dstRepoData) {
+      Supplier<DepanFxWorkspaceResource<DepanFxGitRepoData>> srcRepoRsrc,
+      Consumer<DepanFxWorkspaceResource<DepanFxGitRepoData>> dstRepoRsrc) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem("Select git Repo...",
-        e -> runGitRepoChooser(workspace, dialogRunner, scene)
-            .map(r -> r.getResource())
-            .ifPresent(dstRepoData));
-    builder.appendActionItem("New git Repo...",
-        e -> runCreateDialog(workspace, dialogRunner, scene, srcRepoData.get())
-        .map(r -> r.getResource())
-        .ifPresent(dstRepoData));
+    builder.appendActionItem("Select git Repo...", e ->
+        runGitRepoChooser(workspace, dialogRunner, scene)
+            .ifPresent(dstRepoRsrc));
+    builder.appendActionItem("New git Repo...", e ->
+        runCreateDialog(workspace, dialogRunner, scene, srcRepoRsrc.get())
+            .ifPresent(dstRepoRsrc));
     return builder.build();
   }
 
@@ -87,9 +85,9 @@ public class DepanFxGitRepoToolDialogs {
           DepanFxWorkspace workspace,
           DepanFxDialogRunner dialogRunner,
           Scene scene,
-          DepanFxGitRepoData repoData) {
+          DepanFxWorkspaceResource<DepanFxGitRepoData> repoRsrc) {
     Dialog<DepanFxGitRepoToolDialog> repoDlg =
-        DepanFxGitRepoToolDialog.runCreateDialog(repoData, dialogRunner);
-    return repoDlg.getController().getWorkspaceResource();
+        DepanFxGitRepoToolDialog.runCreateDialog(repoRsrc, dialogRunner);
+    return repoDlg.getController().getToolResource();
   }
 }

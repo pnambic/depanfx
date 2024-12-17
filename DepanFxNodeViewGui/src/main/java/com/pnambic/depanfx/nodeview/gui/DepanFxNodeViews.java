@@ -116,7 +116,7 @@ public class DepanFxNodeViews {
         viewDoc.getRemainderNodesDisplay(),
 
         viewDoc.getAvailableEdgeRsrc(),
-        viewDoc.getVisibleEdgeRsrc(),
+        viewDoc.getVisibleEdgeResource(),
         viewDoc.getLinkDisplayDocRsrc(),
         viewDoc.getRemainderEdgesVisible(),
         viewDoc.getRemainderEdgesLabel(),

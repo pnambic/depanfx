@@ -17,7 +17,6 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -89,28 +88,27 @@ public class DepanFxCategoryColumnToolDialog
   }
 
   public static Dialog<DepanFxCategoryColumnToolDialog> runEditDialog(
-      DepanFxProjectDocument projDoc,
-      DepanFxCategoryColumnData categoryColumnData,
+      DepanFxWorkspaceResource<DepanFxCategoryColumnData> columnRsrc,
       DepanFxDialogRunner dialogRunner,
       DepanFxNodeListTableAdapter tableAdapter) {
 
     Dialog<DepanFxCategoryColumnToolDialog> result =
         DepanFxResourcePerspectives.prepareDialog(
-            categoryColumnData, dialogRunner,
+            columnRsrc, dialogRunner,
             DepanFxCategoryColumnToolDialog.class);
-    result.getController().setDestination(projDoc);
     result.getController().setTableAdapter(tableAdapter);
     result.runDialog(DepanFxCategoryColumn.EDIT_CATEGORY_COLUMN);
     return result;
   }
 
   public static Dialog<DepanFxCategoryColumnToolDialog> runCreateDialog(
-      DepanFxCategoryColumnData columnData, DepanFxDialogRunner dialogRunner,
+      DepanFxWorkspaceResource<DepanFxCategoryColumnData> columnRsrc,
+      DepanFxDialogRunner dialogRunner,
       DepanFxNodeListTableAdapter tableAdapter) {
 
     Dialog<DepanFxCategoryColumnToolDialog> result =
         DepanFxResourcePerspectives.prepareDialog(
-            columnData, dialogRunner,
+            columnRsrc, dialogRunner,
             DepanFxCategoryColumnToolDialog.class);
     result.getController().setTableAdapter(tableAdapter);
     result.runDialog(DepanFxCategoryColumn.NEW_CATEGORY_COLUMN);
@@ -160,10 +158,12 @@ public class DepanFxCategoryColumnToolDialog
             .subtract(2));
   }
 
-  @Override // DepanFxBaseColumnToolDialog
-  public void setTooldata(DepanFxCategoryColumnData columnData) {
-    super.setTooldata(columnData);
+  @Override
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxCategoryColumnData> columnRsrc) {
+    super.setToolResource(columnRsrc);
 
+    DepanFxCategoryColumnData columnData = columnRsrc.getResource();
     List<EditCategory> editCategories = columnData.getCategories().stream()
         .map(c -> new EditCategory(c))
         .collect(Collectors.toList());
@@ -251,14 +251,18 @@ public class DepanFxCategoryColumnToolDialog
 
   private void addSelectionCategory(Event event) {
     DepanFxNodeList selectList = tableAdapter.getSelection();
-    DepanFxSaveNodeListDialog.runSaveNodeList(dialogRunner, selectList)
+    DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc =
+        workspace.addScratchResource(selectList);
+    DepanFxSaveNodeListDialog.runSaveNodeList(dialogRunner, nodeListRsrc)
         .map(this::toEditCategory)
         .ifPresent(categoryTableData::add);
   }
 
   private void addNewCategory(Event event) {
     DepanFxNodeList emptyList = tableAdapter.buildEmptyList();
-    DepanFxSaveNodeListDialog.runSaveNodeList(dialogRunner, emptyList)
+    DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc =
+        workspace.addScratchResource(emptyList);
+    DepanFxSaveNodeListDialog.runSaveNodeList(dialogRunner, nodeListRsrc)
         .map(this::toEditCategory)
         .ifPresent(categoryTableData::add);
   }
