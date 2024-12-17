@@ -74,6 +74,11 @@ public abstract class DepanFxAbstractColumn<T extends DepanFxBaseColumnData>
     return column.getTreeTableView().getScene();
   }
 
+  /**
+   * Derived classes with cached presentation values (e.g. the
+   * CategoryEditor member in the category column) should override
+   * this method and append their updates.
+   */
   protected void refreshColumn() {
     tableAdapter.refreshTableView();
     column.setText(getColumnLabel());

@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 /**
@@ -77,6 +78,22 @@ public class CategoryEditor {
 
   public Collection<GraphNode> getCurrentNodes(CategoryEntry entry) {
     return new ArrayList<>(currentNodes.get(entry));
+  }
+
+  public List<CategoryEntry> snapshotChangedCategories() {
+    // Should not need to check that the two maps have the same key set.
+    return sourceNodes.entrySet().stream()
+        .filter(e -> !areSame(e.getValue(), currentNodes.get(e.getKey())))
+        .map(e -> snapshotCategory(e))
+        .map(e -> e.getKey())
+        .collect(Collectors.toList());
+  }
+
+  private Entry<CategoryEntry, Collection<GraphNode>> snapshotCategory(
+      Entry<CategoryEntry, Collection<GraphNode>> entry) {
+    CategoryEntry key = entry.getKey();
+    sourceNodes.put(key, currentNodes.get(key));
+    return entry;
   }
 
   public List<CategoryEntry> getChangedCategories() {

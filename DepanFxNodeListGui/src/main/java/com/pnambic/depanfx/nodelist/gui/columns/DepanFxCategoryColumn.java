@@ -55,6 +55,11 @@ public class DepanFxCategoryColumn
 
   private CategoryEditor categories;
 
+  // Menu rendering and availablity varies depending on the "dirty" state.
+  private MenuItem selectAction;
+
+  private MenuItem editAction;
+
   private SeparatorMenuItem saveSeparator;
 
   private MenuItem saveAction;
@@ -91,9 +96,10 @@ public class DepanFxCategoryColumn
   @Override
   public ContextMenu buildColumnContextMenu(DepanFxDialogRunner dialogRunner) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem(SELECT_CATEGORY_COLUMN,
+    // These actions are disabled is the node list has changes.
+    selectAction = builder.appendActionItem(SELECT_CATEGORY_COLUMN,
         e -> openColumnChooser(dialogRunner));
-    builder.appendActionItem(EDIT_CATEGORY_COLUMN,
+    editAction = builder.appendActionItem(EDIT_CATEGORY_COLUMN,
         e -> openColumnEditor(dialogRunner, tableAdapter));
 
     // These actions are hidden if the node list is unchanged.
@@ -127,6 +133,12 @@ public class DepanFxCategoryColumn
       TreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember>>
       buildCellFactory() {
     return new CategoryCellFactory();
+  }
+
+  @Override
+  protected void refreshColumn() {
+    super.refreshColumn();
+    updateCategories(getColumnData().getCategories());
   }
 
   public Collection<CategoryEntry> getCurrentCategories(GraphNode graphNode) {
@@ -173,6 +185,9 @@ public class DepanFxCategoryColumn
 
   private void updateActions() {
     boolean hasEdits = hasNodeListEdits();
+    selectAction.setDisable(hasEdits);
+    editAction.setDisable(hasEdits);
+
     saveSeparator.setVisible(hasEdits);
     saveAction.setVisible(hasEdits);
   }
@@ -182,7 +197,7 @@ public class DepanFxCategoryColumn
   }
 
   private void runSaveNodeList() {
-    categories.getChangedCategories().stream()
+    categories.snapshotChangedCategories().stream()
         .forEach(this::saveCategory);
   }
 
