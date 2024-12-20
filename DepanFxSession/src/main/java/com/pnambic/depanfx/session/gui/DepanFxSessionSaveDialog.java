@@ -110,9 +110,9 @@ public class DepanFxSessionSaveDialog {
             destinationField,
             () -> new File(
                 buildTimestampName(
-                    baseName, DepanFxSessionDataTransport.YAML_EXT)));
-    result.getExtensionFilters().add(DepanFxSessionDataTransport.YAML_FILTER);
-    result.setSelectedExtensionFilter(DepanFxSessionDataTransport.YAML_FILTER);
+                    baseName, DepanFxSessionDataTransport.XML_EXT)));
+    result.getExtensionFilters().add(DepanFxSessionDataTransport.XML_FILTER);
+    result.setSelectedExtensionFilter(DepanFxSessionDataTransport.XML_FILTER);
 
     return result;
   }

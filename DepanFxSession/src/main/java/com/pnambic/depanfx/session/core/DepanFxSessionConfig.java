@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.session.core;
 
+import com.pnambic.depanfx.session.tooldata.DepanFxSessionData;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 
 import java.util.Collection;
@@ -25,17 +26,26 @@ public class DepanFxSessionConfig {
 
   public static final DepanFxSessionConfig EMPTY_SESSION_DATA =
       new DepanFxSessionConfig(
+          DepanFxSessionData.BLANK_CURRENT_PROJECT,
           Collections.emptyList(), Collections.emptyList());
+
+  private final String currentProjectName;
 
   private final List<DepanFxProjectTree> projectTrees;
 
   private final Collection<DepanFxSceneConfig> sceneConfigs;
 
   public DepanFxSessionConfig(
+      String currentProjectName,
       List<DepanFxProjectTree> projectTrees,
       Collection<DepanFxSceneConfig> sceneConfigs) {
+    this.currentProjectName = currentProjectName;
     this.projectTrees = projectTrees;
     this.sceneConfigs = sceneConfigs;
+  }
+
+  public String getCurrentProjectName() {
+    return currentProjectName;
   }
 
   public List<DepanFxProjectTree> getProjectTrees() {

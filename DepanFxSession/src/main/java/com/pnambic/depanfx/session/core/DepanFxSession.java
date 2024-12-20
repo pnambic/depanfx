@@ -56,9 +56,13 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
   private Closeable onClose;
 
   public static void startSession(
-      Stage stage, DepanFxSession session, DepanFxSessionConfig  sessionConfig)
+      Stage stage, DepanFxSession session, DepanFxSessionConfig sessionConfig)
       throws Exception {
     // Projects are installed during deserialization.
+    // Set the current project.
+    session.setCurrentProject(sessionConfig.getCurrentProjectName());
+
+    // Start scenes after full workspace context restored.
     startScenes(stage, session, sessionConfig.getSceneConfigs());
   }
 
@@ -165,5 +169,12 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
     stage.setY(left);
     stage.setWidth(width);
     stage.setHeight(height);
+  }
+
+  private void setCurrentProject(String currentProjectName) {
+    workspace.getProjectList().stream()
+        .filter(p -> p.getMemberName().equals(currentProjectName))
+        .findFirst()
+        .ifPresent(workspace::setCurrentProject);
   }
 }

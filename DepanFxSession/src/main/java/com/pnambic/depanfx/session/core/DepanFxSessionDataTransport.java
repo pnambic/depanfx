@@ -68,10 +68,12 @@ public class DepanFxSessionDataTransport {
   /** Base name for session data files */
   public static final String DEPAN_FX_SESSION_LABEL = "DepanFX Session";
 
-  public static final String YAML_EXT = "yml";
+  public static final String DEPAN_FX_SESSION_DESCR = "DepanFX session.";
 
-  public static final ExtensionFilter YAML_FILTER =
-      DepanFxSceneControls.buildExtFilter("Session", YAML_EXT);
+  public static final String XML_EXT = "xml";
+
+  public static final ExtensionFilter XML_FILTER =
+      DepanFxSceneControls.buildExtFilter("Session", XML_EXT);
 
   private static final Class<?>[] ALLOWED_TYPES = new Class[] {
     DepanFxSessionData.class,
@@ -81,7 +83,7 @@ public class DepanFxSessionDataTransport {
 
   private final GraphNodePersistencePluginRegistry graphNodeRegistry;
 
-  private DepanFxSceneViewerRegistry viewerRegistry;
+  private final DepanFxSceneViewerRegistry viewerRegistry;
 
   private final DepanFxSceneStarterRegistry starterRegistry;
 
@@ -111,6 +113,7 @@ public class DepanFxSessionDataTransport {
     scenes.add(sceneInfo);
 
     DepanFxSessionConfig result = new DepanFxSessionConfig(
+        DepanFxSessionData.BLANK_CURRENT_PROJECT,
         Collections.emptyList(), scenes);
     return result;
   }
@@ -128,7 +131,8 @@ public class DepanFxSessionDataTransport {
             .map(this::toSceneConfig)
             .collect(Collectors.toList());
 
-    return new DepanFxSessionConfig(projectTrees, sessionConfigs);
+    return new DepanFxSessionConfig(
+        sessionData.getCurrentProject(), projectTrees, sessionConfigs);
   }
 
   public void saveSession(Path sessionPath, DepanFxSession section) {
@@ -171,8 +175,12 @@ public class DepanFxSessionDataTransport {
   public DepanFxSessionData toSessionData(DepanFxSession session) {
     List<DepanFxProjectData> projectInfo = buildSessionProjects(session);
     Collection<DepanFxSceneData> sceneInfo = buildSessionScenes(session);
+    String currentProjectName = session.getWorkspace().getCurrentProject()
+        .map(p -> p.getMemberName())
+        .orElse(DepanFxSessionData.BLANK_CURRENT_PROJECT);
     return new DepanFxSessionData(
-        "DepanFX Session", "DepanFX session.", projectInfo, sceneInfo);
+        DEPAN_FX_SESSION_LABEL, DEPAN_FX_SESSION_DESCR, currentProjectName,
+        projectInfo, sceneInfo);
   }
 
   private List<DepanFxProjectData> buildSessionProjects(

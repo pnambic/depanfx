@@ -23,10 +23,17 @@ import java.util.List;
 
 public class DepanFxSessionData extends DepanFxBaseToolData {
 
+  /**
+   * Value when the current project is blank.
+   */
+  public static final String BLANK_CURRENT_PROJECT = "";
+
   public static final DepanFxSessionData EMPTY_SESSION_DATA =
       new DepanFxSessionData(
-          "Empty Session", "Empty DepanFx session",
+          "Empty Session", "Empty DepanFx session", BLANK_CURRENT_PROJECT,
           Collections.emptyList(), Collections.emptyList());
+
+  private final String currentProject;
 
   private final List<DepanFxProjectData> projects;
 
@@ -34,11 +41,17 @@ public class DepanFxSessionData extends DepanFxBaseToolData {
 
   public DepanFxSessionData(
       String toolName, String toolDescription,
+      String currentProject,
       List<DepanFxProjectData> projects,
       Collection<DepanFxSceneData> scenes) {
     super(toolName, toolDescription);
+    this.currentProject = currentProject;
     this.projects = projects;
     this.scenes = scenes;
+  }
+
+  public String getCurrentProject() {
+    return currentProject;
   }
 
   public List<DepanFxProjectData> getProjects() {
