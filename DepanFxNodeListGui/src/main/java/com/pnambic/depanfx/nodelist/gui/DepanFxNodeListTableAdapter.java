@@ -5,6 +5,7 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseSectionData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -49,4 +50,13 @@ public interface DepanFxNodeListTableAdapter {
   void updateSection(
       DepanFxNodeListSection section,
       DepanFxWorkspaceResource<? extends DepanFxBaseSectionData> sectionRsrc);
+
+  /**
+   * Provides original or last assigned table view data.  Any revision to the
+   * table view data will be available from
+   */
+  DepanFxWorkspaceResource<DepanFxNodeListTableViewData> getTableViewResource();
+
+  void setTableViewResource(
+      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc);
 }

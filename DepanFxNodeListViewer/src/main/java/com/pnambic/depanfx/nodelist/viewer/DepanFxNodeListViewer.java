@@ -42,8 +42,6 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
    */
   private List<Stage> sideViews = new ArrayList<Stage>();
 
-  private DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc;
-
   public DepanFxNodeListViewer(
       String viewerTitle,
       DepanFxWorkspace workspace,
@@ -53,14 +51,13 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
 
     this.viewerTitle = viewerTitle;
     this.nodeListRsrc = nodeListRsrc;
-    this.tableViewRsrc = tableViewRsrc;
 
     DepanFxNodeList nodeList = nodeListRsrc.getResource();
 
     tableControl = new DepanFxNodeListTableController(
         workspace, dialogRunner, nodeList,
         DepanFxNodeListSelection.forNodes(nodeList.getNodes()),
-        tableViewRsrc.getResource(), new TreeTableView<>());
+        tableViewRsrc, new TreeTableView<>());
   }
 
   @Override
@@ -79,7 +76,7 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
   }
 
   public DepanFxWorkspaceResource<DepanFxNodeListTableViewData> getTableViewResource() {
-    return tableViewRsrc;
+    return tableControl.getTableViewResource();
   }
 
   private ContextMenu buildContextMenu() {
@@ -104,8 +101,7 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
 
     Stage filterSelectionDialog =
         DepanFxNodeViewNodeFiltersDialog.runEditDialog(
-            tableControl.getDialogRunner(), null,
-            tableViewRsrc.getResource(), tableControl.getSelection(),
+            tableControl.getDialogRunner(), tableViewRsrc, tableControl.getSelection(),
             nl -> tableControl.doSelectGraphNodesAction(nl.getNodes()));
 
      sideViews.add(filterSelectionDialog);

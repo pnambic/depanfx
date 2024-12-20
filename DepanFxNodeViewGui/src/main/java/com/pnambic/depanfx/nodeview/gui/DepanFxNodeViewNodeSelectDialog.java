@@ -12,7 +12,7 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -20,8 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -62,7 +60,9 @@ public class DepanFxNodeViewNodeSelectDialog
   @FXML
   private TreeTableView<DepanFxNodeListMember> nodeSelectTable;
 
-  private DepanFxNodeListTableViewData tableView;
+  private DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc;
+
+  // private DepanFxNodeListTableViewData tableView;
 
   private DepanFxNodeListTableController tableControl;
 
@@ -80,14 +80,23 @@ public class DepanFxNodeViewNodeSelectDialog
   static Stage runEditDialog(
       DepanFxDialogRunner dialogRunner,
       DepanFxNodeViewPanel viewPanel,
-      DepanFxNodeListTableViewData tableView) {
+      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc) {
 
     Dialog<DepanFxNodeViewNodeSelectDialog> dlg =
         dialogRunner.createDialogAndParent(
             DepanFxNodeViewNodeSelectDialog.class);
-    dlg.getController().setTableView(tableView);
+    dlg.getController().setTableViewResource(tableViewRsrc);
     dlg.getController().setViewPanel(viewPanel);
     return dlg.runModeless(EDIT_NODE_SELECTION);
+  }
+
+  private void setTableViewResource(
+      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc) {
+    this.tableViewRsrc = tableViewRsrc;
+
+    if (tableControl != null) {
+      tableControl.setTableViewResource(tableViewRsrc);
+    }
   }
 
   public static void setNodeViewNodeListFilters(FileChooser chooser) {
@@ -95,28 +104,23 @@ public class DepanFxNodeViewNodeSelectDialog
     chooser.setSelectedExtensionFilter(NODE_LIST_FILTER);
   }
 
+  /**
+   * @param viewPanel
+   */
   public void setViewPanel(DepanFxNodeViewPanel viewPanel) {
-    if (tableView == null) {
-      Optional<DepanFxWorkspaceResource<DepanFxNodeListTableViewData>> optFlatView =
-          ((DepanFxBuiltInProject) workspace.getBuiltInProject())
-              .getResource(DepanFxNodeListConfiguration.FLAT_TABLE_VIEW_PATH);
-      optFlatView.ifPresent(r -> tableView = r.getResource());
+    if (tableViewRsrc == null) {
+      tableViewRsrc = DepanFxProjects.getBuiltIn(
+          workspace, DepanFxNodeListTableViewData.class,
+          DepanFxNodeListConfiguration.FLAT_TABLE_VIEW_PATH)
+          .get();
     }
 
     tableControl = new DepanFxNodeListTableController(
         workspace, dialogRunner,
         viewPanel.getViewNodesAsNodeList(), viewPanel.getNodeSelection(),
-        tableView, nodeSelectTable);
+        tableViewRsrc, nodeSelectTable);
 
     nodeTableCommands.setContextMenu(buildContextMenu());
-  }
-
-  public void setTableView(DepanFxNodeListTableViewData tableView) {
-    this.tableView = tableView;
-
-    if (tableControl != null) {
-      tableControl.setTableView(tableView);
-    }
   }
 
   @FXML

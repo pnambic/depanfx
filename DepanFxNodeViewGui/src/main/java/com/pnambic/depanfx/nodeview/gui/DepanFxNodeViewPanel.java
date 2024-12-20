@@ -421,7 +421,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
             DepanFxNodeListConfiguration.MEMBER_TABLE_VIEW_PATH).get();
 
     Stage nodeSelectDialog = DepanFxNodeViewNodeSelectDialog.runEditDialog(
-        dialogRunner, this, tableViewRsrc.getResource());
+        dialogRunner, this, tableViewRsrc);
 
     sideViews.add(nodeSelectDialog);
     nodeSelectDialog.setOnCloseRequest(
@@ -457,7 +457,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
         getNodeSelection().getSelection(getNodeSelectionAsNodeList());
 
     Stage filterSelctionDialog = DepanFxNodeViewNodeFiltersDialog.runEditDialog(
-        dialogRunner, null, tableViewRsrc.getResource(), filteredNodes,
+        dialogRunner, tableViewRsrc, filteredNodes,
         nl -> nodeSelection.doSelectGraphNodesAction(nl.getNodes()));
 
      sideViews.add(filterSelctionDialog);

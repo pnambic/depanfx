@@ -31,6 +31,7 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.DepanFxWorkspaceDialog;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -114,13 +115,9 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
   @FXML
   private TreeTableView<DepanFxNodeListMember> nodeSelectTable;
 
-  private DepanFxNodeListTableViewData tableView;
-
   private DepanFxNodeListTableController tableControl;
 
   private Consumer<DepanFxNodeList> onUpdate;
-
-  private DepanFxProjectDocument destDoc;
 
   private DepanFxNodeList sourceNodes;
 
@@ -141,16 +138,16 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
    */
   public static Stage runEditDialog(
       DepanFxDialogRunner dialogRunner,
-      DepanFxProjectDocument destDoc,
-      DepanFxNodeListTableViewData tableView,
+      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc,
       DepanFxNodeList sourceNodes,
       Consumer<DepanFxNodeList> onUpdate) {
 
+    // DepanFxNodeViewNodeFiltersDialog does not extend DepanFxBaseToolData,
+    // DepanFxResourcePerspectives.prepareDialog() is not available.
     Dialog<DepanFxNodeViewNodeFiltersDialog> dlg =
         dialogRunner.createDialogAndParent(
             DepanFxNodeViewNodeFiltersDialog.class);
-    dlg.getController().setDestinationDocument(destDoc);
-    dlg.getController().setTableView(tableView);
+    dlg.getController().setTableViewResource(tableViewRsrc);
     dlg.getController().setSourceNodes(sourceNodes);
     dlg.getController().setOnUpdate(onUpdate);
     return dlg.runModeless(EDIT_NODE_FILTERS);
@@ -212,28 +209,25 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
             .subtract(1));
   }
 
-  public void setDestinationDocument(DepanFxProjectDocument destDoc) {
-    this.destDoc = destDoc;
-  }
-
   public void setSourceNodes(DepanFxNodeList filteredNodes) {
-    if (tableView == null) {
+    if (tableControl == null) {
       Optional<DepanFxWorkspaceResource<DepanFxNodeListTableViewData>> optFlatView =
           ((DepanFxBuiltInProject) workspace.getBuiltInProject())
               .getResource(DepanFxNodeListConfiguration.FLAT_TABLE_VIEW_PATH);
-      optFlatView.ifPresent(r -> tableView = r.getResource());
+      optFlatView.ifPresent(r -> tableControl = buildTable(r, filteredNodes));
     }
 
     this.sourceNodes = filteredNodes;
 
-    tableControl = buildTable(filteredNodes);
+    tableControl = buildTable(
+        tableControl.getTableViewResource(), filteredNodes);
     nodeTableCommands.setContextMenu(buildNodeTableCommandMenu());
   }
 
-  public void setTableView(DepanFxNodeListTableViewData tableView) {
-    this.tableView = tableView;
+  public void setTableViewResource(
+      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc) {
     if (tableControl != null) {
-      tableControl.setTableView(tableView);
+      tableControl.setTableViewResource(tableViewRsrc);
     }
   }
 
@@ -281,7 +275,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
     DepanFxNodeList results =
         DepanFxNodeLists.buildRelatedNodeList(sourceNodes, resultNodes);
 
-    tableControl = buildTable(results);
+    tableControl = buildTable(tableControl.getTableViewResource(), results);
     nodeTableCommands.setContextMenu(buildNodeTableCommandMenu());
   }
 
@@ -302,6 +296,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
   }
 
   private DepanFxNodeListTableController buildTable(
+      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc,
       DepanFxNodeList tableNodes) {
     DepanFxNodeListSelection nodeSelection =
         DepanFxNodeListSelection.forNodes(tableNodes.getNodes());
@@ -309,7 +304,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
 
     return new DepanFxNodeListTableController(
         workspace, dialogRunner, tableNodes, nodeSelection,
-        tableView, nodeSelectTable);
+        tableViewRsrc, nodeSelectTable);
   }
 
   private ContextMenu buildNodeTableCommandMenu() {
@@ -342,13 +337,11 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
       List<? extends DepanFxBaseFilterData> seqFilters =
           seqData.streamFilters().collect(Collectors.toList());
       nodeFilterRoot.setAll(seqFilters);
-      setDestinationDocument(filterRsrc.getDocument());
       return;
     }
 
-    // For sequence, put items in list
+    // Other items become the root
     nodeFilterRoot.set(resource);
-    setDestinationDocument(filterRsrc.getDocument());
   }
 
   private DepanFxNodeFiltersTableColumns getColumnInfo(

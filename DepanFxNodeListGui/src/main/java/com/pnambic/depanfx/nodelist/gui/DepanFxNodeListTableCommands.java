@@ -169,9 +169,13 @@ public class DepanFxNodeListTableCommands {
   }
 
   private void runNodeListTableViewSaveDialog() {
-    DepanFxNodeListTableViewData tableView = tableState.getTableView();
-    DepanFxNodeListTableViewSaveDialog.runSaveTableView(
-        dialogRunner, workspace.addScratchResource(tableView));
+    DepanFxWorkspaceResource<DepanFxNodeListTableViewData> updateViewRsrc =
+        DepanFxWorkspaceResource.forUpdate(
+            tableAdapter.getTableViewResource(), tableState.getTableView());
+
+    DepanFxNodeListTableViewSaveDialog
+        .runSaveTableView(dialogRunner, updateViewRsrc)
+        .ifPresent(tableAdapter::setTableViewResource);
   }
 
   private void doSelectColumnAction() {

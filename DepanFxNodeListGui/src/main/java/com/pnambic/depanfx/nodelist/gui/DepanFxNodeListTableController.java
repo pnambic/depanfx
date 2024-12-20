@@ -33,18 +33,22 @@ public class DepanFxNodeListTableController
 
   private final DepanFxNodeListTableState tableState;
 
+  private DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc;
+
   public DepanFxNodeListTableController(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxNodeList nodeList,
       DepanFxNodeListSelection selectedNodes,
-      DepanFxNodeListTableViewData tableView,
+      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc,
       TreeTableView<DepanFxNodeListMember> treeTable) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
     this.nodeList = nodeList;
+    this.tableViewRsrc = tableViewRsrc;
 
-    tableState = prepareNodeListTable(tableView, treeTable, selectedNodes);
+    tableState = prepareNodeListTable(
+        tableViewRsrc.getResource(), treeTable, selectedNodes);
   }
 
   @Override // DepanFxNodeListTableAdapter
@@ -73,6 +77,18 @@ public class DepanFxNodeListTableController
 
   public Collection<GraphNode> getNodes() {
     return nodeList.getNodes();
+  }
+
+  @Override // DepanFxNodeListTableAdapter
+  public DepanFxWorkspaceResource<DepanFxNodeListTableViewData> getTableViewResource() {
+    return tableViewRsrc;
+  }
+
+  @Override // DepanFxNodeListTableAdapter
+  public void setTableViewResource(
+      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc) {
+    this.tableViewRsrc = tableViewRsrc;
+    setTableView(tableViewRsrc.getResource());
   }
 
   public TreeTableView<DepanFxNodeListMember> getNodeListTable() {
