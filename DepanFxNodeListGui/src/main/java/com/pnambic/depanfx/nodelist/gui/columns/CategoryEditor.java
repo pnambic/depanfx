@@ -92,7 +92,10 @@ public class CategoryEditor {
   private Entry<CategoryEntry, Collection<GraphNode>> snapshotCategory(
       Entry<CategoryEntry, Collection<GraphNode>> entry) {
     CategoryEntry key = entry.getKey();
-    sourceNodes.put(key, currentNodes.get(key));
+
+    // Source has a separate copy of the nodes that will be saved.
+    Collection<GraphNode> nodes = new ArrayList<>(currentNodes.get(key));
+    sourceNodes.put(key, nodes);
     return entry;
   }
 
