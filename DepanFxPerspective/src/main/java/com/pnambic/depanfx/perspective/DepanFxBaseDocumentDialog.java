@@ -45,22 +45,6 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
     this.dataType = dataType;
   }
 
-  @Deprecated // Use {@link #setToolResource(DepanFxWorkspaceResource<T>)}
-  public void setDestination(DepanFxProjectDocument projDoc) {
-
-    // Don't allow a destination in the built-in or scratch project.
-    if (projDoc.getProject().equals(workspace.getBuiltInProjectTree())) {
-      destinationField.setText(null);
-      return;
-    }
-    if (projDoc.getProject().equals(workspace.getScratchProjectTree())) {
-      destinationField.setText(null);
-      return;
-    }
-
-    destinationField.setText(projDoc.getMemberPath().toString());
-  }
-
   public Optional<DepanFxWorkspaceResource<T>> getToolResource() {
     return optResource;
   }

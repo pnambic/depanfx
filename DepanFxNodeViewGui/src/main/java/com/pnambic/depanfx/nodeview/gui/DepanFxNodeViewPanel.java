@@ -497,7 +497,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
     items.add(new SeparatorMenuItem());
     items.add(DepanFxContextMenuBuilder.createActionItem(
-        DepanFxNodeViewLinkDisplayDialog.EDIT_LINK_DISPLAY,
+        DepanFxNodeViewLinkDisplayDialog.EDIT_LINK_DISPLAY_ITEM,
         e -> runEditLinkDisplayDialog()));
     return result;
   }

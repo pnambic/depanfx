@@ -16,7 +16,6 @@
 package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxReferencedFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxSequenceFilterData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -54,8 +53,6 @@ public class DepanFxNodeFiltersSequenceDialog
 
   @FXML
   private Label seqFilterDetailsLabel;
-
-  private DepanFxSequenceFilterData seqFilter;
 
   @Autowired
   public DepanFxNodeFiltersSequenceDialog(
@@ -129,7 +126,8 @@ public class DepanFxNodeFiltersSequenceDialog
   @Override
   protected DepanFxSequenceFilterData prepareResult() {
     List<? extends DepanFxBaseFilterData> filters =
-        seqFilter.streamFilters().collect(Collectors.toList());
+        getToolResource().get().getResource().streamFilters()
+            .collect(Collectors.toList());
     return new DepanFxSequenceFilterData(
         getToolName(), getToolDescription(),
         getMergeMode(), filters, useClosure());

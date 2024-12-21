@@ -93,68 +93,6 @@ public class DepanFxResourcePerspectives {
   }
 
   /////////////////////////////////////
-  // Data and document based dialogs
-
-  @Deprecated
-  public static <
-          Dlg extends DepanFxBaseToolDialog<Data>,
-          Data extends DepanFxBaseToolData>
-    Dialog<Dlg> runEditDialog(
-        DepanFxProjectDocument projDoc,
-        Data toolData,
-        DepanFxDialogRunner dialogRunner,
-        Class<Dlg> dialogType,
-        String title) {
-    Dialog<Dlg> result = prepareDialog(toolData, dialogRunner, dialogType);
-    result.getController().setDestination(projDoc);
-    result.runDialog(title);
-    return result;
-  }
-
-  /**
-   * Provides the {@link Dialog} entity for the supplied class
-   * {@code dialogType}, after the modal dialog completes.
-   *
-   * Callers are expected to extract any interesting result from the
-   * {@code Dialog}'s member.
-   *
-   * @param toolData - provided to dialog before start.
-   * @param dialogRunner - GUI context for dialog.
-   * @param dialogType - Class of dialog controller.
-   * @param title - Title to display on window frame.
-   * @return - Dialog entity with user selected state.
-   */
-  @Deprecated
-  public static <
-        Dlg extends DepanFxBaseToolDialog<Data>,
-        Data extends DepanFxBaseToolData>
-  Dialog<Dlg> runCreateDialog(
-      Data toolData,
-      DepanFxDialogRunner dialogRunner,
-      Class<Dlg> dialogType,
-      String title) {
-    Dialog<Dlg> result = prepareDialog(toolData, dialogRunner, dialogType);
-    result.runDialog(title);
-    return result;
-  }
-
-  /**
-   * Run the dialog yourself, maybe after going modeless.
-   */
-  @Deprecated
-  public static <
-        Dlg extends DepanFxBaseToolDialog<Data>,
-        Data extends DepanFxBaseToolData>
-  Dialog<Dlg> prepareDialog(
-      Data toolData,
-      DepanFxDialogRunner dialogRunner,
-      Class<Dlg> dialogType) {
-    Dialog<Dlg> dlg = dialogRunner.createDialogAndParent(dialogType);
-    //$ DEAD: dlg.getController().setTooldata(toolData);
-    return dlg;
-  }
-
-  /////////////////////////////////////
   // Workspace resource dialogs
 
   public static <

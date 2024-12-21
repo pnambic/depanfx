@@ -45,8 +45,9 @@ public class DepanFxNodeFiltersListConfiguration {
   }
 
   @Bean
-  public DepanFxNodeFiltersDialogContribution nodeFilterListContribution() {
-    return new DepanFxNodeFiltersListContribution();
+  public DepanFxNodeFiltersDialogContribution nodeFilterListContribution(
+      DepanFxWorkspace workspace) {
+    return new DepanFxNodeFiltersListContribution(workspace);
   }
 
   private static class NodeListFilterExtContribution
@@ -102,8 +103,9 @@ public class DepanFxNodeFiltersListConfiguration {
 
     private DepanFxWorkspace workspace;
 
-    public DepanFxNodeFiltersListContribution() {
+    public DepanFxNodeFiltersListContribution(DepanFxWorkspace workspace) {
       super(NODE_LIST_KEY, ADD_LIST_FILTER, DepanFxListFilterData.class);
+      this.workspace = workspace;
     }
 
     @Override

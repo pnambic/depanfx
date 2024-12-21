@@ -23,7 +23,7 @@ public class DepanFxFocusColumnCell extends DepanFxBaseColumnCell {
 
   @Override
   protected void stylizeCell(DepanFxNodeListMember member) {
-    LOG.info("styling {}", member.getDisplayName());
+    LOG.debug("styling {}", member.getDisplayName());
     super.stylizeCell(member);
 
     if (member instanceof DepanFxNodeListGraphNode) {
@@ -44,7 +44,7 @@ public class DepanFxFocusColumnCell extends DepanFxBaseColumnCell {
 
   private void toggleNode(MouseEvent mouse, DepanFxNodeListGraphNode member) {
     GraphNode graphNode = member.getGraphNode();
-    LOG.info("toggle {}", graphNode.getId().getNodeKey());
+    LOG.debug("toggle {}", graphNode.getId().getNodeKey());
 
     if (mouse.getButton() == MouseButton.PRIMARY) {
       DepanFxFocusColumn focusColumn = getFocusColumn();

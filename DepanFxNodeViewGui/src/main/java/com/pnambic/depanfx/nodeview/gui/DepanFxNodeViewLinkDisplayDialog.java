@@ -63,7 +63,9 @@ public class DepanFxNodeViewLinkDisplayDialog
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeViewLinkDisplayDialog.class);
 
-  public static final String EDIT_LINK_DISPLAY = "Edit Link Display...";
+  public static final String EDIT_LINK_DISPLAY_ITEM = "Edit Link Display...";
+
+  public static final String EDIT_LINK_DISPLAY_TITLE = "Edit Link Display";
 
   public static final String NEW_LINK_DISPLAY = "New Link Display...";
 
@@ -106,7 +108,7 @@ public class DepanFxNodeViewLinkDisplayDialog
             displayControl.getLinkDisplayResource(), dialogRunner,
             DepanFxNodeViewLinkDisplayDialog.class);
     dlg.getController().setEdgeDisplayControl(displayControl);
-    return dlg.runModeless(EDIT_LINK_DISPLAY);
+    return dlg.runModeless(EDIT_LINK_DISPLAY_TITLE);
   }
 
   public static void setNodeViewLinkDisplayTooldataFilters(FileChooser chooser) {
