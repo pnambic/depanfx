@@ -188,6 +188,7 @@ public class EdgeDisplayController {
 
   public void setLinkDisplayResource(
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc) {
+    this.displayRsrc = displayRsrc;
     setLinkDisplay();
   }
 

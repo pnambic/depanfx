@@ -175,7 +175,7 @@ public class DepanFxNodeViewDataConverter
     if (availableNodeRsrc != null) {
       marshalObject(dstContext, AVAILABLE_NODE_DOC, availableNodeRsrc);
     }
-    if (visibleEdgeRsrc != null) {
+    if (visibleNodeRsrc != null) {
       marshalObject(dstContext, VISIBLE_NODE_DOC, visibleNodeRsrc);
     }
     marshalObject(dstContext,

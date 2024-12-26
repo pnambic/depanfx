@@ -5,6 +5,7 @@ import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.nodeview.builtins.DepanFxGraphLinkViewBuiltIns;
 import com.pnambic.depanfx.nodeview.builtins.DepanFxGraphNodeViewBuiltIns;
 import com.pnambic.depanfx.nodeview.jogl.JoglCameras;
@@ -135,8 +136,14 @@ public class DepanFxNodeViews {
       ContextModelId modelId = graphDocRsrc.getResource().getContextModelId();
       DepanFxWorkspaceResource<DepanFxNodeViewLayoutData> layoutRsrc =
           getContextLayout(workspace, modelId );
+
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayRsrc =
           getContextLinkDisplay(workspace, modelId);
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableEdgeRsrc =
+          DepanFxNodeViewData.buildAvailableEdgeResource(workspace, linkDisplayRsrc);
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgesRsrc =
+          availableEdgeRsrc;
+
       DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> nodeDisplayRsrc =
           getContextNodeDisplay(workspace, modelId);
 
@@ -157,9 +164,7 @@ public class DepanFxNodeViews {
         DepanFxNodeViewData.DEFAULT_REMAINDER_NODES_VISIBLE,
         DepanFxNodeViewData.DEFAULT_REMAINDER_NODE_DISPLAY,
 
-        DepanFxNodeViewData.EMPTY_AVAILABLE_EDGES,
-        DepanFxNodeViewData.EMPTY_VISIBLE_EDGES,
-        linkDisplayRsrc,
+        availableEdgeRsrc, visibleEdgesRsrc, linkDisplayRsrc,
         DepanFxNodeViewData.DEFAULT_REMAINDER_EDGES_VISIBLE,
         DepanFxNodeViewData.DEFAULT_REMAINDER_EDGES_LABEL,
         DepanFxNodeViewData.DEFAULT_REMAINDER_EDGE_DISPLAY);

@@ -5,6 +5,7 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
@@ -29,12 +30,6 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
 
   public static final DepanFxNodeDisplayData DEFAULT_REMAINDER_NODE_DISPLAY =
       buildRemainerNodeDisplay();
-
-  public static final DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
-      EMPTY_AVAILABLE_EDGES = null;
-
-  public static final DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
-      EMPTY_VISIBLE_EDGES = null;
 
   public static final boolean DEFAULT_REMAINDER_EDGES_VISIBLE = true;
 
@@ -105,9 +100,6 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   private DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
       availableEdgeRsrc;
 
-  // cached from linkDisplayDocRsrc if needed.
-  private DepanFxLinkMatcherSequenceDocument availableEdgeDoc;
-
   /**
    * The set of edges that are visible in the render.
    *
@@ -173,12 +165,24 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
     this.remainderNodesVisible = remainerNodesVisible;
     this.remainderNodesDisplay = remainderNodesDisplay;
 
-    this.availableNodeRsrc = availableNodeRsrc;
+    this.availableEdgeRsrc = availableEdgeRsrc;
     this.visibleEdgeRsrc = visibleEdgeRsrc;
     this.linkDisplayDocRsrc = linkDisplayDocRsrc;
     this.remainerEdgesVisible = remainerEdgesVisible;
     this.remainderEdgesLabel = remainderEdgesLabel;
     this.remainderEdgesDisplay = remainderEdgesDisplay;
+  }
+
+  /**
+   * Provide a minimal available edge resource, in case one is missing.
+   */
+  public static DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+  buildAvailableEdgeResource(
+      DepanFxWorkspace workspace,
+      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayDocRsrc) {
+
+    return workspace.addScratchResource(
+        linkDisplayDocRsrc.getResource().asLinkMatcherSequenceDoc());
   }
 
   public DepanFxWorkspaceResource<GraphDocument> getGraphDocRsrc() {
@@ -292,27 +296,19 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   public void setAvailableEdgeRsrc(
       DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availEdgeRsrc) {
     this.availableEdgeRsrc = availEdgeRsrc;
-    availableEdgeDoc = null;
   }
 
-  /**
-   * Provide matcher sequence document for the available edges.
-   * An implicit result derived from the link display matchers is provided
-   * if the view has not saved its available edges.
-   */
   public DepanFxLinkMatcherSequenceDocument getAvailableEdgesDoc() {
-    if (availableEdgeRsrc != null) {
-      return availableEdgeRsrc.getResource();
-    }
-    if (availableEdgeDoc == null) {
-      availableEdgeDoc =
-          linkDisplayDocRsrc.getResource().asLinkMatcherSequenceDoc();
-    }
-    return availableEdgeDoc;
+    return availableEdgeRsrc.getResource();
   }
 
   public DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
       getVisibleEdgeResource() {
+    return visibleEdgeRsrc;
+  }
+
+  public DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+      getVisibleEdgeRsrc(DepanFxWorkspace workspace) {
     return visibleEdgeRsrc;
   }
 
@@ -321,16 +317,8 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
     this.visibleEdgeRsrc = visibleEdgeRsrc;
   }
 
-  /**
-   * Provide matcher sequence document for the visible edge.
-   * An implicit result derived from the available matches is used
-   * if the view has not saved its visible edges.
-   */
   public DepanFxLinkMatcherSequenceDocument getVisibleEdgesDoc() {
-    if (visibleEdgeRsrc != null) {
-      return visibleEdgeRsrc.getResource();
-    }
-    return getAvailableEdgesDoc();
+    return visibleEdgeRsrc.getResource();
   }
 
   public DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData>

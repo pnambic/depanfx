@@ -99,7 +99,8 @@ public class DepanFxNodeViewEdgeVisibilityDialog
   Map<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>, BooleanProperty>
       matcherVisibleProperties;
 
-  private DepanFxLinkMatcherSequenceDocument availableMatchersDoc;
+
+  private DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableMatchersRsrc;
 
   private EdgeDisplayController edgeDisplay;
 
@@ -115,7 +116,7 @@ public class DepanFxNodeViewEdgeVisibilityDialog
 
   public static Dialog<DepanFxNodeViewEdgeVisibilityDialog> runVisibilityDialog(
       DepanFxDialogRunner dialogRunner,
-      DepanFxLinkMatcherSequenceDocument availableMatchersDoc,
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableMatchersRsrc,
       DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> matcherSequenceRsrc,
       EdgeDisplayController edgeDisplay,
       Consumer<DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>>
@@ -127,7 +128,7 @@ public class DepanFxNodeViewEdgeVisibilityDialog
             DepanFxNodeViewEdgeVisibilityDialog.class);
 
     DepanFxNodeViewEdgeVisibilityDialog dlgCtrl = result.getController();
-    dlgCtrl.setAvailableMatchers(availableMatchersDoc);
+    dlgCtrl.setAvailableMatchers(availableMatchersRsrc);
     dlgCtrl.setEdgeDisplayController(edgeDisplay);
     dlgCtrl.setOnAvailableEdgesUpdate(onAvailableEdgesUpdate);
     result.runDialog(CREATE_LINK_MATCHER_SEQUENCE);
@@ -191,11 +192,11 @@ public class DepanFxNodeViewEdgeVisibilityDialog
   }
 
   public void setAvailableMatchers(
-      DepanFxLinkMatcherSequenceDocument availableMatchersDoc) {
-    this.availableMatchersDoc = availableMatchersDoc;
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableMatchersRsrc) {
+    this.availableMatchersRsrc = availableMatchersRsrc;
 
     matcherVisibleProperties = new HashMap<>();
-    availableMatchersDoc.streamMatchers()
+    availableMatchersRsrc.getResource().streamMatchers()
         .forEach(m -> 
             matcherVisibleProperties.put(m, new SimpleBooleanProperty()));
 
@@ -204,7 +205,7 @@ public class DepanFxNodeViewEdgeVisibilityDialog
     ObservableList<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
     availableMatchers = FXCollections.observableArrayList();
 
-    availableMatchersDoc.streamMatchers()
+    availableMatchersRsrc.getResource().streamMatchers()
         .forEach(availableMatchers::add);
 
     matcherVisibilityData = availableMatchers;
@@ -249,14 +250,14 @@ public class DepanFxNodeViewEdgeVisibilityDialog
   /////////////////////////////////////
 
   private void installVisibleMatchers() {
-    DepanFxLinkMatcherSequenceDocument visibleMatcherDoc = getToolResource()
-        .map(DepanFxWorkspaceResource::getResource)
-        .orElse(null);
-    if (visibleMatcherDoc  == null || availableMatchersDoc == null) {
+    if (getToolResource() == null || availableMatchersRsrc == null) {
       return;
     }
 
-    visibleMatcherDoc.streamMatchers()
+    getToolResource()
+        .map(DepanFxWorkspaceResource::getResource)
+        .get()
+        .streamMatchers()
         .map(m -> matcherVisibleProperties.get(m))
         .forEach(b -> b.set(true));
   }
@@ -307,7 +308,7 @@ public class DepanFxNodeViewEdgeVisibilityDialog
   private void handleSelectAvailableVisibleEdges() {
     DepanFxLinkMatcherSequenceChooser.runChooser(
             workspace, dialogRunner, getScene())
-        .ifPresent(r -> setAvailableMatchers(r.getResource()));
+        .ifPresent(this::setAvailableMatchers);
   }
 
   @FXML
@@ -332,7 +333,7 @@ public class DepanFxNodeViewEdgeVisibilityDialog
   private void updateAvailableEdges(
       DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableMatchersRsrc) {
     // The resource might have changed in the create dialog.
-    setAvailableMatchers(availableMatchersRsrc.getResource());
+    setAvailableMatchers(availableMatchersRsrc);
 
     onAvailableEdgesRsrcUpdate.accept(availableMatchersRsrc);
   }
@@ -342,6 +343,8 @@ public class DepanFxNodeViewEdgeVisibilityDialog
         new ArrayList<>(matcherVisibleProperties.size());
     matcherVisibleProperties.keySet().forEach(availableMatchers::add);
 
+    DepanFxLinkMatcherSequenceDocument availableMatchersDoc =
+        availableMatchersRsrc.getResource();
     return new DepanFxLinkMatcherSequenceDocument(
         availableMatchersDoc.getToolName(), availableMatchersDoc.getToolDescription(),
         availableMatchersDoc.getModelId(), availableMatchers);
