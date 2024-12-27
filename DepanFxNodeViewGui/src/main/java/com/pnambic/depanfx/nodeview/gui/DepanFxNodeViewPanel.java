@@ -689,7 +689,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
     Dialog<DepanFxNodeViewEdgeVisibilityDialog> visibilty =
         DepanFxNodeViewEdgeVisibilityDialog.runVisibilityDialog(
-            dialogRunner, viewData.getAvailableEdgeRsrc(),
+            dialogRunner, viewData.getAvailableEdgeResource(),
             viewData.getVisibleEdgeResource(), edgeDisplay,
             r -> updateAvailableEdges(r));
     visibilty.getController().getToolResource()
@@ -895,7 +895,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
         nodeDisplay.getRemainderVisibility(),
         nodeDisplay.getRemainderDisplay(),
 
-        viewData.getAvailableEdgeRsrc(),
+        viewData.getAvailableEdgeResource(),
         viewData.getVisibleEdgeResource(),
         edgeDisplay.getLinkDisplayResource(),
         edgeDisplay.getRemainderVisible(),

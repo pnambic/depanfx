@@ -1,16 +1,17 @@
 package com.pnambic.depanfx.xstream;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.XppDriver;
 
 public class XstreamDocumentTransportBuilder {
+
+  private XppDriver streamDriver;
 
   private XStream xstream;
 
   public XstreamDocumentTransportBuilder() {
-  }
-
-  public void setXStream() {
-    xstream = new XStream();
+    streamDriver = new XppDriver();
+    xstream = new XStream(streamDriver);
   }
 
   public void setNoReferences() {
@@ -54,6 +55,6 @@ public class XstreamDocumentTransportBuilder {
   }
 
   public XstreamDocumentTransport buildDocumentXmlPersist() {
-    return new XstreamDocumentTransport(xstream);
+    return new XstreamDocumentTransport(xstream, streamDriver);
   }
 }

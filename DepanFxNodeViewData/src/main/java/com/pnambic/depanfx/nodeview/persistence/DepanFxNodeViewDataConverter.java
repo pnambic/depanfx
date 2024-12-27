@@ -54,9 +54,9 @@ public class DepanFxNodeViewDataConverter
 
   public static final String SCENE_DATA = "scene-data";
 
-  private static final String AVAILABLE_NODE_DOC = "avail-nodes-rsrc";
+  private static final String AVAILABLE_NODE_RSRC = "avail-nodes-rsrc";
 
-  private static final String VISIBLE_NODE_DOC = "visible-nodes-rsrc";
+  private static final String VISIBLE_NODE_RSRC = "visible-nodes-rsrc";
 
   public static final String NODE_DISPLAY_DOC = "node-display-doc";
 
@@ -64,9 +64,9 @@ public class DepanFxNodeViewDataConverter
 
   private static final String REMAINDER_NODES_DISPLAY = "remainder-nodes-display";
 
-  private static final String AVAILABLE_EDGE_DOC = "avail-edges-rsrc";
+  private static final String AVAILABLE_EDGE_RSRC = "avail-edges-rsrc";
 
-  private static final String VISIBLE_EDGE_DOC = "visible-edges-rsrc";
+  private static final String VISIBLE_EDGE_RSRC = "visible-edges-rsrc";
 
   public static final String LINK_DISPLAY_DOC = "link-display-doc";
 
@@ -94,9 +94,9 @@ public class DepanFxNodeViewDataConverter
           new PersistTagDataLoader.TagDescriptor(
               SCENE_DATA, DepanFxNodeViewSceneData.class),
           new PersistTagDataLoader.TagDescriptor(
-              AVAILABLE_NODE_DOC, DepanFxWorkspaceResource.class),
+              AVAILABLE_NODE_RSRC, DepanFxWorkspaceResource.class),
           new PersistTagDataLoader.TagDescriptor(
-              VISIBLE_NODE_DOC, DepanFxWorkspaceResource.class),
+              VISIBLE_NODE_RSRC, DepanFxWorkspaceResource.class),
           new PersistTagDataLoader.TagDescriptor(
               NODE_DISPLAY_DOC, DepanFxWorkspaceResource.class),
           new PersistTagDataLoader.TagDescriptor(
@@ -104,9 +104,9 @@ public class DepanFxNodeViewDataConverter
           new PersistTagDataLoader.TagDescriptor(
               REMAINDER_NODES_DISPLAY, DepanFxNodeDisplayData.class),
           new PersistTagDataLoader.TagDescriptor(
-              AVAILABLE_EDGE_DOC, DepanFxWorkspaceResource.class),
+              AVAILABLE_EDGE_RSRC, DepanFxWorkspaceResource.class),
           new PersistTagDataLoader.TagDescriptor(
-              VISIBLE_EDGE_DOC, DepanFxWorkspaceResource.class),
+              VISIBLE_EDGE_RSRC, DepanFxWorkspaceResource.class),
           new PersistTagDataLoader.TagDescriptor(
               LINK_DISPLAY_DOC, DepanFxWorkspaceResource.class),
           new PersistTagDataLoader.TagDescriptor(
@@ -126,9 +126,9 @@ public class DepanFxNodeViewDataConverter
       NODE_VIEW_NAME, NODE_VIEW_DESCR,
       GRAPH_DOC,
       SCENE_DATA,
-      AVAILABLE_NODE_DOC, VISIBLE_NODE_DOC, NODE_DISPLAY_DOC,
+      AVAILABLE_NODE_RSRC, VISIBLE_NODE_RSRC, NODE_DISPLAY_DOC,
       REMAINDER_NODES_VISIBLE, REMAINDER_NODES_DISPLAY,
-      AVAILABLE_EDGE_DOC, VISIBLE_EDGE_DOC, LINK_DISPLAY_DOC,
+      AVAILABLE_EDGE_RSRC, VISIBLE_EDGE_RSRC, LINK_DISPLAY_DOC,
       REMAINDER_EDGES_VISIBLE, REMAINDER_EDGES_LABEL, REMAINDER_EDGES_DISPLAY
   };
 
@@ -157,7 +157,7 @@ public class DepanFxNodeViewDataConverter
         viewData.getVisibleNodeResource();
 
     DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableEdgeRsrc =
-        viewData.getAvailableEdgeRsrc();
+        viewData.getAvailableEdgeResource();
     DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc =
         viewData.getVisibleEdgeResource();
 
@@ -173,10 +173,10 @@ public class DepanFxNodeViewDataConverter
         SCENE_DATA, viewData.getSceneData());
 
     if (availableNodeRsrc != null) {
-      marshalObject(dstContext, AVAILABLE_NODE_DOC, availableNodeRsrc);
+      marshalObject(dstContext, AVAILABLE_NODE_RSRC, availableNodeRsrc);
     }
     if (visibleNodeRsrc != null) {
-      marshalObject(dstContext, VISIBLE_NODE_DOC, visibleNodeRsrc);
+      marshalObject(dstContext, VISIBLE_NODE_RSRC, visibleNodeRsrc);
     }
     marshalObject(dstContext,
         NODE_DISPLAY_DOC, viewData.getNodeDisplayDocRsrc());
@@ -186,10 +186,10 @@ public class DepanFxNodeViewDataConverter
         REMAINDER_NODES_DISPLAY, viewData.getRemainderNodesDisplay());
 
     if (availableEdgeRsrc != null) {
-      marshalObject(dstContext, AVAILABLE_EDGE_DOC, availableEdgeRsrc);
+      marshalObject(dstContext, AVAILABLE_EDGE_RSRC, availableEdgeRsrc);
     }
     if (visibleEdgeRsrc != null) {
-      marshalObject(dstContext, VISIBLE_EDGE_DOC, visibleEdgeRsrc);
+      marshalObject(dstContext, VISIBLE_EDGE_RSRC, visibleEdgeRsrc);
     }
 
     marshalObject(dstContext,
@@ -208,6 +208,9 @@ public class DepanFxNodeViewDataConverter
   @Override
   public DepanFxNodeViewData unmarshal(PersistUnmarshalContext srcContext) {
 
+    DepanFxWorkspace workspace =
+        (DepanFxWorkspace) srcContext.getContextValue(DepanFxWorkspace.class);
+
     PersistTagDataResult metaData =
         new PersistTagDataResult(TAG_LOADER.loadData(META_TAGS, srcContext));
 
@@ -219,10 +222,6 @@ public class DepanFxNodeViewDataConverter
     @SuppressWarnings("unchecked")
     DepanFxWorkspaceResource<GraphDocument> graphDocRsrc =
         metaData.getObject(GRAPH_DOC, DepanFxWorkspaceResource.class);
-
-    @SuppressWarnings("unchecked")
-    DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableNodeRsrc =
-        metaData.getObject(AVAILABLE_NODE_DOC, DepanFxWorkspaceResource.class);
 
     @SuppressWarnings("unchecked")
     DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> nodeDisplayDocRsrc =
@@ -237,16 +236,20 @@ public class DepanFxNodeViewDataConverter
             DepanFxNodeViewData.DEFAULT_REMAINDER_NODE_DISPLAY);
 
     @SuppressWarnings("unchecked")
+    DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableNodeRsrc =
+        metaData.getObject(AVAILABLE_NODE_RSRC, DepanFxWorkspaceResource.class);
+
+    @SuppressWarnings("unchecked")
     DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc =
-        metaData.getObject(VISIBLE_NODE_DOC, DepanFxWorkspaceResource.class);
+        metaData.getObject(VISIBLE_NODE_RSRC, DepanFxWorkspaceResource.class);
 
     @SuppressWarnings("unchecked")
     DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableEdgeRsrc =
-        metaData.getObject(AVAILABLE_EDGE_DOC, DepanFxWorkspaceResource.class);
+        metaData.getObject(AVAILABLE_EDGE_RSRC, DepanFxWorkspaceResource.class);
 
     @SuppressWarnings("unchecked")
     DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc =
-        metaData.getObject(VISIBLE_EDGE_DOC, DepanFxWorkspaceResource.class);
+        metaData.getObject(VISIBLE_EDGE_RSRC, DepanFxWorkspaceResource.class);
 
     @SuppressWarnings("unchecked")
     DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayDocRsrc =
@@ -295,13 +298,26 @@ public class DepanFxNodeViewDataConverter
         nodeBuilder.getNodeDisplay();
 
     if (linkDisplayDocRsrc == null) {
-      DepanFxWorkspace workspace =
-          (DepanFxWorkspace) srcContext.getContextValue(DepanFxWorkspace.class);
       linkDisplayDocRsrc =
           DepanFxProjects.getBuiltIn(workspace,
               DepanFxNodeViewLinkDisplayData.class,
               DepanFxGraphLinkViewBuiltIns.ALL_EDGES_DISPLAY_DOC_PATH)
           .get();
+    }
+
+    // When scratch resources are used.
+    if (availableEdgeRsrc == null) {
+      availableEdgeRsrc = DepanFxNodeViewData.buildAvailableEdgeResource(workspace, linkDisplayDocRsrc);
+    }
+    if (visibleEdgeRsrc == null) {
+      visibleEdgeRsrc = availableEdgeRsrc;
+    }
+
+    if (availableNodeRsrc == null) {
+      availableNodeRsrc = DepanFxNodeViewData.buildAvailableNodeResource(workspace, nodeDisplayDocRsrc);
+    }
+    if (visibleNodeRsrc == null) {
+      visibleNodeRsrc = availableNodeRsrc;
     }
 
     return new DepanFxNodeViewData(toolName, toolDescr,

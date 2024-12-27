@@ -12,11 +12,10 @@ import java.util.Collection;
 
 public class PersistDocumentTransportBuilder {
 
-  private XstreamDocumentTransportBuilder builder =
+  private final XstreamDocumentTransportBuilder builder =
       new XstreamDocumentTransportBuilder();
 
   public PersistDocumentTransportBuilder() {
-    builder.setXStream();
     builder.setNoReferences();
     builder.addDefaultImplementation(ArrayList.class, Collection.class);
   }

@@ -276,7 +276,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   // Links, Edges, and Matchers
 
   public DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
-      getAvailableEdgeRsrc() {
+      getAvailableEdgeResource() {
     return availableEdgeRsrc;
   }
 

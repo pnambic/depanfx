@@ -20,8 +20,10 @@ import java.io.Reader;
 import java.io.Writer;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.converters.DataHolder;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 
 /**
@@ -45,6 +47,8 @@ public class XstreamDocumentTransport {
    */
   protected final XStream xstream;
 
+  private final XppDriver streamDriver;
+
   private DataHolder context;
 
   /**
@@ -60,9 +64,11 @@ public class XstreamDocumentTransport {
    * Check the {@code XStreamFactory} class for other construction mechanisms.
    *
    * @param xstream {@code XStream }to use for serialization
+   * @param streamDriver
    */
-  public XstreamDocumentTransport(XStream xstream) {
+  public XstreamDocumentTransport(XStream xstream, XppDriver streamDriver) {
     this.xstream = xstream;
+    this.streamDriver = streamDriver;
   }
 
   /**
@@ -86,7 +92,7 @@ public class XstreamDocumentTransport {
    */
   public Object load(Reader src) throws IOException {
     // 'cuz no XStream.fromXml() method allows for supplied context.
-    HierarchicalStreamReader reader = new XppDriver().createReader(src);
+    HierarchicalStreamReader reader = streamDriver.createReader(src);
     try {
       return xstream.unmarshal(reader, null, context);
     } finally {
@@ -102,6 +108,21 @@ public class XstreamDocumentTransport {
    * @throws IOException
    */
   public void save(Writer dst, Object item) throws IOException {
-    xstream.toXML(item, dst);
+    toXML(item, dst);
+  }
+
+  /**
+   * Serialize an object to the given Writer as pretty-printed XML.
+   * The Writer will be flushed afterwards and in case of an exception.
+   *
+   * Stolen from XStream, to add context for the marshal call.
+   */
+  private void toXML(Object obj, Writer out) {
+      HierarchicalStreamWriter writer = streamDriver.createWriter(out);
+      try {
+          xstream.marshal(obj, writer, context);
+      } finally {
+          writer.flush();
+      }
   }
 }

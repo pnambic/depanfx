@@ -33,6 +33,13 @@ public class WorkspaceResourceConverter
   public void marshal(PersistMarshalContext dstContext, Object source) {
     DepanFxWorkspaceResource<?> wkspRsrc = (DepanFxWorkspaceResource<?>) source;
 
+    // Don't save scratch resources.
+    DepanFxWorkspace workspace =
+        (DepanFxWorkspace) dstContext.getContextValue(DepanFxWorkspace.class);
+    if (workspace.getScratchProjectTree() == wkspRsrc.getDocument().getProject()) {
+      return;
+    }
+
     PersistWorkspaceResource persistWkspRsrc =
         PersistWorkspaceResource.of(wkspRsrc);
     marshalValue(dstContext, persistWkspRsrc);
@@ -41,12 +48,17 @@ public class WorkspaceResourceConverter
   @Override
   public DepanFxWorkspaceResource<?> unmarshal(
       PersistUnmarshalContext srcContext) {
-    PersistWorkspaceResource persistWkspRsrc =
-        (PersistWorkspaceResource) unmarshalValue(
-            srcContext, PersistWorkspaceResource.class);
+
+    // Scratch resources were stored as a null elements.
+    if (!srcContext.hasMoreChildren()) {
+      return null;
+    }
 
     DepanFxWorkspace workspace =
         (DepanFxWorkspace) srcContext.getContextValue(DepanFxWorkspace.class);
+    PersistWorkspaceResource persistWkspRsrc =
+        (PersistWorkspaceResource) unmarshalValue(
+            srcContext, PersistWorkspaceResource.class);
     DepanFxWorkspaceResource<?> result =
         PersistWorkspaceResource.forWksp(workspace, persistWkspRsrc)
         .get();
