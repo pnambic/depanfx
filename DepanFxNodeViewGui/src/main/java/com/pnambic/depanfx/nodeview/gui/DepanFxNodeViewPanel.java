@@ -42,6 +42,7 @@ import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource.ForUpdateWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import org.slf4j.Logger;
@@ -851,10 +852,12 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
       return;
     }
     DepanFxNodeViewData saveView = buildSaveView();
+    DepanFxWorkspaceResource<DepanFxNodeViewData> updateRsrc =
+        DepanFxWorkspaceResource.forUpdate(nodeViewRsrc, saveView);
 
     Dialog<DepanFxSaveNodeViewDialog> dlg =
-        DepanFxResourcePerspectives.runCreateDialog(
-            workspace.addScratchResource(saveView), dialogRunner,
+        DepanFxResourcePerspectives.runEditDialog(
+            updateRsrc, dialogRunner,
             DepanFxSaveNodeViewDialog.class, "Save node view");
     dlg.getController().getToolResource()
         .ifPresent(this::updateSavedResource);
