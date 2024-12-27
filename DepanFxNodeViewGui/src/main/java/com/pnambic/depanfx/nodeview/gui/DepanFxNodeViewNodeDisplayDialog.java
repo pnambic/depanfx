@@ -295,11 +295,10 @@ public class DepanFxNodeViewNodeDisplayDialog
 
   @FXML
   protected void handleApply() {
-    DepanFxNodeViewNodeDisplayData toolData = prepareResult();
     DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> srcRcsr =
         displayControl.getNodeDisplayResource();
     DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> toolRsrc =
-        DepanFxWorkspaceResource.forUpdate(srcRcsr, toolData);
+        DepanFxWorkspaceResource.forUpdate(srcRcsr, prepareResult());
     displayControl.setNodeDisplayResource(toolRsrc);
   }
 

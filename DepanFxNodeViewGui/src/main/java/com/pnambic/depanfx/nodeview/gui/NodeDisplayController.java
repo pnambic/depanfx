@@ -149,10 +149,6 @@ public class NodeDisplayController {
         viewData.getRemainderNodesDisplay());
   }
 
-  public DepanFxNodeViewNodeDisplayData getNodeDisplayInfo() {
-    return displayRsrc.getResource();
-  }
-
   public DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData>
       getNodeDisplayResource() {
     return displayRsrc;
@@ -428,7 +424,7 @@ public class NodeDisplayController {
    * Refresh the display group after the display info changes.
    */
   private void refreshDisplayGroup() {
-    DepanFxNodeViewNodeDisplayData displayInfo = getNodeDisplayInfo();
+    DepanFxNodeViewNodeDisplayData displayInfo = displayRsrc.getResource();
     displayGroup =
         new FilterControl(filterFactory, displayInfo.countFilters());
     displayByFilter = new HashMap<>(displayInfo.countFilters());

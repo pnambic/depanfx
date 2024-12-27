@@ -293,7 +293,8 @@ public class DepanFxNodeViewLinkDisplayDialog
   @FXML
   protected void handleApply() {
     displayControl.setLinkDisplayResource(
-        workspace.addScratchResource(prepareResult()));
+        DepanFxWorkspaceResource.forUpdate(
+            getToolResource().get(), prepareResult()));
   }
 
   @Override

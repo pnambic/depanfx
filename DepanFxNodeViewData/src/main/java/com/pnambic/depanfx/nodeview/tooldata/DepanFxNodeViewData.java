@@ -20,12 +20,6 @@ import javafx.scene.paint.Color;
 
 public class DepanFxNodeViewData extends DepanFxBaseToolData {
 
-  public static final DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
-      X_EMPTY_AVAILABLE_NODES = null;
-
-  public static final DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
-      X_EMPTY_VISIBLE_NODES = null;
-
   public static final boolean DEFAULT_REMAINDER_NODES_VISIBLE = true;
 
   public static final DepanFxNodeDisplayData DEFAULT_REMAINDER_NODE_DISPLAY =

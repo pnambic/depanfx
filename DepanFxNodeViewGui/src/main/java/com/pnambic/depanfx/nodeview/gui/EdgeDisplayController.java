@@ -140,10 +140,6 @@ public class EdgeDisplayController {
     return displayRsrc;
   }
 
-  public DepanFxNodeViewLinkDisplayData getLinkDisplayInfo() {
-    return displayRsrc.getResource();
-  }
-
   public void revertLinkDisplay() {
     setLinkDisplay();
   }
@@ -391,7 +387,7 @@ public class EdgeDisplayController {
 
     // Mostly, edges display per matcher
     Optional<LinkDisplayEntry> entryMatch =
-        getLinkDisplayInfo().getLinkDisplayEntry(edge);
+        displayRsrc.getResource().getLinkDisplayEntry(edge);
     if (entryMatch.isPresent()) {
       addMatchedEdge(edge, entryMatch.get(), isVisible);
       return;
