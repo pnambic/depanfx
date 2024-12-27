@@ -34,6 +34,7 @@ import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource.ForUpdateWorkspaceResource;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -74,7 +75,9 @@ public class DepanFxNodeViewNodeDisplayDialog
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeViewNodeDisplayDialog.class);
 
-  public static final String EDIT_NODE_DISPLAY = "Edit Node Display...";
+  public static final String EDIT_NODE_DISPLAY_ITEM = "Edit Node Display...";
+
+  public static final String EDIT_NODE_DISPLAY_TITLE = "Edit Node Display";
 
   public static final String NEW_NODE_DISPLAY = "New Node Display...";
 
@@ -124,7 +127,7 @@ public class DepanFxNodeViewNodeDisplayDialog
             DepanFxNodeViewNodeDisplayDialog.class);
 
     dlg.getController().setNodeDisplayController(displayControl);
-    return dlg.runModeless(EDIT_NODE_DISPLAY);
+    return dlg.runModeless(EDIT_NODE_DISPLAY_TITLE);
   }
 
   public static void setNodeViewNodeDisplayTooldataFilters(
@@ -180,7 +183,8 @@ public class DepanFxNodeViewNodeDisplayDialog
   }
 
   /**
-   * Both tooldata and display control  are required to populate the display table.
+   * Both tooldata and display control are required before
+   * populating the display table.
    */
   public void setNodeDisplayController(NodeDisplayController displayControl) {
     this.displayControl = displayControl;
@@ -188,9 +192,9 @@ public class DepanFxNodeViewNodeDisplayDialog
   }
 
   /**
-   * Both view panel and tooldata are required to populate the display table.
+   * Both tooldata and display control are required before
+   * populating the display table.
    */
-
   @Override
   public void setToolResource(
       DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> displayRsrc) {
@@ -292,7 +296,11 @@ public class DepanFxNodeViewNodeDisplayDialog
   @FXML
   protected void handleApply() {
     DepanFxNodeViewNodeDisplayData toolData = prepareResult();
-    displayControl.setNodeDisplayInfo(toolData);
+    DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> srcRcsr =
+        displayControl.getNodeDisplayResource();
+    DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> toolRsrc =
+        new ForUpdateWorkspaceResource<DepanFxNodeViewNodeDisplayData>(srcRcsr, toolData);
+    displayControl.setNodeDisplayResource(toolRsrc);
   }
 
   @Override

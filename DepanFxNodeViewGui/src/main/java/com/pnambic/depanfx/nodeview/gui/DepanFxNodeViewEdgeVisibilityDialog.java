@@ -99,7 +99,6 @@ public class DepanFxNodeViewEdgeVisibilityDialog
   Map<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>, BooleanProperty>
       matcherVisibleProperties;
 
-
   private DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableMatchersRsrc;
 
   private EdgeDisplayController edgeDisplay;

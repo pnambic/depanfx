@@ -63,8 +63,6 @@ public class NodeDisplayController {
    */
   private final DepanFxNodeFiltersRegistry.NodeFilterFactory filterFactory;
 
-  private DepanFxNodeViewNodeDisplayData displayInfo;
-
   private DepanFxNodeDisplayData remainderDisplay;
 
   private boolean remainderVisible;
@@ -122,8 +120,6 @@ public class NodeDisplayController {
     this.remainderVisible = remainderVisible;
     this.remainderDisplay = remainderDisplay;
 
-    this.displayInfo = displayRsrc.getResource();
-
     // Initialize from provided set, so all filters are initially known.
     visibleGroup = new FilterControl(filterFactory, availableFilters.size());
     availableFilters.forEach(visibleGroup::installFilter);
@@ -135,12 +131,12 @@ public class NodeDisplayController {
       JoglPane joglPane, DepanFxNodeViewData viewData,
       DepanFxNodeFiltersRegistry.NodeFilterFactory filterFactory) {
     Set<DepanFxBaseFilterData> availableFilters =
-        viewData.getAvailableNodesDoc().streamFilterRefs()
+        viewData.getAvailableNodeResource().getResource().streamFilterRefs()
             .map(r -> r.getResource())
             .collect(Collectors.toSet());
 
     Set<DepanFxBaseFilterData> visibleFilters =
-        viewData.getVisibleNodesDoc().streamFilterRefs()
+        viewData.getVisibleNodeResource().getResource().streamFilterRefs()
             .map(r -> r.getResource())
             .collect(Collectors.toSet());
 
@@ -154,17 +150,12 @@ public class NodeDisplayController {
   }
 
   public DepanFxNodeViewNodeDisplayData getNodeDisplayInfo() {
-    return displayInfo;
+    return displayRsrc.getResource();
   }
 
   public DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData>
       getNodeDisplayResource() {
     return displayRsrc;
-  }
-
-  public void setNodeDisplayInfo(DepanFxNodeViewNodeDisplayData displayInfo) {
-    this.displayInfo = displayInfo;
-    setNodeDisplay();
   }
 
   public void revertNodeDisplay() {
@@ -208,7 +199,7 @@ public class NodeDisplayController {
   public void setNodeDisplayResource(
       DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> displayRsrc) {
     this.displayRsrc = displayRsrc;
-    setNodeDisplayInfo(displayRsrc.getResource());
+    setNodeDisplay();
   }
 
   public int getVisiblityFilterNodeCount(DepanFxBaseFilterData filter) {
@@ -437,6 +428,7 @@ public class NodeDisplayController {
    * Refresh the display group after the display info changes.
    */
   private void refreshDisplayGroup() {
+    DepanFxNodeViewNodeDisplayData displayInfo = getNodeDisplayInfo();
     displayGroup =
         new FilterControl(filterFactory, displayInfo.countFilters());
     displayByFilter = new HashMap<>(displayInfo.countFilters());

@@ -528,7 +528,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
     items.add(new SeparatorMenuItem());
     items.add(DepanFxContextMenuBuilder.createActionItem(
-        DepanFxNodeViewNodeDisplayDialog.EDIT_NODE_DISPLAY,
+        DepanFxNodeViewNodeDisplayDialog.EDIT_NODE_DISPLAY_ITEM,
         e -> runEditNodeDisplayDialog()));
 
     return result;
@@ -770,8 +770,8 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
     Dialog<DepanFxNodeViewNodeVisibilityDialog> visibiltyDlg =
         DepanFxNodeViewNodeVisibilityDialog.runVisibilityDialog(
-            dialogRunner, viewData.getAvailableNodesDoc(),
-            viewData.getVisibleNodeRsrc(), nodeDisplay,
+            dialogRunner, viewData.getAvailableNodeResource(),
+            viewData.getVisibleNodeResource(), nodeDisplay,
             this::updateAvailableNodes);
     visibiltyDlg.getController().getToolResource()
         .ifPresent(this::updateVisibleNodes);
@@ -779,7 +779,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private void updateAvailableNodes(
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> filterSeqRsrc) {
-    viewData.setAvailableNodeRsrc(filterSeqRsrc);
+    viewData.setAvailableNodeResource(filterSeqRsrc);
     edgeDisplay.setMatcherVisibility(null, linkDisplayDirty);
   }
 
@@ -889,8 +889,8 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
         buildSceneData(),
 
-        viewData.getAvailableNodeRsrc(),
-        viewData.getVisibleNodeRsrc(),
+        viewData.getAvailableNodeResource(),
+        viewData.getVisibleNodeResource(),
         nodeDisplay.getNodeDisplayResource(),
         nodeDisplay.getRemainderVisibility(),
         nodeDisplay.getRemainderDisplay(),

@@ -21,10 +21,10 @@ import javafx.scene.paint.Color;
 public class DepanFxNodeViewData extends DepanFxBaseToolData {
 
   public static final DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
-      EMPTY_AVAILABLE_NODES = null;
+      X_EMPTY_AVAILABLE_NODES = null;
 
   public static final DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
-      EMPTY_VISIBLE_NODES = null;
+      X_EMPTY_VISIBLE_NODES = null;
 
   public static final boolean DEFAULT_REMAINDER_NODES_VISIBLE = true;
 
@@ -179,10 +179,21 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   public static DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
   buildAvailableEdgeResource(
       DepanFxWorkspace workspace,
-      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayDocRsrc) {
+      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayRsrc) {
 
     return workspace.addScratchResource(
-        linkDisplayDocRsrc.getResource().asLinkMatcherSequenceDoc());
+        linkDisplayRsrc.getResource().asLinkMatcherSequenceDoc());
+  }
+
+  /**
+   * Provide a minimal available node resource, in case one is missing.
+   */
+  public static DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
+  buildAvailableNodeResource(
+      DepanFxWorkspace workspace,
+      DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> nodeDisplayRsrc) {
+    return workspace.addScratchResource(
+        nodeDisplayRsrc.getResource().asNodeFilterSequenceDoc());
   }
 
   public DepanFxWorkspaceResource<GraphDocument> getGraphDocRsrc() {
@@ -229,47 +240,23 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   // Nodes and Filters
 
   public DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
-      getAvailableNodeRsrc() {
+      getAvailableNodeResource() {
     return availableNodeRsrc;
   }
 
-  public void setAvailableNodeRsrc(
+  public void setAvailableNodeResource(
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableNodeRsrc) {
     this.availableNodeRsrc = availableNodeRsrc;
   }
 
-  /**
-   * Provide filter sequence document for the available nodes.
-   * An implicit result derived from the node display matchers is provided
-   * if the view has not saved its available nodes.
-   */
-  public DepanFxNodeFilterSequenceData getAvailableNodesDoc() {
-    if (availableNodeRsrc != null) {
-      return availableNodeRsrc.getResource();
-    }
-    return nodeDisplayDocRsrc.getResource().asNodeFilterSequenceDoc();
-  }
-
   public DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
-      getVisibleNodeRsrc() {
+      getVisibleNodeResource() {
     return visibleNodeRsrc;
   }
 
   public void setVisibleNodeRsrc(
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc) {
     this.visibleNodeRsrc = visibleNodeRsrc;
-  }
-
-  /**
-   * Provide filter sequence document for the visible nodes.
-   * An implicit result derived from the available filters is used
-   * if the view has not saved its visible nodes.
-   */
-  public DepanFxNodeFilterSequenceData getVisibleNodesDoc() {
-    if (visibleNodeRsrc != null) {
-      return visibleNodeRsrc.getResource();
-    }
-    return getAvailableNodesDoc();
   }
 
   public DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData>

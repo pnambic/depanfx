@@ -4,6 +4,7 @@ import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.nodeview.builtins.DepanFxGraphLinkViewBuiltIns;
@@ -110,8 +111,8 @@ public class DepanFxNodeViews {
 
         viewDoc.getSceneData(),
 
-        viewDoc.getAvailableNodeRsrc(),
-        viewDoc.getVisibleNodeRsrc(),
+        viewDoc.getAvailableNodeResource(),
+        viewDoc.getVisibleNodeResource(),
         viewDoc.getNodeDisplayDocRsrc(),
         viewDoc.getRemainderNodesVisible(),
         viewDoc.getRemainderNodesDisplay(),
@@ -137,15 +138,21 @@ public class DepanFxNodeViews {
       DepanFxWorkspaceResource<DepanFxNodeViewLayoutData> layoutRsrc =
           getContextLayout(workspace, modelId );
 
+      // Nodes
+      DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> nodeDisplayRsrc =
+          getContextNodeDisplay(workspace, modelId);
+      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableNodeRsrc =
+          DepanFxNodeViewData.buildAvailableNodeResource(workspace, nodeDisplayRsrc);
+      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc =
+          availableNodeRsrc;
+
+      // Edges
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayRsrc =
           getContextLinkDisplay(workspace, modelId);
       DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableEdgeRsrc =
           DepanFxNodeViewData.buildAvailableEdgeResource(workspace, linkDisplayRsrc);
-      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgesRsrc =
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc =
           availableEdgeRsrc;
-
-      DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> nodeDisplayRsrc =
-          getContextNodeDisplay(workspace, modelId);
 
     Map<GraphNode, DepanFxNodeLocationData> locations =
         buildNodeLocations(nodes, layoutRsrc);
@@ -153,18 +160,16 @@ public class DepanFxNodeViews {
         buildNodeDisplay(nodes);
     Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay =
         buildEdgeDisplay();
-
     return new DepanFxNodeViewData(viewName, viewDescr,
         graphDocRsrc, nodes, locations, nodeDisplay, edgeDisplay,
 
         sceneData,
-        DepanFxNodeViewData.EMPTY_AVAILABLE_NODES,
-        DepanFxNodeViewData.EMPTY_VISIBLE_NODES,
-        nodeDisplayRsrc,
+
+        availableNodeRsrc, visibleNodeRsrc, nodeDisplayRsrc,
         DepanFxNodeViewData.DEFAULT_REMAINDER_NODES_VISIBLE,
         DepanFxNodeViewData.DEFAULT_REMAINDER_NODE_DISPLAY,
 
-        availableEdgeRsrc, visibleEdgesRsrc, linkDisplayRsrc,
+        availableEdgeRsrc, visibleEdgeRsrc, linkDisplayRsrc,
         DepanFxNodeViewData.DEFAULT_REMAINDER_EDGES_VISIBLE,
         DepanFxNodeViewData.DEFAULT_REMAINDER_EDGES_LABEL,
         DepanFxNodeViewData.DEFAULT_REMAINDER_EDGE_DISPLAY);

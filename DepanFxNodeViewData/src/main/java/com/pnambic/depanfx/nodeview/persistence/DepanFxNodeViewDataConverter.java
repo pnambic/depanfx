@@ -152,9 +152,9 @@ public class DepanFxNodeViewDataConverter
     DepanFxNodeViewData viewData = (DepanFxNodeViewData) source;
 
     DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableNodeRsrc =
-        viewData.getAvailableNodeRsrc();
+        viewData.getAvailableNodeResource();
     DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc =
-        viewData.getVisibleNodeRsrc();
+        viewData.getVisibleNodeResource();
 
     DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableEdgeRsrc =
         viewData.getAvailableEdgeRsrc();
