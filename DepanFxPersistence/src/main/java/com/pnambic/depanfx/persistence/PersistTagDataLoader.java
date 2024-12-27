@@ -3,6 +3,9 @@ package com.pnambic.depanfx.persistence;
 import com.pnambic.depanfx.persistence.xstream.PersistXstreamObjectConverter;
 import com.pnambic.depanfx.xstream.XstreamUnmarshalContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,6 +36,9 @@ public class PersistTagDataLoader {
       return dataType;
     }
   }
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(PersistTagDataLoader.class);
 
   private final Map<String, TagDescriptor> tagDescrips;
 
@@ -68,7 +74,7 @@ public class PersistTagDataLoader {
       }
       srcContext.moveDown();
       TagDescriptor descr = getDescriptor(srcContext.getNodeName());
-      Object loadValue = unmarshalValue(srcContext, descr.getDataType());
+      Object loadValue = unmarshalValue(srcContext, descr);
       srcContext.moveUp();
 
       result.put(descr.getDataTag(), loadValue);
@@ -82,8 +88,20 @@ public class PersistTagDataLoader {
     return tagDescrips.get(loadName);
   }
 
+  /**
+   * Uses lightweight null for bad values on an internal API.
+   * Avoid extra Optional creation for normal case of valid values.
+   * @return {@code null} if unmarshalling fails
+   */
   private Object unmarshalValue(
-      PersistUnmarshalContext srcContext, Class<?> childClass) {
-    return childClass.cast(srcContext.convertAnother(null, childClass));
+      PersistUnmarshalContext srcContext, TagDescriptor descr) {
+    try {
+      Class<?> childClass = descr.getDataType();
+      return childClass.cast(srcContext.convertAnother(null, childClass));
+    } catch (Exception errAny) {
+      LOG.error("Failed to unmarshal value for tag {}",
+          descr.getDataTag(), errAny);
+    }
+    return null;
   }
 }
