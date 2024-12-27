@@ -96,17 +96,15 @@ public class DepanFxNodeKeyColumn
   }
 
   private void openColumnEditor(DepanFxDialogRunner dialogRunner) {
-    DepanFxWorkspaceResource<DepanFxNodeKeyColumnData> columnRsrc =
-        tableAdapter.getWorkspace().addScratchResource(buildEditResource());
     Dialog<DepanFxNodeKeyColumnToolDialog> nodeKeyColumnEditor =
           DepanFxNodeKeyColumnToolDialog.runEditDialog(
-              columnRsrc, dialogRunner);
+              forUpdate(buildEditData()), dialogRunner);
 
     nodeKeyColumnEditor.getController().getToolResource()
         .ifPresent(this::updateColumnDataRsrc);
   }
 
-  private DepanFxNodeKeyColumnData buildEditResource() {
+  private DepanFxNodeKeyColumnData buildEditData() {
     DepanFxNodeKeyColumnData columnData = getColumnData();
 
     int widthMs = (int) Math.round(

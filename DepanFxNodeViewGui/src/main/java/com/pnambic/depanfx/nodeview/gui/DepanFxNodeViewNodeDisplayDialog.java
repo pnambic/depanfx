@@ -299,7 +299,7 @@ public class DepanFxNodeViewNodeDisplayDialog
     DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> srcRcsr =
         displayControl.getNodeDisplayResource();
     DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> toolRsrc =
-        new ForUpdateWorkspaceResource<DepanFxNodeViewNodeDisplayData>(srcRcsr, toolData);
+        DepanFxWorkspaceResource.forUpdate(srcRcsr, toolData);
     displayControl.setNodeDisplayResource(toolRsrc);
   }
 

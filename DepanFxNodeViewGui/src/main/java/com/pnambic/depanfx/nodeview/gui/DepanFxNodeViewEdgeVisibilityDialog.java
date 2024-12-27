@@ -312,10 +312,12 @@ public class DepanFxNodeViewEdgeVisibilityDialog
 
   @FXML
   private void handleSaveAvailableEdges() {
+    DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> updateRsrc =
+        DepanFxWorkspaceResource.forUpdate(
+            availableMatchersRsrc, prepareAvailableEdgedResult());
     Dialog<DepanFxLinkMatcherSequenceToolDialog> saveAvailDlg =
         DepanFxLinkMatcherSequenceToolDialog.runCreateDialog(
-            workspace.addScratchResource(prepareAvailableEdgedResult()),
-            dialogRunner);
+            updateRsrc, dialogRunner);
 
     saveAvailDlg.getController().getToolResource()
         .ifPresent(this::updateAvailableEdges);

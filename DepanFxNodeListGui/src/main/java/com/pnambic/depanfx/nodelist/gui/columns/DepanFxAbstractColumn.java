@@ -56,6 +56,10 @@ public abstract class DepanFxAbstractColumn<T extends DepanFxBaseColumnData>
     return columnDataRsrc.getDocument();
   }
 
+  public DepanFxWorkspaceResource<T> forUpdate(T updateInfo) {
+    return DepanFxWorkspaceResource.forUpdate(columnDataRsrc, updateInfo);
+  }
+
   public double getWidthPx() {
     return DepanFxSceneControls.layoutWidthMs(getWidthMs());
   }

@@ -215,11 +215,9 @@ public class DepanFxCategoryColumn
   private void openColumnEditor(
       DepanFxDialogRunner dialogRunner,
       DepanFxNodeListTableAdapter tableAdapter) {
-    DepanFxWorkspaceResource<DepanFxCategoryColumnData> columnRsrc =
-        tableAdapter.getWorkspace().addScratchResource(buildEditData());
     Dialog<DepanFxCategoryColumnToolDialog> categoryColumnDlg =
         DepanFxCategoryColumnToolDialog.runEditDialog(
-            columnRsrc, dialogRunner, tableAdapter);
+            forUpdate(buildEditData()), dialogRunner, tableAdapter);
 
     categoryColumnDlg.getController().getToolResource()
         .ifPresent(this::updateColumnDataRsrc);

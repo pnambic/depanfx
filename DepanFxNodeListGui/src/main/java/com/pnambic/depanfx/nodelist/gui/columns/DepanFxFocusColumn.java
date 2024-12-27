@@ -204,11 +204,9 @@ public class DepanFxFocusColumn
   }
 
   private void openColumnEditor(DepanFxDialogRunner dialogRunner) {
-    DepanFxWorkspaceResource<DepanFxFocusColumnData> columnRsrc =
-        tableAdapter.getWorkspace().addScratchResource(buildEditData());
     Dialog<DepanFxFocusColumnToolDialog> focusColumnDlg =
           DepanFxFocusColumnToolDialog.runEditDialog(
-              columnRsrc, dialogRunner);
+              forUpdate(buildEditData()), dialogRunner);
 
     focusColumnDlg.getController().getToolResource()
         .ifPresent(this::updateColumnDataRsrc);

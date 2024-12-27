@@ -327,10 +327,12 @@ public class DepanFxNodeViewNodeVisibilityDialog
 
   @FXML
   private void handleSaveAvailableNodes() {
+    DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> updateRsrc =
+        DepanFxWorkspaceResource.forUpdate(
+            availableFilterRsrc, prepareAvailableNodesResult());
     Dialog<DepanFxNodeFilterSequenceToolDialog> saveAvailDlg =
         DepanFxNodeFilterSequenceToolDialog.runCreateDialog(
-            workspace.addScratchResource(prepareAvailableNodesResult()),
-            dialogRunner);
+            updateRsrc, dialogRunner);
 
     saveAvailDlg.getController().getToolResource()
         .ifPresent(this::updateAvailableNodes);
