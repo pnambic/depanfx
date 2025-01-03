@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>Installation - DepanFX User Documentation</title>
+        <title>Congratuations - DepanFX User Documentation</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../css/brands.min.css" rel="stylesheet">
@@ -46,7 +46,7 @@
 </li>
                                     
 <li>
-    <a href="./" class="dropdown-item active" aria-current="page">Installation</a>
+    <a href="../Installation/" class="dropdown-item">Installation</a>
 </li>
                                     
 <li>
@@ -66,7 +66,7 @@
 </li>
                                     
 <li>
-    <a href="../Summary/" class="dropdown-item">Congratuations</a>
+    <a href="./" class="dropdown-item active" aria-current="page">Congratuations</a>
 </li>
                                 </ul>
                             </li>
@@ -79,12 +79,12 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../Welcome/" class="nav-link">
+                                <a rel="prev" href="../NodeViewPanel/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../GettingStarted/" class="nav-link">
+                                <a rel="next" class="nav-link disabled">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -106,17 +106,13 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-bs-level="1"><a href="#installation-guide" class="nav-link">Installation Guide</a>
+            <li class="nav-item" data-bs-level="1"><a href="#congratulations" class="nav-link">Congratulations</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#system-requirements" class="nav-link">System Requirements</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#installing-from-a-distribution" class="nav-link">Installing from a distribution</a>
+            <li class="nav-item" data-bs-level="2"><a href="#depanfx-concepts" class="nav-link">DepanFX Concepts</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#installation-from-github" class="nav-link">Installation from GitHub</a>
+            <li class="nav-item" data-bs-level="2"><a href="#other-thing-to-explore" class="nav-link">Other Thing To Explore</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -127,66 +123,39 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="installation-guide">Installation Guide</h1>
-<h2 id="system-requirements">System Requirements</h2>
-<p>DepanFX is built to run with Java 21.
-In order to run DepanFX successfully, a valid Java 21 installation
-should be available from the command line.</p>
-<pre><code class="language-bash">$ java -version
-openjdk version &quot;21.0.2&quot; 2024-01-16 LTS
-OpenJDK Runtime Environment Temurin-21.0.2+13 (build 21.0.2+13-LTS)
-OpenJDK 64-Bit Server VM Temurin-21.0.2+13 (build 21.0.2+13-LTS, mixed mode, sharing)
-</code></pre>
-<p>What you enter: <code>java -version</code>.  What is essential: <code>21</code> (or better).</p>
-<p>DepanFX can be a memory hog.  The analysis of large systems requires tracking many components.</p>
-<p>Node views expect to use OpenGL for rendering.</p>
-<h2 id="installing-from-a-distribution">Installing from a distribution</h2>
-<p>DepanFX is distributed as a GitHub release artifact.
-The DepanFX distribution is provided as a zip file that you can download and unzip for use.</p>
-<p>The lastest DepanFX releases are listed on the main
-<a href="https://github.com/pnambic/depanfx/">depanfx</a> GitHub page.
-The full list of available releases are accessible on the
-<a href="https://github.com/pnambic/depanfx/releases">GitHub Releases</a> page.</p>
-<ol>
-<li>Download the zip distribution file from the depanfx GitHub page.
-   <img alt="DepanFX releases" src="../img/Depan%20Releases%20marked.png" title="Available DepanFX releases" /></li>
-<li>Unzip the distribution file into an installation folder.
-   The Application directory can be a good choice.
-   The distribution file unpacks into a couple of top-level directories
-   (<code>./bin</code>, <code>./lib</code>) under the name of the zip file.</li>
-<li>Start DepanFX by starting the DepanFX command file.
-   This is the <code>DepanFxApp</code> command file under the <code>bin</code> directory.
-   <img alt="DepanFX releases" src="../img/Depan%20Start%20marked.png" title="Available DepanFX releases" />
-   <br/>For windows, double click on the <code>DepanFxApp.bat</code> file.
-   For Unix, Linux, cygwin, and related platforms, run the <code>./DepanFxApp</code> command file.</li>
-</ol>
-<p>Assuming a compatible Java can be located, DepanFX should open the first time
-with a Welcome window and the Workspace tab showing in the main editor frame.
-<img alt="DepanFX initial startup" src="../../img/Depan%20Startup.png" title="Welcome from Code Inspector Gonzo" /></p>
-<p>You should be greeted with the welcoming gaze of Code Inspector (CI) Gonzo,
-the mascot for DepanFX.</p>
-<h2 id="installation-from-github">Installation from GitHub</h2>
-<p>Installation from GitHub requires building the application from source.
-This should be straightforward if a Java 21 or higher SDK is available.</p>
-<p>The OpenJDK for Java 21 (and others) is available at <a href="https://jdk.java.net/java-se-ri/21">https://jdk.java.net/java-se-ri/21</a>.</p>
-<p>In addition to the SDK’s basic build tools, DepanFX is built with Gradle 8.6.
-Gradle 8.6 is available at
-<a href="https://gradle.org/next-steps/?version=8.6&amp;format=bin">https://gradle.org/next-steps/?version=8.6&amp;format=bin</a>.</p>
-<p>With these tools in place, installation from GitHub should involve these steps.</p>
-<ol>
-<li>Clone the source code from the repository.</li>
-<li>Change directory into the clone.</li>
-<li>Use gradle to build and run depanfx.</li>
-</ol>
-<pre><code class="language-bash">$ git clone https://github.com/pnambic/depanfx.git
-$ cd depanfx
-$ ./gradlew run
-</code></pre>
-<p>Assuming compatible tooling can be located, DepanFX should open the first time
-with a Welcome window and the Workspace tab showing in the main editor frame.
-<img alt="DepanFX initial startup" src="../../img/Depan%20Startup.png" title="Welcome from Code Inspector Gonzo" /></p>
-<p>You should be greeted with the welcoming gaze of Code Inspector (CI) Gonzo,
-the mascot for DepanFX.</p></div>
+<h1 id="congratulations">Congratulations</h1>
+<p>You've complete a quick tour of DepanFX!</p>
+<h2 id="depanfx-concepts">DepanFX Concepts</h2>
+<p>This Getting Started guide introduced a number of DepanFX's basic concepts and features.</p>
+<ul>
+<li>Work within DepanFX is based on a session that contains projects.</li>
+<li>Dependency graphs can be constructed from various sources.</li>
+<li>Node lists allow you to focus on the components of interest.</li>
+<li>Node view provide flexible rendering of nodes and their relationships.</li>
+<li>The Built-In project provides a number of artifacts for general use.</li>
+</ul>
+<h3 id="panel-types">Panel Types</h3>
+<p>DepenFX provides four main panel types:</p>
+<ul>
+<li>The Welcome panel: provides a cheery welcome to DepanFX.</li>
+<li>The Workspace panel: presents a collection of projects.</li>
+<li>The Node List panel: displays a list of nodes from a dependency graph.</li>
+<li>The Node View panel: displays a diagram of the nodes and their relationships.</li>
+</ul>
+<h3 id="file-types">File Types</h3>
+<p>DepanFX uses many different file types to store data.
+Mostly, the UX will guide your use of these file types with the proper context.
+Regardless, it can be good to know what you are looking at</p>
+<ul>
+<li><code>.dgi</code> - Dependency Graphs</li>
+<li><code>.dnli</code> - Node Lists</li>
+<li><code>.dnvi</code> - Node Lists</li>
+</ul>
+<h2 id="other-thing-to-explore">Other Thing To Explore</h2>
+<p>This simple getting started guide provides only a quick once over
+of the major components in DepanFX.
+More information on each of these components is available in other
+User Manual sections that are specific to the available features.</p></div>
             </div>
         </div>
 

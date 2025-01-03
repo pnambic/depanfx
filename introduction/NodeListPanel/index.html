@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Node List Panel - DepanFX User Documentation</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">DepanFX User Documentation</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Introduction</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../Welcome/" class="dropdown-item">Welcome</a>
+</li>
+                                    
+<li>
+    <a href="../Installation/" class="dropdown-item">Installation</a>
+</li>
+                                    
+<li>
+    <a href="../GettingStarted/" class="dropdown-item">Getting Started</a>
+</li>
+                                    
+<li>
+    <a href="../SaveTheSession/" class="dropdown-item">Save The Session</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">Node List Panel</a>
+</li>
+                                    
+<li>
+    <a href="../NodeViewPanel/" class="dropdown-item">Node View Panel</a>
+</li>
+                                    
+<li>
+    <a href="../Summary/" class="dropdown-item">Congratuations</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../SaveTheSession/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../NodeViewPanel/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#using-node-list-panel" class="nav-link">Using Node List Panel</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#opening-a-node-list-panel" class="nav-link">Opening A Node List Panel</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#expanding-node-list-sections-and-children" class="nav-link">Expanding Node List Sections and Children</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#selecting-interesting-nodes" class="nav-link">Selecting Interesting Nodes</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#saving-interesting-nodes" class="nav-link">Saving Interesting Nodes</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#other-things-to-explore" class="nav-link">Other Things To Explore</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="using-node-list-panel">Using Node List Panel</h1>
+<p>Returning to the workspace, our next goal is to visualize the nodes of the
+HelloWorld application and select the Java components.<br />
+<img alt="Workspace with HelloWorld dependency graph" src="../img/Workspace%20HelloWorld.png" title="Workspace with HelloWorld dependency graph" /><br/>
+The Node List panel displays the nodes of a dependency graph
+in tabular form.
+It provides powerful display mechanisms grouping and organizing the nodes
+ of a large system.
+The presentation of the nodes is very flexible,
+with nodes grouped into user defined sections
+and various details available in user defined columns.
+The structure and nesting of nodes is defined by your selection of interesting relationships.</p>
+<h2 id="opening-a-node-list-panel">Opening A Node List Panel</h2>
+<p>The node list panel provides a tabular view of nodes from a dependency graph.
+The node list is often a subset of all the nodes in a dependency graph.
+The analysis tools for dependency graphs (i.e. <code>.dgi</code> files) start
+with a node list for all nodes in the graph.
+Although DepanFX is comfortable with these large dependency graphs,
+it can be daunting to start with everything.</p>
+<p>For this introductory step, you will use the node list panel to select the
+core Java components from the Hello, World applications.
+Other components discovered during dependency graphs construction,
+such as file system artifacts,
+can be ignored for Java focused analyzes.</p>
+<p>The Node List panel provides a compact and scalable presentation of selected nodes.
+It is a presentation mechanism that is reused throughout DepanFX.
+The ability to select and flexibly organize nodes is a key feature of DepanFX.</p>
+<p>Although the HelloWorld example is not so overwhelming,
+the node list panel is still a good place to start with DepanFX's features.</p>
+<p>Right click on the <code>Hello World yyyyMMddhhmm.dgi</code> file to open the context menu,
+and select the Open As Node List menu item.<br />
+<img alt="Open HelloWorld menu" src="../img/Open%20Hello%20World%20menu.png" title="Open Hello World menu" /><br/>
+(You can also double click on the file to open it into a node list panel,
+since that is the default action.)</p>
+<h2 id="expanding-node-list-sections-and-children">Expanding Node List Sections and Children</h2>
+<p>A new Node List Table tab will appear in the Editor region.
+Selecting the new tab will show the node list table in the Editor region.
+After opening the Tree and flat sections of the node list table,
+the DepanFX node list table should resemble the following:<br />
+<img alt="Hello World Node List Table" src="../img/Hello%20World%20Node%20List.png" title="Hello World Node List Table" /></p>
+<p>Although the Node List Table structure is quite flexible,
+the initial structure provides a tree section based on membership,
+and a flat section that holds any left over nodes.
+There are two columns, one that shows the name of each node and
+one that shows the node kind for each node.</p>
+<p>Opening the Tree section of the node list table shows 5 top level trees.
+The HelloWorld node of type Document and the java node of type Directory
+are inferred elements based on the dependency source.
+These trees can be ignored.</p>
+<p>The most interesting Java elements are in the two nodes of type Package.
+The <code>com</code> node contains the elements of the Hello, World implementation.
+The <code>java</code> node contains the Java elements that the implementation code relied upon.
+You can expand these elements by using the Expand Children menu item from their context menu
+(right mouse click).<br />
+<img alt="Hello World Node List Expand Children" src="../img/Hello%20World%20Node%20List%20Expand%20Children.png" title="Hello World Node List Expand Children" /></p>
+<p>The three nodes under the flat section are components that do not have
+any of relations included in the tree section.
+By default, the Java tree section uses the built-in membership relations from
+the File System container relationships
+and Java package member relationships.
+These do not include the relations from Java's module components.
+For a simple rendering of Java components, these elements can be ignored.</p>
+<h2 id="selecting-interesting-nodes">Selecting Interesting Nodes</h2>
+<p>The dependency graph construction processes strives for comprehensiveness,
+and gathers as many nodes and relationships as feasible from its data sources.
+This allows for the widest range for later analyzes,
+but most analyzes are only interested in a subset of the nodes and the relations.
+For this introduction, we are focusing on the Java components of the Hello, World application.</p>
+<p>The previous step expanded the component trees for all of the Java components.
+These can be selected individually by clicking the select box.
+Entire trees of components can be selected with the <code>Select Recursive</code> menu item.</p>
+<p>Right click on the <code>com</code> node, and select the <code>Select Recursive</code> menu item.<br />
+<img alt="Hello World Node List Select Recursive" src="../img/Hello%20World%20Node%20List%20Select%20Recursive.png" title="Hello World Node List Select Recursive" /><br/>
+This action adds the entire tree of software components to the current selection.</p>
+<p>Right click on the <code>java</code> node of type <code>Package</code>,
+and do the same - select the <code>Select Recursive</code> menu item.
+These items will be the focus of our further analysis.<br />
+<img alt="Hello World Node List Java Components" src="../img/Hello%20World%20Node%20List%20Java%20Components.png" title="Hello World Node List Java Components" /></p>
+<h2 id="saving-interesting-nodes">Saving Interesting Nodes</h2>
+<p>The current set of selected nodes can be saved as a node list.
+This allows future analysis to use the same starting point consistently.
+It captures the state of analysis,
+and can be combined with other node list to offer insights on the structure of the system.</p>
+<p>In order to save the table’s selected nodes as a new node list,
+use the context menu from the Node List Table tab.<br />
+<img alt="Hello World Node List Save Selection" src="../img/Hello%20World%20Node%20List%20Save%20Selection.png" title="Hello World Node List Save Selection" /><br/>
+The Save Node List option (towards the bottom),
+brings up the Node List Save dialog box.<br />
+<img alt="Hello World Node List Save Dialog" src="../img/Hello%20World%20Node%20List%20Save%20Dialog.png" title="Hello World Node List Save Dialog" /><br/>
+This dialog box allows you to name the node list,
+provide a description, and set the destination file for the node list.</p>
+<p>By recommended best practices, node lists are placed into the Analyzes directory.<br />
+<img alt="Hello World Node List Save Chooser" src="../img/Hello%20World%20Node%20List%20Save%20Chooser.png" title="Hello World Node List Save Chooser" /><br/>
+This helps separate graphs from different analysis efforts.
+Complex analyzes may benefit from additional substructure and directories
+within the Analyzes directory.</p>
+<p>After saving the node list, there will be a new document under the Analyzes directory.<br />
+<img alt="Hello World Node List in Analyzes" src="../img/Hello%20World%20Node%20List%20in%20Analyzes.png" title="Hello World Node List in Analyzes" /></p>
+<p>The file <code>Hello World Java components yyyyMMddhhmm.dnli</code> lists the nodes that are Java components.
+The relationships between the nodes remain in the dependency graph and are accessible when needed.</p>
+<p>If you select the new file in the Analyzes directory and select the Open As Node List menu item,
+a new tab appears in the Editor tab panel.<br />
+<img alt="Hello World Node List in Panel" src="../img/Hello%20World%20Node%20List%20in%20Panel.png" title="Hello World Node List in Panel" /><br/></p>
+<p>As before, selecting the tab will show a node list table in the Editor region.
+This table will have only 16 nodes, consisting entirely of the Java components.</p>
+<h2 id="other-things-to-explore">Other Things To Explore</h2>
+<p>The node list panel provides selection, grouping, and presentation capabilities.
+The node list panel is widely used in other components to present tabular
+data for their interesting nodes.</p>
+<p>There are multiple ways to manipulate the current section.
+The panel's <code>Filter Selection...</code> menu item provides access to
+the powerful capabilities of node filters.</p>
+<p>The node list panel can present a variety of information about each node.
+The panel's <code>Table View &gt; Add Column &gt;</code> menu allows for the addition of
+columnar data.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
