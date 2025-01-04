@@ -53,7 +53,7 @@ public class DepanFxResourceConfiguration {
 
     @Override
     public boolean acceptsPath(Path rsrcPath) {
-      return DepanFxProjects.ANALYSES_PATH.equals(rsrcPath);
+      return DepanFxProjects.ANALYZES_PATH.equals(rsrcPath);
     }
 
     @Override

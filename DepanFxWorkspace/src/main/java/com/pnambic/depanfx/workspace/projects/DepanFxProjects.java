@@ -18,14 +18,14 @@ public class DepanFxProjects {
 
   public static final String BUILT_IN = "Built-in";
 
-  public static final String ANALYSES_CONTAINER = "Analyses";
+  public static final String ANALYZES_CONTAINER = "Analyzes";
 
   public static final String GRAPHS_CONTAINER = "Graphs";
 
   public static final String TOOLS_CONTAINER = "Tools";
 
-  public static final Path ANALYSES_PATH =
-      new File(ANALYSES_CONTAINER).toPath();
+  public static final Path ANALYZES_PATH =
+      new File(ANALYZES_CONTAINER).toPath();
 
   public static final Path GRAPHS_PATH =
       new File(GRAPHS_CONTAINER).toPath();
@@ -41,7 +41,7 @@ public class DepanFxProjects {
       DepanFxProjectTree projectTree, DepanFxProjectSpi projectSpi) {
     try {
       projectSpi.checkProjectForNew();
-      createChildContainer(projectTree, projectSpi, ANALYSES_CONTAINER);
+      createChildContainer(projectTree, projectSpi, ANALYZES_CONTAINER);
       createChildContainer(projectTree, projectSpi, GRAPHS_CONTAINER);
       createChildContainer(projectTree, projectSpi, TOOLS_CONTAINER);
     } catch (Exception errAny) {
@@ -59,9 +59,9 @@ public class DepanFxProjects {
     return getCurrentDir(workspace, GRAPHS_CONTAINER);
   }
 
-  public static Optional<DepanFxProjectContainer> getCurrentAnalysesDir(
+  public static Optional<DepanFxProjectContainer> getCurrentAnalyzesDir(
       DepanFxWorkspace workspace) {
-    return getCurrentDir(workspace, ANALYSES_CONTAINER);
+    return getCurrentDir(workspace, ANALYZES_CONTAINER);
   }
 
   public static Optional<DepanFxProjectContainer> getCurrentToolsDir(
@@ -85,9 +85,9 @@ public class DepanFxProjects {
     return getCurrentPath(workspace, GRAPHS_CONTAINER);
   }
 
-  public static Optional<Path> getCurrentAnalysesPath(
+  public static Optional<Path> getCurrentAnalyzesPath(
       DepanFxWorkspace workspace) {
-    return getCurrentPath(workspace, ANALYSES_CONTAINER);
+    return getCurrentPath(workspace, ANALYZES_CONTAINER);
   }
 
   public static Optional<Path> getCurrentToolsPath(
@@ -110,9 +110,9 @@ public class DepanFxProjects {
     return getActivePath(workspace, GRAPHS_PATH);
   }
 
-  public static Path getActiveAnalysesPath(
+  public static Path getActiveAnalyzesPath(
       DepanFxWorkspace workspace) {
-    return getActivePath(workspace, ANALYSES_PATH);
+    return getActivePath(workspace, ANALYZES_PATH);
   }
 
   public static Path getActiveToolsPath(
@@ -134,7 +134,7 @@ public class DepanFxProjects {
   }
 
   public static File getCurrentAnalyzes(DepanFxWorkspace workspace) {
-    return getCurrent(workspace, ANALYSES_CONTAINER);
+    return getCurrent(workspace, ANALYZES_CONTAINER);
   }
 
   public static File getCurrentTools(DepanFxWorkspace workspace) {

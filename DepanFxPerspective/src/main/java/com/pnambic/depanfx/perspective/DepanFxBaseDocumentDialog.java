@@ -111,7 +111,7 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
   protected File buildAnalysisInitialDestination(String targetExt) {
     return DepanFxWorkspaceFactory.bestDocumentFile(
         getDocumentName(), targetExt, workspace,
-        DepanFxProjects.getActiveAnalysesPath(workspace),
+        DepanFxProjects.getActiveAnalyzesPath(workspace),
         DepanFxProjects.getCurrentAnalyzes(workspace));
   }
 
@@ -119,8 +119,8 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
       DepanFxProjectDocument relatedDoc, String targetExt) {
     Path initialDir = relatedDoc.getParent()
         .map(c -> c.getMemberPath())
-        .filter(p -> p.startsWith(DepanFxProjects.ANALYSES_PATH))
-        .orElse(DepanFxProjects.getActiveAnalysesPath(workspace));
+        .filter(p -> p.startsWith(DepanFxProjects.ANALYZES_PATH))
+        .orElse(DepanFxProjects.getActiveAnalyzesPath(workspace));
 
     return DepanFxWorkspaceFactory.bestDocumentFile(
         getDocumentName(), targetExt, workspace, initialDir,
