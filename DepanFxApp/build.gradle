@@ -39,6 +39,20 @@ dependencies {
   implementation project(':DepanFxWorkspace')
   implementation project(':DepanFxWorkspaceGui')
 
+  // Cross platform "fat" jar
+  runtimeOnly "org.openjfx:javafx-base:$javafx.version:win"
+  runtimeOnly "org.openjfx:javafx-base:$javafx.version:linux"
+  runtimeOnly "org.openjfx:javafx-base:$javafx.version:mac"
+  runtimeOnly "org.openjfx:javafx-controls:$javafx.version:win"
+  runtimeOnly "org.openjfx:javafx-controls:$javafx.version:linux"
+  runtimeOnly "org.openjfx:javafx-controls:$javafx.version:mac"
+  runtimeOnly "org.openjfx:javafx-fxml:$javafx.version:win"
+  runtimeOnly "org.openjfx:javafx-fxml:$javafx.version:linux"
+  runtimeOnly "org.openjfx:javafx-fxml:$javafx.version:mac"
+  runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:win"
+  runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:linux"
+  runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:mac"
+
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
