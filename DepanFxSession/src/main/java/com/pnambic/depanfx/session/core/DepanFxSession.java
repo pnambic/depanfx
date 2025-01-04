@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,40 +56,13 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
 
   private Closeable onClose;
 
-  public static void startSession(
-      Stage stage, DepanFxSession session, DepanFxSessionConfig sessionConfig)
+  private Path sessionPath;
+
+  private DepanFxSessionConfig sessionConfig;
+
+  public static void startSession(Stage stage, DepanFxSession session)
       throws Exception {
-    // Projects are installed during deserialization.
-    // Set the current project.
-    session.setCurrentProject(sessionConfig.getCurrentProjectName());
-
-    // Start scenes after full workspace context restored.
-    startScenes(stage, session, sessionConfig.getSceneConfigs());
-  }
-
-  private static void startScenes(
-      Stage stage,
-      DepanFxSession session,
-      Collection<DepanFxSceneConfig> scenes)
-      throws Exception {
-
-    Iterator<DepanFxSceneConfig> sceneSeq = scenes.iterator();
-
-    if (!sceneSeq.hasNext()) {
-      session.addScene(stage, EMPTY_SESSION_SCENE);
-      return;
-    }
-
-    // Start the first scene on the initial stage.
-    DepanFxSceneConfig baseScene = sceneSeq.next();
-    session.addScene(stage, baseScene);
-
-    // Start additional scenes on secondary stages.
-    while (sceneSeq.hasNext()) {
-      DepanFxSceneConfig sceneInfo = sceneSeq.next();
-      Stage sceneStage = new Stage();
-      session.addScene(sceneStage, sceneInfo);
-    }
+    session.startSession(stage);
   }
 
   @Autowired
@@ -100,6 +74,22 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
 
   public void setOnClose(Closeable onClose) {
     this.onClose = onClose;
+  }
+
+  public Path getSessionPath() {
+    return sessionPath;
+  }
+
+  public void setSessionPath(Path sessionPath) {
+    this.sessionPath = sessionPath;
+  }
+
+  public void setSessionConfig(DepanFxSessionConfig sessionConfig) {
+    this.sessionConfig = sessionConfig;
+    setCurrentProject(sessionConfig.getCurrentProjectName());
+
+    // Populate sceneMap when session is started.
+    sceneMap.clear();
   }
 
   public DepanFxWorkspace getWorkspace() {
@@ -114,18 +104,31 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
     return sceneMap.values();
   }
 
-  public void addScene(Stage stage, DepanFxSceneConfig sceneConfig)
-      throws Exception {
-    DepanFxSceneController scene = DepanFxSceneController.createDepanScene(
-        dialogRunner, sceneConfig.getViewers(), this);
-    sceneMap.put(scene, sceneConfig);
+  /**
+   * Start the UX session using a {@link Stage} that is provided by
+   * the framework.  If additional {@link Stage}s are needed for additional
+   * scenes, they are created as needed.
+   */
+  public void startSession(Stage stage) throws Exception {
 
-    positionScreen(stage, sceneConfig);
+    Iterator<DepanFxSceneConfig> sceneSeq =
+        sessionConfig.getSceneConfigs().iterator();
 
-    stage.setTitle("DepanFX");
-    DepanFxAppIcons.installDepanIcons(stage.getIcons());
-    stage.setScene(scene.getScene());
-    stage.show();
+    if (!sceneSeq.hasNext()) {
+      addScene(stage, EMPTY_SESSION_SCENE);
+      return;
+    }
+
+    // Start the first scene on the initial stage.
+    DepanFxSceneConfig baseScene = sceneSeq.next();
+    addScene(stage, baseScene);
+
+    // Start additional scenes on secondary stages.
+    while (sceneSeq.hasNext()) {
+      DepanFxSceneConfig sceneInfo = sceneSeq.next();
+      Stage sceneStage = new Stage();
+      addScene(sceneStage, sceneInfo);
+    }
   }
 
   public void addScene(DepanFxSceneConfig sceneInfo)
@@ -153,6 +156,20 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
     } catch (IOException errIo) {
       // Something better ..
     }
+  }
+
+  private void addScene(Stage stage, DepanFxSceneConfig sceneConfig)
+      throws Exception {
+    DepanFxSceneController scene = DepanFxSceneController.createDepanScene(
+        dialogRunner, sceneConfig.getViewers(), this);
+    sceneMap.put(scene, sceneConfig);
+
+    positionScreen(stage, sceneConfig);
+
+    stage.setTitle("DepanFX");
+    DepanFxAppIcons.installDepanIcons(stage.getIcons());
+    stage.setScene(scene.getScene());
+    stage.show();
   }
 
   private void positionScreen(Stage stage, DepanFxSceneConfig sceneConfig) {

@@ -29,7 +29,7 @@
 
          <HBox spacing="10">
             <TextField fx:id="destinationField"
-                  editable="false" promptText="No file selected"
+                  editable="true" promptText="No file selected"
                   HBox.hgrow="ALWAYS"/>
             <Button text="Browse" onAction="#openFileChooser"
                   HBox.hgrow="ALWAYS"/>

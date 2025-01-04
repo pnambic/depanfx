@@ -3,7 +3,6 @@ package com.pnambic.depanfx.app;
 import com.pnambic.depanfx.DepanFxApplication;
 import com.pnambic.depanfx.session.core.DepanFxSession;
 import com.pnambic.depanfx.session.core.DepanFxSessionCliArgs;
-import com.pnambic.depanfx.session.core.DepanFxSessionConfig;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -20,8 +19,6 @@ public class DepanFxApp extends Application implements Closeable {
 
   private DepanFxSession session;
 
-  private DepanFxSessionConfig sessionConfig;
-
   private ConfigurableApplicationContext applicationContext;
 
   @Override
@@ -33,7 +30,7 @@ public class DepanFxApp extends Application implements Closeable {
   public void start(Stage stage) throws Exception {
     Platform.setImplicitExit(true);
 
-    DepanFxSession.startSession(stage, session, sessionConfig);
+    session.startSession(stage);
   }
 
   @Override
@@ -70,6 +67,8 @@ public class DepanFxApp extends Application implements Closeable {
 
     DepanFxSessionCliArgs sessionArgs =
         applicationContext.getBean(DepanFxSessionCliArgs.class);
-    this.sessionConfig = sessionArgs.getSessionConfig();
+    session.setSessionConfig(sessionArgs.getSessionConfig());
+    sessionArgs.getSessionPath()
+        .ifPresent(session::setSessionPath);
   }
 }

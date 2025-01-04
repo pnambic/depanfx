@@ -23,6 +23,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * Configure the session startup information form the command line.
@@ -38,6 +39,8 @@ public class DepanFxSessionCliArgs implements ApplicationRunner {
   private final DepanFxSessionDataTransport transport;
 
   private DepanFxSessionConfig sessionConfig;
+
+  private Path sessionPath;
 
   @Autowired
   private DepanFxSessionCliArgs(
@@ -61,15 +64,19 @@ public class DepanFxSessionCliArgs implements ApplicationRunner {
     sessionConfig = transport.defaultSessionConfig();
   }
 
-  private DepanFxSessionConfig restoreSession(String sessionSrc) {
-    Path sessionPath = Path.of(sessionSrc);
-    return transport.loadSessionConfig(sessionPath);
-  }
-
   public DepanFxSessionConfig getSessionConfig() {
     if (sessionConfig != null) {
       return sessionConfig;
     }
     return DepanFxSessionConfig.EMPTY_SESSION_DATA;
+  }
+
+  public Optional<Path> getSessionPath() {
+    return Optional.ofNullable(sessionPath);
+  }
+
+  private DepanFxSessionConfig restoreSession(String sessionSrc) {
+    sessionPath = Path.of(sessionSrc);
+    return transport.loadSessionConfig(sessionPath);
   }
 }

@@ -31,6 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.text.MessageFormat;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -40,7 +42,14 @@ import javafx.stage.Stage;
 
 @Component
 @FxmlView("session-save-dialog.fxml")
+/**
+ * A small cheat:  Since their is only one session and it its controlled by
+ * dependency injection, use the injected value.  The managed session is never
+ * passed to the dialog controller via a setter.
+ */
 public class DepanFxSessionSaveDialog {
+
+  private static final String BLANK_DESTINATION = "";
 
   private final DepanFxSession session;
 
@@ -58,7 +67,7 @@ public class DepanFxSessionSaveDialog {
       DepanFxSessionDataTransport transport) {
     this.session = session;
     this.transport = transport;
-    }
+  }
 
   public static Dialog<DepanFxSessionSaveDialog> runSaveSessionDialog(
       DepanFxDialogRunner dialogRunner) {
@@ -66,6 +75,12 @@ public class DepanFxSessionSaveDialog {
         dialogRunner.createDialogAndParent(DepanFxSessionSaveDialog.class);
     dlg.runDialog("Save Session");
     return dlg;
+  }
+
+  @FXML
+  public void initialize() {
+    sessionDetailsLabel.setText(buildSessionDetails());
+    destinationField.setText(buildDestinationPath());
   }
 
   @FXML
@@ -96,7 +111,9 @@ public class DepanFxSessionSaveDialog {
     closeDialog();
 
     File dstFile = new File(destinationField.getText());
-    transport.saveSession(dstFile.toPath(), session);
+    Path dstPath = dstFile.toPath();
+    transport.saveSession(dstPath, session);
+    session.setSessionPath(dstPath);
   }
 
   private void closeDialog() {
@@ -115,6 +132,37 @@ public class DepanFxSessionSaveDialog {
     result.setSelectedExtensionFilter(DepanFxSessionDataTransport.XML_FILTER);
 
     return result;
+  }
+
+  private String buildSessionDetails() {
+    StringBuilder result = new StringBuilder();
+
+    int sceneCount = session.getScenes().size();
+    if (sceneCount == 1) {
+      result.append("The active session has 1 scene");
+    } else {
+      result.append(MessageFormat.format(
+          "The active session has {0} scenes", sceneCount));
+    }
+
+    // Don't include the built-in project.
+    int projectCount = session.getWorkspace().getProjectList().size() - 1;
+    if (projectCount == 1) {
+      result.append(" and the workspace has a single project.");
+    } else {
+      result.append(MessageFormat.format(
+          " and the workspace has {0} projects.", projectCount));
+    }
+
+    return result.toString();
+  }
+
+  private String buildDestinationPath() {
+    Path sessionPath = session.getSessionPath();
+    if (sessionPath != null) {
+      return sessionPath.toAbsolutePath().toString();
+    }
+    return BLANK_DESTINATION;
   }
 
   private String buildTimestampName(String prefix, String ext) {
