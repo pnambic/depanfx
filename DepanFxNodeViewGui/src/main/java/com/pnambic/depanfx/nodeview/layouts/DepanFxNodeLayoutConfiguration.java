@@ -4,6 +4,7 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewPanel;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry.Contribution;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,9 @@ import javafx.event.ActionEvent;
 
 @Configuration
 public class DepanFxNodeLayoutConfiguration {
+
+  public static final Path NODE_LAYOUT_PATH =
+      DepanFxNodeViewData.NODE_VIEW_TOOL_PATH.resolve("Layouts");
 
   private static final String GRID_LAYOUT = "Grid Layout";
 
