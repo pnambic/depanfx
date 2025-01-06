@@ -39,9 +39,13 @@ public class RichLineRender implements LineRender {
 
   private double sourcePosY;
 
+  private double sourcePosZ;
+
   private double targetPosX;
 
   private double targetPosY;
+
+  private double targetPosZ;
 
   /**
    * Cache points to render as a line strip.
@@ -77,8 +81,10 @@ public class RichLineRender implements LineRender {
       // And capture current position, again.
       sourcePosX = sourceShape.shapeX;
       sourcePosY = sourceShape.shapeY;
+      sourcePosZ = sourceShape.shapeZ;
       targetPosX = targetShape.shapeX;
       targetPosY = targetShape.shapeY;
+      targetPosZ = targetShape.shapeZ;
     }
   }
 
@@ -103,10 +109,16 @@ public class RichLineRender implements LineRender {
     if (sourceShape.shapeY != sourcePosY) {
       return true;
     }
+    if (sourceShape.shapeZ != sourcePosZ) {
+      return true;
+    }
     if (targetShape.shapeX != targetPosX) {
       return true;
     }
     if (targetShape.shapeY != targetPosY) {
+      return true;
+    }
+    if (targetShape.shapeZ != targetPosZ) {
       return true;
     }
     return false;
