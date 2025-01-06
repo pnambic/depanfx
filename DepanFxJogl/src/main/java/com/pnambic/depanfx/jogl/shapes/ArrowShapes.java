@@ -128,12 +128,28 @@ public class ArrowShapes {
 
     float deltaX = targetX - sourceX;
     float deltaY = targetY - sourceY;
-    double angle = Math.atan2(deltaY, deltaX);
+    float deltaZ = targetZ - sourceZ;
 
     Matrix4 matrix = new Matrix4();
     matrix.loadIdentity();
+
+    // Translate to the target position
     matrix.translate(targetX, targetY, targetZ);
-    matrix.rotate((float) angle, 0.0f, 0.0f, 1.0f);
+
+    // Rotate to align with the target direction
+    double rotateAngle = Math.atan2(deltaY, deltaX);
+    matrix.rotate((float) rotateAngle, 0.0f, 0.0f, 1.0f);
+
+    // Tilt the line to match the target z-coordinate.
+    if (deltaZ != 0.0f) {
+      double planarDist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      double tiltAngle = Math.atan2(-deltaZ, planarDist);
+
+      // Tilt via the y-azis, since arrows are drawn pointing right,
+      // with the nose at (0, 0) and the tail near (-1, 0).
+      matrix.rotate((float) tiltAngle, 0.0f, 1.0f, 0.0f);
+    }
+
     return matrix.getMatrix();
   }
 }
