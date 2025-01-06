@@ -266,8 +266,21 @@ public class DepanFxSessionDataTransport {
     return result;
   }
 
+  /**
+   * Handle any number of failures restoring the viewer.
+   *
+   * Manytimes, it's a missing value due to a save Scratch document.
+   */
   private Optional<DepanFxSceneViewer> toSceneViewer(
       DepanFxBaseViewerData viewerInfo) {
-    return viewerRegistry.buildViewer(viewerInfo);
+    viewerInfo.getClass().getName();
+    try {
+      return viewerRegistry.buildViewer(viewerInfo);
+    } catch (Exception errAny) {
+      LOG.warn("Unable to build viewer {}", viewerInfo.getClass().getName());
+      LOG.debug("Unable to build viewer {}",
+          viewerInfo.getClass().getName(), errAny);
+    }
+    return Optional.empty();
   }
 }
