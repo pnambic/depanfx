@@ -90,11 +90,15 @@ public class DepanFxNodeLayoutRegistry {
         .collect(Collectors.toList());
   }
 
+  /**
+   * Build a composite resource filter from the resource filters included
+   * in each layout contribution.
+   */
   public DepanFxResourceFilter buildAllLayoutsFilter(
       Predicate<Contribution> layoutFilter) {
     List<Class<?>> resourceTypes = ordered(layoutFilter)
         .filter(c -> c.getResourceFilter() != null)
-        .map(c -> c.getResourceFilter().getClass())
+        .flatMap(c -> c.getResourceFilter().streamTypes())
         .collect(Collectors.toList());
     return new DepanFxResourceFilter(
         ALL_LAYOUTS,

@@ -6,6 +6,7 @@ import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class DepanFxResourceFilter {
 
@@ -41,6 +42,10 @@ public class DepanFxResourceFilter {
           .filter(t -> t.isAssignableFrom(content.getClass()))
           .findFirst()
           .isPresent();
+    }
+
+    public Stream<Class<?>> streamTypes() {
+      return types.stream();
     }
 
     public static DepanFxResourceFilter buildResourceFilter(

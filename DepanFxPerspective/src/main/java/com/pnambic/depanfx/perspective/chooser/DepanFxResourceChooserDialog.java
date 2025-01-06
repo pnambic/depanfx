@@ -287,7 +287,7 @@ public class DepanFxResourceChooserDialog {
     if (workspace.getBuiltInProjectTree().equals(document.getProject())) {
       return workspace.getWorkspaceResource(document, "resource chooser")
         .map(r -> r.getResource())
-        .filter(r -> activeFilter.matchDocument(r))
+        .filter(activeFilter::matchDocument)
         .isPresent();
     }
     return false;
