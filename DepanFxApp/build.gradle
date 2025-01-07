@@ -82,10 +82,13 @@ task buildInfo {
         def releaseTag = System.getenv("BUILD_REF") ?: "-dev-"
         def releaseNumber = project.version
 
-        // Get the Git SHA-1
+        // Get the Git SHA-1 and modifications summary
         def gitSha = 'git rev-parse --short HEAD'.execute().text.trim()
         def gitMods = 'git diff --stat'.execute().text.split("\n")
-        def modSummary = gitMods ? gitMods[-1].trim() : "-clean-"
+        def modSummary = gitMods[-1].trim()
+        if (modSummary.isEmpty()) {
+            modSummary = "-clean-"
+        }
 
         // Construct the build info property file
         def buildInfoFile = new File(buildDir,
