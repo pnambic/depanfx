@@ -32,5 +32,5 @@ jobs:
       with:
         files: DepanFxApp/build/distributions/DepanFxApp.zip
       env:
-        BUILD_REF: $${ github.ref }}
+        BUILD_REF: ${{ github.ref }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
