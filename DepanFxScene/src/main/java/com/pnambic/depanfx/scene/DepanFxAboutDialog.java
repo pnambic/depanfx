@@ -59,16 +59,24 @@ public class DepanFxAboutDialog {
           "\nBuilt on {0}", FORMATTER.format(buildDate)));
     }
     addInfo(body, "On commit {0}", aboutInfo.getBuildSha1());
-    addInfo(body, "with {0}", aboutInfo.getBuildMods());
+    addInfo(body, "with {0}", "--clean--", aboutInfo.getBuildMods());
 
     body.append("\n");
     addInfo(body, "Build tag: {0}", aboutInfo.getBuildTag());
-    addInfo(body, "Release: {0}", aboutInfo.getBuildRelease());
+    addInfo(body, "Release: {0}", "unspecified", aboutInfo.getBuildRelease());
 
      body.append(
         "\n\n" + getMemoryStats());
 
     infoLabel.setText(body.toString());
+  }
+
+  private void addInfo(
+      StringBuffer body, String message, String suppress, String value) {
+    if (suppress.equals(value)) {
+      return;
+    }
+    addInfo(body, message, value);
   }
 
   private void addInfo(StringBuffer body, String message, String value) {
