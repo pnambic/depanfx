@@ -14,4 +14,5 @@ module depanfx.scene {
 
     exports com.pnambic.depanfx.scene;
     exports com.pnambic.depanfx.scene.plugins;
+    exports com.pnambic.depanfx.scene.tooldata;
 }

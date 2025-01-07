@@ -1,11 +1,17 @@
 package com.pnambic.depanfx.scene;
 
 import com.pnambic.depanfx.scene.DepanFxAppIcons.IconSize;
+import com.pnambic.depanfx.scene.tooldata.DepanFxAboutData;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.text.DateFormat;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -16,6 +22,11 @@ import javafx.stage.Stage;
 @FxmlView("about-dialog.fxml")
 public class DepanFxAboutDialog {
 
+  public static final DateFormat FORMATTER =
+      new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+  private final DepanFxAboutData aboutInfo;
+
   @FXML
   private Label infoLabel;
 
@@ -23,7 +34,8 @@ public class DepanFxAboutDialog {
   private ImageView depanImage;
 
   @Autowired
-  public DepanFxAboutDialog() {
+  public DepanFxAboutDialog(DepanFxAboutData aboutInfo) {
+    this.aboutInfo = aboutInfo;
   }
 
   @FXML
@@ -32,14 +44,38 @@ public class DepanFxAboutDialog {
         .ifPresent(depanImage::setImage);
 
     // Tweak welcome tab
+    String javaFxVersion = System.getProperty("javafx.version");
     String javaVersion = System.getProperty("java.version");
-    String javafxVersion = System.getProperty("javafx.version");
-    infoLabel.setText(
-        "* Welcome to DepanFX *"
-        + "\nBuilt with JavaFX " + javafxVersion
-        + "\nRunning on Java " + javaVersion
-        + "\n"
-        + "\n" + getMemoryStats());
+    StringBuffer body = new StringBuffer("* Welcome to DepanFX *");
+
+    body.append("\n");
+    addInfo(body, "Built with JavaFX {0}", javaFxVersion);
+    addInfo(body, "Running on Java {0}", javaVersion);
+
+    body.append("\n");
+    Date buildDate = aboutInfo.getBuildDate();
+    if (buildDate != null) {
+      body.append(MessageFormat.format(
+          "\nBuilt on {0}", FORMATTER.format(buildDate)));
+    }
+    addInfo(body, "On commit {0}", aboutInfo.getBuildSha1());
+    addInfo(body, "with {0}", aboutInfo.getBuildMods());
+
+    body.append("\n");
+    addInfo(body, "Build tag: {0}", aboutInfo.getBuildTag());
+    addInfo(body, "Release: {0}", aboutInfo.getBuildRelease());
+
+     body.append(
+        "\n\n" + getMemoryStats());
+
+    infoLabel.setText(body.toString());
+  }
+
+  private void addInfo(StringBuffer body, String message, String value) {
+    if (value != null) {
+      body.append("\n");
+      body.append(MessageFormat.format(message, value));
+    }
   }
 
   @FXML

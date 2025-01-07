@@ -30,6 +30,7 @@ module depanfx.app {
     requires depanfx.persistence;
     requires depanfx.workspace.gui;
     requires depanfx.workspace;
+    requires spring.beans;
 
     opens com.pnambic.depanfx to spring.core;
     opens com.pnambic.depanfx.app to spring.core;

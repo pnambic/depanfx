@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 plugins {
   id 'depanfx.base'
   id 'org.openjfx.javafxplugin'
@@ -67,6 +69,43 @@ application {
     '--add-opens', 'javafx.graphics/com.sun.glass.ui=ALL-UNNAMED'
   ]
 }
+
+// Create a build info file
+task buildInfo {
+    doLast {
+        // Get the current date
+        def currentDate = new Date()
+        def dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm Z")
+        def buildDate = dateFormat.format(currentDate)
+
+        // Get the release number (assuming you're using a versioning scheme like SemVer)
+        def releaseTag = System.getenv("BUILD_REF") ?: "-dev-"
+        def releaseNumber = project.version
+
+        // Get the Git SHA-1
+        def gitSha = 'git rev-parse --short HEAD'.execute().text.trim()
+        def gitMods = 'git diff --stat'.execute().text.split("\n")
+        def modSummary = gitMods ? gitMods[-1].trim() : "-clean-"
+
+        // Construct the build info property file
+        def buildInfoFile = new File(buildDir,
+            "resources/main/com/pnambic/depanfx/app/build-info.properties")
+        def buildInfoWriter = buildInfoFile.newPrintWriter()
+
+        buildInfoWriter.println("date=$buildDate")
+        buildInfoWriter.println("tag=$releaseTag")
+        buildInfoWriter.println("release=$releaseNumber")
+        buildInfoWriter.println("sha1=$gitSha")
+        buildInfoWriter.println("mods=$modSummary")
+        buildInfoWriter.close()
+    }
+}
+
+// Overwrite any build info resouce copied from the source tree
+buildInfo.dependsOn classes
+
+// Prepare the build info resouce before any further progress
+jar.dependsOn buildInfo
 
 jlink {
   options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
