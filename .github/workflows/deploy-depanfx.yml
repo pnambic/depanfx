@@ -25,12 +25,11 @@ jobs:
         java-version: ${{ env.JAVA_VERSION }}
 
     - name: Create distribution zip
-      run: ./gradlew :DepanFxApp:distZip
+      run: BUILD_REF=${{ github.ref }} ./gradlew :DepanFxApp:distZip
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
         files: DepanFxApp/build/distributions/DepanFxApp.zip
       env:
-        BUILD_REF: ${{ github.ref }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
