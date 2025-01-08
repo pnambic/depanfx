@@ -1,11 +1,26 @@
+/*
+ * Copyright 2025 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.pnambic.depanfx.java.nodeview;
 
 import com.pnambic.depanfx.java.context.JavaContextModelId;
 import com.pnambic.depanfx.java.nodelist.link.JavaLinkMatcherBuiltIns;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayoutData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayouts;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxTreeLayoutData;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
-import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,7 +67,7 @@ public class DepanFxJavaLayoutTreeBuiltins {
   @Bean
   public DepanFxBuiltInContribution<DepanFxTreeLayoutData>
   buildTreeMembershipTreeLayout() {
-    return buildLayoutContrib(
+    return DepanFxNodeViewLayouts.buildTreeLayoutContrib(
         TREE_MEMBERSHIP_TREE_LAYOUT_PATH,
         "Java Tree Membership Tree Layout",
         "Layout selected nodes based on their Java tree membership relations",
@@ -62,7 +77,7 @@ public class DepanFxJavaLayoutTreeBuiltins {
   @Bean
   public DepanFxBuiltInContribution<DepanFxTreeLayoutData>
   buildPackageMembershipTreeLayout() {
-    return buildLayoutContrib(
+    return DepanFxNodeViewLayouts.buildTreeLayoutContrib(
         PACKAGE_MEMBERSHIP_TREE_LAYOUT_PATH,
         "Java Package Membership Tree Layout",
         "Layout selected nodes based on their Java package membership relations",
@@ -72,7 +87,7 @@ public class DepanFxJavaLayoutTreeBuiltins {
   @Bean
   public DepanFxBuiltInContribution<DepanFxTreeLayoutData>
   buildClassMembershipTreeLayout() {
-    return buildLayoutContrib(
+    return DepanFxNodeViewLayouts.buildTreeLayoutContrib(
         CLASS_MEMBERSHIP_TREE_LAYOUT_PATH,
         "Java Class Membership Tree Layout",
         "Layout selected nodes based on their Java class membership relations",
@@ -82,7 +97,7 @@ public class DepanFxJavaLayoutTreeBuiltins {
   @Bean
   public DepanFxBuiltInContribution<DepanFxTreeLayoutData>
   buildDerivedClassTreeLayout() {
-    return buildLayoutContrib(
+    return DepanFxNodeViewLayouts.buildTreeLayoutContrib(
         DERIVED_CLASS_TREE_LAYOUT_PATH,
         "Java Derived Class Tree Layout",
         "Layout selected nodes based on their Java class derivation relations",
@@ -92,31 +107,10 @@ public class DepanFxJavaLayoutTreeBuiltins {
   @Bean
   public DepanFxBuiltInContribution<DepanFxTreeLayoutData>
   buildModuleUsesTreeLayout() {
-    return buildLayoutContrib(
+    return DepanFxNodeViewLayouts.buildTreeLayoutContrib(
         MODULE_USES_TREE_LAYOUT_PATH,
         "Java Module Uses Tree Layout",
         "Layout selected nodes based on their Java module use relations",
         JavaLinkMatcherBuiltIns.MODULE_USES_MATCHER_PATH);
-  }
-
-  private static DepanFxBuiltInContribution.Dependent<DepanFxTreeLayoutData>
-  buildLayoutContrib(
-      Path layoutInfoPath,
-      String layoutName,
-      String layoutDescr,
-      Path layoutMatcherPath) {
-
-    return new DepanFxBuiltInContribution.Dependent<DepanFxTreeLayoutData>(
-        layoutInfoPath) {
-
-      @Override
-      protected DepanFxTreeLayoutData buildDocument(
-          DepanFxBuiltInProject project) {
-
-        DepanFxTreeLayoutData result = new DepanFxTreeLayoutData(
-            layoutName, layoutDescr, getResource(project, layoutMatcherPath));
-        return result ;
-      }
-    };
   }
 }
