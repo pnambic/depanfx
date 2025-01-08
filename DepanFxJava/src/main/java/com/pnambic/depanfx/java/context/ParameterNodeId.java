@@ -32,6 +32,11 @@ public class ParameterNodeId extends JavaNodeId {
   }
 
   @Override
+  public String getSimpleName() {
+    return parameterData;
+  }
+
+  @Override
   public int hashCode() {
     return hashCodeHelper(parameterData.hashCode());
   }

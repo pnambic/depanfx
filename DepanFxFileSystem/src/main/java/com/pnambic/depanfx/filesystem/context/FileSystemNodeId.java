@@ -27,6 +27,11 @@ public class FileSystemNodeId implements ContextNodeId {
     return nodePath.toString();
   }
 
+  @Override
+  public String getSimpleName() {
+    return nodePath.getFileName().toString();
+  }
+
   public Path getNodePath() {
     return nodePath;
   }

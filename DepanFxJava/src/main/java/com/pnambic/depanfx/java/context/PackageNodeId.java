@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.java.context;
 
+import java.nio.file.Path;
 import java.util.Objects;
 
 /**
@@ -36,6 +37,11 @@ public class PackageNodeId extends JavaNodeId {
   @Override
   public String getNodeKey() {
     return packagePath;
+  }
+
+  @Override
+  public String getSimpleName() {
+    return Path.of(packagePath).getFileName().toString();
   }
 
   public String getPackagePath() {

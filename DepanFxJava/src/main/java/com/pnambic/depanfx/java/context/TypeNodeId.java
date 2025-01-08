@@ -32,6 +32,15 @@ public class TypeNodeId extends JavaNodeId {
   }
 
   @Override
+  public String getSimpleName() {
+    int finalName = fqcn.lastIndexOf('.');
+    if (finalName >= 0) {
+      return fqcn.substring(finalName + 1);
+    }
+    return fqcn;
+  }
+
+  @Override
   public int hashCode() {
     return hashCodeHelper(fqcn.hashCode());
   }

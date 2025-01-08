@@ -34,6 +34,11 @@ public class ModuleNodeId extends JavaNodeId {
     return moduleName;
   }
 
+  @Override
+  public String getSimpleName() {
+    return moduleName;
+  }
+
   public String getModuleName() {
     return moduleName;
   }

@@ -44,6 +44,11 @@ public class MemberNodeId extends JavaNodeId {
   }
 
   @Override
+  public String getSimpleName() {
+    return memberName;
+  }
+
+  @Override
   public int hashCode() {
     return hashCodeHelper(Objects.hash(fqcn, memberName));
   }
