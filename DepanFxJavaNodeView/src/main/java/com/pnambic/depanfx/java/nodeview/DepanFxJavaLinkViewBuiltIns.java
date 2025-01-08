@@ -229,7 +229,7 @@ public class DepanFxJavaLinkViewBuiltIns {
     displayInfo.add(
         buildDisplayEntry(project,
             JavaLinkMatcherBuiltIns.TYPE_MATCHER_PATH,
-            buildMemberLine(Color.BLUE, 1.5)));
+            buildUsageLine(Color.MEDIUMAQUAMARINE, 1.0)));
 
     displayInfo.add(
         buildDisplayEntry(project,

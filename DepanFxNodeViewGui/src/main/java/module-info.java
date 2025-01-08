@@ -27,11 +27,13 @@ module depanfx.nodeview.gui {
   requires java.desktop;
 
   opens com.pnambic.depanfx.nodeview.gui
-      to javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;
+      to javafx.fxml, net.rgielen.fxweaver.core,
+         spring.beans, spring.core;
   opens com.pnambic.depanfx.nodeview.layouts
       to javafx.fxml, net.rgielen.fxweaver.core,
-          spring.beans, spring.context, spring.core;
+         spring.beans, spring.context, spring.core;
   opens com.pnambic.depanfx.nodeview.viewdata;
 
   exports com.pnambic.depanfx.nodeview.gui;
+  exports com.pnambic.depanfx.nodeview.layouts;
 }

@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodeview.layouts;
 
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayoutData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxShiftLayoutData;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 
@@ -28,7 +29,7 @@ public class DepanFxShiftLayoutConfiguration {
   private int[] NEG_Z = new int[] { 0, 0, -1 };
 
   public static final Path SHIFT_LAYOUT_PATH =
-      DepanFxNodeLayoutConfiguration.NODE_LAYOUT_PATH.resolve("Shift");
+      DepanFxNodeViewLayoutData.LAYOUT_TOOL_PATH.resolve("Shift");
 
   // X Axis
   @Bean
