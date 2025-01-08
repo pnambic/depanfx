@@ -59,7 +59,7 @@ public class DepanFxAboutDialog {
           "\nBuilt on {0}", FORMATTER.format(buildDate)));
     }
     addInfo(body, "On commit {0}", aboutInfo.getBuildSha1());
-    addInfo(body, "with {0}", "--clean--", aboutInfo.getBuildMods());
+    addInfo(body, "with {0}", "-clean-", aboutInfo.getBuildMods());
 
     body.append("\n");
     addInfo(body, "Build tag: {0}", aboutInfo.getBuildTag());
