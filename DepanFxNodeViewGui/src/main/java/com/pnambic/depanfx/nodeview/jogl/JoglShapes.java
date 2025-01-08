@@ -107,14 +107,7 @@ public class JoglShapes {
   }
 
   private static String guessName(GraphNode node) {
-    // This should reflect the name request to the contextModel.
-    String nodeKey = node.getId().getNodeKey();
-    String[] nameWords = nodeKey.split("[./\\\\]");
-    int lastSplit = nameWords.length - 1;
-    if (lastSplit > 0) {
-      return nameWords[lastSplit - 1];
-    }
-    return nameWords[lastSplit];
+    return node.getId().getSimpleName();
   }
 
   private static Shape getShape(DepanFxJoglShape joglShape) {
