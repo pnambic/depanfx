@@ -70,5 +70,6 @@ public abstract class DepanFxBaseSectionToolDialog<T extends DepanFxBaseSectionD
     orderByField.getItems().add(OrderBy.NODE_LEAF);
     orderByField.getItems().add(OrderBy.NODE_KEY);
     orderByField.getItems().add(OrderBy.NODE_ID);
+    orderByField.getItems().add(OrderBy.SIMPLE_NAME);
   }
 }

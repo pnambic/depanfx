@@ -11,16 +11,16 @@ import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeViewNodeFiltersDialog;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListConfiguration;
+import com.pnambic.depanfx.nodelist.builtins.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodeview.jogl.JoglPane;
 import com.pnambic.depanfx.nodeview.jogl.JoglShapes;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxLayoutsChooser;
@@ -419,7 +419,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc =
         DepanFxProjects.getBuiltIn(
             workspace, DepanFxNodeListTableViewData.class,
-            DepanFxNodeListConfiguration.MEMBER_TABLE_VIEW_PATH).get();
+            DepanFxNodeListViewBuiltIns.MEMBER_TABLE_VIEW_PATH).get();
 
     Stage nodeSelectDialog = DepanFxNodeViewNodeSelectDialog.runEditDialog(
         dialogRunner, this, tableViewRsrc);
@@ -453,7 +453,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc =
         DepanFxProjects.getBuiltIn(
             workspace,  DepanFxNodeListTableViewData.class,
-            DepanFxNodeListConfiguration.FLAT_TABLE_VIEW_PATH).get();
+            DepanFxNodeListViewBuiltIns.FLAT_TABLE_VIEW_PATH).get();
     DepanFxNodeList filteredNodes =
         getNodeSelection().getSelection(getNodeSelectionAsNodeList());
 

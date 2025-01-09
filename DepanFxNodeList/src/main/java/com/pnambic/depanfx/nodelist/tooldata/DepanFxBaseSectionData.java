@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodelist.tooldata;
 
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
@@ -27,17 +28,26 @@ public class DepanFxBaseSectionData extends DepanFxBaseToolData {
 
   private final boolean displayNodeCount;
 
+  private final OrderBy orderBy;
+
   private final OrderDirection orderDirection;
 
   public DepanFxBaseSectionData(String toolName, String toolDescription,
       String sectionLabel, boolean displayNodeCount,
-      OrderDirection orderDirection) {
+      OrderBy orderBy, OrderDirection orderDirection) {
     super(toolName, toolDescription);
+
     // Column header
     this.sectionLabel = sectionLabel;
     this.displayNodeCount = displayNodeCount;
+
     // Collation criteria
+    this.orderBy = orderBy;
     this.orderDirection = orderDirection;
+  }
+
+  public OrderBy getOrderBy() {
+    return orderBy;
   }
 
   public OrderDirection getOrderDirection() {

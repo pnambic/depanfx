@@ -1,7 +1,20 @@
-package com.pnambic.depanfx.nodelist.gui.tooldata;
+/*
+ * Copyright 2025 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.pnambic.depanfx.nodelist.tooldata;
 
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
@@ -35,19 +48,11 @@ public class DepanFxNodeListTableViewData extends DepanFxBaseToolData {
     this.columnResources = new ArrayList<>(columnResources);
   }
 
-  /**
-   * Provided in bottom-to-top order to ensure that a flat section
-   * terminates the table view.
-   */
   public List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
       getSectionResources() {
     return sectionResources;
   }
 
-  /**
-   * Provided in bottom-to-top order to ensure that a flat section
-   * terminates the table view.
-   */
   public List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
       getColumnResources() {
     return columnResources;

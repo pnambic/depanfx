@@ -41,8 +41,6 @@ public class DepanFxTreeSectionData extends DepanFxBaseSectionData {
 
   private final boolean inferMissingParents;
 
-  private final OrderBy orderBy;
-
   private final ContainerOrder containerOrder;
 
   public DepanFxTreeSectionData(
@@ -54,14 +52,13 @@ public class DepanFxTreeSectionData extends DepanFxBaseSectionData {
       ContainerOrder containerOrder,
       OrderDirection orderDirection) {
     super(toolName, toolDescription,
-        sectionLabel, displayNodeCount, orderDirection);
+        sectionLabel, displayNodeCount, orderBy, orderDirection);
 
     // Tree construction
     this.linkMatcherRsrc = linkMatcherRsrc;
     this.inferMissingParents = inferMissingParents;
 
     // Collation criteria
-    this.orderBy = orderBy;
     this.containerOrder = containerOrder;
   }
 
@@ -72,10 +69,6 @@ public class DepanFxTreeSectionData extends DepanFxBaseSectionData {
 
   public DepanFxLinkMatcher getLinkMatcher(DepanFxWorkspace workspace) {
     return linkMatcherRsrc.getResource().getMatcher();
-  }
-
-  public OrderBy getOrderBy() {
-    return orderBy;
   }
 
   public ContainerOrder getContainerOrder() {

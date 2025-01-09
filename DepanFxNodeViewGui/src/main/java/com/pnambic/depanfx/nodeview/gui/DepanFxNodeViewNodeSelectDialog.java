@@ -1,11 +1,11 @@
 package com.pnambic.depanfx.nodeview.gui;
 
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListConfiguration;
+import com.pnambic.depanfx.nodelist.builtins.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableController;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.perspective.DepanFxWorkspaceDialog;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -111,7 +111,7 @@ public class DepanFxNodeViewNodeSelectDialog
     if (tableViewRsrc == null) {
       tableViewRsrc = DepanFxProjects.getBuiltIn(
           workspace, DepanFxNodeListTableViewData.class,
-          DepanFxNodeListConfiguration.FLAT_TABLE_VIEW_PATH)
+          DepanFxNodeListViewBuiltIns.FLAT_TABLE_VIEW_PATH)
           .get();
     }
 

@@ -6,12 +6,12 @@ import com.pnambic.depanfx.nodelist.gui.columns.DepanFxFocusColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxFocusColumnToolDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumnToolDialog;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
@@ -35,6 +35,7 @@ import javafx.scene.control.SeparatorMenuItem;
 
 public class DepanFxNodeListTableCommands {
 
+  @SuppressWarnings("unused")
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeListTableCommands.class);
 

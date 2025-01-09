@@ -1,12 +1,12 @@
 package com.pnambic.depanfx.nodelist.viewer;
 
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeViewNodeFiltersDialog;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListConfiguration;
+import com.pnambic.depanfx.nodelist.builtins.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableController;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
@@ -97,7 +97,7 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
     DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc =
         DepanFxProjects.getBuiltIn(
             tableControl.getWorkspace(), DepanFxNodeListTableViewData.class,
-            DepanFxNodeListConfiguration.FLAT_TABLE_VIEW_PATH).get();
+            DepanFxNodeListViewBuiltIns.FLAT_TABLE_VIEW_PATH).get();
 
     Stage filterSelectionDialog =
         DepanFxNodeViewNodeFiltersDialog.runEditDialog(

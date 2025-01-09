@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodelist.gui.tooldata;
 
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 public class DepanFxFocusColumnData extends DepanFxBaseColumnData {

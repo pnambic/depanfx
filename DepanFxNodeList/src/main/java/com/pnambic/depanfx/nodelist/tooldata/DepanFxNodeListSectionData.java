@@ -16,12 +16,7 @@
 
 package com.pnambic.depanfx.nodelist.tooldata;
 
-import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
-
 import java.nio.file.Path;
-import java.util.Optional;
 
 /**
  * Common data and paths for node list section tool data.
@@ -32,23 +27,10 @@ public class DepanFxNodeListSectionData {
 
   public static final String SECTIONS_TOOL_DIR = "Sections";
 
-  public static final String SIMPLE_SECTION_NAME = "Simple Section";
-
   public static final Path SECTIONS_TOOL_PATH =
       DepanFxNodeListData.NODE_LIST_TOOL_PATH.resolve(SECTIONS_TOOL_DIR);
 
-  public static final Path SIMPLE_SECTION_TOOL_PATH =
-      SECTIONS_TOOL_PATH.resolve(SIMPLE_SECTION_NAME);
-
-  public enum OrderBy { NODE_ID, NODE_KEY, NODE_LEAF };
+  public enum OrderBy { NODE_ID, NODE_KEY, NODE_LEAF, SIMPLE_NAME };
 
   public enum OrderDirection { FORWARD, REVERSE };
-
-  public static Optional<DepanFxWorkspaceResource<DepanFxFlatSectionData>>
-      getBuiltinSimpleSectionResource(
-            DepanFxWorkspace workspace) {
-
-    return DepanFxProjects.getBuiltIn(
-        workspace, DepanFxFlatSectionData.class, SIMPLE_SECTION_TOOL_PATH);
-  }
 }

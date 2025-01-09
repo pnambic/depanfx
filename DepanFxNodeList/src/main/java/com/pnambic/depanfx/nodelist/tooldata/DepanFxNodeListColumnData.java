@@ -13,10 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.pnambic.depanfx.nodelist.gui.tooldata;
-
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListData;
+package com.pnambic.depanfx.nodelist.tooldata;
 
 import java.nio.file.Path;
 

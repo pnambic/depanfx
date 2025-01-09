@@ -11,9 +11,9 @@ import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatchers;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcher;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData.ContainerOrder;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModelBuilder;
@@ -23,7 +23,6 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +30,10 @@ import java.util.stream.Collectors;
 import javafx.scene.control.TreeItem;
 
 public class DepanFxTreeSection implements DepanFxNodeListSection {
+
+  public static final String NEW_TREE_SECTION_DATA = "New Tree Section Data...";
+
+  public static final String EDIT_TREE_SECTION_DATA = "Edit Tree Section Data...";
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxTreeSection.class);
@@ -45,10 +48,6 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
   private DepanFxTreeModel treeModel;
 
   private DepanFxNodeList sectionNodes;
-
-  static final String NEW_TREE_SECTION_DATA = "New Tree Section Data...";
-
-  static final String EDIT_TREE_SECTION_DATA = "Edit Tree Section Data...";
 
   public DepanFxTreeSection(
       DepanFxNodeListTableAdapter tableAdapter,

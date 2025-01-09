@@ -2,17 +2,17 @@ package com.pnambic.depanfx.nodelist.gui;
 
 import com.google.common.collect.ImmutableList;
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.nodelist.builtins.DepanFxNodeListSectionBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxSectionRegistry;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseColumnData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
@@ -195,6 +195,7 @@ public class DepanFxNodeListTableState {
       if (DepanFxSectionRegistry.updateSection(section, dataRsrc)) {
         resetTableRoot();
       }
+      return;
     }
     LOG.warn("Failed update for unknown section {} with resource {}",
         section.getDisplayName(), dataRsrc.getDocument().toString());
@@ -276,7 +277,7 @@ public class DepanFxNodeListTableState {
       Optional<DepanFxWorkspaceResource<DepanFxFlatSectionData>> optFlatRsrc =
           DepanFxProjects.getBuiltIn(
               workspace, DepanFxFlatSectionData.class,
-              DepanFxNodeListSectionData.SIMPLE_SECTION_TOOL_PATH);
+              DepanFxNodeListSectionBuiltIns.SIMPLE_SECTION_TOOL_PATH);
 
       optFlatRsrc.ifPresent(this::installSection);
     }

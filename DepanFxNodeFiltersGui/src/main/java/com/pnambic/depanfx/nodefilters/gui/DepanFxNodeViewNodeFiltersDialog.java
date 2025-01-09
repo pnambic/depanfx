@@ -22,15 +22,15 @@ import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxSequenceFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.FilterMergeMode;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListConfiguration;
+import com.pnambic.depanfx.nodelist.builtins.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableController;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.perspective.DepanFxWorkspaceDialog;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -211,7 +211,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
     if (tableControl == null) {
       Optional<DepanFxWorkspaceResource<DepanFxNodeListTableViewData>> optFlatView =
           ((DepanFxBuiltInProject) workspace.getBuiltInProject())
-              .getResource(DepanFxNodeListConfiguration.FLAT_TABLE_VIEW_PATH);
+              .getResource(DepanFxNodeListViewBuiltIns.FLAT_TABLE_VIEW_PATH);
       optFlatView.ifPresent(r -> tableControl = buildTable(r, filteredNodes));
     }
 

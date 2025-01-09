@@ -1,8 +1,8 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData.KeyChoice;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListColumnData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData.KeyChoice;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -76,6 +76,7 @@ public class DepanFxNodeKeyColumnToolDialog
     keyChoiceField.getItems().add(KeyChoice.MODEL_KEY);
     keyChoiceField.getItems().add(KeyChoice.KIND_KEY);
     keyChoiceField.getItems().add(KeyChoice.NODE_KEY);
+    keyChoiceField.getItems().add(KeyChoice.SIMPLE_NAME);
   }
 
   @Override

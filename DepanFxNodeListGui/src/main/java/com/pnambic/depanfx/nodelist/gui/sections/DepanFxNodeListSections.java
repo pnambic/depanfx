@@ -97,6 +97,8 @@ public class DepanFxNodeListSections {
       return nodeId.getNodeKey();
     case NODE_LEAF:
       return getLeafSortKey(nodeId.getNodeKey());
+    case SIMPLE_NAME:
+      return nodeId.getSimpleName();
     }
 
     // Use the full node key the orderBy value is not known.

@@ -1,11 +1,23 @@
-package com.pnambic.depanfx.nodelist.gui;
+/*
+ * Copyright 2025 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.pnambic.depanfx.nodelist.builtins;
 
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumnConfiguration;
-import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSectionConfiguration;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseColumnData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
@@ -19,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
-public class DepanFxNodeListConfiguration {
+public class DepanFxNodeListViewBuiltIns {
 
   public static final Path FLAT_TABLE_VIEW_PATH =
       DepanFxNodeListTableViewData.TABLE_VIEW_TOOL_PATH
@@ -30,7 +42,7 @@ public class DepanFxNodeListConfiguration {
           .resolve("Member Table View");
 
   @Autowired
-  public DepanFxNodeListConfiguration() {
+  public DepanFxNodeListViewBuiltIns() {
   }
 
   @Bean
@@ -48,13 +60,13 @@ public class DepanFxNodeListConfiguration {
         List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
             sectionRsrcs = new ArrayList<>();
         sectionRsrcs.add(getResource(project,
-            DepanFxNodeListSectionData.SIMPLE_SECTION_TOOL_PATH));
+            DepanFxNodeListSectionBuiltIns.SIMPLE_SECTION_TOOL_PATH));
 
         // Node Kind Column
         List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
             columnRsrcs = new ArrayList<>();
         columnRsrcs.add(getResource(project,
-            DepanFxNodeKeyColumnConfiguration.KIND_KEY_COLUMN_TOOL_PATH));
+            DepanFxNodeKeyColumnBuiltIns.KIND_KEY_COLUMN_TOOL_PATH));
 
         return new DepanFxNodeListTableViewData(
             "Flat Table View", "Flat node list table view",
@@ -78,15 +90,15 @@ public class DepanFxNodeListConfiguration {
         List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
             sectionRsrcs = new ArrayList<>();
         sectionRsrcs.add(getResource(project,
-            DepanFxNodeListSectionConfiguration.MEMBER_TREE_SECTION_PATH));
+            DepanFxNodeListSectionBuiltIns.MEMBER_TREE_SECTION_PATH));
         sectionRsrcs.add(getResource(project,
-            DepanFxNodeListSectionData.SIMPLE_SECTION_TOOL_PATH));
+            DepanFxNodeListSectionBuiltIns.SIMPLE_SECTION_TOOL_PATH));
 
         // Node Kind Column
         List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
             columnRsrcs = new ArrayList<>();
         columnRsrcs.add(getResource(project,
-            DepanFxNodeKeyColumnConfiguration.KIND_KEY_COLUMN_TOOL_PATH));
+            DepanFxNodeKeyColumnBuiltIns.KIND_KEY_COLUMN_TOOL_PATH));
 
         return new DepanFxNodeListTableViewData(
             "Member Table View", "Table view membership",

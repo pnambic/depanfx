@@ -27,20 +27,11 @@ public class DepanFxFlatSectionData extends DepanFxBaseSectionData {
 
   public static final String BASE_SECTION_LABEL = "Section";
 
-  private final OrderBy orderBy;
-
   public DepanFxFlatSectionData(
       String toolName, String toolDescription,
       String sectionLabel, boolean displayNodeCount,
       OrderBy orderBy, OrderDirection orderDirection) {
     super(toolName, toolDescription,
-        sectionLabel, displayNodeCount, orderDirection);
-
-    // Collation criteria
-    this.orderBy = orderBy;
-  }
-
-  public OrderBy getOrderBy() {
-    return orderBy;
+        sectionLabel, displayNodeCount, orderBy, orderDirection);
   }
 }

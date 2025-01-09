@@ -1,10 +1,10 @@
 package com.pnambic.depanfx.nodelist.viewer;
 
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListConfiguration;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListTableViewData;
+import com.pnambic.depanfx.nodelist.builtins.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.plugins.DepanFxAnalysisExtMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -184,7 +184,7 @@ public class DepanFxNodeListViewerConfiguration {
     DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc =
         DepanFxProjects.getBuiltIn(
             workspace,  DepanFxNodeListTableViewData.class,
-            DepanFxNodeListConfiguration.MEMBER_TABLE_VIEW_PATH).get();
+            DepanFxNodeListViewBuiltIns.MEMBER_TABLE_VIEW_PATH).get();
 
     DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(
         viewerTitle, workspace, dialogRunner,

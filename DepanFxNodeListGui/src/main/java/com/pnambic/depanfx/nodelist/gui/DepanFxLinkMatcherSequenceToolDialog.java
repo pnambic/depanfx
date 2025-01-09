@@ -27,7 +27,6 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -58,6 +57,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 public class DepanFxLinkMatcherSequenceToolDialog
     extends DepanFxBaseToolDialog<DepanFxLinkMatcherSequenceDocument> {
 
+  @SuppressWarnings("unused")
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxLinkMatcherSequenceToolDialog.class);
 

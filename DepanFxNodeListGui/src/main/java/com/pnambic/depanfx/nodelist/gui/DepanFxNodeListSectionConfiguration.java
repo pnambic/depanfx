@@ -1,12 +1,31 @@
-package com.pnambic.depanfx.nodelist.gui.sections;
+/*
+ * Copyright 2025 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.pnambic.depanfx.nodelist.gui;
 
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSection;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSectionToolDialog;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeSection;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeSectionToolDialog;
+import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherBuiltIns;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData.ContainerOrder;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
@@ -17,8 +36,6 @@ import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
-import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,58 +51,12 @@ import javafx.scene.control.Cell;
 @Configuration
 public class DepanFxNodeListSectionConfiguration {
 
-  private static final String FLAT_SECTION_KEY = "Flat Section";
+  public static final String FLAT_SECTION_KEY = "Flat Section";
 
-  private static final String TREE_SECTION_KEY = "Tree Section";
-
-  public static final Path MEMBER_MATCHER_PATH =
-      DepanFxLinkMatcherDocument.LINK_MATCHER_TOOL_PATH.resolve("Tree Member");
-
-  public static final Path MEMBER_TREE_SECTION_PATH =
-      DepanFxNodeListSectionData.SECTIONS_TOOL_PATH.resolve("Member Tree");
+  public static final String TREE_SECTION_KEY = "Tree Section";
 
   @Autowired
   public DepanFxNodeListSectionConfiguration() {
-  }
-
-  @Bean
-  public DepanFxBuiltInContribution<DepanFxTreeSectionData>
-      memberTreeSection() {
-
-    return new DepanFxBuiltInContribution.Dependent<DepanFxTreeSectionData>(
-        MEMBER_TREE_SECTION_PATH) {
-
-      @Override
-      protected DepanFxTreeSectionData buildDocument(
-          DepanFxBuiltInProject project) {
-        return buildMemberTreeSection(
-            project, "Member Tree Section",
-            "Tree section based on a link matcher for membership");
-      }
-    };
-  }
-
-  @Bean
-  public DepanFxBuiltInContribution<DepanFxFlatSectionData> flatSection() {
-    DepanFxFlatSectionData toolData =
-        new DepanFxFlatSectionData(
-            "Built-in Flat Section", "Built-in flat section.",
-            DepanFxFlatSectionData.BASE_SECTION_LABEL, true,
-            OrderBy.NODE_KEY, OrderDirection.FORWARD);
-    return new DepanFxBuiltInContribution.Simple<>(
-        DepanFxNodeListSectionData.SIMPLE_SECTION_TOOL_PATH, toolData);
-  }
-
-  @Bean
-  public DepanFxBuiltInContribution<DepanFxLinkMatcherDocument>
-      memberFinderLinkMatcher() {
-
-    DepanFxLinkMatcherDocument finderMatcher =
-        new DepanFxLinkMatcherDocument(
-            "Tree Member", "Synthetic tree membership",
-            null, DepanFxLinkMatcherGroup.MEMBER_MATCHER_GROUP, null);
-    return new DepanFxBuiltInContribution.Simple<>(
-        MEMBER_MATCHER_PATH, finderMatcher);
   }
 
   @Bean
@@ -106,21 +77,6 @@ public class DepanFxNodeListSectionConfiguration {
   @Bean
   public DepanFxResourcePathMenuContribution treeSectionPathMenu() {
     return new TreeSectionPathContribution();
-  }
-
-  private DepanFxTreeSectionData buildMemberTreeSection(
-      DepanFxBuiltInProject project, String toolName, String toolDescription) {
-
-    Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
-        optMatcherRsrc = project.getResource(MEMBER_MATCHER_PATH);
-    DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc =
-        optMatcherRsrc.orElseThrow(() ->
-            new DepanFxBuiltInContribution.MissingDependencyException(
-                MEMBER_TREE_SECTION_PATH, MEMBER_MATCHER_PATH));
-
-    return new DepanFxTreeSectionData(
-        toolName, toolDescription, "Tree", true, matcherRsrc, true,
-        OrderBy.NODE_LEAF, ContainerOrder.LAST, OrderDirection.FORWARD);
   }
 
   /////////////////////////////////////
@@ -253,7 +209,8 @@ public class DepanFxNodeListSectionConfiguration {
     private DepanFxTreeSectionData buildInitialTreeSection(
         DepanFxWorkspace workspace) {
       Optional<DepanFxProjectDocument> matcherProjPath =
-          workspace.getBuiltInProjectTree().asProjectDocument(MEMBER_MATCHER_PATH);
+          workspace.getBuiltInProjectTree().asProjectDocument(
+              DepanFxLinkMatcherBuiltIns.MEMBER_MATCHER_PATH);
       return  workspace.getWorkspaceResource(
           matcherProjPath.get(), DepanFxLinkMatcherDocument.class)
           .map(m -> new DepanFxTreeSectionData(

@@ -28,6 +28,9 @@ import java.util.Collections;
 @Configuration
 public class DepanFxLinkMatcherBuiltIns {
 
+  public static final Path MEMBER_MATCHER_PATH =
+      DepanFxLinkMatcherDocument.LINK_MATCHER_TOOL_PATH.resolve("Tree Member");
+
   public static final String MATCH_ALL_MATCHER_LABEL = "All Edges";
 
   public static final String MATCH_ALL_MATCHER_DESCR = "All Edges";
@@ -42,6 +45,18 @@ public class DepanFxLinkMatcherBuiltIns {
       buildAllEdgeMatcher();
 
   public DepanFxLinkMatcherBuiltIns() {
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxLinkMatcherDocument>
+      memberFinderLinkMatcher() {
+
+    DepanFxLinkMatcherDocument finderMatcher =
+        new DepanFxLinkMatcherDocument(
+            "Tree Member", "Synthetic tree membership",
+            null, DepanFxLinkMatcherGroup.MEMBER_MATCHER_GROUP, null);
+    return new DepanFxBuiltInContribution.Simple<>(
+        MEMBER_MATCHER_PATH, finderMatcher);
   }
 
   @Bean

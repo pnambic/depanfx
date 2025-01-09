@@ -1,11 +1,17 @@
 package com.pnambic.depanfx.nodelist.gui;
 
+import com.pnambic.depanfx.nodelist.builtins.DepanFxNodeListSectionBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSectionItem;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
+
+import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -57,12 +63,19 @@ public class DepanFxNodeListRootItem extends DepanFxNodeListItem {
 
       // Capture a snapshot of baseNodes.
       DepanFxNodeList remainer = baseNodes;
-      DepanFxNodeListSectionData
-          .getBuiltinSimpleSectionResource(root.getWorkspace())
+      getBuiltinSimpleSectionResource(root.getWorkspace())
           .map(r -> new DepanFxFlatSection(r))
           .map(s -> s.buildSectionItem(remainer))
           .ifPresent(result::add);;
     }
     return result;
+  }
+
+  private static Optional<DepanFxWorkspaceResource<DepanFxFlatSectionData>>
+  getBuiltinSimpleSectionResource(DepanFxWorkspace workspace) {
+
+    return DepanFxProjects.getBuiltIn(
+        workspace, DepanFxFlatSectionData.class,
+        DepanFxNodeListSectionBuiltIns.SIMPLE_SECTION_TOOL_PATH);
   }
 }

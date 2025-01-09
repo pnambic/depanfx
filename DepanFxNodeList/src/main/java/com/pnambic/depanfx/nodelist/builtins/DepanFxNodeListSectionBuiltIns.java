@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.filesystem.gui;
+package com.pnambic.depanfx.nodelist.builtins;
 
-import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
-import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemLinkMatcherBuiltIns;
+import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherBuiltIns;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
@@ -25,47 +25,62 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData.ContainerOrd
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
 
 @Configuration
-public class FileSystemNodeListSectionBuiltIns {
+public class DepanFxNodeListSectionBuiltIns {
 
-  public static final Path FILE_SYSTEM_SECTION_PATH =
-      DepanFxNodeListSectionData.SECTIONS_TOOL_PATH
-          .resolve(FileSystemContextModelId.FILE_SYSTEM_KEY);
+  public static final String MEMBER_TREE_SECTION_NAME = "Member Tree";
 
-  public static final String FILE_SYSTEM_HIERARCHY_SECTION_NAME =
-      "File System Hierarchy";
+  public static final Path MEMBER_TREE_SECTION_PATH =
+      DepanFxNodeListSectionData.SECTIONS_TOOL_PATH.resolve(MEMBER_TREE_SECTION_NAME);
 
-  public static final Path FILE_SYSTEM_HIERARCHY_SECTION_PATH =
-      FILE_SYSTEM_SECTION_PATH.resolve(FILE_SYSTEM_HIERARCHY_SECTION_NAME);
+  public static final String SIMPLE_SECTION_NAME = "Simple Section";
+
+  public static final Path SIMPLE_SECTION_TOOL_PATH =
+      DepanFxNodeListSectionData.SECTIONS_TOOL_PATH.resolve(SIMPLE_SECTION_NAME);
+
+  @Autowired
+  public DepanFxNodeListSectionBuiltIns() {
+  }
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxTreeSectionData>
-      fileSystemHierarchySection() {
+      memberTreeSection() {
 
     return new DepanFxBuiltInContribution.Dependent<DepanFxTreeSectionData>(
-        FILE_SYSTEM_HIERARCHY_SECTION_PATH) {
+        MEMBER_TREE_SECTION_PATH) {
 
       @Override
       protected DepanFxTreeSectionData buildDocument(
           DepanFxBuiltInProject project) {
 
         return new DepanFxTreeSectionData(
-            "File System Hierarchy Section",
-            "Tree section based on File System  member relations.",
-            "Hierarchy",
+            "Member Tree Section",
+            "Tree section based on a link matcher for membership",
+            "Tree",
             true,
-            getResource(project,
-                FileSystemLinkMatcherBuiltIns.FILE_SYSTEM_MEMBER_MATCHER_PATH),
-            false,
+            getResource(project, DepanFxLinkMatcherBuiltIns.MEMBER_MATCHER_PATH),
+            true,
             OrderBy.NODE_LEAF,
             ContainerOrder.LAST,
             OrderDirection.FORWARD);
       }
     };
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxFlatSectionData> flatSection() {
+    DepanFxFlatSectionData toolData =
+        new DepanFxFlatSectionData(
+            "Built-in Flat Section", "Built-in flat section.",
+            DepanFxFlatSectionData.BASE_SECTION_LABEL, true,
+            OrderBy.NODE_KEY, OrderDirection.FORWARD);
+    return new DepanFxBuiltInContribution.Simple<>(
+        SIMPLE_SECTION_TOOL_PATH, toolData);
   }
 }

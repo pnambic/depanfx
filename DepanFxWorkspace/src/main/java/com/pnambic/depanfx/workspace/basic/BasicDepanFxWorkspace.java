@@ -175,11 +175,10 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
       @SuppressWarnings("unchecked")
       T document = (T) transport.load(importer);
       return toWorkspaceResource(projDoc, document);
-    } catch (IOException errIo) {
-      LOG.error("Unable to open {} at {}", expectedLabel, projDoc, errIo);
-      throw new RuntimeException(
-          "Unable to open " + expectedLabel + " at " + projDoc, errIo);
+    } catch (Exception errAny) {
+      LOG.error("Unable to open {} at {}", expectedLabel, projDoc, errAny);
     }
+    return Optional.empty();
   }
 
   @Override
