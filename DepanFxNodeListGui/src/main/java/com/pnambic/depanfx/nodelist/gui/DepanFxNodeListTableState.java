@@ -3,6 +3,7 @@ package com.pnambic.depanfx.nodelist.gui;
 import com.google.common.collect.ImmutableList;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.builtins.DepanFxNodeListSectionBuiltIns;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxAbstractColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
@@ -61,9 +63,6 @@ public class DepanFxNodeListTableState {
 
   private List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
       sectionResources;
-
-  private List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
-      columnResources;
 
   private List<DepanFxNodeListSection> sections;
 
@@ -167,6 +166,14 @@ public class DepanFxNodeListTableState {
   }
 
   public DepanFxNodeListTableViewData getTableView() {
+    @SuppressWarnings("unchecked")
+    List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>> columnResources = columns.stream()
+        .filter(c -> DepanFxAbstractColumn.class.isAssignableFrom(c.getClass()))
+        .map(DepanFxAbstractColumn.class::cast)
+        .map(c -> c.getColumnDataResource())
+        .map(r -> (DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>) r)
+        .collect(Collectors.toList());
+
     return new DepanFxNodeListTableViewData(
         tableView.getToolName(), tableView.getToolDescription(),
         sectionResources, columnResources);
@@ -207,7 +214,7 @@ public class DepanFxNodeListTableState {
   public void addColumn(
       DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc) {
 
-    columnResources.add(columnRsrc);
+    // columnResources.add(columnRsrc);
     DepanFxNodeListColumn column = tableFactory.createTableColumn(columnRsrc);
     columns.add(column);
     nodeListTable.getColumns().add(column.prepareColumn());
@@ -258,7 +265,6 @@ public class DepanFxNodeListTableState {
     List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
         srcColumnRsrcs = tableView.getColumnResources();
     int srcColumnCnt = srcColumnRsrcs.size();
-    columnResources = new ArrayList<>(srcColumnCnt);
     columns = new ArrayList<>(srcColumnCnt);
 
     srcColumnRsrcs.stream().forEach(this::addColumn);

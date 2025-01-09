@@ -48,6 +48,10 @@ public abstract class DepanFxAbstractColumn<T extends DepanFxBaseColumnData>
     return result;
   }
 
+  public DepanFxWorkspaceResource<T> getColumnDataResource() {
+    return columnDataRsrc;
+  }
+
   public T getColumnData() {
     return columnDataRsrc.getResource();
   }
