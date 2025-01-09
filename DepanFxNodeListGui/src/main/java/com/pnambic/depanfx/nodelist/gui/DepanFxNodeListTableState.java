@@ -189,9 +189,15 @@ public class DepanFxNodeListTableState {
 
   public void updateSection(DepanFxNodeListSection section,
       DepanFxWorkspaceResource<? extends DepanFxBaseSectionData> dataRsrc) {
-    if (DepanFxSectionRegistry.updateSection(section, dataRsrc)) {
-      resetTableRoot();
+    int sectionIndex = sections.indexOf(section);
+    if (sectionIndex >= 0) {
+      sectionResources.set(sectionIndex, dataRsrc);
+      if (DepanFxSectionRegistry.updateSection(section, dataRsrc)) {
+        resetTableRoot();
+      }
     }
+    LOG.warn("Failed update for unknown section {} with resource {}",
+        section.getDisplayName(), dataRsrc.getDocument().toString());
   }
 
   /////////////////////////////////////
