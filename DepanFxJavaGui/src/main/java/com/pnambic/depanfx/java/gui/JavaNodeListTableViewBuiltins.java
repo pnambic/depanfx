@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.filesystem.gui;
+package com.pnambic.depanfx.java.gui;
 
-import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
+import com.pnambic.depanfx.java.context.JavaContextModelId;
 import com.pnambic.depanfx.nodelist.builtins.DepanFxNodeKeyColumnBuiltIns;
 import com.pnambic.depanfx.nodelist.builtins.DepanFxNodeListSectionBuiltIns;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
@@ -33,24 +33,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
-public class FileSystemNodeListTableViewBuiltins {
+public class JavaNodeListTableViewBuiltins {
 
-  public static final Path FILE_SYSTEM_TABLE_VIEW_PATH =
+  public static final Path JAVA_TABLE_VIEW_PATH =
       DepanFxNodeListTableViewData.TABLE_VIEW_TOOL_PATH
-          .resolve(FileSystemContextModelId.FILE_SYSTEM_KEY);
+          .resolve(JavaContextModelId.JAVA_KEY);
 
-  public static final String FILE_SYSTEM_HIERARY_TABLE_VIEW_NAME =
-      "File System Hierarchy";
+  public static final String TREE_MEMBER_TABLE_VIEW_NAME =
+      "Tree Member Node List View";
 
-  public static final Path FILE_SYSTEM_HIERARY_TABLE_VIEW_PATH =
-      FILE_SYSTEM_TABLE_VIEW_PATH.resolve(FILE_SYSTEM_HIERARY_TABLE_VIEW_NAME);
+  public static final Path TREE_MEMBER_TABLE_VIEW_PATH =
+      JAVA_TABLE_VIEW_PATH.resolve(TREE_MEMBER_TABLE_VIEW_NAME);
+
+  public static final String DERIVED_CLASS_TABLE_VIEW_NAME =
+      "Derived Class Node List View";
+
+  public static final Path DERIVED_CLASS_TABLE_VIEW_PATH =
+      JAVA_TABLE_VIEW_PATH.resolve(DERIVED_CLASS_TABLE_VIEW_NAME);
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
-      fileSystemHierarchyTableView() {
+      treeMembershipTableView() {
 
     return new DepanFxBuiltInContribution.Dependent<DepanFxNodeListTableViewData>(
-        FILE_SYSTEM_HIERARY_TABLE_VIEW_PATH) {
+        TREE_MEMBER_TABLE_VIEW_PATH) {
 
       @Override
       protected DepanFxNodeListTableViewData buildDocument(
@@ -60,7 +66,7 @@ public class FileSystemNodeListTableViewBuiltins {
         List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
             sectionRsrcs = new ArrayList<>();
         sectionRsrcs.add(getResource(project,
-            FileSystemNodeListSectionBuiltIns.FILE_SYSTEM_HIERARCHY_SECTION_PATH));
+            JavaNodeListSectionBuiltIns.TREE_MEMBERSHIP_TREE_SECTION_PATH));
         sectionRsrcs.add(getResource(project,
             DepanFxNodeListSectionBuiltIns.SIMPLE_SECTION_TOOL_PATH));
 
@@ -71,7 +77,40 @@ public class FileSystemNodeListTableViewBuiltins {
             DepanFxNodeKeyColumnBuiltIns.KIND_KEY_COLUMN_TOOL_PATH));
 
         return new DepanFxNodeListTableViewData(
-            "Member Table View", "Table view membership",
+            "Tree Hierarchy View",
+            "Table view based on tree member heirarchy",
+            sectionRsrcs, columnRsrcs);
+      }
+    };
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
+      derivedClassTableView() {
+
+    return new DepanFxBuiltInContribution.Dependent<DepanFxNodeListTableViewData>(
+        DERIVED_CLASS_TABLE_VIEW_PATH) {
+
+      @Override
+      protected DepanFxNodeListTableViewData buildDocument(
+          DepanFxBuiltInProject project) {
+
+        // Flat and Members Sections
+        List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
+            sectionRsrcs = new ArrayList<>();
+        sectionRsrcs.add(getResource(project,
+            JavaNodeListSectionBuiltIns.DERIVED_CLASS_TREE_SECTION_PATH));
+        sectionRsrcs.add(getResource(project,
+            DepanFxNodeListSectionBuiltIns.SIMPLE_SECTION_TOOL_PATH));
+
+        // Node Kind Column
+        List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
+            columnRsrcs = new ArrayList<>();
+        columnRsrcs.add(getResource(project,
+            DepanFxNodeKeyColumnBuiltIns.KIND_KEY_COLUMN_TOOL_PATH));
+
+        return new DepanFxNodeListTableViewData(
+            "Class Hierarchy View", "Table view based on class derivation heirarchy",
             sectionRsrcs, columnRsrcs);
       }
     };
