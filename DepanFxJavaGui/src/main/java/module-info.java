@@ -12,11 +12,15 @@ module depanfx.java.gui {
   requires depanfx.graph;
   requires depanfx.graph_doc;
   requires depanfx.java;
+  requires depanfx.nodelist;
   requires depanfx.perspective;
   requires depanfx.workspace;
   requires depanfx.scene;
+  requires depanfx.nodefilters;
 
-  opens com.pnambic.depanfx.java.gui to javafx.fxml, net.rgielen.fxweaver.core, spring.beans;
+  opens com.pnambic.depanfx.java.gui
+    to javafx.fxml, net.rgielen.fxweaver.core,
+      spring.core, spring.beans;
 
   exports com.pnambic.depanfx.java.gui;
 }

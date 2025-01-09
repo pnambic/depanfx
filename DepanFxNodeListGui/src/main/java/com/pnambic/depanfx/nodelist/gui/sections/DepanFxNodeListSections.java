@@ -5,8 +5,8 @@ import com.pnambic.depanfx.graph.context.GraphContextKeys;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderBy;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderDirection;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui.tooldata;
 
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;

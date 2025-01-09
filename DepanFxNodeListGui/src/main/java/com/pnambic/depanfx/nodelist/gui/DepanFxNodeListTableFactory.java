@@ -5,7 +5,7 @@ import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxSectionRegistry;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseColumnData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 

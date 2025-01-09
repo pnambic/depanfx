@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.pnambic.depanfx.nodelist.gui.tooldata;
+package com.pnambic.depanfx.nodelist.tooldata;
 
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;

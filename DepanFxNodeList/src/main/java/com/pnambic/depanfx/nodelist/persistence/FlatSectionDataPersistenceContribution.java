@@ -1,7 +1,7 @@
-package com.pnambic.depanfx.nodelist.gui.persistence;
+package com.pnambic.depanfx.nodelist.persistence;
 
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFlatSectionData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
 

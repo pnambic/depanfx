@@ -2,6 +2,7 @@ package com.pnambic.depanfx.java.nodelist.link;
 
 import com.pnambic.depanfx.graph.context.ContextNodeKindId;
 import com.pnambic.depanfx.java.context.JavaContextDefinition;
+import com.pnambic.depanfx.java.context.JavaContextModelId;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeKindFilterData;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 
@@ -13,11 +14,9 @@ import java.nio.file.Path;
 @Configuration
 public class JavaNodeKindFilterBuiltIns {
 
-  public static final String JAVA_DIR = "Java";
-
   public static final Path JAVA_NODE_FILTERS_PATH =
       DepanFxNodeKindFilterData.NODE_FILTERS_TOOL_PATH
-          .resolve(JAVA_DIR);
+          .resolve(JavaContextModelId.JAVA_KEY);
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeKindFilterData>

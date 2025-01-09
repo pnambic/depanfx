@@ -1,13 +1,13 @@
 package com.pnambic.depanfx.nodelist.gui.sections;
 
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFlatSectionData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderBy;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderDirection;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData.ContainerOrder;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData.ContainerOrder;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;

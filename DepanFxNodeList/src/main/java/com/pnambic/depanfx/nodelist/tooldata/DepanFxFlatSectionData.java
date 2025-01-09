@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.pnambic.depanfx.nodelist.tooldata;
 
-package com.pnambic.depanfx.nodelist.gui.tooldata;
-
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderBy;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderDirection;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
 
 /**
  * Persisted data for flat sections.

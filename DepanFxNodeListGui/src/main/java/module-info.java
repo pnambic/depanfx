@@ -1,4 +1,5 @@
 module depanfx.nodelist.gui {
+  requires javafx.base;
   requires javafx.controls;
   requires javafx.fxml;
   requires transitive javafx.graphics;
@@ -11,13 +12,12 @@ module depanfx.nodelist.gui {
   requires spring.beans;
 
   requires depanfx.graph;
+  requires depanfx.graph_doc;
   requires depanfx.nodelist;
   requires depanfx.persistence;
   requires depanfx.perspective;
-  requires depanfx.workspace;
-  requires depanfx.graph_doc;
   requires depanfx.scene;
-  requires javafx.base;
+  requires depanfx.workspace;
 
   opens com.pnambic.depanfx.nodelist.gui
       to javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;

@@ -3,9 +3,9 @@ package com.pnambic.depanfx.nodelist.gui;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSectionItem;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

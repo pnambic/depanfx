@@ -1,9 +1,9 @@
 package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseSectionData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFlatSectionData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxTreeSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 /**

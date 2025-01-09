@@ -1,8 +1,8 @@
 package com.pnambic.depanfx.nodelist.gui.sections;
 
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxBaseSectionData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderBy;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeListSectionData.OrderDirection;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
