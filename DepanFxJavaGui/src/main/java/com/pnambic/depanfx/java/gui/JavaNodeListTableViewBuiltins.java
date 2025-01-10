@@ -51,42 +51,25 @@ public class JavaNodeListTableViewBuiltins {
   public static final Path DERIVED_CLASS_TABLE_VIEW_PATH =
       JAVA_TABLE_VIEW_PATH.resolve(DERIVED_CLASS_TABLE_VIEW_NAME);
 
+  public static final Path AS_MEMBER_VIEW_CONTEXT_PATH =
+      JAVA_TABLE_VIEW_PATH.resolve(
+          DepanFxNodeListTableViewData.AS_MEMBER_VIEW_CONTEXT_NAME);
+
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
-      treeMembershipTableView() {
-
-    return new DepanFxBuiltInContribution.Dependent<DepanFxNodeListTableViewData>(
-        TREE_MEMBER_TABLE_VIEW_PATH) {
-
-      @Override
-      protected DepanFxNodeListTableViewData buildDocument(
-          DepanFxBuiltInProject project) {
-
-        // Flat and Members Sections
-        List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
-            sectionRsrcs = new ArrayList<>();
-        sectionRsrcs.add(getResource(project,
-            JavaNodeListSectionBuiltIns.TREE_MEMBERSHIP_TREE_SECTION_PATH));
-        sectionRsrcs.add(getResource(project,
-            DepanFxNodeListSectionBuiltIns.SIMPLE_SECTION_TOOL_PATH));
-
-        // Node Kind Column
-        List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
-            columnRsrcs = new ArrayList<>();
-        columnRsrcs.add(getResource(project,
-            DepanFxNodeKeyColumnBuiltIns.KIND_KEY_COLUMN_TOOL_PATH));
-
-        return new DepanFxNodeListTableViewData(
-            "Tree Hierarchy View",
-            "Table view based on tree member heirarchy",
-            sectionRsrcs, columnRsrcs);
-      }
-    };
+  treeMembershipTableView() {
+    return new AsMemberBuiltIn(AS_MEMBER_VIEW_CONTEXT_PATH);
   }
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
-      derivedClassTableView() {
+  javaAsMemberTableViewContext() {
+    return new AsMemberBuiltIn(JAVA_TABLE_VIEW_PATH);
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
+  derivedClassTableView() {
 
     return new DepanFxBuiltInContribution.Dependent<DepanFxNodeListTableViewData>(
         DERIVED_CLASS_TABLE_VIEW_PATH) {
@@ -114,5 +97,37 @@ public class JavaNodeListTableViewBuiltins {
             sectionRsrcs, columnRsrcs);
       }
     };
+  }
+
+  // Used for two built ins
+  private class AsMemberBuiltIn extends
+      DepanFxBuiltInContribution.Dependent<DepanFxNodeListTableViewData> {
+    private AsMemberBuiltIn(Path path) {
+      super(path);
+    }
+
+    @Override
+    protected DepanFxNodeListTableViewData buildDocument(
+        DepanFxBuiltInProject project) {
+
+      // Flat and Members Sections
+      List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
+          sectionRsrcs = new ArrayList<>();
+      sectionRsrcs.add(getResource(project,
+          JavaNodeListSectionBuiltIns.TREE_MEMBERSHIP_TREE_SECTION_PATH));
+      sectionRsrcs.add(getResource(project,
+          DepanFxNodeListSectionBuiltIns.SIMPLE_SECTION_TOOL_PATH));
+
+      // Node Kind Column
+      List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
+          columnRsrcs = new ArrayList<>();
+      columnRsrcs.add(getResource(project,
+          DepanFxNodeKeyColumnBuiltIns.KIND_KEY_COLUMN_TOOL_PATH));
+
+      return new DepanFxNodeListTableViewData(
+          "Tree Hierarchy View",
+          "Table view based on tree member heirarchy",
+          sectionRsrcs, columnRsrcs);
+    }
   }
 }

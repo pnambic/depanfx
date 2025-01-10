@@ -30,9 +30,9 @@ import javafx.scene.control.Cell;
 @Configuration
 public class DepanFxNodeListViewerConfiguration {
 
-  private static final String NODE_LIST_KEY = "Node List Key";
+  public static final String NODE_LIST_KEY = "Node List Key";
 
-  private static final String OPEN_AS_LIST = "Open as Node List";
+  public static final String OPEN_AS_LIST = "Open as Node List";
 
   @Autowired
   public DepanFxNodeListViewerConfiguration() {
@@ -181,15 +181,33 @@ public class DepanFxNodeListViewerConfiguration {
       String viewerTitle,
       DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
 
-    DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc =
-        DepanFxProjects.getBuiltIn(
-            workspace,  DepanFxNodeListTableViewData.class,
-            DepanFxNodeListViewBuiltIns.MEMBER_TABLE_VIEW_PATH).get();
-
     DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(
         viewerTitle, workspace, dialogRunner,
-        nodeListRsrc, tableViewRsrc);
+        nodeListRsrc, getTableViewResource(workspace, nodeListRsrc));
 
     scene.addViewer(viewer);
+  }
+
+  private static DepanFxWorkspaceResource<DepanFxNodeListTableViewData>
+  getTableViewResource(
+      DepanFxWorkspace workspace,
+      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
+
+    String modelContextKey = nodeListRsrc.getResource().getGraphDocResource()
+        .getResource().getContextModelId().getContextModelKey();
+    Path contextViewPath = DepanFxNodeListTableViewData.TABLE_VIEW_TOOL_PATH
+        .resolve(modelContextKey)
+        .resolve(DepanFxNodeListTableViewData.AS_MEMBER_VIEW_CONTEXT_NAME);
+
+    // If the context view path does not provide a valid resource,
+    // use the member view.
+    return
+        DepanFxProjects.getBuiltIn(
+             workspace,  DepanFxNodeListTableViewData.class, contextViewPath)
+        .orElseGet(() ->
+        DepanFxProjects.getBuiltIn(
+            workspace,  DepanFxNodeListTableViewData.class,
+            DepanFxNodeListViewBuiltIns.MEMBER_TABLE_VIEW_PATH).get());
+
   }
 }

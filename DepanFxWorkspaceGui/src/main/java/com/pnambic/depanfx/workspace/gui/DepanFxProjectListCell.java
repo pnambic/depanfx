@@ -23,6 +23,7 @@ import javafx.scene.text.FontWeight;
  */
 public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
 
+  @SuppressWarnings("unused")
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxProjectListCell.class);
 

@@ -34,7 +34,6 @@ import java.util.List;
 
 @Configuration
 public class FileSystemNodeListTableViewBuiltins {
-
   public static final Path FILE_SYSTEM_TABLE_VIEW_PATH =
       DepanFxNodeListTableViewData.TABLE_VIEW_TOOL_PATH
           .resolve(FileSystemContextModelId.FILE_SYSTEM_KEY);
@@ -45,35 +44,51 @@ public class FileSystemNodeListTableViewBuiltins {
   public static final Path FILE_SYSTEM_HIERARY_TABLE_VIEW_PATH =
       FILE_SYSTEM_TABLE_VIEW_PATH.resolve(FILE_SYSTEM_HIERARY_TABLE_VIEW_NAME);
 
+  public static final Path AS_MEMBER_VIEW_CONTEXT_PATH =
+      FILE_SYSTEM_TABLE_VIEW_PATH.resolve(
+          DepanFxNodeListTableViewData.AS_MEMBER_VIEW_CONTEXT_NAME);
+
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
       fileSystemHierarchyTableView() {
 
-    return new DepanFxBuiltInContribution.Dependent<DepanFxNodeListTableViewData>(
-        FILE_SYSTEM_HIERARY_TABLE_VIEW_PATH) {
+    return new TableViewBuiltin(FILE_SYSTEM_HIERARY_TABLE_VIEW_PATH);
+  }
 
-      @Override
-      protected DepanFxNodeListTableViewData buildDocument(
-          DepanFxBuiltInProject project) {
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
+      fileSystemAsMemberTableViewContext() {
 
-        // Flat and Members Sections
-        List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
-            sectionRsrcs = new ArrayList<>();
-        sectionRsrcs.add(getResource(project,
-            FileSystemNodeListSectionBuiltIns.FILE_SYSTEM_HIERARCHY_SECTION_PATH));
-        sectionRsrcs.add(getResource(project,
-            DepanFxNodeListSectionBuiltIns.SIMPLE_SECTION_TOOL_PATH));
+    return new TableViewBuiltin(AS_MEMBER_VIEW_CONTEXT_PATH);
+  }
 
-        // Node Kind Column
-        List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
-            columnRsrcs = new ArrayList<>();
-        columnRsrcs.add(getResource(project,
-            DepanFxNodeKeyColumnBuiltIns.KIND_KEY_COLUMN_TOOL_PATH));
+  private final class TableViewBuiltin extends
+      DepanFxBuiltInContribution.Dependent<DepanFxNodeListTableViewData> {
+    private TableViewBuiltin(Path path) {
+      super(path);
+    }
 
-        return new DepanFxNodeListTableViewData(
-            "Member Table View", "Table view membership",
-            sectionRsrcs, columnRsrcs);
-      }
-    };
+    @Override
+    protected DepanFxNodeListTableViewData buildDocument(
+        DepanFxBuiltInProject project) {
+
+      // Flat and Members Sections
+      List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
+          sectionRsrcs = new ArrayList<>();
+      sectionRsrcs.add(getResource(project,
+          FileSystemNodeListSectionBuiltIns.FILE_SYSTEM_HIERARCHY_SECTION_PATH));
+      sectionRsrcs.add(getResource(project,
+          DepanFxNodeListSectionBuiltIns.SIMPLE_SECTION_TOOL_PATH));
+
+      // Node Kind Column
+      List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
+          columnRsrcs = new ArrayList<>();
+      columnRsrcs.add(getResource(project,
+          DepanFxNodeKeyColumnBuiltIns.KIND_KEY_COLUMN_TOOL_PATH));
+
+      return new DepanFxNodeListTableViewData(
+          "Member Table View", "Table view membership",
+          sectionRsrcs, columnRsrcs);
+    }
   }
 }
