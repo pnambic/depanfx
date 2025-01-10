@@ -15,6 +15,9 @@
  */
 package com.pnambic.depanfx.java.context;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.file.Path;
 import java.util.Objects;
 
@@ -26,6 +29,8 @@ import java.util.Objects;
  * structure even when it is not enforced.
  */
 public class PackageNodeId extends JavaNodeId {
+
+  private static final Logger LOG = LoggerFactory.getLogger(PackageNodeId.class);
 
   private final String packagePath;
 
@@ -41,7 +46,12 @@ public class PackageNodeId extends JavaNodeId {
 
   @Override
   public String getSimpleName() {
-    return Path.of(packagePath).getFileName().toString();
+    try {
+      return Path.of(packagePath).getFileName().toString();
+    } catch (Exception e) {
+      LOG.debug("Unexpected package path {}", packagePath);
+    }
+    return getNodeKey();
   }
 
   public String getPackagePath() {
