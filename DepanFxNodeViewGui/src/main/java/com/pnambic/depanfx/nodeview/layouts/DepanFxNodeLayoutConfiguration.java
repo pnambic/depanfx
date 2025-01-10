@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodeview.layouts;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewPanel;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry.Contribution;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +63,15 @@ public class DepanFxNodeLayoutConfiguration {
     public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
         DepanFxNodeViewPanel view,
         DepanFxWorkspaceResource<?> layoutRsrc,
-        List<GraphNode> updateNodes) {
+        Collection<GraphNode> updateNodes) {
+      return GridLayoutRunner.buildNodeLocations(updateNodes);
+    }
+
+    @Override
+    public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
+        DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
+        DepanFxWorkspaceResource<?> layoutRsrc,
+        Collection<GraphNode> updateNodes) {
       return GridLayoutRunner.buildNodeLocations(updateNodes);
     }
   }
@@ -91,7 +101,15 @@ public class DepanFxNodeLayoutConfiguration {
     public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
         DepanFxNodeViewPanel view,
         DepanFxWorkspaceResource<?> layoutRsrc,
-        List<GraphNode> updateNodes) {
+        Collection<GraphNode> updateNodes) {
+      return GridLayoutRunner.buildNodeLocations(updateNodes);
+    }
+
+    @Override
+    public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
+        DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
+        DepanFxWorkspaceResource<?> layoutRsrc,
+        Collection<GraphNode> updateNodes) {
       return GridLayoutRunner.buildNodeLocations(updateNodes);
     }
   }

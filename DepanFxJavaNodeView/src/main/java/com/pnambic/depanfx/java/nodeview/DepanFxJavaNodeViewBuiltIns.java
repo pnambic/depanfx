@@ -51,7 +51,7 @@ public class DepanFxJavaNodeViewBuiltIns {
       "Java nodes, separated by Java node kind.";
 
   public static final Path JAVA_NODE_KIND_DISPLAY_DOC_PATH =
-      DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_PATH
+      DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_TOOL_PATH
         .resolve(JavaContextModelId.JAVA_KEY)
         .resolve(DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_CONTEXT_RESOURCE_NAME);
 

@@ -15,6 +15,7 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -50,16 +51,23 @@ public class RadialLayoutContribution
   public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
       DepanFxNodeViewPanel view,
       DepanFxWorkspaceResource<?> layoutRsrc,
-      List<GraphNode> updateNodes) {
+      Collection<GraphNode> updateNodes) {
+    return layoutNodes(view.getGraphDocRsrc(), layoutRsrc, updateNodes);
+  }
+
+  @Override
+  public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
+      DepanFxWorkspaceResource<?> layoutRsrc,
+      Collection<GraphNode> updateNodes) {
     DepanFxRadialLayoutData radialData =
         (DepanFxRadialLayoutData) layoutRsrc.getResource();
 
     DepanFxLinkMatcherDocument matcherDoc =
         (DepanFxLinkMatcherDocument) radialData.getHierarchyMatcherRsrc().getResource();
-    DepanFxLinkMatcher linkMatcher = matcherDoc.getMatcher();
 
     return buildNodeLocations(
-        view.getGraphDocRsrc(), updateNodes, linkMatcher);
+        graphDocRsrc, updateNodes, matcherDoc.getMatcher());
   }
 
   @Override
@@ -85,7 +93,7 @@ public class RadialLayoutContribution
 
   private Map<GraphNode, DepanFxNodeLocationData> buildNodeLocations(
       DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
-      List<GraphNode> updateNodes,
+      Collection<GraphNode> updateNodes,
       DepanFxLinkMatcher linkMatcher) {
     DepanFxTreeModelBuilder builder = new DepanFxTreeModelBuilder(linkMatcher);
     DepanFxTreeModel treeModel =

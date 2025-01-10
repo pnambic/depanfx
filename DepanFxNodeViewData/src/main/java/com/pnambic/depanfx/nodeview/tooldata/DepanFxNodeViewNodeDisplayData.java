@@ -64,7 +64,7 @@ public class DepanFxNodeViewNodeDisplayData extends DepanFxBaseToolData {
 
   public static final String NODE_DISPLAY_DIR = "Node Display";
 
-  public static final Path NODE_DISPLAY_PATH =
+  public static final Path NODE_DISPLAY_TOOL_PATH =
       DepanFxNodeViewData.NODE_VIEW_TOOL_PATH.resolve(NODE_DISPLAY_DIR);
 
   private final ContextModelId contextModelId;

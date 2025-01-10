@@ -34,6 +34,10 @@ public class DepanFxJavaLayoutRadialBuiltins {
       DepanFxNodeViewLayoutData.LAYOUT_TOOL_PATH.resolve(
           JavaContextModelId.JAVA_KEY);
 
+  public static final Path JAVA_MEMBER_LAYOUT_PATH =
+      JAVA_LAYOUT_PATH.resolve(
+          DepanFxNodeViewLayoutData.MEMBER_LAYOUT_RESOURCE_NAME);
+
   public static final String TREE_MEMBERSHIP_RADIAL_LAYOUT_NAME =
       "Tree Membership Radial Layout";
 
@@ -63,6 +67,16 @@ public class DepanFxJavaLayoutRadialBuiltins {
 
   public static final Path MODULE_USES_RADIAL_LAYOUT_PATH =
       JAVA_LAYOUT_PATH.resolve(MODULE_USES_RADIAL_LAYOUT_NAME);
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxRadialLayoutData>
+  javaMemberLayout() {
+    return DepanFxNodeViewLayouts.buildRadialLayoutContrib(
+        JAVA_MEMBER_LAYOUT_PATH,
+        "Java Tree Membership Tree Layout",
+        "Layout selected nodes based on their Java tree membership relations",
+        JavaLinkMatcherBuiltIns.JAVA_TREE_MEMBER_MATCHER_PATH);
+  }
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxRadialLayoutData>

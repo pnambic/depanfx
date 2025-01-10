@@ -4,7 +4,6 @@ import com.pnambic.depanfx.graph.context.BaseContextDefinition;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherBuiltIns;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -29,7 +28,7 @@ public class DepanFxGraphLinkViewBuiltIns {
   private static final String ALL_EDGES_DESCR = "All edges.";
 
   public static final Path ALL_EDGES_DISPLAY_DOC_PATH =
-      DepanFxNodeViewData.NODE_VIEW_TOOL_PATH
+      DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_TOOL_PATH
           .resolve(ALL_EDGES_DOC_NAME);
 
   @Autowired

@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.nodeview.layouts;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewPanel;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxShiftLayoutData;
@@ -27,6 +28,7 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,12 +63,30 @@ public class ShiftLayoutContribution
   public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
       DepanFxNodeViewPanel view,
       DepanFxWorkspaceResource<?> layoutRsrc,
-      List<GraphNode> updateNodes) {
+      Collection<GraphNode> updateNodes) {
     DepanFxShiftLayoutData shiftData =
         (DepanFxShiftLayoutData) layoutRsrc.getResource();
 
     Map<GraphNode, DepanFxNodeLocationData> startLocations =
         view.getNodeLocations(updateNodes.stream());
+
+    return buildNodeLocations(startLocations, shiftData);
+  }
+
+  @Override
+  public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
+      DepanFxWorkspaceResource<?> layoutRsrc,
+      Collection<GraphNode> updateNodes) {
+    DepanFxShiftLayoutData shiftData =
+        (DepanFxShiftLayoutData) layoutRsrc.getResource();
+
+    // Without a base, shift the nodes from the origin
+    Map<GraphNode, DepanFxNodeLocationData> startLocations =
+        updateNodes.stream().collect(
+            Collectors.toMap(
+                n -> n,
+                n -> DepanFxNodeLocationData.buildPoint()));
 
     return buildNodeLocations(startLocations, shiftData);
   }

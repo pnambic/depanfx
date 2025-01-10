@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodeview.layouts;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewPanel;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
@@ -11,9 +12,11 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -58,7 +61,20 @@ public class DepanFxNodeLayoutRegistry {
     Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
         DepanFxNodeViewPanel view,
         DepanFxWorkspaceResource<?> layoutRsrc,
-        List<GraphNode> updateNodes);
+        Collection<GraphNode> updateNodes);
+
+    /**
+     * Layouts that require additional context from {@code DepanFxNodeViewPanel}
+     * (e.g. shift layouts want the current location) may not behave as expected
+     * with this interface.
+     *
+     * Implementations will want to cast the supplied layout resource
+     * to their underlying data type.
+     */
+    Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
+        DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
+        DepanFxWorkspaceResource<?> layoutRsrc,
+        Collection<GraphNode> updateNodes);
   }
 
   private final List<Contribution> layoutContribs;
@@ -109,15 +125,29 @@ public class DepanFxNodeLayoutRegistry {
   public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
       DepanFxNodeViewPanel view,
       DepanFxWorkspaceResource<?> layoutRsrc,
-      List<GraphNode> updateNodes) {
+      Collection<GraphNode> updateNodes) {
+    return findLayoutContribution(layoutRsrc)
+        .map(l -> l.layoutNodes(view, layoutRsrc, updateNodes))
+        .orElse(Collections.emptyMap());
+    }
+
+  public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
+      DepanFxWorkspaceResource<?> layoutRsrc,
+      Collection<GraphNode> updateNodes) {
+    return findLayoutContribution(layoutRsrc)
+        .map(l -> l.layoutNodes(graphDocRsrc, layoutRsrc, updateNodes))
+        .orElse(Collections.emptyMap());
+    }
+
+  private Optional<Contribution> findLayoutContribution(
+      DepanFxWorkspaceResource<?> layoutRsrc) {
     return layoutContribs.stream()
         .map(this::examine)
         .filter(c -> c.getResourceFilter() != null)
         .filter(c -> c.getResourceFilter().matchDocument(layoutRsrc.getResource()))
-        .findFirst()
-        .map(l -> l.layoutNodes(view, layoutRsrc, updateNodes))
-        .orElse(Collections.emptyMap());
-    }
+        .findFirst();
+  }
 
   private Stream<Contribution> ordered(
       Predicate<? super Contribution> resourceFilter) {

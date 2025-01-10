@@ -11,12 +11,11 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxTreeLayoutData;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
-import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -57,7 +56,15 @@ public class TreeLayoutContribution
   public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
       DepanFxNodeViewPanel view,
       DepanFxWorkspaceResource<?> layoutRsrc,
-      List<GraphNode> updateNodes) {
+      Collection<GraphNode> updateNodes) {
+    return layoutNodes(view.getGraphDocRsrc(), layoutRsrc, updateNodes);
+  }
+
+  @Override
+  public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
+      DepanFxWorkspaceResource<?> layoutRsrc,
+      Collection<GraphNode> updateNodes) {
     DepanFxTreeLayoutData treeData =
         (DepanFxTreeLayoutData) layoutRsrc.getResource();
 
@@ -65,7 +72,7 @@ public class TreeLayoutContribution
         treeData.getHierarchyMatcherRsrc().getResource();
     DepanFxLinkMatcher linkMatcher = matcherDoc.getMatcher();
 
-    return buildNodeLocations(view.getGraphDocRsrc(), updateNodes, linkMatcher);
+    return buildNodeLocations(graphDocRsrc, updateNodes, linkMatcher);
   }
 
   @Override
@@ -91,7 +98,7 @@ public class TreeLayoutContribution
 
   private Map<GraphNode, DepanFxNodeLocationData> buildNodeLocations(
       DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
-      List<GraphNode> updateNodes,
+      Collection<GraphNode> updateNodes,
       DepanFxLinkMatcher linkMatcher) {
     DepanFxTreeModelBuilder builder = new DepanFxTreeModelBuilder(linkMatcher);
     DepanFxTreeModel treeModel =

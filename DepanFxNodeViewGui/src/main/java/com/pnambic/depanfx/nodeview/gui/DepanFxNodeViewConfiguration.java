@@ -181,7 +181,7 @@ public class DepanFxNodeViewConfiguration {
           (DepanFxWorkspaceResource<GraphDocument>) rsrc;
 
       return DepanFxNodeViews.fromGraphDocument(
-          graphDocResource, workspace);
+          graphDocResource, workspace, layoutRegistry);
     }
   }
 
@@ -216,7 +216,7 @@ public class DepanFxNodeViewConfiguration {
           (DepanFxWorkspaceResource<DepanFxNodeList>) rsrc;
 
       return DepanFxNodeViews.fromNodeList(
-          nodeListResource, workspace);
+          nodeListResource, workspace, layoutRegistry);
     }
   }
 

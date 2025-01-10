@@ -19,7 +19,6 @@ import com.pnambic.depanfx.graph.context.BaseContextDefinition;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersBuiltIns;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData.NodeDisplayEntry;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -43,7 +42,7 @@ public class DepanFxGraphNodeViewBuiltIns {
   private static final String ALL_NODES_DESCR = "All nodes.";
 
   public static final Path ALL_NODES_DISPLAY_DOC_PATH =
-      DepanFxNodeViewData.NODE_VIEW_TOOL_PATH
+      DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_TOOL_PATH
           .resolve(ALL_NODES_DOC_NAME);
 
   @Autowired

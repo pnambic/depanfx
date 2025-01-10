@@ -51,7 +51,7 @@ public class DepanFxFileSystemNodeViewBuiltIns {
       "File system nodes, separated by node kind.";
 
   public static final Path FILE_SYSTEM_NODE_KIND_DISPLAY_DOC_PATH =
-      DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_PATH
+      DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_TOOL_PATH
           .resolve(FileSystemContextModelId.FILE_SYSTEM_KEY)
           .resolve(DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_CONTEXT_RESOURCE_NAME);
 

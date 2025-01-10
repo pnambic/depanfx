@@ -57,7 +57,7 @@ public class DepanFxNodeDisplayDataChooser {
     DepanFxResourceChooser result =
         new DepanFxResourceChooser(workspace, dialogRunner);
     DepanFxResourcePerspectives.prepareResourceFinder(
-        result, DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_PATH);
+        result, DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_TOOL_PATH);
     result.getExtensionFilters().add(NODE_DISPLAY_FILTER);
     result.setSelectedExtensionFilter(NODE_DISPLAY_FILTER);
     return result;

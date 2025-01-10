@@ -11,7 +11,7 @@ import com.pnambic.depanfx.nodeview.builtins.DepanFxGraphLinkViewBuiltIns;
 import com.pnambic.depanfx.nodeview.builtins.DepanFxGraphNodeViewBuiltIns;
 import com.pnambic.depanfx.nodeview.jogl.JoglCameras;
 import com.pnambic.depanfx.nodeview.jogl.JoglColors;
-import com.pnambic.depanfx.nodeview.layouts.GridLayoutRunner;
+import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
@@ -24,20 +24,25 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewSceneData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.scene.paint.Color;
 
 public class DepanFxNodeViews {
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxNodeViews.class);
 
   public static final Color DEFAULT_BACKGROUND_COLOR =
       Color.rgb(240, 240, 240);     // cream
@@ -62,7 +67,7 @@ public class DepanFxNodeViews {
 
   public static DepanFxNodeViewData fromNodeList(
       DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc,
-      DepanFxWorkspace workspace) {
+      DepanFxWorkspace workspace, DepanFxNodeLayoutRegistry layoutRegistry) {
 
     DepanFxNodeList nodeList = nodeListRsrc.getResource();
     Collection<GraphNode> nodes = nodeList.getNodes().stream()
@@ -77,12 +82,12 @@ public class DepanFxNodeViews {
 
     return buildNodeView(
         resultName, resultDescr,
-        nodeList.getGraphDocResource(), nodes, workspace);
+        nodeList.getGraphDocResource(), nodes, workspace, layoutRegistry);
   }
 
   public static DepanFxNodeViewData fromGraphDocument(
       DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
-      DepanFxWorkspace workspace) {
+      DepanFxWorkspace workspace, DepanFxNodeLayoutRegistry layoutRegistry) {
 
     GraphDocument graphDoc = graphDocRsrc.getResource();
 
@@ -96,7 +101,7 @@ public class DepanFxNodeViews {
 
     return buildNodeView(
         resultName, resultDescr,
-        graphDocRsrc, nodes, workspace);
+        graphDocRsrc, nodes, workspace, layoutRegistry);
   }
 
   public static DepanFxNodeViewData updateNameDescr(
@@ -128,7 +133,8 @@ public class DepanFxNodeViews {
   private static DepanFxNodeViewData buildNodeView(
       String viewName, String viewDescr,
       DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
-      Collection<GraphNode> nodes, DepanFxWorkspace workspace) {
+      Collection<GraphNode> nodes, DepanFxWorkspace workspace,
+      DepanFxNodeLayoutRegistry layoutRegistry) {
     DepanFxNodeViewCameraData cameraData = JoglCameras.getHome();
     DepanFxNodeViewSceneData sceneData =
         new DepanFxNodeViewSceneData(
@@ -136,7 +142,7 @@ public class DepanFxNodeViews {
 
       ContextModelId modelId = graphDocRsrc.getResource().getContextModelId();
       DepanFxWorkspaceResource<DepanFxNodeViewLayoutData> layoutRsrc =
-          getContextLayout(workspace, modelId );
+          getContextLayout(workspace, modelId);
 
       // Nodes
       DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> nodeDisplayRsrc =
@@ -155,7 +161,7 @@ public class DepanFxNodeViews {
           availableEdgeRsrc;
 
     Map<GraphNode, DepanFxNodeLocationData> locations =
-        buildNodeLocations(nodes, layoutRsrc);
+        buildNodeLocations(layoutRegistry, graphDocRsrc, nodes, layoutRsrc);
     Map<GraphNode, DepanFxNodeDisplayData> nodeDisplay =
         buildNodeDisplay(nodes);
     Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay =
@@ -185,28 +191,22 @@ public class DepanFxNodeViews {
   }
 
   private static Map<GraphNode, DepanFxNodeLocationData> buildNodeLocations(
+      DepanFxNodeLayoutRegistry layoutRegistry,
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
       Collection<GraphNode> nodes,
       DepanFxWorkspaceResource<DepanFxNodeViewLayoutData> layoutRsrc) {
 
-    // TODO: Pick from alternatives for a better initial layout choice.
-    return GridLayoutRunner.buildNodeLocations(nodes);
+    return layoutRegistry.layoutNodes(graphDocRsrc, layoutRsrc, nodes);
   }
 
   private static DepanFxWorkspaceResource<DepanFxNodeViewLayoutData>
   getContextLayout(
       DepanFxWorkspace workspace, ContextModelId contextModelId) {
-
-    return null;
-  }
-
-  private static DepanFxWorkspaceResource<DepanFxNodeViewLayoutData>
-  TODOgetContextLayout(
-      DepanFxWorkspace workspace, ContextModelId contextModelId) {
-
     return getContextBuiltIn(workspace, contextModelId,
         DepanFxNodeViewLayoutData.class,
-        d -> null,
-        null); // DepanFxNodeLayoutConfiguration.ALL_EDGES_DOC_PATH);
+        DepanFxNodeViewLayoutData.LAYOUT_TOOL_PATH,
+        DepanFxNodeViewLayoutData.MEMBER_LAYOUT_RESOURCE_NAME)
+        .orElse(null);
   }
 
   private static DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData>
@@ -215,7 +215,8 @@ public class DepanFxNodeViews {
 
     return getContextBuiltIn(workspace, contextModelId,
         DepanFxNodeViewNodeDisplayData.class,
-        DepanFxNodeViewData.NODE_VIEW_TOOL_PATH, " Node Display",
+        DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_TOOL_PATH,
+        DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_CONTEXT_RESOURCE_NAME,
         DepanFxGraphNodeViewBuiltIns.ALL_NODES_DISPLAY_DOC_PATH);
   }
 
@@ -225,43 +226,36 @@ public class DepanFxNodeViews {
 
     return getContextBuiltIn(workspace, contextModelId,
         DepanFxNodeViewLinkDisplayData.class,
-        d -> d.getContextModelId(),
+        DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_TOOL_PATH,
+        DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_CONTEXT_RESOURCE_NAME,
         DepanFxGraphLinkViewBuiltIns.ALL_EDGES_DISPLAY_DOC_PATH);
   }
 
-  private static <T> DepanFxWorkspaceResource<T>
+  private static <T> Optional<DepanFxWorkspaceResource<T>>
   getContextBuiltIn(
         DepanFxWorkspace workspace, ContextModelId contextModelId,
-        Class<T> resourceType, Function<T, ContextModelId> getModel,
-        Path fallbackPath) {
+        Class<T> resourceType, Path contextBasePath, String rsrcName) {
 
-    return DepanFxProjects.getBuiltIn(
-            workspace, resourceType,
-            c -> byContextModel(c, contextModelId, getModel))
-        .orElseGet(() ->
-            DepanFxProjects.getBuiltIn(workspace, resourceType, fallbackPath)
-                .get());
+    Path contextPath = contextBasePath
+        .resolve(contextModelId.getContextModelKey())
+        .resolve(rsrcName);
+
+    return DepanFxProjects.getBuiltIn(workspace, resourceType, contextPath);
   }
 
   private static <T> DepanFxWorkspaceResource<T>
   getContextBuiltIn(
         DepanFxWorkspace workspace, ContextModelId contextModelId,
-        Class<T> resourceType, Path contextBasePath, String suffix,
+        Class<T> resourceType, Path contextBasePath, String rsrcName,
         Path fallbackPath) {
 
-    String resourceName = contextModelId.getContextModelKey() + suffix;
-    Path resourcePath = contextBasePath.resolve(resourceName);
-
-    return DepanFxProjects.getBuiltIn(workspace, resourceType, resourcePath)
-        .orElseGet(() ->
-            DepanFxProjects.getBuiltIn(workspace, resourceType, fallbackPath)
-                .get());
-  }
-
-  private static <T> boolean byContextModel(
-      DepanFxBuiltInContribution<T> contrib, ContextModelId contextModelId,
-      Function<T, ContextModelId> getModel) {
-
-    return contextModelId.equals(getModel.apply(contrib.getDocument()));
+    return getContextBuiltIn(
+        workspace, contextModelId, resourceType, contextBasePath, rsrcName)
+        .orElseGet(() -> {
+          LOG.info("Using fallback resource {} for {}({})",
+              fallbackPath, rsrcName, resourceType.getSimpleName());
+          return DepanFxProjects.getBuiltIn(
+              workspace, resourceType, fallbackPath).get();
+        });
   }
 }

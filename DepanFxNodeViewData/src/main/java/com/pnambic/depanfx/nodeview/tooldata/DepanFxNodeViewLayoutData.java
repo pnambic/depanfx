@@ -7,6 +7,8 @@ import java.nio.file.Path;
  */
 public class DepanFxNodeViewLayoutData {
 
+  public static final String MEMBER_LAYOUT_RESOURCE_NAME = "Member Layout";
+
   public static final String LAYOUT_TOOL_DIR = "Layouts";
 
   public static final Path LAYOUT_TOOL_PATH =

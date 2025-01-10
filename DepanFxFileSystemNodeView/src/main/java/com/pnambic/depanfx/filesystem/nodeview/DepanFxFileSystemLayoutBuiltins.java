@@ -35,6 +35,11 @@ public class DepanFxFileSystemLayoutBuiltins {
       DepanFxNodeViewLayoutData.LAYOUT_TOOL_PATH.resolve(
           FileSystemContextModelId.FILE_SYSTEM_KEY);
 
+  public static final Path FILE_SYSTEM_MEMBER_LAYOUT_PATH =
+      FILE_SYSTEM_LAYOUT_PATH.resolve(
+          DepanFxNodeViewLayoutData.MEMBER_LAYOUT_RESOURCE_NAME);
+
+
   public static final String FILE_SYSTEM_MEMBERSHIP_RADIAL_LAYOUT_NAME =
       "Member Radial Layout";
 
@@ -46,6 +51,16 @@ public class DepanFxFileSystemLayoutBuiltins {
 
   public static final Path FILE_SYSTEM_MEMBERSHIP_TREE_LAYOUT_PATH =
       FILE_SYSTEM_LAYOUT_PATH.resolve(PACKAGE_MEMBERSHIP_TREE_LAYOUT_NAME);
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxTreeLayoutData>
+  buildFileSystemMemberLayout() {
+    return DepanFxNodeViewLayouts.buildTreeLayoutContrib(
+        FILE_SYSTEM_MEMBER_LAYOUT_PATH,
+        "File System Member Tree Layout",
+        "Layout selected nodes based on their Java package member relations",
+        FileSystemLinkMatcherBuiltIns.FILE_SYSTEM_MEMBER_MATCHER_PATH);
+  }
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxRadialLayoutData>
