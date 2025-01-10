@@ -28,7 +28,7 @@ public class DepanFxNodeListTableViewData extends DepanFxBaseToolData {
 
   public static final String TABLE_VIEW_TOOL_EXT = "dtvti";
 
-  public static final String AS_MEMBER_VIEW_CONTEXT_NAME = "As Member View";
+  public static final String TABLE_VIEW_CONTEXT_RESOURCE_NAME = "Table View";
 
   public static final Path TABLE_VIEW_TOOL_PATH =
       DepanFxNodeListData.NODE_LIST_TOOL_PATH.resolve(TABLE_VIEWS_TOOL_DIR);

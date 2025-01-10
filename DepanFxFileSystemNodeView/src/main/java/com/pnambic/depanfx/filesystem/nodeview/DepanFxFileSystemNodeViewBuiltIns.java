@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.filesystem.nodeview;
 
 import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
+import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
 import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemNodeKindFilterBuiltIns;
 import com.pnambic.depanfx.graph.context.ContextNodeKindId;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
@@ -43,9 +44,6 @@ import javafx.scene.paint.Color;
 @Configuration
 public class DepanFxFileSystemNodeViewBuiltIns {
 
-  private static final String FILE_SYSTEM_NODE_NAME =
-      "File System Node Display";
-
   private static final String FILE_SYSTEM_NODE_KINDS_NAME =
       "File System Nodes by Node Kind";
 
@@ -53,7 +51,9 @@ public class DepanFxFileSystemNodeViewBuiltIns {
       "File system nodes, separated by node kind.";
 
   public static final Path FILE_SYSTEM_NODE_KIND_DISPLAY_DOC_PATH =
-      DepanFxNodeViewData.NODE_VIEW_TOOL_PATH.resolve(FILE_SYSTEM_NODE_NAME);
+      DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_PATH
+          .resolve(FileSystemContextModelId.FILE_SYSTEM_KEY)
+          .resolve(DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_CONTEXT_RESOURCE_NAME);
 
   @Autowired
   public DepanFxFileSystemNodeViewBuiltIns() {

@@ -45,12 +45,14 @@ public class DepanFxNodeViewLinkDisplayData extends DepanFxBaseToolData {
     }
   }
 
-  public static final String LINK_DISPLAY_DIR = "Link Display";
-
-  public static final Path LINK_DISPLAY_PATH =
-      DepanFxNodeViewData.NODE_VIEW_TOOL_PATH.resolve(LINK_DISPLAY_DIR);
-
   public static final String NODE_VIEW_LINK_DISPLAY_EXT = "dnvedi";
+
+  public static final String EDGE_DISPLAY_CONTEXT_RESOURCE_NAME = "Edge Display";
+
+  public static final String EDGE_DISPLAY_DIR = "Edge Display";
+
+  public static final Path EDGE_DISPLAY_TOOL_PATH =
+      DepanFxNodeViewData.NODE_VIEW_TOOL_PATH.resolve(EDGE_DISPLAY_DIR);
 
   private final ContextModelId contextModelId;
 

@@ -34,6 +34,7 @@ import java.util.List;
 
 @Configuration
 public class FileSystemNodeListTableViewBuiltins {
+
   public static final Path FILE_SYSTEM_TABLE_VIEW_PATH =
       DepanFxNodeListTableViewData.TABLE_VIEW_TOOL_PATH
           .resolve(FileSystemContextModelId.FILE_SYSTEM_KEY);
@@ -44,9 +45,9 @@ public class FileSystemNodeListTableViewBuiltins {
   public static final Path FILE_SYSTEM_HIERARY_TABLE_VIEW_PATH =
       FILE_SYSTEM_TABLE_VIEW_PATH.resolve(FILE_SYSTEM_HIERARY_TABLE_VIEW_NAME);
 
-  public static final Path AS_MEMBER_VIEW_CONTEXT_PATH =
+  public static final Path FILE_SYSTEM_TABLE_VIEW_CONTEXT_RESOURCE_PATH =
       FILE_SYSTEM_TABLE_VIEW_PATH.resolve(
-          DepanFxNodeListTableViewData.AS_MEMBER_VIEW_CONTEXT_NAME);
+          DepanFxNodeListTableViewData.TABLE_VIEW_CONTEXT_RESOURCE_NAME);
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
@@ -59,7 +60,7 @@ public class FileSystemNodeListTableViewBuiltins {
   public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
       fileSystemAsMemberTableViewContext() {
 
-    return new TableViewBuiltin(AS_MEMBER_VIEW_CONTEXT_PATH);
+    return new TableViewBuiltin(FILE_SYSTEM_TABLE_VIEW_CONTEXT_RESOURCE_PATH);
   }
 
   private final class TableViewBuiltin extends
@@ -87,7 +88,8 @@ public class FileSystemNodeListTableViewBuiltins {
           DepanFxNodeKeyColumnBuiltIns.KIND_KEY_COLUMN_TOOL_PATH));
 
       return new DepanFxNodeListTableViewData(
-          "Member Table View", "Table view membership",
+          "File System Hierarchy Table View",
+          "Node list view by File System member relations",
           sectionRsrcs, columnRsrcs);
     }
   }

@@ -17,6 +17,7 @@ package com.pnambic.depanfx.java.nodeview;
 
 import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemLinkMatcherBuiltIns;
 import com.pnambic.depanfx.java.context.JavaContextDefinition;
+import com.pnambic.depanfx.java.context.JavaContextModelId;
 import com.pnambic.depanfx.java.nodelist.link.JavaLinkMatcherBuiltIns;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
@@ -26,7 +27,6 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineForm;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineLabel;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineStyle;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -47,8 +47,6 @@ import javafx.scene.paint.Color;
 @Configuration
 public class DepanFxJavaLinkViewBuiltIns {
 
-  private static final String JAVA_EDGES_NAME = "Java Edge Display";
-
   private static final String JAVA_EDGE_RELATIONS_NAME =
       "Java Edges by Java Relation Type";
 
@@ -56,8 +54,9 @@ public class DepanFxJavaLinkViewBuiltIns {
       "Java edges, separated by Java relation type.";
 
   public static final Path JAVA_EDGE_RELATION_DISPLAY_DOC_PATH =
-      DepanFxNodeViewData.NODE_VIEW_TOOL_PATH
-          .resolve(JAVA_EDGES_NAME);
+      DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_TOOL_PATH
+          .resolve(JavaContextModelId.JAVA_KEY)
+          .resolve(DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_CONTEXT_RESOURCE_NAME);
 
   @Autowired
   public DepanFxJavaLinkViewBuiltIns() {

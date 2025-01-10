@@ -255,7 +255,7 @@ public class DepanFxNodeViewLinkDisplayDialog
   protected File buildInitialDestinationFile() {
     return buildToolInitialDestination(
         DepanFxNodeViewLinkDisplayData.NODE_VIEW_LINK_DISPLAY_EXT,
-        DepanFxNodeViewLinkDisplayData.LINK_DISPLAY_PATH);
+        DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_TOOL_PATH);
   }
 
   @Override

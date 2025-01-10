@@ -19,6 +19,7 @@ dependencies {
   implementation project(':DepanFxFileSystem')
   implementation project(':DepanFxNodeFilters')
   implementation project(':DepanFxNodeList')
+  implementation project(':DepanFxNodeViewData')
   implementation project(':DepanFxPersistence')
   implementation project(':DepanFxPerspective')
   implementation project(':DepanFxScene')

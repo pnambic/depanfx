@@ -58,12 +58,14 @@ public class DepanFxNodeViewNodeDisplayData extends DepanFxBaseToolData {
     }
   }
 
+  public static final String NODE_VIEW_NODE_DISPLAY_EXT = "dnvndi";
+
+  public static final String NODE_DISPLAY_CONTEXT_RESOURCE_NAME = "Node Display";
+
   public static final String NODE_DISPLAY_DIR = "Node Display";
 
   public static final Path NODE_DISPLAY_PATH =
       DepanFxNodeViewData.NODE_VIEW_TOOL_PATH.resolve(NODE_DISPLAY_DIR);
-
-  public static final String NODE_VIEW_NODE_DISPLAY_EXT = "dnvndi";
 
   private final ContextModelId contextModelId;
 

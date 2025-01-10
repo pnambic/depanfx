@@ -20,6 +20,18 @@ import javafx.scene.paint.Color;
 
 public class DepanFxNodeViewData extends DepanFxBaseToolData {
 
+  public static final String NODE_VIEW_TOOL_EXT = "dnvi";
+
+  public static final String NODE_VIEW_DIR = "Node Views";
+
+  public static final Path NODE_VIEW_TOOL_PATH =
+      DepanFxProjects.TOOLS_PATH.resolve(NODE_VIEW_DIR);
+
+  public static final String NODE_DISPLAY_DIR = "Node Display";
+
+  public static final Path NODE_DISPLAY_TOOL_PATH =
+      NODE_VIEW_TOOL_PATH.resolve(NODE_DISPLAY_DIR);
+
   public static final boolean DEFAULT_REMAINDER_NODES_VISIBLE = true;
 
   public static final DepanFxNodeDisplayData DEFAULT_REMAINDER_NODE_DISPLAY =
@@ -32,14 +44,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   public static final DepanFxLineDisplayData DEFAULT_REMAINDER_EDGE_DISPLAY =
       buildRemainerEdgeDisplay();
 
-  public static final String NODE_VIEW_TOOL_EXT = "dnvi";
-
-  public static final String NODE_VIEW_DIR = "Node Views";
-
   public static final String SIMPLE_VIEW_NAME = "Simple View";
-
-  public static final Path NODE_VIEW_TOOL_PATH =
-      DepanFxProjects.TOOLS_PATH.resolve(NODE_VIEW_DIR);
 
   private final DepanFxWorkspaceResource<GraphDocument> graphDocRsrc;
 

@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.filesystem.nodeview;
 
+import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
 import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemLinkMatcherBuiltIns;
 import com.pnambic.depanfx.graph.context.BaseContextDefinition;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
@@ -25,7 +26,6 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineForm;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineLabel;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineStyle;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -46,9 +46,6 @@ import javafx.scene.paint.Color;
 @Configuration
 public class DepanFxFileSystemLinkViewBuiltIns {
 
-  private static final String FILE_SYSTEM_EDGES_NAME =
-      "File System Edge Display";
-
   private static final String FILE_SYSTEM_EDGE_RELATION_NAME =
       "Files System Edges by Relation Type.";
 
@@ -56,8 +53,9 @@ public class DepanFxFileSystemLinkViewBuiltIns {
       "Files system edges, separated by relation type.";
 
   public static final Path FILE_SYSTEM_EDGE_RELATION_DISPLAY_DOC_PATH =
-      DepanFxNodeViewData.NODE_VIEW_TOOL_PATH
-          .resolve(FILE_SYSTEM_EDGES_NAME);
+      DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_TOOL_PATH
+          .resolve(FileSystemContextModelId.FILE_SYSTEM_KEY)
+          .resolve(DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_CONTEXT_RESOURCE_NAME);
 
   @Autowired
   public DepanFxFileSystemLinkViewBuiltIns() {

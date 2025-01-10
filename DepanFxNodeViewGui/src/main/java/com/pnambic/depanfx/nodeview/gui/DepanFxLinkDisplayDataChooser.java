@@ -42,7 +42,7 @@ public class DepanFxLinkDisplayDataChooser {
     DepanFxResourceChooser result =
         new DepanFxResourceChooser(workspace, dialogRunner);
     DepanFxResourcePerspectives.prepareResourceFinder(
-        result, DepanFxNodeViewLinkDisplayData.LINK_DISPLAY_PATH);
+        result, DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_TOOL_PATH);
     result.getExtensionFilters().add(LINK_DISPLAY_FILTER);
     result.setSelectedExtensionFilter(LINK_DISPLAY_FILTER);
     return result;

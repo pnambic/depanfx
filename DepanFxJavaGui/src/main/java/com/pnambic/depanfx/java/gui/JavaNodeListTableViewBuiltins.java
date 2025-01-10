@@ -51,20 +51,20 @@ public class JavaNodeListTableViewBuiltins {
   public static final Path DERIVED_CLASS_TABLE_VIEW_PATH =
       JAVA_TABLE_VIEW_PATH.resolve(DERIVED_CLASS_TABLE_VIEW_NAME);
 
-  public static final Path AS_MEMBER_VIEW_CONTEXT_PATH =
+  public static final Path JAVA_TABLE_VIEW_CONTEXT_RESOURCE_PATH =
       JAVA_TABLE_VIEW_PATH.resolve(
-          DepanFxNodeListTableViewData.AS_MEMBER_VIEW_CONTEXT_NAME);
+          DepanFxNodeListTableViewData.TABLE_VIEW_CONTEXT_RESOURCE_NAME);
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
   treeMembershipTableView() {
-    return new AsMemberBuiltIn(AS_MEMBER_VIEW_CONTEXT_PATH);
+    return new AsMemberBuiltIn(JAVA_TABLE_VIEW_CONTEXT_RESOURCE_PATH);
   }
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
   javaAsMemberTableViewContext() {
-    return new AsMemberBuiltIn(JAVA_TABLE_VIEW_PATH);
+    return new AsMemberBuiltIn(TREE_MEMBER_TABLE_VIEW_PATH);
   }
 
   @Bean

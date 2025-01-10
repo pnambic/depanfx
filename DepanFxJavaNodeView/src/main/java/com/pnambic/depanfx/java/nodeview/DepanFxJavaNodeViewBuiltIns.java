@@ -19,12 +19,12 @@ import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
 import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemNodeKindFilterBuiltIns;
 import com.pnambic.depanfx.graph.context.ContextNodeKindId;
 import com.pnambic.depanfx.java.context.JavaContextDefinition;
+import com.pnambic.depanfx.java.context.JavaContextModelId;
 import com.pnambic.depanfx.java.nodelist.link.JavaNodeKindFilterBuiltIns;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglShape;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData.NodeDisplayEntry;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -45,15 +45,15 @@ import javafx.scene.paint.Color;
 @Configuration
 public class DepanFxJavaNodeViewBuiltIns {
 
-  private static final String JAVA_NODE_NAME = "Java Node Display";
-
   private static final String JAVA_NODE_KINDS_NAME = "Java Nodes by Node Kind";
 
   private static final String JAVA_NODE_KINDS_DESCR =
       "Java nodes, separated by Java node kind.";
 
   public static final Path JAVA_NODE_KIND_DISPLAY_DOC_PATH =
-      DepanFxNodeViewData.NODE_VIEW_TOOL_PATH.resolve(JAVA_NODE_NAME);
+      DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_PATH
+        .resolve(JavaContextModelId.JAVA_KEY)
+        .resolve(DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_CONTEXT_RESOURCE_NAME);
 
   @Autowired
   public DepanFxJavaNodeViewBuiltIns() {

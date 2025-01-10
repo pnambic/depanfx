@@ -197,7 +197,7 @@ public class DepanFxNodeListViewerConfiguration {
         .getResource().getContextModelId().getContextModelKey();
     Path contextViewPath = DepanFxNodeListTableViewData.TABLE_VIEW_TOOL_PATH
         .resolve(modelContextKey)
-        .resolve(DepanFxNodeListTableViewData.AS_MEMBER_VIEW_CONTEXT_NAME);
+        .resolve(DepanFxNodeListTableViewData.TABLE_VIEW_CONTEXT_RESOURCE_NAME);
 
     // If the context view path does not provide a valid resource,
     // use the member view.
