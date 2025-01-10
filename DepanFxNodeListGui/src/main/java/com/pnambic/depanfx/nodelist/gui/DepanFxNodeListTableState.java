@@ -58,8 +58,7 @@ public class DepanFxNodeListTableState {
 
   private final DepanFxNodeListTableFactory tableFactory;
 
-  // Table view columns and sections can be reloaded.
-  private DepanFxNodeListTableViewData tableView;
+  private DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc;
 
   private List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
       sectionResources;
@@ -160,9 +159,15 @@ public class DepanFxNodeListTableState {
   /////////////////////////////////////
   // Tree view
 
-  public void setTableView(DepanFxNodeListTableViewData tableView) {
-    this.tableView = tableView;
+  public void setTableViewResource(
+      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc) {
+    this.tableViewRsrc = tableViewRsrc;
     prepareTableView();
+  }
+
+  public DepanFxWorkspaceResource<DepanFxNodeListTableViewData>
+  getTableViewResource() {
+    return tableViewRsrc;
   }
 
   public DepanFxNodeListTableViewData getTableView() {
@@ -174,8 +179,9 @@ public class DepanFxNodeListTableState {
         .map(r -> (DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>) r)
         .collect(Collectors.toList());
 
+    DepanFxNodeListTableViewData tableViewInfo = tableViewRsrc.getResource();
     return new DepanFxNodeListTableViewData(
-        tableView.getToolName(), tableView.getToolDescription(),
+        tableViewInfo.getToolName(), tableViewInfo.getToolDescription(),
         sectionResources, columnResources);
   }
 
@@ -262,8 +268,9 @@ public class DepanFxNodeListTableState {
     nameColumn.setCellFactory(p -> tableFactory.createTableCell());
 
     // Prepare the table view's columns.
+    DepanFxNodeListTableViewData tableViewInfo = tableViewRsrc.getResource();
     List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
-        srcColumnRsrcs = tableView.getColumnResources();
+        srcColumnRsrcs = tableViewInfo.getColumnResources();
     int srcColumnCnt = srcColumnRsrcs.size();
     columns = new ArrayList<>(srcColumnCnt);
 
@@ -271,7 +278,7 @@ public class DepanFxNodeListTableState {
 
     // Prepare the table view's sections.
     List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
-        srcSectionRsrcs = tableView.getSectionResources();
+        srcSectionRsrcs = tableViewInfo.getSectionResources();
     int srcSectionCnt = srcSectionRsrcs.size();
     sectionResources = new ArrayList<>(srcSectionCnt);
     sections = new ArrayList<>(srcSectionCnt);

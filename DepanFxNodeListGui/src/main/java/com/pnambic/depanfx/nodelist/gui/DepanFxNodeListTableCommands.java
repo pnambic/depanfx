@@ -154,7 +154,7 @@ public class DepanFxNodeListTableCommands {
   private void runNodeListTableViewChooser() {
     DepanFxNodeListTableViewSaveDialog
         .runTableViewChooser(workspace, dialogRunner, tableState.getScene())
-        .ifPresent(r -> tableState.setTableView(r.getResource()));
+        .ifPresent(tableState::setTableViewResource);
   }
 
   private void runSelectionNodeListDialog() {
@@ -172,7 +172,7 @@ public class DepanFxNodeListTableCommands {
   private void runNodeListTableViewSaveDialog() {
     DepanFxWorkspaceResource<DepanFxNodeListTableViewData> updateViewRsrc =
         DepanFxWorkspaceResource.forUpdate(
-            tableAdapter.getTableViewResource(), tableState.getTableView());
+            tableState.getTableViewResource(), tableState.getTableView());
 
     DepanFxNodeListTableViewSaveDialog
         .runSaveTableView(dialogRunner, updateViewRsrc)

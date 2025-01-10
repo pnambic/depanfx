@@ -33,8 +33,6 @@ public class DepanFxNodeListTableController
 
   private final DepanFxNodeListTableState tableState;
 
-  private DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc;
-
   public DepanFxNodeListTableController(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
@@ -45,10 +43,9 @@ public class DepanFxNodeListTableController
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
     this.nodeList = nodeList;
-    this.tableViewRsrc = tableViewRsrc;
 
     tableState = prepareNodeListTable(
-        tableViewRsrc.getResource(), treeTable, selectedNodes);
+        tableViewRsrc, treeTable, selectedNodes);
   }
 
   @Override // DepanFxNodeListTableAdapter
@@ -81,14 +78,13 @@ public class DepanFxNodeListTableController
 
   @Override // DepanFxNodeListTableAdapter
   public DepanFxWorkspaceResource<DepanFxNodeListTableViewData> getTableViewResource() {
-    return tableViewRsrc;
+    return tableState.getTableViewResource();
   }
 
   @Override // DepanFxNodeListTableAdapter
   public void setTableViewResource(
       DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc) {
-    this.tableViewRsrc = tableViewRsrc;
-    setTableView(tableViewRsrc.getResource());
+    tableState.setTableViewResource(tableViewRsrc);
   }
 
   public TreeTableView<DepanFxNodeListMember> getNodeListTable() {
@@ -98,10 +94,6 @@ public class DepanFxNodeListTableController
   public DepanFxNodeListTableCommands buildTableCommands() {
     return new DepanFxNodeListTableCommands(
         workspace, dialogRunner, this, tableState);
-  }
-
-  public void setTableView(DepanFxNodeListTableViewData tableView) {
-    tableState.setTableView(tableView);
   }
 
   public void doSelectAllAction() {
@@ -170,7 +162,7 @@ public class DepanFxNodeListTableController
   }
 
   private DepanFxNodeListTableState prepareNodeListTable(
-      DepanFxNodeListTableViewData tableView,
+      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc,
       TreeTableView<DepanFxNodeListMember> treeTable,
       DepanFxNodeListSelection selectedNodes) {
 
@@ -179,7 +171,7 @@ public class DepanFxNodeListTableController
             workspace, nodeList, selectedNodes,
             treeTable, new DepanFxNodeListTableFactory(this));
 
-    result.setTableView(tableView);
+    result.setTableViewResource(tableViewRsrc);
     return result;
   }
 }
