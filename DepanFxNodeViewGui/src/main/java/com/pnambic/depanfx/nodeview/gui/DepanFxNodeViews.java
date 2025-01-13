@@ -142,7 +142,7 @@ public class DepanFxNodeViews {
 
       ContextModelId modelId = graphDocRsrc.getResource().getContextModelId();
       DepanFxWorkspaceResource<DepanFxNodeViewLayoutData> layoutRsrc =
-          getContextLayout(workspace, modelId);
+          getContextLayout(workspace, modelId).orElse(null);
 
       // Nodes
       DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> nodeDisplayRsrc =
@@ -199,14 +199,13 @@ public class DepanFxNodeViews {
     return layoutRegistry.layoutNodes(graphDocRsrc, layoutRsrc, nodes);
   }
 
-  private static DepanFxWorkspaceResource<DepanFxNodeViewLayoutData>
+  private static Optional<DepanFxWorkspaceResource<DepanFxNodeViewLayoutData>>
   getContextLayout(
       DepanFxWorkspace workspace, ContextModelId contextModelId) {
     return getContextBuiltIn(workspace, contextModelId,
         DepanFxNodeViewLayoutData.class,
         DepanFxNodeViewLayoutData.LAYOUT_TOOL_PATH,
-        DepanFxNodeViewLayoutData.MEMBER_LAYOUT_RESOURCE_NAME)
-        .orElse(null);
+        DepanFxNodeViewLayoutData.MEMBER_LAYOUT_RESOURCE_NAME);
   }
 
   private static DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData>
