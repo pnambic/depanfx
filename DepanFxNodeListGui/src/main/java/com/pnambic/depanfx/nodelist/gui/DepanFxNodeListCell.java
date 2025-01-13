@@ -8,6 +8,7 @@ import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSectionToolDialog;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeFork;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeLeaf;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeSectionToolDialog;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
@@ -26,6 +27,9 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -33,12 +37,19 @@ import java.util.Optional;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.cell.CheckBoxTreeTableCell;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.util.StringConverter;
 
 public class DepanFxNodeListCell
     extends CheckBoxTreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember> {
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxNodeListCell.class);
 
   private static final String SELECT_FLAT_SECTION = "Select Flat Section...";
 
@@ -54,12 +65,25 @@ public class DepanFxNodeListCell
   private static final String INSERT_ABOVE_MEMBER_TREE_SECTION =
       "Insert Member Tree Section";
 
+  // Copy behaviors
+  private static final String COPY_ITEM = "Copy";
+
+  private static final String COPY_AS_ITEM = "Copy as";
+
+  private static final String COPY_DISPLAY_ITEM = "Display";
+
+  private static final String COPY_NODE_KEY = "Node Key";
+
+  private static final String COPY_SIMPLE_NAME = "Short Name";
+
   // Fork/Directory actions
   private static final String SELECT_RECURSIVE = "Select Recursive";
 
   private static final String CLEAR_RECURSIVE = "Clear Recursive";
 
   private static final String EXPAND_CHILDREN = "Expand Children";
+
+  private static final String EXPAND_TREE_100 = "Expand Tree (100)";
 
   // Allow cells to act on viewer (e.g. change sections, etc.)
   private final DepanFxNodeListTableAdapter tableAdapter;
@@ -90,24 +114,35 @@ public class DepanFxNodeListCell
   }
 
   private void stylizeCell(DepanFxNodeListMember member) {
-
-    if (member instanceof DepanFxFlatSection) {
-      setContextMenu(nodeListSectionMenu((DepanFxFlatSection) member));
+    switch (member) {
+    case DepanFxFlatSection flat:
+      setContextMenu(nodeListSectionMenu(flat));
       return;
-    }
-
-    if (member instanceof DepanFxTreeFork) {
-      setContextMenu(treeForkMenu((DepanFxTreeFork) member));
+    case  DepanFxTreeLeaf leaf:
+      setContextMenu(DepanFxTreeLeaf(leaf));
       return;
-    }
-
-    if (member instanceof DepanFxTreeSection) {
-      setContextMenu(treeSectionMenu((DepanFxTreeSection) member));
+    case DepanFxTreeFork fork:
+      setContextMenu(treeForkMenu(fork));
       return;
+    case DepanFxTreeSection tree:
+      setContextMenu(treeSectionMenu(tree));
+      return;
+    default:
+      LOG.warn("Unrecognized node list element of class {}",
+          member.getClass().getName());
     }
 
     // Otherwise clear the context menu
     setContextMenu(null);
+  }
+
+  private ContextMenu DepanFxTreeLeaf(DepanFxTreeLeaf leaf) {
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem(
+        COPY_ITEM,
+        e -> runCopyFrom(leaf.getDisplayName()));
+    builder.appendSubMenu(buildCopyMenu(leaf));
+    return builder.build();
   }
 
   private ContextMenu nodeListSectionMenu(DepanFxFlatSection member) {
@@ -153,16 +188,43 @@ public class DepanFxNodeListCell
         e -> runSelectRecursiveAction(fork, false));
     builder.appendSeparator();
     builder.appendActionItem(
-        EXPAND_CHILDREN,
-        e -> runExpandChildrenAction());
+        COPY_ITEM,
+        e -> runCopyFrom(fork.getDisplayName()));
+    builder.appendSubMenu(buildCopyMenu(fork));
+    builder.appendSeparator();
+    builder.appendActionItem(
+        EXPAND_TREE_100,
+        e -> runExpandTreeAction());
     return builder.build();
   }
 
-  private void runExpandChildrenAction() {
+  private Menu buildCopyMenu(DepanFxNodeListGraphNode node) {
+    Menu result = new Menu(COPY_AS_ITEM);
+    ObservableList<MenuItem> items = result.getItems();
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        COPY_DISPLAY_ITEM,
+        e -> runCopyFrom(node.getDisplayName())));
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        COPY_NODE_KEY,
+        e -> runCopyFrom(node.getGraphNode().getId().getNodeKey())));
+    items.add(DepanFxContextMenuBuilder.createActionItem(
+        COPY_SIMPLE_NAME,
+        e -> runCopyFrom(node.getGraphNode().getId().getSimpleName())));
+    return result;
+  }
+
+  private void runCopyFrom(String src) {
+    Clipboard clipboard = Clipboard.getSystemClipboard();
+    ClipboardContent content = new ClipboardContent();
+    content.putString(src);
+    clipboard.setContent(content);
+  }
+
+  private void runExpandTreeAction() {
     TreeItem<DepanFxNodeListMember> tree = getTableRow().getTreeItem();
     BreadthExpander expander = new BreadthExpander(100);
     expander.addBreadthItems(tree.getChildren());
-    expander.expandChildren();
+    expander.expandTree();
     tree.setExpanded(true);
   }
 
@@ -288,7 +350,7 @@ public class DepanFxNodeListCell
       breadthItems.addAll(moreItems);
     }
 
-    public void expandChildren() {
+    public void expandTree() {
       for (int next = 0; next < breadthItems.size(); next++) {
         if (expandLimit <= 0) {
           return;
