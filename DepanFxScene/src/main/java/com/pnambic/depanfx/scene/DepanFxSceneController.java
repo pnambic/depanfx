@@ -148,6 +148,7 @@ public class DepanFxSceneController {
     Tab tab = viewer.getSceneTab(this);
     sceneViewers.put(viewer, tab);
 
+    tab.setOnClosed(event -> sceneViewers.remove(viewer));
     viewRoot.getTabs().add(tab);
   }
 
