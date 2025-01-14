@@ -225,10 +225,13 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     });
 
     result.setContextMenu(buildViewContextMenu());
-
-    result.setOnClosed(e -> closeTab());
-    result.setOnCloseRequest(e -> closeTab());
     return result;
+  }
+
+  @Override // DepanFxSceneViewer
+  public void closeTab() {
+    joglPane.close();
+    closeSideViews();
   }
 
   public DepanFxWorkspace getWorkspace() {
@@ -472,10 +475,6 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   /**
    * Release all resources for the tab.
    */
-  private void closeTab() {
-    joglPane.close();
-    closeSideViews();
-  }
 
   private void showSideViews() {
     sideViews.forEach(e -> e.show());

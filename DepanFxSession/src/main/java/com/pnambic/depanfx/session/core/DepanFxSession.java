@@ -21,6 +21,8 @@ import com.pnambic.depanfx.scene.DepanFxSceneController;
 import com.pnambic.depanfx.session.gui.DepanFxSessionSaveDialog;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +43,9 @@ import javafx.stage.Stage;
  */
 @Component
 public class DepanFxSession implements DepanFxSceneController.SceneOwner {
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxSession.class);
 
   public static DepanFxSceneConfig EMPTY_SESSION_SCENE =
       new DepanFxSceneConfig("Empty Session", "Empty",
@@ -126,9 +131,12 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
     // Start additional scenes on secondary stages.
     while (sceneSeq.hasNext()) {
       DepanFxSceneConfig sceneInfo = sceneSeq.next();
-      Stage sceneStage = new Stage();
-      addScene(sceneStage, sceneInfo);
+      addScene(sceneInfo);
     }
+  }
+
+  public void stopSession() {
+    sceneMap.keySet().forEach(c -> c.closeScene());
   }
 
   public void addScene(DepanFxSceneConfig sceneInfo)
@@ -139,6 +147,7 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
 
   @Override // DepanFxSceneController.SceneOwner
   public void closeScene(DepanFxSceneController scene) {
+    scene.closeScene();
     sceneMap.remove(scene);
     if (sceneMap.isEmpty()) {
       closeParent();
@@ -152,9 +161,10 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
 
   private void closeParent() {
     try {
+      // Shutting down the application context that started this session.
       onClose.close();
-    } catch (IOException errIo) {
-      // Something better ..
+    } catch (Exception errAny) {
+      LOG.warn("Trouble closing down the session", errAny);
     }
   }
 

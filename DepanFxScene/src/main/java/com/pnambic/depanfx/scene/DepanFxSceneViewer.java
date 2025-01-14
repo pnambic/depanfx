@@ -20,4 +20,6 @@ import javafx.scene.control.Tab;
 public interface DepanFxSceneViewer {
 
   Tab getSceneTab(DepanFxSceneController scene);
+
+  void closeTab();
 }

@@ -55,4 +55,9 @@ public class DepanFxWorkspaceViewer implements DepanFxSceneViewer {
 
     return workspaceTab;
   }
+
+  @Override // DepanFxSceneViewer
+  public void closeTab() {
+    // Just JavaFX resources.
+  }
 }

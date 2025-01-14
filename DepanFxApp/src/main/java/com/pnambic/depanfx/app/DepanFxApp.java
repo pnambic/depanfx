@@ -35,6 +35,7 @@ public class DepanFxApp extends Application implements Closeable {
 
   @Override
   public void stop() {
+    session.stopSession();
     applicationContext.close();
     Platform.exit();
   }

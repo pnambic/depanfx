@@ -67,6 +67,11 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
     return result;
   }
 
+  @Override // DepanFxSceneViewer
+  public void closeTab() {
+    // Just JavaFX resources.
+  }
+
   public String getViewerTitle() {
     return viewerTitle;
   }

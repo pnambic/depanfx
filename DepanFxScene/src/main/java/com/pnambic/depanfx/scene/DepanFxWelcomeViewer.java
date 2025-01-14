@@ -28,8 +28,13 @@ public class DepanFxWelcomeViewer implements DepanFxSceneViewer {
     this.resource = resource;
   }
 
-  @Override
+  @Override // DepanFxSceneViewer
   public Tab getSceneTab(DepanFxSceneController scene) {
     return new Tab(DepanFxWelcomeViewer.WELCOME_TAB, resource);
+  }
+
+  @Override // DepanFxSceneViewer
+  public void closeTab() {
+    // Just JavaFX resources.
   }
 }

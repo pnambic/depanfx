@@ -20,12 +20,10 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.image.ImageView;
 
 @Component
 @FxmlView("scene.fxml")
@@ -51,12 +49,6 @@ public class DepanFxSceneController {
 
   @FXML
   private TabPane viewRoot;
-
-  @FXML
-  private Label welcomeLabel;
-
-  @FXML
-  private ImageView welcomeImage;
 
   @FXML
   private Menu fileNewItem;
@@ -100,6 +92,12 @@ public class DepanFxSceneController {
   public void initialize() {
     fileNewItem.getItems().addAll(newResourceRegistry.buildNewResourceItems());
     fileOpenResourceItem.setOnAction(this::handleByMenuRegistry);
+  }
+
+  public void closeScene() {
+    sceneViewers.keySet().forEach(v -> v.closeTab());
+    sceneViewers.clear();
+    viewRoot.getTabs().clear();
   }
 
   @FXML
@@ -147,9 +145,14 @@ public class DepanFxSceneController {
   public void addViewer(DepanFxSceneViewer viewer) {
     Tab tab = viewer.getSceneTab(this);
     sceneViewers.put(viewer, tab);
-
-    tab.setOnClosed(event -> sceneViewers.remove(viewer));
     viewRoot.getTabs().add(tab);
+
+    tab.setOnClosed(event -> removeViewer(viewer));
+  }
+
+  public void removeViewer(DepanFxSceneViewer viewer) {
+    sceneViewers.remove(viewer);
+    viewer.closeTab();
   }
 
   private void handleByMenuRegistry(ActionEvent event) {
