@@ -19,6 +19,7 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -88,6 +89,9 @@ public class GridLayoutRunner extends DirectLayoutRunner {
   public static Map<GraphNode, DepanFxNodeLocationData> buildNodeLocations(
       Collection<GraphNode> nodes) {
     int size = nodes.size();
+    if (size == 0) {
+      return Collections.emptyMap();
+    }
     int width = (int) Math.ceil(Math.sqrt(size));   // aka column count, x
     int breadth = (size + width - 1) / width;       // aka row rount, y
 

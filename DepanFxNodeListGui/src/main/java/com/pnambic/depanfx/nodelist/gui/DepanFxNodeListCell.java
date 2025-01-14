@@ -81,7 +81,9 @@ public class DepanFxNodeListCell
 
   private static final String CLEAR_RECURSIVE = "Clear Recursive";
 
-  private static final String EXPAND_CHILDREN = "Expand Children";
+  private static final String EXPAND_TREE_5 = "Expand Tree (5)";
+
+  private static final String EXPAND_TREE_20 = "Expand Tree (20)";
 
   private static final String EXPAND_TREE_100 = "Expand Tree (100)";
 
@@ -193,8 +195,11 @@ public class DepanFxNodeListCell
     builder.appendSubMenu(buildCopyMenu(fork));
     builder.appendSeparator();
     builder.appendActionItem(
-        EXPAND_TREE_100,
-        e -> runExpandTreeAction());
+        EXPAND_TREE_5, e -> runExpandTreeAction(5));
+    builder.appendActionItem(
+        EXPAND_TREE_20, e -> runExpandTreeAction(20));
+    builder.appendActionItem(
+        EXPAND_TREE_100, e -> runExpandTreeAction(100));
     return builder.build();
   }
 
@@ -220,9 +225,9 @@ public class DepanFxNodeListCell
     clipboard.setContent(content);
   }
 
-  private void runExpandTreeAction() {
+  private void runExpandTreeAction(int expandLimit) {
     TreeItem<DepanFxNodeListMember> tree = getTableRow().getTreeItem();
-    BreadthExpander expander = new BreadthExpander(100);
+    BreadthExpander expander = new BreadthExpander(expandLimit);
     expander.addBreadthItems(tree.getChildren());
     expander.expandTree();
     tree.setExpanded(true);

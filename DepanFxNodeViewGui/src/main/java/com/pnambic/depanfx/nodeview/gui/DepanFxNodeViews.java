@@ -12,6 +12,7 @@ import com.pnambic.depanfx.nodeview.builtins.DepanFxGraphNodeViewBuiltIns;
 import com.pnambic.depanfx.nodeview.jogl.JoglCameras;
 import com.pnambic.depanfx.nodeview.jogl.JoglColors;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
+import com.pnambic.depanfx.nodeview.layouts.GridLayoutRunner;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
@@ -33,8 +34,10 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.scene.paint.Color;
@@ -196,7 +199,17 @@ public class DepanFxNodeViews {
       Collection<GraphNode> nodes,
       DepanFxWorkspaceResource<DepanFxNodeViewLayoutData> layoutRsrc) {
 
-    return layoutRegistry.layoutNodes(graphDocRsrc, layoutRsrc, nodes);
+    Map<GraphNode, DepanFxNodeLocationData> result =
+        layoutRegistry.layoutNodes(graphDocRsrc, layoutRsrc, nodes);
+
+    // Prepare a grid placement for any nodes not covered by the chosen layout.
+    Set<GraphNode> gridNodes = new HashSet<>(nodes);
+    gridNodes.removeAll(result.keySet());
+    Map<GraphNode, DepanFxNodeLocationData> gridLayouts =
+        GridLayoutRunner.buildNodeLocations(gridNodes);
+    result.putAll(gridLayouts);
+    return result;
+
   }
 
   private static Optional<DepanFxWorkspaceResource<DepanFxNodeViewLayoutData>>

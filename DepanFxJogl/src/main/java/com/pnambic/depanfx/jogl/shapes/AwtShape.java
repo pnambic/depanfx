@@ -37,7 +37,7 @@ public class AwtShape extends NodeShape {
 
   private static final Logger LOG = LoggerFactory.getLogger(AwtShape.class);
 
-  private Shape shapeAwt;
+  public Shape shapeAwt;
 
   public AwtShape(
       Shape shapeAwt,

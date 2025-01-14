@@ -66,6 +66,13 @@ public class JoglShapes {
       } else {
         nodeShape.edgeColor = nodeShape.borderColor;;
       }
+
+      // Only AWT shapes have a shape
+      if (nodeShape instanceof AwtShape awtShape) {
+        awtShape.shapeAwt = getShape(display.nodeShape);
+      }
+
+      // Do the update
       joglPane.updateShape(node, nodeShape);
     }
   }

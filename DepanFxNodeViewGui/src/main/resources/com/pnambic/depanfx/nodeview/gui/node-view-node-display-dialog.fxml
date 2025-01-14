@@ -14,7 +14,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            prefWidth="900"
+            prefWidth="980"
             fx:controller="com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewNodeDisplayDialog" >
    <VBox spacing="10" layoutX="10" layoutY="10"
          AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"
@@ -27,7 +27,7 @@
             <columns>
                 <TableColumn text="Label"
                     editable="true"
-                    prefWidth="100" minWidth="50">
+                    prefWidth="80" minWidth="50">
                 </TableColumn>
                 <TableColumn text="Filter"
                     editable="false"
@@ -35,30 +35,30 @@
                 </TableColumn>
                 <TableColumn text="Node Count"
                     editable="false"
-                    prefWidth="80" minWidth="80">
+                    prefWidth="80" minWidth="20">
                 </TableColumn>
                 <TableColumn text="Shape"
-                    prefWidth="90"
+                    prefWidth="180"
                     editable="true"
                     sortable="false">
                 </TableColumn>
                 <TableColumn text="Fill"
-                    prefWidth="80"
+                    prefWidth="120"
                     editable="true"
                     resizable="false" sortable="false">
                 </TableColumn>
                 <TableColumn text="Border"
-                    prefWidth="80"
+                    prefWidth="120"
                     editable="true"
                     resizable="false" sortable="false">
                 </TableColumn>
                 <TableColumn text="Highlight"
-                    prefWidth="80"
+                    prefWidth="120"
                     editable="true"
                     resizable="false" sortable="false">
                 </TableColumn>
                 <TableColumn text="Edit"
-                    prefWidth="50" minWidth="30"
+                    prefWidth="40" minWidth="30"
                     editable="true"
                     resizable="false" sortable="false">
                 </TableColumn>
