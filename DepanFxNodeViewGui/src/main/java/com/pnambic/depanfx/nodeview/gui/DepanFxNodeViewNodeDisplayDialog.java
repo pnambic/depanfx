@@ -192,7 +192,6 @@ public class DepanFxNodeViewNodeDisplayDialog
             .subtract(highlightColorColumn.widthProperty())
             .subtract(rowActionColumn.widthProperty())
             .subtract(4));
-
   }
 
   /**

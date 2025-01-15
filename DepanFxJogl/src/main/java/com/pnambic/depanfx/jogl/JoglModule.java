@@ -85,8 +85,13 @@ public class JoglModule {
   }
 
   public void stop() {
-    glWindow.getAnimator().stop();
-    canvasPane.disableCanvas();
+    GLAnimatorControl animator = glWindow.getAnimator();
+    if (animator != null) {
+      animator.stop();
+    }
+    if (canvasPane != null) {
+      canvasPane.disableCanvas();
+    }
   }
 
   /**

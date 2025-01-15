@@ -105,7 +105,6 @@ public class DepanFxNodeViewNodeVisibilityDialog
   private DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableFilterRsrc;
   // private DepanFxNodeFilterSequenceData availableFilterDoc;
 
-  // The visible filters are the tool resource.
   // private DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleFilterRsrc;
 
   private NodeDisplayController nodeDisplay;
@@ -122,6 +121,9 @@ public class DepanFxNodeViewNodeVisibilityDialog
     this.filterRegistry = filterRegistry;
   }
 
+  /**
+   * The visibility filter sequence is the tool resource.
+   */
   public static Dialog<DepanFxNodeViewNodeVisibilityDialog> runVisibilityDialog(
       DepanFxDialogRunner dialogRunner,
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableFilterRsrc,
@@ -165,8 +167,8 @@ public class DepanFxNodeViewNodeVisibilityDialog
     columnBinder = new DepanFxTableColumnBinder<>(filterVisibilityTable);
 
     TableColumn<DepanFxWorkspaceResource<DepanFxBaseFilterData>, String>
-    filePathColumn = columnBinder.next();
-    filePathColumn.setCellValueFactory(
+    filterNameColumn = columnBinder.next();
+    filterNameColumn.setCellValueFactory(
         r -> new SimpleStringProperty(
             r.getValue().getResource().getToolName()));
 
@@ -184,6 +186,13 @@ public class DepanFxNodeViewNodeVisibilityDialog
         r -> new SimpleIntegerProperty(
             nodeDisplay.getDisplayFilterNodeCount(
                 r.getValue().getResource())));
+
+    // Size filePath to remaining room
+    filterNameColumn.prefWidthProperty().bind(
+        filterVisibilityTable.widthProperty()
+            .subtract(isVisibleColumn.widthProperty())
+            .subtract(countColumn.widthProperty())
+            .subtract(1));
   }
 
   /**
