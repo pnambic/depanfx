@@ -82,7 +82,11 @@ public class JoglPane extends BorderPane {
 
   public void release() {
     jogl.stop();
-    statusPanel.getController().stop();
+
+    // May not have allocated if never activated.
+    if (statusPanel != null) {
+      statusPanel.getController().stop();
+    }
   }
 
   public void close() {

@@ -95,9 +95,10 @@ public class DepanFxSceneController {
   }
 
   public void closeScene() {
-    sceneViewers.keySet().forEach(v -> v.closeTab());
-    sceneViewers.clear();
+    // Clear UX resources first (tabs), then map-list of viewers.
+    // Leads to DepanFxSceneViewer.closeTab(), which release any resources.
     viewRoot.getTabs().clear();
+    sceneViewers.clear();
   }
 
   @FXML
