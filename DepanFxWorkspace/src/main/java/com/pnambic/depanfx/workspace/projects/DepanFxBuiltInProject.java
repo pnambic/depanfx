@@ -67,8 +67,7 @@ public class DepanFxBuiltInProject extends DepanFxMemoryProject {
         (DepanFxBuiltInContribution<T>) contribs.get(projDoc);
     if (contrib != null) {
       return Optional.of(
-          new DepanFxWorkspaceResource.StaticWorkspaceResource<T>(
-              projDoc, contrib.getDocument()));
+          DepanFxWorkspaceResource.forSource(projDoc, contrib.getDocument()));
     }
     return Optional.empty();
   }

@@ -6,6 +6,8 @@ import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuRegistry;
 import net.rgielen.fxweaver.core.FxControllerAndView;
 import net.rgielen.fxweaver.core.FxmlView;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,7 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javafx.event.ActionEvent;
@@ -35,6 +38,9 @@ public class DepanFxSceneController {
     void closeScene(DepanFxSceneController depanFxSceneController)
         throws IOException;
   }
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxSceneController.class);
 
   private final DepanFxSceneMenuRegistry menuRegistry;
 
@@ -144,11 +150,7 @@ public class DepanFxSceneController {
   }
 
   public void addViewer(DepanFxSceneViewer viewer) {
-    Tab tab = viewer.getSceneTab(this);
-    sceneViewers.put(viewer, tab);
-    viewRoot.getTabs().add(tab);
-
-    tab.setOnClosed(event -> removeViewer(viewer));
+    getSceneTab(viewer).ifPresent(t -> installTab(t, viewer));
   }
 
   public void removeViewer(DepanFxSceneViewer viewer) {
@@ -158,5 +160,24 @@ public class DepanFxSceneController {
 
   private void handleByMenuRegistry(ActionEvent event) {
     menuRegistry.dispatch(event);
+  }
+
+  private void installTab(Tab tab, DepanFxSceneViewer viewer) {
+    sceneViewers.put(viewer, tab);
+    viewRoot.getTabs().add(tab);
+
+    tab.setOnClosed(event -> removeViewer(viewer));
+  }
+
+  private Optional<Tab> getSceneTab(DepanFxSceneViewer viewer) {
+    try {
+      return Optional.of(viewer.getSceneTab(this));
+    } catch (Exception errAny) {
+      LOG.warn("Unable to build viewer {} due to {}",
+          viewer.getClass().getName(), errAny.getMessage());
+      LOG.info("Unable to build viewer {}",
+          viewer.getClass().getName(), errAny);
+    }
+    return Optional.empty();
   }
 }

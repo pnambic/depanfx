@@ -1,5 +1,7 @@
 package com.pnambic.depanfx.workspace;
 
+import java.util.Objects;
+
 public interface DepanFxWorkspaceResource<T> {
 
   DepanFxProjectDocument getDocument();
@@ -9,6 +11,11 @@ public interface DepanFxWorkspaceResource<T> {
   public static <T> DepanFxWorkspaceResource<T> forUpdate(
       DepanFxWorkspaceResource<T> originalRsrc, T updateData) {
     return new ForUpdateWorkspaceResource<>(originalRsrc, updateData);
+  }
+
+  public static <T> DepanFxWorkspaceResource<T> forSource(
+      DepanFxProjectDocument rsrcDoc, T updateData) {
+    return new StaticWorkspaceResource<>(rsrcDoc, updateData);
   }
 
   /**
@@ -38,6 +45,16 @@ public interface DepanFxWorkspaceResource<T> {
     public T getResource() {
       return rsrcData;
     }
+
+    @Override
+    public int hashCode() {
+      return DepanFxWorkspaceResource.calcHashCode(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return DepanFxWorkspaceResource.calcEquals(this, obj);
+    }
   }
 
   /**
@@ -53,7 +70,12 @@ public interface DepanFxWorkspaceResource<T> {
 
     public ForUpdateWorkspaceResource(
         DepanFxWorkspaceResource<T> baseRsrc, T rsrcData) {
-      this.baseRsrc = baseRsrc;
+      // Avoid stacking base resource references.
+      if (baseRsrc instanceof ForUpdateWorkspaceResource<T> forUpdateRsrc) {
+        this.baseRsrc = forUpdateRsrc.baseRsrc;
+      } else {
+        this.baseRsrc = baseRsrc;
+      }
       this.rsrcData = rsrcData;
     }
 
@@ -66,5 +88,35 @@ public interface DepanFxWorkspaceResource<T> {
     public T getResource() {
       return rsrcData;
     }
+
+    @Override
+    public int hashCode() {
+      return DepanFxWorkspaceResource.calcHashCode(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return DepanFxWorkspaceResource.calcEquals(this, obj);
+    }
   }
+
+  private static int calcHashCode(DepanFxWorkspaceResource<?> rsrc) {
+    return Objects.hash(rsrc.getDocument(), rsrc.getResource());
+  }
+
+  private static boolean calcEquals(
+      DepanFxWorkspaceResource<?> rsrc, Object obj) {
+
+    if (rsrc == obj) {
+      return true;
+    }
+    if (!(obj instanceof DepanFxWorkspaceResource)) {
+      return false;
+    }
+
+    DepanFxWorkspaceResource<?> other = (DepanFxWorkspaceResource<?>) obj;
+    return Objects.equals(rsrc.getResource(), other.getResource())
+        && Objects.equals(rsrc.getDocument(), other.getDocument());
+  }
+
 }

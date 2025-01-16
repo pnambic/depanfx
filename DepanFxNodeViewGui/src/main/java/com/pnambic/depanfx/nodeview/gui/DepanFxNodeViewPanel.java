@@ -42,7 +42,6 @@ import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource.ForUpdateWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import org.slf4j.Logger;
@@ -720,10 +719,9 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     items.clear();
 
     // Toggles for each (non-zero) matcher
-    nodeDisplay.streamVisibilityFilters()
+    nodeDisplay.streamAvailableResources()
         .filter(d -> nodeDisplay.getVisiblityFilterNodeCount(d) > 0)
-        .sorted((a, b) -> a.getToolName().compareTo(b.getToolName()))
-        .forEach(m -> items.add(buildNodeVisibleItem(m)));
+        .forEach(r -> items.add(buildNodeVisibleItem(r)));
 
     // Add one for the remainders
     items.add(buildEgdeVisibleItem(
@@ -746,20 +744,19 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   }
 
   private void doAllNodesVisibleAction() {
-    nodeDisplay.streamVisibilityFilters()
-        .forEach(f -> nodeDisplay.setFilterVisibility(f, true));
+    nodeDisplay.forEachVisibilityResource(
+        f -> nodeDisplay.setFilterVisibility(f, true));
     nodeDisplay.setRemainderVisibility(true);
   }
 
   private void doNoNodeVisibleAction() {
-    nodeDisplay.streamVisibilityFilters()
-        .forEach(f -> nodeDisplay.setFilterVisibility(f, false));
+    nodeDisplay.forEachVisibilityResource(
+        f -> nodeDisplay.setFilterVisibility(f, false));
     nodeDisplay.setRemainderVisibility(false);
   }
 
   private void doInvertNodesVisibleAction() {
-    nodeDisplay.streamVisibilityFilters()
-        .forEach(f -> {
+    nodeDisplay.forEachVisibilityResource(f -> {
           boolean isVisible = nodeDisplay.getFilterVisibility(f);
           nodeDisplay.setFilterVisibility(f, isVisible);
         });
@@ -770,8 +767,10 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
     Dialog<DepanFxNodeViewNodeVisibilityDialog> visibiltyDlg =
         DepanFxNodeViewNodeVisibilityDialog.runVisibilityDialog(
-            dialogRunner, viewData.getAvailableNodeResource(),
-            viewData.getVisibleNodeResource(), nodeDisplay,
+            dialogRunner,
+            nodeDisplay.forUpdateAvailableFilterResource(),
+            nodeDisplay.forUpdateVisibleFilterResource(),
+            nodeDisplay,
             this::updateAvailableNodes);
     visibiltyDlg.getController().getToolResource()
         .ifPresent(this::updateVisibleNodes);
@@ -783,12 +782,14 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     edgeDisplay.setMatcherVisibility(null, linkDisplayDirty);
   }
 
-  private MenuItem buildNodeVisibleItem(DepanFxBaseFilterData filter) {
-    String label = filter.getToolName();
-    boolean isVisible = nodeDisplay.getFilterVisibility(filter);
-    int nodeCount = nodeDisplay.getVisiblityFilterNodeCount(filter);
+  private MenuItem buildNodeVisibleItem(
+      DepanFxWorkspaceResource<DepanFxBaseFilterData> filterRsrc) {
+    DepanFxBaseFilterData filterInfo = filterRsrc.getResource();
+    String label = filterInfo.getToolName();
+    boolean isVisible = nodeDisplay.getFilterVisibility(filterRsrc);
+    int nodeCount = nodeDisplay.getVisiblityFilterNodeCount(filterRsrc);
     return buildEgdeVisibleItem(label, isVisible, nodeCount,
-        e -> setFilterVisible(filter, !isVisible));
+        e -> setFilterVisible(filterRsrc, !isVisible));
   }
 
   private void updateVisibleNodes(
@@ -797,13 +798,13 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
     nodeDisplay.clearFilterVisibility();
     visibleFilterRsrc.getResource().streamFilterRefs()
-        .map(r -> r.getResource())
-        .forEach(m -> nodeDisplay.setFilterVisibility(m, true));
+        .forEach(r -> nodeDisplay.setFilterVisibility(r, true));
   }
 
   private void setFilterVisible(
-      DepanFxBaseFilterData filter, boolean isVisible) {
-    nodeDisplay.setFilterVisibility(filter, isVisible);
+      DepanFxWorkspaceResource<DepanFxBaseFilterData> filterRsrc,
+      boolean isVisible) {
+    nodeDisplay.setFilterVisibility(filterRsrc, isVisible);
   }
 
   /////////////////////////////////////

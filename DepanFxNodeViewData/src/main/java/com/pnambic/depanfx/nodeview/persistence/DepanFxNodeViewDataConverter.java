@@ -307,14 +307,16 @@ public class DepanFxNodeViewDataConverter
 
     // When scratch resources are used.
     if (availableEdgeRsrc == null) {
-      availableEdgeRsrc = DepanFxNodeViewData.buildAvailableEdgeResource(workspace, linkDisplayDocRsrc);
+      availableEdgeRsrc = DepanFxNodeViewData.buildAvailableEdgeResource(
+          workspace, linkDisplayDocRsrc);
     }
     if (visibleEdgeRsrc == null) {
       visibleEdgeRsrc = availableEdgeRsrc;
     }
 
     if (availableNodeRsrc == null) {
-      availableNodeRsrc = DepanFxNodeViewData.buildAvailableNodeResource(workspace, nodeDisplayDocRsrc);
+      availableNodeRsrc = DepanFxNodeViewData.buildAvailableNodeResource(
+          workspace, nodeDisplayDocRsrc);
     }
     if (visibleNodeRsrc == null) {
       visibleNodeRsrc = availableNodeRsrc;

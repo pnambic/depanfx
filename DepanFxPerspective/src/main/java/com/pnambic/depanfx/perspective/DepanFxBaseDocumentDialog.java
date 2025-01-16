@@ -57,6 +57,14 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
     updateDestinationField();
   }
 
+  /**
+   * When there is no saved resource, such as canceling the dialog.
+   */
+  public void clearToolResource() {
+    optResource = Optional.empty();
+    updateDestinationField();
+  }
+
   /////////////////////////////////////
   // Hook methods for derived classes.
 
@@ -154,6 +162,13 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
 
   /////////////////////////////////////
   // FXML handlers.
+
+  @Override
+  @FXML
+  protected void handleCancel() {
+    super.handleCancel();
+    clearToolResource();
+  }
 
   @FXML
   protected void handleConfirm() {

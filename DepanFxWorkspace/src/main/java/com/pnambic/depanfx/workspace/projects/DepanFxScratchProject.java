@@ -95,9 +95,7 @@ public class DepanFxScratchProject extends DepanFxMemoryProject {
     @SuppressWarnings("unchecked")
     T resource = (T) documents.get(projDoc);
     if (resource != null) {
-      return Optional.of(
-          new DepanFxWorkspaceResource.StaticWorkspaceResource<T>(
-              projDoc, resource));
+      return Optional.of(DepanFxWorkspaceResource.forSource(projDoc, resource));
     }
     return Optional.empty();
   }
@@ -119,8 +117,7 @@ public class DepanFxScratchProject extends DepanFxMemoryProject {
     addMember(parentDir, scratchDoc);
 
     DepanFxWorkspaceResource<T> result =
-        new DepanFxWorkspaceResource.StaticWorkspaceResource<T>(
-            scratchDoc, scratchResource);
+        DepanFxWorkspaceResource.forSource(scratchDoc, scratchResource);
     return result ;
   }
 

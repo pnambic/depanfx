@@ -200,7 +200,6 @@ public class DepanFxProjects {
     Optional<DepanFxProjectDocument> optProjDoc =
         project.getProjectTree().asProjectDocument(contrib.getPath());
     return optProjDoc
-        .map(p -> new DepanFxWorkspaceResource.StaticWorkspaceResource<T>(
-            p, contrib.getDocument()));
+        .map(p -> DepanFxWorkspaceResource.forSource(p, contrib.getDocument()));
   }
 }

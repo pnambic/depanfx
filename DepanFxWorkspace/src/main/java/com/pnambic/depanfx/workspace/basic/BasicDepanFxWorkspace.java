@@ -240,8 +240,11 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
       return scratchProj.getResource(resourceDoc);
     }
     // Check if the resource has already been loaded.
-    if (findResource(resourceDoc).isPresent()) {
-      WorkspaceResource<T> result = new WorkspaceResource<T>(resourceDoc);
+    Optional<Object> resource = findResource(resourceDoc);
+    if (resource.isPresent()) {
+      @SuppressWarnings("unchecked")
+      DepanFxWorkspaceResource<T> result =
+          DepanFxWorkspaceResource.forSource(resourceDoc, (T) resource.get());
       return Optional.of(result);
     }
     // Obtain the resource from the store.
@@ -298,7 +301,7 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   private <T> Optional<DepanFxWorkspaceResource<T>> toWorkspaceResource(
       DepanFxProjectDocument projDoc, T resource) {
     documentRegistry.registerDocument(projDoc, resource);
-    return Optional.of(new WorkspaceResource<>(projDoc));
+    return Optional.of(DepanFxWorkspaceResource.forSource(projDoc, resource));
   }
 
   private Optional<Object> findResource(DepanFxProjectDocument resourceUri) {
@@ -345,29 +348,4 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   private URI getMemberUri( DepanFxProjectMember member) {
     return member.getMemberPath().toUri();
   }
-
-  private class WorkspaceResource<T> implements DepanFxWorkspaceResource<T> {
-
-    private DepanFxProjectDocument document;
-
-    public WorkspaceResource(DepanFxProjectDocument document) {
-      this.document = document;
-    }
-
-    @Override
-    public DepanFxProjectDocument getDocument() {
-      return document;
-    }
-
-    /**
-     * Any workspace resource should have already been loaded into the
-     * document registry.
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public T getResource() {
-      return (T) findResource(document).get();
-    }
-  }
-
 }

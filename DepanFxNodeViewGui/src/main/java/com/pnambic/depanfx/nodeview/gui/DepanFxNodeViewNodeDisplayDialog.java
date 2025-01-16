@@ -96,11 +96,6 @@ public class DepanFxNodeViewNodeDisplayDialog
   private ObservableList<EditNodeDisplay> nodesDisplayData;
 
   /**
-   * Source of non-mutated data (e.g. context model)
-   */
-  // private DepanFxNodeViewNodeDisplayData sourceDisplayData;
-
-  /**
    * Where live changes happen.
    */
   private NodeDisplayController displayControl;
@@ -160,7 +155,7 @@ public class DepanFxNodeViewNodeDisplayDialog
     countColumn.setCellValueFactory(
         r -> new SimpleIntegerProperty(
             displayControl.getDisplayFilterNodeCount(
-                r.getValue().getFilterData())));
+                r.getValue().getFilterResource())));
 
     TableColumn<EditNodeDisplay, DepanFxJoglShape> shapeColumn =
         columnBinder.bind("shape", DepanFxJoglShape.class);
@@ -179,7 +174,7 @@ public class DepanFxNodeViewNodeDisplayDialog
 
     TableColumn<EditNodeDisplay, String> rowActionColumn =
         columnBinder.next();
-    DepanFxActionCell.prepareColumn(rowActionColumn,  p -> new DisplayActions());
+    DepanFxActionCell.prepareColumn(rowActionColumn, p -> new DisplayActions());
 
     // Size filePath to remaining room
     filterPathColumn.prefWidthProperty().bind(
@@ -400,7 +395,7 @@ public class DepanFxNodeViewNodeDisplayDialog
           nodeDisplay.nodeDisplayLabelProp.getValue());
       NodeDisplayEntry display = toNodeDisplayEntry(nodeDisplay);
       displayControl.updateNodeDisplayByFilter(
-          nodeDisplay.displayFilterRsrc.getResource(), display);
+          nodeDisplay.displayFilterRsrc, display);
     }
   }
 
@@ -473,8 +468,8 @@ public class DepanFxNodeViewNodeDisplayDialog
       return result;
     }
 
-    public DepanFxBaseFilterData getFilterData() {
-      return displayFilterRsrc.getResource();
+    public DepanFxWorkspaceResource<DepanFxBaseFilterData> getFilterResource() {
+      return displayFilterRsrc;
     }
 
     public void setDisplayFilterRsrc(
