@@ -183,7 +183,8 @@ public class DepanFxNodeFiltersSequenceChooser {
             DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
 
     DepanFxResourceChooser chooser = prepareChooser(workspace, dialogRunner);
-    DepanFxResourceFilter rsrcFilter = nodeFiltersDialogRegistry.getResourceFilter();
+    DepanFxResourceFilter rsrcFilter =
+        DepanFxNodeFilterSequenceToolDialog.NODE_FILTER_SEQUENCE_RSRC_FILTER;
     chooser.getExtensionFilters().add(rsrcFilter);
     chooser.setSelectedExtensionFilter(rsrcFilter);
 
