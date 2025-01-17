@@ -15,7 +15,6 @@
  */
 package com.pnambic.depanfx.nodeview.gui;
 
-import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFilterSequenceToolDialog;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersDialogRegistry;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersSequenceChooser;
@@ -146,6 +145,9 @@ public class DepanFxNodeViewNodeVisibilityDialog
     return result;
   }
 
+  /**
+   * This should be done first.
+   */
   private void setNodeDisplayController(NodeDisplayController nodeDisplay) {
     this.nodeDisplay = nodeDisplay;
   }
@@ -231,13 +233,6 @@ public class DepanFxNodeViewNodeVisibilityDialog
     filterVisibilityTable.setItems(availableFilters);
   }
 
-  private void installFilterProperty(
-      DepanFxWorkspaceResource<DepanFxBaseFilterData> m) {
-    BooleanProperty visibilityProp = new SimpleBooleanProperty();
-    visibilityProp.addListener((e, o, n) -> updateVisibility(m, n));
-    filterVisibleProperties.put(m, visibilityProp);
-  }
-
   /////////////////////////////////////
   // Tool Dialog protected overrides
 
@@ -245,11 +240,10 @@ public class DepanFxNodeViewNodeVisibilityDialog
   protected DepanFxNodeFilterSequenceData prepareResult() {
     // Build results from UX table, not current nodeDisplay.
     // .. even though these should be the same if live updates are working.
-    ContextModelId modelId =
-        getToolResource().get().getResource().getContextModelId();
     return new DepanFxNodeFilterSequenceData(
             getToolName(), getToolDescription(),
-            modelId, prepareVisibleFilters());
+            getToolResource().get().getResource().getContextModelId(),
+            prepareVisibleFilters());
   }
 
   @Override
@@ -270,18 +264,21 @@ public class DepanFxNodeViewNodeVisibilityDialog
     return  "Visible Nodes Save Confirmation Error";
   }
 
+  /////////////////////////////////////
+  // Visibility properties and updates
+
   private BooleanProperty getFilterVisibleProperty(
       DepanFxWorkspaceResource<DepanFxBaseFilterData> value) {
     return filterVisibleProperties
         .getOrDefault(value, UNKNOWN_FILTER_VISIBILITY);
   }
 
-  /////////////////////////////////////
-
-  private void updateVisibility(
-      DepanFxWorkspaceResource<DepanFxBaseFilterData> filterRsrc,
-      boolean isVisible) {
-    nodeDisplay.setFilterVisibility(filterRsrc, isVisible);
+  private void installFilterProperty(
+      DepanFxWorkspaceResource<DepanFxBaseFilterData> availableFilterRsrc) {
+    BooleanProperty visibilityProp = new SimpleBooleanProperty();
+    visibilityProp.addListener(
+        (e, o, n) -> updateVisibility(availableFilterRsrc, n));
+    filterVisibleProperties.put(availableFilterRsrc, visibilityProp);
   }
 
   private void installVisibleFilters() {
@@ -295,6 +292,12 @@ public class DepanFxNodeViewNodeVisibilityDialog
         .streamFilterRefs()
         .map(m -> filterVisibleProperties.get(m))
         .forEach(b -> b.set(true));
+  }
+
+  private void updateVisibility(
+      DepanFxWorkspaceResource<DepanFxBaseFilterData> filterRsrc,
+      boolean isVisible) {
+    nodeDisplay.setFilterVisibility(filterRsrc, isVisible);
   }
 
   /////////////////////////////////////

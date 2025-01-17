@@ -15,7 +15,6 @@
  */
 package com.pnambic.depanfx.nodeview.gui;
 
-import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLink;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
@@ -27,6 +26,7 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -55,8 +56,6 @@ public class EdgeDisplayController {
    */
   private final Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay;
 
-  private DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc;
-
   private DepanFxLineDisplayData remainderDisplay;
 
   private String remainderLabel;
@@ -70,6 +69,9 @@ public class EdgeDisplayController {
 
   private Collection<GraphEdge> remainderEdges = new ArrayList<>();
 
+  ///////////////////////////////////
+  // Edge Visibility
+
   /**
    * Number of showing visibility matchers for each edges.  Transitions to
    * and from zero cause a change in the edge's display status.
@@ -79,8 +81,22 @@ public class EdgeDisplayController {
   /**
    * Track each edge that is matched by any visibility matcher.
    */
-  private final Map<DepanFxLinkMatcherDocument, Collection<GraphEdge>>
+  private final Map<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>, Collection<GraphEdge>>
       edgeVisibleGroup = new HashMap<>();
+
+  /**
+   * The matchers that are currently visible.
+   * Not the complete inventory of matchers for visibility.
+   */
+  private final Set<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+      visibleMatcherRsrcs = new HashSet<>();
+
+  private DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableMatchersRsrc;
+
+  private DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleMatchersRsrc;
+
+  ///////////////////////////////////
+  // Edge Display
 
   /**
    * Track which edges's displays are handled by the display matcher.
@@ -88,22 +104,19 @@ public class EdgeDisplayController {
   private final Map<DepanFxLinkMatcherDocument, Collection<GraphEdge>>
       edgeDisplayGroup = new HashMap<>();
 
-  /**
-   * The matchers that are currently visible.
-   * Not the complete inventory of matchers for visibility.
-   */
-  private Set<DepanFxLinkMatcherDocument> visibleMatchers;
+  private DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc;
 
   public EdgeDisplayController(
       JoglPane joglPane,
-      Set<DepanFxLinkMatcherDocument> availableMatchers,
-      Set<DepanFxLinkMatcherDocument> visibleMatchers,
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableMatchersRsrc,
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleMatchersRsrc,
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc,
       Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay,
       boolean remainderVisible, String remainderLabel,
       DepanFxLineDisplayData remainderDisplay) {
     this.joglPane = joglPane;
-    this.visibleMatchers = visibleMatchers;
+    this.availableMatchersRsrc = availableMatchersRsrc;
+    this.visibleMatchersRsrc = visibleMatchersRsrc;
     this.displayRsrc = displayRsrc;
     this.edgeDisplay = edgeDisplay;
     this.remainderVisible = remainderVisible;
@@ -111,24 +124,19 @@ public class EdgeDisplayController {
     this.remainderDisplay = remainderDisplay;
 
     // Initialize from provided set, so all matchers are initially known.
-    availableMatchers.forEach(m -> edgeVisibleGroup.put(m, new ArrayList<>()));
+    availableMatchersRsrc.getResource().streamMatchers()
+        .forEach(m -> edgeVisibleGroup.put(m, new ArrayList<>()));
+    visibleMatchersRsrc.getResource().streamMatchers()
+        .forEach(r -> setMatcherVisibility(r, true));
   }
 
   public static EdgeDisplayController of(
       JoglPane joglPane, DepanFxNodeViewData viewData) {
-    Set<DepanFxLinkMatcherDocument> trackingMatchers =
-        viewData.getAvailableEdgesDoc().streamMatchers()
-            .map(r -> r.getResource())
-            .collect(Collectors.toSet());
-
-    Set<DepanFxLinkMatcherDocument> visibleMatchers =
-        viewData.getVisibleEdgesDoc().streamMatchers()
-            .map(r -> r.getResource())
-            .collect(Collectors.toSet());
 
     return new EdgeDisplayController(
         joglPane,
-        trackingMatchers, visibleMatchers,
+        viewData.getAvailableEdgeResource(),
+        viewData.getVisibleEdgeResource(),
         viewData.getLinkDisplayDocRsrc(),
         viewData.getEdgeDisplay(),
         viewData.getRemainderEdgesVisible(),
@@ -142,10 +150,6 @@ public class EdgeDisplayController {
 
   public void revertLinkDisplay() {
     setLinkDisplay();
-  }
-
-  public Map<GraphEdge, DepanFxLineDisplayData> getEdgeDisplay() {
-    return edgeDisplay;
   }
 
   public boolean getRemainderVisible() {
@@ -178,8 +182,35 @@ public class EdgeDisplayController {
     return edgeDisplayGroup.keySet().stream();
   }
 
-  public Stream<DepanFxLinkMatcherDocument> streamVisibilityMatchers() {
-    return edgeVisibleGroup.keySet().stream();
+  public void forEachAvailableMatchers(
+      Consumer<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> filterSrvc) {
+    streamAvailableMatchers().forEach(filterSrvc);
+  }
+
+  /**
+   * Provides an alphabetically ordered sequence of matcher resources,
+   * based on the tool name of each matcher.
+   *
+   * This ensure that consumers always see the same order,
+   * regardless of set construction.
+   */
+  public Stream<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+  streamAvailableMatchers() {
+    return edgeVisibleGroup.keySet().stream()
+            .sorted(DepanFxBaseToolData.BY_RESOURCE_NAME);
+  }
+
+  /**
+   * Provides an alphabetically ordered sequence of matcher resources,
+   * based on the tool name of each matcher.
+   *
+   * This ensure that consumers always see the same order,
+   * regardless of set construction.
+   */
+  public Stream<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+  streamVisibilityMatchers() {
+    return visibleMatcherRsrcs.stream()
+        .sorted(DepanFxBaseToolData.BY_RESOURCE_NAME);
   }
 
   public void setLinkDisplayResource(
@@ -188,18 +219,21 @@ public class EdgeDisplayController {
     setLinkDisplay();
   }
 
-  public int getVisiblityMatcherEdgeCount(DepanFxLinkMatcherDocument matcher) {
+  public int getVisiblityMatcherEdgeCount(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
     return edgeVisibleGroup
-        .getOrDefault(matcher, Collections.emptyList()).size();
+        .getOrDefault(matcherRsrc, Collections.emptyList()).size();
   }
 
-  public int getDisplayMatcherEdgeCount(DepanFxLinkMatcherDocument matcher) {
+  public int getDisplayMatcherEdgeCount(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
     return edgeDisplayGroup
-        .getOrDefault(matcher, Collections.emptyList()).size();
+        .getOrDefault(matcherRsrc, Collections.emptyList()).size();
   }
 
-  public boolean getMatcherVisibility(DepanFxLinkMatcherDocument matcher) {
-    return visibleMatchers.contains(matcher);
+  public boolean getMatcherVisibility(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
+    return visibleMatcherRsrcs.contains(matcherRsrc);
   }
 
   public void clearMatcherVisibility() {
@@ -208,27 +242,37 @@ public class EdgeDisplayController {
       edgeVisibleMatchers.put(e, Integer.valueOf(0));
       setEdgeVisible(e, false);
     });
-    visibleMatchers.clear();
+    visibleMatcherRsrcs.clear();
   }
 
   public void setMatcherVisibility(
-      DepanFxLinkMatcherDocument matcher, boolean isVisible) {
-    checkKnownMatcher(matcher);
-    boolean currVisible = visibleMatchers.contains(matcher);
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc,
+      boolean isVisible) {
+    checkKnownMatcher(matcherRsrc);
+    boolean currVisible = visibleMatcherRsrcs.contains(matcherRsrc);
     // Nothing to change.
     if (currVisible == isVisible) {
       return;
     }
 
-    Collection<GraphEdge> updateEdges = edgeVisibleGroup.get(matcher);
+    Collection<GraphEdge> updateEdges = edgeVisibleGroup.get(matcherRsrc);
     if (isVisible) {
-      visibleMatchers.add(matcher);
+      visibleMatcherRsrcs.add(matcherRsrc);
       updateEdges.forEach(e -> increaseVisible(e));
       return;
     }
 
-    visibleMatchers.remove(matcher);
+    visibleMatcherRsrcs.remove(matcherRsrc);
     updateEdges.forEach(e -> decreaseVisible(e));
+  }
+
+  public void setVisibiltyResource(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleMatchersRsrc) {
+    this.visibleMatchersRsrc = visibleMatchersRsrc;
+
+    clearMatcherVisibility();
+    visibleMatchersRsrc.getResource().streamMatchers()
+        .forEach(r -> setMatcherVisibility(r, true));
   }
 
   /**
@@ -236,20 +280,24 @@ public class EdgeDisplayController {
    * visibility. Because the added matcher is not added to the set of visible
    * matchers, the added matcher has a not visible status.
    */
-  public void addAvailableMatcher(DepanFxLinkMatcherDocument matcher) {
+  public void addAvailableMatcher(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
     List<GraphEdge> matcherEdges = edgeVisibleMatchers.keySet().stream()
-        .filter(e -> matcher.getMatcher().match(e).isPresent())
+        .filter(e ->
+            matcherRsrc.getResource().getMatcher().match(e).isPresent())
         .collect(Collectors.toList());
-    edgeVisibleGroup.put(matcher, matcherEdges);
+    edgeVisibleGroup.put(matcherRsrc, matcherEdges);
   }
 
   public void updateAvailableMatchers(
-      Set<DepanFxLinkMatcherDocument> availableMatchers) {
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableMatchersRsrc) {
+
     clearMatcherVisibility();
     edgeVisibleGroup.isEmpty();
 
-    // Initialize from provided set, so all matchers are initially known.
-    availableMatchers.forEach(m -> edgeVisibleGroup.put(m, new ArrayList<>()));
+    this.availableMatchersRsrc = availableMatchersRsrc;
+    availableMatchersRsrc.getResource().streamMatchers()
+        .forEach(m -> edgeVisibleGroup.put(m, new ArrayList<>()));
     edgeVisibleMatchers.keySet().stream()
         .forEach(e -> installEdgeVisible(e));
   }
@@ -261,7 +309,6 @@ public class EdgeDisplayController {
     if (updateEdges != null) {
       updateEdges.forEach(e -> updateMatchedEdge(e, matcher, displayEntry));
     }
-    // TODO: Update displayInfo.
   }
 
   public void installEdge(GraphEdge edge) {
@@ -269,38 +316,40 @@ public class EdgeDisplayController {
     installEdgeDisplay(edge, visibleCount > 0);
   }
 
-  public DepanFxLinkMatcherSequenceDocument buildAvailableMatcherSequenceDoc(
-      ContextModelId modelId,
-      List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> matcherRsrcs) {
-    // Ensure serializable ArrayList.
-    List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
-    availMatcherRsrc = new ArrayList<>();
-    Set<DepanFxLinkMatcherDocument> availMatchers =
-        new HashSet<>(edgeVisibleGroup.keySet());
+  public DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+  forUpdateAvailableMatcherSequenceDoc() {
 
-    matcherRsrcs.stream()
-        .filter(r -> availMatchers.contains(r.getResource()))
-        .forEach(availMatcherRsrc::add);
+    List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> matcherRefs =
+        streamAvailableMatchers().collect(Collectors.toList());
 
-    return new DepanFxLinkMatcherSequenceDocument(
-        "Available Edges",
-        "Available edges from ", modelId, availMatcherRsrc);
+    DepanFxLinkMatcherSequenceDocument availableEdgeInfo =
+        availableMatchersRsrc.getResource();
+    DepanFxLinkMatcherSequenceDocument matcherInfo =
+        new DepanFxLinkMatcherSequenceDocument(
+            availableEdgeInfo.getToolName(),
+            availableEdgeInfo.getToolDescription(),
+            availableEdgeInfo.getModelId(),
+            matcherRefs);
+
+    return DepanFxWorkspaceResource.forUpdate(availableMatchersRsrc, matcherInfo);
   }
 
-  public DepanFxLinkMatcherSequenceDocument buildVisibleMatcherSequenceDoc(
-      ContextModelId modelId,
-      List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> matcherRsrcs) {
-    // Ensure serializable ArrayList.
-    List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
-    visibleMatcherRsrcs = new ArrayList<>();
-    matcherRsrcs.stream()
-        .filter(r -> visibleMatchers.contains(r.getResource()))
-        .forEach(visibleMatcherRsrcs::add);
+  public DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+  forUpdateVisibleMatcherSequenceDoc() {
 
-    return new DepanFxLinkMatcherSequenceDocument(
-        " Visible Edges",
-        "Visible edges from ",
-        modelId, visibleMatcherRsrcs);
+    List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> vizMatcherRsrcs =
+        streamVisibilityMatchers().collect(Collectors.toList());
+
+    DepanFxLinkMatcherSequenceDocument visibleMatchersInfo =
+        visibleMatchersRsrc.getResource();
+    DepanFxLinkMatcherSequenceDocument matcherInfo =
+        new DepanFxLinkMatcherSequenceDocument(
+            visibleMatchersInfo.getToolName(),
+            visibleMatchersInfo.getToolDescription(),
+            visibleMatchersInfo.getModelId(),
+            vizMatcherRsrcs);
+
+    return DepanFxWorkspaceResource.forUpdate(visibleMatchersRsrc, matcherInfo);
   }
 
   private void increaseVisible(GraphEdge edge) {
@@ -344,32 +393,34 @@ public class EdgeDisplayController {
     return 0;
   }
 
-  private void checkKnownMatcher(DepanFxLinkMatcherDocument matcher) {
-    if (edgeVisibleGroup.keySet().contains(matcher)) {
+  private void checkKnownMatcher(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
+    if (edgeVisibleGroup.keySet().contains(matcherRsrc)) {
       return;
     }
     LOG.error("Unexpected matcher {}.\nAdding matcher to available",
-        matcher.getToolName());
-    addAvailableMatcher(matcher);
+        matcherRsrc.getResource().getToolName());
+    addAvailableMatcher(matcherRsrc);
   }
 
   private void addMatcherEdge(
-      DepanFxLinkMatcherDocument matcherDoc, GraphEdge edge) {
-    Collection<GraphEdge> currEdges = edgeVisibleGroup.get(matcherDoc);
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc,
+      GraphEdge edge) {
+    Collection<GraphEdge> currEdges = edgeVisibleGroup.get(matcherRsrc);
     currEdges.add(edge);
   }
 
   private int installEdgeVisible(GraphEdge edge) {
-    List<DepanFxLinkMatcherDocument> edgeMatchers =
+    List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> edgeMatchers =
         edgeVisibleGroup.keySet().stream()
-            .filter(m -> m.getMatcher().match(edge).isPresent())
+            .filter(m -> m.getResource().getMatcher().match(edge).isPresent())
             .collect(Collectors.toList());
 
     edgeMatchers.stream()
         .forEach(m -> addMatcherEdge(m, edge));
 
     int visibleCount = (int) edgeMatchers.stream()
-        .filter(m -> visibleMatchers.contains(m))
+        .filter(m -> visibleMatcherRsrcs.contains(m))
         .count();
 
     edgeVisibleMatchers.put(edge, visibleCount);
@@ -399,7 +450,7 @@ public class EdgeDisplayController {
 
   private void setLinkDisplay() {
     // Capture the edges before we zap the current assignments
-    List<GraphEdge> updateEdges = new ArrayList<>();
+    Set<GraphEdge> updateEdges = new HashSet<>();
     edgeDisplayGroup.values().stream()
         .flatMap(s -> s.stream())
         .forEach(updateEdges::add);

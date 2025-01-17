@@ -306,7 +306,7 @@ public class NodeDisplayController {
    * Provides an alphabetically ordered sequence of filter resources,
    * based on the tool name of each resource.
    *
-   * This ensure that consumes always see the same order,
+   * This ensure that consumers always see the same order,
    * regardless of set construction.
    */
   public Stream<DepanFxWorkspaceResource<DepanFxBaseFilterData>>
@@ -318,7 +318,6 @@ public class NodeDisplayController {
     int visibleCount = installNodeVisible(node);
     installNodeDisplay(node, location, visibleCount > 0);
   }
-
 
   public DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
   forUpdateAvailableFilterResource() {

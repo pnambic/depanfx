@@ -28,20 +28,21 @@ import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
@@ -58,6 +59,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 @Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @FxmlView("node-view-edge-visibility-dialog.fxml")
 public class DepanFxNodeViewEdgeVisibilityDialog
     extends DepanFxBaseToolDialog<DepanFxLinkMatcherSequenceDocument> {
@@ -96,15 +98,10 @@ public class DepanFxNodeViewEdgeVisibilityDialog
   private ObservableList<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
       matcherVisibilityData;
 
-  Map<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>, BooleanProperty>
+  private Map<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>, BooleanProperty>
       matcherVisibleProperties;
 
-  private DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableMatchersRsrc;
-
   private EdgeDisplayController edgeDisplay;
-
-  private Consumer<DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>>
-      onAvailableEdgesRsrcUpdate;
 
   @Autowired
   public DepanFxNodeViewEdgeVisibilityDialog(
@@ -114,40 +111,25 @@ public class DepanFxNodeViewEdgeVisibilityDialog
   }
 
   public static Dialog<DepanFxNodeViewEdgeVisibilityDialog> runVisibilityDialog(
-      DepanFxDialogRunner dialogRunner,
-      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableMatchersRsrc,
-      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> matcherSequenceRsrc,
-      EdgeDisplayController edgeDisplay,
-      Consumer<DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>>
-          onAvailableEdgesUpdate) {
+      DepanFxDialogRunner dialogRunner, EdgeDisplayController edgeDisplay) {
 
     Dialog<DepanFxNodeViewEdgeVisibilityDialog> result =
         DepanFxResourcePerspectives.prepareDialog(
-            matcherSequenceRsrc, dialogRunner,
+            edgeDisplay.forUpdateVisibleMatcherSequenceDoc(), dialogRunner,
             DepanFxNodeViewEdgeVisibilityDialog.class);
 
     DepanFxNodeViewEdgeVisibilityDialog dlgCtrl = result.getController();
-    dlgCtrl.setAvailableMatchers(availableMatchersRsrc);
     dlgCtrl.setEdgeDisplayController(edgeDisplay);
-    dlgCtrl.setOnAvailableEdgesUpdate(onAvailableEdgesUpdate);
     result.runDialog(CREATE_LINK_MATCHER_SEQUENCE);
     return result;
   }
 
+  /**
+   * This should be done first, and once.
+   */
   private void setEdgeDisplayController(EdgeDisplayController edgeDisplay) {
     this.edgeDisplay = edgeDisplay;
-  }
-
-  /**
-   * The workspace resource for visible edges is consumed during normal
-   * dialog confirm and close.  This allows the container to save the
-   * resource reference for the available edges when it is changed in the
-   * dialog.
-   */
-  public void setOnAvailableEdgesUpdate(
-      Consumer<DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>>
-          onAvailableEdgesRsrcUpdate) {
-    this.onAvailableEdgesRsrcUpdate = onAvailableEdgesRsrcUpdate;
+    installAvailableMatchers();
   }
 
   @FXML
@@ -156,8 +138,8 @@ public class DepanFxNodeViewEdgeVisibilityDialog
     columnBinder = new DepanFxTableColumnBinder<>(matcherVisibilityTable);
 
     TableColumn<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>, String>
-    filePathColumn = columnBinder.next();
-    filePathColumn.setCellValueFactory(
+    matcherNameColumn = columnBinder.next();
+    matcherNameColumn.setCellValueFactory(
         r -> new SimpleStringProperty(
             r.getValue().getResource().getToolName()));
 
@@ -173,8 +155,14 @@ public class DepanFxNodeViewEdgeVisibilityDialog
     countColumn.setStyle("-fx-alignment: CENTER-RIGHT;");
     countColumn.setCellValueFactory(
         r -> new SimpleIntegerProperty(
-            edgeDisplay.getDisplayMatcherEdgeCount(
-                r.getValue().getResource())));
+            edgeDisplay.getVisiblityMatcherEdgeCount(r.getValue())));
+
+    // Size filePath to remaining room
+    matcherNameColumn.prefWidthProperty().bind(
+        matcherVisibilityTable.widthProperty()
+            .subtract(isVisibleColumn.widthProperty())
+            .subtract(countColumn.widthProperty())
+            .subtract(1));
   }
 
   /**
@@ -187,28 +175,20 @@ public class DepanFxNodeViewEdgeVisibilityDialog
       DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleMatcherRsrc) {
     super.setToolResource(visibleMatcherRsrc);
 
-    installVisibleMatchers();
+    // The life cycle of DepanFxBaseToolDialog with
+    // DepanFxResourcePerspectives.prepareDialog() invokes this method
+    // before the edgeDisplay is connected for updates.
+    if (edgeDisplay != null) {
+      edgeDisplay.setVisibiltyResource(visibleMatcherRsrc);
+
+      installVisibleMatchers();
+    }
   }
 
   public void setAvailableMatchers(
       DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableMatchersRsrc) {
-    this.availableMatchersRsrc = availableMatchersRsrc;
-
-    matcherVisibleProperties = new HashMap<>();
-    availableMatchersRsrc.getResource().streamMatchers()
-        .forEach(m -> 
-            matcherVisibleProperties.put(m, new SimpleBooleanProperty()));
-
-    installVisibleMatchers();
-
-    ObservableList<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
-    availableMatchers = FXCollections.observableArrayList();
-
-    availableMatchersRsrc.getResource().streamMatchers()
-        .forEach(availableMatchers::add);
-
-    matcherVisibilityData = availableMatchers;
-    matcherVisibilityTable.setItems(availableMatchers);
+    edgeDisplay.updateAvailableMatchers(availableMatchersRsrc);
+    installAvailableMatchers();
   }
 
   /////////////////////////////////////
@@ -216,6 +196,8 @@ public class DepanFxNodeViewEdgeVisibilityDialog
 
   @Override
   protected DepanFxLinkMatcherSequenceDocument prepareResult() {
+    // Build results from UX table, not current nodeDisplay.
+    // .. even though these should be the same if live updates are working.
     return new DepanFxLinkMatcherSequenceDocument(
             getToolName(), getToolDescription(),
             getToolResource().get().getResource().getModelId(),
@@ -247,30 +229,65 @@ public class DepanFxNodeViewEdgeVisibilityDialog
   }
 
   /////////////////////////////////////
+  // Visibility properties and updates
 
+  private void installFilterProperty(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
+    BooleanProperty visibilityProp = new SimpleBooleanProperty();
+    visibilityProp.addListener((e, o, n) -> updateVisibility(matcherRsrc, n));
+    matcherVisibleProperties.put(matcherRsrc, visibilityProp);
+  }
+
+  /**
+   * Bring the matcher visibility properties up to date with the latest
+   * edge display, and indirectly the matcher visibility table that listens
+   * to those properties.
+   */
   private void installVisibleMatchers() {
-    if (getToolResource() == null || availableMatchersRsrc == null) {
+    if (getToolResource() == null || edgeDisplay == null) {
       return;
     }
 
-    getToolResource()
-        .map(DepanFxWorkspaceResource::getResource)
-        .get()
-        .streamMatchers()
-        .map(m -> matcherVisibleProperties.get(m))
-        .forEach(b -> b.set(true));
+    edgeDisplay.forEachAvailableMatchers(
+        r -> matcherVisibleProperties.get(r).set(
+            edgeDisplay.getMatcherVisibility(r)));
+  }
+
+  private void updateVisibility(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc,
+      Boolean visibility) {
+    edgeDisplay.setMatcherVisibility(matcherRsrc, visibility);
+  }
+
+  private void installAvailableMatchers() {
+    matcherVisibleProperties = new HashMap<>();
+    edgeDisplay.forEachAvailableMatchers(this::installFilterProperty);
+
+    installVisibleMatchers();
+
+    ObservableList<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+    availableMatchers = FXCollections.observableArrayList();
+
+    edgeDisplay.forEachAvailableMatchers(availableMatchers::add);
+
+    matcherVisibilityData = availableMatchers;
+    matcherVisibilityTable.setItems(availableMatchers);
   }
 
   /////////////////////////////////////
   // Context menu handlers
 
   @FXML
+  protected void handleRevert() {
+    handleCancel();
+    edgeDisplay.revertLinkDisplay();
+  }
+
+  @FXML
   private void handleApply() {
-    DepanFxLinkMatcherSequenceDocument result = prepareResult();
-    edgeDisplay.clearMatcherVisibility();
-    result.streamMatchers()
-        .map(r -> r.getResource())
-        .forEach(m -> edgeDisplay.setMatcherVisibility(m, true));
+    edgeDisplay.setVisibiltyResource(
+        DepanFxWorkspaceResource.forUpdate(
+            getToolResource().get(), prepareResult()));
   }
 
   @FXML
@@ -312,42 +329,33 @@ public class DepanFxNodeViewEdgeVisibilityDialog
 
   @FXML
   private void handleSaveAvailableEdges() {
-    DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> updateRsrc =
-        DepanFxWorkspaceResource.forUpdate(
-            availableMatchersRsrc, prepareAvailableEdgedResult());
-    Dialog<DepanFxLinkMatcherSequenceToolDialog> saveAvailDlg =
-        DepanFxLinkMatcherSequenceToolDialog.runCreateDialog(
-            updateRsrc, dialogRunner);
-
-    saveAvailDlg.getController().getToolResource()
+    DepanFxLinkMatcherSequenceToolDialog.runCreateDialog(
+        edgeDisplay.forUpdateAvailableMatcherSequenceDoc(), dialogRunner)
+        .getController()
+        .getToolResource()
         .ifPresent(this::updateAvailableEdges);
   }
 
+  /**
+   * Provides an alphabetically ordered sequence of matcher resources,
+   * based on the tool name of each matcher.
+   *
+   * This ensure that consumers always see the same order,
+   * regardless of set construction.
+   */
   private List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
       prepareVisibleMatchers() {
     return matcherVisibleProperties.entrySet().stream()
         .filter(e -> e.getValue().get())
         .map(e -> e.getKey())
+        .sorted(DepanFxBaseToolData.BY_RESOURCE_NAME)
         .collect(Collectors.toList());
   }
 
   private void updateAvailableEdges(
       DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableMatchersRsrc) {
     // The resource might have changed in the create dialog.
+    edgeDisplay.updateAvailableMatchers(availableMatchersRsrc);
     setAvailableMatchers(availableMatchersRsrc);
-
-    onAvailableEdgesRsrcUpdate.accept(availableMatchersRsrc);
-  }
-
-  private DepanFxLinkMatcherSequenceDocument prepareAvailableEdgedResult() {
-    List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> availableMatchers =
-        new ArrayList<>(matcherVisibleProperties.size());
-    matcherVisibleProperties.keySet().forEach(availableMatchers::add);
-
-    DepanFxLinkMatcherSequenceDocument availableMatchersDoc =
-        availableMatchersRsrc.getResource();
-    return new DepanFxLinkMatcherSequenceDocument(
-        availableMatchersDoc.getToolName(), availableMatchersDoc.getToolDescription(),
-        availableMatchersDoc.getModelId(), availableMatchers);
   }
 }

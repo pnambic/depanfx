@@ -143,7 +143,7 @@ public class DepanFxNodeViewLinkDisplayDialog
     countColumn.setCellValueFactory(
         r -> new SimpleIntegerProperty(
             displayControl.getDisplayMatcherEdgeCount(
-                r.getValue().linkDisplayRsrc.getResource())));
+                r.getValue().linkDisplayRsrc)));
 
     TableColumn<EditLinkDisplay, DepanFxLineForm> lineFormColumn =
         columnBinder.bind("lineForm", DepanFxLineForm.class);

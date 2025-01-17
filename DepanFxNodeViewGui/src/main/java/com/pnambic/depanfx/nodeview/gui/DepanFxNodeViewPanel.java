@@ -298,7 +298,8 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   public void setLinkDisplayResource(
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc) {
     edgeDisplay.setLinkDisplayResource(displayRsrc);
-    linkDisplayDirty = false;
+    linkDisplayDirty =
+        DepanFxWorkspaceResource.isSavedResource(displayRsrc, workspace);
   }
 
   /////////////////////////////////////
@@ -610,9 +611,8 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     items.clear();
 
     // Toggles for each (non-zero) matcher
-    edgeDisplay.streamVisibilityMatchers()
+    edgeDisplay.streamAvailableMatchers()
         .filter(d -> edgeDisplay.getVisiblityMatcherEdgeCount(d) > 0)
-        .sorted((a, b) -> a.getToolName().compareTo(b.getToolName()))
         .forEach(m -> items.add(buildEdgeVisibleItem(m)));
 
     // Add one for the remainders
@@ -636,32 +636,33 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   }
 
   private void doAllEdgesVisibleAction() {
-    edgeDisplay.streamVisibilityMatchers()
-        .forEach(m -> edgeDisplay.setMatcherVisibility(m, true));
+    edgeDisplay.forEachAvailableMatchers(
+        m -> edgeDisplay.setMatcherVisibility(m, true));
     edgeDisplay.setRemainderVisibility(true);
   }
 
   private void doNoEdgesVisibleAction() {
-    edgeDisplay.streamVisibilityMatchers()
-        .forEach(m -> edgeDisplay.setMatcherVisibility(m, false));
+    edgeDisplay.forEachAvailableMatchers(
+        m -> edgeDisplay.setMatcherVisibility(m, false));
     edgeDisplay.setRemainderVisibility(false);
   }
 
   private void doInvertEdgesVisibleAction() {
-    edgeDisplay.streamVisibilityMatchers()
-        .forEach(m -> {
+    edgeDisplay.forEachAvailableMatchers(
+        m -> {
           boolean isVisible = edgeDisplay.getMatcherVisibility(m);
           edgeDisplay.setMatcherVisibility(m, !isVisible);
         });
     doToggleRemainderVisibleAction();
   }
 
-  private MenuItem buildEdgeVisibleItem(DepanFxLinkMatcherDocument matcher) {
-    String label = matcher.getToolName();
-    boolean isVisible = edgeDisplay.getMatcherVisibility(matcher);
-    int edgeCount = edgeDisplay.getVisiblityMatcherEdgeCount(matcher);
+  private MenuItem buildEdgeVisibleItem(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
+    String label = matcherRsrc.getResource().getToolName();
+    boolean isVisible = edgeDisplay.getMatcherVisibility(matcherRsrc);
+    int edgeCount = edgeDisplay.getVisiblityMatcherEdgeCount(matcherRsrc);
     return buildEgdeVisibleItem(label, isVisible, edgeCount,
-        e -> setMatcherVisible(matcher, !isVisible));
+        e -> setMatcherVisible(matcherRsrc, !isVisible));
   }
 
   private MenuItem buildEgdeVisibleItem(
@@ -680,35 +681,23 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   }
 
   private void setMatcherVisible(
-      DepanFxLinkMatcherDocument matcher, boolean isVisible) {
-    edgeDisplay.setMatcherVisibility(matcher, isVisible);
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc,
+      boolean isVisible) {
+    edgeDisplay.setMatcherVisibility(matcherRsrc, isVisible);
   }
 
   private void runEditVisibleEdgesDialog() {
 
     Dialog<DepanFxNodeViewEdgeVisibilityDialog> visibilty =
         DepanFxNodeViewEdgeVisibilityDialog.runVisibilityDialog(
-            dialogRunner, viewData.getAvailableEdgeResource(),
-            viewData.getVisibleEdgeResource(), edgeDisplay,
-            r -> updateAvailableEdges(r));
+            dialogRunner, edgeDisplay);
     visibilty.getController().getToolResource()
         .ifPresent(this::updateVisibleEdges);
   }
 
-  private void updateAvailableEdges(
-      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableMatchersRsrc) {
-    viewData.setAvailableEdgeRsrc(availableMatchersRsrc);
-    edgeDisplay.setMatcherVisibility(null, linkDisplayDirty);
-  }
-
   private void updateVisibleEdges(
       DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleMatchersRsrc) {
-    viewData.setVisibleEdgeRsrc(visibleMatchersRsrc);
-
-    edgeDisplay.clearMatcherVisibility();
-    visibleMatchersRsrc.getResource().streamMatchers()
-        .map(r -> r.getResource())
-        .forEach(m -> edgeDisplay.setMatcherVisibility(m, true));
+    edgeDisplay.setVisibiltyResource(visibleMatchersRsrc);
   }
 
   /////////////////////////////////////
@@ -892,14 +881,14 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
         buildSceneData(),
 
-        viewData.getAvailableNodeResource(),
-        viewData.getVisibleNodeResource(),
+        nodeDisplay.forUpdateAvailableFilterResource(),
+        nodeDisplay.forUpdateVisibleFilterResource(),
         nodeDisplay.getNodeDisplayResource(),
         nodeDisplay.getRemainderVisibility(),
         nodeDisplay.getRemainderDisplay(),
 
-        viewData.getAvailableEdgeResource(),
-        viewData.getVisibleEdgeResource(),
+        edgeDisplay.forUpdateAvailableMatcherSequenceDoc(),
+        edgeDisplay.forUpdateVisibleMatcherSequenceDoc(),
         edgeDisplay.getLinkDisplayResource(),
         edgeDisplay.getRemainderVisible(),
         edgeDisplay.getRemainderLabel(),

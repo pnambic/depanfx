@@ -56,6 +56,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 public class DepanFxNodeFilterSequenceToolDialog
     extends DepanFxBaseToolDialog<DepanFxNodeFilterSequenceData> {
 
+  @SuppressWarnings("unused")
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeFilterSequenceToolDialog.class);
 

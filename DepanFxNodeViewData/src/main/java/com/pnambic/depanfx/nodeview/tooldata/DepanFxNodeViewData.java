@@ -86,9 +86,9 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   private final DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData>
       nodeDisplayDocRsrc;
 
-  private boolean remainderNodesVisible;
+  private final boolean remainderNodesVisible;
 
-  private DepanFxNodeDisplayData remainderNodesDisplay;
+  private final DepanFxNodeDisplayData remainderNodesDisplay;
 
   /**
    * The set of edges shown as selectable for display.
@@ -96,7 +96,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
    * This set is often initialized from {@link #linkDisplayDocRsrc},
    * but may be independent.
    */
-  private DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+  private final DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
       availableEdgeRsrc;
 
   /**
@@ -106,7 +106,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
    * and is typically a subset of the edges in {@link #availableEdgeRsrc},
    * but it may be independent from either.
    */
-  private DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+  private final DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
       visibleEdgeRsrc;
 
   /**
@@ -119,11 +119,11 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   private final DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData>
       linkDisplayDocRsrc;
 
-  private boolean remainerEdgesVisible;
+  private final boolean remainerEdgesVisible;
 
-  private String remainderEdgesLabel;
+  private final String remainderEdgesLabel;
 
-  private DepanFxLineDisplayData remainderEdgesDisplay;
+  private final DepanFxLineDisplayData remainderEdgesDisplay;
 
   public DepanFxNodeViewData(
       String toolName, String toolDescription,
@@ -279,11 +279,6 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
     return availableEdgeRsrc;
   }
 
-  public void setAvailableEdgeRsrc(
-      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availEdgeRsrc) {
-    this.availableEdgeRsrc = availEdgeRsrc;
-  }
-
   public DepanFxLinkMatcherSequenceDocument getAvailableEdgesDoc() {
     return availableEdgeRsrc.getResource();
   }
@@ -296,11 +291,6 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   public DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
       getVisibleEdgeRsrc(DepanFxWorkspace workspace) {
     return visibleEdgeRsrc;
-  }
-
-  public void setVisibleEdgeRsrc(
-      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc) {
-    this.visibleEdgeRsrc = visibleEdgeRsrc;
   }
 
   public DepanFxLinkMatcherSequenceDocument getVisibleEdgesDoc() {
