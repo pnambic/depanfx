@@ -758,7 +758,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   private void doInvertNodesVisibleAction() {
     nodeDisplay.forEachVisibilityResource(f -> {
           boolean isVisible = nodeDisplay.getFilterVisibility(f);
-          nodeDisplay.setFilterVisibility(f, isVisible);
+          nodeDisplay.setFilterVisibility(f, !isVisible);
         });
     doToggleRemainderVisibleAction();
   }
