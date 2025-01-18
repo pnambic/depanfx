@@ -10,7 +10,6 @@ import com.pnambic.depanfx.jogl.JoglMouseActionListener;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeViewNodeFiltersDialog;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
 import com.pnambic.depanfx.nodelist.builtins.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
@@ -19,7 +18,6 @@ import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodeview.jogl.JoglPane;
 import com.pnambic.depanfx.nodeview.jogl.JoglShapes;
@@ -688,16 +686,11 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private void runEditVisibleEdgesDialog() {
 
-    Dialog<DepanFxNodeViewEdgeVisibilityDialog> visibilty =
-        DepanFxNodeViewEdgeVisibilityDialog.runVisibilityDialog(
-            dialogRunner, edgeDisplay);
-    visibilty.getController().getToolResource()
-        .ifPresent(this::updateVisibleEdges);
-  }
-
-  private void updateVisibleEdges(
-      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleMatchersRsrc) {
-    edgeDisplay.setVisibiltyResource(visibleMatchersRsrc);
+    DepanFxNodeViewEdgeVisibilityDialog.runVisibilityDialog(
+        dialogRunner, edgeDisplay)
+        .getController()
+        .getToolResource()
+        .ifPresent(edgeDisplay::setVisibiltyResource);
   }
 
   /////////////////////////////////////
@@ -733,19 +726,19 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   }
 
   private void doAllNodesVisibleAction() {
-    nodeDisplay.forEachVisibilityResource(
+    nodeDisplay.forEachAvailablityFilter(
         f -> nodeDisplay.setFilterVisibility(f, true));
     nodeDisplay.setRemainderVisibility(true);
   }
 
   private void doNoNodeVisibleAction() {
-    nodeDisplay.forEachVisibilityResource(
+    nodeDisplay.forEachAvailablityFilter(
         f -> nodeDisplay.setFilterVisibility(f, false));
     nodeDisplay.setRemainderVisibility(false);
   }
 
   private void doInvertNodesVisibleAction() {
-    nodeDisplay.forEachVisibilityResource(f -> {
+    nodeDisplay.forEachAvailablityFilter(f -> {
           boolean isVisible = nodeDisplay.getFilterVisibility(f);
           nodeDisplay.setFilterVisibility(f, !isVisible);
         });
@@ -753,22 +746,11 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   }
 
   private void runEditVisibleNodesDialog() {
-
-    Dialog<DepanFxNodeViewNodeVisibilityDialog> visibiltyDlg =
-        DepanFxNodeViewNodeVisibilityDialog.runVisibilityDialog(
-            dialogRunner,
-            nodeDisplay.forUpdateAvailableFilterResource(),
-            nodeDisplay.forUpdateVisibleFilterResource(),
-            nodeDisplay,
-            this::updateAvailableNodes);
-    visibiltyDlg.getController().getToolResource()
-        .ifPresent(this::updateVisibleNodes);
-  }
-
-  private void updateAvailableNodes(
-      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> filterSeqRsrc) {
-    viewData.setAvailableNodeResource(filterSeqRsrc);
-    edgeDisplay.setMatcherVisibility(null, linkDisplayDirty);
+    DepanFxNodeViewNodeVisibilityDialog.runVisibilityDialog(
+        dialogRunner, nodeDisplay)
+        .getController()
+        .getToolResource()
+        .ifPresent(nodeDisplay::setVisiblityResource);
   }
 
   private MenuItem buildNodeVisibleItem(
@@ -779,15 +761,6 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     int nodeCount = nodeDisplay.getVisiblityFilterNodeCount(filterRsrc);
     return buildEgdeVisibleItem(label, isVisible, nodeCount,
         e -> setFilterVisible(filterRsrc, !isVisible));
-  }
-
-  private void updateVisibleNodes(
-      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleFilterRsrc) {
-    viewData.setVisibleNodeRsrc(visibleFilterRsrc);
-
-    nodeDisplay.clearFilterVisibility();
-    visibleFilterRsrc.getResource().streamFilterRefs()
-        .forEach(r -> nodeDisplay.setFilterVisibility(r, true));
   }
 
   private void setFilterVisible(
@@ -844,11 +817,11 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     DepanFxWorkspaceResource<DepanFxNodeViewData> updateRsrc =
         DepanFxWorkspaceResource.forUpdate(nodeViewRsrc, saveView);
 
-    Dialog<DepanFxSaveNodeViewDialog> dlg =
-        DepanFxResourcePerspectives.runEditDialog(
-            updateRsrc, dialogRunner,
-            DepanFxSaveNodeViewDialog.class, "Save node view");
-    dlg.getController().getToolResource()
+    DepanFxResourcePerspectives.runEditDialog(
+        updateRsrc, dialogRunner,
+        DepanFxSaveNodeViewDialog.class, "Save node view")
+        .getController()
+        .getToolResource()
         .ifPresent(this::updateSavedResource);
   }
 

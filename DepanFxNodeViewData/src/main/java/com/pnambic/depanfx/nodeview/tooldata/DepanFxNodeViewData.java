@@ -64,7 +64,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   /**
    * The set of nodes shown as selectable for display.
    */
-  private DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
+  private final DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
       availableNodeRsrc;
 
   /**
@@ -73,7 +73,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
    * This is typically a subset of the nodes in {@link #availableNodeRsrc},
    * but it may be independent.
    */
-  private DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
+  private final DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
       visibleNodeRsrc;
 
   /**
@@ -243,19 +243,9 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
     return availableNodeRsrc;
   }
 
-  public void setAvailableNodeResource(
-      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableNodeRsrc) {
-    this.availableNodeRsrc = availableNodeRsrc;
-  }
-
   public DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
       getVisibleNodeResource() {
     return visibleNodeRsrc;
-  }
-
-  public void setVisibleNodeRsrc(
-      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc) {
-    this.visibleNodeRsrc = visibleNodeRsrc;
   }
 
   public DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData>

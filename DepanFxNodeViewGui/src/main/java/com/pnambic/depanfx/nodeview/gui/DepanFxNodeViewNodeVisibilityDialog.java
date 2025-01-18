@@ -38,11 +38,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
@@ -105,12 +103,7 @@ public class DepanFxNodeViewNodeVisibilityDialog
   Map<DepanFxWorkspaceResource<DepanFxBaseFilterData>, BooleanProperty>
       filterVisibleProperties;
 
-  private DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableFilterRsrc;
-
   private NodeDisplayController nodeDisplay;
-
-  private Consumer<DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>>
-      onAvailableNodesRsrcUpdate;
 
   @Autowired
   public DepanFxNodeViewNodeVisibilityDialog(
@@ -125,22 +118,16 @@ public class DepanFxNodeViewNodeVisibilityDialog
    * The visibility filter sequence is the tool resource.
    */
   public static Dialog<DepanFxNodeViewNodeVisibilityDialog> runVisibilityDialog(
-      DepanFxDialogRunner dialogRunner,
-      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableFilterRsrc,
-      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleFilterRsrc,
-      NodeDisplayController nodeDisplay,
-      Consumer<DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>>
-          onAvailableNodesUpdate) {
+      DepanFxDialogRunner dialogRunner, NodeDisplayController nodeDisplay) {
 
     Dialog<DepanFxNodeViewNodeVisibilityDialog> result =
         DepanFxResourcePerspectives.prepareDialog(
-            visibleFilterRsrc, dialogRunner,
+            nodeDisplay.forUpdateVisibleFilterResource(),
+            dialogRunner,
             DepanFxNodeViewNodeVisibilityDialog.class);
 
     DepanFxNodeViewNodeVisibilityDialog dlgCtrl = result.getController();
     dlgCtrl.setNodeDisplayController(nodeDisplay);
-    dlgCtrl.setAvailableFilterResource(availableFilterRsrc);
-    dlgCtrl.setOnAvailableNodesUpdate(onAvailableNodesUpdate);
     result.runDialog(CREATE_NODE_VISIBILITY);
     return result;
   }
@@ -150,18 +137,7 @@ public class DepanFxNodeViewNodeVisibilityDialog
    */
   private void setNodeDisplayController(NodeDisplayController nodeDisplay) {
     this.nodeDisplay = nodeDisplay;
-  }
-
-  /**
-   * The workspace resource for visible nodes is consumed during normal
-   * dialog confirm and close.  This allows the container to save the
-   * resource reference for the available nodes when it is changed in the
-   * dialog.
-   */
-  public void setOnAvailableNodesUpdate(
-      Consumer<DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>>
-          onAvailableNodesRsrcUpdate) {
-    this.onAvailableNodesRsrcUpdate = onAvailableNodesRsrcUpdate;
+    installAvailableFilterResource();
   }
 
   @FXML
@@ -213,24 +189,8 @@ public class DepanFxNodeViewNodeVisibilityDialog
 
   public void setAvailableFilterResource(
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableFilterRsrc) {
-    this.availableFilterRsrc = availableFilterRsrc;
-    DepanFxNodeFilterSequenceData availableFilterInfo =
-        availableFilterRsrc.getResource();
-
-    filterVisibleProperties = new HashMap<>();
-    availableFilterInfo.streamFilterRefs()
-        .forEach(this::installFilterProperty);
-
-    installVisibleFilters();
-
-    ObservableList<DepanFxWorkspaceResource<DepanFxBaseFilterData>>
-    availableFilters = FXCollections.observableArrayList();
-
-    availableFilterInfo.streamFilterRefs()
-        .forEach(availableFilters::add);
-
-    filterVisibilityData = availableFilters;
-    filterVisibilityTable.setItems(availableFilters);
+    nodeDisplay.setAvailableResource(availableFilterRsrc);
+    installAvailableFilterResource();
   }
 
   /////////////////////////////////////
@@ -273,6 +233,22 @@ public class DepanFxNodeViewNodeVisibilityDialog
         .getOrDefault(value, UNKNOWN_FILTER_VISIBILITY);
   }
 
+  private void installAvailableFilterResource() {
+
+    filterVisibleProperties = new HashMap<>();
+    nodeDisplay.forEachAvailablityFilter(this::installFilterProperty);
+
+    installVisibleFilters();
+
+    ObservableList<DepanFxWorkspaceResource<DepanFxBaseFilterData>>
+    availableFilters = FXCollections.observableArrayList();
+
+    nodeDisplay.forEachAvailablityFilter(availableFilters::add);
+
+    filterVisibilityData = availableFilters;
+    filterVisibilityTable.setItems(availableFilters);
+  }
+
   private void installFilterProperty(
       DepanFxWorkspaceResource<DepanFxBaseFilterData> availableFilterRsrc) {
     BooleanProperty visibilityProp = new SimpleBooleanProperty();
@@ -282,7 +258,7 @@ public class DepanFxNodeViewNodeVisibilityDialog
   }
 
   private void installVisibleFilters() {
-    if (getToolResource().isEmpty() || availableFilterRsrc == null) {
+    if (getToolResource().isEmpty() || nodeDisplay == null) {
       return;
     }
 
@@ -355,15 +331,12 @@ public class DepanFxNodeViewNodeVisibilityDialog
 
   @FXML
   private void handleSaveAvailableNodes() {
-    DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> updateRsrc =
-        DepanFxWorkspaceResource.forUpdate(
-            availableFilterRsrc, prepareAvailableNodesResult());
-    Dialog<DepanFxNodeFilterSequenceToolDialog> saveAvailDlg =
-        DepanFxNodeFilterSequenceToolDialog.runCreateDialog(
-            updateRsrc, dialogRunner);
-
-    saveAvailDlg.getController().getToolResource()
-        .ifPresent(this::updateAvailableNodes);
+    DepanFxNodeFilterSequenceToolDialog.runCreateDialog(
+        nodeDisplay.forUpdateAvailableFilterResource(),
+        dialogRunner)
+        .getController()
+        .getToolResource()
+        .ifPresent(this::setAvailableFilterResource);
   }
 
   private List<DepanFxWorkspaceResource<DepanFxBaseFilterData>>
@@ -372,26 +345,5 @@ public class DepanFxNodeViewNodeVisibilityDialog
         .filter(e -> e.getValue().get())
         .map(e -> e.getKey())
         .collect(Collectors.toList());
-  }
-
-  private void updateAvailableNodes(
-      DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableFiltersRsrc) {
-    // The resource might have changed in the create dialog.
-    setAvailableFilterResource(availableFiltersRsrc);
-
-    onAvailableNodesRsrcUpdate.accept(availableFiltersRsrc);
-  }
-
-  private DepanFxNodeFilterSequenceData prepareAvailableNodesResult() {
-    List<DepanFxWorkspaceResource<DepanFxBaseFilterData>> availableFilters =
-        new ArrayList<>(filterVisibleProperties.size());
-    filterVisibleProperties.keySet().forEach(availableFilters::add);
-
-    DepanFxNodeFilterSequenceData availableFilterInfo =
-        availableFilterRsrc.getResource();
-    return new DepanFxNodeFilterSequenceData(
-        availableFilterInfo.getToolName(),
-        availableFilterInfo.getToolDescription(),
-        availableFilterInfo.getContextModelId(), availableFilters);
   }
 }

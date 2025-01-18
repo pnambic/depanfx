@@ -88,7 +88,6 @@ public class NodeDisplayController {
 
   /**
    * The filters for choosing which nodes are visible.
-   * Not the complete inventory of filters for visibility.
    */
   private DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableFilterRsrc;
 
@@ -100,7 +99,7 @@ public class NodeDisplayController {
 
   /**
    * The filters that are currently visible.
-   * Not the complete inventory of filters for visibility.
+   * This should be a subset of the {@code availableFilterRsrc}.
    */
   private DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc;
 
@@ -194,8 +193,7 @@ public class NodeDisplayController {
 
   public void setRemainderVisibility(boolean isVisible) {
     this.remainderVisible = isVisible;
-    remainderNodes
-        .forEach(n -> setNodeVisible(n, isVisible));
+    remainderNodes.forEach(n -> setNodeVisible(n, isVisible));
   }
 
   /**
@@ -212,7 +210,7 @@ public class NodeDisplayController {
         .sorted(DepanFxBaseToolData.BY_RESOURCE_NAME);
   }
 
-  public void forEachVisibilityResource(
+  public void forEachAvailablityFilter(
       Consumer<DepanFxWorkspaceResource<DepanFxBaseFilterData>> filterUpdate) {
     visibleGroup.streamAvailableFilters().forEach(filterUpdate);
   }
