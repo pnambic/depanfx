@@ -15,10 +15,11 @@
  */
 package com.pnambic.depanfx.filesystem.nodeview;
 
+import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
 import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
 import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemLinkMatcherBuiltIns;
-import com.pnambic.depanfx.graph.context.BaseContextDefinition;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDirection;
@@ -33,6 +34,7 @@ import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -40,22 +42,34 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.scene.paint.Color;
 
 @Configuration
 public class DepanFxFileSystemLinkViewBuiltIns {
 
-  private static final String FILE_SYSTEM_EDGE_RELATION_NAME =
-      "Files System Edges by Relation Type.";
+  private static final String FILE_SYSTEM_EDGE_RELATION_DISPLAY_NAME =
+      "Files System Edges Display by Relation Type.";
 
-  private static final String FILE_SYSTEM_EDGE_RELATION_DESCR =
-      "Files system edges, separated by relation type.";
+  private static final String FILE_SYSTEM_EDGE_RELATION_DISPLAY_DESCR =
+      "Files system edges display, separated by relation type.";
 
   public static final Path FILE_SYSTEM_EDGE_RELATION_DISPLAY_DOC_PATH =
       DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_TOOL_PATH
           .resolve(FileSystemContextModelId.FILE_SYSTEM_KEY)
           .resolve(DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_CONTEXT_RESOURCE_NAME);
+
+  private static final String FILE_SYSTEM_EDGE_RELATION_VISIBILITY_NAME =
+      "Files System Edges Visibility by Relation Type.";
+
+  private static final String FILE_SYSTEM_EDGE_RELATION_VISIBILITY_DESCR =
+      "Files system edges visibility, separated by relation type.";
+
+  public static final Path FILE_SYSTEM_EDGE_RELATION_VISIBILITY_DOC_PATH =
+      DepanFxLinkMatcherSequenceDocument.LINK_MATCHER_SEQUENCE_TOOL_PATH
+          .resolve(FileSystemContextModelId.FILE_SYSTEM_KEY)
+          .resolve(DepanFxLinkMatcherSequenceDocument.EDGE_VISIBILITY_CONTEXT_RESOURCE_NAME);
 
   @Autowired
   public DepanFxFileSystemLinkViewBuiltIns() {
@@ -71,6 +85,40 @@ public class DepanFxFileSystemLinkViewBuiltIns {
       protected DepanFxNodeViewLinkDisplayData
           buildDocument(DepanFxBuiltInProject project) {
         return buildFileSystemLinkDisplayData(project);
+      }
+    };
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxLinkMatcherSequenceDocument>
+  fileSystemMembersEdgeLinkVisibleDoc(
+      @Qualifier("fileSystemMembersEdgeLinkDisplayDoc")
+      DepanFxBuiltInContribution<DepanFxNodeViewLinkDisplayData> displayContrib) {
+
+    return new DepanFxBuiltInContribution.Dependent<>(
+        FILE_SYSTEM_EDGE_RELATION_VISIBILITY_DOC_PATH) {
+
+      @Override
+      protected DepanFxLinkMatcherSequenceDocument
+          buildDocument(DepanFxBuiltInProject project) {
+
+        return new DepanFxLinkMatcherSequenceDocument(
+            FILE_SYSTEM_EDGE_RELATION_VISIBILITY_NAME,
+            FILE_SYSTEM_EDGE_RELATION_VISIBILITY_DESCR,
+            FileSystemContextDefinition.MODEL_ID,
+            getDisplayFilters(displayContrib));
+      }
+
+      private List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+      getDisplayFilters(
+          DepanFxBuiltInContribution<DepanFxNodeViewLinkDisplayData> displayContrib) {
+        if (displayContrib.getDocument() == null) {
+          throw new DepanFxBuiltInContribution.MissingDependencyException(
+              getPath(), displayContrib.getPath());
+        }
+       return displayContrib.getDocument().streamLinkDisplay()
+              .map(r -> r.getLinkRsrc())
+              .collect(Collectors.toList());
       }
     };
   }
@@ -120,9 +168,9 @@ public class DepanFxFileSystemLinkViewBuiltIns {
 
     DepanFxNodeViewLinkDisplayData result =
         new DepanFxNodeViewLinkDisplayData(
-            FILE_SYSTEM_EDGE_RELATION_NAME,
-            FILE_SYSTEM_EDGE_RELATION_DESCR,
-            BaseContextDefinition.MODEL_ID, displayInfo);
+            FILE_SYSTEM_EDGE_RELATION_DISPLAY_NAME,
+            FILE_SYSTEM_EDGE_RELATION_DISPLAY_DESCR,
+            FileSystemContextDefinition.MODEL_ID, displayInfo);
     return result;
   };
 

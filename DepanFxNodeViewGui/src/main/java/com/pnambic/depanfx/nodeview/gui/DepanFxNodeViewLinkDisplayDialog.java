@@ -139,7 +139,6 @@ public class DepanFxNodeViewLinkDisplayDialog
 
     TableColumn<EditLinkDisplay, Number> countColumn = columnBinder.next();
     countColumn.setStyle("-fx-alignment: CENTER-RIGHT;");
-    Object blix;
     countColumn.setCellValueFactory(
         r -> new SimpleIntegerProperty(
             displayControl.getDisplayMatcherEdgeCount(

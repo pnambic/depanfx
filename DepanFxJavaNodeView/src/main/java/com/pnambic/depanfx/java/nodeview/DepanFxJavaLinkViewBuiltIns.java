@@ -56,16 +56,16 @@ public class DepanFxJavaLinkViewBuiltIns {
   private static final String JAVA_EDGE_RELATIONS_DISPLAY_DESCR =
       "Java edges display, separated by Java relation type.";
 
+  public static final Path JAVA_EDGE_RELATION_DISPLAY_DOC_PATH =
+      DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_TOOL_PATH
+          .resolve(JavaContextModelId.JAVA_KEY)
+          .resolve(DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_CONTEXT_RESOURCE_NAME);
+
   private static final String JAVA_EDGE_RELATIONS_VISIBILITY_NAME =
       "Java Edges Visibility by Java Relation Type";
 
   private static final String JAVA_EDGE_RELATIONS_VISIBILITY_DESCR =
       "Java edges visibility, separated by Java relation type.";
-
-  public static final Path JAVA_EDGE_RELATION_DISPLAY_DOC_PATH =
-      DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_TOOL_PATH
-          .resolve(JavaContextModelId.JAVA_KEY)
-          .resolve(DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_CONTEXT_RESOURCE_NAME);
 
   public static final Path JAVA_EDGE_RELATION_VISIBILITY_DOC_PATH =
       DepanFxLinkMatcherSequenceDocument.LINK_MATCHER_SEQUENCE_TOOL_PATH
@@ -115,7 +115,7 @@ public class DepanFxJavaLinkViewBuiltIns {
       getDisplayFilters(
           DepanFxBuiltInContribution<DepanFxNodeViewLinkDisplayData> displayContrib) {
         if (displayContrib.getDocument() == null) {
-          new DepanFxBuiltInContribution.MissingDependencyException(
+          throw new DepanFxBuiltInContribution.MissingDependencyException(
               getPath(), displayContrib.getPath());
         }
        return displayContrib.getDocument().streamLinkDisplay()

@@ -119,7 +119,7 @@ public class DepanFxJavaNodeViewBuiltIns {
           getDisplayFilters(
               DepanFxBuiltInContribution<DepanFxNodeViewNodeDisplayData> displayContrib) {
             if (displayContrib.getDocument() == null) {
-              new DepanFxBuiltInContribution.MissingDependencyException(
+              throw new DepanFxBuiltInContribution.MissingDependencyException(
                   getPath(), displayContrib.getPath());
             }
             return displayContrib.getDocument().streamNodeDisplay()

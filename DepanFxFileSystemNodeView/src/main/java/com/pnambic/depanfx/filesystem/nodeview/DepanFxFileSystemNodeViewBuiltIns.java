@@ -20,10 +20,10 @@ import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
 import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemNodeKindFilterBuiltIns;
 import com.pnambic.depanfx.graph.context.ContextNodeKindId;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
+import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglShape;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData.NodeDisplayEntry;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -31,6 +31,7 @@ import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -38,22 +39,34 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.scene.paint.Color;
 
 @Configuration
 public class DepanFxFileSystemNodeViewBuiltIns {
 
-  private static final String FILE_SYSTEM_NODE_KINDS_NAME =
-      "File System Nodes by Node Kind";
+  private static final String FILE_SYSTEM_NODE_KINDS_DISPLAY_NAME =
+      "File System Nodes Display by Node Kind";
 
-  private static final String FILE_SYSTEM_NODE_KINDS_DESCR =
-      "File system nodes, separated by node kind.";
+  private static final String FILE_SYSTEM_NODE_KINDS_DISPLAY_DESCR =
+      "File system nodes display, separated by node kind.";
 
   public static final Path FILE_SYSTEM_NODE_KIND_DISPLAY_DOC_PATH =
       DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_TOOL_PATH
           .resolve(FileSystemContextModelId.FILE_SYSTEM_KEY)
           .resolve(DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_CONTEXT_RESOURCE_NAME);
+
+  private static final String FILE_SYSTEM_NODE_KINDS_VISIBILITY_NAME =
+      "File System Nodes Visibility by Node Kind";
+
+  private static final String FILE_SYSTEM_NODE_KINDS_VISIBILITY_DESCR =
+      "File system nodes visibility, separated by node kind.";
+
+  public static final Path FILE_SYSTEM_NODE_KIND_VISIBILITY_DOC_PATH =
+      DepanFxBaseFilterData.NODE_FILTERS_TOOL_PATH
+          .resolve(FileSystemContextModelId.FILE_SYSTEM_KEY)
+          .resolve(DepanFxBaseFilterData.NODE_VSIBILITY_CONTEXT_RESOURCE_NAME);
 
   @Autowired
   public DepanFxFileSystemNodeViewBuiltIns() {
@@ -73,11 +86,44 @@ public class DepanFxFileSystemNodeViewBuiltIns {
         addFileSystemDisplay(kindDisplay, project);
 
         return new DepanFxNodeViewNodeDisplayData(
-            FILE_SYSTEM_NODE_KINDS_NAME,
-            FILE_SYSTEM_NODE_KINDS_DESCR,
+            FILE_SYSTEM_NODE_KINDS_DISPLAY_NAME,
+            FILE_SYSTEM_NODE_KINDS_DISPLAY_DESCR,
             FileSystemContextDefinition.MODEL_ID,
             kindDisplay);
       }
+    };
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxNodeFilterSequenceData>
+  fileSystemNodeKinkAvailableDoc(
+      @Qualifier("javaNodeKindDisplayDoc")
+      DepanFxBuiltInContribution<DepanFxNodeViewNodeDisplayData> displayContrib) {
+    return new DepanFxBuiltInContribution.Dependent<>(
+        FILE_SYSTEM_NODE_KIND_VISIBILITY_DOC_PATH) {
+
+          @Override
+          protected DepanFxNodeFilterSequenceData buildDocument(
+              DepanFxBuiltInProject project) {
+
+            return new DepanFxNodeFilterSequenceData(
+                FILE_SYSTEM_NODE_KINDS_VISIBILITY_NAME,
+                FILE_SYSTEM_NODE_KINDS_VISIBILITY_DESCR,
+                FileSystemContextDefinition.MODEL_ID,
+                getDisplayFilters(displayContrib));
+          }
+
+          private List<DepanFxWorkspaceResource<DepanFxBaseFilterData>>
+          getDisplayFilters(
+              DepanFxBuiltInContribution<DepanFxNodeViewNodeDisplayData> displayContrib) {
+            if (displayContrib.getDocument() == null) {
+              throw new DepanFxBuiltInContribution.MissingDependencyException(
+                  getPath(), displayContrib.getPath());
+            }
+            return displayContrib.getDocument().streamNodeDisplay()
+                .map(r -> r.getFilterResource())
+                .collect(Collectors.toList());
+          }
     };
   }
 

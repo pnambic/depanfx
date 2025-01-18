@@ -139,7 +139,7 @@ public class DepanFxBuiltInRegistry {
       DepanFxWorkspaceResource<?> priorRsrc,
       DepanFxBuiltInContribution<?> contrib) {
 
-    LOG.warn("Duplicate builtin for path {}. Tool {} being replaced by {}",
+    LOG.error("Duplicate builtin for path {}. Tool {} being replaced by {}",
         path,
         getToolName(priorRsrc.getResource()),
         getToolName(contrib.getDocument()));
