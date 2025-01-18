@@ -9,6 +9,8 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import net.rgielen.fxweaver.core.FxmlView;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -20,6 +22,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 @Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @FxmlView("save-node-view-dialog.fxml")
 public class DepanFxSaveNodeViewDialog
     extends DepanFxBaseToolDialog<DepanFxNodeViewData> {

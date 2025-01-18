@@ -26,6 +26,8 @@ import net.rgielen.fxweaver.core.FxmlView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -56,6 +58,7 @@ import javafx.stage.Stage;
 import javafx.util.converter.DoubleStringConverter;
 
 @Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @FxmlView("node-view-link-display-dialog.fxml")
 public class DepanFxNodeViewLinkDisplayDialog
     extends DepanFxBaseToolDialog<DepanFxNodeViewLinkDisplayData> {
