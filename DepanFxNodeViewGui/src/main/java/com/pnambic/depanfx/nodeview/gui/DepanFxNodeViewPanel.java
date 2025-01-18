@@ -357,10 +357,9 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   }
 
   public void updateEdgeDisplayByMatcher(
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcher,
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc,
       LinkDisplayEntry displayEntry) {
-    edgeDisplay.updateEdgeDisplayByMatcher(
-        matcher.getResource(), displayEntry);
+    edgeDisplay.updateEdgeDisplayByMatcher(matcherRsrc, displayEntry);
 
     linkDisplayDirty = true;
   }

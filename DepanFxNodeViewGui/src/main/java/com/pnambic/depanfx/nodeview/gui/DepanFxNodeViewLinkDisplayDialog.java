@@ -415,7 +415,7 @@ public class DepanFxNodeViewLinkDisplayDialog
           linkDisplay.linkDisplayLabelProp.getValue());
       LinkDisplayEntry display = toLinkDisplayEntry(linkDisplay);
       displayControl.updateEdgeDisplayByMatcher(
-          linkDisplay.linkDisplayRsrc.getResource(), display);
+          linkDisplay.linkDisplayRsrc, display);
     }
   }
 

@@ -101,7 +101,9 @@ public class EdgeDisplayController {
   /**
    * Track which edges's displays are handled by the display matcher.
    */
-  private final Map<DepanFxLinkMatcherDocument, Collection<GraphEdge>>
+  private final Map<
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>,
+      Collection<GraphEdge>>
       edgeDisplayGroup = new HashMap<>();
 
   private DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc;
@@ -176,10 +178,6 @@ public class EdgeDisplayController {
     this.remainderVisible = isVisible;
     remainderEdges
         .forEach(e -> setEdgeVisible(e, isVisible));
-  }
-
-  public Stream<DepanFxLinkMatcherDocument> streamDisplayMatchers() {
-    return edgeDisplayGroup.keySet().stream();
   }
 
   public void forEachAvailableMatchers(
@@ -303,11 +301,11 @@ public class EdgeDisplayController {
   }
 
   public void updateEdgeDisplayByMatcher(
-      DepanFxLinkMatcherDocument matcher,
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc,
       LinkDisplayEntry displayEntry) {
-    Collection<GraphEdge> updateEdges = edgeDisplayGroup.get(matcher);
+    Collection<GraphEdge> updateEdges = edgeDisplayGroup.get(matcherRsrc);
     if (updateEdges != null) {
-      updateEdges.forEach(e -> updateMatchedEdge(e, matcher, displayEntry));
+      updateEdges.forEach(e -> updateMatchedEdge(e, matcherRsrc, displayEntry));
     }
   }
 
@@ -471,14 +469,14 @@ public class EdgeDisplayController {
   private void addMatchedEdge(
       GraphEdge edge, LinkDisplayEntry lineDisplay, boolean isVisible) {
 
-    // Record edge with the matcher,
-    DepanFxLinkMatcherDocument matcher =
-        lineDisplay.getLinkRsrc().getResource();
+    // Record edge with the matcher.
+    DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc =
+        lineDisplay.getLinkRsrc();
     edgeDisplayGroup
-        .computeIfAbsent(matcher, m -> new ArrayList<>())
+        .computeIfAbsent(matcherRsrc, m -> new ArrayList<>())
         .add(edge);
 
-    installMatchedEdge(edge, matcher, lineDisplay, isVisible);
+    installMatchedEdge(edge, matcherRsrc.getResource(), lineDisplay, isVisible);
   }
 
   private void setEdgeVisible(GraphEdge edge, boolean isVisible) {
@@ -496,10 +494,10 @@ public class EdgeDisplayController {
 
   private void updateMatchedEdge(
       GraphEdge edge,
-      DepanFxLinkMatcherDocument matcher,
+      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc,
       LinkDisplayEntry lineDisplay) {
 
-    DepanFxLink link = matcher.getMatcher().match(edge).get();
+    DepanFxLink link = matcherRsrc.getResource().getMatcher().match(edge).get();
     JoglLines.updateLine(joglPane, edge, link, lineDisplay);
   }
 
