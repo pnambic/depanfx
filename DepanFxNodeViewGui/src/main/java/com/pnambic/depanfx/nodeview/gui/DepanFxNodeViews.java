@@ -4,6 +4,7 @@ import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
@@ -151,7 +152,7 @@ public class DepanFxNodeViews {
       DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> nodeDisplayRsrc =
           getContextNodeDisplay(workspace, modelId);
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableNodeRsrc =
-          DepanFxNodeViewData.buildAvailableNodeResource(workspace, nodeDisplayRsrc);
+          getContextNodeAvailable(workspace, nodeDisplayRsrc);
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc =
           availableNodeRsrc;
 
@@ -159,7 +160,7 @@ public class DepanFxNodeViews {
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayRsrc =
           getContextLinkDisplay(workspace, modelId);
       DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableEdgeRsrc =
-          DepanFxNodeViewData.buildAvailableEdgeResource(workspace, linkDisplayRsrc);
+          getContextEdgeAvailable(workspace, linkDisplayRsrc);
       DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc =
           availableEdgeRsrc;
 
@@ -232,6 +233,25 @@ public class DepanFxNodeViews {
         DepanFxGraphNodeViewBuiltIns.ALL_NODES_DISPLAY_DOC_PATH);
   }
 
+  private static DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
+  getContextNodeAvailable(
+      DepanFxWorkspace workspace,
+      DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> nodeDisplayRsrc) {
+    return getContextBuiltIn(
+            workspace,
+            nodeDisplayRsrc.getResource().getContextModelId(),
+            DepanFxNodeFilterSequenceData.class,
+            DepanFxBaseFilterData.NODE_FILTERS_TOOL_PATH,
+            DepanFxNodeFilterSequenceData.NODE_VISIBILITY_CONTEXT_RESOURCE_NAME)
+        .orElseGet(() -> {
+          LOG.info("Building available nodes for context {}",
+              nodeDisplayRsrc.getResource()
+              .getContextModelId().getContextModelKey());
+          return DepanFxNodeViewData.buildAvailableNodeResource(
+              workspace, nodeDisplayRsrc);
+        });
+  }
+
   private static DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData>
   getContextLinkDisplay(
       DepanFxWorkspace workspace, ContextModelId contextModelId) {
@@ -241,6 +261,25 @@ public class DepanFxNodeViews {
         DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_TOOL_PATH,
         DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_CONTEXT_RESOURCE_NAME,
         DepanFxGraphLinkViewBuiltIns.ALL_EDGES_DISPLAY_DOC_PATH);
+  }
+
+  private static DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+  getContextEdgeAvailable(
+      DepanFxWorkspace workspace,
+      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayRsrc) {
+    return getContextBuiltIn(
+            workspace,
+            linkDisplayRsrc.getResource().getContextModelId(),
+            DepanFxLinkMatcherSequenceDocument.class,
+            DepanFxLinkMatcherSequenceDocument.LINK_MATCHER_SEQUENCE_TOOL_PATH,
+            DepanFxLinkMatcherSequenceDocument.EDGE_VISIBILITY_CONTEXT_RESOURCE_NAME)
+        .orElseGet(() -> {
+          LOG.info("Building available edges for context {}",
+              linkDisplayRsrc.getResource()
+              .getContextModelId().getContextModelKey());
+          return DepanFxNodeViewData.buildAvailableEdgeResource(
+              workspace, linkDisplayRsrc);
+        });
   }
 
   private static <T> Optional<DepanFxWorkspaceResource<T>>

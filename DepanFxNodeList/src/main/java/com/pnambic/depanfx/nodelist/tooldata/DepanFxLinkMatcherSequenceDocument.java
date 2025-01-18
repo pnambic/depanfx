@@ -29,6 +29,8 @@ public class DepanFxLinkMatcherSequenceDocument extends DepanFxBaseToolData {
 
   public static final String LINK_MATCHER_SEQUENCE_TOOL_EXT = "dlmsti";
 
+  public static final String EDGE_VISIBILITY_CONTEXT_RESOURCE_NAME = "Edge Visibility";
+
   // Share persistence location with stand-alone link matchers.
   public static final String LINK_MATCHER_SEQUENCE_TOOL_DIR =
       DepanFxLinkMatcherDocument.LINK_MATCHER_TOOL_DIR;

@@ -11,6 +11,8 @@ public class DepanFxNodeFilterSequenceData extends DepanFxBaseToolData {
 
   public static final String NODE_FILTER_SEQUENCE_TOOL_EXT = "dnfsti";
 
+  public static final String NODE_VISIBILITY_CONTEXT_RESOURCE_NAME = "Node Visibility";
+
   private final ContextModelId contextModelId;
 
   private final List<DepanFxWorkspaceResource<DepanFxBaseFilterData>> filterRefs;

@@ -20,6 +20,7 @@ import com.pnambic.depanfx.java.context.JavaContextDefinition;
 import com.pnambic.depanfx.java.context.JavaContextModelId;
 import com.pnambic.depanfx.java.nodelist.link.JavaLinkMatcherBuiltIns;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDirection;
@@ -34,6 +35,7 @@ import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -41,22 +43,34 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.scene.paint.Color;
 
 @Configuration
 public class DepanFxJavaLinkViewBuiltIns {
 
-  private static final String JAVA_EDGE_RELATIONS_NAME =
-      "Java Edges by Java Relation Type";
+  private static final String JAVA_EDGE_RELATIONS_DISPLAY_NAME =
+      "Java Edges Display by Java Relation Type";
 
-  private static final String JAVA_EDGE_RELATIONS_DESCR =
-      "Java edges, separated by Java relation type.";
+  private static final String JAVA_EDGE_RELATIONS_DISPLAY_DESCR =
+      "Java edges display, separated by Java relation type.";
+
+  private static final String JAVA_EDGE_RELATIONS_VISIBILITY_NAME =
+      "Java Edges Visibility by Java Relation Type";
+
+  private static final String JAVA_EDGE_RELATIONS_VISIBILITY_DESCR =
+      "Java edges visibility, separated by Java relation type.";
 
   public static final Path JAVA_EDGE_RELATION_DISPLAY_DOC_PATH =
       DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_TOOL_PATH
           .resolve(JavaContextModelId.JAVA_KEY)
           .resolve(DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_CONTEXT_RESOURCE_NAME);
+
+  public static final Path JAVA_EDGE_RELATION_VISIBILITY_DOC_PATH =
+      DepanFxLinkMatcherSequenceDocument.LINK_MATCHER_SEQUENCE_TOOL_PATH
+          .resolve(JavaContextModelId.JAVA_KEY)
+          .resolve(DepanFxLinkMatcherSequenceDocument.EDGE_VISIBILITY_CONTEXT_RESOURCE_NAME);
 
   @Autowired
   public DepanFxJavaLinkViewBuiltIns() {
@@ -64,7 +78,8 @@ public class DepanFxJavaLinkViewBuiltIns {
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeViewLinkDisplayData>
-      javaMembersEdgeLinkDisplayDoc() {
+  javaMembersEdgeLinkDisplayDoc() {
+
     return new DepanFxBuiltInContribution.Dependent<>(
         JAVA_EDGE_RELATION_DISPLAY_DOC_PATH) {
 
@@ -72,6 +87,40 @@ public class DepanFxJavaLinkViewBuiltIns {
       protected DepanFxNodeViewLinkDisplayData
           buildDocument(DepanFxBuiltInProject project) {
         return buildJavaLinkDisplayData(project);
+      }
+    };
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxLinkMatcherSequenceDocument>
+  javaMembersEdgeLinkVisibleDoc(
+      @Qualifier("javaMembersEdgeLinkDisplayDoc")
+      DepanFxBuiltInContribution<DepanFxNodeViewLinkDisplayData> displayContrib) {
+
+    return new DepanFxBuiltInContribution.Dependent<>(
+        JAVA_EDGE_RELATION_VISIBILITY_DOC_PATH) {
+
+      @Override
+      protected DepanFxLinkMatcherSequenceDocument
+          buildDocument(DepanFxBuiltInProject project) {
+
+        return new DepanFxLinkMatcherSequenceDocument(
+            JAVA_EDGE_RELATIONS_VISIBILITY_NAME,
+            JAVA_EDGE_RELATIONS_VISIBILITY_DESCR,
+            JavaContextDefinition.MODEL_ID,
+            getDisplayFilters(displayContrib));
+      }
+
+      private List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+      getDisplayFilters(
+          DepanFxBuiltInContribution<DepanFxNodeViewLinkDisplayData> displayContrib) {
+        if (displayContrib.getDocument() == null) {
+          new DepanFxBuiltInContribution.MissingDependencyException(
+              getPath(), displayContrib.getPath());
+        }
+       return displayContrib.getDocument().streamLinkDisplay()
+              .map(r -> r.getLinkRsrc())
+              .collect(Collectors.toList());
       }
     };
   }
@@ -113,8 +162,10 @@ public class DepanFxJavaLinkViewBuiltIns {
 
     DepanFxNodeViewLinkDisplayData result =
         new DepanFxNodeViewLinkDisplayData(
-            JAVA_EDGE_RELATIONS_NAME, JAVA_EDGE_RELATIONS_DESCR,
-            JavaContextDefinition.MODEL_ID, displayInfo);
+            JAVA_EDGE_RELATIONS_DISPLAY_NAME,
+            JAVA_EDGE_RELATIONS_DISPLAY_DESCR,
+            JavaContextDefinition.MODEL_ID,
+            displayInfo);
     return result;
   }
 

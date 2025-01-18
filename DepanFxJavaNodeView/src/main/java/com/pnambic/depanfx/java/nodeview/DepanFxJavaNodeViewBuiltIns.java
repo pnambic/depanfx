@@ -22,6 +22,7 @@ import com.pnambic.depanfx.java.context.JavaContextDefinition;
 import com.pnambic.depanfx.java.context.JavaContextModelId;
 import com.pnambic.depanfx.java.nodelist.link.JavaNodeKindFilterBuiltIns;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
+import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglShape;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
@@ -32,6 +33,7 @@ import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -39,21 +41,34 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.scene.paint.Color;
 
 @Configuration
 public class DepanFxJavaNodeViewBuiltIns {
 
-  private static final String JAVA_NODE_KINDS_NAME = "Java Nodes by Node Kind";
+  private static final String JAVA_NODE_KINDS_DISPLAY_NAME =
+      "Java Nodes Display by Node Kind";
 
-  private static final String JAVA_NODE_KINDS_DESCR =
-      "Java nodes, separated by Java node kind.";
+  private static final String JAVA_NODE_KINDS_DISPLAY_DESCR =
+      "Java nodes display, separated by Java node kind.";
 
   public static final Path JAVA_NODE_KIND_DISPLAY_DOC_PATH =
       DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_TOOL_PATH
         .resolve(JavaContextModelId.JAVA_KEY)
         .resolve(DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_CONTEXT_RESOURCE_NAME);
+
+  private static final String JAVA_NODE_KINDS_VISIBILTY_NAME =
+      "Java Nodes Display by Node Kind";
+
+  private static final String JAVA_NODE_KINDS_VISIBILTY_DESCR =
+      "Java nodes display, separated by Java node kind.";
+
+  public static final Path JAVA_NODE_KIND_VISIBILITY_DOC_PATH =
+      DepanFxBaseFilterData.NODE_FILTERS_TOOL_PATH
+        .resolve(JavaContextModelId.JAVA_KEY)
+        .resolve(DepanFxBaseFilterData.NODE_VSIBILITY_CONTEXT_RESOURCE_NAME);
 
   @Autowired
   public DepanFxJavaNodeViewBuiltIns() {
@@ -74,10 +89,43 @@ public class DepanFxJavaNodeViewBuiltIns {
         addNodeKindDisplay(kindDisplay, project);
 
         return new DepanFxNodeViewNodeDisplayData(
-            JAVA_NODE_KINDS_NAME, JAVA_NODE_KINDS_DESCR,
+            JAVA_NODE_KINDS_DISPLAY_NAME, JAVA_NODE_KINDS_DISPLAY_DESCR,
             JavaContextDefinition.MODEL_ID,
             kindDisplay);
       }
+    };
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxNodeFilterSequenceData>
+  javaNodeKinkAvailableDoc(
+      @Qualifier("javaNodeKindDisplayDoc")
+      DepanFxBuiltInContribution<DepanFxNodeViewNodeDisplayData> displayContrib) {
+    return new DepanFxBuiltInContribution.Dependent<>(
+        JAVA_NODE_KIND_VISIBILITY_DOC_PATH) {
+
+          @Override
+          protected DepanFxNodeFilterSequenceData buildDocument(
+              DepanFxBuiltInProject project) {
+
+            return new DepanFxNodeFilterSequenceData(
+                JAVA_NODE_KINDS_VISIBILTY_NAME,
+                JAVA_NODE_KINDS_VISIBILTY_DESCR,
+                JavaContextDefinition.MODEL_ID,
+                getDisplayFilters(displayContrib));
+          }
+
+          private List<DepanFxWorkspaceResource<DepanFxBaseFilterData>>
+          getDisplayFilters(
+              DepanFxBuiltInContribution<DepanFxNodeViewNodeDisplayData> displayContrib) {
+            if (displayContrib.getDocument() == null) {
+              new DepanFxBuiltInContribution.MissingDependencyException(
+                  getPath(), displayContrib.getPath());
+            }
+            return displayContrib.getDocument().streamNodeDisplay()
+                .map(r -> r.getFilterResource())
+                .collect(Collectors.toList());
+          }
     };
   }
 
