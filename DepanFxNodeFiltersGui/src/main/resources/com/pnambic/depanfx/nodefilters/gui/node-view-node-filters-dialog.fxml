@@ -44,16 +44,20 @@
                      <columns>
                          <TreeTableColumn  text="Label"
                              editable="true"
-                             prefWidth="150.0"/>
+                             prefWidth="150"/>
                          <TreeTableColumn text="Closure"
                              editable="true"
-                             prefWidth="60.0"/>
+                             prefWidth="60"/>
                          <TreeTableColumn text="Merge"
                              editable="true"
-                             prefWidth="90.0"/>
+                             prefWidth="90"/>
                          <TreeTableColumn text="Description"
                              editable="true"
-                             prefWidth="150.0"/>
+                             prefWidth="150"/>
+                         <TreeTableColumn text="Edit"
+                            prefWidth="40" minWidth="30"
+                            editable="true"
+                            resizable="false" sortable="false"/>
                      </columns>
                   </TreeTableView>
 

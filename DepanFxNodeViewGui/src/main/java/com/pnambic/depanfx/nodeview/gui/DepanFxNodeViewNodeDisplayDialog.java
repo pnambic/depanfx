@@ -27,7 +27,7 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData.Node
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxSizerModel;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
-import com.pnambic.depanfx.scene.DepanFxActionCell;
+import com.pnambic.depanfx.scene.DepanFxActionTableCell;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -178,7 +178,7 @@ public class DepanFxNodeViewNodeDisplayDialog
 
     TableColumn<EditNodeDisplay, String> rowActionColumn =
         columnBinder.next();
-    DepanFxActionCell.prepareColumn(rowActionColumn, p -> new DisplayActions());
+    DepanFxActionTableCell.prepareColumn(rowActionColumn, p -> new DisplayActions());
 
     // Size filePath to remaining room
     filterPathColumn.prefWidthProperty().bind(
@@ -323,7 +323,7 @@ public class DepanFxNodeViewNodeDisplayDialog
   /////////////////////////////////////
   // Internal Table Classes
 
-  private class DisplayActions extends DepanFxActionCell<EditNodeDisplay> {
+  private class DisplayActions extends DepanFxActionTableCell<EditNodeDisplay> {
 
     public DisplayActions() {
       super(nodesDisplayData);

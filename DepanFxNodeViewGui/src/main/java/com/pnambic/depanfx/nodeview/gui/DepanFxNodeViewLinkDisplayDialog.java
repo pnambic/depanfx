@@ -13,7 +13,7 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
-import com.pnambic.depanfx.scene.DepanFxActionCell;
+import com.pnambic.depanfx.scene.DepanFxActionTableCell;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -177,7 +177,7 @@ public class DepanFxNodeViewLinkDisplayDialog
 
     TableColumn<EditLinkDisplay, String> rowActionColumn =
         columnBinder.next();
-    DepanFxActionCell.prepareColumn(rowActionColumn, p -> new DisplayActions());
+    DepanFxActionTableCell.prepareColumn(rowActionColumn, p -> new DisplayActions());
 
     // Size filePath to remaining room
     filePathColumn.prefWidthProperty().bind(
@@ -382,7 +382,7 @@ public class DepanFxNodeViewLinkDisplayDialog
     }
   }
 
-  private class DisplayActions extends DepanFxActionCell<EditLinkDisplay> {
+  private class DisplayActions extends DepanFxActionTableCell<EditLinkDisplay> {
 
     public DisplayActions() {
       super(linksDiplayTableData);

@@ -28,7 +28,7 @@ import javafx.util.converter.DefaultStringConverter;
 /**
  * Provide a context menu for filter rows.
  */
-public class DepanFxNodeFiltersTableCell
+public class DepanFxNodeFiltersTreeCell
     extends TextFieldTreeTableCell<
         DepanFxNodeFiltersTableMember, String> {
 
@@ -42,7 +42,7 @@ public class DepanFxNodeFiltersTableCell
 
   private final DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry;
 
-  public DepanFxNodeFiltersTableCell(
+  public DepanFxNodeFiltersTreeCell(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
       DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
     super(new DefaultStringConverter());

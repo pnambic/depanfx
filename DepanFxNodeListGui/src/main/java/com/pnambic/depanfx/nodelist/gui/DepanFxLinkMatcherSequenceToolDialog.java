@@ -21,7 +21,7 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
-import com.pnambic.depanfx.scene.DepanFxActionCell;
+import com.pnambic.depanfx.scene.DepanFxActionTableCell;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -146,7 +146,7 @@ public class DepanFxLinkMatcherSequenceToolDialog
 
     TableColumn<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>, String>
     rowActionColumn = columnBinder.next();
-    DepanFxActionCell.prepareColumn(rowActionColumn, p -> new MatcherActions());
+    DepanFxActionTableCell.prepareColumn(rowActionColumn, p -> new MatcherActions());
 
     // Size the resource column to remaining room
     resourceColumn.prefWidthProperty().bind(
@@ -219,7 +219,7 @@ public class DepanFxLinkMatcherSequenceToolDialog
   }
 
   private class MatcherActions
-      extends DepanFxActionCell<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> {
+      extends DepanFxActionTableCell<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> {
 
     public MatcherActions() {
       super(linkMatcherSequenceTableData);

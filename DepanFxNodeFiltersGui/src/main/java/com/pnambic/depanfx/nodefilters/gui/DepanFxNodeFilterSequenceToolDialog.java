@@ -20,7 +20,7 @@ import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
-import com.pnambic.depanfx.scene.DepanFxActionCell;
+import com.pnambic.depanfx.scene.DepanFxActionTableCell;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -149,7 +149,7 @@ public class DepanFxNodeFilterSequenceToolDialog
 
     TableColumn<DepanFxWorkspaceResource<DepanFxBaseFilterData>, String>
     rowActionColumn = columnBinder.next();
-    DepanFxActionCell.prepareColumn(rowActionColumn, p -> new FilterActions());
+    DepanFxActionTableCell.prepareColumn(rowActionColumn, p -> new FilterActions());
 
     // Size the resource column to remaining room
     resourceColumn.prefWidthProperty().bind(
@@ -221,7 +221,7 @@ public class DepanFxNodeFilterSequenceToolDialog
   }
 
   private class FilterActions
-      extends DepanFxActionCell<DepanFxWorkspaceResource<DepanFxBaseFilterData>> {
+      extends DepanFxActionTableCell<DepanFxWorkspaceResource<DepanFxBaseFilterData>> {
 
     public FilterActions() {
       super(nodeFiltersSequenceData);

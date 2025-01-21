@@ -27,41 +27,33 @@
             <columns>
                 <TableColumn text="Label"
                     editable="true"
-                    prefWidth="80" minWidth="50">
-                </TableColumn>
+                    prefWidth="80" minWidth="50"/>
                 <TableColumn text="Filter"
                     editable="false"
-                    prefWidth="200" minWidth="80">
-                </TableColumn>
+                    prefWidth="200" minWidth="80"/>
                 <TableColumn text="Node Count"
                     editable="false"
-                    prefWidth="80" minWidth="20">
-                </TableColumn>
+                    prefWidth="80" minWidth="20"/>
                 <TableColumn text="Shape"
                     prefWidth="180"
                     editable="true"
-                    sortable="false">
-                </TableColumn>
+                    sortable="false"/>
                 <TableColumn text="Fill"
                     prefWidth="120"
                     editable="true"
-                    resizable="false" sortable="false">
-                </TableColumn>
+                    resizable="false" sortable="false"/>
                 <TableColumn text="Border"
                     prefWidth="120"
                     editable="true"
-                    resizable="false" sortable="false">
-                </TableColumn>
+                    resizable="false" sortable="false"/>
                 <TableColumn text="Highlight"
                     prefWidth="120"
                     editable="true"
-                    resizable="false" sortable="false">
-                </TableColumn>
+                    resizable="false" sortable="false"/>
                 <TableColumn text="Edit"
                     prefWidth="40" minWidth="30"
                     editable="true"
-                    resizable="false" sortable="false">
-                </TableColumn>
+                    resizable="false" sortable="false"/>
             </columns>
          </TableView>
 

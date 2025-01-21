@@ -32,6 +32,7 @@ import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.perspective.DepanFxWorkspaceDialog;
+import com.pnambic.depanfx.scene.DepanFxActionTreeCell;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -73,7 +74,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeViewNodeFiltersDialog.class);
 
-  public static final String EDIT_NODE_FILTERS = "Node Filters...";
+  public static final String EDIT_NODE_FILTERS = "Node Filters";
 
   private static final String SELECT_NODE_FILTER = "Select Filter...";
 
@@ -173,7 +174,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
     labelColumn.setCellValueFactory(
         f -> getColumnInfo(f.getValue()).getToolNameProperty());
     labelColumn.setCellFactory(
-        l -> new DepanFxNodeFiltersTableCell(
+        l -> new DepanFxNodeFiltersTreeCell(
                 getWorkspace(), dialogRunner, nodeFiltersDialogRegistry));
 
     TreeTableColumn<DepanFxNodeFiltersTableMember, Boolean> closureColumn =
@@ -198,12 +199,18 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
         f -> getColumnInfo(f.getValue()).getToolDescriptionProperty());
     descrColumn.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
 
+    TreeTableColumn<DepanFxNodeFiltersTableMember, String> rowActionColumn =
+        columnBinder.next();
+    DepanFxActionTreeCell.prepareColumn(
+        rowActionColumn, p -> new DisplayActions());
+
     // Size descrColumn to remaining room
     descrColumn.prefWidthProperty().bind(
         nodeFilterTable.widthProperty()
             .subtract(labelColumn.widthProperty())
             .subtract(closureColumn.widthProperty())
             .subtract(mergeColumn.widthProperty())
+            .subtract(rowActionColumn.widthProperty())
             .subtract(1));
   }
 
@@ -376,5 +383,39 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
     LOG.info("Unrecognized item value type {} on filter tree.",
         item.getValue().getClass().getName());
     return Optional.empty();
+  }
+
+  private class DisplayActions
+      extends DepanFxActionTreeCell<DepanFxNodeFiltersTableMember> {
+
+    public DisplayActions() {
+      super(nodeFilterTable);
+    }
+
+    @Override
+    protected void populateContextMenu(DepanFxContextMenuBuilder builder) {
+      builder.appendActionItem(""
+          + "Edit Filter...",
+          e -> runFilterEditor(getIndex()));
+      // appendMoveOps(builder);
+    }
+
+    private void runFilterEditor(int index) {
+      DepanFxNodeFiltersTableMember rowInfo = getRowData(index);
+      if (rowInfo instanceof DepanFxNodeFiltersDataProvider src) {
+        DepanFxBaseFilterData filterInfo = src.prepareFilterData();
+        nodeFiltersDialogRegistry.runUpdateFilters(dialogRunner, filterInfo)
+            .ifPresent(f -> updateFilter(rowInfo, f));
+      }
+    }
+
+    private void updateFilter(
+        DepanFxNodeFiltersTableMember rowInfo,
+        DepanFxBaseFilterData filterInfo) {
+
+      if (rowInfo instanceof DepanFxNodeFiltersDisplayMember display) {
+        display.updateFilter(filterInfo);
+      }
+    }
   }
 }

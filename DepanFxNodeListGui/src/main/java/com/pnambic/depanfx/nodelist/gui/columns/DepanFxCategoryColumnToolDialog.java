@@ -11,7 +11,7 @@ import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
-import com.pnambic.depanfx.scene.DepanFxActionCell;
+import com.pnambic.depanfx.scene.DepanFxActionTableCell;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -147,7 +147,7 @@ public class DepanFxCategoryColumnToolDialog
 
     TableColumn<EditCategory, String> rowActionColumn =
         columnBinder.next();
-    DepanFxActionCell.prepareColumn(
+    DepanFxActionTableCell.prepareColumn(
         rowActionColumn, p -> new CategoryActions());
 
     // Size filePath to remaining room
@@ -283,7 +283,7 @@ public class DepanFxCategoryColumnToolDialog
   /////////////////////////////////////
   // Internal Table Classes
 
-  private class CategoryActions extends DepanFxActionCell<EditCategory> {
+  private class CategoryActions extends DepanFxActionTableCell<EditCategory> {
 
     CategoryActions() {
       super(categoryTableData);

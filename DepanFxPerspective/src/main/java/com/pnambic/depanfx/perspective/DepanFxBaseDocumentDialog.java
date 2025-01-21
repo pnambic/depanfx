@@ -36,6 +36,12 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
   private Optional<DepanFxWorkspaceResource<T>> optResource =
       Optional.empty();
 
+  /**
+   * The chosen destination for the resource.
+   */
+  private Optional<DepanFxProjectDocument> optSaveProjDoc =
+      Optional.empty();
+
   @FXML
   private TextField destinationField;
 
@@ -54,6 +60,7 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
    */
   public void setToolResource(DepanFxWorkspaceResource<T> toolRsrc) {
     optResource = Optional.of(toolRsrc);
+    optSaveProjDoc = asSaveDocument(toolRsrc);
     updateDestinationField();
   }
 
@@ -62,39 +69,17 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
    */
   public void clearToolResource() {
     optResource = Optional.empty();
+    optSaveProjDoc = Optional.empty();
     updateDestinationField();
   }
 
   /////////////////////////////////////
-  // Hook methods for derived classes.
 
   private void updateDestinationField() {
-    if (optResource.isEmpty()) {
-      destinationField.setText(null);
-      return;
-    }
-
-    DepanFxWorkspaceResource<T> resource = optResource.get();
-    DepanFxProjectDocument document = resource.getDocument();
-
-    // Don't allow a destination in the built-in or scratch project.
-    if (document.getProject().equals(workspace.getBuiltInProjectTree())) {
-      destinationField.setText(null);
-      return;
-    }
-    if (document.getProject().equals(workspace.getScratchProjectTree())) {
-      destinationField.setText(null);
-      return;
-    }
-    destinationField.setText(DepanFxProjects.getDocumentLabel(document));
-  }
-
-  protected String getDestination() {
-    return destinationField.getText();
-  }
-
-  protected void setDestinationField(TextField destinationField) {
-    this.destinationField = destinationField;
+    destinationField.setText(
+        optSaveProjDoc
+            .map(DepanFxProjects::getDocumentLabel)
+            .orElse(null));
   }
 
   protected abstract String getDocumentName();
@@ -147,8 +132,7 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
   // for window closing.
 
   protected Optional<DepanFxWorkspaceResource<T>> saveProjectDoc(T toolData) {
-    return DepanFxResourcePerspectives.toProjDoc(workspace, destinationField)
-        .flatMap(d -> saveDocument(d, toolData));
+    return optSaveProjDoc.flatMap(d -> saveDocument(d, toolData));
   }
 
   /**
@@ -156,8 +140,10 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
    */
   @Override // DepanFxBaseDialog
   protected void checkInput(DepanFxProctor proctor) {
-    DepanFxDialogChecks.checkDestinationFile(
-        proctor, destinationField.getText());
+    if (optSaveProjDoc.isEmpty()) {
+        proctor.addError("Destination field is not usable",
+            "Blank value for destination field");
+    }
   }
 
   /////////////////////////////////////
@@ -186,8 +172,10 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
     File selectedFile =
         fileChooser.showSaveDialog(destinationField.getScene().getWindow());
     if (selectedFile != null) {
-      destinationField.setText(selectedFile.getAbsolutePath());
-    }
+      optSaveProjDoc =
+          DepanFxResourcePerspectives.toProjDoc(workspace, selectedFile);
+      }
+    updateDestinationField();
   }
 
   /////////////////////////////////////
@@ -218,5 +206,20 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
           + ", type " + docData.getClass().getName(),
           errIo);
     }
+  }
+
+  private Optional<DepanFxProjectDocument> asSaveDocument(
+      DepanFxWorkspaceResource<T> rsrc) {
+
+    DepanFxProjectDocument document = rsrc.getDocument();
+
+    // Don't allow a destination in the built-in or scratch project.
+    if (document.getProject().equals(workspace.getBuiltInProjectTree())) {
+      return Optional.empty();
+    }
+    if (document.getProject().equals(workspace.getScratchProjectTree())) {
+      return Optional.empty();
+    }
+    return Optional.of(document);
   }
 }

@@ -42,9 +42,7 @@ public class DepanFxNodeViewNodeSelectDialog
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeViewNodeSelectDialog.class);
 
-  public static final String EDIT_NODE_SELECTION = "Edit Node Selection...";
-
-  public static final String NEW_LINK_DISPLAY = "New Link Display...";
+  public static final String EDIT_NODE_SELECTION = "Edit Node Selection";
 
   private static final ExtensionFilter NODE_LIST_FILTER =
       DepanFxSaveNodeListDialog.EXT_FILTER;

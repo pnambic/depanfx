@@ -17,6 +17,7 @@ package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.scene.DepanFxActionTreeCell;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +28,8 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 public class DepanFxNodeFiltersRootMember
-    implements DepanFxNodeFiltersTableMember, DepanFxNodeFiltersTableContainer {
+    implements DepanFxNodeFiltersTableMember, DepanFxNodeFiltersTableContainer,
+        DepanFxActionTreeCell.ItemContainer<DepanFxNodeFiltersTableMember> {
 
   private final DepanFxWorkspace workspace;
 
@@ -88,5 +90,19 @@ public class DepanFxNodeFiltersRootMember
 
   public void setAll(List<? extends DepanFxBaseFilterData> seqMemebers) {
     filterItems.setAll(seqMemebers);
+  }
+
+  @Override
+  public void deleteItem(DepanFxNodeFiltersTableMember member) {
+    if (member instanceof DepanFxNodeFiltersDisplayMember display) {
+      deleteFilter(display.getFilterData());
+    }
+  }
+
+  @Override
+  public void addItem(DepanFxNodeFiltersTableMember member) {
+    if (member instanceof DepanFxNodeFiltersDisplayMember display) {
+      addFilter(display.getFilterData());
+    }
   }
 }

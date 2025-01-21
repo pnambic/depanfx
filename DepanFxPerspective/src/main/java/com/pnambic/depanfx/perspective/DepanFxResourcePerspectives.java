@@ -76,6 +76,12 @@ public class DepanFxResourcePerspectives {
       DepanFxWorkspace workspace, TextField destinationField) {
 
     File dstFile = new File(destinationField.getText());
+    return toProjDoc(workspace, dstFile);
+  }
+
+  public static Optional<DepanFxProjectDocument> toProjDoc(
+      DepanFxWorkspace workspace, File dstFile) {
+
     return workspace.toProjectDocument(dstFile.toURI());
   }
 
