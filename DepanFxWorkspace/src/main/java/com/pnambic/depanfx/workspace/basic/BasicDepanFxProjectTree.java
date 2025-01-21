@@ -6,6 +6,7 @@ import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectSpi;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -84,7 +85,7 @@ public class BasicDepanFxProjectTree implements DepanFxProjectTree {
 
   @Override
   public String toLabel(DepanFxProjectDocument projDoc) {
-    return projectSpi.getProjectName() + ":" + projDoc.getMemberPath();
+    return DepanFxProjects.getDocumentLabel(projDoc);
   }
 
   @Override

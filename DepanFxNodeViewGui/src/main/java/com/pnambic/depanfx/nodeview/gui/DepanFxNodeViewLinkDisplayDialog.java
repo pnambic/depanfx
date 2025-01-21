@@ -21,6 +21,7 @@ import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -177,6 +178,22 @@ public class DepanFxNodeViewLinkDisplayDialog
     TableColumn<EditLinkDisplay, String> rowActionColumn =
         columnBinder.next();
     DepanFxActionCell.prepareColumn(rowActionColumn, p -> new DisplayActions());
+
+    // Size filePath to remaining room
+    filePathColumn.prefWidthProperty().bind(
+        linksDisplayTable.widthProperty()
+            .subtract(labelColumn.widthProperty())
+            .subtract(countColumn.widthProperty())
+            .subtract(lineFormColumn.widthProperty())
+            .subtract(lineStyleColumn.widthProperty())
+            .subtract(lineColorColumn.widthProperty())
+            .subtract(lineWidthColumn.widthProperty())
+            .subtract(lineLabelColumn.widthProperty())
+            .subtract(sourceArrowColumn.widthProperty())
+            .subtract(targetArrowColumn.widthProperty())
+            .subtract(lineDirectionColumn.widthProperty())
+            .subtract(rowActionColumn.widthProperty())
+            .subtract(4));
   }
 
   /**
@@ -514,7 +531,7 @@ public class DepanFxNodeViewLinkDisplayDialog
       this.linkDisplayRsrc = linkDisplayRsrc;
       if (this.linkDisplayRsrc != null) {
         linkDisplayNameProp.setValue(
-            linkDisplayRsrc.getDocument().getMemberName());
+            DepanFxProjects.getResourceLabel(linkDisplayRsrc));
         return;
       }
 

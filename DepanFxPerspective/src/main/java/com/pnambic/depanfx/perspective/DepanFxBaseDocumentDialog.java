@@ -86,7 +86,7 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
       destinationField.setText(null);
       return;
     }
-    destinationField.setText(document.getMemberPath().toString());
+    destinationField.setText(DepanFxProjects.getDocumentLabel(document));
   }
 
   protected String getDestination() {

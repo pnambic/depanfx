@@ -108,7 +108,8 @@ public class DepanFxNodeFiltersChooser {
     private void runNodeFilterFinder() {
       DepanFxNodeFiltersChooser
           .runNodeFiltersFinder(
-                workspace, dialogRunner, nodeFilterField.getScene(), nodeFiltersDialogRegistry)
+                workspace, dialogRunner, nodeFilterField.getScene(),
+                nodeFiltersDialogRegistry)
           .ifPresent(this::setNodeFilterRsrc);
     }
   }

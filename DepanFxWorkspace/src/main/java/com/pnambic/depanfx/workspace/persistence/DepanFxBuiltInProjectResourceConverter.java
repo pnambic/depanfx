@@ -8,8 +8,8 @@ import com.pnambic.depanfx.workspace.DepanFxProjectResource.BuiltIn;
 
 import java.io.File;
 
-public class DepanFxBuiltInProjectResourceConverter
-    extends BasePersistObjectConverter<DepanFxProjectResource.BuiltIn> {
+public class DepanFxBuiltInProjectResourceConverter<T>
+    extends BasePersistObjectConverter<DepanFxProjectResource.BuiltIn<T>> {
 
   private static final Class<?>[] ALLOW_TYPES = new Class[] {
       DepanFxProjectResource.BuiltIn.class
@@ -37,18 +37,19 @@ public class DepanFxBuiltInProjectResourceConverter
 
   @Override
   public void marshal(PersistMarshalContext dstContext, Object source) {
-    DepanFxProjectResource.BuiltIn projRsrc =
-        (DepanFxProjectResource.BuiltIn) source;
+    @SuppressWarnings("unchecked")
+    DepanFxProjectResource.BuiltIn<T> projRsrc =
+        (DepanFxProjectResource.BuiltIn<T>) source;
 
     String builtInName = projRsrc.getBuiltInPath().toString();
     marshalValue(dstContext, builtInName);
   }
 
   @Override
-  public BuiltIn unmarshal(PersistUnmarshalContext srcContext) {
+  public BuiltIn<T> unmarshal(PersistUnmarshalContext srcContext) {
 
     String builtInPath = (String) unmarshalValue(srcContext, String.class);
-    return new DepanFxProjectResource.BuiltIn(
+    return new DepanFxProjectResource.BuiltIn<>(
         new File((String) builtInPath).toPath());
   }
 }

@@ -22,6 +22,7 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -158,9 +159,7 @@ public abstract class DepanFxNodeFiltersBaseDialog<T extends DepanFxBaseFilterDa
       DepanFxWorkspaceResource<?> filterRsrc) {
 
     this.filterRsrc = filterRsrc;
-
-    DepanFxProjectDocument filterDoc = filterRsrc.getDocument();
-    filterRsrcField.setText(filterDoc.getProject().toLabel(filterDoc));
+    filterRsrcField.setText(DepanFxProjects.getResourceLabel(filterRsrc));
   }
 
   @FXML

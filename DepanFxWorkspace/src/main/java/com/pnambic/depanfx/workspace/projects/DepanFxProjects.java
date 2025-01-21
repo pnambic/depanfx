@@ -165,6 +165,16 @@ public class DepanFxProjects {
                 .getResource(d));
   }
 
+  public static String getResourceLabel(DepanFxWorkspaceResource<?> resource) {
+    return getDocumentLabel(resource.getDocument());
+  }
+
+  public static String getDocumentLabel(DepanFxProjectDocument doc) {
+    DepanFxProjectTree proj = doc.getProject();
+    Path docPath = proj.getMemberPath().relativize(doc.getMemberPath());
+    return proj.getMemberName() + ":" + docPath.toString();
+  }
+
   /**
    * By the time a candidate built in hits the filter,
    * it has already been filtered to be of the requested type.

@@ -99,9 +99,10 @@ public class DepanFxTreeSection implements DepanFxNodeListSection {
 
   @Override
   public String getDisplayName(GraphNode node) {
-    // Node registry may need to parse node to deliver best display name.
-    // For example, Java method name would be better than full signature.
-    // This works for current simple paths from FileSystem objects.
+    if (treeModel.getRoots().contains(node)) {
+      return node.getId().getNodeKey();
+    }
+
     return node.getId().getSimpleName();
   }
 
