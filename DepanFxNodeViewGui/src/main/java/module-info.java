@@ -1,4 +1,5 @@
 module depanfx.nodeview.gui {
+  requires java.desktop;
   requires javafx.base;
   requires javafx.controls;
   requires javafx.fxml;
@@ -21,10 +22,9 @@ module depanfx.nodeview.gui {
   requires depanfx.nodeview.data;
   requires depanfx.persistence;
   requires depanfx.perspective;
-  requires depanfx.workspace;
   requires depanfx.scene;
   requires depanfx.session.data;
-  requires java.desktop;
+  requires depanfx.workspace;
 
   opens com.pnambic.depanfx.nodeview.gui
       to javafx.fxml, net.rgielen.fxweaver.core,

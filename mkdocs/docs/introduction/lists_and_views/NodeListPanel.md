@@ -2,7 +2,7 @@
 
 Returning to the workspace, our next goal is to visualize the nodes of the
 HelloWorld application and select the Java components.  
-![Workspace with HelloWorld dependency graph](img/Workspace HelloWorld.png "Workspace with HelloWorld dependency graph")<br/>
+![Workspace with HelloWorld dependency graph](../img/Workspace HelloWorld.png "Workspace with HelloWorld dependency graph")<br/>
 The Node List panel displays the nodes of a dependency graph
 in tabular form.
 It provides powerful display mechanisms grouping and organizing the nodes
@@ -118,7 +118,7 @@ Complex analyzes may benefit from additional substructure and directories
 within the Analyzes directory.
 
 After saving the node list, there will be a new document under the Analyzes directory.  
-![Hello World Node List in Analyzes](img/Hello World Node List in Analyzes.png "Hello World Node List in Analyzes")
+![Hello World Node List in Analyzes](../img/Hello World Node List in Analyzes.png "Hello World Node List in Analyzes")
 
 The file `Hello World Java components yyyyMMddhhmm.dnli` lists the nodes that are Java components.
 The relationships between the nodes remain in the dependency graph and are accessible when needed.

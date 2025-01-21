@@ -1,12 +1,23 @@
 site_name: DepanFX User Documentation
+theme: mkdocs
 nav:
   - Home: index.md
   - Introduction:
     - Welcome: introduction/Welcome.md
-    - Installation: introduction/Installation.md
-    - Getting Started: introduction/GettingStarted.md
-    - Save The Session: introduction/SaveTheSession.md
-    - Node List Panel: introduction/NodeListPanel.md
-    - Node View Panel: introduction/NodeViewPanel.md
+    - Installation: introduction/installation/Installation.md
+    - Initial Project:
+      - Getting Started: introduction/initial_project/GettingStarted.md
+      - Create A Project: introduction/initial_project/CreateProject.md
+      - Create A Dependency Graph: introduction/initial_project/FirstDependencyGraph.md
+      - Save The Session: introduction/initial_project/SaveTheSession.md
+      - Summary: introduction/initial_project/Summary.md
+    - Lists And Views:
+      - Node Lists and Views Panel: introduction/lists_and_views/Introduction.md
+      - Node List Panel: introduction/lists_and_views/NodeListPanel.md
+      - Node View Panel: introduction/lists_and_views/NodeViewPanel.md
+      - Congratulations: introduction/lists_and_views/Summary.md
     - Congratulations: introduction/Summary.md
+  - Reference:
+    - Node Views:
+      - Keyboard Commands: reference/nodeview/keyboard_cmnds/KeyboardCommands.md
 

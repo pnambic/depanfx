@@ -2,7 +2,7 @@
 
 Returning to the workspace, our next goal is to graphically display
 the Java nodes and relationships.  
-![Hello World Node List in Analyzes](img/Hello World Node List in Analyzes.png "Hello World Node List in Analyzes")
+![Hello World Node List in Analyzes](../img/Hello World Node List in Analyzes.png "Hello World Node List in Analyzes")
 
 The presentation of the nodes is very flexible,
 with nodes grouped into user defined sections

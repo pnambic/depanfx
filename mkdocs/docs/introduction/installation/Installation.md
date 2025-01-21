@@ -42,7 +42,7 @@ The full list of available releases are accessible on the
 
 Assuming a compatible Java can be located, DepanFX should open the first time
 with a Welcome window and the Workspace tab showing in the main editor frame.
-![DepanFX initial startup](../img/Depan Startup.png "Welcome from Code Inspector Gonzo")
+![DepanFX initial startup](../../img/Depan Startup.png "Welcome from Code Inspector Gonzo")
 
 You should be greeted with the welcoming gaze of Code Inspector (CI) Gonzo,
 the mascot for DepanFX.
@@ -71,7 +71,7 @@ $ ./gradlew run
 
 Assuming compatible tooling can be located, DepanFX should open the first time
 with a Welcome window and the Workspace tab showing in the main editor frame.
-![DepanFX initial startup](../img/Depan Startup.png "Welcome from Code Inspector Gonzo")
+![DepanFX initial startup](../../img/Depan Startup.png "Welcome from Code Inspector Gonzo")
 
 You should be greeted with the welcoming gaze of Code Inspector (CI) Gonzo,
 the mascot for DepanFX.

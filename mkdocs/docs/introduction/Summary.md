@@ -4,7 +4,8 @@ You've complete a quick tour of DepanFX!
 
 ## DepanFX Concepts
 
-This Getting Started guide introduced a number of DepanFX's basic concepts and features.
+This introduction to DepanFX guide provides an overview to
+a number of DepanFX's basic concepts and features.
 
 * Work within DepanFX is based on a session that contains projects.
 * Dependency graphs can be constructed from various sources.
@@ -30,7 +31,6 @@ Regardless, it can be good to know what you are looking at
 * `.dgi` - Dependency Graphs
 * `.dnli` - Node Lists
 * `.dnvi` - Node Lists
-
 
 ## Other Thing To Explore
 
