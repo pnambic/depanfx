@@ -119,8 +119,9 @@ public abstract class DepanFxActionTreeCell<T> extends
 
   private void deleteRow(int index) {
     TreeItem<T> item = tableView.getTreeItem(index);
-    T bix = item.getValue();
     T parentInfo = item.getParent().getValue();
+    // By construction, every shown item has a parent.
+    // Note that the root item is not shown.
     @SuppressWarnings("unchecked")
     ItemContainer<T> container = (ItemContainer<T>) parentInfo;
     container.deleteItem(item.getValue());
