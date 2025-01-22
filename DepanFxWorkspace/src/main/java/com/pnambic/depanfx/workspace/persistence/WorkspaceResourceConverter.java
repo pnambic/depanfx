@@ -6,6 +6,11 @@ import com.pnambic.depanfx.persistence.PersistUnmarshalContext;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
+
 public class WorkspaceResourceConverter
     extends BasePersistObjectConverter<DepanFxWorkspaceResource<?>> {
 
@@ -13,6 +18,9 @@ public class WorkspaceResourceConverter
 
   private static final Class<?>[] ALLOWED_TYPES = new Class[] {
   };
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(WorkspaceResourceConverter.class);
 
   @Override
   public Class<?> forType() {
@@ -59,9 +67,13 @@ public class WorkspaceResourceConverter
     PersistWorkspaceResource persistWkspRsrc =
         (PersistWorkspaceResource) unmarshalValue(
             srcContext, PersistWorkspaceResource.class);
-    DepanFxWorkspaceResource<?> result =
-        PersistWorkspaceResource.forWksp(workspace, persistWkspRsrc)
-        .get();
-    return result;
+    Optional<DepanFxWorkspaceResource<Object>> optResult =
+        PersistWorkspaceResource.forWksp(workspace, persistWkspRsrc);
+
+    if (optResult.isEmpty()) {
+      LOG.error("Unable to find workspace resource {}:{}",
+      persistWkspRsrc.projectName, persistWkspRsrc.resourcePath);
+    }
+    return optResult.get();
   }
 }
