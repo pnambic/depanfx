@@ -15,7 +15,7 @@
  */
 package com.pnambic.depanfx.nodefilters.tooldata;
 
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListData;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import java.nio.file.Path;
@@ -27,7 +27,7 @@ public class DepanFxBaseFilterData extends DepanFxBaseToolData {
   public static final String NODE_VSIBILITY_CONTEXT_RESOURCE_NAME = "Node Visibility";
 
   public static final Path NODE_FILTERS_TOOL_PATH =
-      DepanFxNodeListData.NODE_LIST_TOOL_PATH.resolve(NODE_FILTERS_TOOL_DIR);
+      DepanFxProjects.TOOLS_PATH.resolve(NODE_FILTERS_TOOL_DIR);
 
   private final FilterMergeMode mergeMode;
 
