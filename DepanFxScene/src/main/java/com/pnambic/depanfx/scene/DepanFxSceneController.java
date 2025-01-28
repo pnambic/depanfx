@@ -103,6 +103,7 @@ public class DepanFxSceneController {
   public void closeScene() {
     // Clear UX resources first (tabs), then map-list of viewers.
     // Leads to DepanFxSceneViewer.closeTab(), which release any resources.
+    LOG.info("Close scene invoked");
     viewRoot.getTabs().clear();
     sceneViewers.clear();
   }

@@ -20,6 +20,9 @@ import com.jogamp.opengl.util.awt.ImageUtil;
 import com.pnambic.depanfx.jogl.JoglCamera.CameraData;
 import com.pnambic.depanfx.jogl.shapes.DemoShape;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.nio.ByteBuffer;
@@ -40,6 +43,8 @@ public class JoglModule {
 
   public  static final int FRAME_CNT =
       FPSCounter.DEFAULT_FRAMES_PER_INTERVAL;  // 300 .. ~ 5 seconds.
+
+  public static final Logger LOG = LoggerFactory.getLogger(JoglModule.class);
 
   private GLWindow glWindow;
 
@@ -238,6 +243,7 @@ public class JoglModule {
     }
 
     public void disableCanvas() {
+      LOG.info("Disabling canvas pane");
       getChildren().clear();
     }
 
