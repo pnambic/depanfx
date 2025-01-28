@@ -243,8 +243,16 @@ public class JoglModule {
     }
 
     public void disableCanvas() {
-      LOG.info("Disabling canvas pane");
-      getChildren().clear();
+      LOG.info("Disabling canvas pane {}", canvas.getId());
+      if (canvas.getId() == null) {
+        canvas.destroy();
+        return;
+      }
+      try {
+        getChildren().clear();
+      } catch (Exception errAny) {
+        LOG.warn("Trouble disabling JOGL: {}", errAny.getMessage());
+      }
     }
 
     @Override
