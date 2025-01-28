@@ -15,16 +15,15 @@
  */
 package com.pnambic.depanfx.xstream;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.converters.DataHolder;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.XppDriver;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 
 /**
  * Handle persistence of a document object to and from XML files.

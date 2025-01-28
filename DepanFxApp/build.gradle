@@ -54,13 +54,11 @@ dependencies {
   runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:win"
   runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:linux"
   runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:mac"
-
-  testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 application {
-  mainClass = "com.pnambic.depanfx.DepanFxApplication"
-  mainModule = "depanfx.app"
+  mainClass = 'com.pnambic.depanfx.DepanFxApplication'
+  mainModule = 'depanfx.app'
   applicationDefaultJvmArgs = [
     '-Xmx4G',
     '--add-opens', 'javafx.graphics/com.sun.javafx.tk=ALL-UNNAMED',
@@ -75,24 +73,24 @@ task buildInfo {
     doLast {
         // Get the current date
         def currentDate = new Date()
-        def dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm Z")
+        def dateFormat = new SimpleDateFormat('yyyy-MM-dd HH:mm Z')
         def buildDate = dateFormat.format(currentDate)
 
         // Get the release number (assuming you're using a versioning scheme like SemVer)
-        def releaseTag = System.getenv("BUILD_REF") ?: "-dev-"
+        def releaseTag = System.getenv('BUILD_REF') ?: '-dev-'
         def releaseNumber = project.version
 
         // Get the Git SHA-1 and modifications summary
         def gitSha = 'git rev-parse --short HEAD'.execute().text.trim()
-        def gitMods = 'git diff --stat'.execute().text.split("\n")
+        def gitMods = 'git diff --stat'.execute().text.split('\n')
         def modSummary = gitMods[-1].trim()
         if (modSummary.isEmpty()) {
-            modSummary = "-clean-"
+            modSummary = '-clean-'
         }
 
         // Construct the build info property file
         def buildInfoFile = new File(buildDir,
-            "resources/main/com/pnambic/depanfx/app/build-info.properties")
+            'resources/main/com/pnambic/depanfx/app/build-info.properties')
         def buildInfoWriter = buildInfoFile.newPrintWriter()
 
         buildInfoWriter.println("date=$buildDate")
