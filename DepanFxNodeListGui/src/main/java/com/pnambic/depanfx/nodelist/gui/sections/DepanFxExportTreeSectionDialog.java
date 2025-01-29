@@ -8,19 +8,19 @@ import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
+import com.pnambic.depanfx.scene.DepanFxFxmlDialog;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
-@Component
+@DepanFxFxmlDialog
 @FxmlView("export-tree-section-csv-dialog.fxml")
 public class DepanFxExportTreeSectionDialog
     extends DepanFxBaseExportSectionDialog {

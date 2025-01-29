@@ -1,12 +1,12 @@
 package com.pnambic.depanfx.nodeview.gui;
 
+import com.pnambic.depanfx.jogl.JoglModule;
+import com.pnambic.depanfx.scene.DepanFxFxmlDialog;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
 import net.rgielen.fxweaver.core.FxmlView;
-import com.pnambic.depanfx.jogl.JoglModule;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -20,7 +20,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
 
-@Component
+@DepanFxFxmlDialog
 @FxmlView("node-view-status-panel.fxml")
 public class DepanFxNodeViewStatusPanel {
 

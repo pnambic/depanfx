@@ -5,6 +5,7 @@ import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.perspective.DepanFxBaseDocumentDialog;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
+import com.pnambic.depanfx.scene.DepanFxFxmlDialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -12,7 +13,6 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import net.rgielen.fxweaver.core.FxmlView;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -24,7 +24,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-@Component
+@DepanFxFxmlDialog
 @FxmlView("save-node-list-dialog.fxml")
 public class DepanFxSaveNodeListDialog
     extends DepanFxBaseDocumentDialog<DepanFxNodeList> {

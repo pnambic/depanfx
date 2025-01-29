@@ -5,6 +5,7 @@ import com.pnambic.depanfx.perspective.workspace.controls.DepanFxProjectListCell
 import com.pnambic.depanfx.perspective.workspace.controls.DepanFxProjectTreeCell;
 import com.pnambic.depanfx.perspective.workspace.controls.DepanFxWorkspaceItem;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxFxmlDialog;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
@@ -12,8 +13,6 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 
 import net.rgielen.fxweaver.core.FxmlView;
-
-import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
@@ -32,7 +31,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
-@Component
+@DepanFxFxmlDialog
 @FxmlView("resource-chooser-dialog.fxml")
 public class DepanFxResourceChooserDialog {
 

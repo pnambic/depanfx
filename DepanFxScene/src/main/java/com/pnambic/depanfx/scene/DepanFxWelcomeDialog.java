@@ -5,14 +5,13 @@ import com.pnambic.depanfx.scene.DepanFxAppIcons.IconSize;
 import net.rgielen.fxweaver.core.FxmlView;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
-@Component
+@DepanFxFxmlDialog
 @FxmlView("welcome-dialog.fxml")
 public class DepanFxWelcomeDialog {
 

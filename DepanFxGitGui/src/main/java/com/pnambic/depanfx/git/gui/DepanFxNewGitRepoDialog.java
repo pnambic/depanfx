@@ -12,6 +12,7 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.perspective.DepanFxBaseDocumentDialog;
 import com.pnambic.depanfx.perspective.graphdoc.GraphDocumentData;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxFxmlDialog;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -20,7 +21,6 @@ import net.rgielen.fxweaver.core.FxmlView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 
@@ -33,7 +33,7 @@ import javafx.stage.FileChooser;
  * Builds a new graph document from the file system components
  * of a git repository.
  */
-@Component
+@DepanFxFxmlDialog
 @FxmlView("new-git-repo-dialog.fxml")
 public class DepanFxNewGitRepoDialog
     extends DepanFxBaseDocumentDialog<GraphDocument> {

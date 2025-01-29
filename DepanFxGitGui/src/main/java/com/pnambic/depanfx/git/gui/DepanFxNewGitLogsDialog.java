@@ -8,6 +8,7 @@ import com.pnambic.depanfx.perspective.DepanFxBaseDialog;
 import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
 import com.pnambic.depanfx.perspective.DepanFxProctor;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxFxmlDialog;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -19,7 +20,6 @@ import net.rgielen.fxweaver.core.FxmlView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.Optional;
@@ -29,7 +29,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 
-@Component
+@DepanFxFxmlDialog
 @FxmlView("new-git-logs-dialog.fxml")
 public class DepanFxNewGitLogsDialog extends DepanFxBaseDialog {
 
