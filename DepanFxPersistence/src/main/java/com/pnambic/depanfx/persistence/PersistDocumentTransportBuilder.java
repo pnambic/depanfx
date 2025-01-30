@@ -1,8 +1,8 @@
 package com.pnambic.depanfx.persistence;
 
 import com.pnambic.depanfx.persistence.xstream.PersistXstreamObjectConverter;
-import com.pnambic.depanfx.xstream.XstreamDocumentTransport;
-import com.pnambic.depanfx.xstream.XstreamDocumentTransportBuilder;
+import com.pnambic.modxstream.XstreamDocumentTransport;
+import com.pnambic.modxstream.XstreamDocumentTransportBuilder;
 
 import java.io.IOException;
 import java.io.Reader;

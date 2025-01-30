@@ -11,6 +11,7 @@ module depanfx.filesystem {
   requires depanfx.nodelist;
   requires depanfx.persistence;
   requires depanfx.workspace;
+  requires pnambic.modxstream;
 
   opens com.pnambic.depanfx.filesystem.graph to spring.core;
   opens com.pnambic.depanfx.filesystem.nodelist.link to spring.core;

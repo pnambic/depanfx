@@ -19,13 +19,13 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewSceneData;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
-import com.pnambic.depanfx.persistence.PersistMarshalContext;
 import com.pnambic.depanfx.persistence.PersistTagDataLoader;
 import com.pnambic.depanfx.persistence.PersistTagDataResult;
-import com.pnambic.depanfx.persistence.PersistUnmarshalContext;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
+import com.pnambic.modxstream.XstreamMarshalContext;
+import com.pnambic.modxstream.XstreamUnmarshalContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,7 +148,7 @@ public class DepanFxNodeViewDataConverter
   }
 
   @Override
-  public void marshal(PersistMarshalContext dstContext, Object source) {
+  public void marshal(XstreamMarshalContext dstContext, Object source) {
     DepanFxNodeViewData viewData = (DepanFxNodeViewData) source;
 
     DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableNodeRsrc =
@@ -206,7 +206,7 @@ public class DepanFxNodeViewDataConverter
   }
 
   @Override
-  public DepanFxNodeViewData unmarshal(PersistUnmarshalContext srcContext) {
+  public DepanFxNodeViewData unmarshal(XstreamUnmarshalContext srcContext) {
 
     DepanFxWorkspace workspace =
         (DepanFxWorkspace) srcContext.getContextValue(DepanFxWorkspace.class);
@@ -332,7 +332,7 @@ public class DepanFxNodeViewDataConverter
   }
 
   private void marshalNodeInfo(
-      PersistMarshalContext dstContext,
+      XstreamMarshalContext dstContext,
       GraphNode node,
       DepanFxNodeViewData viewData) {
 

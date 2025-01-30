@@ -4,8 +4,8 @@ import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
 import com.pnambic.depanfx.filesystem.graph.DocumentNode;
 import com.pnambic.depanfx.graph.context.GraphContextKeys;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
-import com.pnambic.depanfx.persistence.PersistMarshalContext;
-import com.pnambic.depanfx.persistence.PersistUnmarshalContext;
+import com.pnambic.modxstream.XstreamMarshalContext;
+import com.pnambic.modxstream.XstreamUnmarshalContext;
 
 import java.nio.file.Path;
 
@@ -35,14 +35,14 @@ public class DocumentNodeConverter
   }
 
   @Override
-  public void marshal(PersistMarshalContext dstContext, Object source) {
+  public void marshal(XstreamMarshalContext dstContext, Object source) {
     DocumentNode node = (DocumentNode) source;
     String value = node.getPath().toString();
     marshalValue(dstContext, value);
   }
 
   @Override
-  public DocumentNode unmarshal(PersistUnmarshalContext srcContext) {
+  public DocumentNode unmarshal(XstreamUnmarshalContext srcContext) {
     String pathText = srcContext.getValue();
     Path nodePath = Path.of(pathText);
     return new DocumentNode(nodePath);

@@ -1,6 +1,6 @@
 package com.pnambic.depanfx.persistence;
 
-public interface PersistUnmarshalContext {
+public interface XPersistUnmarshalContext {
 
   void moveDown();
 

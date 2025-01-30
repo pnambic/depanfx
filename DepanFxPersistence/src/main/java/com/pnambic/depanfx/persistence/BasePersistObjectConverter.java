@@ -1,35 +1,39 @@
 package com.pnambic.depanfx.persistence;
 
+import com.pnambic.modxstream.XstreamMarshalContext;
+import com.pnambic.modxstream.XstreamUnmarshalContext;
+
 /**
  * Useful protected methods for implementing persistent.
  */
 public abstract class BasePersistObjectConverter<T>
     implements PersistObjectConverter<T> {
 
-  protected void marshalObject(PersistMarshalContext dstContext, Object source) {
+  protected void marshalObject(
+      XstreamMarshalContext dstContext, Object source) {
     String tag = dstContext.serializedClass(source.getClass());
     marshalObject(dstContext, tag, source);
   }
 
   protected void marshalObject(
-      PersistMarshalContext dstContext, String tag, Object source) {
+      XstreamMarshalContext dstContext, String tag, Object source) {
     dstContext.startNode(tag);
     marshalValue(dstContext, source);
     dstContext.endNode();
   }
 
   protected void marshalProperty(
-      PersistMarshalContext dstContext, String propertyTag, Object source) {
+      XstreamMarshalContext dstContext, String propertyTag, Object source) {
     dstContext.startNode(propertyTag);
     marshalObject(dstContext, source);
     dstContext.endNode();
   }
 
-  protected void marshalValue(PersistMarshalContext dstContext, Object value) {
+  protected void marshalValue(XstreamMarshalContext dstContext, Object value) {
     dstContext.convertAnother(value);
   }
 
-  protected Object unmarshalOne(PersistUnmarshalContext srcContext) {
+  protected Object unmarshalOne(XstreamUnmarshalContext srcContext) {
     srcContext.moveDown();
 
     String childName = srcContext.getNodeName();
@@ -42,11 +46,12 @@ public abstract class BasePersistObjectConverter<T>
   }
 
   protected Object unmarshalValue(
-      PersistUnmarshalContext context, Class<?> childClass) {
+      XstreamUnmarshalContext context, Class<?> childClass) {
     return childClass.cast(context.convertAnother(null, childClass));
   }
 
-  protected Class<?> mapChildName(String childName, PersistUnmarshalContext srcContext) {
+  protected Class<?> mapChildName(
+      String childName, XstreamUnmarshalContext srcContext) {
     Class<?> childClass = srcContext.realClass(childName);
     return childClass;
   }

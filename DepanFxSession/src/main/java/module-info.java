@@ -16,6 +16,7 @@ module depanfx.session {
     requires depanfx.session.data;
     requires depanfx.scene;
     requires depanfx.workspace;
+    requires pnambic.modxstream;
 
     opens com.pnambic.depanfx.session.core to
         spring.core, spring.beans;

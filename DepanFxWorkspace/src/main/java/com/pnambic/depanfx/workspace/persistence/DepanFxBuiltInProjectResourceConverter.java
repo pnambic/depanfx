@@ -1,10 +1,10 @@
 package com.pnambic.depanfx.workspace.persistence;
 
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
-import com.pnambic.depanfx.persistence.PersistMarshalContext;
-import com.pnambic.depanfx.persistence.PersistUnmarshalContext;
 import com.pnambic.depanfx.workspace.DepanFxProjectResource;
 import com.pnambic.depanfx.workspace.DepanFxProjectResource.BuiltIn;
+import com.pnambic.modxstream.XstreamMarshalContext;
+import com.pnambic.modxstream.XstreamUnmarshalContext;
 
 import java.io.File;
 
@@ -36,7 +36,7 @@ public class DepanFxBuiltInProjectResourceConverter<T>
   }
 
   @Override
-  public void marshal(PersistMarshalContext dstContext, Object source) {
+  public void marshal(XstreamMarshalContext dstContext, Object source) {
     @SuppressWarnings("unchecked")
     DepanFxProjectResource.BuiltIn<T> projRsrc =
         (DepanFxProjectResource.BuiltIn<T>) source;
@@ -46,7 +46,7 @@ public class DepanFxBuiltInProjectResourceConverter<T>
   }
 
   @Override
-  public BuiltIn<T> unmarshal(PersistUnmarshalContext srcContext) {
+  public BuiltIn<T> unmarshal(XstreamUnmarshalContext srcContext) {
 
     String builtInPath = (String) unmarshalValue(srcContext, String.class);
     return new DepanFxProjectResource.BuiltIn<>(

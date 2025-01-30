@@ -1,5 +1,8 @@
 package com.pnambic.depanfx.persistence;
 
+import com.pnambic.modxstream.XstreamMarshalContext;
+import com.pnambic.modxstream.XstreamUnmarshalContext;
+
 /**
  * Fit into XStream converters via simple String conversions.
  */
@@ -11,8 +14,8 @@ public interface PersistObjectConverter<T> {
 
   String getTag();
 
-  void marshal(PersistMarshalContext dstContext, Object source);
+  void marshal(XstreamMarshalContext dstContext, Object source);
 
-  T unmarshal(PersistUnmarshalContext srcContext);
+  T unmarshal(XstreamUnmarshalContext srcContext);
 }
 

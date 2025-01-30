@@ -4,11 +4,11 @@ import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph_doc.model.GraphContextDocument;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
-import com.pnambic.depanfx.persistence.PersistMarshalContext;
-import com.pnambic.depanfx.persistence.PersistUnmarshalContext;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
+import com.pnambic.modxstream.XstreamMarshalContext;
+import com.pnambic.modxstream.XstreamUnmarshalContext;
 
 import java.nio.file.Path;
 
@@ -46,12 +46,12 @@ public class ContextModelIdConverter
 
 
   @Override
-  public void marshal(PersistMarshalContext dstContext, Object source) {
+  public void marshal(XstreamMarshalContext dstContext, Object source) {
     marshalValue(dstContext, ((ContextModelId) source).getContextModelKey());
   }
 
   @Override
-  public ContextModelId unmarshal(PersistUnmarshalContext srcContext) {
+  public ContextModelId unmarshal(XstreamUnmarshalContext srcContext) {
 
     String modelKey = srcContext.getValue();
 

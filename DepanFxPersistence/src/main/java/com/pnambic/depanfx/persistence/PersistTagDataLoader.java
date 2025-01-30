@@ -1,7 +1,6 @@
 package com.pnambic.depanfx.persistence;
 
-import com.pnambic.depanfx.persistence.xstream.PersistXstreamObjectConverter;
-import com.pnambic.depanfx.xstream.XstreamUnmarshalContext;
+import com.pnambic.modxstream.XstreamUnmarshalContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,11 +56,10 @@ public class PersistTagDataLoader {
   }
 
   public Map<String, Object> loadData(
-      String[] metaTags, PersistUnmarshalContext srcContext) {
+      String[] metaTags, XstreamUnmarshalContext srcContext) {
 
     XstreamUnmarshalContext.PeekableReader peekable =
-        ((PersistXstreamObjectConverter.PersistUnmarshalWrapper) srcContext)
-        .getXstreamUnmarshal().getPeekableReader();
+        srcContext.getPeekableReader();
     Set<String> expectedTags = new HashSet<>(Arrays.asList(metaTags));
     Map<String, Object> result = new HashMap<>();
 
@@ -94,7 +92,7 @@ public class PersistTagDataLoader {
    * @return {@code null} if unmarshalling fails
    */
   private Object unmarshalValue(
-      PersistUnmarshalContext srcContext, TagDescriptor descr) {
+      XstreamUnmarshalContext srcContext, TagDescriptor descr) {
     try {
       Class<?> childClass = descr.getDataType();
       return childClass.cast(srcContext.convertAnother(null, childClass));

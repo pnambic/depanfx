@@ -5,6 +5,7 @@ module depanfx.workspace {
   requires spring.beans;
 
   requires depanfx.persistence;
+  requires pnambic.modxstream;
 
   // Instantiate a workspace
   opens com.pnambic.depanfx.workspace.basic to spring.beans;

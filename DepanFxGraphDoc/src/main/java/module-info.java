@@ -7,6 +7,7 @@ module depanfx.graph_doc {
   requires depanfx.graph;
   requires depanfx.persistence;
   requires depanfx.workspace;
+  requires pnambic.modxstream;
 
   opens com.pnambic.depanfx.graph_doc.model to spring.core;
   opens com.pnambic.depanfx.graph_doc.persistence to spring.core;

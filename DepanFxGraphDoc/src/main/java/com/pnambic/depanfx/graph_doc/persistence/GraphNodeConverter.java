@@ -3,8 +3,8 @@ package com.pnambic.depanfx.graph_doc.persistence;
 import com.pnambic.depanfx.graph.context.GraphContextKeys;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
-import com.pnambic.depanfx.persistence.PersistMarshalContext;
-import com.pnambic.depanfx.persistence.PersistUnmarshalContext;
+import com.pnambic.modxstream.XstreamMarshalContext;
+import com.pnambic.modxstream.XstreamUnmarshalContext;
 
 public class GraphNodeConverter
     extends BasePersistObjectConverter<GraphNode> {
@@ -31,14 +31,14 @@ public class GraphNodeConverter
   }
 
   @Override
-  public void marshal(PersistMarshalContext dstContext, Object source) {
+  public void marshal(XstreamMarshalContext dstContext, Object source) {
     GraphNode node = (GraphNode) source;
     marshalObject(dstContext, GRAPH_NODE_TAG, getNodeKey(node));
   }
 
 
   @Override
-  public GraphNode unmarshal(PersistUnmarshalContext srcContext) {
+  public GraphNode unmarshal(XstreamUnmarshalContext srcContext) {
     return (GraphNode) unmarshalOne(srcContext);
   }
 

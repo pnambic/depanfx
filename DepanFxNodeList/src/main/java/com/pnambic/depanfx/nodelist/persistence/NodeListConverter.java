@@ -8,10 +8,10 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
-import com.pnambic.depanfx.persistence.PersistMarshalContext;
 import com.pnambic.depanfx.persistence.PersistTagDataLoader;
-import com.pnambic.depanfx.persistence.PersistUnmarshalContext;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.modxstream.XstreamMarshalContext;
+import com.pnambic.modxstream.XstreamUnmarshalContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +81,7 @@ public class NodeListConverter
   }
 
   @Override
-  public void marshal(PersistMarshalContext dstContext, Object source) {
+  public void marshal(XstreamMarshalContext dstContext, Object source) {
     DepanFxNodeList nodeList = (DepanFxNodeList) source;
 
     marshalObject(dstContext, GRAPH_DOC, nodeList.getGraphDocResource());
@@ -95,7 +95,7 @@ public class NodeListConverter
 
   @Override
   public DepanFxNodeList unmarshal(
-      PersistUnmarshalContext srcContext) {
+      XstreamUnmarshalContext srcContext) {
 
     Map<String, Object> metaData = TAG_LOADER.loadData(META_TAGS, srcContext);
 
@@ -139,7 +139,7 @@ public class NodeListConverter
    * of node information.
    */
   private void marshalNodeInfo(
-      PersistMarshalContext dstContext,
+      XstreamMarshalContext dstContext,
       GraphNode node,
       DepanFxNodeList nodeList) {
 

@@ -1,10 +1,10 @@
 package com.pnambic.depanfx.workspace.persistence;
 
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
-import com.pnambic.depanfx.persistence.PersistMarshalContext;
-import com.pnambic.depanfx.persistence.PersistUnmarshalContext;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.modxstream.XstreamMarshalContext;
+import com.pnambic.modxstream.XstreamUnmarshalContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class WorkspaceResourceConverter
   }
 
   @Override
-  public void marshal(PersistMarshalContext dstContext, Object source) {
+  public void marshal(XstreamMarshalContext dstContext, Object source) {
     DepanFxWorkspaceResource<?> wkspRsrc = (DepanFxWorkspaceResource<?>) source;
 
     // Don't save scratch resources.
@@ -55,7 +55,7 @@ public class WorkspaceResourceConverter
 
   @Override
   public DepanFxWorkspaceResource<?> unmarshal(
-      PersistUnmarshalContext srcContext) {
+      XstreamUnmarshalContext srcContext) {
 
     // Scratch resources were stored as a null elements.
     if (!srcContext.hasMoreChildren()) {

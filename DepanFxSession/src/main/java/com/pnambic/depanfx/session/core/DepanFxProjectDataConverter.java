@@ -1,14 +1,14 @@
 package com.pnambic.depanfx.session.core;
 
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
-import com.pnambic.depanfx.persistence.PersistMarshalContext;
 import com.pnambic.depanfx.persistence.PersistTagDataLoader;
-import com.pnambic.depanfx.persistence.PersistUnmarshalContext;
 import com.pnambic.depanfx.session.tooldata.DepanFxProjectData;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.projects.DepanFxFileSystemProject;
+import com.pnambic.modxstream.XstreamMarshalContext;
+import com.pnambic.modxstream.XstreamUnmarshalContext;
 
 import java.nio.file.Path;
 import java.util.Collections;
@@ -78,7 +78,7 @@ public class DepanFxProjectDataConverter
   }
 
   @Override
-  public void marshal(PersistMarshalContext dstContext, Object source) {
+  public void marshal(XstreamMarshalContext dstContext, Object source) {
     DepanFxProjectData projectData = (DepanFxProjectData) source;
 
     marshalObject(dstContext, PROJECT_NAME_TAG, projectData.getToolName());
@@ -87,7 +87,7 @@ public class DepanFxProjectDataConverter
   }
 
   @Override
-  public DepanFxProjectData unmarshal(PersistUnmarshalContext srcContext) {
+  public DepanFxProjectData unmarshal(XstreamUnmarshalContext srcContext) {
     Map<String, Object> metaData =
         TAG_LOADER.loadData(META_TAGS, srcContext);
 

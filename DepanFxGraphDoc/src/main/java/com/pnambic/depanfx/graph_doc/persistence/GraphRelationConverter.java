@@ -4,11 +4,11 @@ import com.pnambic.depanfx.graph.context.GraphContextKeys;
 import com.pnambic.depanfx.graph.model.GraphRelation;
 import com.pnambic.depanfx.graph_doc.model.GraphContextDocument;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
-import com.pnambic.depanfx.persistence.PersistMarshalContext;
-import com.pnambic.depanfx.persistence.PersistUnmarshalContext;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
+import com.pnambic.modxstream.XstreamMarshalContext;
+import com.pnambic.modxstream.XstreamUnmarshalContext;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -44,13 +44,13 @@ public class GraphRelationConverter
   }
 
   @Override
-  public void marshal(PersistMarshalContext dstContext, Object source) {
+  public void marshal(XstreamMarshalContext dstContext, Object source) {
     GraphRelation relation = (GraphRelation) source;
     marshalValue(dstContext, GraphContextKeys.toRelationKey(relation));
   }
 
   @Override
-  public GraphRelation unmarshal(PersistUnmarshalContext srcContext) {
+  public GraphRelation unmarshal(XstreamUnmarshalContext srcContext) {
     String value = srcContext.getValue();
     DepanFxWorkspace workspace =
         (DepanFxWorkspace) srcContext.getContextValue(DepanFxWorkspace.class);

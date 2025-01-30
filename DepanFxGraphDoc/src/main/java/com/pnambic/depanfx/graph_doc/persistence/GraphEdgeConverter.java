@@ -5,8 +5,8 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.model.GraphRelation;
 import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
-import com.pnambic.depanfx.persistence.PersistMarshalContext;
-import com.pnambic.depanfx.persistence.PersistUnmarshalContext;
+import com.pnambic.modxstream.XstreamMarshalContext;
+import com.pnambic.modxstream.XstreamUnmarshalContext;
 
 public class GraphEdgeConverter
     extends BasePersistObjectConverter<GraphEdge> {
@@ -39,7 +39,7 @@ public class GraphEdgeConverter
   }
 
   @Override
-  public void marshal(PersistMarshalContext dstContext, Object source) {
+  public void marshal(XstreamMarshalContext dstContext, Object source) {
     GraphEdge edge = (GraphEdge) source;
 
     marshalObject(dstContext, edge.getRelation());
@@ -48,7 +48,7 @@ public class GraphEdgeConverter
   }
 
   @Override
-  public GraphEdge unmarshal(PersistUnmarshalContext srcContext) {
+  public GraphEdge unmarshal(XstreamUnmarshalContext srcContext) {
     DepanFxGraphModelBuilder modelBuilder =
        (DepanFxGraphModelBuilder) srcContext.getContextValue(
            DepanFxGraphModelBuilder.class);
@@ -77,7 +77,7 @@ public class GraphEdgeConverter
       this.modelBuilder = modelBuilder;
     }
 
-    public void addNode(PersistUnmarshalContext srcContext) {
+    public void addNode(XstreamUnmarshalContext srcContext) {
 
       srcContext.moveDown();
       GraphNode node = (GraphNode) unmarshalOne(srcContext);

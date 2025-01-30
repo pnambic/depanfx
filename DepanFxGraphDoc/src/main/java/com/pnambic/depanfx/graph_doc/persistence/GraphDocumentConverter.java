@@ -4,9 +4,9 @@ import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
-import com.pnambic.depanfx.persistence.PersistMarshalContext;
 import com.pnambic.depanfx.persistence.PersistTagDataLoader;
-import com.pnambic.depanfx.persistence.PersistUnmarshalContext;
+import com.pnambic.modxstream.XstreamMarshalContext;
+import com.pnambic.modxstream.XstreamUnmarshalContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +68,7 @@ public class GraphDocumentConverter
   }
 
   @Override
-  public void marshal(PersistMarshalContext dstContext, Object source) {
+  public void marshal(XstreamMarshalContext dstContext, Object source) {
     GraphDocument doc = (GraphDocument) source;
 
     marshalObject(dstContext, GRAPH_NAME_TAG, doc.getGraphName());
@@ -78,7 +78,7 @@ public class GraphDocumentConverter
   }
 
   @Override
-  public GraphDocument unmarshal(PersistUnmarshalContext srcContext) {
+  public GraphDocument unmarshal(XstreamUnmarshalContext srcContext) {
 
     Map<String, Object> metaData =
         TAG_LOADER.loadData(META_TAGS, srcContext);

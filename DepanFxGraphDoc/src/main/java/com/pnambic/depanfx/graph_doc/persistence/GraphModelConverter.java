@@ -15,8 +15,8 @@ import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.docdata.EdgeInfoBlock;
 import com.pnambic.depanfx.graph_doc.docdata.NodeInfoBlock;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
-import com.pnambic.depanfx.persistence.PersistMarshalContext;
-import com.pnambic.depanfx.persistence.PersistUnmarshalContext;
+import com.pnambic.modxstream.XstreamMarshalContext;
+import com.pnambic.modxstream.XstreamUnmarshalContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,7 @@ public class GraphModelConverter
   }
 
   @Override
-  public void marshal(PersistMarshalContext dstContext, Object source) {
+  public void marshal(XstreamMarshalContext dstContext, Object source) {
     GraphModel graph = (GraphModel) source;
     dstContext.putContextValue(GraphModel.class, graph);
 
@@ -73,9 +73,8 @@ public class GraphModelConverter
         .forEach(info -> marshal(dstContext, info));
   }
 
-
   @Override
-  public GraphModel unmarshal(PersistUnmarshalContext srcContext) {
+  public GraphModel unmarshal(XstreamUnmarshalContext srcContext) {
 
     DepanFxGraphModelBuilder builder = new SimpleGraphModelBuilder();
     srcContext.putContextValue(DepanFxGraphModelBuilder.class, builder);
@@ -108,7 +107,7 @@ public class GraphModelConverter
   }
 
   private void marshalEdgeInfo(
-      PersistMarshalContext dstContext, GraphModel graph, GraphEdge edge) {
+      XstreamMarshalContext dstContext, GraphModel graph, GraphEdge edge) {
 
     if (graph.hasEdgeInfo(edge)) {
       List<GraphEdgeInfo> infos = graph.streamEdgeInfo(edge)
@@ -119,7 +118,7 @@ public class GraphModelConverter
   }
 
   private void marshalNodeInfo(
-      PersistMarshalContext dstContext, GraphModel graph, GraphNode node) {
+      XstreamMarshalContext dstContext, GraphModel graph, GraphNode node) {
     if (graph.hasNodeInfo(node) ) {
       List<GraphNodeInfo> infos = graph.streamNodeInfo(node)
           .collect(Collectors.toList());

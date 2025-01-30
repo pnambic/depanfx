@@ -8,6 +8,8 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-autoconfigure'
   implementation "org.slf4j:slf4j-api:${slf4jVersion}"
 
+  implementation "com.pnambic.modxstream:modxstream:${modxstreamVersion}"
+
   implementation project(':DepanFxGraph')
   implementation project(':DepanFxGraphDoc')
   implementation project(':DepanFxNodeFilters')

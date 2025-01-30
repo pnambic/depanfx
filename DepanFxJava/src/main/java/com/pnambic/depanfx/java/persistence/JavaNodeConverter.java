@@ -4,8 +4,8 @@ import com.pnambic.depanfx.graph.context.GraphContextKeys;
 import com.pnambic.depanfx.java.context.JavaNodeKindId;
 import com.pnambic.depanfx.java.graph.JavaNode;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
-import com.pnambic.depanfx.persistence.PersistMarshalContext;
-import com.pnambic.depanfx.persistence.PersistUnmarshalContext;
+import com.pnambic.modxstream.XstreamMarshalContext;
+import com.pnambic.modxstream.XstreamUnmarshalContext;
 
 public abstract class JavaNodeConverter<T extends JavaNode>
     extends BasePersistObjectConverter<T> {
@@ -38,13 +38,13 @@ public abstract class JavaNodeConverter<T extends JavaNode>
   }
 
   @Override
-  public void marshal(PersistMarshalContext dstContext, Object source) {
+  public void marshal(XstreamMarshalContext dstContext, Object source) {
     JavaNode node = (JavaNode) source;
     marshalValue(dstContext, node.getId().getNodeKey());
   }
 
   @Override
-  public T unmarshal(PersistUnmarshalContext srcContext) {
+  public T unmarshal(XstreamUnmarshalContext srcContext) {
     String nodeKey = srcContext.getValue();
     return createNode(nodeKey);
   }

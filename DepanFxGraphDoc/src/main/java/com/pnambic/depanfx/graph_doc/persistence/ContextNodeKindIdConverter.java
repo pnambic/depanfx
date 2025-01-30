@@ -6,11 +6,11 @@ import com.pnambic.depanfx.graph.model.GraphContextModel;
 import com.pnambic.depanfx.graph_doc.model.GraphContextDocument;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
-import com.pnambic.depanfx.persistence.PersistMarshalContext;
-import com.pnambic.depanfx.persistence.PersistUnmarshalContext;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
+import com.pnambic.modxstream.XstreamMarshalContext;
+import com.pnambic.modxstream.XstreamUnmarshalContext;
 
 import java.nio.file.Path;
 
@@ -48,14 +48,14 @@ public class ContextNodeKindIdConverter
   }
 
   @Override
-  public void marshal(PersistMarshalContext dstContext, Object source) {
+  public void marshal(XstreamMarshalContext dstContext, Object source) {
     ContextNodeKindId nodeKind = (ContextNodeKindId) source;
     marshalObject(dstContext, nodeKind.getContextModelId());
     marshalObject(dstContext, NODE_KIND_KEY_TAG, nodeKind.getNodeKindKey());
   }
 
   @Override
-  public ContextNodeKindId unmarshal(PersistUnmarshalContext srcContext) {
+  public ContextNodeKindId unmarshal(XstreamUnmarshalContext srcContext) {
     GraphContextModel contextModel = (GraphContextModel)
         unmarshalValue(srcContext, ContextModelId.class);
 

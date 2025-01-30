@@ -12,6 +12,7 @@ module depanfx.java {
   requires depanfx.graph_doc;
   requires depanfx.persistence;
   requires depanfx.workspace;
+  requires pnambic.modxstream;
 
   opens com.pnambic.depanfx.java.graph to spring.core;
   opens com.pnambic.depanfx.java.nodelist.link to spring.core;

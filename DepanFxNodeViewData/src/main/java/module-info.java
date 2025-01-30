@@ -14,6 +14,7 @@ module depanfx.nodeview.data {
   requires depanfx.persistence;
   requires depanfx.session.data;
   requires depanfx.workspace;
+  requires pnambic.modxstream;
 
   opens com.pnambic.depanfx.nodeview.builtins
       to spring.beans, spring.context, spring.core;

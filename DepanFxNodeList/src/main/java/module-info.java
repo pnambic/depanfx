@@ -8,6 +8,7 @@ module depanfx.nodelist {
   requires depanfx.graph_doc;
   requires depanfx.persistence;
   requires depanfx.workspace;
+  requires pnambic.modxstream;
 
   opens com.pnambic.depanfx.nodelist.builtins to spring.beans, spring.core;
   opens com.pnambic.depanfx.nodelist.link to spring.beans, spring.core;

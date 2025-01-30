@@ -1,6 +1,6 @@
 package com.pnambic.depanfx.persistence;
 
-public interface PersistMarshalContext {
+public interface XPersistMarshalContext {
 
   String serializedClass(Class<?> type);
 
