@@ -7,14 +7,14 @@
         
         
         
-        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <link rel="shortcut icon" href="../../../img/favicon.ico">
         <title>Node List Panel - DepanFX User Documentation</title>
-        <link href="../../css/bootstrap.min.css" rel="stylesheet">
-        <link href="../../css/fontawesome.min.css" rel="stylesheet">
-        <link href="../../css/brands.min.css" rel="stylesheet">
-        <link href="../../css/solid.min.css" rel="stylesheet">
-        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
-        <link href="../../css/base.css" rel="stylesheet">
+        <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../../css/brands.min.css" rel="stylesheet">
+        <link href="../../../css/solid.min.css" rel="stylesheet">
+        <link href="../../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../../css/base.css" rel="stylesheet">
         <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
         <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
@@ -24,7 +24,7 @@
     <body>
         <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href="../..">DepanFX User Documentation</a>
+                <a class="navbar-brand" href="../../..">DepanFX User Documentation</a>
                 <!-- Expander button -->
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -35,39 +35,86 @@
                         <!-- Main navigation -->
                         <ul class="nav navbar-nav">
                             <li class="nav-item">
-                                <a href="../.." class="nav-link">Home</a>
+                                <a href="../../.." class="nav-link">Home</a>
                             </li>
                             <li class="nav-item dropdown">
                                 <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Introduction</a>
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="../Welcome/" class="dropdown-item">Welcome</a>
+    <a href="../../Welcome/" class="dropdown-item">Welcome</a>
 </li>
                                     
 <li>
-    <a href="../Installation/" class="dropdown-item">Installation</a>
+    <a href="../../installation/Installation/" class="dropdown-item">Installation</a>
 </li>
                                     
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Initial Project</a>
+    <ul class="dropdown-menu">
+            
 <li>
-    <a href="../GettingStarted/" class="dropdown-item">Getting Started</a>
+    <a href="../../initial_project/GettingStarted/" class="dropdown-item">Getting Started</a>
 </li>
-                                    
+            
 <li>
-    <a href="../SaveTheSession/" class="dropdown-item">Save The Session</a>
+    <a href="../../initial_project/CreateProject/" class="dropdown-item">Create A Project</a>
 </li>
+            
+<li>
+    <a href="../../initial_project/FirstDependencyGraph/" class="dropdown-item">Create A Dependency Graph</a>
+</li>
+            
+<li>
+    <a href="../../initial_project/SaveTheSession/" class="dropdown-item">Save The Session</a>
+</li>
+            
+<li>
+    <a href="../../initial_project/Summary/" class="dropdown-item">Summary</a>
+</li>
+    </ul>
+  </li>
                                     
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Lists And Views</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="../Introduction/" class="dropdown-item">Node Lists and Views Panel</a>
+</li>
+            
 <li>
     <a href="./" class="dropdown-item active" aria-current="page">Node List Panel</a>
 </li>
-                                    
+            
 <li>
     <a href="../NodeViewPanel/" class="dropdown-item">Node View Panel</a>
 </li>
+            
+<li>
+    <a href="../Summary/" class="dropdown-item">Congratulations</a>
+</li>
+    </ul>
+  </li>
                                     
 <li>
-    <a href="../Summary/" class="dropdown-item">Congratuations</a>
+    <a href="../../Summary/" class="dropdown-item">Congratulations</a>
 </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Reference</a>
+                                <ul class="dropdown-menu">
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Node Views</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="../../../reference/nodeview/keyboard_cmnds/KeyboardCommands/" class="dropdown-item">Keyboard Commands</a>
+</li>
+    </ul>
+  </li>
                                 </ul>
                             </li>
                         </ul>
@@ -79,7 +126,7 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../SaveTheSession/" class="nav-link">
+                                <a rel="prev" href="../Introduction/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
@@ -138,7 +185,7 @@
 <h1 id="using-node-list-panel">Using Node List Panel</h1>
 <p>Returning to the workspace, our next goal is to visualize the nodes of the
 HelloWorld application and select the Java components.<br />
-<img alt="Workspace with HelloWorld dependency graph" src="../img/Workspace%20HelloWorld.png" title="Workspace with HelloWorld dependency graph" /><br/>
+<img alt="Workspace with HelloWorld dependency graph" src="../../img/Workspace%20HelloWorld.png" title="Workspace with HelloWorld dependency graph" /><br/>
 The Node List panel displays the nodes of a dependency graph
 in tabular form.
 It provides powerful display mechanisms grouping and organizing the nodes
@@ -232,7 +279,7 @@ This helps separate graphs from different analysis efforts.
 Complex analyzes may benefit from additional substructure and directories
 within the Analyzes directory.</p>
 <p>After saving the node list, there will be a new document under the Analyzes directory.<br />
-<img alt="Hello World Node List in Analyzes" src="../img/Hello%20World%20Node%20List%20in%20Analyzes.png" title="Hello World Node List in Analyzes" /></p>
+<img alt="Hello World Node List in Analyzes" src="../../img/Hello%20World%20Node%20List%20in%20Analyzes.png" title="Hello World Node List in Analyzes" /></p>
 <p>The file <code>Hello World Java components yyyyMMddhhmm.dnli</code> lists the nodes that are Java components.
 The relationships between the nodes remain in the dependency graph and are accessible when needed.</p>
 <p>If you select the new file in the Analyzes directory and select the Open As Node List menu item,
@@ -257,13 +304,13 @@ columnar data.</p></div>
             <hr>
             <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
-        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script src="../../../js/bootstrap.bundle.min.js"></script>
         <script>
-            var base_url = "../..",
+            var base_url = "../../..",
                 shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
         </script>
-        <script src="../../js/base.js"></script>
-        <script src="../../search/main.js"></script>
+        <script src="../../../js/base.js"></script>
+        <script src="../../../search/main.js"></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">

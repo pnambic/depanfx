@@ -7,14 +7,14 @@
         
         
         
-        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <link rel="shortcut icon" href="../../../img/favicon.ico">
         <title>Node View Panel - DepanFX User Documentation</title>
-        <link href="../../css/bootstrap.min.css" rel="stylesheet">
-        <link href="../../css/fontawesome.min.css" rel="stylesheet">
-        <link href="../../css/brands.min.css" rel="stylesheet">
-        <link href="../../css/solid.min.css" rel="stylesheet">
-        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
-        <link href="../../css/base.css" rel="stylesheet">
+        <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../../css/brands.min.css" rel="stylesheet">
+        <link href="../../../css/solid.min.css" rel="stylesheet">
+        <link href="../../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../../css/base.css" rel="stylesheet">
         <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
         <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
@@ -24,7 +24,7 @@
     <body>
         <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href="../..">DepanFX User Documentation</a>
+                <a class="navbar-brand" href="../../..">DepanFX User Documentation</a>
                 <!-- Expander button -->
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -35,39 +35,86 @@
                         <!-- Main navigation -->
                         <ul class="nav navbar-nav">
                             <li class="nav-item">
-                                <a href="../.." class="nav-link">Home</a>
+                                <a href="../../.." class="nav-link">Home</a>
                             </li>
                             <li class="nav-item dropdown">
                                 <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Introduction</a>
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="../Welcome/" class="dropdown-item">Welcome</a>
+    <a href="../../Welcome/" class="dropdown-item">Welcome</a>
 </li>
                                     
 <li>
-    <a href="../Installation/" class="dropdown-item">Installation</a>
+    <a href="../../installation/Installation/" class="dropdown-item">Installation</a>
 </li>
                                     
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Initial Project</a>
+    <ul class="dropdown-menu">
+            
 <li>
-    <a href="../GettingStarted/" class="dropdown-item">Getting Started</a>
+    <a href="../../initial_project/GettingStarted/" class="dropdown-item">Getting Started</a>
 </li>
-                                    
+            
 <li>
-    <a href="../SaveTheSession/" class="dropdown-item">Save The Session</a>
+    <a href="../../initial_project/CreateProject/" class="dropdown-item">Create A Project</a>
 </li>
+            
+<li>
+    <a href="../../initial_project/FirstDependencyGraph/" class="dropdown-item">Create A Dependency Graph</a>
+</li>
+            
+<li>
+    <a href="../../initial_project/SaveTheSession/" class="dropdown-item">Save The Session</a>
+</li>
+            
+<li>
+    <a href="../../initial_project/Summary/" class="dropdown-item">Summary</a>
+</li>
+    </ul>
+  </li>
                                     
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Lists And Views</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="../Introduction/" class="dropdown-item">Node Lists and Views Panel</a>
+</li>
+            
 <li>
     <a href="../NodeListPanel/" class="dropdown-item">Node List Panel</a>
 </li>
-                                    
+            
 <li>
     <a href="./" class="dropdown-item active" aria-current="page">Node View Panel</a>
 </li>
+            
+<li>
+    <a href="../Summary/" class="dropdown-item">Congratulations</a>
+</li>
+    </ul>
+  </li>
                                     
 <li>
-    <a href="../Summary/" class="dropdown-item">Congratuations</a>
+    <a href="../../Summary/" class="dropdown-item">Congratulations</a>
 </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Reference</a>
+                                <ul class="dropdown-menu">
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Node Views</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="../../../reference/nodeview/keyboard_cmnds/KeyboardCommands/" class="dropdown-item">Keyboard Commands</a>
+</li>
+    </ul>
+  </li>
                                 </ul>
                             </li>
                         </ul>
@@ -112,10 +159,6 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#selecting-a-layout" class="nav-link">Selecting A Layout</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
             <li class="nav-item" data-bs-level="2"><a href="#grabbing-a-screenshot" class="nav-link">Grabbing A Screenshot</a>
               <ul class="nav flex-column">
               </ul>
@@ -138,7 +181,7 @@
 <h1 id="using-the-node-view-panel">Using the Node View Panel</h1>
 <p>Returning to the workspace, our next goal is to graphically display
 the Java nodes and relationships.<br />
-<img alt="Hello World Node List in Analyzes" src="../img/Hello%20World%20Node%20List%20in%20Analyzes.png" title="Hello World Node List in Analyzes" /></p>
+<img alt="Hello World Node List in Analyzes" src="../../img/Hello%20World%20Node%20List%20in%20Analyzes.png" title="Hello World Node List in Analyzes" /></p>
 <p>The presentation of the nodes is very flexible,
 with nodes grouped into user defined sections
 and various details available in user defined columns.
@@ -153,29 +196,12 @@ through the code as you examine its structure.</p>
 <p>Right click on the <code>Hello World yyyyMMddhhmm.dgi</code> file to open the context menu,
 and select the Open As Node View menu item.<br />
 <img alt="Open Hello World Node View" src="../img/Open%20Hello%20World%20Node%20View.png" title="Open Hello World Node View" /><br/></p>
-<p>The initial presentation is a bit cahotic.<br />
-<img alt="Hello World Node View Initial Panel" src="../img/Hello%20World%20Node%20View%20Initial%20Panel.png" title="Hello World Node View Initial Panel" /></p>
-<p>Even zoomed out, the initial presentation remains messy.
-<img alt="Hello World Node View Zoomed Out" src="../img/Hello%20World%20Node%20View%20Zoomed%20Out.png" title="Hello World Node View Zoomed Out" /><br/>
-The initial set of 32 components are displayed in a grid layout,
-with arrows going everywhere.</p>
-<p>When a node list is opened as a node view, none of the nodes have been assigned a location.
-The current default is a grid layout, whith each node placed on a retangular grid.
-If there are more than a handful of nodes,
-the initial node zoom will only show a few nodes.</p>
-<h2 id="selecting-a-layout">Selecting A Layout</h2>
-<p>Even zoomed out, the nodes do not present a useful structure.
-We can expose their structure by using the layout options,
-and adjusting the display and visibility of edges and nodes.</p>
-<p>From the context menu on the Node View tab,
-select the <code>Layout Nodes &gt; Radial Layout</code> menu option.<br />
-<img alt="Hello World Node View Layout Menu" src="../img/Hello%20World%20Node%20View%20Layout%20Menu.png" title="Hello World Node View Layout Menu" /></p>
-<p>Use the resource chooser to select the Built In <code>Radial Layout</code> layout tool.<br />
-<img alt="Hello World Node View Open Layout" src="../img/Hello%20World%20Node%20View%20Open%20Layout.png" title="Hello World Node View Open Layout" /></p>
-<p>After confirming your selection, the nodes in the view panel move to their new locations.<br />
-<img alt="Hello World Node View Radial Layout" src="../img/Hello%20World%20Node%20View%20Radial%20Layout.png" title="Hello World Node View Radial Layout" /></p>
-<p>The radial layout tool uses the same Java membership relationships a
-the tree section of a node list panel, so it exposes a similar structure.</p>
+<p>The initial view is a bit too close to the nodes.<br />
+<img alt="Hello World Node View Initial Panel" src="../img/Hello%20World%20Node%20View%20Initial%20Layout.png" title="Hello World Node View Initial Layout" /></p>
+<p>With the mouse wheel (or '-'), we can zoom in and out for a more comfortable view.</p>
+<p>When zoomed out, the Java components are shown in a radial tree.
+This layout optimizes for screen space.
+<img alt="Hello World Node View Zoomed Out" src="../img/Hello%20World%20Node%20View%20Radial%20Layout.png" title="Hello World Node View Radial Layout" /><br/></p>
 <p>Due to the setup for edge visibility configuration,
 membership relationships use straight arrows of various widths and colors,
 and uses relationships are indicated by curved arrows.
@@ -193,7 +219,7 @@ select the <code>Take Screenshot</code> menu option.<br />
 <img alt="Hello World Node View Take Screenshot" src="../img/Hello%20World%20Node%20View%20Take%20Screenshot.png" title="Hello World Node View Take Screenshot" /></p>
 <p>This brings up the save screenshot dialog using the local system's file chooser.<br />
 <img alt="Hello World Node View Take Save Screenshot" src="../img/Hello%20World%20Node%20View%20Save%20Screenshot.png" title="Hello World Node View Save Screenshot" /><br/>
-The saved <code>.pdf</code> from the take screenshot command can be used as any image file.</p>
+The saved <code>.png</code> from the take screenshot command can be used as any image file.</p>
 <p>Since a primary goal of screenshots is to share information outside of DepanFX,
 screenshots should not be saved within a project.</p>
 <h2 id="save-the-view">Save The View</h2>
@@ -208,13 +234,13 @@ the selection, visibility, rendering, and placement of nodes and edges.</p></div
             <hr>
             <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
-        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script src="../../../js/bootstrap.bundle.min.js"></script>
         <script>
-            var base_url = "../..",
+            var base_url = "../../..",
                 shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
         </script>
-        <script src="../../js/base.js"></script>
-        <script src="../../search/main.js"></script>
+        <script src="../../../js/base.js"></script>
+        <script src="../../../search/main.js"></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
