@@ -23,37 +23,14 @@ Right click on the `Hello World yyyyMMddhhmm.dgi` file to open the context menu,
 and select the Open As Node View menu item.  
 ![Open Hello World Node View](img/Open Hello World Node View.png "Open Hello World Node View")<br/>
 
-The initial presentation is a bit cahotic.  
-![Hello World Node View Initial Panel](img/Hello World Node View Initial Panel.png "Hello World Node View Initial Panel")
+The initial view is a bit too close to the nodes.  
+![Hello World Node View Initial Panel](img/Hello World Node View Initial Layout.png "Hello World Node View Initial Layout")
 
-Even zoomed out, the initial presentation remains messy.
-![Hello World Node View Zoomed Out](img/Hello World Node View Zoomed Out.png "Hello World Node View Zoomed Out")<br/>
-The initial set of 32 components are displayed in a grid layout,
-with arrows going everywhere.
+With the mouse wheel (or '-'), we can zoom in and out for a more comfortable view.
 
-When a node list is opened as a node view, none of the nodes have been assigned a location.
-The current default is a grid layout, whith each node placed on a retangular grid.
-If there are more than a handful of nodes,
-the initial node zoom will only show a few nodes.
-
-## Selecting A Layout
-
-Even zoomed out, the nodes do not present a useful structure.
-We can expose their structure by using the layout options,
-and adjusting the display and visibility of edges and nodes.
-
-From the context menu on the Node View tab,
-select the `Layout Nodes > Radial Layout` menu option.  
-![Hello World Node View Layout Menu](img/Hello World Node View Layout Menu.png "Hello World Node View Layout Menu")
-
-Use the resource chooser to select the Built In `Radial Layout` layout tool.  
-![Hello World Node View Open Layout](img/Hello World Node View Open Layout.png "Hello World Node View Open Layout")
-
-After confirming your selection, the nodes in the view panel move to their new locations.  
-![Hello World Node View Radial Layout](img/Hello World Node View Radial Layout.png "Hello World Node View Radial Layout")
-
-The radial layout tool uses the same Java membership relationships a
-the tree section of a node list panel, so it exposes a similar structure.
+When zoomed out, the Java components are shown in a radial tree.
+This layout optimizes for screen space.
+![Hello World Node View Zoomed Out](img/Hello World Node View Radial Layout.png "Hello World Node View Radial Layout")<br/>
 
 Due to the setup for edge visibility configuration,
 membership relationships use straight arrows of various widths and colors,
@@ -77,7 +54,7 @@ select the `Take Screenshot` menu option.
 
 This brings up the save screenshot dialog using the local system's file chooser.  
 ![Hello World Node View Take Save Screenshot](img/Hello World Node View Save Screenshot.png "Hello World Node View Save Screenshot")<br/>
-The saved `.pdf` from the take screenshot command can be used as any image file.
+The saved `.png` from the take screenshot command can be used as any image file.
 
 Since a primary goal of screenshots is to share information outside of DepanFX,
 screenshots should not be saved within a project.

@@ -3,6 +3,24 @@
 The node view panel provides a number of actions that may be triggered
 by user actions within the view rendering panel.
 
+## Node View Motion
+
+DepanFX provides a number of ways to change the view of node graph.
+Many of the view changing commands act on the viewpoint, or camera.
+The actions of these commands can be broken done into a number of categories.
+
+* dolly: move the camera on the indicated direction,
+typically one of the three standard axes.
+* rotate: rotate the camera on the indicated axis.
+* forward: move the camera in the direction it is looking.
+* reverse: move the camera in the away from the direction it is looking.
+
+Note that forward or reverse have effects that resemble zooming in or out.
+Zooming in changes the cameras field of view,
+effectively magnifying the included items.
+Moving forward brings the camera closer,
+which also magnifies the included items.
+
 ## Keyboard Commands
 
 The node view panel provides a number of keyboard commands.
