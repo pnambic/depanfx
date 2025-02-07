@@ -4,6 +4,6 @@ plugins {
 }
 
 javafx {
-  version = "20"
+  version = "${javafxVersion}"
   modules = [ 'javafx.controls', 'javafx.fxml' ]
 }

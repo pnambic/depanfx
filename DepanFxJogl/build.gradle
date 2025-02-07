@@ -5,7 +5,7 @@ plugins {
 
 // For javafx.scene.canvas.Canvas
 javafx {
-  version = "20"
+  version = "${javafxVersion}"
   modules = [ 'javafx.controls' ]
 }
 
