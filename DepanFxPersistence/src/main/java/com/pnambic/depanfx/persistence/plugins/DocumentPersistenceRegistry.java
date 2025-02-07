@@ -1,7 +1,7 @@
 package com.pnambic.depanfx.persistence.plugins;
 
-import com.pnambic.depanfx.persistence.PersistDocumentTransport;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
+import com.pnambic.modxstream.XstreamDocumentTransport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -53,16 +53,16 @@ public class DocumentPersistenceRegistry {
     this.persistModels = persistModels;
   }
 
-  public PersistDocumentTransport getDocumentTransport(Object document) {
+  public XstreamDocumentTransport getDocumentTransport(Object document) {
     return buildDocumentTransport(findContribution(document));
   }
 
-  public PersistDocumentTransport getDocumentTransport(URI uri) {
+  public XstreamDocumentTransport getDocumentTransport(URI uri) {
     String extText = getExtText(uri);
     return buildDocumentTransport(findContribution(extText));
   }
 
-  public PersistDocumentTransport buildDocumentTransport(
+  public XstreamDocumentTransport buildDocumentTransport(
       DocumentPersistenceContribution contrib) {
     PersistDocumentTransportBuilder builder =
         new PersistDocumentTransportBuilder();

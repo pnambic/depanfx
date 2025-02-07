@@ -15,6 +15,8 @@ dependencies {
   implementation "net.rgielen:javafx-weaver-core:${javafxWeaverVersion}"
   implementation "org.apache.commons:commons-csv:${apacheCsv}"
 
+  implementation "com.pnambic.modxstream:modxstream:${modxstreamVersion}"
+
   implementation project(':DepanFxGraph')
   implementation project(':DepanFxGraphDoc')
   implementation project(':DepanFxNodeFilters')

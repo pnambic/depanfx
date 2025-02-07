@@ -3,6 +3,8 @@ module depanfx.git {
   requires org.slf4j;
   requires spring.context;
 
+  requires pnambic.modxstream;
+
   requires depanfx.graph;
   requires depanfx.filesystem;
   requires depanfx.graph_doc;

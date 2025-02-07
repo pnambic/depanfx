@@ -11,6 +11,8 @@ module depanfx.nodelist.gui {
   requires spring.context;
   requires spring.beans;
 
+  requires pnambic.modxstream;
+
   requires depanfx.graph;
   requires depanfx.graph_doc;
   requires depanfx.nodelist;

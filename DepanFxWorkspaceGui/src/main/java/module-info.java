@@ -8,6 +8,8 @@ module depanfx.workspace.gui {
     requires spring.context;
     requires spring.beans;
 
+    requires pnambic.modxstream;
+
     requires depanfx.graph_doc;
     requires depanfx.perspective;
     requires depanfx.scene;

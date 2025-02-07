@@ -1,81 +1,28 @@
 package com.pnambic.depanfx.persistence;
 
 import com.pnambic.depanfx.persistence.xstream.PersistXstreamObjectConverter;
-import com.pnambic.modxstream.XstreamDocumentTransport;
 import com.pnambic.modxstream.XstreamDocumentTransportBuilder;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class PersistDocumentTransportBuilder {
-
-  private final XstreamDocumentTransportBuilder builder =
-      new XstreamDocumentTransportBuilder();
+/**
+ * Extend the transport build for the DepanFX context
+ * <ul>
+ * <li>Configure standard options in construct</li>
+ * <li>Provide {@link #addConverter(PersistObjectConverter)} installing
+ *   converter contributions.</li>
+ * </ul>
+ */
+public class PersistDocumentTransportBuilder
+    extends XstreamDocumentTransportBuilder {
 
   public PersistDocumentTransportBuilder() {
-    builder.setNoReferences();
-    builder.addDefaultImplementation(ArrayList.class, Collection.class);
-  }
-
-  public void addAlias(String alias, Class<?> type) {
-    builder.addAlias(alias, type);
-  }
-
-  public void addAliasType(String alias, Class<?> type) {
-    builder.addAliasType(alias, type);
-  }
-
-  public void addAliasField(
-      String alias, Class<?> fieldType, String fieldName) {
-    builder.addAliasField(alias, fieldType, fieldName);
-  }
-
-  public void addAllowedType(Class<?>[] allowedTypes) {
-    builder.addAllowedType(allowedTypes);
+    setNoReferences();
+    addDefaultImplementation(ArrayList.class, Collection.class);
   }
 
   public void addConverter(PersistObjectConverter<?> contrib) {
-    builder.addConverter(new PersistXstreamObjectConverter<>(contrib));
-  }
-
-  public void addImplicitCollection(Class<?> type, String fieldName) {
-    builder.addImplicitCollection(type, fieldName);
-  }
-
-  public void processAnnotations(Class<?> type) {
-    builder.processAnnotations(type);
-  }
-
-  public PersistDocumentTransport buildDocumentXmlPersist() {
-    return new XstreamPersistDocumentTransport(
-        builder.buildDocumentXmlPersist());
-  }
-
-  private static class XstreamPersistDocumentTransport
-      implements PersistDocumentTransport {
-
-    private final XstreamDocumentTransport transport;
-
-    public XstreamPersistDocumentTransport(XstreamDocumentTransport transport) {
-      this.transport = transport;
-    }
-
-    @Override
-    public void addContextValue(Object key, Object value) {
-      transport.addContextValue(key, value);
-    }
-
-    @Override
-    public Object load(Reader src) throws IOException {
-      return transport.load(src);
-    }
-
-    @Override
-    public void save(Writer dst, Object item) throws IOException {
-      transport.save(dst, item);
-    }
+    addConverter(new PersistXstreamObjectConverter<>(contrib));
   }
 }

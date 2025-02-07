@@ -14,6 +14,8 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-autoconfigure'
   implementation "net.rgielen:javafx-weaver-core:${javafxWeaverVersion}"
 
+  implementation "com.pnambic.modxstream:modxstream:${modxstreamVersion}"
+
   implementation project(':DepanFxGraphDoc')
   implementation project(':DepanFxPersistence')
   implementation project(':DepanFxPerspective')

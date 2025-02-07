@@ -10,6 +10,8 @@ module depanfx.nodelist.viewer {
   requires spring.context;
   requires spring.beans;
 
+  requires pnambic.modxstream;
+
   requires depanfx.graph;
   requires depanfx.nodelist;
   requires depanfx.nodefilters.gui;

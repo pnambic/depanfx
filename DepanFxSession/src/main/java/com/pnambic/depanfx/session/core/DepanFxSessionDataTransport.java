@@ -15,7 +15,6 @@
  */
 package com.pnambic.depanfx.session.core;
 
-import com.pnambic.depanfx.persistence.PersistDocumentTransport;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.persistence.plugins.GraphNodePersistencePluginRegistry;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
@@ -32,6 +31,7 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxFileSystemProject;
+import com.pnambic.modxstream.XstreamDocumentTransport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,7 +136,7 @@ public class DepanFxSessionDataTransport {
   }
 
   public void saveSession(Path sessionPath, DepanFxSession section) {
-    PersistDocumentTransport transport = prepareTransport();
+    XstreamDocumentTransport transport = prepareTransport();
     DepanFxSessionData sectionInfo = toSessionData(section);
 
     try (Writer saver = openForSave(sessionPath)) {
@@ -149,7 +149,7 @@ public class DepanFxSessionDataTransport {
   }
 
   public DepanFxSessionData loadSessionData(Path sessionPath) {
-    PersistDocumentTransport transport = prepareTransport();
+    XstreamDocumentTransport transport = prepareTransport();
 
     try (Reader importer = openForLoad(sessionPath)) {
       return (DepanFxSessionData) transport.load(importer);
@@ -161,7 +161,7 @@ public class DepanFxSessionDataTransport {
 
   public void saveSessionData(
       Path sessionPath, DepanFxSessionData sectionInfo) {
-    PersistDocumentTransport transport = prepareTransport();
+    XstreamDocumentTransport transport = prepareTransport();
 
     try (Writer saver = openForSave(sessionPath)) {
       transport.save(saver, sectionInfo);
@@ -218,7 +218,7 @@ public class DepanFxSessionDataTransport {
         viewersInfo);
   }
 
-  private PersistDocumentTransport prepareTransport() {
+  private XstreamDocumentTransport prepareTransport() {
     PersistDocumentTransportBuilder transportBuilder =
         new PersistDocumentTransportBuilder();
     transportBuilder.addAllowedType(ALLOWED_TYPES);
@@ -230,7 +230,7 @@ public class DepanFxSessionDataTransport {
         transportBuilder, DepanFxWorkspaceResource.class);
     viewerRegistry.prepareTransport(transportBuilder);
 
-    PersistDocumentTransport transport =
+    XstreamDocumentTransport transport =
         transportBuilder.buildDocumentXmlPersist();
 
     transport.addContextValue(DepanFxWorkspace.class, workspace);

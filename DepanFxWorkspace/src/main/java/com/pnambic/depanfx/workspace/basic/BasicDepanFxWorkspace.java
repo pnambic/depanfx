@@ -1,6 +1,5 @@
 package com.pnambic.depanfx.workspace.basic;
 
-import com.pnambic.depanfx.persistence.PersistDocumentTransport;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceRegistry;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
@@ -12,6 +11,7 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.documents.DocumentRegistry;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 import com.pnambic.depanfx.workspace.projects.DepanFxScratchProject;
+import com.pnambic.modxstream.XstreamDocumentTransport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,7 +151,7 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   public <T> Optional<DepanFxWorkspaceResource<T>> saveDocument(
       DepanFxProjectDocument projDoc, T document)
       throws IOException {
-    PersistDocumentTransport transport =
+    XstreamDocumentTransport transport =
         persistRegistry.getDocumentTransport(document);
     transport.addContextValue(DepanFxWorkspace.class, this);
 
@@ -167,7 +167,7 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   @Override
   public <T> Optional<DepanFxWorkspaceResource<T>> loadDocument(
       DepanFxProjectDocument projDoc, String expectedLabel) {
-    PersistDocumentTransport transport =
+    XstreamDocumentTransport transport =
         persistRegistry.getDocumentTransport(getMemberUri(projDoc));
     transport.addContextValue(DepanFxWorkspace.class, this);
 
