@@ -23,7 +23,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
@@ -57,9 +56,6 @@ public class DepanFxSceneController {
 
   @FXML
   private Menu fileNewItem;
-
-  @FXML
-  private MenuItem fileOpenResourceItem;
 
   public static DepanFxSceneController createDepanScene(
       DepanFxDialogRunner dialogRunner,
@@ -96,7 +92,6 @@ public class DepanFxSceneController {
   @FXML
   public void initialize() {
     fileNewItem.getItems().addAll(newResourceRegistry.buildNewResourceItems());
-    fileOpenResourceItem.setOnAction(this::handleByMenuRegistry);
   }
 
   public void closeScene() {
@@ -127,12 +122,7 @@ public class DepanFxSceneController {
 
   @FXML
   public void handleByRegistry(ActionEvent event) {
-    menuRegistry.dispatch(event);
-  }
-
-  @FXML
-  public void handleImportItem(ActionEvent event) {
-    menuRegistry.dispatch(event);
+    handleByMenuRegistry(event);
   }
 
   @FXML

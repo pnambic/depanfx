@@ -10,6 +10,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
+<?import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuItems?>
 
 <BorderPane
       maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
@@ -22,24 +23,40 @@
                 <Menu text="File">
                     <items>
                         <Menu fx:id="fileNewItem" text="New"/>
-                        <SeparatorMenuItem />
-                        <MenuItem text="Open"/>
-                        <MenuItem fx:id="fileOpenProjectItem"
+                        <SeparatorMenuItem /> 
+                        <MenuItem id="fileOpenItem"
+                            text="Open"
+                            onAction="#handleByRegistry"/>
+                        <MenuItem id="fileOpenProjectItem"
                             text="Open Project..."
                             onAction="#handleByRegistry"/>
-                        <MenuItem fx:id="fileOpenResourceItem" text="Open Resource..."/>
+                        <MenuItem id="fileOpenResourceItem"
+                            text="Open Resource..."
+                            onAction="#handleByRegistry"/>
                         <SeparatorMenuItem />
-                        <MenuItem text="Save"/>
-                        <MenuItem text="Save As..."/>
-                        <MenuItem text="Save All"/>
+                        <MenuItem id="fileSaveItem"
+                            text="Save"
+                            onAction="#handleByRegistry"/>
+                        <MenuItem id="fileSaveAsItem"
+                             text="Save As..."/>
+                        <MenuItem id="fileSaveAllItem"
+                             text="Save All"
+                            onAction="#handleByRegistry"/>
                         <SeparatorMenuItem />
-                        <MenuItem fx:id="fileImportItem" text="Import..."
-                            onAction="#handleImportItem"/>
-                        <MenuItem text="Export..."/>
+                        <MenuItem id="fileImportItem"
+                            text="Import..."
+                            onAction="#handleByRegistry"/>
+                        <MenuItem id="fileExportItem"
+                            text="Export..."
+                            onAction="#handleByRegistry"/>
                         <SeparatorMenuItem />
-                        <MenuItem text="Print"/>
+                        <MenuItem id="filePrintItem"
+                            text="Print"
+                            onAction="#handleByRegistry"/>
                         <SeparatorMenuItem />
-                        <MenuItem text="Close"/>
+                        <MenuItem id="fileCloseItem"
+                            text="Close"
+                            onAction="#handleByRegistry"/>
                         <MenuItem text="Save Session..."
                             onAction="#handleSaveSession"/>
                         <SeparatorMenuItem />
@@ -48,17 +65,35 @@
                 </Menu>
                 <Menu text="Edit">
                      <items>
-                        <MenuItem text="Undo"/>
-                        <MenuItem text="Redo"/>
+                        <MenuItem id="editUndoItem"
+                            text="Undo"
+                            onAction="#handleByRegistry"/>
+                        <MenuItem id="editRedoItem"
+                            text="Redo"
+                            onAction="#handleByRegistry"/>
                         <SeparatorMenuItem />
-                        <MenuItem text="Cut"/>
-                        <MenuItem text="Copy"/>
-                        <MenuItem text="Paste"/>
+                        <MenuItem id="editCutItem"
+                            text="Cut"
+                            onAction="#handleByRegistry"/>
+                        <MenuItem id="editCopyItem"
+                            text="Copy"
+                            onAction="#handleByRegistry"/>
+                        <MenuItem id="editPasteItem"
+                            text="Paste"
+                            onAction="#handleByRegistry"/>
                      </items>
                 </Menu>
                 <Menu text="Selection">
                      <items>
-                        <MenuItem text="Select All"/>
+                        <MenuItem id="SelectionAllItem"
+                            text="Select All"
+                            onAction="#handleByRegistry"/>
+                        <MenuItem id="SelectionNoneItem"
+                            text="Select None"
+                            onAction="#handleByRegistry"/>
+                        <MenuItem id="SelectionInvertItem"
+                            text="Invert Selection"
+                            onAction="#handleByRegistry"/>
                      </items>
                 </Menu>
                 <Menu text="View"/>
