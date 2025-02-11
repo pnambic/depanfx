@@ -3,6 +3,7 @@ package com.pnambic.depanfx.nodefilters.gui;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeKindFilterData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceOpenRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -35,6 +36,13 @@ public class DepanFxNodeFiltersNodeKindConfiguration {
   private static final String NODE_KIND_KEY = "Node Kind";
 
   @Bean
+  public DepanFxResourceOpenRegistry.Contribution
+      nodeKindFilterFileOpenContribution() {
+
+    return new NodeKindFilterFileOpenContribution();
+  }
+
+  @Bean
   public DepanFxResourceExtMenuContribution nodeKindFilterExtMenu() {
     return new NodeKindFilterExtContribution();
   }
@@ -47,6 +55,23 @@ public class DepanFxNodeFiltersNodeKindConfiguration {
   @Bean
   public DepanFxNodeFiltersDialogContribution nodeFilterNodeKindContribution() {
     return new NodeKindNodeFiltersContribution();
+  }
+
+  private static class NodeKindFilterFileOpenContribution
+      extends DepanFxResourceOpenRegistry.Basic<DepanFxNodeKindFilterData> {
+
+    public NodeKindFilterFileOpenContribution() {
+      super(
+          DepanFxNodeKindFilterData.class,
+          DepanFxNodeKindFilterData.NODE_KIND_FILTER_TOOL_EXT);
+    }
+
+    @Override
+    protected void runDialog(
+        DepanFxWorkspaceResource<DepanFxNodeKindFilterData> wkspRsrc,
+        DepanFxDialogRunner dialogRunner) {
+      // DepanFxNodeFiltersMatcherDialog.runEditDialog(dialogRunner, wkspRsrc);
+    }
   }
 
   private static class NodeKindFilterExtContribution

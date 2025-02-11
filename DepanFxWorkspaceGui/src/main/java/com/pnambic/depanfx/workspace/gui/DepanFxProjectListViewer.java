@@ -14,6 +14,7 @@ import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SelectionMode;
@@ -93,6 +94,15 @@ public class DepanFxProjectListViewer {
     Tab result = new Tab(tabName, workspaceView);
     result.setContextMenu(buildWorkspaceMenu());
     return result;
+  }
+
+  public Optional<DepanFxWorkspaceMember> getCurrentSelection() {
+    TreeItem<DepanFxWorkspaceMember> selection =
+        workspaceView.getSelectionModel().getSelectedItem();
+    if (selection != null) {
+      return Optional.of(selection.getValue());
+    }
+    return Optional.empty();
   }
 
   private TreeView<DepanFxWorkspaceMember> createView() {

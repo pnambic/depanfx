@@ -46,7 +46,8 @@ public class DepanFxSceneController {
 
   private final DepanFxDialogRunner dialogRunner;
 
-  private final Map<DepanFxSceneViewer, Tab> sceneViewers =
+  // Preserves order of tabs for serialization
+  private final Map<Tab, DepanFxSceneViewer> sceneTabs=
       new LinkedHashMap<>();
 
   private SceneOwner owner;
@@ -56,6 +57,8 @@ public class DepanFxSceneController {
 
   @FXML
   private Menu fileNewItem;
+
+  private DepanFxSceneService sceneSrvc;
 
   public static DepanFxSceneController createDepanScene(
       DepanFxDialogRunner dialogRunner,
@@ -83,10 +86,12 @@ public class DepanFxSceneController {
     this.menuRegistry = menuRegistry;
     this.newResourceRegistry = newResourceRegistry;
     this.dialogRunner = dialogRunner;
+
+    this.sceneSrvc = new SceneService();
   }
 
   public Stream<DepanFxSceneViewer> streamViewers() {
-    return sceneViewers.keySet().stream();
+    return sceneTabs.values().stream();
   }
 
   @FXML
@@ -99,7 +104,7 @@ public class DepanFxSceneController {
     // Leads to DepanFxSceneViewer.closeTab(), which release any resources.
     LOG.info("Close scene invoked");
     viewRoot.getTabs().clear();
-    sceneViewers.clear();
+    sceneTabs.clear();
   }
 
   @FXML
@@ -143,20 +148,20 @@ public class DepanFxSceneController {
     getSceneTab(viewer).ifPresent(t -> installTab(t, viewer));
   }
 
-  public void removeViewer(DepanFxSceneViewer viewer) {
-    sceneViewers.remove(viewer);
+  public void removeViewer(Tab tab) {
+    DepanFxSceneViewer viewer = sceneTabs.get(tab);
     viewer.closeTab();
   }
 
   private void handleByMenuRegistry(ActionEvent event) {
-    menuRegistry.dispatch(event);
+    menuRegistry.dispatch(sceneSrvc, event);
   }
 
   private void installTab(Tab tab, DepanFxSceneViewer viewer) {
-    sceneViewers.put(viewer, tab);
+    sceneTabs.put(tab, viewer);
     viewRoot.getTabs().add(tab);
 
-    tab.setOnClosed(event -> removeViewer(viewer));
+    tab.setOnClosed(event -> removeViewer(tab));
   }
 
   private Optional<Tab> getSceneTab(DepanFxSceneViewer viewer) {
@@ -169,5 +174,20 @@ public class DepanFxSceneController {
           viewer.getClass().getName(), errAny);
     }
     return Optional.empty();
+  }
+
+  private class SceneService implements DepanFxSceneService {
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends DepanFxSceneViewer> Optional<T> getViewer(
+        Class<T> viewerClass) {
+      Tab activeTab = viewRoot.getSelectionModel().getSelectedItem();
+      DepanFxSceneViewer result = sceneTabs.get(activeTab);
+      if (viewerClass.isAssignableFrom(result.getClass())) {
+        return Optional.of((T) result);
+      }
+      return Optional.empty();
+    }
   }
 }

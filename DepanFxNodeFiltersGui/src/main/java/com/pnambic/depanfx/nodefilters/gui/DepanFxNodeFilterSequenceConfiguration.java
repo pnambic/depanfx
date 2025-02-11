@@ -18,6 +18,7 @@ package com.pnambic.depanfx.nodefilters.gui;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceOpenRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -57,13 +58,19 @@ public class DepanFxNodeFilterSequenceConfiguration {
       "Node filter sequence.";
 
   @Bean
+  public DepanFxResourceOpenRegistry.Contribution
+      nodeFilterFileOpenContribution() {
+    return new NodeFileSequenceFileOpenContribution();
+  }
+
+  @Bean
   public DepanFxResourceExtMenuContribution nodeFilterSequenceExtMenu() {
-    return new ExtContribution();
+    return new NodeFileSequenceExtContribution();
   }
 
   @Bean
   public DepanFxResourcePathMenuContribution nodeFilterSequencePathMenu() {
-    return new PathContribution();
+    return new NodeFilterSequencePathContribution();
   }
 
   @Bean
@@ -72,10 +79,28 @@ public class DepanFxNodeFilterSequenceConfiguration {
     return new NewContribution(workspace, dialogRunner);
   }
 
-  private static class ExtContribution
+  private static class NodeFileSequenceFileOpenContribution
+      extends DepanFxResourceOpenRegistry.Basic<DepanFxNodeFilterSequenceData> {
+
+    public NodeFileSequenceFileOpenContribution() {
+      super(
+          DepanFxNodeFilterSequenceData.class,
+          DepanFxNodeFilterSequenceData.NODE_FILTER_SEQUENCE_TOOL_EXT);
+    }
+
+    @Override
+    protected void runDialog(
+        DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> wkspRsrc,
+        DepanFxDialogRunner dialogRunner) {
+      DepanFxNodeFilterSequenceToolDialog.runEditDialog(
+          wkspRsrc, dialogRunner);
+    }
+  }
+
+  private static class NodeFileSequenceExtContribution
       extends DepanFxResourceExtMenuContribution.Basic<DepanFxNodeFilterSequenceData> {
 
-    public ExtContribution() {
+    public NodeFileSequenceExtContribution() {
       super(DepanFxNodeFilterSequenceData.class,
           NODE_FILTER_SEQUENCE_KEY, EDIT_NODE_FILTER_SEQUENCE_FILTER,
           DepanFxNodeFilterSequenceData.NODE_FILTER_SEQUENCE_TOOL_EXT);
@@ -90,7 +115,7 @@ public class DepanFxNodeFilterSequenceConfiguration {
     }
   }
 
-  private static class PathContribution
+  private static class NodeFilterSequencePathContribution
       implements DepanFxResourcePathMenuContribution {
 
     @Override

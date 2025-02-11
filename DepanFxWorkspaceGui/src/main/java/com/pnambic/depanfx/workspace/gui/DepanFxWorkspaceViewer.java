@@ -20,6 +20,9 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
+
+import java.util.Optional;
 
 import javafx.scene.control.Tab;
 
@@ -35,6 +38,8 @@ public class DepanFxWorkspaceViewer implements DepanFxSceneViewer {
 
   private final String tabLabel;
 
+  private DepanFxProjectListViewer workspaceViewer;
+
   public DepanFxWorkspaceViewer(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
@@ -48,8 +53,7 @@ public class DepanFxWorkspaceViewer implements DepanFxSceneViewer {
 
   @Override
   public Tab getSceneTab(DepanFxSceneController scene) {
-    DepanFxProjectListViewer workspaceViewer =
-        new DepanFxProjectListViewer(
+    workspaceViewer = new DepanFxProjectListViewer(
           workspace, dialogRunner, rsrcMenuRegistry, scene);
     Tab workspaceTab = workspaceViewer.createWorkspaceTab(tabLabel);
 
@@ -59,5 +63,9 @@ public class DepanFxWorkspaceViewer implements DepanFxSceneViewer {
   @Override // DepanFxSceneViewer
   public void closeTab() {
     // Just JavaFX resources.
+  }
+
+  public Optional<DepanFxWorkspaceMember> getCurrentSelection() {
+    return workspaceViewer.getCurrentSelection();
   }
 }

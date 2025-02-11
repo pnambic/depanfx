@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.perspective.chooser;
 
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuContribution;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
@@ -30,13 +31,15 @@ public class DepanFxFileOpenResourceMenuContribution
   }
 
   @Override
-  public boolean acceptsEvent(ActionEvent event) {
+  public boolean acceptsEvent(
+      DepanFxSceneService sceneSrvc, ActionEvent event) {
     MenuItem item = (MenuItem) event.getSource();
     return item.idProperty().getValue().equals("fileOpenResourceItem");
   }
 
   @Override
-  public void handleEvent(ActionEvent event) {
+  public void handleEvent(
+      DepanFxSceneService sceneSrvc, ActionEvent event) {
     runOpenResourceDialog();
   }
 

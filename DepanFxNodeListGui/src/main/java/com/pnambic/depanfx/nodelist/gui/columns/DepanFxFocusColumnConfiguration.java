@@ -3,6 +3,7 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceOpenRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -24,6 +25,12 @@ public class DepanFxFocusColumnConfiguration {
   private static final String FOCUS_COLUMN_KEY = "Focus Column";
 
   @Bean
+  public DepanFxResourceOpenRegistry.Contribution
+      focusColumnFileOpenContribution() {
+    return new FocusColumnFileOpenContribution();
+  }
+
+  @Bean
   public DepanFxResourceExtMenuContribution focusColumnExtMenu() {
     return new FocusColumnExtContribution();
   }
@@ -31,6 +38,24 @@ public class DepanFxFocusColumnConfiguration {
   @Bean
   public DepanFxResourcePathMenuContribution focusColumnPathMenu() {
     return new FocusColumnPathContribution();
+  }
+
+  private static class FocusColumnFileOpenContribution
+      extends DepanFxResourceOpenRegistry.Basic<DepanFxFocusColumnData> {
+
+    public FocusColumnFileOpenContribution() {
+      super(
+          DepanFxFocusColumnData.class,
+          DepanFxFocusColumnData.FOCUS_COLUMN_TOOL_EXT);
+    }
+
+    @Override
+    protected void runDialog(
+        DepanFxWorkspaceResource<DepanFxFocusColumnData> columnRsrc,
+        DepanFxDialogRunner dialogRunner) {
+      DepanFxFocusColumnToolDialog.runEditDialog(
+          columnRsrc, dialogRunner);
+    }
   }
 
   private static class FocusColumnExtContribution

@@ -1,5 +1,7 @@
 package com.pnambic.depanfx.scene.plugins;
 
+import com.pnambic.depanfx.scene.DepanFxSceneService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +25,12 @@ public class DepanFxSceneMenuRegistry {
     this.contributions = contributions;
   }
 
-  public void dispatch(ActionEvent event) {
+  public void dispatch(DepanFxSceneService sceneSrvc, ActionEvent event) {
     contributions.stream()
-        .filter(c -> c.acceptsEvent(event))
+        .filter(c -> c.acceptsEvent(sceneSrvc, event))
         .findFirst()
         .ifPresentOrElse(
-            a -> a.handleEvent(event),
+            c -> c.handleEvent(sceneSrvc, event),
             () -> {
               MenuItem item = (MenuItem) event.getSource();
               LOG.info("Unable to dispatch scene menu event {}",

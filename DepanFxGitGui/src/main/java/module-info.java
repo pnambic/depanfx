@@ -18,7 +18,7 @@ module depanfx.git.gui {
     requires com.google.common;
 
     opens com.pnambic.depanfx.git.gui
-      to javafx.fxml, net.rgielen.fxweaver.core, spring.beans;
+      to javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;
 
     exports com.pnambic.depanfx.git.gui;
 }

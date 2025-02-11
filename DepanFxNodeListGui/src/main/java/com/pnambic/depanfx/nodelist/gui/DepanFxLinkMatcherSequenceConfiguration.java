@@ -17,6 +17,7 @@ package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceOpenRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -56,13 +57,20 @@ public class DepanFxLinkMatcherSequenceConfiguration {
       "Link matcher sequence.";
 
   @Bean
+  public  DepanFxResourceOpenRegistry.Contribution
+      linkMatcherFileOpenContrib() {
+
+    return new LinkMatcherSequenceFileOpenContribution();
+  }
+
+  @Bean
   public DepanFxResourceExtMenuContribution linkMatcherSequenceExtMenu() {
-    return new ExtContribution();
+    return new LinkMatcherSequenceExtContribution();
   }
 
   @Bean
   public DepanFxResourcePathMenuContribution linkMatcherSequencePathMenu() {
-    return new PathContribution();
+    return new LinkMatcherSequencePathContribution();
   }
 
   @Bean
@@ -71,10 +79,28 @@ public class DepanFxLinkMatcherSequenceConfiguration {
     return new NewContribution(workspace, dialogRunner);
   }
 
-  private static class ExtContribution
+  private static class LinkMatcherSequenceFileOpenContribution extends
+      DepanFxResourceOpenRegistry.Basic<DepanFxLinkMatcherSequenceDocument> {
+
+    private LinkMatcherSequenceFileOpenContribution() {
+      super(
+          DepanFxLinkMatcherSequenceDocument.class,
+          DepanFxLinkMatcherSequenceDocument.LINK_MATCHER_SEQUENCE_TOOL_EXT);
+    }
+
+    @Override
+    protected void runDialog(
+        DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> wkspRsrc,
+        DepanFxDialogRunner dialogRunner) {
+      DepanFxLinkMatcherSequenceToolDialog.runEditDialog(
+          wkspRsrc, dialogRunner);
+    }
+  }
+
+  private static class LinkMatcherSequenceExtContribution
       extends DepanFxResourceExtMenuContribution.Basic<DepanFxLinkMatcherSequenceDocument> {
 
-    public ExtContribution() {
+    public LinkMatcherSequenceExtContribution() {
       super(DepanFxLinkMatcherSequenceDocument.class,
           LINK_MATCHER_SEQUENCE_KEY, EDIT_LINK_MATCHER_SEQUENCE_FILTER,
           DepanFxLinkMatcherSequenceDocument.LINK_MATCHER_SEQUENCE_TOOL_EXT);
@@ -89,7 +115,7 @@ public class DepanFxLinkMatcherSequenceConfiguration {
     }
   }
 
-  private static class PathContribution
+  private static class LinkMatcherSequencePathContribution
       implements DepanFxResourcePathMenuContribution {
 
     @Override
