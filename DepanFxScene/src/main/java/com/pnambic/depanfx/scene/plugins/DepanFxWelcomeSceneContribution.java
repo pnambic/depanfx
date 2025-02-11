@@ -15,8 +15,8 @@
  */
 package com.pnambic.depanfx.scene.plugins;
 
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
-import com.pnambic.depanfx.scene.DepanFxWelcomeViewLoader;
 import com.pnambic.depanfx.scene.DepanFxWelcomeViewer;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +29,11 @@ import org.springframework.stereotype.Component;
 public class DepanFxWelcomeSceneContribution
     implements DepanFxSceneStarterContribution {
 
-  private final DepanFxWelcomeViewLoader welcomeLoader;
+  private final DepanFxDialogRunner dialogRunner;
 
   @Autowired
-  public DepanFxWelcomeSceneContribution(
-      DepanFxWelcomeViewLoader welcomeLoader) {
-    this.welcomeLoader = welcomeLoader;
+  public DepanFxWelcomeSceneContribution(DepanFxDialogRunner dialogRunner) {
+    this.dialogRunner = dialogRunner;
   }
 
   @Override
@@ -44,6 +43,6 @@ public class DepanFxWelcomeSceneContribution
 
   @Override
   public DepanFxSceneViewer getSceneViewer() {
-    return welcomeLoader.getWelcomeViewer();
+    return new DepanFxWelcomeViewer(dialogRunner);
   }
 }

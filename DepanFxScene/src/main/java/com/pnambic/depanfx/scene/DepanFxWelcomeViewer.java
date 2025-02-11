@@ -15,6 +15,8 @@
  */
 package com.pnambic.depanfx.scene;
 
+import java.util.Optional;
+
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 
@@ -22,15 +24,17 @@ public class DepanFxWelcomeViewer implements DepanFxSceneViewer {
 
   public static final String WELCOME_TAB = "Welcome";
 
-  private final Node resource;
+  private final DepanFxDialogRunner dialogRunner;
 
-  public DepanFxWelcomeViewer(Node resource) {
-    this.resource = resource;
+  public DepanFxWelcomeViewer(DepanFxDialogRunner dialogRunner) {
+    this.dialogRunner = dialogRunner;
   }
 
   @Override // DepanFxSceneViewer
   public Tab getSceneTab(DepanFxSceneController scene) {
-    return new Tab(DepanFxWelcomeViewer.WELCOME_TAB, resource);
+    Optional<Node> welcomePanel =
+        dialogRunner.weaveFxmlView(DepanFxWelcomePanel.class).getView();
+    return new Tab(DepanFxWelcomeViewer.WELCOME_TAB, welcomePanel.get());
   }
 
   @Override // DepanFxSceneViewer

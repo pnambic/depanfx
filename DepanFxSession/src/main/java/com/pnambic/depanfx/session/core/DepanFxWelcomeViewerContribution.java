@@ -16,8 +16,8 @@
 package com.pnambic.depanfx.session.core;
 
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
-import com.pnambic.depanfx.scene.DepanFxWelcomeViewLoader;
 import com.pnambic.depanfx.scene.DepanFxWelcomeViewer;
 import com.pnambic.depanfx.session.plugins.DepanFxSceneViewerRegistry;
 import com.pnambic.depanfx.session.tooldata.DepanFxWelcomeViewerData;
@@ -39,12 +39,11 @@ public class DepanFxWelcomeViewerContribution
     DepanFxWelcomeViewerData.class
   };
 
-  private final DepanFxWelcomeViewLoader welcomeLoader;
+  private DepanFxDialogRunner dialogRunner;
 
   @Autowired
-  public DepanFxWelcomeViewerContribution(
-      DepanFxWelcomeViewLoader welcomeLoader) {
-    this.welcomeLoader = welcomeLoader;
+  public DepanFxWelcomeViewerContribution(DepanFxDialogRunner dialogRunner) {
+    this.dialogRunner = dialogRunner;
   }
 
   @Override
@@ -60,12 +59,14 @@ public class DepanFxWelcomeViewerContribution
   }
 
   @Override
-  public Optional<DepanFxSceneViewer> buildViewer(DepanFxBaseViewerData viewData) {
-    return Optional.of(welcomeLoader.getWelcomeViewer());
+  public Optional<DepanFxSceneViewer> buildViewer(
+      DepanFxBaseViewerData viewData) {
+    return Optional.of(new DepanFxWelcomeViewer(dialogRunner));
   }
 
   @Override
-  public Optional<DepanFxBaseViewerData> getViewerData(DepanFxSceneViewer viewer) {
+  public Optional<DepanFxBaseViewerData> getViewerData(
+      DepanFxSceneViewer viewer) {
     return Optional.of(DepanFxWelcomeViewerData.MARKER);
   }
 
