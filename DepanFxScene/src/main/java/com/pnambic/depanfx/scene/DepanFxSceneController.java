@@ -2,6 +2,7 @@ package com.pnambic.depanfx.scene;
 
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceRegistry;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuRegistry;
+import com.pnambic.depanfx.scene.plugins.DepanFxSceneViewPanelRegistry;
 
 import net.rgielen.fxweaver.core.FxControllerAndView;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -44,6 +45,8 @@ public class DepanFxSceneController {
 
   private final DepanFxNewResourceRegistry newResourceRegistry;
 
+  private final DepanFxSceneViewPanelRegistry viewPanelRegistry;
+
   private final DepanFxDialogRunner dialogRunner;
 
   // Preserves order of tabs for serialization
@@ -57,6 +60,9 @@ public class DepanFxSceneController {
 
   @FXML
   private Menu fileNewItem;
+
+  @FXML
+  private Menu viewPanelsItem;
 
   private DepanFxSceneService sceneSrvc;
 
@@ -82,9 +88,11 @@ public class DepanFxSceneController {
   public DepanFxSceneController(
       DepanFxSceneMenuRegistry menuRegistry,
       DepanFxNewResourceRegistry newResourceRegistry,
+      DepanFxSceneViewPanelRegistry viewPanelRegistry,
       DepanFxDialogRunner dialogRunner) {
     this.menuRegistry = menuRegistry;
     this.newResourceRegistry = newResourceRegistry;
+    this.viewPanelRegistry = viewPanelRegistry;
     this.dialogRunner = dialogRunner;
 
     this.sceneSrvc = new SceneService();
@@ -97,6 +105,8 @@ public class DepanFxSceneController {
   @FXML
   public void initialize() {
     fileNewItem.getItems().addAll(newResourceRegistry.buildNewResourceItems());
+    viewPanelsItem.getItems().addAll(
+        viewPanelRegistry.buildViewPanelItems(this));
   }
 
   public void closeScene() {
@@ -151,6 +161,7 @@ public class DepanFxSceneController {
   public void removeViewer(Tab tab) {
     DepanFxSceneViewer viewer = sceneTabs.get(tab);
     viewer.closeTab();
+    sceneTabs.remove(tab);
   }
 
   private void handleByMenuRegistry(ActionEvent event) {

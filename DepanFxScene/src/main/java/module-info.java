@@ -13,7 +13,7 @@ module depanfx.scene {
     requires javafx.base;
 
     opens com.pnambic.depanfx.scene to
-      javafx.fxml, net.rgielen.fxweaver.core, spring.beans;
+      javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;
 
     exports com.pnambic.depanfx.scene;
     exports com.pnambic.depanfx.scene.plugins;
