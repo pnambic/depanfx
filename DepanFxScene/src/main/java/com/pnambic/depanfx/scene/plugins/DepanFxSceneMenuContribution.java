@@ -5,45 +5,58 @@ import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import java.util.function.Consumer;
 
 import javafx.event.ActionEvent;
-import javafx.scene.control.MenuItem;
 
 public interface DepanFxSceneMenuContribution {
 
+  /**
+   * Identifies the menu item key that this contribution is associated with.
+   */
   String forMenuKey();
 
+  /**
+   * Indicates if the contribution can handle the proposed viewer object.
+   */
   boolean forViewer(DepanFxSceneViewer viewer);
 
-  boolean acceptsEvent(DepanFxSceneService sceneSrvc, ActionEvent event);
+  /**
+   * Indicates whether the contribution can handle the proposed menu item key
+   * given the supplied {@link DepanFxSceneService}.
+   */
+  boolean acceptsMenuItemKey(
+      DepanFxSceneService sceneSrvc, String eventItemKey);
 
+  /**
+   * Perform the action defined by this contribution.
+   * The full originating event is provided for context
+   * in the situation that the action requires further contextual refinement.
+   */
   void handleEvent(DepanFxSceneService sceneSrvc, ActionEvent event);
 
   /**
+   * Basic menu contribution that uses a baked in {@link #menuItemKey}.
    */
   abstract public static class Simple implements DepanFxSceneMenuContribution {
 
-    private final String menuKey;
+    private final String menuItemKey;
 
-    public Simple(String menuKey) {
-      this.menuKey = menuKey;
+    public Simple(String menuItemKey) {
+      this.menuItemKey = menuItemKey;
     }
 
     @Override
     public String forMenuKey() {
-      return menuKey;
+      return menuItemKey;
     }
 
     @Override
-    public boolean acceptsEvent(
-        DepanFxSceneService sceneSrvc, ActionEvent event) {
-      MenuItem item = (MenuItem) event.getSource();
-      return (item.idProperty().getValue().equals(menuKey));
+    public boolean acceptsMenuItemKey(
+        DepanFxSceneService sceneSrvc, String menuItemKey) {
+      return this.menuItemKey.equals(menuItemKey);
     }
   }
 
   /**
-   * Assumes menuKey and viewerType are independent.
-   *
-   * @param <T>
+   * Extends Simple to support a viewer type.
    */
   abstract public static class Basic<T extends DepanFxSceneViewer>
       extends Simple {
@@ -61,9 +74,9 @@ public interface DepanFxSceneMenuContribution {
     }
 
     @Override
-    public boolean acceptsEvent(
-        DepanFxSceneService sceneSrvc, ActionEvent event) {
-      if (!super.acceptsEvent(sceneSrvc, event)) {
+    public boolean acceptsMenuItemKey(
+        DepanFxSceneService sceneSrvc, String menuItemKey) {
+      if (!super.acceptsMenuItemKey(sceneSrvc, menuItemKey)) {
         return false;
       }
 
@@ -87,7 +100,7 @@ public interface DepanFxSceneMenuContribution {
     @Override
     public void handleEvent(DepanFxSceneService sceneSrvc, ActionEvent event) {
       sceneSrvc.getViewer(viewerType)
-      .ifPresent(action::accept);
+          .ifPresent(action::accept);
     }
   }
 }

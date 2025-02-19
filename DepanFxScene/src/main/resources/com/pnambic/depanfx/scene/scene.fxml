@@ -20,7 +20,7 @@
     <top>
         <MenuBar>
             <menus>
-                <Menu text="File">
+                <Menu text="File" onShowing="#onMenuShowing">
                     <items>
                         <Menu fx:id="fileNewItem" text="New"/>
                         <SeparatorMenuItem /> 
@@ -30,17 +30,15 @@
                         <MenuItem id="fileOpenProjectItem"
                             text="Open Project..."
                             onAction="#handleByRegistry"/>
-                        <MenuItem id="fileOpenResourceItem"
-                            text="Open Resource..."
-                            onAction="#handleByRegistry"/>
                         <SeparatorMenuItem />
                         <MenuItem id="fileSaveItem"
                             text="Save"
                             onAction="#handleByRegistry"/>
                         <MenuItem id="fileSaveAsItem"
-                             text="Save As..."/>
+                            text="Save As..."
+                            onAction="#handleByRegistry"/>
                         <MenuItem id="fileSaveAllItem"
-                             text="Save All"
+                            text="Save All"
                             onAction="#handleByRegistry"/>
                         <SeparatorMenuItem />
                         <MenuItem id="fileImportItem"
@@ -63,7 +61,7 @@
                         <MenuItem text="Exit" onAction="#handleClose"/>
                     </items>
                 </Menu>
-                <Menu text="Edit">
+                <Menu text="Edit" onShowing="#onMenuShowing">
                      <items>
                         <MenuItem id="editUndoItem"
                             text="Undo"
@@ -83,7 +81,7 @@
                             onAction="#handleByRegistry"/>
                      </items>
                 </Menu>
-                <Menu text="Selection">
+                <Menu text="Selection" onShowing="#onMenuShowing">
                      <items>
                         <MenuItem id="SelectionAllItem"
                             text="Select All"
@@ -96,12 +94,12 @@
                             onAction="#handleByRegistry"/>
                      </items>
                 </Menu>
-                <Menu text="View">
+                <Menu text="View" onShowing="#onMenuShowing">
                      <items>
                         <Menu fx:id="viewPanelsItem" text="Panels"/>
                       </items>
                 </Menu>
-                <Menu text="Help">
+                <Menu text="Help" onShowing="#onMenuShowing">
                      <items>
                         <MenuItem text="Welcome..." onAction="#handleWelcome"/>
                         <SeparatorMenuItem />

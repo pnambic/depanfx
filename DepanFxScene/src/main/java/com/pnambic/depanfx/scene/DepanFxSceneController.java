@@ -19,11 +19,13 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
@@ -58,6 +60,7 @@ public class DepanFxSceneController {
   @FXML
   private TabPane viewRoot;
 
+  // Internal menus
   @FXML
   private Menu fileNewItem;
 
@@ -118,6 +121,12 @@ public class DepanFxSceneController {
   }
 
   @FXML
+  public void onMenuShowing(Event event) {
+    Menu menu = (Menu) event.getSource();
+    menu.getItems().stream().forEach(i -> prepareItem(i));
+  }
+
+  @FXML
   public void handleClose() {
     try {
       owner.closeScene(this);
@@ -162,6 +171,20 @@ public class DepanFxSceneController {
     DepanFxSceneViewer viewer = sceneTabs.get(tab);
     viewer.closeTab();
     sceneTabs.remove(tab);
+  }
+
+  private void prepareItem(MenuItem item) {
+    if (item.equals(fileNewItem)) {
+      return;
+    }
+    if (item.equals(viewPanelsItem)) {
+      return;
+    }
+    String menuItemKey = item.getId();
+    if (menuItemKey != null) {
+      boolean active = menuRegistry.isMenuItemActive(sceneSrvc, menuItemKey);
+      item.setDisable(! active);
+    }
   }
 
   private void handleByMenuRegistry(ActionEvent event) {
