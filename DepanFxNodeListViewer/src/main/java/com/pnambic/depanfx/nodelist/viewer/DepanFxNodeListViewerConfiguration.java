@@ -1,3 +1,18 @@
+/*
+ * Copyright 2024 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.pnambic.depanfx.nodelist.viewer;
 
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
@@ -10,6 +25,8 @@ import com.pnambic.depanfx.perspective.plugins.DepanFxAnalysisExtMenuContributio
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
+import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuContribution;
+import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuItems;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
@@ -46,6 +63,33 @@ public class DepanFxNodeListViewerConfiguration {
   @Bean
   public DepanFxAnalysisExtMenuContribution nodeListExtMenu() {
     return new NodeListContribution();
+  }
+
+  @Bean
+  public DepanFxSceneMenuContribution nodeListEditSelectAll() {
+
+    return new DepanFxSceneMenuContribution.Action<DepanFxNodeListViewer>(
+        DepanFxSceneMenuItems.SELECTION_ALL_ITEM,
+        DepanFxNodeListViewer.class,
+        v -> v.doSelectAllAction());
+  }
+
+  @Bean
+  public DepanFxSceneMenuContribution nodeListEditClearSelection() {
+
+    return new DepanFxSceneMenuContribution.Action<DepanFxNodeListViewer>(
+        DepanFxSceneMenuItems.SELECTION_NONE_ITEM,
+        DepanFxNodeListViewer.class,
+        v -> v.doClearSelectionAction());
+  }
+
+  @Bean
+  public DepanFxSceneMenuContribution nodeListEditInvertSection() {
+
+    return new DepanFxSceneMenuContribution.Action<DepanFxNodeListViewer>(
+        DepanFxSceneMenuItems.SELECTION_INVERT_ITEM,
+        DepanFxNodeListViewer.class,
+        v -> v.doInvertSelectionAction());
   }
 
   private static class GraphAsListContribution

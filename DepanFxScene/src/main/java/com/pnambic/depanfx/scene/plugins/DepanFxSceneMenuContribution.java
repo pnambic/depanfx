@@ -1,7 +1,8 @@
 package com.pnambic.depanfx.scene.plugins;
-
 import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
+
+import java.util.function.Consumer;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.MenuItem;
@@ -47,7 +48,7 @@ public interface DepanFxSceneMenuContribution {
   abstract public static class Basic<T extends DepanFxSceneViewer>
       extends Simple {
 
-    private final Class<T> viewerType;
+    protected final Class<T> viewerType;
 
     public Basic(String menuKey, Class<T> viewerType) {
       super(menuKey);
@@ -69,6 +70,24 @@ public interface DepanFxSceneMenuContribution {
       return sceneSrvc.getViewer(viewerType)
           .map(this::forViewer)
           .orElse(false);
+    }
+  }
+
+  public static class Action<T extends DepanFxSceneViewer>
+      extends Basic<T> {
+
+    private final Consumer<T> action;
+
+    public Action(
+        String menuKey, Class<T> viewerType, Consumer<T> action) {
+      super(menuKey, viewerType);
+      this.action = action;
+    }
+
+    @Override
+    public void handleEvent(DepanFxSceneService sceneSrvc, ActionEvent event) {
+      sceneSrvc.getViewer(viewerType)
+      .ifPresent(action::accept);
     }
   }
 }

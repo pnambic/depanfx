@@ -80,8 +80,21 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
     return nodeListRsrc;
   }
 
-  public DepanFxWorkspaceResource<DepanFxNodeListTableViewData> getTableViewResource() {
+  public DepanFxWorkspaceResource<DepanFxNodeListTableViewData>
+      getTableViewResource() {
     return tableControl.getTableViewResource();
+  }
+
+  public void doSelectAllAction() {
+    tableControl.doSelectAllAction();
+  }
+
+  public void doClearSelectionAction() {
+    tableControl.doClearSelectionAction();
+  }
+
+  public void doInvertSelectionAction() {
+    tableControl.doInvertSelectionAction();
   }
 
   private ContextMenu buildContextMenu() {
