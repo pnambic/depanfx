@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 /**
- * Define how the welcome view is serialized.
+ * Define how the node view panel is serialized.
  */
 @Component
 public class DepanFxNodeViewPanelContribution

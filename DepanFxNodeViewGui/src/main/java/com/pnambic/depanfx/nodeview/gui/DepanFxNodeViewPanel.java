@@ -548,6 +548,18 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
         e -> sideViews.remove(nodeDisplayDialog));
   }
 
+  public void doSelectAllAction() {
+    nodeSelection.doSelectAllAction();
+  }
+
+  public void doClearSelectionAction() {
+    nodeSelection.doClearSelectionAction();
+  }
+
+  public void doInvertSelectionAction() {
+    nodeSelection.doInvertSelectionAction();
+  }
+
   /////////////////////////////////////
   // Menus and UX
 
@@ -555,13 +567,13 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
     builder.appendActionItem(
         DepanFxNodeListTableCommands.SELECT_ALL_ITEM,
-        e -> nodeSelection.doSelectAllAction());
+        e -> doSelectAllAction());
     builder.appendActionItem(
         DepanFxNodeListTableCommands.CLEAR_SELECTION_ITEM,
-        e -> nodeSelection.doClearSelectionAction());
+        e -> doClearSelectionAction());
     builder.appendActionItem(
         DepanFxNodeListTableCommands.INVERT_SELECTION_ITEM,
-        e -> nodeSelection.doInvertSelectionAction());
+        e -> doInvertSelectionAction());
     builder.appendActionItem(
         NODE_SELECTION_ITEM,
         e -> runNodeSelectionDialog());
