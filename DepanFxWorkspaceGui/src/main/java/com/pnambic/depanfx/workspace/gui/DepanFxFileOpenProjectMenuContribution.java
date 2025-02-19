@@ -2,6 +2,7 @@ package com.pnambic.depanfx.workspace.gui;
 
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
+import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuContribution;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuItems;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -10,11 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javafx.event.ActionEvent;
-import javafx.scene.control.MenuItem;
 
 @Component
 public class DepanFxFileOpenProjectMenuContribution
-    implements DepanFxSceneMenuContribution {
+    extends DepanFxSceneMenuContribution.Simple {
 
   private final DepanFxWorkspace workspace;
 
@@ -23,16 +23,14 @@ public class DepanFxFileOpenProjectMenuContribution
   @Autowired
   public DepanFxFileOpenProjectMenuContribution(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+    super(DepanFxSceneMenuItems.FILE_OPEN_PROJECT_ITEM);
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
   }
 
   @Override
-  public boolean acceptsEvent(
-      DepanFxSceneService sceneSrvc, ActionEvent event) {
-    MenuItem item = (MenuItem) event.getSource();
-    return item.idProperty().getValue().equals(
-        DepanFxSceneMenuItems.FILE_OPEN_PROJECT_ITEM);
+  public boolean forViewer(DepanFxSceneViewer viewer) {
+    return true;
   }
 
   @Override

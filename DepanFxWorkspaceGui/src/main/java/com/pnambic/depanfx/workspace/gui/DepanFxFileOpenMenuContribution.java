@@ -18,6 +18,7 @@ package com.pnambic.depanfx.workspace.gui;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceOpenRegistry;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
+import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuContribution;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuItems;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
@@ -30,11 +31,10 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 import javafx.event.ActionEvent;
-import javafx.scene.control.MenuItem;
 
 @Component
 public class DepanFxFileOpenMenuContribution
-    implements DepanFxSceneMenuContribution {
+    extends DepanFxSceneMenuContribution.Basic<DepanFxWorkspaceViewer> {
 
   private final DepanFxWorkspace workspace;
 
@@ -47,31 +47,20 @@ public class DepanFxFileOpenMenuContribution
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxResourceOpenRegistry openRegistry) {
+    super(DepanFxSceneMenuItems.FILE_OPEN_ITEM, DepanFxWorkspaceViewer.class);
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
     this.openRegistry = openRegistry;
   }
 
   @Override
-  public boolean acceptsEvent(
-      DepanFxSceneService sceneSrvc, ActionEvent event) {
-    MenuItem item = (MenuItem) event.getSource();
-    if ( ! item.idProperty().getValue().equals(
-        DepanFxSceneMenuItems.FILE_OPEN_ITEM)) {
-      return false;
-    }
-    Optional<DepanFxWorkspaceViewer> optWkspViewer =
-        sceneSrvc.getViewer(DepanFxWorkspaceViewer.class);
-    if (optWkspViewer.isEmpty()) {
-      return false;
-    }
-    DepanFxWorkspaceViewer wkspViewer = optWkspViewer.get();
-    Optional<DepanFxWorkspaceMember> optMember =
-        wkspViewer.getCurrentSelection();
-    if (optMember.isEmpty()) {
-      return false;
-    }
-    return optMember.get() instanceof DepanFxProjectDocument;
+  public boolean forViewer(DepanFxSceneViewer viewer) {
+    if (viewer instanceof DepanFxWorkspaceViewer wksp) {
+      return wksp.getCurrentSelection()
+          .map(s -> s instanceof DepanFxProjectDocument)
+          .orElse(false);
+      }
+    return false;
   }
 
   @Override

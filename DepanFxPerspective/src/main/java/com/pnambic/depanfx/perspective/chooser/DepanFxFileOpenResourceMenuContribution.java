@@ -2,7 +2,9 @@ package com.pnambic.depanfx.perspective.chooser;
 
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
+import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuContribution;
+import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuItems;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 
@@ -13,11 +15,10 @@ import java.util.Optional;
 
 import javafx.event.ActionEvent;
 import javafx.scene.Scene;
-import javafx.scene.control.MenuItem;
 
 @Component
 public class DepanFxFileOpenResourceMenuContribution
-    implements DepanFxSceneMenuContribution {
+    extends DepanFxSceneMenuContribution.Simple {
 
   private final DepanFxWorkspace workspace;
 
@@ -26,15 +27,14 @@ public class DepanFxFileOpenResourceMenuContribution
   @Autowired
   public DepanFxFileOpenResourceMenuContribution(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+    super(DepanFxSceneMenuItems.FILE_OPEN_RESOURCE_ITEM);
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
   }
 
   @Override
-  public boolean acceptsEvent(
-      DepanFxSceneService sceneSrvc, ActionEvent event) {
-    MenuItem item = (MenuItem) event.getSource();
-    return item.idProperty().getValue().equals("fileOpenResourceItem");
+  public boolean forViewer(DepanFxSceneViewer viewer) {
+    return true;
   }
 
   @Override

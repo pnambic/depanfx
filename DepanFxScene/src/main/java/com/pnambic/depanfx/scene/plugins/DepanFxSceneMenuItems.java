@@ -55,4 +55,10 @@ public class DepanFxSceneMenuItems {
   public static String SELECTION_NONE_ITEM = "SelectionNoneItem";
 
   public static String SELECTION_INVERT_ITEM = "SelectionInvertItem";
+
+  public static String VIEW_PANELS = "ViewPanelsItem";
+
+  public static String HELP_WELCOME_TIME = "HelpWelcomeItem";
+
+  public static String HELP_ABOUT_ITEM = "HelpAboutItem";
 }

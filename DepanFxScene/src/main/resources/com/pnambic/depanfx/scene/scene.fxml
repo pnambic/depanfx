@@ -89,7 +89,7 @@
                             text="Select All"
                             onAction="#handleByRegistry"/>
                         <MenuItem id="SelectionNoneItem"
-                            text="Select None"
+                            text="Clear Selection"
                             onAction="#handleByRegistry"/>
                         <MenuItem id="SelectionInvertItem"
                             text="Invert Selection"
