@@ -6,7 +6,7 @@ import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DepanFxGitRepoDataContribution
+public class GitRepoPersistenceContribution
     implements DocumentPersistenceContribution {
 
   /**
@@ -21,7 +21,7 @@ public class DepanFxGitRepoDataContribution
       DepanFxGitRepoData.class
   };
 
-  public DepanFxGitRepoDataContribution() {
+  public GitRepoPersistenceContribution() {
   }
 
   @Override
