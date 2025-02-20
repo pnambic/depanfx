@@ -18,6 +18,8 @@ import javafx.scene.control.Cell;
 public interface DepanFxResourceExtMenuContribution
     extends DepanFxOrderableContribution {
 
+  Class<?> forDataType();
+
   boolean acceptsExt(String ext);
 
   void prepareCell(
@@ -50,6 +52,11 @@ public interface DepanFxResourceExtMenuContribution
     @Override
     public String getOrderKey() {
       return orderKey;
+    }
+
+    @Override
+    public Class<T> forDataType() {
+      return dataType;
     }
 
     @Override

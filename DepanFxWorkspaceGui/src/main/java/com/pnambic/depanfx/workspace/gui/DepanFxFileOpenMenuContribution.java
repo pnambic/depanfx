@@ -15,7 +15,7 @@
  */
 package com.pnambic.depanfx.workspace.gui;
 
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceOpenRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
@@ -40,17 +40,28 @@ public class DepanFxFileOpenMenuContribution
 
   private final DepanFxDialogRunner dialogRunner;
 
-  private final DepanFxResourceOpenRegistry openRegistry;
+  private final DepanFxResourceRegistry openRegistry;
 
   @Autowired
   public DepanFxFileOpenMenuContribution(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
-      DepanFxResourceOpenRegistry openRegistry) {
+      DepanFxResourceRegistry openRegistry) {
     super(DepanFxSceneMenuItems.FILE_OPEN_ITEM, DepanFxWorkspaceViewer.class);
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
     this.openRegistry = openRegistry;
+  }
+
+  @Override
+  public boolean acceptsMenuItemKey(
+      DepanFxSceneService sceneSrvc, String menuItemKey) {
+    if (! super.acceptsMenuItemKey(sceneSrvc, menuItemKey)) {
+      return false;
+    }
+    return getDocument(sceneSrvc)
+        .map(d -> openRegistry.opensDocument(workspace, d))
+        .orElse(false);
   }
 
   @Override
@@ -66,12 +77,20 @@ public class DepanFxFileOpenMenuContribution
   @Override
   public void handleEvent(
       DepanFxSceneService sceneSrvc, ActionEvent event) {
+    getDocument(sceneSrvc)
+        .ifPresent(d ->
+            openRegistry.openDocument(sceneSrvc, workspace, dialogRunner, d));
+  }
+
+  private Optional<DepanFxProjectDocument> getDocument(
+      DepanFxSceneService sceneSrvc) {
     Optional<DepanFxWorkspaceMember> optMember =
         sceneSrvc.getViewer(DepanFxWorkspaceViewer.class)
         .flatMap(v -> v.getCurrentSelection());
 
     if (optMember.get() instanceof DepanFxProjectDocument document) {
-      openRegistry.openDocument(workspace, dialogRunner, document);
+      return Optional.of(document);
     }
+    return Optional.empty();
   }
 }

@@ -18,7 +18,7 @@ package com.pnambic.depanfx.nodefilters.gui;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceOpenRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -48,17 +48,20 @@ public class DepanFxNodeFilterSequenceConfiguration {
   public static final String NEW_NODE_FILTER_SEQUENCE_FILTER =
       "New Node Filter Sequence...";
 
+  private static final String NODE_FILTER_SEQUENCE_LABEL =
+      NODE_FILTER_SEQUENCE;
+
   private static final String NODE_FILTER_SEQUENCE_KEY =
-      "Node Filter Sequence";
+      NODE_FILTER_SEQUENCE;
 
   private static final String NODE_FILTER_SEQUENCE_TOOL_NAME =
-      "Node Filter Sequence";
+      NODE_FILTER_SEQUENCE;
 
   private static final String NODE_FILTER_SEQUENCE_TOOL_DESCR =
       "Node filter sequence.";
 
   @Bean
-  public DepanFxResourceOpenRegistry.Contribution
+  public DepanFxResourceRegistry.Contribution
       nodeFilterFileOpenContribution() {
     return new NodeFileSequenceFileOpenContribution();
   }
@@ -80,12 +83,14 @@ public class DepanFxNodeFilterSequenceConfiguration {
   }
 
   private static class NodeFileSequenceFileOpenContribution
-      extends DepanFxResourceOpenRegistry.Basic<DepanFxNodeFilterSequenceData> {
+      extends DepanFxResourceRegistry.Principal<DepanFxNodeFilterSequenceData> {
 
     public NodeFileSequenceFileOpenContribution() {
       super(
+          NODE_FILTER_SEQUENCE_LABEL,
           DepanFxNodeFilterSequenceData.class,
-          DepanFxNodeFilterSequenceData.NODE_FILTER_SEQUENCE_TOOL_EXT);
+          DepanFxNodeFilterSequenceData.NODE_FILTER_SEQUENCE_TOOL_EXT,
+          NODE_FILTER_SEQUENCE_KEY);
     }
 
     @Override

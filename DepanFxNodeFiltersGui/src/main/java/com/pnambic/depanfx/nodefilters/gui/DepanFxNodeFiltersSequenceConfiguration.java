@@ -3,7 +3,7 @@ package com.pnambic.depanfx.nodefilters.gui;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxSequenceFilterData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceOpenRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -33,10 +33,12 @@ public class DepanFxNodeFiltersSequenceConfiguration {
 
   public static final String NEW_SEQUENCE_FILTER = "New Filter Sequence...";
 
+  private static final String SEQUENCE_MATCHER_LABEL = "Sequence";
+
   private static final String SEQUENCE_MATCHER_KEY = "Sequence";
 
   @Bean
-  public DepanFxResourceOpenRegistry.Contribution sequenceFilterFileOpenMenu() {
+  public DepanFxResourceRegistry.Contribution sequenceFilterFileOpenMenu() {
     return new SequenceFilterFileOpenContribution();
   }
 
@@ -57,12 +59,14 @@ public class DepanFxNodeFiltersSequenceConfiguration {
   }
 
   private static class SequenceFilterFileOpenContribution
-      extends DepanFxResourceOpenRegistry.Basic<DepanFxSequenceFilterData> {
+      extends DepanFxResourceRegistry.Principal<DepanFxSequenceFilterData> {
 
     public SequenceFilterFileOpenContribution() {
       super(
+          SEQUENCE_MATCHER_LABEL,
           DepanFxSequenceFilterData.class,
-          DepanFxSequenceFilterData.SEQUENCE_FILTER_TOOL_EXT);
+          DepanFxSequenceFilterData.SEQUENCE_FILTER_TOOL_EXT,
+          SEQUENCE_MATCHER_KEY);
     }
 
     @Override

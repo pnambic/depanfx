@@ -17,7 +17,7 @@ package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceOpenRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -47,17 +47,20 @@ public class DepanFxLinkMatcherSequenceConfiguration {
   public static final String NEW_LINK_MATCHER_FILTER =
       "New Link Matcher Sequence...";
 
+  private static final String LINK_MATCHER_SEQUENCE_LABEL =
+      LINK_MATCHER_SEQUENCE;
+
   private static final String LINK_MATCHER_SEQUENCE_KEY =
-      "Link Matcher Sequence";
+      LINK_MATCHER_SEQUENCE;
 
   private static final String LINK_MATCHER_SEQUENCE_TOOL_NAME =
-      "Link Matcher Sequence";
+      LINK_MATCHER_SEQUENCE;
 
   private static final String LINK_MATCHER_SEQUENCE_TOOL_DESCR =
       "Link matcher sequence.";
 
   @Bean
-  public  DepanFxResourceOpenRegistry.Contribution
+  public  DepanFxResourceRegistry.Contribution
       linkMatcherFileOpenContrib() {
 
     return new LinkMatcherSequenceFileOpenContribution();
@@ -80,12 +83,14 @@ public class DepanFxLinkMatcherSequenceConfiguration {
   }
 
   private static class LinkMatcherSequenceFileOpenContribution extends
-      DepanFxResourceOpenRegistry.Basic<DepanFxLinkMatcherSequenceDocument> {
+      DepanFxResourceRegistry.Principal<DepanFxLinkMatcherSequenceDocument> {
 
     private LinkMatcherSequenceFileOpenContribution() {
       super(
+          LINK_MATCHER_SEQUENCE_LABEL,
           DepanFxLinkMatcherSequenceDocument.class,
-          DepanFxLinkMatcherSequenceDocument.LINK_MATCHER_SEQUENCE_TOOL_EXT);
+          DepanFxLinkMatcherSequenceDocument.LINK_MATCHER_SEQUENCE_TOOL_EXT,
+          LINK_MATCHER_SEQUENCE_KEY);
     }
 
     @Override

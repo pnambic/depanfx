@@ -28,7 +28,7 @@ import java.nio.file.Path;
  */
 public class DepanFxNodeListData {
 
-  public static final String NODE_LIST_DIR = "Node List";
+  public static final String NODE_LIST_DIR = "Node Lists";
 
   public static final Path NODE_LIST_TOOL_PATH =
       DepanFxProjects.TOOLS_PATH.resolve(NODE_LIST_DIR);

@@ -17,13 +17,13 @@
 package com.pnambic.depanfx.workspace.gui;
 
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceMenuRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterContribution;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneViewPanelRegistry;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -37,18 +37,20 @@ public class DepanFxWorkspacePanelConfiguration {
   DepanFxWorkspaceSceneStarterContribution workspaceSceneStarterContribution(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
+      DepanFxResourceRegistry rsrcRegistry,
       DepanFxResourceMenuRegistry rsrcMenuRegistry) {
     return new DepanFxWorkspaceSceneStarterContribution(
-        workspace, dialogRunner, rsrcMenuRegistry);
+        workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry);
   }
 
   @Bean
   DepanFxSceneViewPanelRegistry.Contribution workspaceViewPanelsContribution(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
+      DepanFxResourceRegistry rsrcRegistry,
       DepanFxResourceMenuRegistry rsrcMenuRegistry) {
     return new WorkspaceViewPanelsContribution(
-        workspace, dialogRunner, rsrcMenuRegistry);
+        workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry);
   }
 
   private class DepanFxWorkspaceSceneStarterContribution
@@ -58,15 +60,18 @@ public class DepanFxWorkspacePanelConfiguration {
 
     private final DepanFxDialogRunner dialogRunner;
 
+    private final DepanFxResourceRegistry rsrcRegistry;
+
     private final DepanFxResourceMenuRegistry rsrcMenuRegistry;
 
-    @Autowired
     public DepanFxWorkspaceSceneStarterContribution(
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
+        DepanFxResourceRegistry rsrcRegistry,
         DepanFxResourceMenuRegistry rsrcMenuRegistry) {
       this.workspace = workspace;
       this.dialogRunner = dialogRunner;
+      this.rsrcRegistry = rsrcRegistry;
       this.rsrcMenuRegistry = rsrcMenuRegistry;
     }
 
@@ -79,7 +84,7 @@ public class DepanFxWorkspacePanelConfiguration {
     public DepanFxSceneViewer getSceneViewer() {
 
       return new DepanFxWorkspaceViewer(
-          workspace, dialogRunner, rsrcMenuRegistry, getLabel());
+          workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry, getLabel());
     }
   }
 
@@ -90,15 +95,19 @@ public class DepanFxWorkspacePanelConfiguration {
 
     private final DepanFxDialogRunner dialogRunner;
 
+    private final DepanFxResourceRegistry rsrcRegistry;
+
     private final DepanFxResourceMenuRegistry rsrcMenuRegistry;
 
     public WorkspaceViewPanelsContribution(
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
+        DepanFxResourceRegistry rsrcRegistry,
         DepanFxResourceMenuRegistry rsrcMenuRegistry) {
       this.workspace = workspace;
       this.dialogRunner = dialogRunner;
       this.rsrcMenuRegistry = rsrcMenuRegistry;
+      this.rsrcRegistry = rsrcRegistry;
     }
 
     @Override
@@ -115,7 +124,7 @@ public class DepanFxWorkspacePanelConfiguration {
     public DepanFxSceneViewer getSceneViewer() {
 
       return new DepanFxWorkspaceViewer(
-          workspace, dialogRunner, rsrcMenuRegistry, getLabel());
+          workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry, getLabel());
     }
   }
 }

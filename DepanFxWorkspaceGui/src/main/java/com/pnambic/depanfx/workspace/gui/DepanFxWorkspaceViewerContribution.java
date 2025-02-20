@@ -17,6 +17,7 @@ package com.pnambic.depanfx.workspace.gui;
 
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceMenuRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.session.plugins.DepanFxSceneViewerRegistry;
@@ -44,15 +45,19 @@ public class DepanFxWorkspaceViewerContribution
 
   private final DepanFxDialogRunner dialogRunner;
 
+  private final DepanFxResourceRegistry rsrcRegistry;
+
   private final DepanFxResourceMenuRegistry rsrcMenuRegistry;
 
   @Autowired
   private DepanFxWorkspaceViewerContribution(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
+      DepanFxResourceRegistry rsrcRegistry,
       DepanFxResourceMenuRegistry rsrcMenuRegistry) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
+    this.rsrcRegistry = rsrcRegistry;
     this.rsrcMenuRegistry = rsrcMenuRegistry;
   }
 
@@ -73,7 +78,7 @@ public class DepanFxWorkspaceViewerContribution
       DepanFxBaseViewerData viewData) {
 
     return Optional.of(new DepanFxWorkspaceViewer(
-        workspace, dialogRunner, rsrcMenuRegistry,
+        workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry,
         DepanFxWorkspaceViewer.WORKSPACE_TAB));
   }
 

@@ -49,7 +49,9 @@ import javafx.stage.Stage;
  */
 public class DepanFxSessionSaveDialog {
 
-  private static final String BLANK_DESTINATION = "";
+  private static final String BLANK_DESTINATION_NAME = "";
+
+  private static final Path BLANK_DESTINATION_PATH = Path.of(BLANK_DESTINATION_NAME);
 
   private final DepanFxSession session;
 
@@ -80,7 +82,7 @@ public class DepanFxSessionSaveDialog {
   @FXML
   public void initialize() {
     sessionDetailsLabel.setText(buildSessionDetails());
-    destinationField.setText(buildDestinationPath());
+    destinationField.setText(buildDestinationPath().toString());
   }
 
   @FXML
@@ -124,7 +126,7 @@ public class DepanFxSessionSaveDialog {
     String baseName = DepanFxSessionDataTransport.DEPAN_FX_SESSION_LABEL;
     FileChooser result =
         DepanFxSceneControls.prepareFileChooser(
-            destinationField,
+            buildDestinationPath(),
             () -> new File(
                 buildTimestampName(
                     baseName, DepanFxSessionDataTransport.XML_EXT)));
@@ -157,12 +159,12 @@ public class DepanFxSessionSaveDialog {
     return result.toString();
   }
 
-  private String buildDestinationPath() {
+  private Path buildDestinationPath() {
     Path sessionPath = session.getSessionPath();
     if (sessionPath != null) {
-      return sessionPath.toAbsolutePath().toString();
+      return sessionPath.toAbsolutePath();
     }
-    return BLANK_DESTINATION;
+    return BLANK_DESTINATION_PATH;
   }
 
   private String buildTimestampName(String prefix, String ext) {

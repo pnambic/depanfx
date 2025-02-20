@@ -3,7 +3,7 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceOpenRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -22,10 +22,12 @@ import javafx.scene.control.Cell;
 @Configuration
 public class DepanFxNodeKeyColumnConfiguration {
 
-  private static final String NODE_KEY_COLUMN_KEY = "Node Key Column";
+  public static final String NODE_KEY_COLUMN_LABEL = "Node Key Column";
+
+  public static final String NODE_KEY_COLUMN_KEY = "Node Key Column";
 
   @Bean
-  public DepanFxResourceOpenRegistry.Contribution nodeKeyColumnFileOpenMenu() {
+  public DepanFxResourceRegistry.Contribution nodeKeyColumnFileOpenMenu() {
     return new NodeKeyColumnFileOpenContribution();
   }
 
@@ -40,12 +42,14 @@ public class DepanFxNodeKeyColumnConfiguration {
   }
 
   private static class NodeKeyColumnFileOpenContribution
-      extends DepanFxResourceOpenRegistry.Basic<DepanFxNodeKeyColumnData> {
+      extends DepanFxResourceRegistry.Principal<DepanFxNodeKeyColumnData> {
 
     public NodeKeyColumnFileOpenContribution() {
       super(
+          NODE_KEY_COLUMN_LABEL,
           DepanFxNodeKeyColumnData.class,
-          DepanFxNodeKeyColumnData.NODE_KEY_COLUMN_TOOL_EXT);
+          DepanFxNodeKeyColumnData.NODE_KEY_COLUMN_TOOL_EXT,
+          NODE_KEY_COLUMN_KEY);
     }
 
     @Override

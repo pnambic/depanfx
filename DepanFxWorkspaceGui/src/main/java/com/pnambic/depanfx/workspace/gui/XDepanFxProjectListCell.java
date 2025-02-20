@@ -21,11 +21,11 @@ import javafx.scene.text.FontWeight;
 /**
  * 'cuz {@code DepanFxWorkspace} doesn't know anything about menus.
  */
-public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
+public class XDepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
 
   @SuppressWarnings("unused")
   private static final Logger LOG =
-      LoggerFactory.getLogger(DepanFxProjectListCell.class);
+      LoggerFactory.getLogger(XDepanFxProjectListCell.class);
 
   // Menu texts
   private static final String DELETE_DOCUMENT = "Delete Document";
@@ -41,12 +41,12 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
 
   private final DepanFxResourceMenuRegistry rsrcMenuRegistry;
 
-  private final DepanFxSceneController scene;
+  //private final DepanFxSceneController xscene;
 
   // Manage Font tweeks (e.g. embolden).
   private Font previousFont;
 
-  public DepanFxProjectListCell(
+  public XDepanFxProjectListCell(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxResourceMenuRegistry rsrcMenuRegistry,
@@ -54,7 +54,7 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
     this.rsrcMenuRegistry = rsrcMenuRegistry;
-    this.scene = scene;
+    //this.scene = scene;
   }
 
   @Override
@@ -113,9 +113,9 @@ public class DepanFxProjectListCell extends TreeCell<DepanFxWorkspaceMember> {
       rsrcMenuRegistry.prepareDocumentMenu(
           dialogRunner, workspace, this,
           (DepanFxProjectDocument) member, builder);
-      rsrcMenuRegistry.prepareAnalysisMenu(
-          scene, dialogRunner, workspace, this,
-          (DepanFxProjectDocument) member, builder);
+//      rsrcMenuRegistry.prepareAnalysisMenu(
+//          scene, dialogRunner, workspace, this,
+//          (DepanFxProjectDocument) member, builder);
     }
     if (member instanceof DepanFxProjectMember) {
       rsrcMenuRegistry.prepareMemberMenu(

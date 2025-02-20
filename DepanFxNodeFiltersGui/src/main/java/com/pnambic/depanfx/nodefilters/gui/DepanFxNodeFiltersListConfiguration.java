@@ -4,7 +4,7 @@ import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxListFilterData;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceOpenRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -33,10 +33,12 @@ public class DepanFxNodeFiltersListConfiguration {
 
   public static final String NEW_NODE_LIST_FILTER = "New Node List Filter...";
 
+  private static final String NODE_LIST_LABEL = "Node List";
+
   private static final String NODE_LIST_KEY = "Node List";
 
   @Bean
-  public DepanFxResourceOpenRegistry.Contribution
+  public DepanFxResourceRegistry.Contribution
       nodeListFilterFileOpenContribution() {
     return new NodeListFilterFileOpenContribution();
   }
@@ -58,12 +60,14 @@ public class DepanFxNodeFiltersListConfiguration {
   }
 
   private static class NodeListFilterFileOpenContribution
-      extends DepanFxResourceOpenRegistry.Basic<DepanFxListFilterData> {
+      extends DepanFxResourceRegistry.Principal<DepanFxListFilterData> {
 
     public NodeListFilterFileOpenContribution() {
       super(
+          NODE_LIST_LABEL,
           DepanFxListFilterData.class,
-          DepanFxListFilterData.LIST_FILTER_TOOL_EXT);
+          DepanFxListFilterData.LIST_FILTER_TOOL_EXT,
+          NODE_LIST_KEY);
     }
 
     @Override

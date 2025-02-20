@@ -187,9 +187,11 @@ public abstract class DepanFxBaseDocumentDialog<T> extends DepanFxBaseDialog {
   }
 
   private FileChooser prepareDestinationFileChooser() {
+    Path destPath = optSaveProjDoc.map(p -> p.getMemberPath())
+        .orElse(null);
     FileChooser result =
         DepanFxSceneControls.prepareFileChooser(
-            destinationField, () -> buildInitialDestinationFile());
+            destPath, () -> buildInitialDestinationFile());
     setTooldataFilters(result);
     return result;
   }

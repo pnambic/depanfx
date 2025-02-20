@@ -3,7 +3,7 @@ package com.pnambic.depanfx.nodefilters.gui;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxReferencedFilterData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceOpenRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -33,10 +33,12 @@ public class DepanFxNodeFiltersReferencedConfiguration {
 
   public static final String NEW_REFERENCED_FILTER = "New Filter Reference...";
 
+  private static final String REFERENCED_MATCHER_LABEL = "Referenced";
+
   private static final String REFERENCED_MATCHER_KEY = "Referenced";
 
   @Bean
-  public DepanFxResourceOpenRegistry.Contribution referencedFilterFileOpenMenu() {
+  public DepanFxResourceRegistry.Contribution referencedFilterFileOpenMenu() {
     return new ReferencedFilterFileOpenContribution();
   }
 
@@ -57,12 +59,14 @@ public class DepanFxNodeFiltersReferencedConfiguration {
   }
 
   private static class ReferencedFilterFileOpenContribution
-      extends DepanFxResourceOpenRegistry.Basic<DepanFxReferencedFilterData> {
+      extends DepanFxResourceRegistry.Principal<DepanFxReferencedFilterData> {
 
     public ReferencedFilterFileOpenContribution() {
       super(
+          REFERENCED_MATCHER_LABEL,
           DepanFxReferencedFilterData.class,
-          DepanFxReferencedFilterData.REFERENCED_FILTER_TOOL_EXT);
+          DepanFxReferencedFilterData.REFERENCED_FILTER_TOOL_EXT,
+          REFERENCED_MATCHER_KEY);
     }
 
     @Override

@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.workspace.gui;
 
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceMenuRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
@@ -34,6 +35,8 @@ public class DepanFxWorkspaceViewer implements DepanFxSceneViewer {
 
   private final DepanFxDialogRunner dialogRunner;
 
+  private final DepanFxResourceRegistry rsrcRegistry;
+
   private final DepanFxResourceMenuRegistry rsrcMenuRegistry;
 
   private final String tabLabel;
@@ -43,10 +46,12 @@ public class DepanFxWorkspaceViewer implements DepanFxSceneViewer {
   public DepanFxWorkspaceViewer(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
+      DepanFxResourceRegistry rsrcRegistry,
       DepanFxResourceMenuRegistry rsrcMenuRegistry,
       String tabLabel) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
+    this.rsrcRegistry = rsrcRegistry;
     this.rsrcMenuRegistry = rsrcMenuRegistry;
     this.tabLabel = tabLabel;
   }
@@ -54,7 +59,7 @@ public class DepanFxWorkspaceViewer implements DepanFxSceneViewer {
   @Override
   public Tab getSceneTab(DepanFxSceneController scene) {
     workspaceViewer = new DepanFxProjectListViewer(
-          workspace, dialogRunner, rsrcMenuRegistry, scene);
+          workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry, scene);
     Tab workspaceTab = workspaceViewer.createWorkspaceTab(tabLabel);
 
     return workspaceTab;

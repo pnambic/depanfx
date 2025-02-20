@@ -125,9 +125,20 @@ public class DepanFxSceneControls {
   }
 
   public static FileChooser prepareFileChooser(
+      Path filePath, Supplier<File> onBlank) {
+    String fileName = filePath != null ? filePath.toString() : "";
+    return prepareFileChooser(fileName, onBlank);
+  }
+
+  public static FileChooser prepareFileChooser(
       TextField fileField, Supplier<File> onBlank) {
+    return prepareFileChooser(fileField.getText(), onBlank);
+  }
+
+  public static FileChooser prepareFileChooser(
+      String fileName, Supplier<File> onBlank) {
     FileChooser result = new FileChooser();
-    initializeFileChooser(result, buildLocationFile(fileField, onBlank));
+    initializeFileChooser(result, buildLocationFile(fileName, onBlank));
     return result;
   }
 
@@ -138,8 +149,7 @@ public class DepanFxSceneControls {
   }
 
   private static File buildLocationFile(
-      TextField fileField, Supplier<File> onBlank) {
-    String fileName = fileField.getText();
+      String fileName, Supplier<File> onBlank) {
     if (isPresent(fileName)) {
       return new File(fileName);
     }

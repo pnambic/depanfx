@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.perspective.chooser;
 
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceMenuRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.workspace.controls.DepanFxProjectListCell;
 import com.pnambic.depanfx.perspective.workspace.controls.DepanFxProjectTreeCell;
 import com.pnambic.depanfx.perspective.workspace.controls.DepanFxWorkspaceItem;
@@ -38,7 +39,10 @@ public class DepanFxResourceChooserDialog {
   // Injected
   private final DepanFxDialogRunner dialogRunner;
 
-  // Injected
+  // Injected - passthrough
+  private final DepanFxResourceRegistry rsrcRegistry;
+
+  // Injected - passthrough
   private final DepanFxResourceMenuRegistry rsrcMenuRegistry;
 
   @FXML
@@ -67,8 +71,10 @@ public class DepanFxResourceChooserDialog {
 
   public DepanFxResourceChooserDialog(
       DepanFxDialogRunner dialogRunner,
+      DepanFxResourceRegistry rsrcRegistry,
       DepanFxResourceMenuRegistry rsrcMenuRegistry) {
     this.dialogRunner = dialogRunner;
+    this.rsrcRegistry = rsrcRegistry;
     this.rsrcMenuRegistry = rsrcMenuRegistry;
   }
 
@@ -112,10 +118,10 @@ public class DepanFxResourceChooserDialog {
   public void setWorkspace(DepanFxWorkspace workspace) {
     this.workspace = workspace;
 
-      TreeItem<DepanFxWorkspaceMember> rootItem =
-          new DepanFxWorkspaceItem(workspace,
-              m -> !(m instanceof DepanFxProjectDocument));
-      directoryTreeView.setRoot(rootItem);
+    TreeItem<DepanFxWorkspaceMember> rootItem =
+        new DepanFxWorkspaceItem(workspace,
+            m -> !(m instanceof DepanFxProjectDocument));
+    directoryTreeView.setRoot(rootItem);
   }
 
   public Optional<DepanFxWorkspaceMember> getSelectedResource() {
@@ -139,7 +145,7 @@ public class DepanFxResourceChooserDialog {
     directoryTreeView.setShowRoot(false);
     directoryTreeView.setCellFactory(
         p -> new DepanFxProjectTreeCell(
-            workspace, dialogRunner, rsrcMenuRegistry));
+            workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry));
 
     directoryTreeView.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
@@ -152,7 +158,7 @@ public class DepanFxResourceChooserDialog {
   private void initListView() {
     fileListView.setCellFactory(
         p -> new DepanFxProjectListCell(
-            workspace, dialogRunner, rsrcMenuRegistry));
+            workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry));
     fileListView.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {

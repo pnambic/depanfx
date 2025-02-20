@@ -28,7 +28,7 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDir
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData.ContainerOrder;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceOpenRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -52,7 +52,11 @@ import javafx.scene.control.Cell;
 @Configuration
 public class DepanFxNodeListSectionConfiguration {
 
+  public static final String FLAT_SECTION_LABEL = "Flat Section";
+
   public static final String FLAT_SECTION_KEY = "Flat Section";
+
+  public static final String TREE_SECTION_LABEL = "Tree Section";
 
   public static final String TREE_SECTION_KEY = "Tree Section";
 
@@ -61,7 +65,7 @@ public class DepanFxNodeListSectionConfiguration {
   }
 
   @Bean
-  public DepanFxResourceOpenRegistry.Contribution flatSectionFileOpenContribution() {
+  public DepanFxResourceRegistry.Contribution flatSectionFileOpenContribution() {
     return new FlatSectionFileOpenContribution();
   }
 
@@ -76,7 +80,7 @@ public class DepanFxNodeListSectionConfiguration {
   }
 
   @Bean
-  public DepanFxResourceOpenRegistry.Contribution treeSectionFileOpenContribution() {
+  public DepanFxResourceRegistry.Contribution treeSectionFileOpenContribution() {
     return new TreeSectionFileOpenContribution();
   }
 
@@ -94,12 +98,14 @@ public class DepanFxNodeListSectionConfiguration {
   // Flat section contributions
 
   private static class FlatSectionFileOpenContribution
-      extends DepanFxResourceOpenRegistry.Basic<DepanFxFlatSectionData> {
+      extends DepanFxResourceRegistry.Principal<DepanFxFlatSectionData> {
 
     public FlatSectionFileOpenContribution() {
       super(
+          FLAT_SECTION_LABEL,
           DepanFxFlatSectionData.class,
-          DepanFxFlatSectionData.FLAT_SECTION_TOOL_EXT);
+          DepanFxFlatSectionData.FLAT_SECTION_TOOL_EXT,
+          FLAT_SECTION_KEY);
     }
 
     @Override
@@ -180,12 +186,14 @@ public class DepanFxNodeListSectionConfiguration {
   // Tree section GUI contributions
 
   private static class TreeSectionFileOpenContribution
-      extends DepanFxResourceOpenRegistry.Basic<DepanFxTreeSectionData> {
+      extends DepanFxResourceRegistry.Principal<DepanFxTreeSectionData> {
 
     public TreeSectionFileOpenContribution() {
       super(
+          TREE_SECTION_LABEL,
           DepanFxTreeSectionData.class,
-          DepanFxTreeSectionData.TREE_SECTION_TOOL_EXT);
+          DepanFxTreeSectionData.TREE_SECTION_TOOL_EXT,
+          TREE_SECTION_KEY);
     }
 
     @Override

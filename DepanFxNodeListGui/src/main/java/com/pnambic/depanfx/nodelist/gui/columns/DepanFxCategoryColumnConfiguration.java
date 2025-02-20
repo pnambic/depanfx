@@ -3,7 +3,7 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceOpenRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -22,10 +22,12 @@ import javafx.scene.control.Cell;
 @Configuration
 public class DepanFxCategoryColumnConfiguration {
 
+  private static final String CATEGORY_COLUMN_LABEL = "Category Column";
+
   private static final String CATEGORY_COLUMN_KEY = "Category Column";
 
   @Bean
-  public DepanFxResourceOpenRegistry.Contribution
+  public DepanFxResourceRegistry.Contribution
       categoryColumnFileOpenContribution() {
 
     return new CategoryColumnFileOpenContribution();
@@ -42,12 +44,14 @@ public class DepanFxCategoryColumnConfiguration {
   }
 
   private static class CategoryColumnFileOpenContribution
-      extends DepanFxResourceOpenRegistry.Basic<DepanFxCategoryColumnData> {
+      extends DepanFxResourceRegistry.Principal<DepanFxCategoryColumnData> {
 
     private CategoryColumnFileOpenContribution() {
       super(
+          CATEGORY_COLUMN_LABEL,
           DepanFxCategoryColumnData.class,
-          DepanFxCategoryColumnData.CATEGORY_COLUMN_TOOL_EXT);
+          DepanFxCategoryColumnData.CATEGORY_COLUMN_TOOL_EXT,
+          CATEGORY_COLUMN_KEY);
     }
 
     @Override

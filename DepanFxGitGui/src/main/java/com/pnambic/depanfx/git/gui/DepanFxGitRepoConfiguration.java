@@ -17,7 +17,7 @@ package com.pnambic.depanfx.git.gui;
 
 import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceOpenRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -38,6 +38,8 @@ import javafx.scene.control.Cell;
 @Configuration
 public class DepanFxGitRepoConfiguration {
 
+  public static final String GIT_REPO_LABEL = "git Repo";
+
   public static final String GIT_REPO_KEY = "git Repo";
 
   public static final String EDIT_GIT_REPO = "Edit git Repo Data...";
@@ -48,7 +50,7 @@ public class DepanFxGitRepoConfiguration {
       LoggerFactory.getLogger(DepanFxGitRepoConfiguration.class);
 
   @Bean
-  public DepanFxResourceOpenRegistry.Contribution
+  public DepanFxResourceRegistry.Contribution
       gitRepoFileOpenContribution() {
 
     return new GitRepoDataFileOpenContribution();
@@ -65,12 +67,14 @@ public class DepanFxGitRepoConfiguration {
   }
 
   private static class GitRepoDataFileOpenContribution
-      extends DepanFxResourceOpenRegistry.Basic<DepanFxGitRepoData> {
+      extends DepanFxResourceRegistry.Principal<DepanFxGitRepoData> {
 
     public GitRepoDataFileOpenContribution() {
       super(
+          GIT_REPO_LABEL,
           DepanFxGitRepoData.class,
-          DepanFxGitRepoData.GIT_REPO_TOOL_EXT);
+          DepanFxGitRepoData.GIT_REPO_TOOL_EXT,
+          GIT_REPO_KEY);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.pnambic.depanfx.workspace.gui;
 
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceMenuRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
+import com.pnambic.depanfx.perspective.workspace.controls.DepanFxProjectTreeCell;
 import com.pnambic.depanfx.perspective.workspace.controls.DepanFxWorkspaceItem;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -41,6 +43,8 @@ public class DepanFxProjectListViewer {
 
   private final DepanFxDialogRunner dialogRunner;
 
+  private final DepanFxResourceRegistry rsrcRegistry;
+
   private final DepanFxResourceMenuRegistry rsrcMenuRegistry;
 
   private final DepanFxSceneController scene;
@@ -50,10 +54,12 @@ public class DepanFxProjectListViewer {
   public DepanFxProjectListViewer(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
+      DepanFxResourceRegistry rsrcRegistry,
       DepanFxResourceMenuRegistry rsrcMenuRegistry,
       DepanFxSceneController scene) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
+    this.rsrcRegistry = rsrcRegistry;
     this.rsrcMenuRegistry = rsrcMenuRegistry;
     this.scene = scene;
 
@@ -141,8 +147,9 @@ public class DepanFxProjectListViewer {
     @Override
     public TreeCell<DepanFxWorkspaceMember> call(TreeView<DepanFxWorkspaceMember> param) {
 
-      return new DepanFxProjectListCell(
-        workspace, dialogRunner, rsrcMenuRegistry, scene);
+      scene.getClass();
+      return new DepanFxProjectTreeCell(
+        workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry);
     }
   }
 }

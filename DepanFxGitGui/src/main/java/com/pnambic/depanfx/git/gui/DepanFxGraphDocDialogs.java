@@ -65,7 +65,8 @@ public class DepanFxGraphDocDialogs {
       TextField graphDocumentField,
       String baseGraphName,
       DepanFxWorkspace workspace) {
-    return DepanFxSceneControls.prepareFileChooser(graphDocumentField,
+    return DepanFxSceneControls.prepareFileChooser(
+        graphDocumentField,
         () -> buildDestinationName(workspace, baseGraphName));
   }
 
