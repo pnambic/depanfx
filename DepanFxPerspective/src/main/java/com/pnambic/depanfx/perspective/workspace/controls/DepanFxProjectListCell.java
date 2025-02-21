@@ -2,7 +2,6 @@ package com.pnambic.depanfx.perspective.workspace.controls;
 
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceMenuRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
-import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -23,11 +22,11 @@ public class DepanFxProjectListCell extends ListCell<DepanFxWorkspaceMember> {
 
   public DepanFxProjectListCell(
       DepanFxWorkspace workspace,
-      DepanFxDialogRunner dialogRunner,
+      DepanFxWorkspaceMemberCells.DocumentDispatch dispatch,
       DepanFxResourceRegistry rsrcRegistry,
       DepanFxResourceMenuRegistry rsrcMenuRegistry) {
     this.memberCells = new DepanFxWorkspaceMemberCells(
-            workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry,
+            workspace, dispatch, rsrcRegistry, rsrcMenuRegistry,
             this::getCellIcon);
   }
 

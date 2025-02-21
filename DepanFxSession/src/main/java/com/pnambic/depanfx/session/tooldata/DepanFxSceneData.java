@@ -18,12 +18,18 @@ package com.pnambic.depanfx.session.tooldata;
 import com.pnambic.depanfx.session.viewdata.DepanFxBaseViewerData;
 import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Encapsulates the persisted data for a scene.
  */
 public class DepanFxSceneData extends DepanFxBaseToolData {
+
+  public static final DepanFxSceneData EMPTY_SESSION_SCENE =
+      new DepanFxSceneData(
+          "Empty Session", "Empty",
+          -1, -1, -1, -1, Collections.emptyList());
 
   private final int top;
 

@@ -18,7 +18,13 @@ package com.pnambic.depanfx.session.core;
 import com.pnambic.depanfx.scene.DepanFxAppIcons;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneController;
+import com.pnambic.depanfx.scene.DepanFxSceneService;
+import com.pnambic.depanfx.scene.DepanFxSceneViewer;
+import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterRegistry;
 import com.pnambic.depanfx.session.gui.DepanFxSessionSaveDialog;
+import com.pnambic.depanfx.session.plugins.DepanFxSceneViewerRegistry;
+import com.pnambic.depanfx.session.tooldata.DepanFxSceneData;
+import com.pnambic.depanfx.session.viewdata.DepanFxBaseViewerData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
 import org.slf4j.Logger;
@@ -29,11 +35,11 @@ import org.springframework.stereotype.Component;
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import javafx.stage.Stage;
 
@@ -47,17 +53,15 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxSession.class);
 
-  public static DepanFxSceneConfig EMPTY_SESSION_SCENE =
-      new DepanFxSceneConfig("Empty Session", "Empty",
-          -1.0d, -1.0d, -1.0d, -1.0d,
-          Collections.emptyList());
-
   private final DepanFxWorkspace workspace;
 
   private final DepanFxDialogRunner dialogRunner;
 
-  private final Map<DepanFxSceneController, DepanFxSceneConfig> sceneMap =
-      new HashMap<>();
+  private final DepanFxSceneViewerRegistry viewerRegistry;
+
+  private final DepanFxSceneStarterRegistry starterRegistry;
+
+  private final Set<DepanFxSceneService> scenes = new HashSet<>();
 
   private Closeable onClose;
 
@@ -72,9 +76,14 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
 
   @Autowired
   public DepanFxSession(
-      DepanFxDialogRunner dialogRunner, DepanFxWorkspace workspace) {
+      DepanFxDialogRunner dialogRunner,
+      DepanFxWorkspace workspace,
+      DepanFxSceneViewerRegistry viewerRegistry,
+      DepanFxSceneStarterRegistry starterRegistry) {
     this.dialogRunner = dialogRunner;
     this.workspace = workspace;
+    this.viewerRegistry = viewerRegistry;
+    this.starterRegistry = starterRegistry;
   }
 
   public void setOnClose(Closeable onClose) {
@@ -94,19 +103,15 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
     setCurrentProject(sessionConfig.getCurrentProjectName());
 
     // Populate sceneMap when session is started.
-    sceneMap.clear();
+    scenes.clear();
   }
 
   public DepanFxWorkspace getWorkspace() {
     return workspace;
   }
 
-  public Collection<DepanFxSceneController> getScenes() {
-    return sceneMap.keySet();
-  }
-
-  public Collection<DepanFxSceneConfig> getSceneConfigs() {
-    return sceneMap.values();
+  public Stream<DepanFxSceneService> streamScenes() {
+    return scenes.stream();
   }
 
   /**
@@ -116,40 +121,45 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
    */
   public void startSession(Stage stage) throws Exception {
 
-    Iterator<DepanFxSceneConfig> sceneSeq =
+    if (sessionConfig.getSceneConfigs() == null) {
+      startStarterSession(stage);
+      return;
+    }
+
+    Iterator<DepanFxSceneData> sceneSeq =
         sessionConfig.getSceneConfigs().iterator();
 
     if (!sceneSeq.hasNext()) {
-      addScene(stage, EMPTY_SESSION_SCENE);
+      addScene(stage, DepanFxSceneData.EMPTY_SESSION_SCENE);
       return;
     }
 
     // Start the first scene on the initial stage.
-    DepanFxSceneConfig baseScene = sceneSeq.next();
+    DepanFxSceneData baseScene = sceneSeq.next();
     addScene(stage, baseScene);
 
     // Start additional scenes on secondary stages.
     while (sceneSeq.hasNext()) {
-      DepanFxSceneConfig sceneInfo = sceneSeq.next();
+      DepanFxSceneData sceneInfo = sceneSeq.next();
       addScene(sceneInfo);
     }
   }
 
   public void stopSession() {
-    sceneMap.keySet().forEach(c -> c.closeScene());
+    streamScenes().forEach(c -> c.closeScene());
   }
 
-  public void addScene(DepanFxSceneConfig sceneInfo)
+  public void addScene(DepanFxSceneData sceneInfo)
       throws Exception {
-    Stage sceneState = new Stage();
-    addScene(sceneState, sceneInfo);
+    Stage sceneStage = new Stage();
+    addScene(sceneStage, sceneInfo);
   }
 
   @Override // DepanFxSceneController.SceneOwner
-  public void closeScene(DepanFxSceneController scene) {
-    scene.closeScene();
-    sceneMap.remove(scene);
-    if (sceneMap.isEmpty()) {
+  public void closeScene(DepanFxSceneService sceneSrvc) {
+    sceneSrvc.closeScene();
+    scenes.remove(sceneSrvc);
+    if (scenes.isEmpty()) {
       closeParent();
     }
   }
@@ -158,7 +168,6 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
   public void saveSession() throws IOException {
     DepanFxSessionSaveDialog.runSaveSessionDialog(dialogRunner);
   }
-
   private void closeParent() {
     try {
       // Shutting down the application context that started this session.
@@ -168,25 +177,62 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
     }
   }
 
-  private void addScene(Stage stage, DepanFxSceneConfig sceneConfig)
+  private void addScene(Stage stage, DepanFxSceneData sceneInfo)
       throws Exception {
-    DepanFxSceneController scene = DepanFxSceneController.createDepanScene(
-        dialogRunner, sceneConfig.getViewers(), this);
-    sceneMap.put(scene, sceneConfig);
 
-    positionScreen(stage, sceneConfig);
+    DepanFxSceneController scene =
+        DepanFxSceneController.createDepanScene(dialogRunner, this);
+
+    positionScreen(stage, sceneInfo);
+    stage.setTitle("DepanFX");
+    DepanFxAppIcons.installDepanIcons(stage.getIcons());
+    stage.setScene(scene.getScene());
+    stage.show();
+
+    DepanFxSceneService sceneSrvc = scene.getSceneService();
+    sceneInfo.getViewers().stream()
+        .flatMap(d -> toSceneViewer(sceneSrvc, d).stream())
+        .forEach(sceneSrvc::addViewer);
+  }
+
+  private void startStarterSession(Stage stage) throws Exception {
+
+    DepanFxSceneController scene =
+        DepanFxSceneController.createDepanScene(dialogRunner, this);
 
     stage.setTitle("DepanFX");
     DepanFxAppIcons.installDepanIcons(stage.getIcons());
     stage.setScene(scene.getScene());
     stage.show();
+
+    DepanFxSceneService sceneSrvc = scene.getSceneService();
+    starterRegistry.getStarterViews(sceneSrvc)
+        .forEach(sceneSrvc::addViewer);
   }
 
-  private void positionScreen(Stage stage, DepanFxSceneConfig sceneConfig) {
-    double top = sceneConfig.getTop();
-    double left = sceneConfig.getLeft();
-    double width = sceneConfig.getWidth();
-    double height = sceneConfig.getHeight();
+  /**
+   * Handle any number of failures restoring the viewer.
+   *
+   * Many times, it's a missing value due to a save Scratch document.
+   */
+  private Optional<DepanFxSceneViewer> toSceneViewer(
+      DepanFxSceneService sceneSrvc, DepanFxBaseViewerData viewerInfo) {
+
+    try {
+      return viewerRegistry.buildViewer(sceneSrvc, viewerInfo);
+    } catch (Exception errAny) {
+      LOG.warn("Unable to build viewer {}", viewerInfo.getClass().getName());
+      LOG.debug("Unable to build viewer {}",
+          viewerInfo.getClass().getName(), errAny);
+    }
+    return Optional.empty();
+  }
+
+  private void positionScreen(Stage stage, DepanFxSceneData sceneInfo) {
+    double top = sceneInfo.getTop();
+    double left = sceneInfo.getLeft();
+    double width = sceneInfo.getWidth();
+    double height = sceneInfo.getHeight();
 
     if (width < 100 || height < 100) {
       return;

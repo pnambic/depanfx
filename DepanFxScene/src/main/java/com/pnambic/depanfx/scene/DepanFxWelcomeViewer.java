@@ -31,7 +31,7 @@ public class DepanFxWelcomeViewer implements DepanFxSceneViewer {
   }
 
   @Override // DepanFxSceneViewer
-  public Tab getSceneTab(DepanFxSceneController scene) {
+  public Tab getSceneTab(DepanFxSceneService sceneSrvc) {
     Optional<Node> welcomePanel =
         dialogRunner.weaveFxmlView(DepanFxWelcomePanel.class).getView();
     return new Tab(DepanFxWelcomeViewer.WELCOME_TAB, welcomePanel.get());

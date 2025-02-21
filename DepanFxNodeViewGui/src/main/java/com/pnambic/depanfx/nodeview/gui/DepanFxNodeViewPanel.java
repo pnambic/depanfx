@@ -34,8 +34,8 @@ import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
-import com.pnambic.depanfx.scene.DepanFxSceneController;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
+import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
@@ -133,8 +133,6 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private final DepanFxWorkspace workspace;
 
-  private final DepanFxDialogRunner dialogRunner;
-
   private final DepanFxNodeLayoutRegistry layoutRegistry;
 
   private final DepanFxNodeFiltersRegistry filterRegistry;
@@ -175,14 +173,14 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   // Only need to do this once.
   private DepanFxNodeList viewNodesAsNodeList;
 
+  private DepanFxDialogRunner dialogRunner;
+
   public DepanFxNodeViewPanel(
       DepanFxWorkspace workspace,
-      DepanFxDialogRunner dialogRunner,
       DepanFxNodeLayoutRegistry layoutRegistry,
       DepanFxNodeFiltersRegistry filterRegistry,
       DepanFxWorkspaceResource<DepanFxNodeViewData> nodeViewRsrc) {
     this.workspace = workspace;
-    this.dialogRunner = dialogRunner;
     this.layoutRegistry = layoutRegistry;
     this.filterRegistry = filterRegistry;
     this.nodeViewRsrc = nodeViewRsrc;
@@ -201,7 +199,8 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   }
 
   @Override // DepanFxSceneViewer
-  public Tab getSceneTab(DepanFxSceneController scene) {
+  public Tab getSceneTab(DepanFxSceneService sceneSrvc) {
+    dialogRunner = sceneSrvc.getDialogRunner();
     joglPane = createJoglPane();
     populateJoglPane();
 
@@ -422,7 +421,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
             DepanFxNodeListViewBuiltIns.MEMBER_TABLE_VIEW_PATH).get();
 
     Stage nodeSelectDialog = DepanFxNodeViewNodeSelectDialog.runEditDialog(
-        dialogRunner, this, tableViewRsrc);
+        getDialogRunner(), this, tableViewRsrc);
 
     sideViews.add(nodeSelectDialog);
     nodeSelectDialog.setOnCloseRequest(
@@ -458,7 +457,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
         getNodeSelection().getSelection(getNodeSelectionAsNodeList());
 
     Stage filterSelctionDialog = DepanFxNodeViewNodeFiltersDialog.runEditDialog(
-        dialogRunner, tableViewRsrc, filteredNodes,
+        getDialogRunner(), tableViewRsrc, filteredNodes,
         nl -> nodeSelection.doSelectGraphNodesAction(nl.getNodes()));
 
      sideViews.add(filterSelctionDialog);
@@ -502,14 +501,14 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   private void doSelectEdgeDisplayAction() {
     DepanFxLinkDisplayDataChooser
         .runLinkDisplayFinder(
-            workspace, dialogRunner, joglPane.getScene())
+            workspace, getDialogRunner(), joglPane.getScene())
         .ifPresent(this::setLinkDisplayResource);
   }
 
   private void runEditLinkDisplayDialog() {
     Stage edgeDisplayDialog =
         DepanFxNodeViewLinkDisplayDialog.runEditDialog(
-            edgeDisplay, dialogRunner);
+            edgeDisplay, getDialogRunner());
 
     sideViews.add(edgeDisplayDialog);
     edgeDisplayDialog.setOnCloseRequest(
@@ -534,14 +533,14 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   private void doSelectNodeDisplayAction() {
     DepanFxNodeDisplayDataChooser
         .runNodeDisplayFinder(
-            workspace, dialogRunner, joglPane.getScene())
+            workspace, getDialogRunner(), joglPane.getScene())
         .ifPresent(nodeDisplay::setNodeDisplayResource);
   }
 
   private void runEditNodeDisplayDialog() {
     Stage nodeDisplayDialog =
         DepanFxNodeViewNodeDisplayDialog.runEditDialog(
-            nodeDisplay, dialogRunner);
+            nodeDisplay, getDialogRunner());
 
     sideViews.add(nodeDisplayDialog);
     nodeDisplayDialog.setOnCloseRequest(
@@ -698,7 +697,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   private void runEditVisibleEdgesDialog() {
 
     DepanFxNodeViewEdgeVisibilityDialog.runVisibilityDialog(
-        dialogRunner, edgeDisplay)
+        getDialogRunner(), edgeDisplay)
         .getController()
         .getToolResource()
         .ifPresent(edgeDisplay::setVisibiltyResource);
@@ -758,7 +757,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private void runEditVisibleNodesDialog() {
     DepanFxNodeViewNodeVisibilityDialog.runVisibilityDialog(
-        dialogRunner, nodeDisplay)
+        getDialogRunner(), nodeDisplay)
         .getController()
         .getToolResource()
         .ifPresent(nodeDisplay::setVisiblityResource);
@@ -798,7 +797,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   private void doSelectLayoutAction() {
     DepanFxLayoutsChooser
         .runLayoutFinder(
-            workspace, dialogRunner, joglPane.getScene(), layoutRegistry)
+            workspace, getDialogRunner(), joglPane.getScene(), layoutRegistry)
         .ifPresent(this::layoutNodes);
   }
 
@@ -811,8 +810,8 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private void runSaveNodeListDialog() {
     DepanFxSaveNodeListDialog.runSaveNodeList(
-            dialogRunner,
-            workspace.addScratchResource(buildSelectedAsNodeList()))
+        getDialogRunner(),
+        workspace.addScratchResource(buildSelectedAsNodeList()))
         .map(r -> r.getResource().getNodes())
         .ifPresent(nodeSelection::doSelectGraphNodesAction);
   }
@@ -829,7 +828,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
         DepanFxWorkspaceResource.forUpdate(nodeViewRsrc, saveView);
 
     DepanFxResourcePerspectives.runEditDialog(
-        updateRsrc, dialogRunner,
+        updateRsrc, getDialogRunner(),
         DepanFxSaveNodeViewDialog.class, "Save node view")
         .getController()
         .getToolResource()
@@ -891,7 +890,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   private JoglPane createJoglPane() {
     DepanFxNodeViewCameraData cameraInfo =
         viewData.getSceneData().getCameraInfo();
-    JoglPane result = JoglPane.createJoglPane(cameraInfo, dialogRunner);
+    JoglPane result = JoglPane.createJoglPane(cameraInfo, getDialogRunner());
     result.addMouseActionListener(new ViewMouseActionListener());
     return result;
   }

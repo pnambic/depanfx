@@ -38,15 +38,12 @@ public class DepanFxSceneMenuRegistry {
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxSceneMenuRegistry.class);
 
-  private final Collection<DepanFxSceneMenuContribution> contributions;
-
   private final HashMap<String, Collection<DepanFxSceneMenuContribution>>
   menuContribs = new HashMap<>();
 
   @Autowired
   public DepanFxSceneMenuRegistry(
       Collection<DepanFxSceneMenuContribution> contributions) {
-    this.contributions = contributions;
     installContributions(contributions);
   }
 

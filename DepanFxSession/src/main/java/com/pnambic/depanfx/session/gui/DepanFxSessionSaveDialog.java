@@ -139,7 +139,7 @@ public class DepanFxSessionSaveDialog {
   private String buildSessionDetails() {
     StringBuilder result = new StringBuilder();
 
-    int sceneCount = session.getScenes().size();
+    long sceneCount = session.streamScenes().count();
     if (sceneCount == 1) {
       result.append("The active session has 1 scene");
     } else {

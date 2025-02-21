@@ -16,14 +16,13 @@
 package com.pnambic.depanfx.session.core;
 
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
-import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.scene.DepanFxWelcomeViewer;
 import com.pnambic.depanfx.session.plugins.DepanFxSceneViewerRegistry;
 import com.pnambic.depanfx.session.tooldata.DepanFxWelcomeViewerData;
 import com.pnambic.depanfx.session.viewdata.DepanFxBaseViewerData;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -39,13 +38,6 @@ public class DepanFxWelcomeViewerContribution
     DepanFxWelcomeViewerData.class
   };
 
-  private DepanFxDialogRunner dialogRunner;
-
-  @Autowired
-  public DepanFxWelcomeViewerContribution(DepanFxDialogRunner dialogRunner) {
-    this.dialogRunner = dialogRunner;
-  }
-
   @Override
   public boolean accepts(DepanFxBaseViewerData viewerData) {
     return DepanFxWelcomeViewerData.class.isAssignableFrom(
@@ -60,8 +52,8 @@ public class DepanFxWelcomeViewerContribution
 
   @Override
   public Optional<DepanFxSceneViewer> buildViewer(
-      DepanFxBaseViewerData viewData) {
-    return Optional.of(new DepanFxWelcomeViewer(dialogRunner));
+      DepanFxSceneService sceneSrvc, DepanFxBaseViewerData viewData) {
+    return Optional.of(new DepanFxWelcomeViewer(sceneSrvc.getDialogRunner()));
   }
 
   @Override

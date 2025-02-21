@@ -22,43 +22,41 @@ package com.pnambic.depanfx.scene.plugins;
  */
 public class DepanFxSceneMenuItems {
 
-  public static String FILE_OPEN_ITEM = "fileOpenItem";
+  public static final String FILE_OPEN_ITEM = "fileOpenItem";
 
-  public static String FILE_OPEN_PROJECT_ITEM = "fileOpenProjectItem";
+  public static final String FILE_OPEN_PROJECT_ITEM = "fileOpenProjectItem";
 
-  public static String FILE_OPEN_RESOURCE_ITEM = "fileOpenResourceItem";
+  public static final String FILE_SAVE_ITEM = "fileSaveItem";
 
-  public static String FILE_SAVE_ITEM = "fileSaveItem";
+  public static final String FILE_SAVE_AS_ITEM = "fileSaveAsItem";
 
-  public static String FILE_SAVE_AS_ITEM = "fileSaveAsItem";
+  public static final String FILE_SAVE_ALL_ITEM = "fileSaveAllItem";
 
-  public static String FILE_SAVE_ALL_ITEM = "fileSaveAllItem";
+  public static final String FILE_IMPORT_ITEM = "fileImportItem";
 
-  public static String FILE_IMPORT_ITEM = "fileImportItem";
+  public static final String FILE_EXPORT_ITEM = "fileExportItem";
 
-  public static String FILE_EXPORT_ITEM = "fileExportItem";
+  public static final String FILE_PRINT_ITEM = "filePrintItem";
 
-  public static String FILE_PRINT_ITEM = "filePrintItem";
+  public static final String EDIT_UNDO_ITEM = "editUndoItem";
 
-  public static String EDIT_UNDO_ITEM = "editUndoItem";
+  public static final String EDIT_REDO_ITEM = "editRedoItem";
 
-  public static String EDIT_REDO_ITEM = "editRedoItem";
+  public static final String EDIT_CUT_ITEM = "editCutItem";
 
-  public static String EDIT_CUT_ITEM = "editCutItem";
+  public static final String EDIT_COPY_ITEM = "editCopyItem";
 
-  public static String EDIT_COPY_ITEM = "editCopyItem";
+  public static final String EDIT_PASTE_ITEM = "editPasteItem";
 
-  public static String EDIT_PASTE_ITEM = "editPasteItem";
+  public static final String SELECTION_ALL_ITEM = "SelectionAllItem";
 
-  public static String SELECTION_ALL_ITEM = "SelectionAllItem";
+  public static final String SELECTION_NONE_ITEM = "SelectionNoneItem";
 
-  public static String SELECTION_NONE_ITEM = "SelectionNoneItem";
+  public static final String SELECTION_INVERT_ITEM = "SelectionInvertItem";
 
-  public static String SELECTION_INVERT_ITEM = "SelectionInvertItem";
+  public static final String VIEW_PANELS = "ViewPanelsItem";
 
-  public static String VIEW_PANELS = "ViewPanelsItem";
+  public static final String HELP_WELCOME_TIME = "HelpWelcomeItem";
 
-  public static String HELP_WELCOME_TIME = "HelpWelcomeItem";
-
-  public static String HELP_ABOUT_ITEM = "HelpAboutItem";
+  public static final String HELP_ABOUT_ITEM = "HelpAboutItem";
 }

@@ -15,7 +15,7 @@
  */
 package com.pnambic.depanfx.scene;
 
-import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterContribution;
+import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterRegistry;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneViewPanelRegistry;
 
 import org.springframework.context.annotation.Bean;
@@ -29,25 +29,19 @@ import org.springframework.context.annotation.Configuration;
 public class DepanFxWelcomePanelConfiguration {
 
   @Bean
-  public DepanFxSceneStarterContribution welcomeSceneStarterContribution(
-      DepanFxDialogRunner dialogRunner) {
-    return new WelcomeSceneStarterContribution(dialogRunner);
+  public DepanFxSceneStarterRegistry.Contribution
+  welcomeSceneStarterContribution() {
+    return new WelcomeSceneStarterContribution();
   }
 
   @Bean
   public DepanFxSceneViewPanelRegistry.Contribution
-  welcomeViewPanelsContribution(DepanFxDialogRunner dialogRunner) {
-    return new WelcomeViewPanelsContribution(dialogRunner);
+  welcomeViewPanelsContribution() {
+    return new WelcomeViewPanelsContribution();
   }
 
   private class WelcomeSceneStarterContribution
-      implements DepanFxSceneStarterContribution {
-
-    private final DepanFxDialogRunner dialogRunner;
-
-    public WelcomeSceneStarterContribution(DepanFxDialogRunner dialogRunner) {
-      this.dialogRunner = dialogRunner;
-    }
+      implements DepanFxSceneStarterRegistry.Contribution {
 
     @Override
     public String getLabel() {
@@ -55,33 +49,27 @@ public class DepanFxWelcomePanelConfiguration {
     }
 
     @Override
-    public DepanFxSceneViewer getSceneViewer() {
-      return new DepanFxWelcomeViewer(dialogRunner);
+    public DepanFxSceneViewer getSceneViewer(DepanFxSceneService sceneSrvc) {
+      return new DepanFxWelcomeViewer(sceneSrvc.getDialogRunner());
     }
   }
 
   private class WelcomeViewPanelsContribution
       implements DepanFxSceneViewPanelRegistry.Contribution {
 
-    private final DepanFxDialogRunner dialogRunner;
-
-    public WelcomeViewPanelsContribution(DepanFxDialogRunner dialogRunner) {
-      this.dialogRunner = dialogRunner;
-    }
-
     @Override
     public String getLabel() {
       return DepanFxWelcomeViewer.WELCOME_TAB;
     }
 
     @Override
-    public String getOrder() {
+    public String getOrderKey() {
       return DepanFxWelcomeViewer.WELCOME_TAB;
     }
 
     @Override
-    public DepanFxSceneViewer getSceneViewer() {
-      return new DepanFxWelcomeViewer(dialogRunner);
+    public DepanFxSceneViewer getSceneViewer(DepanFxSceneService sceneSrvc) {
+      return new DepanFxWelcomeViewer(sceneSrvc.getDialogRunner());
     }
   }
 }

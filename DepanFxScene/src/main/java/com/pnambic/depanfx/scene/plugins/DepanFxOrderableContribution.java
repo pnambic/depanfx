@@ -1,4 +1,4 @@
-package com.pnambic.depanfx.perspective.plugins;
+package com.pnambic.depanfx.scene.plugins;
 
 import java.util.Comparator;
 

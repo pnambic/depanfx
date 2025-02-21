@@ -17,6 +17,7 @@ package com.pnambic.depanfx.perspective.plugins;
 
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
+import com.pnambic.depanfx.scene.plugins.DepanFxOrderableContribution;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
@@ -32,12 +33,22 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+/**
+ * A registry of resources.
+ */
 @Component
 public class DepanFxResourceRegistry {
 
   private static Logger LOG =
       LoggerFactory.getLogger(DepanFxResourceRegistry.class);
 
+  /**
+   * Provides standard mechanisms for opening a UX on all documents.
+   *
+   * Through various options and related interfaces ({@link Panel}),
+   * a contribution may arrange for documents or resources to open
+   * into dialog windows or screen panels.
+   */
   public interface Contribution extends DepanFxOrderableContribution {
 
     String getResourceLabel();
@@ -53,22 +64,35 @@ public class DepanFxResourceRegistry {
     boolean acceptsResource(DepanFxWorkspaceResource<?> resource);
 
     /**
-     * Needed to keep from exposing the unknown type (E.G. @{code <?>}).
+     * Open the supplied document in a dialog window.
+     *
+     * Needed to keep from exposing the unknown type (e.g. @{code <?>}).
+     * Type erasure loses track if an unbound result from {@code loadResource()}
+     * is passed to this method.
      */
     void openDocument(
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
         DepanFxProjectDocument document);
 
+
+    /**
+     * Open the supplied resource in a dialog window.
+     */
     void openResource(
         DepanFxDialogRunner dialogRunner,
         DepanFxWorkspaceResource<?> resource);
   }
 
+  /**
+   * Indicates that the document should be opened as a panel for the
+   * supplied scene.
+   */
   public interface Panel {
+
     void openPanel(
-        DepanFxSceneService sceneSrcv,
         DepanFxWorkspace workspace,
+        DepanFxSceneService sceneSrcv,
         DepanFxProjectDocument document);
   }
 
@@ -82,6 +106,10 @@ public class DepanFxResourceRegistry {
 
     private final String orderKey;
 
+    /**
+     * Use one of the public types,
+     * such as {@link Principal} or {@link Additional}.
+     */
     protected Basic(
         String resourceLabel,
         Class<T> dataType,
@@ -179,9 +207,40 @@ public class DepanFxResourceRegistry {
     }
   }
 
+  /**
+   * Resources that open to a panel may not open to a separate dialog window.
+   */
+  @SuppressWarnings("serial")
+  public static class UseOpenPanelException
+      extends UnsupportedOperationException {
+
+    public UseOpenPanelException(Contribution contrib) {
+      super("Use openPanel() for this contribution "
+            + contrib.getClass().getName());
+    }
+  }
+
   public static void dispatchContribution(
       Contribution contrib,
+      DepanFxWorkspace workspace,
       DepanFxSceneService sceneSrvc,
+      DepanFxProjectDocument document) {
+
+    if (contrib instanceof Panel panel) {
+      panel.openPanel(workspace, sceneSrvc, document);
+      return;
+    }
+
+    Optional<DepanFxWorkspaceResource<?>> optRsrc =
+        getBuiltInResource(workspace, document);
+    DepanFxDialogRunner dialogRunner = sceneSrvc.getDialogRunner();
+    optRsrc.ifPresentOrElse(
+        r -> contrib.openResource(dialogRunner , r),
+        () -> contrib.openDocument(workspace, dialogRunner, document));
+  }
+
+  public static void dispatchContribution(
+      Contribution contrib,
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxProjectDocument document) {
@@ -189,10 +248,6 @@ public class DepanFxResourceRegistry {
     Optional<DepanFxWorkspaceResource<?>> optRsrc =
         getBuiltInResource(workspace, document);
 
-    if (contrib instanceof Panel panel) {
-      panel.openPanel(sceneSrvc, workspace, document);
-      return;
-    }
     optRsrc.ifPresentOrElse(
         r -> contrib.openResource(dialogRunner, r),
         () -> contrib.openDocument(workspace, dialogRunner, document));
@@ -207,9 +262,23 @@ public class DepanFxResourceRegistry {
 
   /**
    * Indicates if there a principal contribution for the the supplied document
-   * which will be used for open operations.
+   * which will be used for open document operations.
    */
   public boolean opensDocument(
+      DepanFxWorkspace workspace,
+      DepanFxProjectDocument document) {
+
+    return selectContributions(
+        streamPrincipalContributions(), workspace, document)
+        .findAny()
+        .isPresent();
+  }
+
+  /**
+   * Indicates if there a principal contribution for the the supplied document
+   * which will be used for open dialog operations.
+   */
+  public boolean opensDialog(
       DepanFxWorkspace workspace,
       DepanFxProjectDocument document) {
 
@@ -249,21 +318,30 @@ public class DepanFxResourceRegistry {
    * Use the principal contribution to open the supplied document.
    */
   public void openDocument(
+      DepanFxWorkspace workspace,
       DepanFxSceneService sceneSrvc,
+      DepanFxProjectDocument document) {
+
+    selectContributions(
+        streamPrincipalContributions(), workspace, document)
+        .findFirst()
+        .ifPresent(c ->
+            dispatchContribution(c, workspace, sceneSrvc, document));
+  }
+
+  /**
+   * Use the principal contribution to open the supplied document.
+   */
+  public void openDialog(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxProjectDocument document) {
 
-    Optional<Contribution> optContrib =
-        selectContributions(
-            streamPrincipalContributions(), workspace, document)
-            .findFirst();
-    if (optContrib.isEmpty()) {
-      return;
-    }
-
-    optContrib.ifPresent(c ->
-        dispatchContribution(c, sceneSrvc, workspace, dialogRunner, document));
+    selectContributions(streamPrincipalContributions(), workspace, document)
+        .filter(c -> !(c instanceof Panel))
+        .findFirst()
+        .ifPresent(c ->
+            dispatchContribution(c, workspace, dialogRunner, document));
   }
 
   private Stream<Contribution> streamPrincipalContributions() {

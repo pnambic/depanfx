@@ -9,7 +9,7 @@ import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
-import com.pnambic.depanfx.scene.DepanFxSceneController;
+import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -61,7 +61,7 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
   }
 
   @Override
-  public Tab getSceneTab(DepanFxSceneController scene) {
+  public Tab getSceneTab(DepanFxSceneService sceneSrvc) {
     Tab result = new Tab(viewerTitle, tableControl.getNodeListTable());
     result.setContextMenu(buildContextMenu());
     return result;

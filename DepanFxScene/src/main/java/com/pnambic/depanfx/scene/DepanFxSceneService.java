@@ -16,8 +16,41 @@
 package com.pnambic.depanfx.scene;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
+import javafx.geometry.Rectangle2D;
+
+/**
+ * Encapsulate access to the containing scene
+ * and allow access to a limited set of scene capabilities.
+ */
 public interface DepanFxSceneService {
 
+  String getLabel();
+
+  String getDescription();
+
+  Rectangle2D getDisplayRectangle();
+
+  DepanFxDialogRunner getDialogRunner();
+
+  /**
+   * Provide the current viewer in the scene.
+   *
+   * Only a viewer of the requested type will be returned.
+   * A different requested type may return with a non-empty {@link Optional}.
+   */
   <T extends DepanFxSceneViewer> Optional<T> getViewer(Class<T> viewerClass);
+
+  Stream<DepanFxSceneViewer> streamViewers();
+
+  /**
+   * Add a viewer (a.k.a. panel) to the screen.
+   */
+  void addViewer(DepanFxSceneViewer viewer);
+
+  /**
+   * Close the screen and all panels.
+   */
+  void closeScene();
 }

@@ -18,9 +18,9 @@ package com.pnambic.depanfx.workspace.gui;
 
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceMenuRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
-import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
-import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterContribution;
+import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterRegistry;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneViewPanelRegistry;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
@@ -36,29 +36,25 @@ public class DepanFxWorkspacePanelConfiguration {
   @Bean
   DepanFxWorkspaceSceneStarterContribution workspaceSceneStarterContribution(
       DepanFxWorkspace workspace,
-      DepanFxDialogRunner dialogRunner,
       DepanFxResourceRegistry rsrcRegistry,
       DepanFxResourceMenuRegistry rsrcMenuRegistry) {
     return new DepanFxWorkspaceSceneStarterContribution(
-        workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry);
+        workspace, rsrcRegistry, rsrcMenuRegistry);
   }
 
   @Bean
   DepanFxSceneViewPanelRegistry.Contribution workspaceViewPanelsContribution(
       DepanFxWorkspace workspace,
-      DepanFxDialogRunner dialogRunner,
       DepanFxResourceRegistry rsrcRegistry,
       DepanFxResourceMenuRegistry rsrcMenuRegistry) {
     return new WorkspaceViewPanelsContribution(
-        workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry);
+        workspace, rsrcRegistry, rsrcMenuRegistry);
   }
 
   private class DepanFxWorkspaceSceneStarterContribution
-      implements DepanFxSceneStarterContribution {
+      implements DepanFxSceneStarterRegistry.Contribution {
 
     private final DepanFxWorkspace workspace;
-
-    private final DepanFxDialogRunner dialogRunner;
 
     private final DepanFxResourceRegistry rsrcRegistry;
 
@@ -66,11 +62,9 @@ public class DepanFxWorkspacePanelConfiguration {
 
     public DepanFxWorkspaceSceneStarterContribution(
         DepanFxWorkspace workspace,
-        DepanFxDialogRunner dialogRunner,
         DepanFxResourceRegistry rsrcRegistry,
         DepanFxResourceMenuRegistry rsrcMenuRegistry) {
       this.workspace = workspace;
-      this.dialogRunner = dialogRunner;
       this.rsrcRegistry = rsrcRegistry;
       this.rsrcMenuRegistry = rsrcMenuRegistry;
     }
@@ -81,10 +75,10 @@ public class DepanFxWorkspacePanelConfiguration {
     }
 
     @Override
-    public DepanFxSceneViewer getSceneViewer() {
+    public DepanFxSceneViewer getSceneViewer(DepanFxSceneService sceneSrvc) {
 
       return new DepanFxWorkspaceViewer(
-          workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry, getLabel());
+          workspace, rsrcRegistry, rsrcMenuRegistry, getLabel());
     }
   }
 
@@ -93,19 +87,15 @@ public class DepanFxWorkspacePanelConfiguration {
 
     private final DepanFxWorkspace workspace;
 
-    private final DepanFxDialogRunner dialogRunner;
-
     private final DepanFxResourceRegistry rsrcRegistry;
 
     private final DepanFxResourceMenuRegistry rsrcMenuRegistry;
 
     public WorkspaceViewPanelsContribution(
         DepanFxWorkspace workspace,
-        DepanFxDialogRunner dialogRunner,
         DepanFxResourceRegistry rsrcRegistry,
         DepanFxResourceMenuRegistry rsrcMenuRegistry) {
       this.workspace = workspace;
-      this.dialogRunner = dialogRunner;
       this.rsrcMenuRegistry = rsrcMenuRegistry;
       this.rsrcRegistry = rsrcRegistry;
     }
@@ -116,15 +106,15 @@ public class DepanFxWorkspacePanelConfiguration {
     }
 
     @Override
-    public String getOrder() {
+    public String getOrderKey() {
       return DepanFxWorkspaceViewer.WORKSPACE_TAB;
     }
 
     @Override
-    public DepanFxSceneViewer getSceneViewer() {
+    public DepanFxSceneViewer getSceneViewer(DepanFxSceneService screenSrvc) {
 
       return new DepanFxWorkspaceViewer(
-          workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry, getLabel());
+          workspace, rsrcRegistry, rsrcMenuRegistry, getLabel());
     }
   }
 }

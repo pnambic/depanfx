@@ -16,7 +16,6 @@
 package com.pnambic.depanfx.workspace.gui;
 
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
-import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuContribution;
@@ -38,18 +37,14 @@ public class DepanFxFileOpenMenuContribution
 
   private final DepanFxWorkspace workspace;
 
-  private final DepanFxDialogRunner dialogRunner;
-
   private final DepanFxResourceRegistry openRegistry;
 
   @Autowired
   public DepanFxFileOpenMenuContribution(
       DepanFxWorkspace workspace,
-      DepanFxDialogRunner dialogRunner,
       DepanFxResourceRegistry openRegistry) {
     super(DepanFxSceneMenuItems.FILE_OPEN_ITEM, DepanFxWorkspaceViewer.class);
     this.workspace = workspace;
-    this.dialogRunner = dialogRunner;
     this.openRegistry = openRegistry;
   }
 
@@ -79,7 +74,7 @@ public class DepanFxFileOpenMenuContribution
       DepanFxSceneService sceneSrvc, ActionEvent event) {
     getDocument(sceneSrvc)
         .ifPresent(d ->
-            openRegistry.openDocument(sceneSrvc, workspace, dialogRunner, d));
+            openRegistry.openDocument(workspace, sceneSrvc, d));
   }
 
   private Optional<DepanFxProjectDocument> getDocument(

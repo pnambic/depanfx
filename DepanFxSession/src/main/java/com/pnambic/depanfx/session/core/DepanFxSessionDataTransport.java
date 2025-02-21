@@ -17,10 +17,8 @@ package com.pnambic.depanfx.session.core;
 
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.persistence.plugins.GraphNodePersistencePluginRegistry;
-import com.pnambic.depanfx.scene.DepanFxSceneController;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
-import com.pnambic.depanfx.scene.DepanFxSceneViewer;
-import com.pnambic.depanfx.scene.plugins.DepanFxSceneStarterRegistry;
+import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.session.plugins.DepanFxSceneViewerRegistry;
 import com.pnambic.depanfx.session.tooldata.DepanFxProjectData;
 import com.pnambic.depanfx.session.tooldata.DepanFxSceneData;
@@ -49,11 +47,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.geometry.Rectangle2D;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Window;
 
 /**
  * Encapsulate knowledge about Session serialization and the structure
@@ -85,31 +82,24 @@ public class DepanFxSessionDataTransport {
 
   private final DepanFxSceneViewerRegistry viewerRegistry;
 
-  private final DepanFxSceneStarterRegistry starterRegistry;
-
   @Autowired
   public DepanFxSessionDataTransport(
       DepanFxWorkspace workspace,
       GraphNodePersistencePluginRegistry graphNodeRegistry,
-      DepanFxSceneStarterRegistry starterRegistry,
       DepanFxSceneViewerRegistry viewerRegistry) {
     this.workspace = workspace;
     this.graphNodeRegistry = graphNodeRegistry;
-    this.starterRegistry = starterRegistry;
     this.viewerRegistry = viewerRegistry;
   }
 
   public DepanFxSessionConfig defaultSessionConfig() {;
-    List<DepanFxSceneViewer> defaultViewers =
-        starterRegistry.getStarterViews();
 
-    DepanFxSceneConfig sceneInfo = new DepanFxSceneConfig(
+  DepanFxSceneData sceneInfo = new DepanFxSceneData(
         "Initial Startup Scene",
         "Initial scene created at DepanFX startup.",
-        -1.0d, -1.0d, -1.0d, -1.0d,
-        defaultViewers);
+        -1, -1, -1, -1, null);
 
-    List<DepanFxSceneConfig> scenes = new ArrayList<>(1);
+    List<DepanFxSceneData> scenes = new ArrayList<>(1);
     scenes.add(sceneInfo);
 
     DepanFxSessionConfig result = new DepanFxSessionConfig(
@@ -126,13 +116,8 @@ public class DepanFxSessionDataTransport {
             .map(this::toProjectTree)
             .collect(Collectors.toList());
 
-    Collection<DepanFxSceneConfig> sessionConfigs =
-        sessionData.getScenes().stream()
-            .map(this::toSceneConfig)
-            .collect(Collectors.toList());
-
     return new DepanFxSessionConfig(
-        sessionData.getCurrentProject(), projectTrees, sessionConfigs);
+        sessionData.getCurrentProject(), projectTrees, sessionData.getScenes());
   }
 
   public void saveSession(Path sessionPath, DepanFxSession section) {
@@ -201,20 +186,22 @@ public class DepanFxSessionDataTransport {
 
   private Collection<DepanFxSceneData> buildSessionScenes(
       DepanFxSession session) {
-    return session.getScenes().stream()
+    return session.streamScenes()
         .map(c -> buildSceneData(c))
         .collect(Collectors.toList());
   }
 
-  private DepanFxSceneData buildSceneData(DepanFxSceneController scene) {
-    List<DepanFxBaseViewerData> viewersInfo = scene.streamViewers()
+  private DepanFxSceneData buildSceneData(DepanFxSceneService sceneSrvc) {
+    List<DepanFxBaseViewerData> viewersInfo = sceneSrvc.streamViewers()
         .flatMap(v -> viewerRegistry.getViewerData(v).stream())
         .collect(Collectors.toList());
-    Window window = scene.getScene().getWindow();
+    Rectangle2D displayRect = sceneSrvc.getDisplayRectangle();
 
-    return new DepanFxSceneData("DepanFX", "DepanFX scene.",
-        (int) window.getX(), (int) window.getY(),
-        (int) window.getWidth(), (int) window.getHeight(),
+    return new DepanFxSceneData(
+        sceneSrvc.getLabel(),
+        sceneSrvc.getDescription(),
+        (int) displayRect.getMinX(), (int) displayRect.getMinY(),
+        (int) displayRect.getWidth(), (int) displayRect.getHeight(),
         viewersInfo);
   }
 
@@ -250,37 +237,5 @@ public class DepanFxSessionDataTransport {
     DepanFxFileSystemProject projectSpi = new DepanFxFileSystemProject(
         projectInfo.getToolName(), projectInfo.getProjectPath());
     return DepanFxWorkspaceFactory.createDepanFxProjectTree(projectSpi);
-  }
-
-  private DepanFxSceneConfig toSceneConfig(DepanFxSceneData sceneInfo) {
-    sceneInfo.getViewers();
-    List<DepanFxSceneViewer> viewers = sceneInfo.getViewers().stream()
-        .flatMap(d -> toSceneViewer(d).stream())
-        .collect(Collectors.toList());
-
-    DepanFxSceneConfig result = new DepanFxSceneConfig(
-        sceneInfo.getToolName(), sceneInfo.getToolDescription(),
-        (double) sceneInfo.getTop(), (double) sceneInfo.getLeft(),
-        (double) sceneInfo.getWidth(), (double) sceneInfo.getHeight(),
-        viewers);
-    return result;
-  }
-
-  /**
-   * Handle any number of failures restoring the viewer.
-   *
-   * Manytimes, it's a missing value due to a save Scratch document.
-   */
-  private Optional<DepanFxSceneViewer> toSceneViewer(
-      DepanFxBaseViewerData viewerInfo) {
-    viewerInfo.getClass().getName();
-    try {
-      return viewerRegistry.buildViewer(viewerInfo);
-    } catch (Exception errAny) {
-      LOG.warn("Unable to build viewer {}", viewerInfo.getClass().getName());
-      LOG.debug("Unable to build viewer {}",
-          viewerInfo.getClass().getName(), errAny);
-    }
-    return Optional.empty();
   }
 }

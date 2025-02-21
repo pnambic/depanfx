@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.session.plugins;
 
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
+import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.session.viewdata.DepanFxBaseViewerData;
 
@@ -39,7 +40,8 @@ public class DepanFxSceneViewerRegistry {
 
     boolean accepts(DepanFxSceneViewer viewer);
 
-    Optional<DepanFxSceneViewer> buildViewer(DepanFxBaseViewerData viewData);
+    Optional<DepanFxSceneViewer> buildViewer(
+        DepanFxSceneService sceneSrvc, DepanFxBaseViewerData viewData);
 
     Optional<DepanFxBaseViewerData> getViewerData(DepanFxSceneViewer viewer);
 
@@ -57,9 +59,9 @@ public class DepanFxSceneViewerRegistry {
   }
 
   public Optional<DepanFxSceneViewer> buildViewer(
-      DepanFxBaseViewerData viewerData) {
+      DepanFxSceneService sceneSrvc, DepanFxBaseViewerData viewerData) {
     return lookupContrib(viewerData, "buildViewer")
-        .flatMap(c -> c.buildViewer(viewerData));
+        .flatMap(c -> c.buildViewer(sceneSrvc, viewerData));
   }
 
   public Optional<DepanFxBaseViewerData> getViewerData(

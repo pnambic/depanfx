@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -21,6 +20,7 @@ import java.util.stream.Stream;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -28,6 +28,8 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 @DepanFxFxmlDialog
 @FxmlView("scene.fxml")
@@ -36,7 +38,7 @@ public class DepanFxSceneController {
   public static interface SceneOwner { // extends Closeable {
     void saveSession() throws IOException;
 
-    void closeScene(DepanFxSceneController depanFxSceneController)
+    void closeScene(DepanFxSceneService sceneSrvc)
         throws IOException;
   }
 
@@ -49,7 +51,7 @@ public class DepanFxSceneController {
 
   private final DepanFxSceneViewPanelRegistry viewPanelRegistry;
 
-  private final DepanFxDialogRunner dialogRunner;
+  private final DepanFxSceneService sceneSrvc;
 
   // Preserves order of tabs for serialization
   private final Map<Tab, DepanFxSceneViewer> sceneTabs=
@@ -67,11 +69,8 @@ public class DepanFxSceneController {
   @FXML
   private Menu viewPanelsItem;
 
-  private DepanFxSceneService sceneSrvc;
-
   public static DepanFxSceneController createDepanScene(
       DepanFxDialogRunner dialogRunner,
-      List<DepanFxSceneViewer> initViewers,
       SceneOwner owner)
       throws IOException {
 
@@ -79,7 +78,6 @@ public class DepanFxSceneController {
         dialogRunner.weaveFxmlView(DepanFxSceneController.class);
     DepanFxSceneController controller = root.getController();
     controller.owner = owner;
-    initViewers.forEach(controller::addViewer);
 
     Scene scene = new Scene((Parent) root.getView().get());
     scene.getStylesheets().add(
@@ -89,27 +87,22 @@ public class DepanFxSceneController {
 
   @Autowired
   public DepanFxSceneController(
+      DepanFxDialogRunner dialogRunner,
       DepanFxSceneMenuRegistry menuRegistry,
       DepanFxNewResourceRegistry newResourceRegistry,
-      DepanFxSceneViewPanelRegistry viewPanelRegistry,
-      DepanFxDialogRunner dialogRunner) {
+      DepanFxSceneViewPanelRegistry viewPanelRegistry) {
     this.menuRegistry = menuRegistry;
     this.newResourceRegistry = newResourceRegistry;
     this.viewPanelRegistry = viewPanelRegistry;
-    this.dialogRunner = dialogRunner;
 
-    this.sceneSrvc = new SceneService();
-  }
-
-  public Stream<DepanFxSceneViewer> streamViewers() {
-    return sceneTabs.values().stream();
+    this.sceneSrvc = new SceneService(dialogRunner);
   }
 
   @FXML
   public void initialize() {
     fileNewItem.getItems().addAll(newResourceRegistry.buildNewResourceItems());
     viewPanelsItem.getItems().addAll(
-        viewPanelRegistry.buildViewPanelItems(this));
+        viewPanelRegistry.buildViewPanelItems(sceneSrvc));
   }
 
   public void closeScene() {
@@ -129,7 +122,7 @@ public class DepanFxSceneController {
   @FXML
   public void handleClose() {
     try {
-      owner.closeScene(this);
+      owner.closeScene(sceneSrvc);
     } catch (IOException errIo) {
       throw new RuntimeException("Unable to shutdown", errIo);
     }
@@ -151,12 +144,14 @@ public class DepanFxSceneController {
 
   @FXML
   public void handleWelcome() {
-    dialogRunner.runDialog(DepanFxWelcomeDialog.class, "Welcome To DepanFX");
+    sceneSrvc.getDialogRunner().runDialog(
+        DepanFxWelcomeDialog.class, "Welcome To DepanFX");
   }
 
   @FXML
   public void handleAbout() {
-    dialogRunner.runDialog(DepanFxAboutDialog.class, "About DepanFX");
+    sceneSrvc.getDialogRunner().runDialog(
+        DepanFxAboutDialog.class, "About DepanFX");
   }
 
   public Scene getScene() {
@@ -171,6 +166,10 @@ public class DepanFxSceneController {
     DepanFxSceneViewer viewer = sceneTabs.get(tab);
     viewer.closeTab();
     sceneTabs.remove(tab);
+  }
+
+  public DepanFxSceneService getSceneService() {
+    return sceneSrvc;
   }
 
   private void prepareItem(MenuItem item) {
@@ -200,7 +199,7 @@ public class DepanFxSceneController {
 
   private Optional<Tab> getSceneTab(DepanFxSceneViewer viewer) {
     try {
-      return Optional.of(viewer.getSceneTab(this));
+      return Optional.of(viewer.getSceneTab(sceneSrvc));
     } catch (Exception errAny) {
       LOG.warn("Unable to build viewer {} due to {}",
           viewer.getClass().getName(), errAny.getMessage());
@@ -210,7 +209,17 @@ public class DepanFxSceneController {
     return Optional.empty();
   }
 
+  /**
+   * Encapsulate access to the containing scene
+   * and allow access to a limited set of scene capabilities.
+   */
   private class SceneService implements DepanFxSceneService {
+
+    private final DepanFxDialogRunner dialogRunner;
+
+    private SceneService(DepanFxDialogRunner dialogRunner) {
+      this.dialogRunner = dialogRunner;
+    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -222,6 +231,47 @@ public class DepanFxSceneController {
         return Optional.of((T) result);
       }
       return Optional.empty();
+    }
+
+    @Override
+    public DepanFxDialogRunner getDialogRunner() {
+      return dialogRunner;
+    }
+
+    @Override
+    public void addViewer(DepanFxSceneViewer viewer) {
+      DepanFxSceneController.this.addViewer(viewer);
+    }
+
+    @Override
+    public void closeScene() {
+      DepanFxSceneController.this.closeScene();
+    }
+
+    @Override
+    public String getLabel() {
+      if (getScene().getWindow() instanceof Stage stage) {
+        return stage.getTitle();
+      }
+      return "DepanFX";
+    }
+
+    @Override
+    public String getDescription() {
+      return "DepanFX scene.";
+    }
+
+    @Override
+    public Rectangle2D getDisplayRectangle() {
+      Window window = getScene().getWindow();
+      return new Rectangle2D(
+          window.getX(), window.getY(),
+          window.getWidth(), window.getHeight());
+    }
+
+    @Override
+    public Stream<DepanFxSceneViewer> streamViewers() {
+      return sceneTabs.values().stream();
     }
   }
 }

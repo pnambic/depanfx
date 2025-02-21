@@ -1,7 +1,7 @@
 package com.pnambic.depanfx.scene.plugins;
 
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
-import com.pnambic.depanfx.scene.DepanFxSceneController;
+import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.List;
 
 import javafx.scene.control.MenuItem;
-
 /**
  * Provide a registry of scene panel components that may be created
  * within the scene.
@@ -22,7 +21,7 @@ import javafx.scene.control.MenuItem;
 @Component
 public class DepanFxSceneViewPanelRegistry {
 
-  public interface Contribution {
+  public interface Contribution extends DepanFxOrderableContribution {
 
     @SuppressWarnings("serial")
     public class LoadPanelException extends RuntimeException {
@@ -34,9 +33,7 @@ public class DepanFxSceneViewPanelRegistry {
 
     String getLabel();
 
-    String getOrder();
-
-    DepanFxSceneViewer getSceneViewer();
+    DepanFxSceneViewer getSceneViewer(DepanFxSceneService sceneSrvc);
   }
 
   private final Collection<Contribution> viewPanelContribs;
@@ -46,14 +43,14 @@ public class DepanFxSceneViewPanelRegistry {
     this.viewPanelContribs = viewPanelContribs;
   }
 
-  public List<MenuItem> buildViewPanelItems(DepanFxSceneController scene) {
+  public List<MenuItem> buildViewPanelItems(DepanFxSceneService sceneSrvc) {
 
     int contribCnt = viewPanelContribs.size();
     if (contribCnt > 0) {
       List<MenuItem> result = new ArrayList<>(contribCnt);
       viewPanelContribs.stream()
-          .sorted((a,b) -> a.getOrder().compareTo(b.getOrder()))
-          .map(c -> buildContribMenuItem(scene, c))
+          .sorted(DepanFxOrderableContribution.CONTRIB_COMPARE)
+          .map(c -> buildContribMenuItem(sceneSrvc, c))
           .forEach(result::add);
       return result;
     }
@@ -61,9 +58,9 @@ public class DepanFxSceneViewPanelRegistry {
   }
 
   private MenuItem buildContribMenuItem(
-      DepanFxSceneController scene, Contribution contrib) {
+      DepanFxSceneService sceneSrvc, Contribution contrib) {
     return DepanFxContextMenuBuilder.createActionItem(
         contrib.getLabel(),
-        e -> scene.addViewer(contrib.getSceneViewer()));
+        e -> sceneSrvc.addViewer(contrib.getSceneViewer(sceneSrvc)));
   }
 }

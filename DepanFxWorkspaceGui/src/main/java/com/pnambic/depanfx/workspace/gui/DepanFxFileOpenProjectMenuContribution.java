@@ -1,6 +1,5 @@
 package com.pnambic.depanfx.workspace.gui;
 
-import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuContribution;
@@ -18,14 +17,10 @@ public class DepanFxFileOpenProjectMenuContribution
 
   private final DepanFxWorkspace workspace;
 
-  private final DepanFxDialogRunner dialogRunner;
-
   @Autowired
-  public DepanFxFileOpenProjectMenuContribution(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+  public DepanFxFileOpenProjectMenuContribution(DepanFxWorkspace workspace) {
     super(DepanFxSceneMenuItems.FILE_OPEN_PROJECT_ITEM);
     this.workspace = workspace;
-    this.dialogRunner = dialogRunner;
   }
 
   @Override

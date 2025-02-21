@@ -19,7 +19,7 @@ import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
 import com.pnambic.depanfx.nodeview.viewdata.DepanFxNodeViewPanelData;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
-import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.session.plugins.DepanFxSceneViewerRegistry;
 import com.pnambic.depanfx.session.viewdata.DepanFxBaseViewerData;
@@ -43,8 +43,6 @@ public class DepanFxNodeViewPanelContribution
 
   private final DepanFxWorkspace workspace;
 
-  private final DepanFxDialogRunner dialogRunner;
-
   private final DepanFxNodeLayoutRegistry layoutRegistry;
 
   private final DepanFxNodeFiltersRegistry filterRegistry;
@@ -52,11 +50,9 @@ public class DepanFxNodeViewPanelContribution
   @Autowired
   private DepanFxNodeViewPanelContribution(
       DepanFxWorkspace workspace,
-      DepanFxDialogRunner dialogRunner,
     DepanFxNodeLayoutRegistry layoutRegistry,
     DepanFxNodeFiltersRegistry filterRegistry) {
     this.workspace = workspace;
-    this.dialogRunner = dialogRunner;
     this.layoutRegistry = layoutRegistry;
     this.filterRegistry = filterRegistry;
   }
@@ -75,11 +71,11 @@ public class DepanFxNodeViewPanelContribution
 
   @Override
   public Optional<DepanFxSceneViewer> buildViewer(
-      DepanFxBaseViewerData baseData) {
+      DepanFxSceneService sceneSrvc, DepanFxBaseViewerData baseData) {
 
     DepanFxNodeViewPanelData viewerData = (DepanFxNodeViewPanelData) baseData;
     return Optional.of(new DepanFxNodeViewPanel(
-        workspace, dialogRunner, layoutRegistry, filterRegistry,
+        workspace, layoutRegistry, filterRegistry,
         viewerData.getNodeViewRsrc()));
   }
 

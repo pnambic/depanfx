@@ -5,6 +5,7 @@ import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.workspace.controls.DepanFxProjectListCell;
 import com.pnambic.depanfx.perspective.workspace.controls.DepanFxProjectTreeCell;
 import com.pnambic.depanfx.perspective.workspace.controls.DepanFxWorkspaceItem;
+import com.pnambic.depanfx.perspective.workspace.controls.DepanFxWorkspaceMemberCells;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxFxmlDialog;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
@@ -80,8 +81,11 @@ public class DepanFxResourceChooserDialog {
 
   @FXML
   public void initialize() {
-    initTreeView();
-    initListView();
+    DepanFxWorkspaceMemberCells.DocumentDispatch dispatch =
+        new DepanFxWorkspaceMemberCells.DialogDispatch(dialogRunner);
+
+    initTreeView(dispatch);
+    initListView(dispatch);
     initComboBox();
   }
 
@@ -141,11 +145,12 @@ public class DepanFxResourceChooserDialog {
     closeDialog();
   }
 
-  private void initTreeView() {
+  private void initTreeView(
+      DepanFxWorkspaceMemberCells.DocumentDispatch dispatch) {
     directoryTreeView.setShowRoot(false);
     directoryTreeView.setCellFactory(
         p -> new DepanFxProjectTreeCell(
-            workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry));
+            workspace, dispatch, rsrcRegistry, rsrcMenuRegistry));
 
     directoryTreeView.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
@@ -155,10 +160,11 @@ public class DepanFxResourceChooserDialog {
         });
   }
 
-  private void initListView() {
+  private void initListView(
+      DepanFxWorkspaceMemberCells.DocumentDispatch dispatch) {
     fileListView.setCellFactory(
         p -> new DepanFxProjectListCell(
-            workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry));
+            workspace, dispatch , rsrcRegistry, rsrcMenuRegistry));
     fileListView.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {

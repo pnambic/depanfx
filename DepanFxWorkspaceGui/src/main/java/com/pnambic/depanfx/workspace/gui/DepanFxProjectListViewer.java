@@ -4,9 +4,9 @@ import com.pnambic.depanfx.perspective.plugins.DepanFxResourceMenuRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.workspace.controls.DepanFxProjectTreeCell;
 import com.pnambic.depanfx.perspective.workspace.controls.DepanFxWorkspaceItem;
+import com.pnambic.depanfx.perspective.workspace.controls.DepanFxWorkspaceMemberCells;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
-import com.pnambic.depanfx.scene.DepanFxDialogRunner;
-import com.pnambic.depanfx.scene.DepanFxSceneController;
+import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
@@ -21,11 +21,9 @@ import java.util.Optional;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.stage.DirectoryChooser;
-import javafx.util.Callback;
 
 public class DepanFxProjectListViewer {
 
@@ -41,27 +39,23 @@ public class DepanFxProjectListViewer {
 
   private final DepanFxWorkspace workspace;
 
-  private final DepanFxDialogRunner dialogRunner;
+  private final DepanFxSceneService sceneSrvc;
 
   private final DepanFxResourceRegistry rsrcRegistry;
 
   private final DepanFxResourceMenuRegistry rsrcMenuRegistry;
 
-  private final DepanFxSceneController scene;
-
   private TreeView<DepanFxWorkspaceMember> workspaceView;
 
   public DepanFxProjectListViewer(
       DepanFxWorkspace workspace,
-      DepanFxDialogRunner dialogRunner,
+      DepanFxSceneService sceneSrvc,
       DepanFxResourceRegistry rsrcRegistry,
-      DepanFxResourceMenuRegistry rsrcMenuRegistry,
-      DepanFxSceneController scene) {
+      DepanFxResourceMenuRegistry rsrcMenuRegistry) {
     this.workspace = workspace;
-    this.dialogRunner = dialogRunner;
+    this.sceneSrvc = sceneSrvc;
     this.rsrcRegistry = rsrcRegistry;
     this.rsrcMenuRegistry = rsrcMenuRegistry;
-    this.scene = scene;
 
     workspaceView = createView();
   }
@@ -112,11 +106,15 @@ public class DepanFxProjectListViewer {
   }
 
   private TreeView<DepanFxWorkspaceMember> createView() {
+    DepanFxWorkspaceMemberCells.DocumentDispatch dispatch =
+        new DepanFxWorkspaceMemberCells.ScreenDispatch(sceneSrvc);
+
     TreeView<DepanFxWorkspaceMember> result =
         new TreeView<>(buildWorkspaceRoot());
     result.setShowRoot(false);
     result.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    result.setCellFactory(new WorkspaceCellFactory());
+    result.setCellFactory(p -> new DepanFxProjectTreeCell(
+        workspace, dispatch , rsrcRegistry, rsrcMenuRegistry));
     result.setContextMenu(buildWorkspaceMenu());
     return result;
   }
@@ -139,17 +137,5 @@ public class DepanFxProjectListViewer {
     TreeItem<DepanFxWorkspaceMember> result =
         new DepanFxWorkspaceItem(workspace, m -> true);
     return result;
-  }
-
-  private class WorkspaceCellFactory
-      implements Callback<TreeView<DepanFxWorkspaceMember>, TreeCell<DepanFxWorkspaceMember>> {
-
-    @Override
-    public TreeCell<DepanFxWorkspaceMember> call(TreeView<DepanFxWorkspaceMember> param) {
-
-      scene.getClass();
-      return new DepanFxProjectTreeCell(
-        workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry);
-    }
   }
 }

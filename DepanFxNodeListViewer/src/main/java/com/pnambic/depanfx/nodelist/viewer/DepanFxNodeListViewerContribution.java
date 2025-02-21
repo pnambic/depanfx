@@ -18,6 +18,7 @@ package com.pnambic.depanfx.nodelist.viewer;
 import com.pnambic.depanfx.nodelist.viewdata.DepanFxNodeListViewerData;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.session.plugins.DepanFxSceneViewerRegistry;
 import com.pnambic.depanfx.session.viewdata.DepanFxBaseViewerData;
@@ -41,13 +42,10 @@ public class DepanFxNodeListViewerContribution
 
   private final DepanFxWorkspace workspace;
 
-  private final DepanFxDialogRunner dialogRunner;
-
   @Autowired
   private DepanFxNodeListViewerContribution(DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner) {
     this.workspace = workspace;
-    this.dialogRunner = dialogRunner;
   }
 
   @Override
@@ -64,12 +62,12 @@ public class DepanFxNodeListViewerContribution
 
   @Override
   public Optional<DepanFxSceneViewer> buildViewer(
-      DepanFxBaseViewerData baseData) {
+      DepanFxSceneService sceneService, DepanFxBaseViewerData baseData) {
 
     DepanFxNodeListViewerData viewerData = (DepanFxNodeListViewerData) baseData;
     return Optional.of(new DepanFxNodeListViewer(
         viewerData.getViewerTitle(),
-        workspace, dialogRunner,
+        workspace, sceneService.getDialogRunner(),
         viewerData.getNodeListRsrc(),
         viewerData.getTableViewRsrc()));
   }
