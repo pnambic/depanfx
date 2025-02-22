@@ -2,9 +2,8 @@ package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeKindFilterData;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
@@ -47,11 +46,6 @@ public class DepanFxNodeFiltersNodeKindConfiguration {
   }
 
   @Bean
-  public DepanFxResourceExtMenuContribution nodeKindFilterExtMenu() {
-    return new NodeKindFilterExtContribution();
-  }
-
-  @Bean
   public DepanFxResourcePathMenuContribution nodeKindFilterPathMenu() {
     return new NodeKindFilterPathContribution();
   }
@@ -69,7 +63,7 @@ public class DepanFxNodeFiltersNodeKindConfiguration {
 
     public NodeKindFilterFileOpenContribution() {
       super(
-          NODE_KIND_LABEL,
+          "No" + NODE_KIND_LABEL,
           DepanFxNodeKindFilterData.class,
           DepanFxNodeKindFilterData.NODE_KIND_FILTER_TOOL_EXT,
           NODE_KIND_KEY);
@@ -80,23 +74,6 @@ public class DepanFxNodeFiltersNodeKindConfiguration {
         DepanFxWorkspaceResource<DepanFxNodeKindFilterData> wkspRsrc,
         DepanFxDialogRunner dialogRunner) {
       LOG.info("No editor for NodeKindFilterFileOpenContribution");
-      // DepanFxNodeFiltersMatcherDialog.runEditDialog(dialogRunner, wkspRsrc);
-    }
-  }
-
-  private static class NodeKindFilterExtContribution
-      extends DepanFxResourceExtMenuContribution.Basic<DepanFxNodeKindFilterData> {
-
-    public NodeKindFilterExtContribution() {
-      super(DepanFxNodeKindFilterData.class,
-          NODE_KIND_KEY, EDIT_NODE_KIND_FILTER,
-          DepanFxNodeKindFilterData.NODE_KIND_FILTER_TOOL_EXT);
-    }
-
-    @Override
-    protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxNodeKindFilterData> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
       // DepanFxNodeFiltersMatcherDialog.runEditDialog(dialogRunner, wkspRsrc);
     }
   }

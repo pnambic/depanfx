@@ -16,9 +16,8 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceContribution;
@@ -67,11 +66,6 @@ public class DepanFxLinkMatcherSequenceConfiguration {
   }
 
   @Bean
-  public DepanFxResourceExtMenuContribution linkMatcherSequenceExtMenu() {
-    return new LinkMatcherSequenceExtContribution();
-  }
-
-  @Bean
   public DepanFxResourcePathMenuContribution linkMatcherSequencePathMenu() {
     return new LinkMatcherSequencePathContribution();
   }
@@ -91,24 +85,6 @@ public class DepanFxLinkMatcherSequenceConfiguration {
           DepanFxLinkMatcherSequenceDocument.class,
           DepanFxLinkMatcherSequenceDocument.LINK_MATCHER_SEQUENCE_TOOL_EXT,
           LINK_MATCHER_SEQUENCE_KEY);
-    }
-
-    @Override
-    protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
-      DepanFxLinkMatcherSequenceToolDialog.runEditDialog(
-          wkspRsrc, dialogRunner);
-    }
-  }
-
-  private static class LinkMatcherSequenceExtContribution
-      extends DepanFxResourceExtMenuContribution.Basic<DepanFxLinkMatcherSequenceDocument> {
-
-    public LinkMatcherSequenceExtContribution() {
-      super(DepanFxLinkMatcherSequenceDocument.class,
-          LINK_MATCHER_SEQUENCE_KEY, EDIT_LINK_MATCHER_SEQUENCE_FILTER,
-          DepanFxLinkMatcherSequenceDocument.LINK_MATCHER_SEQUENCE_TOOL_EXT);
     }
 
     @Override

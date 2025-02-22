@@ -3,7 +3,6 @@ package com.pnambic.depanfx.nodefilters.gui;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxListFilterData;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -44,11 +43,6 @@ public class DepanFxNodeFiltersListConfiguration {
   }
 
   @Bean
-  public DepanFxResourceExtMenuContribution nodeListFilterExtMenu() {
-    return new NodeListFilterExtContribution();
-  }
-
-  @Bean
   public DepanFxResourcePathMenuContribution nodeListFilterPathMenu() {
     return new NodeListFilterPathContribution();
   }
@@ -68,22 +62,6 @@ public class DepanFxNodeFiltersListConfiguration {
           DepanFxListFilterData.class,
           DepanFxListFilterData.LIST_FILTER_TOOL_EXT,
           NODE_LIST_KEY);
-    }
-
-    @Override
-    protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxListFilterData> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
-      DepanFxNodeFiltersListDialog.runEditDialog(dialogRunner, wkspRsrc);
-    }
-  }
-
-  private static class NodeListFilterExtContribution
-      extends DepanFxResourceExtMenuContribution.Basic<DepanFxListFilterData> {
-
-    public NodeListFilterExtContribution() {
-      super(DepanFxListFilterData.class, NODE_LIST_KEY, EDIT_NODE_LIST_FILTER,
-          DepanFxListFilterData.LIST_FILTER_TOOL_EXT);
     }
 
     @Override

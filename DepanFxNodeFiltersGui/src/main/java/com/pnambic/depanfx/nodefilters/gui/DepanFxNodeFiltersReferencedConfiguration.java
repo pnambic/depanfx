@@ -2,7 +2,6 @@ package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxReferencedFilterData;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -43,11 +42,6 @@ public class DepanFxNodeFiltersReferencedConfiguration {
   }
 
   @Bean
-  public DepanFxResourceExtMenuContribution referencedFilterExtMenu() {
-    return new ReferencedFilterExtContribution();
-  }
-
-  @Bean
   public DepanFxResourcePathMenuContribution ReferencedFilterPathMenu() {
     return new ReferencedFilterPathContribution();
   }
@@ -67,23 +61,6 @@ public class DepanFxNodeFiltersReferencedConfiguration {
           DepanFxReferencedFilterData.class,
           DepanFxReferencedFilterData.REFERENCED_FILTER_TOOL_EXT,
           REFERENCED_MATCHER_KEY);
-    }
-
-    @Override
-    protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxReferencedFilterData> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
-      DepanFxNodeFiltersReferencedDialog.runEditFilter(dialogRunner, wkspRsrc);
-    }
-  }
-
-  private static class ReferencedFilterExtContribution
-      extends DepanFxResourceExtMenuContribution.Basic<DepanFxReferencedFilterData> {
-
-    public ReferencedFilterExtContribution() {
-      super(DepanFxReferencedFilterData.class,
-          REFERENCED_MATCHER_KEY, EDIT_REFERENCED_FILTER,
-          DepanFxReferencedFilterData.REFERENCED_FILTER_TOOL_EXT);
     }
 
     @Override

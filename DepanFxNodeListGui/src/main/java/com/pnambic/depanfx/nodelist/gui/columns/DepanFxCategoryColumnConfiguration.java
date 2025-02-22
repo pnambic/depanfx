@@ -2,7 +2,6 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -34,11 +33,6 @@ public class DepanFxCategoryColumnConfiguration {
   }
 
   @Bean
-  public DepanFxResourceExtMenuContribution categoryColumnExtMenu() {
-    return new CategoryColumnExtContribution();
-  }
-
-  @Bean
   public DepanFxResourcePathMenuContribution categoryColumnPathMenu() {
     return new CategoryColumnPathContribution();
   }
@@ -59,24 +53,6 @@ public class DepanFxCategoryColumnConfiguration {
         DepanFxWorkspaceResource<DepanFxCategoryColumnData> columnRsrc,
         DepanFxDialogRunner dialogRunner) {
 
-      DepanFxCategoryColumnToolDialog.runEditDialog(
-          columnRsrc, dialogRunner, null);
-    }
-  }
-
-  private static class CategoryColumnExtContribution
-      extends DepanFxResourceExtMenuContribution.Basic<DepanFxCategoryColumnData> {
-
-    public CategoryColumnExtContribution() {
-      super(DepanFxCategoryColumnData.class, CATEGORY_COLUMN_KEY,
-          DepanFxCategoryColumn.EDIT_CATEGORY_COLUMN,
-          DepanFxCategoryColumnData.CATEGORY_COLUMN_TOOL_EXT);
-    }
-
-    @Override
-    protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxCategoryColumnData> columnRsrc,
-        DepanFxDialogRunner dialogRunner) {
       DepanFxCategoryColumnToolDialog.runEditDialog(
           columnRsrc, dialogRunner, null);
     }

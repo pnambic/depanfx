@@ -24,17 +24,13 @@ public class DepanFxResourceMenuRegistry {
 
   private final List<DepanFxAnalysisExtMenuContribution> analysisContribs;
 
-  private final List<DepanFxResourceExtMenuContribution> extContribs;
-
   private final List<DepanFxResourcePathMenuContribution> pathContribs;
 
   @Autowired
   public DepanFxResourceMenuRegistry(
       List<DepanFxAnalysisExtMenuContribution> analysisContribs,
-      List<DepanFxResourceExtMenuContribution> extContribs,
       List<DepanFxResourcePathMenuContribution> pathContribs) {
     this.analysisContribs = analysisContribs;
-    this.extContribs = extContribs;
     this.pathContribs = pathContribs;
   }
 
@@ -60,30 +56,6 @@ public class DepanFxResourceMenuRegistry {
           .sorted(DepanFxOrderableContribution.CONTRIB_COMPARE)
           .forEach(c -> c.prepareCell(
               workspace, dialogRunner, scene, cell, ext, document, builder));
-    }
-  }
-
-  /**
-   * Apply every contribution that matches this document's file name extension.
-   */
-  public void prepareDocumentMenu(
-      DepanFxDialogRunner dialogRunner,
-      DepanFxWorkspace workspace,
-      Cell<DepanFxWorkspaceMember> cell,
-      DepanFxProjectDocument document,
-      DepanFxContextMenuBuilder builder) {
-    Path docPath = document.getMemberPath();
-    Optional<String> optExt =
-        DepanFxWorkspaceFactory.getExtension(docPath.getFileName().toString());
-
-    if (optExt.isPresent()) {
-      String ext = optExt.get();
-
-      extContribs.stream()
-          .filter(c -> c.acceptsExt(ext))
-          .sorted(DepanFxOrderableContribution.CONTRIB_COMPARE)
-          .forEach(c -> c.prepareCell(
-              workspace, dialogRunner, cell, ext, document, builder));
     }
   }
 

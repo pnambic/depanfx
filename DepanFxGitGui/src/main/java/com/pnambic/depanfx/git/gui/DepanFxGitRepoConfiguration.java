@@ -16,9 +16,8 @@
 package com.pnambic.depanfx.git.gui;
 
 import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
@@ -57,11 +56,6 @@ public class DepanFxGitRepoConfiguration {
   }
 
   @Bean
-  public DepanFxResourceExtMenuContribution gitRepoExtMenu() {
-    return new GitRepoDataExtMenuContribution();
-  }
-
-  @Bean
   public DepanFxResourcePathMenuContribution gitRepoPathMenu() {
     return new GitRepoDataPathMenuContribution();
   }
@@ -75,24 +69,6 @@ public class DepanFxGitRepoConfiguration {
           DepanFxGitRepoData.class,
           DepanFxGitRepoData.GIT_REPO_TOOL_EXT,
           GIT_REPO_KEY);
-    }
-
-    @Override
-    protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxGitRepoData> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
-      DepanFxGitRepoToolDialog.runEditDialog(wkspRsrc, dialogRunner);
-    }
-  }
-
-  private static class GitRepoDataExtMenuContribution
-      extends DepanFxResourceExtMenuContribution.Basic<DepanFxGitRepoData> {
-
-    public GitRepoDataExtMenuContribution() {
-      super(
-          DepanFxGitRepoData.class,
-          GIT_REPO_KEY, EDIT_GIT_REPO,
-          DepanFxGitRepoData.GIT_REPO_TOOL_EXT);
     }
 
     @Override

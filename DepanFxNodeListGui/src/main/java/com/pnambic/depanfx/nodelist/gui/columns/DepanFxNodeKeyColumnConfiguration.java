@@ -2,9 +2,8 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
@@ -32,11 +31,6 @@ public class DepanFxNodeKeyColumnConfiguration {
   }
 
   @Bean
-  public DepanFxResourceExtMenuContribution nodeKeyColumnExtMenu() {
-    return new NodeKeyColumnExtContribution();
-  }
-
-  @Bean
   public DepanFxResourcePathMenuContribution nodeKeyColumnPathMenu() {
     return new NodeKeyColumnPathContribution();
   }
@@ -50,23 +44,6 @@ public class DepanFxNodeKeyColumnConfiguration {
           DepanFxNodeKeyColumnData.class,
           DepanFxNodeKeyColumnData.NODE_KEY_COLUMN_TOOL_EXT,
           NODE_KEY_COLUMN_KEY);
-    }
-
-    @Override
-    protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxNodeKeyColumnData> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
-      DepanFxNodeKeyColumnToolDialog.runEditDialog(wkspRsrc, dialogRunner);
-    }
-  }
-
-  private static class NodeKeyColumnExtContribution
-      extends DepanFxResourceExtMenuContribution.Basic<DepanFxNodeKeyColumnData> {
-
-    public NodeKeyColumnExtContribution() {
-      super(DepanFxNodeKeyColumnData.class, NODE_KEY_COLUMN_KEY,
-          DepanFxNodeKeyColumn.EDIT_NODE_KEY_COLUMN,
-          DepanFxNodeKeyColumnData.NODE_KEY_COLUMN_TOOL_EXT);
     }
 
     @Override

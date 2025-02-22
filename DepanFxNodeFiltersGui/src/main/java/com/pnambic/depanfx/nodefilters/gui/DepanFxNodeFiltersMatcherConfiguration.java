@@ -3,7 +3,6 @@ package com.pnambic.depanfx.nodefilters.gui;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxMatcherFilterData;
 import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -46,11 +45,6 @@ public class DepanFxNodeFiltersMatcherConfiguration {
   }
 
   @Bean
-  public DepanFxResourceExtMenuContribution linkMatcherFilterExtMenu() {
-    return new LinkMatcherFilterExtContribution();
-  }
-
-  @Bean
   public DepanFxResourcePathMenuContribution linkMatcherFilterPathMenu() {
     return new LinkMatcherFilterPathContribution();
   }
@@ -70,23 +64,6 @@ public class DepanFxNodeFiltersMatcherConfiguration {
           DepanFxMatcherFilterData.class,
           DepanFxMatcherFilterData.MATCHER_FILTER_TOOL_EXT,
           LINK_MATCHER_KEY);
-    }
-
-    @Override
-    protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxMatcherFilterData> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
-      DepanFxNodeFiltersMatcherDialog.runEditDialog(dialogRunner, wkspRsrc);
-    }
-  }
-
-  private static class LinkMatcherFilterExtContribution
-      extends DepanFxResourceExtMenuContribution.Basic<DepanFxMatcherFilterData> {
-
-    public LinkMatcherFilterExtContribution() {
-      super(DepanFxMatcherFilterData.class,
-          LINK_MATCHER_KEY, EDIT_LINK_MATCHER_FILTER,
-          DepanFxMatcherFilterData.MATCHER_FILTER_TOOL_EXT);
     }
 
     @Override

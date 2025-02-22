@@ -27,9 +27,8 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData.ContainerOrder;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceExtMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
@@ -70,11 +69,6 @@ public class DepanFxNodeListSectionConfiguration {
   }
 
   @Bean
-  public DepanFxResourceExtMenuContribution flatSectionExtMenu() {
-    return new FlatSectionExtContribution();
-  }
-
-  @Bean
   public DepanFxResourcePathMenuContribution flatSectionPathMenu() {
     return new FlatSectionPathContribution();
   }
@@ -82,11 +76,6 @@ public class DepanFxNodeListSectionConfiguration {
   @Bean
   public DepanFxResourceRegistry.Contribution treeSectionFileOpenContribution() {
     return new TreeSectionFileOpenContribution();
-  }
-
-  @Bean
-  public DepanFxResourceExtMenuContribution treeSectionExtMenu() {
-    return new TreeSectionExtContribution();
   }
 
   @Bean
@@ -106,23 +95,6 @@ public class DepanFxNodeListSectionConfiguration {
           DepanFxFlatSectionData.class,
           DepanFxFlatSectionData.FLAT_SECTION_TOOL_EXT,
           FLAT_SECTION_KEY);
-    }
-
-    @Override
-    protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxFlatSectionData> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
-      DepanFxFlatSectionToolDialog.runEditDialog(wkspRsrc, dialogRunner);
-    }
-  }
-
-  private static class FlatSectionExtContribution
-      extends DepanFxResourceExtMenuContribution.Basic<DepanFxFlatSectionData> {
-
-    public FlatSectionExtContribution() {
-      super(DepanFxFlatSectionData.class, FLAT_SECTION_KEY,
-          DepanFxFlatSection.EDIT_FLAT_SECTION_DATA,
-          DepanFxFlatSectionData.FLAT_SECTION_TOOL_EXT);
     }
 
     @Override
@@ -194,23 +166,6 @@ public class DepanFxNodeListSectionConfiguration {
           DepanFxTreeSectionData.class,
           DepanFxTreeSectionData.TREE_SECTION_TOOL_EXT,
           TREE_SECTION_KEY);
-    }
-
-    @Override
-    protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxTreeSectionData> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
-      DepanFxTreeSectionToolDialog.runEditDialog(wkspRsrc, dialogRunner);
-    }
-  }
-
-  private static class TreeSectionExtContribution
-      extends DepanFxResourceExtMenuContribution.Basic<DepanFxTreeSectionData> {
-
-    public TreeSectionExtContribution() {
-      super(DepanFxTreeSectionData.class, TREE_SECTION_KEY,
-          DepanFxTreeSection.EDIT_TREE_SECTION_DATA,
-          DepanFxTreeSectionData.TREE_SECTION_TOOL_EXT);
     }
 
     @Override
