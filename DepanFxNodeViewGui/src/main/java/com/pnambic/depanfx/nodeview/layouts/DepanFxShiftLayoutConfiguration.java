@@ -2,6 +2,9 @@ package com.pnambic.depanfx.nodeview.layouts;
 
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayoutData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxShiftLayoutData;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 
 import org.springframework.context.annotation.Bean;
@@ -15,6 +18,10 @@ import java.text.MessageFormat;
  */
 @Configuration
 public class DepanFxShiftLayoutConfiguration {
+
+  public static final String SHIFT_LAYOUT_LABEL = "Shift Layout";
+
+  public static final String SHIFT_LAYOUT_KEY = "Shift Layout";;
 
   private int[] POS_X = new int[] { 1, 0, 0 };
 
@@ -30,6 +37,12 @@ public class DepanFxShiftLayoutConfiguration {
 
   public static final Path SHIFT_LAYOUT_PATH =
       DepanFxNodeViewLayoutData.LAYOUT_TOOL_PATH.resolve("Shift");
+
+
+  @Bean
+  public DepanFxResourceRegistry.Contribution shiftLayoutResourceContribution() {
+    return new ShiftLayoutResourceContribution();
+  }
 
   // X Axis
   @Bean
@@ -151,5 +164,24 @@ public class DepanFxShiftLayoutConfiguration {
 
   private String buildToolDescription(String axis, int amount) {
     return MessageFormat.format("Shift {0} by {1}.", axis, amount);
+  }
+
+  private class ShiftLayoutResourceContribution
+      extends DepanFxResourceRegistry.Principal<DepanFxShiftLayoutData>{
+
+    public ShiftLayoutResourceContribution() {
+      super(
+          SHIFT_LAYOUT_LABEL,
+          DepanFxShiftLayoutData.class,
+          DepanFxShiftLayoutData.SHIFT_LAYOUT_TOOL_EXT,
+          SHIFT_LAYOUT_KEY);
+    }
+
+    @Override
+    protected void runDialog(
+        DepanFxWorkspaceResource<DepanFxShiftLayoutData> wkspRsrc,
+        DepanFxDialogRunner dialogRunner) {
+      DepanFxShiftLayoutToolDialog.runEditDialog(wkspRsrc, dialogRunner);
+    }
   }
 }

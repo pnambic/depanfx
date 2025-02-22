@@ -21,6 +21,8 @@ import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
@@ -53,6 +55,14 @@ public class DepanFxNodeViewPanelConfiguration {
   public static final String OPEN_GRAPH_DOC_AS_VIEW_KEY =
       "Graph Doc as View";
 
+  public static final String LINK_DISPLAY_LABEL = "Link Display";
+
+  public static final String LINK_DISPLAY_KEY = "Link Display";
+
+  public static final String NODE_DISPLAY_LABEL = "Node Display";
+
+  public static final String NODE_DISPLAY_KEY = "Node Display";
+
   private final DepanFxNodeLayoutRegistry layoutRegistry;
 
   private final DepanFxNodeFiltersRegistry filterRegistry;
@@ -64,6 +74,9 @@ public class DepanFxNodeViewPanelConfiguration {
     this.layoutRegistry = layoutRegistry;
     this.filterRegistry = filterRegistry;
   }
+
+  /////////////////////////////////////
+  // Open various resources as node views
 
   @Bean
   public DepanFxResourceRegistry.Contribution
@@ -85,6 +98,24 @@ public class DepanFxNodeViewPanelConfiguration {
     return new GraphDocAsViewResourceContribution(
         layoutRegistry, filterRegistry);
   }
+
+  /////////////////////////////////////
+  // Open view rendering resources
+
+  @Bean
+  public DepanFxResourceRegistry.Contribution
+  linkDisplayResourceContribution() {
+    return new LinkDisplayResourceContribution();
+  }
+
+  @Bean
+  public DepanFxResourceRegistry.Contribution
+  nodeDisplayResourceContribution() {
+    return new NodeDisplayResourceContribution();
+  }
+
+  /////////////////////////////////////
+  // Selection Menu Contributions
 
   @Bean
   public DepanFxSceneMenuContribution nodeViewEditSelectAll() {
@@ -112,6 +143,48 @@ public class DepanFxNodeViewPanelConfiguration {
         DepanFxNodeViewPanel.class,
         v -> v.doInvertSelectionAction());
   }
+
+  /////////////////////////////////////
+  // Node View internal display resources
+
+  private static class LinkDisplayResourceContribution
+      extends DepanFxResourceRegistry.Principal<DepanFxNodeViewLinkDisplayData> {
+
+    public LinkDisplayResourceContribution() {
+      super(LINK_DISPLAY_LABEL,
+          DepanFxNodeViewLinkDisplayData.class,
+          DepanFxNodeViewLinkDisplayData.NODE_VIEW_LINK_DISPLAY_EXT,
+          LINK_DISPLAY_KEY);
+    }
+
+    @Override
+    protected void runDialog(
+        DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> wkspRsrc,
+        DepanFxDialogRunner dialogRunner) {
+      DepanFxNodeViewLinkDisplayDialog.runEditDialog(wkspRsrc, dialogRunner);
+    }
+  }
+
+  private static class NodeDisplayResourceContribution
+      extends DepanFxResourceRegistry.Principal<DepanFxNodeViewNodeDisplayData> {
+
+    public NodeDisplayResourceContribution() {
+      super(NODE_DISPLAY_LABEL,
+          DepanFxNodeViewNodeDisplayData.class,
+          DepanFxNodeViewNodeDisplayData.NODE_VIEW_NODE_DISPLAY_EXT,
+          NODE_DISPLAY_KEY);
+    }
+
+    @Override
+    protected void runDialog(
+        DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> wkspRsrc,
+        DepanFxDialogRunner dialogRunner) {
+      DepanFxNodeViewNodeDisplayDialog.runEditDialog(wkspRsrc, dialogRunner);
+    }
+  }
+
+  /////////////////////////////////////
+  // Supported Node View resources
 
   private static class NodeViewAsViewResourceContribution
       extends DepanFxResourceRegistry.Principal<DepanFxNodeViewPanel>

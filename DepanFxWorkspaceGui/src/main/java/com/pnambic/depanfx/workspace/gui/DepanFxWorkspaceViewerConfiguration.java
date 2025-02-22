@@ -31,7 +31,7 @@ import org.springframework.context.annotation.Configuration;
  * Workspace panel installation for scene and UX menus.
  */
 @Configuration
-public class DepanFxWorkspacePanelConfiguration {
+public class DepanFxWorkspaceViewerConfiguration {
 
   @Bean
   DepanFxWorkspaceSceneStarterContribution workspaceSceneStarterContribution(

@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ObjectProperty;
@@ -99,7 +100,7 @@ public class DepanFxNodeViewNodeDisplayDialog
   /**
    * Where live changes happen.
    */
-  private NodeDisplayController displayControl;
+  private NodeDisplayService displaySrvc;
 
   public DepanFxNodeViewNodeDisplayDialog(
       DepanFxWorkspace workspace,
@@ -111,7 +112,7 @@ public class DepanFxNodeViewNodeDisplayDialog
   }
 
   /**
-   * Node Display Editor is a modeless dialog coupled to the graph view.
+   * Node Display Editor as a modeless dialog coupled to the graph view.
    */
   public static Stage runEditDialog(
       NodeDisplayController displayControl,
@@ -124,6 +125,25 @@ public class DepanFxNodeViewNodeDisplayDialog
 
     dlg.getController().setNodeDisplayController(displayControl);
     return dlg.runModeless(EDIT_NODE_DISPLAY_TITLE);
+  }
+
+  /**
+   * Node Display Editor as a modal dialog detached from any view.
+   */
+  public static Optional<DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData>>
+  runEditDialog(
+      DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> nodeRsrc,
+      DepanFxDialogRunner dialogRunner) {
+
+    Dialog<DepanFxNodeViewNodeDisplayDialog> editDlg =
+        DepanFxResourcePerspectives.prepareDialog(
+            nodeRsrc, dialogRunner,
+            DepanFxNodeViewNodeDisplayDialog.class);
+
+    editDlg.getController().clearNodeDisplayController();
+    editDlg.runDialog(EDIT_NODE_DISPLAY_TITLE);
+
+    return editDlg.getController().getToolResource();
   }
 
   public static void setNodeViewNodeDisplayTooldataFilters(
@@ -154,9 +174,7 @@ public class DepanFxNodeViewNodeDisplayDialog
         columnBinder.next();
     countColumn.setStyle("-fx-alignment: CENTER-RIGHT;");
     countColumn.setCellValueFactory(
-        r -> new SimpleIntegerProperty(
-            displayControl.getDisplayFilterNodeCount(
-                r.getValue().getFilterResource())));
+        r -> displaySrvc.getCountProperty(r.getValue().getFilterResource()));
 
     TableColumn<EditNodeDisplay, DepanFxJoglShape> shapeColumn =
         columnBinder.bind("shape", DepanFxJoglShape.class);
@@ -195,7 +213,16 @@ public class DepanFxNodeViewNodeDisplayDialog
    * populating the display table.
    */
   public void setNodeDisplayController(NodeDisplayController displayControl) {
-    this.displayControl = displayControl;
+    this.displaySrvc = new BoundNodeDisplayService(displayControl);
+    prepareDisplayTable();
+  }
+
+  /**
+   * Both tooldata and display control are required before
+   * populating the display table.
+   */
+  public void clearNodeDisplayController() {
+    this.displaySrvc = new DetachedNodeDisplayService();
     prepareDisplayTable();
   }
 
@@ -217,12 +244,12 @@ public class DepanFxNodeViewNodeDisplayDialog
         .orElse(null);
 
     // Wait for both to be configured.
-    if ((displayControl == null) || (sourceDisplayData == null)) {
+    if ((displaySrvc == null) || (sourceDisplayData == null)) {
       return;
     }
     List<EditNodeDisplay> editNodeDisplay =
         sourceDisplayData.streamNodeDisplay()
-            .map(e -> new EditNodeDisplay(displayControl, e))
+            .map(e -> new EditNodeDisplay(displaySrvc, e))
             .collect(Collectors.toList());
 
     nodesDisplayData = FXCollections.observableArrayList(editNodeDisplay);
@@ -234,7 +261,7 @@ public class DepanFxNodeViewNodeDisplayDialog
     DepanFxNodeFiltersChooser
         .runNodeFiltersFinder(workspace, dialogRunner, getScene(), filtersRegistry)
         .map(this::buildDisplay)
-        .map(d -> new EditNodeDisplay(displayControl, d))
+        .map(d -> new EditNodeDisplay(displaySrvc, d))
         .ifPresent(nodesDisplayData::add);
   }
 
@@ -298,23 +325,21 @@ public class DepanFxNodeViewNodeDisplayDialog
   @FXML
   protected void handleRevert() {
     closeDialog();
-    displayControl.revertNodeDisplay();
+    displaySrvc.revertNodeDisplay();
   }
 
   @FXML
   protected void handleApply() {
-    DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> srcRcsr =
-        displayControl.getNodeDisplayResource();
-    DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> toolRsrc =
-        DepanFxWorkspaceResource.forUpdate(srcRcsr, prepareResult());
-    displayControl.setNodeDisplayResource(toolRsrc);
+    displaySrvc.setNodeDisplayResource(
+        DepanFxWorkspaceResource.forUpdate(
+            getToolResource().get(), prepareResult()));
   }
 
   @Override
   @FXML
   protected void handleConfirm() {
     super.handleConfirm();
-    getToolResource().ifPresent(displayControl::setNodeDisplayResource);
+    getToolResource().ifPresent(displaySrvc::setNodeDisplayResource);
   }
 
   /////////////////////////////////////
@@ -376,6 +401,79 @@ public class DepanFxNodeViewNodeDisplayDialog
     }
   }
 
+  private static interface NodeDisplayService {
+
+    ChangeListener<Object> getChangeListener(EditNodeDisplay nodeDisplay);
+
+    ObservableValue<Number> getCountProperty(
+        DepanFxWorkspaceResource<DepanFxBaseFilterData> filterResource);
+
+    void revertNodeDisplay();
+
+    void setNodeDisplayResource(
+        DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> toolRsrc);
+  }
+
+  private static class BoundNodeDisplayService implements NodeDisplayService {
+
+    private final NodeDisplayController displayControl;
+
+    private BoundNodeDisplayService(NodeDisplayController displayControl) {
+      this.displayControl = displayControl;
+    }
+
+    @Override
+    public ChangeListener<Object> getChangeListener(
+        EditNodeDisplay nodeDisplay) {
+      return new NodeDisplayUpdater(displayControl, nodeDisplay);
+    }
+
+    @Override
+    public ObservableValue<Number> getCountProperty(
+        DepanFxWorkspaceResource<DepanFxBaseFilterData> filterResource) {
+      return new SimpleIntegerProperty(
+          displayControl.getDisplayFilterNodeCount(filterResource));
+    }
+
+    @Override
+    public void revertNodeDisplay() {
+      displayControl.revertNodeDisplay();
+    }
+
+    @Override
+    public void setNodeDisplayResource(
+        DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> toolRsrc) {
+      displayControl.setNodeDisplayResource(toolRsrc);
+    }
+  }
+
+  private static class DetachedNodeDisplayService
+      implements NodeDisplayService {
+
+    @Override
+    public ChangeListener<Object> getChangeListener(
+        EditNodeDisplay nodeDisplay) {
+      return (observable, oldValue, newValue) -> {};
+    }
+
+    @Override
+    public ObservableValue<Number> getCountProperty(
+        DepanFxWorkspaceResource<DepanFxBaseFilterData> filterResource) {
+      return new SimpleIntegerProperty();
+    }
+
+    @Override
+    public void revertNodeDisplay() {
+      // Do nothing.
+    }
+
+    @Override
+    public void setNodeDisplayResource(
+        DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> toolRsrc) {
+      // Do nothing.
+    }
+  }
+
   private static class NodeDisplayUpdater implements ChangeListener<Object> {
 
     private final NodeDisplayController displayControl;
@@ -421,7 +519,7 @@ public class DepanFxNodeViewNodeDisplayDialog
    */
   public static class EditNodeDisplay {
 
-    private final NodeDisplayUpdater updater;
+    private final ChangeListener<Object> updater;
 
     public StringProperty nodeDisplayLabelProp;
 
@@ -438,8 +536,8 @@ public class DepanFxNodeViewNodeDisplayDialog
     public ObjectProperty<Color> highlightColorProp;
 
     public EditNodeDisplay(
-        NodeDisplayController displayControl, NodeDisplayEntry nodeDisplay) {
-      updater = new NodeDisplayUpdater(displayControl, this);
+        NodeDisplayService displaySrvc, NodeDisplayEntry nodeDisplay) {
+      updater = displaySrvc.getChangeListener(this);
 
       // Unpack data from source.
       nodeDisplayLabelProp =

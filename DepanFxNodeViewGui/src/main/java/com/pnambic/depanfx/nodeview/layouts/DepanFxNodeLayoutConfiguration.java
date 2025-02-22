@@ -5,7 +5,11 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewPanel;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry.Contribution;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxRadialLayoutData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxTreeLayoutData;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +29,14 @@ public class DepanFxNodeLayoutConfiguration {
 
   public static final String GRID_LAYOUT = "Grid Layout";
 
+  public String RADIAL_LAYOUT_LABEL = "Radial Layout";
+
+  public String RADIAL_LAYOUT_KEY = "Radial Layout";
+
+  public String TREE_LAYOUT_LABEL = "Tree Layout";
+
+  public String TREE_LAYOUT_KEY = "Tree Layout";
+
   @Autowired
   public DepanFxNodeLayoutConfiguration() {
   }
@@ -37,6 +49,16 @@ public class DepanFxNodeLayoutConfiguration {
   @Bean
   public Contribution shuffleLayoutContribution() {
     return new ShuffleLayoutContribution();
+  }
+
+  @Bean
+  public DepanFxResourceRegistry.Contribution radialLayoutResourceContribution() {
+    return new RadialLayoutResourceContribution();
+  }
+
+  @Bean
+  public DepanFxResourceRegistry.Contribution treeLayoutResourceContribution() {
+    return new TreeLayoutResourceContribution();
   }
 
   private static class GridLayoutContribution implements Contribution {
@@ -111,6 +133,44 @@ public class DepanFxNodeLayoutConfiguration {
         DepanFxWorkspaceResource<?> layoutRsrc,
         Collection<GraphNode> updateNodes) {
       return GridLayoutRunner.buildNodeLocations(updateNodes);
+    }
+  }
+
+  private class RadialLayoutResourceContribution
+      extends DepanFxResourceRegistry.Principal<DepanFxRadialLayoutData>{
+
+    public RadialLayoutResourceContribution() {
+      super(
+          RADIAL_LAYOUT_LABEL,
+          DepanFxRadialLayoutData.class,
+          DepanFxRadialLayoutData.RADIAL_LAYOUT_TOOL_EXT,
+          RADIAL_LAYOUT_KEY);
+    }
+
+    @Override
+    protected void runDialog(
+        DepanFxWorkspaceResource<DepanFxRadialLayoutData> wkspRsrc,
+        DepanFxDialogRunner dialogRunner) {
+      DepanFxRadialLayoutToolDialog.runEditDialog(wkspRsrc, dialogRunner);
+    }
+  }
+
+  private class TreeLayoutResourceContribution
+      extends DepanFxResourceRegistry.Principal<DepanFxTreeLayoutData>{
+
+    public TreeLayoutResourceContribution() {
+      super(
+          TREE_LAYOUT_LABEL,
+          DepanFxTreeLayoutData.class,
+          DepanFxTreeLayoutData.TREE_LAYOUT_TOOL_EXT,
+          TREE_LAYOUT_KEY);
+    }
+
+    @Override
+    protected void runDialog(
+        DepanFxWorkspaceResource<DepanFxTreeLayoutData> wkspRsrc,
+        DepanFxDialogRunner dialogRunner) {
+      DepanFxTreeLayoutToolDialog.runEditDialog(wkspRsrc, dialogRunner);
     }
   }
 }

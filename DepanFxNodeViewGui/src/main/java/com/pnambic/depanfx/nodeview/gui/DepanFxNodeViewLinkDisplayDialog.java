@@ -31,9 +31,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -89,7 +91,7 @@ public class DepanFxNodeViewLinkDisplayDialog
   /**
    * Where live changes happen.
    */
-  private EdgeDisplayController displayControl;
+  private EdgeDisplayService displaySrvc;
 
   public DepanFxNodeViewLinkDisplayDialog(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
@@ -98,7 +100,7 @@ public class DepanFxNodeViewLinkDisplayDialog
   }
 
   /**
-   * Edge Display Editor is a modeless dialog coupled to the graph view.
+   * Edge Display Editor as a modeless dialog coupled to the graph view.
    */
   public static Stage runEditDialog(
       EdgeDisplayController displayControl,
@@ -112,13 +114,30 @@ public class DepanFxNodeViewLinkDisplayDialog
     return dlg.runModeless(EDIT_LINK_DISPLAY_TITLE);
   }
 
+  /**
+   * Edge Display Editor as a modal dialog detached from any view.
+   */
+  public static Optional<DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData>>
+  runEditDialog(
+      DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc,
+      DepanFxDialogRunner dialogRunner) {
+
+    Dialog<DepanFxNodeViewLinkDisplayDialog> editDlg =
+        DepanFxResourcePerspectives.prepareDialog(
+            displayRsrc, dialogRunner,
+            DepanFxNodeViewLinkDisplayDialog.class);
+    editDlg.getController().clearEdgeDisplayControl();
+    editDlg.runDialog(EDIT_LINK_DISPLAY_TITLE);
+
+    return editDlg.getController().getToolResource();
+  }
+
   public static void setNodeViewLinkDisplayTooldataFilters(FileChooser chooser) {
     chooser.getExtensionFilters().add(NODE_VIEW_LINK_DISPLAY_FILTER);
     chooser.setSelectedExtensionFilter(NODE_VIEW_LINK_DISPLAY_FILTER);
   }
 
   @FXML
-  @SuppressWarnings("unused")
   public void initialize() {
     DepanFxTableColumnBinder<EditLinkDisplay> columnBinder =
         new DepanFxTableColumnBinder<>(linksDisplayTable);
@@ -141,9 +160,7 @@ public class DepanFxNodeViewLinkDisplayDialog
     TableColumn<EditLinkDisplay, Number> countColumn = columnBinder.next();
     countColumn.setStyle("-fx-alignment: CENTER-RIGHT;");
     countColumn.setCellValueFactory(
-        r -> new SimpleIntegerProperty(
-            displayControl.getDisplayMatcherEdgeCount(
-                r.getValue().linkDisplayRsrc)));
+        r -> displaySrvc.getCountProperty(r.getValue().linkDisplayRsrc));
 
     TableColumn<EditLinkDisplay, DepanFxLineForm> lineFormColumn =
         columnBinder.bind("lineForm", DepanFxLineForm.class);
@@ -197,7 +214,16 @@ public class DepanFxNodeViewLinkDisplayDialog
    * Both tooldata and view panel are required to populate the display table.
    */
   public void setEdgeDisplayControl(EdgeDisplayController displayControl) {
-    this.displayControl = displayControl;
+    this.displaySrvc = new BoundEdgeDisplayService(displayControl);
+    prepareDisplayTable();
+  }
+
+  /**
+   * Set a detached edge display service.
+   * Both tooldata and view panel are required to populate the display table.
+   */
+  public void clearEdgeDisplayControl() {
+    this.displaySrvc = new DetachedEdgeDisplayService();
     prepareDisplayTable();
   }
 
@@ -216,13 +242,13 @@ public class DepanFxNodeViewLinkDisplayDialog
     DepanFxNodeViewLinkDisplayData linkDisplayData = getToolResource()
         .map(DepanFxWorkspaceResource::getResource)
         .orElse(null);
-    if ((displayControl == null) || (linkDisplayData  == null)) {
+    if ((displaySrvc == null) || (linkDisplayData  == null)) {
       return;
     }
 
     List<EditLinkDisplay> editLinkDisplay =
         linkDisplayData.streamLinkDisplay()
-        .map(e -> new EditLinkDisplay(displayControl, e))
+        .map(e -> new EditLinkDisplay(displaySrvc, e))
         .collect(Collectors.toList());
 
     linksDiplayTableData = FXCollections.observableArrayList(editLinkDisplay);
@@ -242,7 +268,7 @@ public class DepanFxNodeViewLinkDisplayDialog
         DepanFxLineDisplayData.buildSimpleLineDisplayData();
     LinkDisplayEntry rowDisplay = new LinkDisplayEntry(
         matcherRsrc.getResource().getToolName(), matcherRsrc, lineDisplay);
-    linksDiplayTableData.add(new EditLinkDisplay(displayControl, rowDisplay));
+    linksDiplayTableData.add(new EditLinkDisplay(displaySrvc, rowDisplay));
   }
 
   private void onUpdateLabelEvent(
@@ -303,12 +329,12 @@ public class DepanFxNodeViewLinkDisplayDialog
   @FXML
   protected void handleRevert() {
     closeDialog();
-    displayControl.revertLinkDisplay();
+    displaySrvc.revertLinkDisplay();
   }
 
   @FXML
   protected void handleApply() {
-    displayControl.setLinkDisplayResource(
+    displaySrvc.setLinkDisplayResource(
         DepanFxWorkspaceResource.forUpdate(
             getToolResource().get(), prepareResult()));
   }
@@ -317,7 +343,7 @@ public class DepanFxNodeViewLinkDisplayDialog
   @FXML
   protected void handleConfirm() {
     super.handleConfirm();
-    getToolResource().ifPresent(displayControl::setLinkDisplayResource);
+    getToolResource().ifPresent(displaySrvc::setLinkDisplayResource);
   }
 
   /////////////////////////////////////
@@ -409,6 +435,82 @@ public class DepanFxNodeViewLinkDisplayDialog
   /////////////////////////////////////
   // Editable Link properties, with helpers
 
+  // private EdgeDisplayController displayControl;
+  private static interface EdgeDisplayService {
+
+    public Property<Number> getCountProperty(
+        DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc);
+
+    public void setLinkDisplayResource(
+        DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> forUpdate);
+
+    public void revertLinkDisplay();
+
+    public ChangeListener<Object> getChangeListener(
+        EditLinkDisplay editLinkDisplay);
+  }
+
+  private static class BoundEdgeDisplayService implements EdgeDisplayService {
+
+    private EdgeDisplayController displayControl;
+
+    public BoundEdgeDisplayService(EdgeDisplayController displayControl) {
+      this.displayControl = displayControl;
+    }
+
+    @Override
+    public Property<Number> getCountProperty(
+        DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
+      return new SimpleIntegerProperty(
+          displayControl.getDisplayMatcherEdgeCount(matcherRsrc));
+    }
+
+    @Override
+    public ChangeListener<Object> getChangeListener(
+        EditLinkDisplay editLinkDisplay) {
+      return new LinkDisplayUpdater(displayControl, editLinkDisplay);
+    }
+
+    @Override
+    public void setLinkDisplayResource(
+        DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> forUpdate) {
+      displayControl.setLinkDisplayResource(forUpdate);
+    }
+
+    @Override
+    public void revertLinkDisplay() {
+      displayControl.revertLinkDisplay();
+    }
+  }
+
+  private static class DetachedEdgeDisplayService
+      implements EdgeDisplayService {
+
+    @Override
+    public Property<Number> getCountProperty(
+        DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
+      return new SimpleIntegerProperty();
+    }
+
+    @Override
+    public ChangeListener<Object> getChangeListener(
+        EditLinkDisplay editLinkDisplay) {
+      // Ignore changes.
+      return (observable, oldValue, newValue) -> {};
+    }
+
+    @Override
+    public void setLinkDisplayResource(
+        DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> forUpdate) {
+      // Ignore changes.
+    }
+
+    @Override
+    public void revertLinkDisplay() {
+      // Ignore changes.
+    }
+  }
+
   private static class LinkDisplayUpdater implements ChangeListener<Object> {
 
     private final EdgeDisplayController displayControl;
@@ -460,7 +562,7 @@ public class DepanFxNodeViewLinkDisplayDialog
    */
   public static class EditLinkDisplay {
 
-    private final LinkDisplayUpdater updater;
+    private final ChangeListener<Object> updater;
 
     public StringProperty linkDisplayLabelProp;
 
@@ -485,8 +587,8 @@ public class DepanFxNodeViewLinkDisplayDialog
     public ObjectProperty<DepanFxLineDirection> lineDirectionProp;
 
     public EditLinkDisplay(
-        EdgeDisplayController displayControl, LinkDisplayEntry linkDisplay) {
-      updater = new LinkDisplayUpdater(displayControl, this);
+        EdgeDisplayService displaySrvc, LinkDisplayEntry linkDisplay) {
+      updater = displaySrvc.getChangeListener(this);
 
       // Unpack data from source.
       linkDisplayLabelProp =
