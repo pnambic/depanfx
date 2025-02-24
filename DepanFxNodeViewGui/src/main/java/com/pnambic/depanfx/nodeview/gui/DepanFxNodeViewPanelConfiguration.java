@@ -245,7 +245,7 @@ public class DepanFxNodeViewPanelConfiguration {
     @Override
     public void openPanel(DepanFxWorkspace workspace,
         DepanFxSceneService sceneSrcv, DepanFxProjectDocument document) {
-      workspace.getWorkspaceResource(document, GraphDocument.class)
+      loadResource(workspace, document)
           .map(r -> getNodeViewData(workspace, r, layoutRegistry))
           .map(d -> workspace.addScratchResource(d))
           .ifPresent(r ->
@@ -305,7 +305,7 @@ public class DepanFxNodeViewPanelConfiguration {
           OPEN_GRAPH_DOC_AS_VIEW_LABEL,
           GraphDocument.class,
           GraphDocPersistenceContribution.EXTENSION,
-          OPEN_GRAPH_DOC_AS_VIEW_LABEL,
+          OPEN_GRAPH_DOC_AS_VIEW_KEY,
           layoutRegistry,
           filterRegistry);
     }
