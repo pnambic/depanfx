@@ -32,6 +32,8 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,16 +43,27 @@ import java.nio.file.Path;
 @Configuration
 public class DepanFxNodeListViewerConfiguration {
 
+  public static final String OPEN_LIST_VIEW_LABEL = "List View";
+
+  public static final String OPEN_LIST__VIEW_ORDER_KEY = "List View";
+
   public static final String OPEN_AS_LIST_LABEL = "as Node List";
 
   public static final String OPEN_AS_LIST_ORDER_KEY = "Node List";
 
   public static final String OPEN_GRAPH_AS_LIST_LABEL = "as Node List";
 
-  public static final String OPEN_GRAPH_AS_LIST_ORDER_KEY = "Graph Doc as Node List";
+  public static final String OPEN_GRAPH_AS_LIST_ORDER_KEY =
+      "Graph Doc as Node List";
 
   @Autowired
   public DepanFxNodeListViewerConfiguration() {
+  }
+
+  @Bean
+  public DepanFxResourceRegistry.Contribution
+  TableViewContribution() {
+    return new TableViewResourceContribution();
   }
 
   @Bean
@@ -90,6 +103,33 @@ public class DepanFxNodeListViewerConfiguration {
         DepanFxSceneMenuItems.SELECTION_INVERT_ITEM,
         DepanFxNodeListViewer.class,
         v -> v.doInvertSelectionAction());
+  }
+
+  private static class TableViewResourceContribution
+      extends DepanFxResourceRegistry.Principal<DepanFxNodeListTableViewData> {
+
+    private static final Logger LOG =
+        LoggerFactory.getLogger(TableViewResourceContribution.class);
+
+    public TableViewResourceContribution() {
+      super(
+          OPEN_LIST_VIEW_LABEL,
+          DepanFxNodeListTableViewData.class,
+          DepanFxNodeListTableViewData.TABLE_VIEW_TOOL_EXT,
+          OPEN_LIST_VIEW_LABEL);
+    }
+
+    @Override
+    protected void runDialog(
+        DepanFxWorkspaceResource<DepanFxNodeListTableViewData> wkspRsrc,
+        DepanFxDialogRunner dialogRunner) {
+
+      LOG.info("No editor for DepanFxNodeListTableViewData");
+      // DepanFxNodeListTableViewDialog.runEditDialog(dialogRunner, tableRsrc);
+
+      // Without a node list, can't open a DepanFxNodeListTableViewData
+      // into a panel.
+    }
   }
 
   private static class NodeListResourceContribution
