@@ -249,8 +249,10 @@ public class DepanFxWorkspaceMemberCells {
       DepanFxProjectDocument document,
       DepanFxContextMenuBuilder builder) {
 
-    DepanFxResourcePerspectives.installOnOpen(cell, document.getMemberPath(),
-        p -> dispatchContribution(contrib, document));
+    if (contrib instanceof DepanFxResourceRegistry.Principal<?>) {
+      DepanFxResourcePerspectives.installOnOpen(cell, document.getMemberPath(),
+          p -> dispatchContribution(contrib, document));
+    }
     builder.appendActionItem(
         fmtEditAction(contrib),
         e -> dispatchContribution(contrib, document));
