@@ -18,16 +18,24 @@ package com.pnambic.depanfx.app;
 import com.pnambic.depanfx.DepanFxApplication;
 import com.pnambic.depanfx.session.core.DepanFxSession;
 import com.pnambic.depanfx.session.core.DepanFxSessionCliArgs;
+import com.pnambic.depanfx.session.core.DepanFxSessionConfig;
+import com.pnambic.depanfx.session.core.DepanFxSessionDataTransport;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
+
+import java.nio.file.Path;
 
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 
 public class DepanFxApp extends Application {
+
+  private static final Logger LOG = LoggerFactory.getLogger(DepanFxApp.class);
 
   private ConfigurableApplicationContext applicationContext;
 
@@ -70,13 +78,15 @@ public class DepanFxApp extends Application {
 
     // Configure and run the session.
     this.session = applicationContext.getBean(DepanFxSession.class);
+
+    DepanFxSessionDataTransport transport =
+        applicationContext.getBean(DepanFxSessionDataTransport.class);
     session.setOnClose(applicationContext::close);
 
     DepanFxSessionCliArgs sessionArgs =
         applicationContext.getBean(DepanFxSessionCliArgs.class);
-    session.setSessionConfig(sessionArgs.getSessionConfig());
-    sessionArgs.getSessionPath()
-        .ifPresent(session::setSessionPath);
+
+    configSession(transport, sessionArgs);
 
     session.startSession(stage);
   }
@@ -86,5 +96,29 @@ public class DepanFxApp extends Application {
     session.stopSession();
     applicationContext.close();
     // Stop is called by Platform.exit();
+  }
+
+  private void configSession(
+      DepanFxSessionDataTransport transport,
+      DepanFxSessionCliArgs sessionArgs) {
+    sessionArgs.getSessionSource()
+        .ifPresent(s -> {
+          Path sessionPath = Path.of(s);
+          session.setSessionPath(sessionPath);
+          session.setSessionConfig(loadConfig(transport, sessionPath));
+        });
+  }
+
+  private DepanFxSessionConfig loadConfig(
+      DepanFxSessionDataTransport transport, Path sessionPath) {
+
+    try {
+      return transport.loadSessionConfig(sessionPath);
+    } catch (RuntimeException errAny) {
+      LOG.error("Unable to load session data at {}",
+          sessionPath.toString(), errAny);
+    // Fall through to default.
+    }
+    return transport.defaultSessionConfig();
   }
 }

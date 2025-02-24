@@ -23,3 +23,9 @@ tasks.named('test') {
   // Use JUnit Platform for unit tests.
    useJUnitPlatform()
 }
+
+// Simplify generated jar names
+// [https://docs.spring.io/spring-boot/gradle-plugin/packaging.html#packaging-executable.and-plain-archives]
+tasks.named("jar") {
+    archiveClassifier = ''
+}

@@ -15,68 +15,30 @@
  */
 package com.pnambic.depanfx.session.core;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import java.nio.file.Path;
 import java.util.Optional;
 
 /**
- * Configure the session startup information form the command line.
+ * Configure the session startup information from the command line.
  */
 @Component
-public class DepanFxSessionCliArgs implements ApplicationRunner {
-
-  private static final Logger LOG =
-      LoggerFactory.getLogger(DepanFxSessionCliArgs.class);
+public class DepanFxSessionCliArgs {
 
   private static final String SESSION_OPTION = "session";
 
-  private final DepanFxSessionDataTransport transport;
-
-  private DepanFxSessionConfig sessionConfig;
-
-  private Path sessionPath;
+  private String sessionSrc;
 
   @Autowired
-  private DepanFxSessionCliArgs(
-      DepanFxSessionDataTransport transport) {
-    this.transport = transport;
-  }
-
-  @Override
-  public void run(ApplicationArguments args) {
+  public DepanFxSessionCliArgs(ApplicationArguments args) {
     if (args.containsOption(SESSION_OPTION)) {
-      String sessionSrc = args.getOptionValues(SESSION_OPTION).get(0);
-
-      try {
-        sessionConfig = restoreSession(sessionSrc);
-        return;
-      } catch (RuntimeException errAny) {
-        LOG.error("Unable to load session data at {}", sessionSrc, errAny);
-      // Fall through to default.
-      }
+      sessionSrc = args.getOptionValues(SESSION_OPTION).get(0);
     }
-    sessionConfig = transport.defaultSessionConfig();
   }
 
-  public DepanFxSessionConfig getSessionConfig() {
-    if (sessionConfig != null) {
-      return sessionConfig;
-    }
-    return DepanFxSessionConfig.EMPTY_SESSION_DATA;
-  }
-
-  public Optional<Path> getSessionPath() {
-    return Optional.ofNullable(sessionPath);
-  }
-
-  private DepanFxSessionConfig restoreSession(String sessionSrc) {
-    sessionPath = Path.of(sessionSrc);
-    return transport.loadSessionConfig(sessionPath);
+  public Optional<String> getSessionSource() {
+    return Optional.ofNullable(sessionSrc);
   }
 }
