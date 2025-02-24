@@ -381,13 +381,10 @@ public class DepanFxResourceRegistry {
 
     // For built ins, open as the resource.
     if (document.getProject().equals(workspace.getBuiltInProjectTree())) {
-      if (workspace.getBuiltInProject() instanceof DepanFxMemoryProject projStore) {
-        Optional<DepanFxWorkspaceResource<Object>> optResource =
-            projStore.getResource(document.getMemberPath());
-        if (optResource.isPresent()) {
-          DepanFxWorkspaceResource<?> resource = optResource.get();
-          return Optional.of(resource);
-        }
+      if (workspace.getBuiltInProject()
+            instanceof DepanFxMemoryProject projStore) {
+        return projStore.getResource(document.getMemberPath())
+            .map(r -> r); // Convert from <Object> to <?>
       }
     }
     return Optional.empty();

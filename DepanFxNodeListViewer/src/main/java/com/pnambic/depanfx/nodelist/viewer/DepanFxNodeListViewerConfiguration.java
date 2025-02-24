@@ -113,7 +113,7 @@ public class DepanFxNodeListViewerConfiguration {
 
     public TableViewResourceContribution() {
       super(
-          OPEN_LIST_VIEW_LABEL,
+          OPEN_LIST_VIEW_LABEL + " [Down]",
           DepanFxNodeListTableViewData.class,
           DepanFxNodeListTableViewData.TABLE_VIEW_TOOL_EXT,
           OPEN_LIST_VIEW_LABEL);

@@ -145,7 +145,7 @@ public class DepanFxShiftLayoutToolDialog
   }
 
   private void setShiftField(TextField shiftField, double shift) {
-    shiftField.setText(String.valueOf(shift));
+    shiftField.setText(String.valueOf((int) shift));
   }
 
   private void configureShiftField(TextField field) {

@@ -63,7 +63,7 @@ public class DepanFxNodeFiltersNodeKindConfiguration {
 
     public NodeKindFilterFileOpenContribution() {
       super(
-          "No" + NODE_KIND_LABEL,
+          NODE_KIND_LABEL + " [Down]",
           DepanFxNodeKindFilterData.class,
           DepanFxNodeKindFilterData.NODE_KIND_FILTER_TOOL_EXT,
           NODE_KIND_KEY);
