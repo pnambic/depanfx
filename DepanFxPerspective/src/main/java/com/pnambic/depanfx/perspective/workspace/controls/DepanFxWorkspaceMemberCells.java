@@ -291,6 +291,9 @@ public class DepanFxWorkspaceMemberCells {
 
   private String fmtEditAction(
       DepanFxResourceRegistry.Contribution contrib) {
+    if (contrib instanceof DepanFxResourceRegistry.Panel) {
+      return MessageFormat.format("Open {0}...", contrib.getResourceLabel());
+    }
     return MessageFormat.format("Edit {0}...", contrib.getResourceLabel());
   }
 }

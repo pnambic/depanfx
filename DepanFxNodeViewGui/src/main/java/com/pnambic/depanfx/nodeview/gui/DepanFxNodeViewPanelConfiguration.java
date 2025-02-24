@@ -44,16 +44,16 @@ public class DepanFxNodeViewPanelConfiguration {
   public static final String NODE_VIEW_KEY = "Node View";
 
   public static final String OPEN_NODE_LIST_AS_VIEW_LABEL =
-      "Open Node List as Node View";
+      "as Node View";
 
   public static final String OPEN_NODE_LIST_AS_VIEW_KEY =
       "Node List as Node View";
 
   public static final String OPEN_GRAPH_DOC_AS_VIEW_LABEL =
-      "Open Graph Doc as Node View";
+      "as Node View";
 
   public static final String OPEN_GRAPH_DOC_AS_VIEW_KEY =
-      "Graph Doc as View";
+      "Graph Doc as Node View";
 
   public static final String LINK_DISPLAY_LABEL = "Link Display";
 

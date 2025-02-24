@@ -41,13 +41,13 @@ import java.nio.file.Path;
 @Configuration
 public class DepanFxNodeListViewerConfiguration {
 
-  public static final String OPEN_AS_LIST_LABEL = "Open as Node List";
+  public static final String OPEN_AS_LIST_LABEL = "as Node List";
 
   public static final String OPEN_AS_LIST_ORDER_KEY = "Node List";
 
-  public static final String OPEN_GRAPH_AS_LIST_LABEL = "Open as Node List";
+  public static final String OPEN_GRAPH_AS_LIST_LABEL = "as Node List";
 
-  public static final String OPEN_GRAPH_AS_LIST_ORDER_KEY = "Graph Document";
+  public static final String OPEN_GRAPH_AS_LIST_ORDER_KEY = "Graph Doc as Node List";
 
   @Autowired
   public DepanFxNodeListViewerConfiguration() {
