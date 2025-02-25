@@ -1,8 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListLeafNode;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListLeafNodeItem;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
@@ -82,8 +80,8 @@ public class DepanFxFlatSection implements DepanFxNodeListSection {
 
   @Override
   public TreeItem<DepanFxNodeListMember> buildNodeItem(GraphNode node) {
-    DepanFxNodeListLeafNode leaf = new DepanFxNodeListLeafNode(node, this);
-    return new DepanFxNodeListLeafNodeItem(leaf);
+    DepanFxFlatLeaf leaf = new DepanFxFlatLeaf(node, this);
+    return new DepanFxFlatLeafItem(leaf);
   }
 
   @Override

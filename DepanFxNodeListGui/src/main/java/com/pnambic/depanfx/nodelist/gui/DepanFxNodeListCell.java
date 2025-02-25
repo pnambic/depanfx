@@ -4,6 +4,7 @@ import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxExportFlatSectionDialog;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxExportTreeSectionDialog;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatLeaf;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSectionToolDialog;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
@@ -117,11 +118,16 @@ public class DepanFxNodeListCell
 
   private void stylizeCell(DepanFxNodeListMember member) {
     switch (member) {
+    case DepanFxFlatLeaf item:
+      // Items in the flat section don't have menus (yet),
+      // and they are not an unexpected type.
+      setContextMenu(null);
+      return;
     case DepanFxFlatSection flat:
-      setContextMenu(nodeListSectionMenu(flat));
+      setContextMenu(flatSectionMenu(flat));
       return;
     case  DepanFxTreeLeaf leaf:
-      setContextMenu(DepanFxTreeLeaf(leaf));
+      setContextMenu(treeLeafMenu(leaf));
       return;
     case DepanFxTreeFork fork:
       setContextMenu(treeForkMenu(fork));
@@ -138,16 +144,7 @@ public class DepanFxNodeListCell
     setContextMenu(null);
   }
 
-  private ContextMenu DepanFxTreeLeaf(DepanFxTreeLeaf leaf) {
-    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem(
-        COPY_ITEM,
-        e -> runCopyFrom(leaf.getDisplayName()));
-    builder.appendSubMenu(buildCopyMenu(leaf));
-    return builder.build();
-  }
-
-  private ContextMenu nodeListSectionMenu(DepanFxFlatSection member) {
+  private ContextMenu flatSectionMenu(DepanFxFlatSection member) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
     builder.appendActionItem(SELECT_FLAT_SECTION,
         e -> openFlatSectionFinder(member));
@@ -200,6 +197,15 @@ public class DepanFxNodeListCell
         EXPAND_TREE_20, e -> runExpandTreeAction(20));
     builder.appendActionItem(
         EXPAND_TREE_100, e -> runExpandTreeAction(100));
+    return builder.build();
+  }
+
+  private ContextMenu treeLeafMenu(DepanFxTreeLeaf leaf) {
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem(
+        COPY_ITEM,
+        e -> runCopyFrom(leaf.getDisplayName()));
+    builder.appendSubMenu(buildCopyMenu(leaf));
     return builder.build();
   }
 
