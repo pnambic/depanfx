@@ -226,9 +226,11 @@ public class DepanFxSceneController {
     public <T extends DepanFxSceneViewer> Optional<T> getViewer(
         Class<T> viewerClass) {
       Tab activeTab = viewRoot.getSelectionModel().getSelectedItem();
-      DepanFxSceneViewer result = sceneTabs.get(activeTab);
-      if (viewerClass.isAssignableFrom(result.getClass())) {
-        return Optional.of((T) result);
+      if (activeTab != null) {
+        DepanFxSceneViewer result = sceneTabs.get(activeTab);
+        if (viewerClass.isAssignableFrom(result.getClass())) {
+          return Optional.of((T) result);
+        }
       }
       return Optional.empty();
     }
