@@ -78,6 +78,8 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
 
   private static final String SELECT_NODE_FILTER = "Select Filter...";
 
+  private static final String CLEAR_NODE_FILTERS = "Clear Filters";
+
   private static final String SAVE_NODE_FILTER = "Save Filter...";
 
   private final DepanFxDialogRunner dialogRunner;
@@ -296,6 +298,9 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
   private ContextMenu buildFiltersCommandMenu() {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
     builder.appendActionItem(SELECT_NODE_FILTER, e -> loadNodeFilter());
+    builder.appendSeparator();
+    builder.appendActionItem(CLEAR_NODE_FILTERS, e -> clearNodeFilters());
+    builder.appendSeparator();
     builder.appendActionItem(SAVE_NODE_FILTER, e -> handleSaveFilters());
     return builder.build();
   }
@@ -347,6 +352,10 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
 
     // Other items become the root
     nodeFilterRoot.set(resource);
+  }
+
+  private void clearNodeFilters() {
+    nodeFilterRoot.clear();
   }
 
   private DepanFxNodeFiltersTableColumns getColumnInfo(
