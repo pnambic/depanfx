@@ -185,12 +185,8 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
         DepanFxSceneController.createDepanScene(dialogRunner, this);
 
     positionScreen(stage, sceneInfo);
-    stage.setTitle("DepanFX");
-    DepanFxAppIcons.installDepanIcons(stage.getIcons());
-    stage.setScene(scene.getScene());
-    stage.show();
+    DepanFxSceneService sceneSrvc = installScene(stage, scene);
 
-    DepanFxSceneService sceneSrvc = scene.getSceneService();
     List<DepanFxBaseViewerData> viewers = sceneInfo.getViewers();
     if (viewers != null ) {
       viewers.stream()
@@ -205,18 +201,28 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
   }
 
   private void startStarterSession(Stage stage) throws Exception {
-
     DepanFxSceneController scene =
         DepanFxSceneController.createDepanScene(dialogRunner, this);
+
+    DepanFxSceneService sceneSrvc = installScene(stage, scene);
+
+    starterRegistry.getStarterViews(sceneSrvc)
+        .forEach(sceneSrvc::addViewer);
+  }
+
+  private DepanFxSceneService installScene(
+      Stage stage, DepanFxSceneController scene)
+      throws Exception {
 
     stage.setTitle("DepanFX");
     DepanFxAppIcons.installDepanIcons(stage.getIcons());
     stage.setScene(scene.getScene());
     stage.show();
 
-    DepanFxSceneService sceneSrvc = scene.getSceneService();
-    starterRegistry.getStarterViews(sceneSrvc)
-        .forEach(sceneSrvc::addViewer);
+    DepanFxSceneService result = scene.getSceneService();
+
+    scenes.add(result);
+    return result;
   }
 
   /**
