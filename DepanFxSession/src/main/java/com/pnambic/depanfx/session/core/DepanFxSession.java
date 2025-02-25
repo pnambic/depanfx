@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -190,8 +191,16 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
     stage.show();
 
     DepanFxSceneService sceneSrvc = scene.getSceneService();
-    sceneInfo.getViewers().stream()
-        .flatMap(d -> toSceneViewer(sceneSrvc, d).stream())
+    List<DepanFxBaseViewerData> viewers = sceneInfo.getViewers();
+    if (viewers != null ) {
+      viewers.stream()
+          .flatMap(d -> toSceneViewer(sceneSrvc, d).stream())
+          .forEach(sceneSrvc::addViewer);
+      return;
+    }
+
+    // If viewers are null (not empty), use the starter views.
+    starterRegistry.getStarterViews(sceneSrvc)
         .forEach(sceneSrvc::addViewer);
   }
 

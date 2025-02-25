@@ -102,11 +102,13 @@ public class DepanFxApp extends Application {
       DepanFxSessionDataTransport transport,
       DepanFxSessionCliArgs sessionArgs) {
     sessionArgs.getSessionSource()
-        .ifPresent(s -> {
-          Path sessionPath = Path.of(s);
-          session.setSessionPath(sessionPath);
-          session.setSessionConfig(loadConfig(transport, sessionPath));
-        });
+        .map(Path::of)
+        .ifPresentOrElse(p -> {
+          session.setSessionPath(p);
+          session.setSessionConfig(loadConfig(transport, p));
+        },
+          () -> session.setSessionConfig(transport.defaultSessionConfig())
+        );
   }
 
   private DepanFxSessionConfig loadConfig(

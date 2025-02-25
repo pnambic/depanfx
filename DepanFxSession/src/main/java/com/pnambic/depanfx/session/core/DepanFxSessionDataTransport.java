@@ -92,9 +92,9 @@ public class DepanFxSessionDataTransport {
     this.viewerRegistry = viewerRegistry;
   }
 
-  public DepanFxSessionConfig defaultSessionConfig() {;
+  public DepanFxSessionConfig defaultSessionConfig() {
 
-  DepanFxSceneData sceneInfo = new DepanFxSceneData(
+    DepanFxSceneData sceneInfo = new DepanFxSceneData(
         "Initial Startup Scene",
         "Initial scene created at DepanFX startup.",
         -1, -1, -1, -1, null);
