@@ -64,7 +64,7 @@ public class DepanFxSequenceFilter
   protected Collection<GraphNode> computeResult(Collection<GraphNode> nodes) {
     Collection<GraphNode> result = ImmutableSet.copyOf(nodes);
     for (DepanFxBaseFilter<?> filter : filters) {
-      result  = filter.computeNodes(result);
+      result = filter.computeNodes(result);
     }
     return result;
   }

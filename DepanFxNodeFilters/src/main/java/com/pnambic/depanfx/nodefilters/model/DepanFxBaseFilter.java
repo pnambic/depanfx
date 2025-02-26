@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -73,8 +74,7 @@ public abstract class DepanFxBaseFilter<T extends DepanFxBaseFilterData> {
     case REPLACE:
       return resultNodes;
     case UNION:
-      resultNodes.addAll(sourceNodes);
-      return resultNodes;
+      return union(sourceNodes, resultNodes);
     }
     LOG.warn("Unrecognized merge mode", mergeMode);
     return Collections.emptyList();
@@ -123,7 +123,19 @@ public abstract class DepanFxBaseFilter<T extends DepanFxBaseFilterData> {
     if (oneNodes.size() < twoNodes.size()) {
       return intersectByLength(oneNodes, twoNodes);
     }
-    return  intersectByLength(twoNodes, oneNodes);
+    return intersectByLength(twoNodes, oneNodes);
+  }
+
+  private static Collection<GraphNode> union(
+      Collection<GraphNode> oneNodes, Collection<GraphNode> twoNodes){
+    if (twoNodes instanceof Set<GraphNode>) {
+      twoNodes.addAll(oneNodes);
+      return twoNodes;
+    }
+
+    Set<GraphNode> result = new HashSet<>(oneNodes);
+    result.addAll(twoNodes);
+    return result;
   }
 
   private static Collection<GraphNode> intersectByLength(
