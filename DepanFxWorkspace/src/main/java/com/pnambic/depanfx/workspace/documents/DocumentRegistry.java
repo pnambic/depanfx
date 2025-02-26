@@ -25,7 +25,7 @@ public class DocumentRegistry {
       DepanFxProjectDocument projDoc, Object document) {
     registry.put(getUri(projDoc), document);
 
-    LOG.info("Loaded {} type {}.",
+    LOG.debug("Loaded {} type {}.",
         DepanFxProjects.getDocumentLabel(projDoc),
         document.getClass().getName());
   }
@@ -34,7 +34,7 @@ public class DocumentRegistry {
       DepanFxProjectDocument projDoc, Object document) {
     registry.put(getUri(projDoc), document);
 
-    LOG.info("Saved {} type {}.",
+    LOG.debug("Saved {} type {}.",
         DepanFxProjects.getDocumentLabel(projDoc),
         document.getClass().getName());
   }
@@ -44,11 +44,11 @@ public class DocumentRegistry {
         Optional.ofNullable(registry.get(getUri(projDoc)));
     result.ifPresentOrElse(
         r ->
-        LOG.info("findResource for {} returns {} data.",
+        LOG.debug("findResource for {} returns {} data.",
             DepanFxProjects.getDocumentLabel(projDoc),
             r.getClass().getName()),
         () ->
-        LOG.info("findResource miss for {}.",
+        LOG.debug("findResource miss for {}.",
           DepanFxProjects.getDocumentLabel(projDoc)));
     return result;
   }

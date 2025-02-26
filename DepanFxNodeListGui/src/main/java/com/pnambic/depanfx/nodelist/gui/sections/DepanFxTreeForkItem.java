@@ -43,7 +43,7 @@ public class DepanFxTreeForkItem extends DepanFxNodeListItem {
 
   private ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
     DepanFxTreeFork folder = (DepanFxTreeFork) getValue();
-    LOG.info("building children for {}", folder.getDisplayName());
+    LOG.debug("building children for {}", folder.getDisplayName());
 
     Collection<GraphNode> nodes = folder.getMembers();
 
