@@ -69,7 +69,7 @@ public class CategoryEditor {
         .forEach(c -> c.add(graphNode));
   }
 
-  public void adddListMembership(
+  public void addListMembership(
       GraphNode graphNode, Collection<CategoryEntry> enabledCategories) {
     // Leave existing memberships in place.
     enabledCategories.stream()

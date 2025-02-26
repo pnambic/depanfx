@@ -127,7 +127,7 @@ public class CategoryWinch {
 
   private boolean updateSource(
       GraphNode node, List<CategoryEntry> nodeCategories) {
-    categories.adddListMembership(node, nodeCategories);
+    categories.addListMembership(node, nodeCategories);
     NodeData nodeData = hoistData.get(node);
     nodeData.addCategories(nodeCategories);
     nodeData.countTarget();

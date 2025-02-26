@@ -157,6 +157,7 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
 
     try (Writer saver = openForSave(projDoc)) {
       transport.save(saver, document);
+      documentRegistry.registerDocumentSave(projDoc, document);
       Optional<DepanFxWorkspaceResource<T>> result =
           toWorkspaceResource(projDoc, document);
       result.ifPresent(this::registerProjectDocument);
@@ -174,12 +175,14 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
     try (Reader importer = openForLoad(projDoc)) {
       @SuppressWarnings("unchecked")
       T document = (T) transport.load(importer);
+      documentRegistry.registerDocumentLoad(projDoc, document);
       return toWorkspaceResource(projDoc, document);
     } catch (Exception errAny) {
       LOG.error("Unable to open {} at {}", expectedLabel, projDoc, errAny);
     }
     return Optional.empty();
   }
+
 
   @Override
   public Optional<DepanFxProjectContainer> toProjectContainer(URI uri) {
@@ -240,7 +243,7 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
       return scratchProj.getResource(resourceDoc);
     }
     // Check if the resource has already been loaded.
-    Optional<Object> resource = findResource(resourceDoc);
+    Optional<Object> resource = documentRegistry.findResource(resourceDoc);
     if (resource.isPresent()) {
       @SuppressWarnings("unchecked")
       DepanFxWorkspaceResource<T> result =
@@ -253,7 +256,7 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
 
   @Override
   public void addListener(WorkspaceListener listener) {
-    listeners .add(listener);
+    listeners.add(listener);
   }
 
   @Override
@@ -295,17 +298,9 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
         .registerDocument(wkspRsrc.getDocument());
   }
 
-  /**
-   * All loaded/known documents are saved in the cache.
-   */
   private <T> Optional<DepanFxWorkspaceResource<T>> toWorkspaceResource(
       DepanFxProjectDocument projDoc, T resource) {
-    documentRegistry.registerDocument(projDoc, resource);
     return Optional.of(DepanFxWorkspaceResource.forSource(projDoc, resource));
-  }
-
-  private Optional<Object> findResource(DepanFxProjectDocument resourceUri) {
-    return documentRegistry.findResource(resourceUri);
   }
 
   private static <T> boolean expectType(

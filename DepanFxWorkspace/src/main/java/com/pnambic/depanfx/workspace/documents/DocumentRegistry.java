@@ -21,9 +21,20 @@ public class DocumentRegistry {
 
   private final Map<URI, Object> registry = new HashMap<>();
 
-  public void registerDocument(DepanFxProjectDocument projDoc, Object document) {
+  public void registerDocumentLoad(
+      DepanFxProjectDocument projDoc, Object document) {
     registry.put(getUri(projDoc), document);
-    LOG.info("Registered document {} type {}.",
+
+    LOG.info("Loaded {} type {}.",
+        DepanFxProjects.getDocumentLabel(projDoc),
+        document.getClass().getName());
+  }
+
+  public void registerDocumentSave(
+      DepanFxProjectDocument projDoc, Object document) {
+    registry.put(getUri(projDoc), document);
+
+    LOG.info("Saved {} type {}.",
         DepanFxProjects.getDocumentLabel(projDoc),
         document.getClass().getName());
   }
@@ -37,7 +48,7 @@ public class DocumentRegistry {
             DepanFxProjects.getDocumentLabel(projDoc),
             r.getClass().getName()),
         () ->
-        LOG.info("findResource for {} return empty.",
+        LOG.info("findResource miss for {}.",
           DepanFxProjects.getDocumentLabel(projDoc)));
     return result;
   }
