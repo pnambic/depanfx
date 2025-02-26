@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Organizes modifications to the set of nodes assigned to categories.
@@ -80,13 +81,15 @@ public class CategoryEditor {
     return new ArrayList<>(currentNodes.get(entry));
   }
 
-  public List<CategoryEntry> snapshotChangedCategories() {
+  /**
+   * Provide a stream snapshots from the changed categories.
+   */
+  public Stream<CategoryEntry> streamChangedCategories() {
     // Should not need to check that the two maps have the same key set.
     return sourceNodes.entrySet().stream()
         .filter(e -> !areSame(e.getValue(), currentNodes.get(e.getKey())))
         .map(e -> snapshotCategory(e))
-        .map(e -> e.getKey())
-        .collect(Collectors.toList());
+        .map(e -> e.getKey());
   }
 
   private Entry<CategoryEntry, Collection<GraphNode>> snapshotCategory(

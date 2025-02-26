@@ -197,7 +197,7 @@ public class DepanFxCategoryColumn
   }
 
   private void runSaveNodeList() {
-    categories.snapshotChangedCategories().stream()
+    categories.streamChangedCategories()
         .forEach(this::saveCategory);
   }
 
@@ -247,11 +247,11 @@ public class DepanFxCategoryColumn
     DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc =
         entry.getNodeListRsrc();
     DepanFxProjectDocument dstDoc = nodeListRsrc.getDocument();
-    DepanFxNodeList updateRsrc = DepanFxNodeLists.buildRelatedNodeList(
+    DepanFxNodeList updateNodeList = DepanFxNodeLists.buildRelatedNodeList(
         nodeListRsrc.getResource(), categories.getCurrentNodes(entry));
 
     try {
-      saveDocument(dstDoc, updateRsrc);
+      saveDocument(dstDoc, updateNodeList);
     } catch (IOException errIo) {
       LOG.error("Unable to save updated node list for {}",
           entry.getCategoryLabel(), errIo);

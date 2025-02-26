@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.workspace.documents;
 
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +23,23 @@ public class DocumentRegistry {
 
   public void registerDocument(DepanFxProjectDocument projDoc, Object document) {
     registry.put(getUri(projDoc), document);
+    LOG.info("Registered document {} type {}.",
+        DepanFxProjects.getDocumentLabel(projDoc),
+        document.getClass().getName());
   }
 
   public Optional<Object> findResource(DepanFxProjectDocument projDoc) {
-    return Optional.ofNullable(registry.get(getUri(projDoc)));
+    Optional<Object> result =
+        Optional.ofNullable(registry.get(getUri(projDoc)));
+    result.ifPresentOrElse(
+        r ->
+        LOG.info("findResource for {} returns {} data.",
+            DepanFxProjects.getDocumentLabel(projDoc),
+            r.getClass().getName()),
+        () ->
+        LOG.info("findResource for {} return empty.",
+          DepanFxProjects.getDocumentLabel(projDoc)));
+    return result;
   }
 
   public <T> List<T> findByType(Class<T> type) {
