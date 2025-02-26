@@ -140,8 +140,16 @@ public abstract class DepanFxBaseFilter<T extends DepanFxBaseFilterData> {
 
   private static Collection<GraphNode> intersectByLength(
       Collection<GraphNode> shortNodes, Collection<GraphNode> longNodes) {
-    return shortNodes.stream()
-        .filter(n -> !longNodes.contains(n))
+    if (longNodes instanceof Set<GraphNode>) {
+      return shortNodes.stream()
+          .filter(n -> !longNodes.contains(n))
+          .collect(Collectors.toSet());
+    }
+    // If the long list is not a set, only go through it once.
+    Set<GraphNode> shortSet = (shortNodes instanceof Set<GraphNode> asSet)
+        ? asSet : new HashSet<>(shortNodes);
+    return longNodes.stream()
+        .filter(n -> !shortSet.contains(n))
         .collect(Collectors.toSet());
   }
 }
