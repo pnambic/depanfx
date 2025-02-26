@@ -1,15 +1,29 @@
+/*
+ * Copyright 2023 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData.CategoryEntry;
-import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -20,21 +34,34 @@ public class CategoryEditor {
 
   private List<CategoryEntry> categories;
 
-  private Map<CategoryEntry, Collection<GraphNode>> sourceNodes;
+  private Map<CategoryEntry, Collection<GraphNode>> sourceNodes =
+      new HashMap<>();
 
-  private Map<CategoryEntry, Collection<GraphNode>> currentNodes;
+  private Map<CategoryEntry, Collection<GraphNode>> currentNodes =
+      new HashMap<>();
 
   public CategoryEditor(List<CategoryEntry> categories) {
     this.categories = categories;
-    updateNodeMaps();
+    categories.forEach(this::updateNodeMaps);
   }
 
   public List<CategoryEntry> getCategoryList() {
     return categories;
   }
 
+  public void updateCategory(
+      CategoryEntry sourceEntry, CategoryEntry updateEntry) {
+    int entryIndex = categories.indexOf(sourceEntry);
+    if (entryIndex >= 0) {
+      categories.set(entryIndex, updateEntry);
+      sourceNodes.remove(sourceEntry);
+      currentNodes.remove(sourceEntry);
+      updateNodeMaps(updateEntry);
+    }
+  }
+
   public boolean hasEdits() {
-    return !getChangedCategories().isEmpty();
+    return streamChangedCategories().findAny().isPresent();
   }
 
   public List<CategoryEntry> getSourceCategories(GraphNode node) {
@@ -88,39 +115,15 @@ public class CategoryEditor {
     // Should not need to check that the two maps have the same key set.
     return sourceNodes.entrySet().stream()
         .filter(e -> !areSame(e.getValue(), currentNodes.get(e.getKey())))
-        .map(e -> snapshotCategory(e))
         .map(e -> e.getKey());
   }
 
-  private Entry<CategoryEntry, Collection<GraphNode>> snapshotCategory(
-      Entry<CategoryEntry, Collection<GraphNode>> entry) {
-    CategoryEntry key = entry.getKey();
+  private void updateNodeMaps(CategoryEntry updateEntry) {
 
-    // Source has a separate copy of the nodes that will be saved.
-    Collection<GraphNode> nodes = new ArrayList<>(currentNodes.get(key));
-    sourceNodes.put(key, nodes);
-    return entry;
-  }
-
-  public List<CategoryEntry> getChangedCategories() {
-    // Should not need to check that the two maps have the same key set.
-    return sourceNodes.entrySet().stream()
-        .filter(e -> !areSame(e.getValue(), currentNodes.get(e.getKey())))
-        .map(e -> e.getKey())
-        .collect(Collectors.toList());
-  }
-
-  private void updateNodeMaps() {
-    sourceNodes = categories.stream()
-        .collect(Collectors.toMap(c -> c, this::getEntryNodes));
-    currentNodes = sourceNodes.entrySet().stream()
-        .collect(Collectors.toMap(
-            e -> e.getKey(), e -> new HashSet<>(e.getValue())));
-  }
-
-  private Collection<GraphNode> getEntryNodes(CategoryEntry entry) {
-    DepanFxNodeList nodeList = entry.getNodeListRsrc().getResource();
-    return nodeList.getNodes();
+    Collection<GraphNode> entryNodes =
+        updateEntry.getNodeListRsrc().getResource().getNodes();
+    sourceNodes.put(updateEntry, entryNodes);
+    currentNodes.put(updateEntry, new HashSet<>(entryNodes));
   }
 
   private static boolean areSame(

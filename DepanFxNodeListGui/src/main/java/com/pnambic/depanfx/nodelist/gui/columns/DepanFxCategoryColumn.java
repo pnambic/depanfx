@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
@@ -27,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -164,7 +180,7 @@ public class DepanFxCategoryColumn
   public void addDecendantsCategories(
       DepanFxTreeFork forkItem, Collection<CategoryEntry> updateCategories) {
     forkItem.getDecendants().stream()
-          .forEach(n -> categories.adddListMembership(n, updateCategories));
+          .forEach(n -> categories.addListMembership(n, updateCategories));
       tableAdapter.refreshTableView();
   }
 
@@ -197,8 +213,10 @@ public class DepanFxCategoryColumn
   }
 
   private void runSaveNodeList() {
-    categories.streamChangedCategories()
-        .forEach(this::saveCategory);
+    // Separate discovery from changes to avoid ConcurrentModificationException
+    List<CategoryEntry> updates =
+        categories.streamChangedCategories().collect(Collectors.toList());
+    updates.forEach(this::saveCategory);
   }
 
   private static void openColumnCreate(
@@ -227,6 +245,7 @@ public class DepanFxCategoryColumn
     DepanFxCategoryColumnData columnData = getColumnData();
     int widthMs = (int) Math.round(
         column.getWidth() / DepanFxSceneControls.layoutWidthMs(1));
+
     return new DepanFxCategoryColumnData(
         columnData.getToolName(), columnData.getToolDescription(),
         columnData.getColumnLabel(), widthMs, categories.getCategoryList());
@@ -251,7 +270,9 @@ public class DepanFxCategoryColumn
         nodeListRsrc.getResource(), categories.getCurrentNodes(entry));
 
     try {
-      saveDocument(dstDoc, updateNodeList);
+      saveDocument(dstDoc, updateNodeList)
+          .map(nl -> new CategoryEntry(entry.getCategoryLabel(), nl))
+          .ifPresent(c -> categories.updateCategory(entry, c));
     } catch (IOException errIo) {
       LOG.error("Unable to save updated node list for {}",
           entry.getCategoryLabel(), errIo);
