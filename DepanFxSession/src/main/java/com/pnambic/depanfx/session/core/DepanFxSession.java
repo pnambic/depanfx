@@ -169,6 +169,7 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
   public void saveSession() throws IOException {
     DepanFxSessionSaveDialog.runSaveSessionDialog(dialogRunner);
   }
+
   private void closeParent() {
     try {
       // Shutting down the application context that started this session.

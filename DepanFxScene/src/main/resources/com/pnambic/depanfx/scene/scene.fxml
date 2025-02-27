@@ -58,7 +58,7 @@
                         <MenuItem text="Save Session..."
                             onAction="#handleSaveSession"/>
                         <SeparatorMenuItem />
-                        <MenuItem text="Exit" onAction="#handleClose"/>
+                        <MenuItem text="Exit" onAction="#handleFileExit"/>
                     </items>
                 </Menu>
                 <Menu text="Edit" onShowing="#onMenuShowing">

@@ -90,6 +90,7 @@ public class JoglModule {
   }
 
   public void stop() {
+    LOG.info("Stopping jogl pane");
     GLAnimatorControl animator = glWindow.getAnimator();
     if (animator != null) {
       animator.stop();
@@ -103,9 +104,11 @@ public class JoglModule {
    * Release system resources, primarily the window draw thread.
    */
   public void destroy() {
+    LOG.info("Destroy jogl pane");
     stop();
     glWindow.removeGLEventListener(drawListener);
     glWindow.removeKeyListener(keyListener);
+    canvas.destroy();
     glWindow.destroy();
   }
 
@@ -243,12 +246,8 @@ public class JoglModule {
     }
 
     public void disableCanvas() {
-      LOG.info("Disabling canvas pane {}", canvas.getId());
-      if (canvas.getId() == null) {
-        canvas.destroy();
-        return;
-      }
       try {
+        LOG.info("Remove canvas {} from pane", canvas.getId());
         getChildren().clear();
       } catch (Exception errAny) {
         LOG.warn("Trouble disabling JOGL: {}", errAny.getMessage());

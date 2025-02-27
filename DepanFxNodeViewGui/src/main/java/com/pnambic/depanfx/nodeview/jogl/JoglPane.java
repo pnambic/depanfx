@@ -81,6 +81,7 @@ public class JoglPane extends BorderPane {
   }
 
   public void release() {
+    LOG.info("JoglPane release");
     jogl.stop();
 
     // May not have allocated if never activated.

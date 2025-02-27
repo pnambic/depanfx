@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -106,52 +107,11 @@ public class DepanFxSceneController {
   }
 
   public void closeScene() {
+    LOG.info("Close scene invoked");
     // Clear UX resources first (tabs), then map-list of viewers.
     // Leads to DepanFxSceneViewer.closeTab(), which release any resources.
-    LOG.info("Close scene invoked");
     viewRoot.getTabs().clear();
     sceneTabs.clear();
-  }
-
-  @FXML
-  public void onMenuShowing(Event event) {
-    Menu menu = (Menu) event.getSource();
-    menu.getItems().stream().forEach(i -> prepareItem(i));
-  }
-
-  @FXML
-  public void handleClose() {
-    try {
-      owner.closeScene(sceneSrvc);
-    } catch (IOException errIo) {
-      throw new RuntimeException("Unable to shutdown", errIo);
-    }
-  }
-
-  @FXML
-  public void handleSaveSession() {
-    try {
-      owner.saveSession();
-    } catch (IOException errIo) {
-      throw new RuntimeException("Unable to shutdown", errIo);
-    }
-  }
-
-  @FXML
-  public void handleByRegistry(ActionEvent event) {
-    handleByMenuRegistry(event);
-  }
-
-  @FXML
-  public void handleWelcome() {
-    sceneSrvc.getDialogRunner().runDialog(
-        DepanFxWelcomeDialog.class, "Welcome To DepanFX");
-  }
-
-  @FXML
-  public void handleAbout() {
-    sceneSrvc.getDialogRunner().runDialog(
-        DepanFxAboutDialog.class, "About DepanFX");
   }
 
   public Scene getScene() {
@@ -170,6 +130,49 @@ public class DepanFxSceneController {
 
   public DepanFxSceneService getSceneService() {
     return sceneSrvc;
+  }
+
+  @FXML
+  private void onMenuShowing(Event event) {
+    Menu menu = (Menu) event.getSource();
+    menu.getItems().stream().forEach(i -> prepareItem(i));
+  }
+
+  @FXML
+  private void handleFileExit() {
+    // Don't try to second guess JavaFX on what needs to happen on an exit.
+    // Prolly not on the correct thread anyway.
+    //
+    // Just tell JavaFX to release the resources.
+    // It will call DepanFxApp.close() in the right context,
+    // and all the windows will release resources correctly.
+    Platform.exit();
+  }
+
+  @FXML
+  private void handleSaveSession() {
+    try {
+      owner.saveSession();
+    } catch (IOException errIo) {
+      throw new RuntimeException("Unable to shutdown", errIo);
+    }
+  }
+
+  @FXML
+  public void handleByRegistry(ActionEvent event) {
+    handleByMenuRegistry(event);
+  }
+
+  @FXML
+  private void handleWelcome() {
+    sceneSrvc.getDialogRunner().runDialog(
+        DepanFxWelcomeDialog.class, "Welcome To DepanFX");
+  }
+
+  @FXML
+  private void handleAbout() {
+    sceneSrvc.getDialogRunner().runDialog(
+        DepanFxAboutDialog.class, "About DepanFX");
   }
 
   private void prepareItem(MenuItem item) {
