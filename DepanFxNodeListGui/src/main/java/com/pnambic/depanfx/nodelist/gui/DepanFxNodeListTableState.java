@@ -2,11 +2,11 @@ package com.pnambic.depanfx.nodelist.gui;
 
 import com.google.common.collect.ImmutableList;
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.nodelist.builtins.DepanFxNodeListSectionBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxAbstractColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSectionBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxSectionRegistry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;

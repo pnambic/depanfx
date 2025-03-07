@@ -10,12 +10,10 @@ module depanfx.nodelist {
   requires depanfx.workspace;
   requires pnambic.modxstream;
 
-  opens com.pnambic.depanfx.nodelist.builtins to spring.beans, spring.core;
   opens com.pnambic.depanfx.nodelist.link to spring.beans, spring.core;
   opens com.pnambic.depanfx.nodelist.persistence to spring.beans;
   opens com.pnambic.depanfx.nodelist.tooldata;
 
-  exports com.pnambic.depanfx.nodelist.builtins;
   exports com.pnambic.depanfx.nodelist.link;
   exports com.pnambic.depanfx.nodelist.model;
   exports com.pnambic.depanfx.nodelist.tooldata;

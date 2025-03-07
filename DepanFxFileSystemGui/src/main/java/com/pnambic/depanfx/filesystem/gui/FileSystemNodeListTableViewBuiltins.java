@@ -16,8 +16,8 @@
 package com.pnambic.depanfx.filesystem.gui;
 
 import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
-import com.pnambic.depanfx.nodelist.builtins.DepanFxNodeKeyColumnBuiltIns;
-import com.pnambic.depanfx.nodelist.builtins.DepanFxNodeListSectionBuiltIns;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumnBuiltIns;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSectionBuiltIns;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;

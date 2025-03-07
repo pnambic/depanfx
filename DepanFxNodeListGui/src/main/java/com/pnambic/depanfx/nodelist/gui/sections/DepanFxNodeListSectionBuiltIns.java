@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.nodelist.builtins;
+package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherBuiltIns;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
