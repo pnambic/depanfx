@@ -54,7 +54,11 @@ public class DepanFxFocusColumnConfiguration {
   private static class FocusColumnContribution
       extends DepanFxColumnRegistry.Basic {
     private FocusColumnContribution() {
-      super(FOCUS_LABEL, DepanFxFocusColumnData.class, FOCUS_KEY);
+      super(
+          FOCUS_LABEL,
+          DepanFxFocusColumnData.class,
+          FOCUS_KEY,
+          DepanFxFocusColumnToolDialog.FOCUS_COLUMN_RSRC_FILTER);
     }
 
     @Override

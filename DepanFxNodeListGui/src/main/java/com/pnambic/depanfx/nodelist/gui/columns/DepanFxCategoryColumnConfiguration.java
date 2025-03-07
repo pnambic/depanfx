@@ -55,7 +55,12 @@ public class DepanFxCategoryColumnConfiguration {
       extends DepanFxColumnRegistry.Basic {
 
     private CategoryColumnContribution() {
-      super(CATEGORY_LABEL, DepanFxCategoryColumnData.class, CATEGORY_KEY);
+      super(
+          CATEGORY_LABEL,
+          DepanFxCategoryColumnData.class,
+          CATEGORY_KEY,
+          DepanFxCategoryColumnToolDialog.CATEGORY_COLUMN__RSRC_FILTER
+          );
     }
 
     @Override

@@ -195,9 +195,10 @@ public class DepanFxNodeListTableCommands {
 
     ObservableList<DepanFxResourceFilter> filters =
         rsrcChooser.getExtensionFilters();
-    filters.add(DepanFxCategoryColumnToolDialog.CATEGORY_COLUMN__RSRC_FILTER);
-    filters.add(DepanFxFocusColumnToolDialog.FOCUS_COLUMN_RSRC_FILTER);
-    filters.add(DepanFxNodeKeyColumnToolDialog.NODE_KEY_COLUMN_RSRC_FILTER);
+    tableAdapter.streamColumnChoices()
+        .map(c -> c.getColumnFilter())
+        .forEach(filters::add);
+
     filters.add(ANY_COLUMN_RSRC_FILTER);
     rsrcChooser.setSelectedExtensionFilter(ANY_COLUMN_RSRC_FILTER);
 

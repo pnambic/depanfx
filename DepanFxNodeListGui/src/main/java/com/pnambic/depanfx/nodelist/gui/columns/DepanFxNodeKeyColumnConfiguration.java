@@ -53,7 +53,11 @@ public class DepanFxNodeKeyColumnConfiguration {
   private static class NodeKeyColumnContribution
       extends DepanFxColumnRegistry.Basic {
     private NodeKeyColumnContribution() {
-      super(NODE_KEY_LABEL, DepanFxNodeKeyColumnData.class, NODE_KEY_KEY);
+      super(
+          NODE_KEY_LABEL,
+          DepanFxNodeKeyColumnData.class,
+          NODE_KEY_KEY,
+          DepanFxNodeKeyColumnToolDialog.NODE_KEY_COLUMN_RSRC_FILTER);
     }
 
     @Override

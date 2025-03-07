@@ -18,6 +18,7 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableState;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.plugins.DepanFxOrderableContribution;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -46,6 +47,8 @@ public class DepanFxColumnRegistry {
 
     String getColumnLabel();
 
+    DepanFxResourceFilter getColumnFilter();
+
     DepanFxNodeListColumn toColumn(
         DepanFxNodeListTableAdapter tableAdapter,
         DepanFxWorkspaceResource<?> columnRsrc);
@@ -66,15 +69,27 @@ public class DepanFxColumnRegistry {
 
     private final String orderKey;
 
-    public Basic(String label, Class<?> acceptType, String orderKey) {
+    private final DepanFxResourceFilter columnFilter;
+
+    public Basic(
+        String label,
+        Class<?> acceptType,
+        String orderKey,
+        DepanFxResourceFilter columnFilter) {
       this.label = label;
       this.acceptType = acceptType;
       this.orderKey = orderKey;
+      this.columnFilter = columnFilter;
     }
 
     @Override
     public String getColumnLabel() {
       return label;
+    }
+
+    @Override
+    public DepanFxResourceFilter getColumnFilter() {
+      return columnFilter;
     }
 
     @Override
