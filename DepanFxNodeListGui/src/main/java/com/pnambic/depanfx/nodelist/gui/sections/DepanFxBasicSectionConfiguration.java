@@ -13,12 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.nodelist.gui;
+package com.pnambic.depanfx.nodelist.gui.sections;
 
-import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSection;
-import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSectionToolDialog;
-import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeSection;
-import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeSectionToolDialog;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherBuiltIns;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
@@ -49,7 +45,7 @@ import java.util.Optional;
 import javafx.scene.control.Cell;
 
 @Configuration
-public class DepanFxNodeListSectionConfiguration {
+public class DepanFxBasicSectionConfiguration {
 
   public static final String FLAT_SECTION_LABEL = "Flat Section";
 
@@ -60,7 +56,7 @@ public class DepanFxNodeListSectionConfiguration {
   public static final String TREE_SECTION_KEY = "Tree Section";
 
   @Autowired
-  public DepanFxNodeListSectionConfiguration() {
+  public DepanFxBasicSectionConfiguration() {
   }
 
   @Bean
