@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodelist.viewer;
 
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.viewdata.DepanFxNodeListViewerData;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -42,10 +43,15 @@ public class DepanFxNodeListViewerContribution
 
   private final DepanFxWorkspace workspace;
 
+  private final DepanFxColumnRegistry columnRegistry;
+
   @Autowired
-  private DepanFxNodeListViewerContribution(DepanFxWorkspace workspace,
-      DepanFxDialogRunner dialogRunner) {
+  private DepanFxNodeListViewerContribution(
+      DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner,
+      DepanFxColumnRegistry columnRegistry) {
     this.workspace = workspace;
+    this.columnRegistry = columnRegistry;
   }
 
   @Override
@@ -68,6 +74,7 @@ public class DepanFxNodeListViewerContribution
     return Optional.of(new DepanFxNodeListViewer(
         viewerData.getViewerTitle(),
         workspace, sceneService.getDialogRunner(),
+        columnRegistry,
         viewerData.getNodeListRsrc(),
         viewerData.getTableViewRsrc()));
   }

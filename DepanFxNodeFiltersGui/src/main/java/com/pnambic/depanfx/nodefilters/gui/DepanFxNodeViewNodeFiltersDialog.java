@@ -28,6 +28,7 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableController;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
@@ -122,14 +123,18 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
 
   private DepanFxNodeList sourceNodes;
 
+  private final DepanFxColumnRegistry columnRegistry;
+
   @Autowired
   public DepanFxNodeViewNodeFiltersDialog(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
+      DepanFxColumnRegistry columnRegistry,
       DepanFxNodeFiltersRegistry nodeFiltersRegistry,
       DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
     super(workspace);
     this.dialogRunner = dialogRunner;
+    this.columnRegistry = columnRegistry;
     this.nodeFiltersRegistry = nodeFiltersRegistry;
     this.nodeFiltersDialogRegistry = nodeFiltersDialogRegistry;
   }
@@ -313,7 +318,8 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
     nodeSelection.doSelectAllAction();
 
     return new DepanFxNodeListTableController(
-        workspace, dialogRunner, tableNodes, nodeSelection,
+        workspace, dialogRunner, columnRegistry,
+        tableNodes, nodeSelection,
         tableViewRsrc, nodeSelectTable);
   }
 

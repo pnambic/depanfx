@@ -2,10 +2,12 @@ package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -13,6 +15,7 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javafx.beans.value.ObservableValue;
@@ -29,6 +32,8 @@ public class DepanFxNodeListTableController
 
   private final DepanFxDialogRunner dialogRunner;
 
+  private final DepanFxColumnRegistry columnRegistry;
+
   private final DepanFxNodeList nodeList;
 
   private final DepanFxNodeListTableState tableState;
@@ -36,12 +41,14 @@ public class DepanFxNodeListTableController
   public DepanFxNodeListTableController(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
+      DepanFxColumnRegistry columnRegistry,
       DepanFxNodeList nodeList,
       DepanFxNodeListSelection selectedNodes,
       DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc,
       TreeTableView<DepanFxNodeListMember> treeTable) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
+    this.columnRegistry = columnRegistry;
     this.nodeList = nodeList;
 
     tableState = prepareNodeListTable(
@@ -173,5 +180,12 @@ public class DepanFxNodeListTableController
 
     result.setTableViewResource(tableViewRsrc);
     return result;
+  }
+
+  @Override
+  public Optional<DepanFxNodeListColumn> toColumn(
+      DepanFxNodeListTableAdapter tableAdapter,
+      DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc) {
+    return columnRegistry.toColumn(tableAdapter, columnRsrc);
   }
 }

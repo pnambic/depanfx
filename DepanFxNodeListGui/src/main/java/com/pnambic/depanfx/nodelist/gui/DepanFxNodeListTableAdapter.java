@@ -5,12 +5,14 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javafx.beans.value.ObservableValue;
@@ -59,4 +61,8 @@ public interface DepanFxNodeListTableAdapter {
 
   void setTableViewResource(
       DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc);
+
+  Optional<DepanFxNodeListColumn> toColumn(
+      DepanFxNodeListTableAdapter tableAdapter,
+      DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc);
 }

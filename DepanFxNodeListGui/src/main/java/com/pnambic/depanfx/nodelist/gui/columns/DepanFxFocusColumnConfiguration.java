@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
@@ -24,6 +25,24 @@ public class DepanFxFocusColumnConfiguration {
   private static final String FOCUS_COLUMN_LABEL = "Focus Column";
 
   private static final String FOCUS_COLUMN_KEY = "Focus Column";
+
+  @Bean
+  public DepanFxColumnRegistry.Contribution
+      focusColumnContribution() {
+    return new DepanFxColumnRegistry.Basic(
+        DepanFxFocusColumnData.class, "Focus") {
+
+      @Override
+      public DepanFxNodeListColumn toColumn(
+          DepanFxNodeListTableAdapter tableAdapter,
+          DepanFxWorkspaceResource<?> columnRsrc) {
+        @SuppressWarnings("unchecked")
+        DepanFxWorkspaceResource<DepanFxFocusColumnData> focusRsrc =
+            (DepanFxWorkspaceResource<DepanFxFocusColumnData>) columnRsrc;
+        return new DepanFxFocusColumn(tableAdapter, focusRsrc);
+      }
+    };
+  }
 
   @Bean
   public DepanFxResourceRegistry.Contribution

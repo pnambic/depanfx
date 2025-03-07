@@ -1,9 +1,10 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
@@ -24,6 +25,24 @@ public class DepanFxCategoryColumnConfiguration {
   private static final String CATEGORY_COLUMN_LABEL = "Category Column";
 
   private static final String CATEGORY_COLUMN_KEY = "Category Column";
+
+  @Bean
+  public DepanFxColumnRegistry.Contribution
+      categoryColumnContribution() {
+    return new DepanFxColumnRegistry.Basic(
+        DepanFxCategoryColumnData.class, "Category") {
+
+      @Override
+      public DepanFxNodeListColumn toColumn(
+          DepanFxNodeListTableAdapter tableAdapter,
+          DepanFxWorkspaceResource<?> columnRsrc) {
+        @SuppressWarnings("unchecked")
+        DepanFxWorkspaceResource<DepanFxCategoryColumnData> catRsrc =
+            (DepanFxWorkspaceResource<DepanFxCategoryColumnData>) columnRsrc;
+        return new DepanFxCategoryColumn(tableAdapter, catRsrc);
+      }
+    };
+  }
 
   @Bean
   public DepanFxResourceRegistry.Contribution

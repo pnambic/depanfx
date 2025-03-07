@@ -1,6 +1,5 @@
 package com.pnambic.depanfx.nodelist.gui;
 
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxSectionRegistry;
@@ -8,6 +7,8 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+
+import java.util.Optional;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.control.TreeTableColumn;
@@ -24,9 +25,9 @@ public class DepanFxNodeListTableFactory {
     this.tableAdapter = tableAdapter;
   }
 
-  public DepanFxNodeListColumn createTableColumn(
+  public Optional<DepanFxNodeListColumn> createTableColumn(
       DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc) {
-    return DepanFxColumnRegistry.toColumn(tableAdapter, columnRsrc);
+    return tableAdapter.toColumn(tableAdapter, columnRsrc);
   }
 
   public DepanFxNodeListSection createTableSection(

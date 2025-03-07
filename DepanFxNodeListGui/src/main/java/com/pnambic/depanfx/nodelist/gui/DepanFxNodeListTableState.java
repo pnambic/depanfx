@@ -221,9 +221,13 @@ public class DepanFxNodeListTableState {
       DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc) {
 
     // columnResources.add(columnRsrc);
-    DepanFxNodeListColumn column = tableFactory.createTableColumn(columnRsrc);
-    columns.add(column);
-    nodeListTable.getColumns().add(column.prepareColumn());
+    tableFactory.createTableColumn(columnRsrc)
+        .ifPresentOrElse(c -> {
+          columns.add(c);
+          nodeListTable.getColumns().add(c.prepareColumn());
+        }, () ->
+          LOG.warn("Unknown type {} for column construction",
+              columnRsrc.getResource().getClass().getName()));
   }
 
   public Stream<DepanFxNodeListColumn> streamColumns() {

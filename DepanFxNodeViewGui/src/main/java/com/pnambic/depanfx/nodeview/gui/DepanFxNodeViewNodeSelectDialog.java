@@ -5,6 +5,7 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableController;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.perspective.DepanFxWorkspaceDialog;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -65,12 +66,16 @@ public class DepanFxNodeViewNodeSelectDialog
 
   private DepanFxNodeListTableController tableControl;
 
+  private final DepanFxColumnRegistry columnRegistry;
+
   @Autowired
   public DepanFxNodeViewNodeSelectDialog(
       DepanFxWorkspace workspace,
-      DepanFxDialogRunner dialogRunner) {
+      DepanFxDialogRunner dialogRunner,
+      DepanFxColumnRegistry columnRegistry) {
     super(workspace);
     this.dialogRunner = dialogRunner;
+    this.columnRegistry = columnRegistry;
   }
 
   /**
@@ -115,7 +120,7 @@ public class DepanFxNodeViewNodeSelectDialog
     }
 
     tableControl = new DepanFxNodeListTableController(
-        workspace, dialogRunner,
+        workspace, dialogRunner, columnRegistry,
         viewPanel.getViewNodesAsNodeList(), viewPanel.getNodeSelection(),
         tableViewRsrc, nodeSelectTable);
 

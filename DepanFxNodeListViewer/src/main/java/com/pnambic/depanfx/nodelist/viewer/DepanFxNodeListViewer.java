@@ -5,6 +5,7 @@ import com.pnambic.depanfx.nodelist.builtins.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableController;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -46,6 +47,7 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
       String viewerTitle,
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
+      DepanFxColumnRegistry columnRegistry,
       DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc,
       DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc) {
 
@@ -55,7 +57,7 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
     DepanFxNodeList nodeList = nodeListRsrc.getResource();
 
     tableControl = new DepanFxNodeListTableController(
-        workspace, dialogRunner, nodeList,
+        workspace, dialogRunner, columnRegistry, nodeList,
         DepanFxNodeListSelection.forNodes(nodeList.getNodes()),
         tableViewRsrc, new TreeTableView<>());
   }

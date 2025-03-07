@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeKeyColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
@@ -24,6 +25,24 @@ public class DepanFxNodeKeyColumnConfiguration {
   public static final String NODE_KEY_COLUMN_LABEL = "Node Key Column";
 
   public static final String NODE_KEY_COLUMN_KEY = "Node Key Column";
+
+  @Bean
+  public DepanFxColumnRegistry.Contribution
+      nodeKeyColumnContribution() {
+    return new DepanFxColumnRegistry.Basic(
+        DepanFxNodeKeyColumnData.class, "Category") {
+
+      @Override
+      public DepanFxNodeListColumn toColumn(
+          DepanFxNodeListTableAdapter tableAdapter,
+          DepanFxWorkspaceResource<?> columnRsrc) {
+        @SuppressWarnings("unchecked")
+        DepanFxWorkspaceResource<DepanFxNodeKeyColumnData> nodeKeyRsrc =
+            (DepanFxWorkspaceResource<DepanFxNodeKeyColumnData>) columnRsrc;
+        return new DepanFxNodeKeyColumn(tableAdapter, nodeKeyRsrc);
+      }
+    };
+  }
 
   @Bean
   public DepanFxResourceRegistry.Contribution nodeKeyColumnFileOpenMenu() {
