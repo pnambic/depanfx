@@ -1,9 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui;
 
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxCategoryColumnToolDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxFocusColumnToolDialog;
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumnToolDialog;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
