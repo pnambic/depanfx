@@ -1,7 +1,9 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableState;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
@@ -16,11 +18,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
+import javafx.event.Event;
 import javafx.scene.control.Cell;
 
 @Configuration
 public class DepanFxFocusColumnConfiguration {
+
+  private static final String FOCUS_LABEL = "Focus";
+
+  private static final String FOCUS_KEY = "Focus";
 
   private static final String FOCUS_COLUMN_LABEL = "Focus Column";
 
@@ -29,19 +37,7 @@ public class DepanFxFocusColumnConfiguration {
   @Bean
   public DepanFxColumnRegistry.Contribution
       focusColumnContribution() {
-    return new DepanFxColumnRegistry.Basic(
-        DepanFxFocusColumnData.class, "Focus") {
-
-      @Override
-      public DepanFxNodeListColumn toColumn(
-          DepanFxNodeListTableAdapter tableAdapter,
-          DepanFxWorkspaceResource<?> columnRsrc) {
-        @SuppressWarnings("unchecked")
-        DepanFxWorkspaceResource<DepanFxFocusColumnData> focusRsrc =
-            (DepanFxWorkspaceResource<DepanFxFocusColumnData>) columnRsrc;
-        return new DepanFxFocusColumn(tableAdapter, focusRsrc);
-      }
-    };
+    return new FocusColumnContribution();
   }
 
   @Bean
@@ -53,6 +49,41 @@ public class DepanFxFocusColumnConfiguration {
   @Bean
   public DepanFxResourcePathMenuContribution focusColumnPathMenu() {
     return new FocusColumnPathContribution();
+  }
+
+  private static class FocusColumnContribution
+      extends DepanFxColumnRegistry.Basic {
+    private FocusColumnContribution() {
+      super(FOCUS_LABEL, DepanFxFocusColumnData.class, FOCUS_KEY);
+    }
+
+    @Override
+    public DepanFxNodeListColumn toColumn(
+        DepanFxNodeListTableAdapter tableAdapter,
+        DepanFxWorkspaceResource<?> columnRsrc) {
+      @SuppressWarnings("unchecked")
+      DepanFxWorkspaceResource<DepanFxFocusColumnData> focusRsrc =
+          (DepanFxWorkspaceResource<DepanFxFocusColumnData>) columnRsrc;
+      return new DepanFxFocusColumn(tableAdapter, focusRsrc);
+    }
+
+    @Override
+    public Optional<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>> getNewColumn(
+        Event event,
+        DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner,
+        DepanFxNodeListTableAdapter tableAdapter,
+        DepanFxNodeListTableState tableState) {
+      DepanFxFocusColumnData columnData =
+          DepanFxFocusColumnData.buildInitialFocusColumnData(null);
+      DepanFxWorkspaceResource<DepanFxFocusColumnData> columnRsrc =
+          workspace.addScratchResource(columnData);
+      return DepanFxFocusColumnToolDialog.runCreateDialog(
+          columnRsrc, dialogRunner)
+          .getController()
+          .getToolResource()
+          .map(r -> r);
+    }
   }
 
   private static class FocusColumnFileOpenContribution

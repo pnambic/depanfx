@@ -1,7 +1,9 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableState;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
@@ -16,32 +18,25 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
+import javafx.event.Event;
 import javafx.scene.control.Cell;
 
 @Configuration
 public class DepanFxCategoryColumnConfiguration {
+
+  private static final String CATEGORY_LABEL = "Category";
+
+  private static final String CATEGORY_KEY = "Category";
 
   private static final String CATEGORY_COLUMN_LABEL = "Category Column";
 
   private static final String CATEGORY_COLUMN_KEY = "Category Column";
 
   @Bean
-  public DepanFxColumnRegistry.Contribution
-      categoryColumnContribution() {
-    return new DepanFxColumnRegistry.Basic(
-        DepanFxCategoryColumnData.class, "Category") {
-
-      @Override
-      public DepanFxNodeListColumn toColumn(
-          DepanFxNodeListTableAdapter tableAdapter,
-          DepanFxWorkspaceResource<?> columnRsrc) {
-        @SuppressWarnings("unchecked")
-        DepanFxWorkspaceResource<DepanFxCategoryColumnData> catRsrc =
-            (DepanFxWorkspaceResource<DepanFxCategoryColumnData>) columnRsrc;
-        return new DepanFxCategoryColumn(tableAdapter, catRsrc);
-      }
-    };
+  public DepanFxColumnRegistry.Contribution categoryColumnContribution() {
+    return new CategoryColumnContribution();
   }
 
   @Bean
@@ -54,6 +49,43 @@ public class DepanFxCategoryColumnConfiguration {
   @Bean
   public DepanFxResourcePathMenuContribution categoryColumnPathMenu() {
     return new CategoryColumnPathContribution();
+  }
+
+  private static class CategoryColumnContribution
+      extends DepanFxColumnRegistry.Basic {
+
+    private CategoryColumnContribution() {
+      super(CATEGORY_LABEL, DepanFxCategoryColumnData.class, CATEGORY_KEY);
+    }
+
+    @Override
+    public DepanFxNodeListColumn toColumn(
+        DepanFxNodeListTableAdapter tableAdapter,
+        DepanFxWorkspaceResource<?> columnRsrc) {
+      @SuppressWarnings("unchecked")
+      DepanFxWorkspaceResource<DepanFxCategoryColumnData> catRsrc =
+          (DepanFxWorkspaceResource<DepanFxCategoryColumnData>) columnRsrc;
+      return new DepanFxCategoryColumn(tableAdapter, catRsrc);
+    }
+
+    @Override
+    public Optional<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>> getNewColumn(
+        Event event,
+        DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner,
+        DepanFxNodeListTableAdapter tableAdapter,
+        DepanFxNodeListTableState tableState) {
+      DepanFxCategoryColumnData columnData =
+          DepanFxCategoryColumnData.buildInitialCategoryColumnData();
+      DepanFxWorkspaceResource<DepanFxCategoryColumnData> columnRsrc =
+          workspace.addScratchResource(columnData);
+
+      return DepanFxCategoryColumnToolDialog.runCreateDialog(
+          columnRsrc, dialogRunner, tableAdapter)
+          .getController()
+          .getToolResource()
+          .map(r -> r);
+    }
   }
 
   private static class CategoryColumnFileOpenContribution

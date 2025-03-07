@@ -2,6 +2,7 @@ package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
@@ -65,4 +66,6 @@ public interface DepanFxNodeListTableAdapter {
   Optional<DepanFxNodeListColumn> toColumn(
       DepanFxNodeListTableAdapter tableAdapter,
       DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc);
+
+  Stream<DepanFxColumnRegistry.Contribution> streamColumnChoices();
 }

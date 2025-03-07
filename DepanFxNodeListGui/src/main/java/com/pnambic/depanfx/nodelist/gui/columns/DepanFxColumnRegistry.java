@@ -16,7 +16,11 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableState;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.plugins.DepanFxOrderableContribution;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.slf4j.Logger;
@@ -28,6 +32,8 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import javafx.event.Event;
+
 @Component
 public class DepanFxColumnRegistry {
 
@@ -38,20 +44,37 @@ public class DepanFxColumnRegistry {
      */
     boolean acceptsResource(DepanFxWorkspaceResource<?> resource);
 
+    String getColumnLabel();
+
     DepanFxNodeListColumn toColumn(
         DepanFxNodeListTableAdapter tableAdapter,
         DepanFxWorkspaceResource<?> columnRsrc);
+
+    Optional<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>> getNewColumn(
+        Event event,
+        DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner,
+        DepanFxNodeListTableAdapter tableAdapter,
+        DepanFxNodeListTableState tableState);
   }
 
   public static abstract class Basic implements Contribution {
 
-    private Class<?> acceptType;
+    private final String label;
 
-    private String orderKey;
+    private final Class<?> acceptType;
 
-    public Basic(Class<?> acceptType, String orderKey) {
+    private final String orderKey;
+
+    public Basic(String label, Class<?> acceptType, String orderKey) {
+      this.label = label;
       this.acceptType = acceptType;
       this.orderKey = orderKey;
+    }
+
+    @Override
+    public String getColumnLabel() {
+      return label;
     }
 
     @Override
@@ -74,6 +97,11 @@ public class DepanFxColumnRegistry {
   @Autowired
   public DepanFxColumnRegistry(Collection<Contribution> contribs) {
     this.contribs = contribs;
+  }
+
+  public Stream<Contribution> streamContributions() {
+    return contribs.stream()
+        .sorted(DepanFxOrderableContribution.CONTRIB_COMPARE);
   }
 
   public Optional<DepanFxNodeListColumn> toColumn(

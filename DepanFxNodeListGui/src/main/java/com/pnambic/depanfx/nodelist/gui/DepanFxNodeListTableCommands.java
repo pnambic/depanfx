@@ -1,10 +1,8 @@
 package com.pnambic.depanfx.nodelist.gui;
 
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxCategoryColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxCategoryColumnToolDialog;
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxFocusColumn;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxFocusColumnToolDialog;
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumnToolDialog;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
@@ -17,7 +15,6 @@ import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
-import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -25,6 +22,7 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -124,17 +122,26 @@ public class DepanFxNodeListTableCommands {
     items.add(DepanFxContextMenuBuilder.createActionItem(
         SELECT_COLUMN,
         e -> doSelectColumnAction()));
+
     items.add(new SeparatorMenuItem());
-    items.add(DepanFxContextMenuBuilder.createActionItem(
-        DepanFxNodeKeyColumn.NEW_NODE_KEY_COLUMN,
-        e -> doNewNodeKeyColumnAction()));
-    items.add(DepanFxContextMenuBuilder.createActionItem(
-        DepanFxFocusColumn.NEW_FOCUS_COLUMN,
-        e -> doNewFocusColumnAction()));
-    items.add(DepanFxContextMenuBuilder.createActionItem(
-        DepanFxCategoryColumn.NEW_CATEGORY_COLUMN,
-        e -> doNewCategoryColumnAction()));
+    tableAdapter.streamColumnChoices()
+        .map(this::buildColumnItem)
+        .forEach(items::add);
+
     return result;
+  }
+
+  private MenuItem buildColumnItem(
+      DepanFxColumnRegistry.Contribution contrib) {
+    String fmtLabel = MessageFormat.format(
+        "New {0} Column...", contrib.getColumnLabel());
+    return DepanFxContextMenuBuilder.createActionItem(
+        fmtLabel,
+        e ->
+          contrib.getNewColumn(
+              e, workspace, dialogRunner, tableAdapter, tableState)
+              .ifPresent(tableState::addColumn)
+        );
   }
 
   private Menu buildTableViewMenu() {
@@ -199,39 +206,5 @@ public class DepanFxNodeListTableCommands {
         .flatMap(m -> workspace.getWorkspaceResource(
             m, DepanFxBaseColumnData.class))
         .ifPresent(tableState::addColumn);
-  }
-
-  private void doNewNodeKeyColumnAction() {
-    DepanFxNodeKeyColumnData initialData =
-        DepanFxNodeKeyColumn.buildInitialNodeKeyColumnData();
-    Dialog<DepanFxNodeKeyColumnToolDialog> createDlg =
-        DepanFxNodeKeyColumnToolDialog.runCreateDialog(
-            asResource(initialData), dialogRunner);
-    createDlg.getController().getToolResource()
-        .ifPresent(tableState::addColumn);
-  }
-
-  private void doNewFocusColumnAction() {
-    DepanFxFocusColumnData initialData =
-        DepanFxFocusColumnData.buildInitialFocusColumnData(null);
-    Dialog<DepanFxFocusColumnToolDialog> createDlg =
-        DepanFxFocusColumnToolDialog.runCreateDialog(
-            asResource(initialData), dialogRunner);
-    createDlg.getController().getToolResource()
-        .ifPresent(tableState::addColumn);
-  }
-
-  private void doNewCategoryColumnAction() {
-    DepanFxCategoryColumnData columnData =
-        DepanFxCategoryColumnData.buildInitialCategoryColumnData();
-    Dialog<DepanFxCategoryColumnToolDialog> createDlg =
-        DepanFxCategoryColumnToolDialog.runCreateDialog(
-            asResource(columnData), dialogRunner, tableAdapter);
-    createDlg.getController().getToolResource()
-        .ifPresent(tableState::addColumn);
-  }
-
-  private <T> DepanFxWorkspaceResource<T> asResource(T columnData) {
-    return workspace.addScratchResource(columnData);
   }
 }
