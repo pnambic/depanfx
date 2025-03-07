@@ -13,6 +13,7 @@ module depanfx.java.gui {
   requires depanfx.graph_doc;
   requires depanfx.java;
   requires depanfx.nodelist;
+  requires depanfx.nodelist.gui;
   requires depanfx.perspective;
   requires depanfx.workspace;
   requires depanfx.scene;

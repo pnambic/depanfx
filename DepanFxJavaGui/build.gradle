@@ -21,6 +21,7 @@ dependencies {
   implementation project(':DepanFxJava')
   implementation project(':DepanFxNodeFilters')
   implementation project(':DepanFxNodeList')
+  implementation project(':DepanFxNodeListGui')
   implementation project(':DepanFxPersistence')
   implementation project(':DepanFxPerspective')
   implementation project(':DepanFxScene')

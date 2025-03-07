@@ -25,6 +25,9 @@ module depanfx.nodelist.gui {
       to javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;
   opens com.pnambic.depanfx.nodelist.gui.columns
       to javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;
+  opens com.pnambic.depanfx.nodelist.gui.columns.infos
+      to javafx.fxml, net.rgielen.fxweaver.core,
+         spring.beans, spring.context, spring.core;
   opens com.pnambic.depanfx.nodelist.gui.sections
       to javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;
   opens com.pnambic.depanfx.nodelist.gui.persistence to spring.beans;
