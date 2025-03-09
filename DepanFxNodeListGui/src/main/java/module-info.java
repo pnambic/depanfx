@@ -35,6 +35,7 @@ module depanfx.nodelist.gui {
 
   exports com.pnambic.depanfx.nodelist.gui;
   exports com.pnambic.depanfx.nodelist.gui.columns;
+  exports com.pnambic.depanfx.nodelist.gui.columns.infos;
   exports com.pnambic.depanfx.nodelist.gui.link;
   exports com.pnambic.depanfx.nodelist.gui.sections;
   exports com.pnambic.depanfx.nodelist.gui.tooldata;

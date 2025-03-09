@@ -13,7 +13,7 @@
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             prefWidth="400"
-            fx:controller="com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeInfoColumnToolDialog" >
+            fx:controller="com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxInfoColumnToolDialog" >
    <VBox spacing="10" layoutX="10" layoutY="10"
          AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"
          AnchorPane.topAnchor="10" AnchorPane.bottomAnchor="10">
@@ -33,12 +33,23 @@
                   prefWidth="40" alignment="BASELINE_RIGHT"/>
          </HBox>
 
-         <Label text="Node Key"/>
+         <Label text="Info Selection"/>
 
          <HBox spacing="10">
-            <Label text="Show"/>
-            <ComboBox fx:id="keyChoiceField" />
+            <Label text="Info"/>
+            <ComboBox fx:id="infoChoiceField" promptText="Select"/>
+            <Label fx:id="infoDescrLabel" HBox.hgrow="ALWAYS"/>
          </HBox>
+
+         <Label text="Property Selection"/>
+
+         <HBox spacing="10">
+            <Label text="Property"/>
+            <ComboBox fx:id="propertyChoiceField" promptText="Select"/>
+            <Label fx:id="propertyDetailsLabel" HBox.hgrow="ALWAYS"/>
+         </HBox>
+
+         <Label fx:id="propertyDescrLabel" HBox.hgrow="ALWAYS"/>
 
          <Label text="Tool Name"/>
 

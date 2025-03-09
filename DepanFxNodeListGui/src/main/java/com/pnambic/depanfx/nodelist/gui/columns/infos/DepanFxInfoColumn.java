@@ -32,7 +32,7 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import javafx.scene.control.ContextMenu;
 
-public class DepanFxNodeInfoColumn
+public class DepanFxInfoColumn
     extends DepanFxAbstractColumn<DepanFxNodeInfoColumnData> {
 
   public static final String EDIT_INFO_COLUMN = "Edit Info Column...";
@@ -41,7 +41,7 @@ public class DepanFxNodeInfoColumn
 
   public static final String SELECT_INFO_COLUMN = "Select Info Column...";
 
-  public DepanFxNodeInfoColumn(
+  public DepanFxInfoColumn(
       DepanFxNodeListTableAdapter tableAdapter,
       DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnDataRsrc) {
     super(tableAdapter, columnDataRsrc);
@@ -76,12 +76,12 @@ public class DepanFxNodeInfoColumn
         DepanFxNodeInfoColumnData.buildInitialColumnData();
     DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnRsrc =
         workspace.addScratchResource(initialData);
-    DepanFxNodeInfoColumnToolDialog.runCreateDialog(columnRsrc, dialogRunner);
+    DepanFxInfoColumnToolDialog.runCreateDialog(columnRsrc, dialogRunner);
   }
 
   private void openColumnEditor(DepanFxDialogRunner dialogRunner) {
-    Dialog<DepanFxNodeInfoColumnToolDialog> nodeKeyColumnEditor =
-          DepanFxNodeInfoColumnToolDialog.runEditDialog(
+    Dialog<DepanFxInfoColumnToolDialog> nodeKeyColumnEditor =
+          DepanFxInfoColumnToolDialog.runEditDialog(
               forUpdate(buildEditData()), dialogRunner);
 
     nodeKeyColumnEditor.getController().getToolResource()
@@ -95,7 +95,8 @@ public class DepanFxNodeInfoColumn
         column.getWidth() / DepanFxSceneControls.layoutWidthMs(1));
     return new DepanFxNodeInfoColumnData(
         columnData.getToolName(), columnData.getToolDescription(),
-        columnData.getColumnLabel(), widthMs);
+        columnData.getColumnLabel(), widthMs,
+        columnData.getInfoContribution(), columnData.getInfoProperty());
   }
 
   private void openColumnChooser(DepanFxDialogRunner dialogRunner) {
@@ -117,9 +118,9 @@ public class DepanFxNodeInfoColumn
         result, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
 
     result.getExtensionFilters().add(
-        DepanFxNodeInfoColumnToolDialog.INFO_COLUMN_RSRC_FILTER);
+        DepanFxInfoColumnToolDialog.INFO_COLUMN_RSRC_FILTER);
     result.setSelectedExtensionFilter(
-        DepanFxNodeInfoColumnToolDialog.INFO_COLUMN_RSRC_FILTER);
+        DepanFxInfoColumnToolDialog.INFO_COLUMN_RSRC_FILTER);
     return result;
   }
 }

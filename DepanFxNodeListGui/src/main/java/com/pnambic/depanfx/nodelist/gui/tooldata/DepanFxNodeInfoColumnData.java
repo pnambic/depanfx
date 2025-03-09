@@ -15,7 +15,10 @@
  */
 package com.pnambic.depanfx.nodelist.gui.tooldata;
 
+import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxInfoRegistry;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
+
+import java.util.stream.Stream;
 
 public class DepanFxNodeInfoColumnData extends DepanFxBaseColumnData {
 
@@ -29,15 +32,36 @@ public class DepanFxNodeInfoColumnData extends DepanFxBaseColumnData {
 
   public static final String NODE_INFO_COLUMN_TOOL_EXT = "dnicti";
 
+  private final DepanFxInfoRegistry.Contribution infoContribution;
+
+  private final DepanFxNodeInfoPropertyData infoProperty;
+
   public DepanFxNodeInfoColumnData(
       String toolName, String toolDescription,
-      String columnLabel, int widthMs) {
+      String columnLabel, int widthMs,
+      DepanFxInfoRegistry.Contribution infoContribution,
+      DepanFxNodeInfoPropertyData infoProperty) {
     super(toolName, toolDescription, columnLabel, widthMs);
+    this.infoContribution = infoContribution;
+    this.infoProperty = infoProperty;
   }
 
   public static DepanFxNodeInfoColumnData buildInitialColumnData() {
     return new DepanFxNodeInfoColumnData(
         NEW_INFO_COLUMN_NAME, NEW_INFO_COLUMN_DESCR,
-        NEW_INFO_COLUMN_LABEL, COLUMN_WIDTH_MS);
+        NEW_INFO_COLUMN_LABEL, COLUMN_WIDTH_MS,
+        null, null);
+  }
+
+  public DepanFxInfoRegistry.Contribution getInfoContribution() {
+    return infoContribution;
+  }
+
+  public DepanFxNodeInfoPropertyData getInfoProperty() {
+    return infoProperty;
+  }
+
+  public Stream<DepanFxNodeInfoPropertyData> streamProperties() {
+    return infoContribution.streamProperties();
   }
 }

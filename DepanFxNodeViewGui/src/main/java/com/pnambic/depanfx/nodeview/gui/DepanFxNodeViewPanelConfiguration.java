@@ -18,8 +18,11 @@ package com.pnambic.depanfx.nodeview.gui;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.graph_doc.persistence.GraphDocPersistenceContribution;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
+import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxInfoRegistry;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeInfoPropertyData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData;
@@ -32,9 +35,10 @@ import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.Arrays;
 
 @Configuration
 public class DepanFxNodeViewPanelConfiguration {
@@ -63,38 +67,39 @@ public class DepanFxNodeViewPanelConfiguration {
 
   public static final String NODE_DISPLAY_KEY = "Node Display";
 
-  private final DepanFxNodeLayoutRegistry layoutRegistry;
+  public static final String NODE_POSITION_LABEL = "Position";
 
-  private final DepanFxNodeFiltersRegistry filterRegistry;
+  public static final String NODE_POSITION_KEY = "Position";
 
-  @Autowired
-  public DepanFxNodeViewPanelConfiguration(
-      DepanFxNodeLayoutRegistry layoutRegistry,
-      DepanFxNodeFiltersRegistry filterRegistry) {
-    this.layoutRegistry = layoutRegistry;
-    this.filterRegistry = filterRegistry;
-  }
+  public static final String NODE_POSITION_DESCR =
+      "Position of nodes in their rendered graph view.";
 
   /////////////////////////////////////
   // Open various resources as node views
 
   @Bean
   public DepanFxResourceRegistry.Contribution
-  nodeViewAsViewResourceContribution() {
+  nodeViewAsViewResourceContribution(
+      DepanFxNodeLayoutRegistry layoutRegistry,
+      DepanFxNodeFiltersRegistry filterRegistry) {
     return new NodeViewAsViewResourceContribution(
         layoutRegistry, filterRegistry);
   }
 
   @Bean
   public DepanFxResourceRegistry.Contribution
-  nodeListAsViewResourceContribution() {
+  nodeListAsViewResourceContribution(
+      DepanFxNodeLayoutRegistry layoutRegistry,
+      DepanFxNodeFiltersRegistry filterRegistry) {
     return new NodeListAsViewResourceContribution(
         layoutRegistry, filterRegistry);
   }
 
   @Bean
   public DepanFxResourceRegistry.Contribution
-  graphDocAsViewResourceContribution() {
+  graphDocAsViewResourceContribution(
+      DepanFxNodeLayoutRegistry layoutRegistry,
+      DepanFxNodeFiltersRegistry filterRegistry) {
     return new GraphDocAsViewResourceContribution(
         layoutRegistry, filterRegistry);
   }
@@ -142,6 +147,14 @@ public class DepanFxNodeViewPanelConfiguration {
         DepanFxSceneMenuItems.SELECTION_INVERT_ITEM,
         DepanFxNodeViewPanel.class,
         v -> v.doInvertSelectionAction());
+  }
+
+  /////////////////////////////////////
+  // Node Position Info
+
+  @Bean
+  public DepanFxInfoRegistry.Contribution nodePositionsInfoContribution() {
+    return new NodePositionInfoContribution();
   }
 
   /////////////////////////////////////
@@ -334,4 +347,32 @@ public class DepanFxNodeViewPanelConfiguration {
         workspace, layoutRegistry, filterRegistry, nodeViewRsrc);
     sceneSrvc.addViewer(viewPanel);
   }
+
+  private static class NodePositionInfoContribution extends DepanFxInfoRegistry.Basic {
+
+    public static DepanFxNodeInfoPropertyData buildPosProperty(
+        String toolName, String toolDescription) {
+      return new DepanFxNodeInfoPropertyData(
+          toolName, toolDescription,
+          DepanFxNodeInfoPropertyData.PropertyKind.POS, true);
+    }
+
+    private static final DepanFxNodeInfoPropertyData[] PROPERTIES =
+        new DepanFxNodeInfoPropertyData[] {
+            buildPosProperty("X Pos", "X position of the node"),
+            buildPosProperty("Y Pos", "Y position of the node"),
+            buildPosProperty("Z Pos", "Z position of the node")
+    };
+
+    public NodePositionInfoContribution() {
+      super(
+          DepanFxNodeLocationData.class.getName(),
+          NODE_POSITION_LABEL,
+          NODE_POSITION_DESCR,
+          DepanFxNodeLocationData.class,
+          NODE_POSITION_KEY,
+          Arrays.asList(PROPERTIES));
+    }
+  }
+
 }

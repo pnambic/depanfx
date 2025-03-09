@@ -41,7 +41,7 @@ import javafx.event.Event;
 import javafx.scene.control.Cell;
 
 @Configuration
-public class DepanFxNodeInfoColumnConfiguration {
+public class DepanFxInfoColumnConfiguration {
 
   public static final String INFOS_LABEL = "Infos";
 
@@ -73,7 +73,7 @@ public class DepanFxNodeInfoColumnConfiguration {
           INFOS_LABEL,
           DepanFxNodeInfoColumnData.class,
           INFOS_KEY,
-          DepanFxNodeInfoColumnToolDialog.INFO_COLUMN_RSRC_FILTER);
+          DepanFxInfoColumnToolDialog.INFO_COLUMN_RSRC_FILTER);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class DepanFxNodeInfoColumnConfiguration {
       @SuppressWarnings("unchecked")
       DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> infoRsrc =
           (DepanFxWorkspaceResource<DepanFxNodeInfoColumnData>) columnRsrc;
-      return new DepanFxNodeInfoColumn(tableAdapter, infoRsrc);
+      return new DepanFxInfoColumn(tableAdapter, infoRsrc);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class DepanFxNodeInfoColumnConfiguration {
       DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnRsrc =
           workspace.addScratchResource(columnData);
 
-      return DepanFxNodeInfoColumnToolDialog.runCreateDialog(
+      return DepanFxInfoColumnToolDialog.runCreateDialog(
           columnRsrc, dialogRunner)
           .getController()
           .getToolResource()
@@ -120,7 +120,7 @@ public class DepanFxNodeInfoColumnConfiguration {
     protected void runDialog(
         DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> wkspRsrc,
         DepanFxDialogRunner dialogRunner) {
-      DepanFxNodeInfoColumnToolDialog.runEditDialog(wkspRsrc, dialogRunner);
+      DepanFxInfoColumnToolDialog.runEditDialog(wkspRsrc, dialogRunner);
     }
   }
 
@@ -137,7 +137,7 @@ public class DepanFxNodeInfoColumnConfiguration {
         DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
-      DepanFxNodeInfoColumn.addNewColumnAction(builder, workspace, dialogRunner);
+      DepanFxInfoColumn.addNewColumnAction(builder, workspace, dialogRunner);
     }
 
     @Override
