@@ -19,7 +19,7 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.graph_doc.persistence.GraphDocPersistenceContribution;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxInfoRegistry;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeInfoPropertyData;
+import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeInfoProperty;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
@@ -350,15 +350,15 @@ public class DepanFxNodeViewPanelConfiguration {
 
   private static class NodePositionInfoContribution extends DepanFxInfoRegistry.Basic {
 
-    public static DepanFxNodeInfoPropertyData buildPosProperty(
+    public static DepanFxNodeInfoProperty buildPosProperty(
         String toolName, String toolDescription) {
-      return new DepanFxNodeInfoPropertyData(
+      return new DepanFxNodeInfoProperty(
           toolName, toolDescription,
-          DepanFxNodeInfoPropertyData.PropertyKind.POS, true);
+          DepanFxNodeInfoProperty.PropertyKind.POS, true);
     }
 
-    private static final DepanFxNodeInfoPropertyData[] PROPERTIES =
-        new DepanFxNodeInfoPropertyData[] {
+    private static final DepanFxNodeInfoProperty[] PROPERTIES =
+        new DepanFxNodeInfoProperty[] {
             buildPosProperty("X Pos", "X position of the node"),
             buildPosProperty("Y Pos", "Y position of the node"),
             buildPosProperty("Z Pos", "Z position of the node")

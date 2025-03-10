@@ -15,7 +15,9 @@
  */
 package com.pnambic.depanfx.nodelist.gui.persistence;
 
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeInfoColumnData;
+import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxInfoRegistry;
+import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeInfoColumnData;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeInfoColumnDataConverter;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
 
@@ -29,14 +31,12 @@ public class NodeInfoColumnDataPersistenceContribution
   public static final String EXTENSION =
       DepanFxNodeInfoColumnData.NODE_INFO_COLUMN_TOOL_EXT;
 
-  public static final String NODE_INFO_COLUMN_INFO_TAG = "info-column-info";
-
-  private static final Class<?>[] ALLOW_TYPES = new Class[] {
-      DepanFxNodeInfoColumnData.class
-  };
+  private final DepanFxInfoRegistry infoRegistry;
 
   @Autowired
-  public NodeInfoColumnDataPersistenceContribution() {
+  public NodeInfoColumnDataPersistenceContribution(
+      DepanFxInfoRegistry infoRegistry) {
+    this.infoRegistry = infoRegistry;
   }
 
   @Override
@@ -51,8 +51,6 @@ public class NodeInfoColumnDataPersistenceContribution
 
   @Override
   public void prepareTransport(PersistDocumentTransportBuilder builder) {
-    builder.addAlias(NODE_INFO_COLUMN_INFO_TAG, DepanFxNodeInfoColumnData.class);
-
-    builder.addAllowedType(ALLOW_TYPES);
+    builder.addConverter(new DepanFxNodeInfoColumnDataConverter(infoRegistry));
   }
 }

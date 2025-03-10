@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.nodelist.gui.tooldata;
+package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
 import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
-public class DepanFxNodeInfoPropertyData extends DepanFxBaseToolData {
+public class DepanFxNodeInfoProperty extends DepanFxBaseToolData {
 
   public enum PropertyKind {
     INT,
@@ -33,7 +33,7 @@ public class DepanFxNodeInfoPropertyData extends DepanFxBaseToolData {
 
   private final boolean isEditable;
 
-  public DepanFxNodeInfoPropertyData(
+  public DepanFxNodeInfoProperty(
       String toolName, String toolDescription,
       PropertyKind propertyKind, boolean isEditable) {
     super(toolName, toolDescription);
@@ -41,15 +41,15 @@ public class DepanFxNodeInfoPropertyData extends DepanFxBaseToolData {
     this.isEditable = isEditable;
   }
 
-  public static DepanFxNodeInfoPropertyData buildStringProperty(
+  public static DepanFxNodeInfoProperty buildStringProperty(
       String toolName, String toolDescription) {
-    return new DepanFxNodeInfoPropertyData(
+    return new DepanFxNodeInfoProperty(
         toolName, toolDescription,
         PropertyKind.STRING, false);
   }
 
-  public static DepanFxNodeInfoPropertyData buildInitialColumnData() {
-    return new DepanFxNodeInfoPropertyData(
+  public static DepanFxNodeInfoProperty buildInitialColumnData() {
+    return new DepanFxNodeInfoProperty(
         NEW_PROPERTY_NAME, NEW_PROPERTY_DESCR,
         PropertyKind.STRING, false);
   }

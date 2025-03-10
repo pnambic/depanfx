@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.nodelist.gui.tooldata;
+package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
-import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxInfoRegistry;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 
 import java.util.stream.Stream;
@@ -34,13 +33,13 @@ public class DepanFxNodeInfoColumnData extends DepanFxBaseColumnData {
 
   private final DepanFxInfoRegistry.Contribution infoContribution;
 
-  private final DepanFxNodeInfoPropertyData infoProperty;
+  private final DepanFxNodeInfoProperty infoProperty;
 
   public DepanFxNodeInfoColumnData(
       String toolName, String toolDescription,
       String columnLabel, int widthMs,
       DepanFxInfoRegistry.Contribution infoContribution,
-      DepanFxNodeInfoPropertyData infoProperty) {
+      DepanFxNodeInfoProperty infoProperty) {
     super(toolName, toolDescription, columnLabel, widthMs);
     this.infoContribution = infoContribution;
     this.infoProperty = infoProperty;
@@ -57,11 +56,11 @@ public class DepanFxNodeInfoColumnData extends DepanFxBaseColumnData {
     return infoContribution;
   }
 
-  public DepanFxNodeInfoPropertyData getInfoProperty() {
+  public DepanFxNodeInfoProperty getInfoProperty() {
     return infoProperty;
   }
 
-  public Stream<DepanFxNodeInfoPropertyData> streamProperties() {
+  public Stream<DepanFxNodeInfoProperty> streamProperties() {
     return infoContribution.streamProperties();
   }
 }

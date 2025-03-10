@@ -38,7 +38,7 @@ public class WorkspaceResourcePersistenceContribution
       builder.addConverter(converter);
     }
     if (DepanFxProjectResource.class.isAssignableFrom(withType)) {
-      builder.addConverter(new DepanFxBuiltInProjectResourceConverter());
+      builder.addConverter(new DepanFxBuiltInProjectResourceConverter<>());
     }
   }
 }

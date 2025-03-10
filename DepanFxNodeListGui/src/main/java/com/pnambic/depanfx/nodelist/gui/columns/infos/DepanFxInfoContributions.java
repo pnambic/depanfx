@@ -16,7 +16,6 @@
 package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
 import com.pnambic.depanfx.graph.context.ContextNodeId;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeInfoPropertyData;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,15 +36,15 @@ public class DepanFxInfoContributions {
     return new NodeKeyInfoContribution();
   }
 
-  private static final DepanFxNodeInfoPropertyData[] PROPERTIES =
-      new DepanFxNodeInfoPropertyData[] {
-          DepanFxNodeInfoPropertyData.buildStringProperty(
+  private static final DepanFxNodeInfoProperty[] PROPERTIES =
+      new DepanFxNodeInfoProperty[] {
+          DepanFxNodeInfoProperty.buildStringProperty(
               "Model", "Node id graph model property"),
-          DepanFxNodeInfoPropertyData.buildStringProperty(
+          DepanFxNodeInfoProperty.buildStringProperty(
               "Kind", "Node id node kind property"),
-          DepanFxNodeInfoPropertyData.buildStringProperty(
+          DepanFxNodeInfoProperty.buildStringProperty(
               "Key", "Node id node key property"),
-          DepanFxNodeInfoPropertyData.buildStringProperty(
+          DepanFxNodeInfoProperty.buildStringProperty(
               "Complete", "Complete node id")
   };
 

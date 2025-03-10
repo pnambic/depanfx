@@ -18,7 +18,6 @@ package com.pnambic.depanfx.nodelist.gui.columns.infos;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxAbstractColumn;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeInfoColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;

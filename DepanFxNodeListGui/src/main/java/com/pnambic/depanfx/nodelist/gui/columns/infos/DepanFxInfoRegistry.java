@@ -15,7 +15,6 @@
  */
 package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeInfoPropertyData;
 import com.pnambic.depanfx.scene.plugins.DepanFxOrderableContribution;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -61,9 +60,9 @@ public class DepanFxInfoRegistry {
     /**
      * Supply the properties supported by this info.
      */
-    Stream<DepanFxNodeInfoPropertyData> streamProperties();
+    Stream<DepanFxNodeInfoProperty> streamProperties();
 
-    Optional<DepanFxNodeInfoPropertyData> getProperty(String label);
+    Optional<DepanFxNodeInfoProperty> getProperty(String label);
   }
 
   public static abstract class Basic implements Contribution {
@@ -78,7 +77,7 @@ public class DepanFxInfoRegistry {
 
     private final String orderKey;
 
-    private final List<DepanFxNodeInfoPropertyData> properties;
+    private final List<DepanFxNodeInfoProperty> properties;
 
     public Basic(
         String id,
@@ -86,7 +85,7 @@ public class DepanFxInfoRegistry {
         String descr,
         Class<?> acceptType,
         String orderKey,
-        List<DepanFxNodeInfoPropertyData> properties) {
+        List<DepanFxNodeInfoProperty> properties) {
       this.id = id;
       this.label = label;
       this.descr = descr;
@@ -116,12 +115,12 @@ public class DepanFxInfoRegistry {
     }
 
     @Override
-    public Stream<DepanFxNodeInfoPropertyData> streamProperties() {
+    public Stream<DepanFxNodeInfoProperty> streamProperties() {
       return properties.stream();
     }
 
     @Override
-    public Optional<DepanFxNodeInfoPropertyData> getProperty(String label) {
+    public Optional<DepanFxNodeInfoProperty> getProperty(String label) {
       return properties.stream()
           .filter(p -> label.equals(p.getToolName()))
           .findFirst();

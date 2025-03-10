@@ -17,8 +17,6 @@ package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxBaseColumnToolDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxInfoRegistry.Contribution;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeInfoColumnData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeInfoPropertyData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
@@ -73,7 +71,7 @@ public class DepanFxInfoColumnToolDialog
   private Label infoDescrLabel;
 
   @FXML
-  private ComboBox<DepanFxNodeInfoPropertyData> propertyChoiceField;
+  private ComboBox<DepanFxNodeInfoProperty> propertyChoiceField;
 
   @FXML
   private Label propertyDetailsLabel;
@@ -142,7 +140,7 @@ public class DepanFxInfoColumnToolDialog
   @Override
   protected DepanFxNodeInfoColumnData prepareResult() {
     Contribution info = infoChoiceField.getValue();
-    DepanFxNodeInfoPropertyData property = propertyChoiceField.getValue();
+    DepanFxNodeInfoProperty property = propertyChoiceField.getValue();
 
     return new DepanFxNodeInfoColumnData(
         getToolName(), getToolDescription(),
@@ -171,7 +169,7 @@ public class DepanFxInfoColumnToolDialog
     DepanFxInfoRegistry.Contribution infoContrib = infoChoiceField.getValue();
     infoDescrLabel.setText(infoContrib.getInfoDescription());
 
-    ObservableList<DepanFxNodeInfoPropertyData> propertyItems =
+    ObservableList<DepanFxNodeInfoProperty> propertyItems =
         propertyChoiceField.getItems();
     propertyItems.clear();
     infoContrib.streamProperties()
@@ -179,7 +177,7 @@ public class DepanFxInfoColumnToolDialog
   }
 
   private void handlePropertyAction(ActionEvent event) {
-    DepanFxNodeInfoPropertyData infoProp = propertyChoiceField.getValue();
+    DepanFxNodeInfoProperty infoProp = propertyChoiceField.getValue();
     if (infoProp != null) {
       propertyDetailsLabel.setText(infoProp.getPropertyKind().toString());
       propertyDescrLabel.setText(infoProp.getToolDescription());
@@ -209,17 +207,17 @@ public class DepanFxInfoColumnToolDialog
   }
 
   private class PropertyConverter
-      extends StringConverter<DepanFxNodeInfoPropertyData> {
+      extends StringConverter<DepanFxNodeInfoProperty> {
 
     DepanFxInfoRegistry.Contribution contrib;
 
     @Override
-    public String toString(DepanFxNodeInfoPropertyData contribution) {
+    public String toString(DepanFxNodeInfoProperty contribution) {
         return contribution.getToolName();
     }
 
     @Override
-    public DepanFxNodeInfoPropertyData fromString(String label) {
+    public DepanFxNodeInfoProperty fromString(String label) {
       return contrib.getProperty(label).orElse(null);
     }
   }
