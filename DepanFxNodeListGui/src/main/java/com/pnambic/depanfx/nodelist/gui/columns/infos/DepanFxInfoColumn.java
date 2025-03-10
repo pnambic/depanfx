@@ -58,7 +58,8 @@ public class DepanFxInfoColumn
 
   @Override
   public String toString(DepanFxNodeListGraphNode member) {
-    return "<unknown info>";
+    return tableAdapter.getInfoPropertyString(
+        member.getGraphNode(), getColumnData());
   }
 
   public static void addNewColumnAction(

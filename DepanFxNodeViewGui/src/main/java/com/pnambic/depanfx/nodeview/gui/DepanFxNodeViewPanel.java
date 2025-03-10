@@ -348,6 +348,10 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
         .collect(Collectors.toMap(Function.identity(), nodeLocations::get));
   }
 
+  public DepanFxNodeLocationData getNodeLocation(GraphNode node) {
+    return nodeLocations.get(node);
+  }
+
   public void updateNodeLocations(
       Map<GraphNode, DepanFxNodeLocationData> locations) {
     LOG.info("Updating location of {} nodes", locations.size());

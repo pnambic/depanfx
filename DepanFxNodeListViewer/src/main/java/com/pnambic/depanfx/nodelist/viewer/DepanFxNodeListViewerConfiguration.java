@@ -62,8 +62,7 @@ public class DepanFxNodeListViewerConfiguration {
   }
 
   @Bean
-  public DepanFxResourceRegistry.Contribution
-  TableViewContribution() {
+  public DepanFxResourceRegistry.Contribution TableViewContribution() {
     return new TableViewResourceContribution();
   }
 
@@ -139,8 +138,7 @@ public class DepanFxNodeListViewerConfiguration {
 
     private final DepanFxColumnRegistry columnRegistry;
 
-    public NodeListResourceContribution(
-        DepanFxColumnRegistry columnRegistry) {
+    public NodeListResourceContribution(DepanFxColumnRegistry columnRegistry) {
       super(
           OPEN_AS_LIST_LABEL,
           DepanFxNodeList.class,
@@ -158,10 +156,11 @@ public class DepanFxNodeListViewerConfiguration {
 
     @Override
     public void openPanel(DepanFxWorkspace workspace,
-        DepanFxSceneService sceneSrvc, DepanFxProjectDocument document) {
+        DepanFxSceneService sceneSrvc,
+        DepanFxProjectDocument document) {
       workspace.getWorkspaceResource(document, DepanFxNodeList.class)
-        .ifPresent(r ->
-            addNodeListPanelToScene(workspace, sceneSrvc, columnRegistry, r));
+        .ifPresent(r -> addNodeListPanelToScene(
+            workspace, sceneSrvc, columnRegistry, r));
     }
 
     private static void addNodeListPanelToScene(
@@ -186,10 +185,9 @@ public class DepanFxNodeListViewerConfiguration {
       extends DepanFxResourceRegistry.Principal<GraphDocument>
       implements DepanFxResourceRegistry.Panel {
 
-    private DepanFxColumnRegistry columnRegistry;
+    private final DepanFxColumnRegistry columnRegistry;
 
-    public GraphDocResourceContribution(
-        DepanFxColumnRegistry columnRegistry) {
+    public GraphDocResourceContribution(DepanFxColumnRegistry columnRegistry) {
       super(
           OPEN_GRAPH_AS_LIST_LABEL,
           GraphDocument.class,
@@ -208,10 +206,11 @@ public class DepanFxNodeListViewerConfiguration {
 
     @Override
     public void openPanel(DepanFxWorkspace workspace,
-        DepanFxSceneService sceneSrvc, DepanFxProjectDocument document) {
+        DepanFxSceneService sceneSrvc,
+        DepanFxProjectDocument document) {
       workspace.getWorkspaceResource(document, GraphDocument.class)
-        .ifPresent(r ->
-            addGraphDocViewToScene(workspace, sceneSrvc, columnRegistry, r));
+        .ifPresent(r -> addGraphDocViewToScene(
+            workspace, sceneSrvc, columnRegistry, r));
     }
 
     private static void addGraphDocViewToScene(

@@ -7,6 +7,8 @@ module depanfx.graph.info {
   requires depanfx.base;
   requires depanfx.graph;
 
+  opens com.pnambic.depanfx.graph.nodeinfo to spring.core;
+
   exports com.pnambic.depanfx.graph.info;
   exports com.pnambic.depanfx.graph.nodeinfo;
 }

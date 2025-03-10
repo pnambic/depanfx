@@ -15,14 +15,11 @@
  */
 package com.pnambic.depanfx.nodeview.gui;
 
-import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
-import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.graph_doc.persistence.GraphDocPersistenceContribution;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
-import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData;
@@ -37,8 +34,6 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Arrays;
 
 @Configuration
 public class DepanFxNodeViewPanelConfiguration {
@@ -147,14 +142,6 @@ public class DepanFxNodeViewPanelConfiguration {
         DepanFxSceneMenuItems.SELECTION_INVERT_ITEM,
         DepanFxNodeViewPanel.class,
         v -> v.doInvertSelectionAction());
-  }
-
-  /////////////////////////////////////
-  // Node Position Info
-
-  @Bean
-  public DepanFxInfoRegistry.Contribution nodePositionsInfoContribution() {
-    return new NodePositionInfoContribution();
   }
 
   /////////////////////////////////////
@@ -346,33 +333,6 @@ public class DepanFxNodeViewPanelConfiguration {
     DepanFxNodeViewPanel viewPanel = new DepanFxNodeViewPanel(
         workspace, layoutRegistry, filterRegistry, nodeViewRsrc);
     sceneSrvc.addViewer(viewPanel);
-  }
-
-  private static class NodePositionInfoContribution extends DepanFxInfoRegistry.Basic {
-
-    public static DepanFxNodeInfoProperty buildPosProperty(
-        String toolName, String toolDescription) {
-      return new DepanFxNodeInfoProperty(
-          toolName, toolDescription,
-          DepanFxNodeInfoProperty.PropertyKind.POS, true);
-    }
-
-    private static final DepanFxNodeInfoProperty[] PROPERTIES =
-        new DepanFxNodeInfoProperty[] {
-            buildPosProperty("X Pos", "X position of the node"),
-            buildPosProperty("Y Pos", "Y position of the node"),
-            buildPosProperty("Z Pos", "Z position of the node")
-    };
-
-    public NodePositionInfoContribution() {
-      super(
-          DepanFxNodeLocationData.class.getName(),
-          NODE_POSITION_LABEL,
-          NODE_POSITION_DESCR,
-          DepanFxNodeLocationData.class,
-          NODE_POSITION_KEY,
-          Arrays.asList(PROPERTIES));
-    }
   }
 
 }

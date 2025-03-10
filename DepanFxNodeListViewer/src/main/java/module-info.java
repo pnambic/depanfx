@@ -1,4 +1,5 @@
 module depanfx.nodelist.viewer {
+  requires javafx.base;
   requires javafx.controls;
   requires javafx.fxml;
   requires transitive javafx.graphics;
@@ -14,6 +15,7 @@ module depanfx.nodelist.viewer {
 
   requires depanfx.base;
   requires depanfx.graph;
+  requires depanfx.graph.info;
   requires depanfx.nodelist;
   requires depanfx.nodefilters.gui;
   requires depanfx.nodelist.gui;
@@ -23,7 +25,6 @@ module depanfx.nodelist.viewer {
   requires depanfx.workspace;
   requires depanfx.graph_doc;
   requires depanfx.scene;
-  requires javafx.base;
 
   opens com.pnambic.depanfx.nodelist.viewdata;
   opens com.pnambic.depanfx.nodelist.viewer

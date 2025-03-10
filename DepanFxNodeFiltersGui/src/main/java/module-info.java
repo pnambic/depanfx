@@ -20,6 +20,7 @@ module depanfx.nodefilters.gui {
   requires depanfx.graph_doc;
   requires depanfx.scene;
   requires javafx.base;
+  requires depanfx.graph.info;
 
   opens com.pnambic.depanfx.nodefilters.gui
       to javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;

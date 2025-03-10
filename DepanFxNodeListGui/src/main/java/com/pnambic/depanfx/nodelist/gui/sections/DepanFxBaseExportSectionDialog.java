@@ -43,6 +43,7 @@ public abstract class DepanFxBaseExportSectionDialog {
   private static final ExtensionFilter EXT_FILTER =
       DepanFxSceneControls.buildExtFilter("Spreadsheet/CSV", CSV_EXT);
 
+  @SuppressWarnings("unused")
   private final DepanFxWorkspace workspace;
 
   private DepanFxNodeListSection section;

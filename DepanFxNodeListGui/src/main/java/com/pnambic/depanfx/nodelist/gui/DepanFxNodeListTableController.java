@@ -1,10 +1,13 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry.Contribution;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
+import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeInfoColumnData;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
@@ -193,5 +196,24 @@ public class DepanFxNodeListTableController
   @Override
   public Stream<Contribution> streamColumnChoices() {
     return columnRegistry.streamContributions();
+  }
+
+  public Optional<?> getInfoPropertyValue(
+      GraphNode graphNode,
+      DepanFxInfoRegistry.Contribution infoContribution,
+      DepanFxNodeInfoProperty infoProperty) {
+    return infoContribution
+        .getPropertyValue(graphNode, infoProperty);
+  }
+
+  @Override
+  public String getInfoPropertyString(
+      GraphNode graphNode, DepanFxNodeInfoColumnData columnInfo) {
+    return getInfoPropertyValue(
+        graphNode,
+        columnInfo.getInfoContribution(),
+        columnInfo.getInfoProperty())
+        .map(v -> v.toString())
+        .orElse("");
   }
 }

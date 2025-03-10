@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoSource;
 import com.pnambic.depanfx.graph_doc.model.GraphModel;
 import com.pnambic.depanfx.nodefilters.model.DepanFxBaseFilter;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
@@ -85,6 +86,8 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
 
   private final DepanFxDialogRunner dialogRunner;
 
+  private final DepanFxColumnRegistry columnRegistry;
+
   private final DepanFxNodeFiltersRegistry nodeFiltersRegistry;
 
   private final DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry;
@@ -122,8 +125,6 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
   private Consumer<DepanFxNodeList> onUpdate;
 
   private DepanFxNodeList sourceNodes;
-
-  private final DepanFxColumnRegistry columnRegistry;
 
   @Autowired
   public DepanFxNodeViewNodeFiltersDialog(

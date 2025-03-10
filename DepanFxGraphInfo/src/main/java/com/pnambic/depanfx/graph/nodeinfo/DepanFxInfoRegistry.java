@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.graph.nodeinfo;
 
 import com.pnambic.depanfx.base.DepanFxOrderableContribution;
+import com.pnambic.depanfx.graph.model.GraphNode;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,6 +61,9 @@ public interface DepanFxInfoRegistry {
     Stream<DepanFxNodeInfoProperty> streamProperties();
 
     Optional<DepanFxNodeInfoProperty> getProperty(String label);
+
+    Optional<?> getPropertyValue(
+        GraphNode graphNode, DepanFxNodeInfoProperty infoProperty);
   }
 
   public static abstract class Basic implements Contribution {
