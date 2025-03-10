@@ -19,8 +19,11 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableState;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
+import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeInfoColumnDataConverter;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
+import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
+import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -50,19 +53,28 @@ public class DepanFxInfoColumnConfiguration {
 
   public static final String INFOS_COLUMN_KEY = "Infos Column";
 
+  public static final String EXTENSION =
+      DepanFxNodeInfoColumnData.NODE_INFO_COLUMN_TOOL_EXT;
+
   @Bean
-  public DepanFxColumnRegistry.Contribution nodeInfoColumnContribution() {
+  public DepanFxColumnRegistry.Contribution infoColumnContribution() {
     return new NodeInfoColumnContribution();
   }
 
   @Bean
-  public DepanFxResourceRegistry.Contribution nodeInfoColumnFileOpenMenu() {
-    return new NodeInfoColumnFileOpenContribution();
+  public DepanFxResourceRegistry.Contribution infoColumnFileOpenMenu() {
+    return new InfoColumnFileOpenContribution();
   }
 
   @Bean
-  public DepanFxResourcePathMenuContribution nodeInfoColumnPathMenu() {
-    return new NodeInfoColumnPathContribution();
+  public DepanFxResourcePathMenuContribution infoColumnPathMenu() {
+    return new InfoColumnPathContribution();
+  }
+
+  @Bean
+  public DocumentPersistenceContribution infoColumnPersistenceContribution(
+      DepanFxInfoRegistry infoRegistry) {
+    return new InfoColumnPersistenceContribution(infoRegistry);
   }
 
   private static class NodeInfoColumnContribution
@@ -104,10 +116,10 @@ public class DepanFxInfoColumnConfiguration {
     }
   }
 
-  private static class NodeInfoColumnFileOpenContribution
+  private static class InfoColumnFileOpenContribution
       extends DepanFxResourceRegistry.Principal<DepanFxNodeInfoColumnData> {
 
-    public NodeInfoColumnFileOpenContribution() {
+    public InfoColumnFileOpenContribution() {
       super(
           INFOS_COLUMN_LABEL,
           DepanFxNodeInfoColumnData.class,
@@ -123,7 +135,7 @@ public class DepanFxInfoColumnConfiguration {
     }
   }
 
-  private static class NodeInfoColumnPathContribution
+  private static class InfoColumnPathContribution
       implements DepanFxResourcePathMenuContribution {
 
     @Override
@@ -142,6 +154,32 @@ public class DepanFxInfoColumnConfiguration {
     @Override
     public String getOrderKey() {
       return INFOS_COLUMN_KEY;
+    }
+  }
+
+  private static class InfoColumnPersistenceContribution
+      implements DocumentPersistenceContribution {
+
+    private final DepanFxInfoRegistry infoRegistry;
+
+    public InfoColumnPersistenceContribution(
+        DepanFxInfoRegistry infoRegistry) {
+      this.infoRegistry = infoRegistry;
+    }
+
+    @Override
+    public boolean acceptsDocument(Object document) {
+      return DepanFxNodeInfoColumnData.class.isAssignableFrom(document.getClass());
+    }
+
+    @Override
+    public boolean acceptsExt(String extText) {
+      return EXTENSION.equalsIgnoreCase(extText);
+    }
+
+    @Override
+    public void prepareTransport(PersistDocumentTransportBuilder builder) {
+      builder.addConverter(new DepanFxNodeInfoColumnDataConverter(infoRegistry));
     }
   }
 }

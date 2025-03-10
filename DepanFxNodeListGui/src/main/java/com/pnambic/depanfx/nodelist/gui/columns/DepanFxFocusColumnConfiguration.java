@@ -5,6 +5,9 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableState;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
+import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
+import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
+import com.pnambic.depanfx.persistence.plugins.GraphNodePersistencePluginRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -26,13 +29,16 @@ import javafx.scene.control.Cell;
 @Configuration
 public class DepanFxFocusColumnConfiguration {
 
-  private static final String FOCUS_LABEL = "Focus";
+  public static final String FOCUS_LABEL = "Focus";
 
-  private static final String FOCUS_KEY = "Focus";
+  public static final String FOCUS_KEY = "Focus";
 
-  private static final String FOCUS_COLUMN_LABEL = "Focus Column";
+  public static final String FOCUS_COLUMN_LABEL = "Focus Column";
 
-  private static final String FOCUS_COLUMN_KEY = "Focus Column";
+  public static final String FOCUS_COLUMN_KEY = "Focus Column";
+
+  public static final String EXTENSION =
+      DepanFxFocusColumnData.FOCUS_COLUMN_TOOL_EXT;
 
   @Bean
   public DepanFxColumnRegistry.Contribution
@@ -49,6 +55,12 @@ public class DepanFxFocusColumnConfiguration {
   @Bean
   public DepanFxResourcePathMenuContribution focusColumnPathMenu() {
     return new FocusColumnPathContribution();
+  }
+
+  @Bean
+  public DocumentPersistenceContribution focusColumnPersistenceContribution(
+      GraphNodePersistencePluginRegistry graphNodeRegistry) {
+    return new FocusColumnPersistenceContribution(graphNodeRegistry);
   }
 
   private static class FocusColumnContribution
@@ -131,4 +143,41 @@ public class DepanFxFocusColumnConfiguration {
       return FOCUS_COLUMN_KEY;
     }
   }
+
+  private static class FocusColumnPersistenceContribution
+      implements DocumentPersistenceContribution {
+
+    public static final String FOCUS_COLUMN_INFO_TAG = "focus-column-info";
+
+    private static final Class<?>[] ALLOW_TYPES = new Class[] {
+        DepanFxFocusColumnData.class
+    };
+
+    private final GraphNodePersistencePluginRegistry graphNodeRegistry;
+
+    public FocusColumnPersistenceContribution(
+        GraphNodePersistencePluginRegistry graphNodeRegistry) {
+      this.graphNodeRegistry = graphNodeRegistry;
+    }
+
+    @Override
+    public boolean acceptsDocument(Object document) {
+      return DepanFxFocusColumnData.class.isAssignableFrom(document.getClass());
+    }
+
+    @Override
+    public boolean acceptsExt(String extText) {
+      return EXTENSION.equalsIgnoreCase(extText);
+    }
+
+    @Override
+    public void prepareTransport(PersistDocumentTransportBuilder builder) {
+      builder.addAlias(FOCUS_COLUMN_INFO_TAG, DepanFxFocusColumnData.class);
+
+      builder.addAllowedType(ALLOW_TYPES);
+      graphNodeRegistry.applyExtensions(builder, DepanFxWorkspaceResource.class);
+    }
+
+  }
+
 }

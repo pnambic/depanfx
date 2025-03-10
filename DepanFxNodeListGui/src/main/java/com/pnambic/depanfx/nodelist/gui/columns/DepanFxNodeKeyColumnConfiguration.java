@@ -5,6 +5,8 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableState;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
+import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
+import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -34,6 +36,9 @@ public class DepanFxNodeKeyColumnConfiguration {
 
   public static final String NODE_KEY_COLUMN_KEY = "Node Key Column";
 
+  public static final String EXTENSION =
+      DepanFxNodeKeyColumnData.NODE_KEY_COLUMN_TOOL_EXT;
+
   @Bean
   public DepanFxColumnRegistry.Contribution
       nodeKeyColumnContribution() {
@@ -48,6 +53,11 @@ public class DepanFxNodeKeyColumnConfiguration {
   @Bean
   public DepanFxResourcePathMenuContribution nodeKeyColumnPathMenu() {
     return new NodeKeyColumnPathContribution();
+  }
+
+  @Bean
+  public DocumentPersistenceContribution nodeKeyColumnPersistenceContribution() {
+    return new NodeKeyColumnPersistenceContribution();
   }
 
   private static class NodeKeyColumnContribution
@@ -127,6 +137,38 @@ public class DepanFxNodeKeyColumnConfiguration {
     @Override
     public String getOrderKey() {
       return NODE_KEY_COLUMN_KEY;
+    }
+  }
+
+  private class NodeKeyColumnPersistenceContribution
+      implements DocumentPersistenceContribution {
+
+    public static final String NODE_KEY_COLUMN_INFO_TAG = "node-key-column-info";
+
+    public static final String KEY_CHOICE_TAG = "key-choice-info";
+
+    private static final Class<?>[] ALLOW_TYPES = new Class[] {
+        DepanFxNodeKeyColumnData.class,
+        DepanFxNodeKeyColumnData.KeyChoice.class
+    };
+
+    @Override
+    public boolean acceptsDocument(Object document) {
+      return DepanFxNodeKeyColumnData.class.isAssignableFrom(document.getClass());
+    }
+
+    @Override
+    public boolean acceptsExt(String extText) {
+      return EXTENSION.equalsIgnoreCase(extText);
+    }
+
+    @Override
+    public void prepareTransport(PersistDocumentTransportBuilder builder) {
+      builder.addAlias(NODE_KEY_COLUMN_INFO_TAG, DepanFxNodeKeyColumnData.class);
+      builder.addAlias(
+          KEY_CHOICE_TAG, DepanFxNodeKeyColumnData.KeyChoice.class);
+
+      builder.addAllowedType(ALLOW_TYPES);
     }
   }
 }

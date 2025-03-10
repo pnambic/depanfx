@@ -5,6 +5,9 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableState;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
+import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
+import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
+import com.pnambic.depanfx.persistence.plugins.GraphNodePersistencePluginRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -34,6 +37,9 @@ public class DepanFxCategoryColumnConfiguration {
 
   private static final String CATEGORY_COLUMN_KEY = "Category Column";
 
+  public static final String EXTENSION =
+      DepanFxCategoryColumnData.CATEGORY_COLUMN_TOOL_EXT;
+
   @Bean
   public DepanFxColumnRegistry.Contribution categoryColumnContribution() {
     return new CategoryColumnContribution();
@@ -49,6 +55,12 @@ public class DepanFxCategoryColumnConfiguration {
   @Bean
   public DepanFxResourcePathMenuContribution categoryColumnPathMenu() {
     return new CategoryColumnPathContribution();
+  }
+
+  @Bean
+  public DocumentPersistenceContribution categoryColumnPersistenceContribution(
+      GraphNodePersistencePluginRegistry graphNodeRegistry) {
+    return new CategoryColumnPersistenceContribution(graphNodeRegistry);
   }
 
   private static class CategoryColumnContribution
@@ -135,4 +147,49 @@ public class DepanFxCategoryColumnConfiguration {
       return CATEGORY_COLUMN_KEY;
     }
   }
+
+  private static class CategoryColumnPersistenceContribution
+      implements DocumentPersistenceContribution {
+
+    public static final String CATEGORY_COLUMN_INFO_TAG =
+        "category-column-info";
+
+    public static final String CATEGORY_ENTRY_TAG = "category-entry";
+
+    private static final Class<?>[] ALLOW_TYPES = new Class[] {
+        DepanFxCategoryColumnData.class,
+        DepanFxCategoryColumnData.CategoryEntry.class
+    };
+
+    private final GraphNodePersistencePluginRegistry graphNodeRegistry;
+
+    public CategoryColumnPersistenceContribution(
+        GraphNodePersistencePluginRegistry graphNodeRegistry) {
+      this.graphNodeRegistry = graphNodeRegistry;
+    }
+
+    @Override
+    public boolean acceptsDocument(Object document) {
+      return DepanFxCategoryColumnData.class.isAssignableFrom(
+          document.getClass());
+    }
+
+    @Override
+    public boolean acceptsExt(String extText) {
+      return EXTENSION.equalsIgnoreCase(extText);
+    }
+
+    @Override
+    public void prepareTransport(PersistDocumentTransportBuilder builder) {
+      builder.addAlias(
+          CATEGORY_COLUMN_INFO_TAG, DepanFxCategoryColumnData.class);
+      builder.addAlias(
+          CATEGORY_ENTRY_TAG, DepanFxCategoryColumnData.CategoryEntry.class);
+
+      builder.addAllowedType(ALLOW_TYPES);
+      graphNodeRegistry.applyExtensions(
+          builder, DepanFxWorkspaceResource.class);
+    }
+  }
+
 }
