@@ -8,6 +8,7 @@ module depanfx.java.nodeview {
 
   requires depanfx.base;
   requires depanfx.graph;
+  requires depanfx.graph.info;
   requires depanfx.nodelist;
   requires depanfx.filesystem;
   requires depanfx.graph_doc;

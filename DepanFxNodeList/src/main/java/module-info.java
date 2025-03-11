@@ -6,6 +6,7 @@ module depanfx.nodelist {
 
   requires depanfx.graph;
   requires depanfx.graph_doc;
+  requires depanfx.graph.info;
   requires depanfx.persistence;
   requires depanfx.workspace;
   requires pnambic.modxstream;

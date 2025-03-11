@@ -16,8 +16,8 @@
 package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
 import com.pnambic.depanfx.graph.context.ContextNodeId;
-import com.pnambic.depanfx.nodeinfo.DepanFxInfoRegistry;
-import com.pnambic.depanfx.nodeinfo.DepanFxNodeInfoProperty;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

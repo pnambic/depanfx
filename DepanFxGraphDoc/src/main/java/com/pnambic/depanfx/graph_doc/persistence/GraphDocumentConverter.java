@@ -1,8 +1,8 @@
 package com.pnambic.depanfx.graph_doc.persistence;
 
 import com.pnambic.depanfx.graph.context.ContextModelId;
-import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.graph_doc.model.GraphModel;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
 import com.pnambic.depanfx.persistence.PersistTagDataLoader;
 import com.pnambic.modxstream.XstreamMarshalContext;

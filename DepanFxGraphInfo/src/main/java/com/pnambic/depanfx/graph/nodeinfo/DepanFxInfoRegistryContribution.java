@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.nodeinfo;
+package com.pnambic.depanfx.graph.nodeinfo;
 
 import com.pnambic.depanfx.base.DepanFxOrderableContribution;
 

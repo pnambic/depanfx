@@ -17,7 +17,6 @@
 package com.pnambic.depanfx.graph_doc.model;
 
 import com.pnambic.depanfx.graph.context.ContextModelId;
-import com.pnambic.depanfx.graph.model.GraphModel;
 
 /**
  * A document that provides information about a dependency graph.  In addition

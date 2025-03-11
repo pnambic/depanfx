@@ -5,6 +5,7 @@ module depanfx.graph_doc {
   requires spring.beans;
 
   requires depanfx.graph;
+  requires depanfx.graph.info;
   requires depanfx.persistence;
   requires depanfx.workspace;
   requires pnambic.modxstream;

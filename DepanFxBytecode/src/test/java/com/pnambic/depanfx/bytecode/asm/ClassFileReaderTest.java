@@ -23,8 +23,8 @@ import com.pnambic.depanfx.bytecode.AsmFactory;
 import com.pnambic.depanfx.bytecode.ClassAnalysisStats;
 import com.pnambic.depanfx.bytecode.ClassFileReader;
 import com.pnambic.depanfx.filesystem.graph.DocumentNode;
-import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
+import com.pnambic.depanfx.graph_doc.model.GraphModel;
 
 import org.junit.jupiter.api.Test;
 

@@ -21,8 +21,8 @@ import com.pnambic.depanfx.graph.info.GraphEdgeInfo;
 import com.pnambic.depanfx.graph.info.GraphModelInfo;
 import com.pnambic.depanfx.graph.info.GraphNodeInfo;
 import com.pnambic.depanfx.graph.model.GraphEdge;
-import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.model.GraphModel;
 
 /**
  * Interface for a Class capable of constructing a graph.

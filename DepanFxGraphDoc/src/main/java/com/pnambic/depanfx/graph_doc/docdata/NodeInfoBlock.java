@@ -1,8 +1,8 @@
 package com.pnambic.depanfx.graph_doc.docdata;
 
 import com.pnambic.depanfx.graph.info.GraphNodeInfo;
-import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.model.GraphModel;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 
 import java.util.Collection;

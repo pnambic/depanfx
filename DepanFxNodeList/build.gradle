@@ -13,6 +13,7 @@ dependencies {
   implementation project(':DepanFxBase')
   implementation project(':DepanFxGraph')
   implementation project(':DepanFxGraphDoc')
+  implementation project(':DepanFxGraphInfo')
   implementation project(':DepanFxPersistence')
   implementation project(':DepanFxWorkspace')
 }

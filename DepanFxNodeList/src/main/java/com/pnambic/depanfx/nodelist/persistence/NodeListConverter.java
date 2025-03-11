@@ -1,10 +1,10 @@
 package com.pnambic.depanfx.nodelist.persistence;
 
-import com.pnambic.depanfx.graph.model.GraphModel;
-import com.pnambic.depanfx.graph.model.GraphModels;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.docdata.NodeInfoBlock;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.graph_doc.model.GraphModel;
+import com.pnambic.depanfx.graph_doc.model.GraphModels;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;

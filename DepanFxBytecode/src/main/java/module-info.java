@@ -9,6 +9,7 @@ module depanfx.bytecode {
   requires depanfx.filesystem;
   requires depanfx.graph;
   requires depanfx.graph_doc;
+  requires depanfx.graph.info;
   requires depanfx.java;
 
   exports com.pnambic.depanfx.bytecode;

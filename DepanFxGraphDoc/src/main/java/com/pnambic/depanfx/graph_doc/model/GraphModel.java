@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.graph.model;
+package com.pnambic.depanfx.graph_doc.model;
 
 import com.pnambic.depanfx.graph.api.Edge;
 import com.pnambic.depanfx.graph.api.Node;
@@ -23,6 +23,8 @@ import com.pnambic.depanfx.graph.context.ContextRelationId;
 import com.pnambic.depanfx.graph.info.GraphEdgeInfo;
 import com.pnambic.depanfx.graph.info.GraphModelInfo;
 import com.pnambic.depanfx.graph.info.GraphNodeInfo;
+import com.pnambic.depanfx.graph.model.GraphEdge;
+import com.pnambic.depanfx.graph.model.GraphNode;
 
 import java.util.Collection;
 import java.util.Map;

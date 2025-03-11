@@ -15,8 +15,8 @@
  */
 package com.pnambic.depanfx.nodefilters.model;
 
-import com.pnambic.depanfx.graph.model.GraphModel;
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.model.GraphModel;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxMatcherFilterData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLink;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcher;

@@ -1,4 +1,6 @@
-package com.pnambic.depanfx.graph.model;
+package com.pnambic.depanfx.graph_doc.model;
+
+import com.pnambic.depanfx.graph.model.GraphNode;
 
 public class GraphModels {
 
