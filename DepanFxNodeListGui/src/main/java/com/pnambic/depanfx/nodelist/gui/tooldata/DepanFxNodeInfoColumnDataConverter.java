@@ -15,9 +15,9 @@
  */
 package com.pnambic.depanfx.nodelist.gui.tooldata;
 
-import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxInfoRegistry;
+import com.pnambic.depanfx.nodeinfo.DepanFxInfoRegistry;
+import com.pnambic.depanfx.nodeinfo.DepanFxNodeInfoProperty;
 import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeInfoColumnData;
-import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeInfoProperty;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
 import com.pnambic.modxstream.XstreamMarshalContext;
 import com.pnambic.modxstream.XstreamUnmarshalContext;

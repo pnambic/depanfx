@@ -15,11 +15,11 @@
  */
 package com.pnambic.depanfx.nodefilters.model;
 
+import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeKindFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.FilterMergeMode;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
-import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

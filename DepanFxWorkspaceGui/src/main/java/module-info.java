@@ -10,6 +10,7 @@ module depanfx.workspace.gui {
 
     requires pnambic.modxstream;
 
+    requires depanfx.base;
     requires depanfx.graph_doc;
     requires depanfx.perspective;
     requires depanfx.scene;

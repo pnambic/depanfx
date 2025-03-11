@@ -13,24 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.nodelist.gui.columns.infos;
+package com.pnambic.depanfx.nodeinfo;
 
-import com.pnambic.depanfx.scene.plugins.DepanFxOrderableContribution;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.base.DepanFxOrderableContribution;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Component
-public class DepanFxInfoRegistry {
+public interface DepanFxInfoRegistry {
+
+  Stream<Contribution> streamByLabel(String label);
+
+  Optional<Contribution> getById(String id);
+
+  Stream<Contribution> streamContributions();
 
   public interface Contribution extends DepanFxOrderableContribution {
 
@@ -43,9 +40,9 @@ public class DepanFxInfoRegistry {
     String getInfoId();
 
     /**
-     * Recognize a content by type.
+     * Recognize an info content by type.
      */
-    boolean acceptsResource(DepanFxWorkspaceResource<?> resource);
+    boolean acceptsInfo(Object info);
 
     /**
      * Label to show to humans.
@@ -127,57 +124,8 @@ public class DepanFxInfoRegistry {
     }
 
     @Override
-    public boolean acceptsResource(DepanFxWorkspaceResource<?> resource) {
-      return acceptType.isAssignableFrom(resource.getResource().getClass());
+    public boolean acceptsInfo(Object info) {
+      return acceptType.isAssignableFrom(info.getClass());
     }
-  }
-
-  // @SuppressWarnings("unused")
-  private static final Logger LOG =
-      LoggerFactory.getLogger(DepanFxInfoRegistry.class);
-
-  private final Collection<Contribution> contribs;
-
-  @Autowired
-  public DepanFxInfoRegistry(Collection<Contribution> contribs) {
-    this.contribs = contribs;
-  }
-
-  public Stream<Contribution> streamContributions() {
-    return contribs.stream()
-        .sorted(DepanFxOrderableContribution.CONTRIB_COMPARE);
-  }
-
-  public Optional<Contribution> getById(String id) {
-
-    List<Contribution> idContribs = contribs.stream()
-        .filter(c -> id.equals(c.getInfoId()))
-        .collect(Collectors.toList());
-    if (idContribs.size() > 1) {
-      LOG.error("Multiple ({}) contributions for id {}",
-          idContribs.size(), id);
-    }
-    if (!idContribs.isEmpty()) {
-      return Optional.of(idContribs.get(0));
-    }
-    return Optional.empty();
-  }
-
-  public Stream<Contribution> streamByLabel(String label) {
-
-    return contribs.stream()
-        .filter(c -> label.equals(c.getInfoLabel()))
-        .sorted(DepanFxOrderableContribution.CONTRIB_COMPARE);
-  }
-
-  /**
-   * Provide those contributions from the stream that claim to be able
-   * to open the supplied document.
-   */
-  private Stream<Contribution> selectContributions(
-      DepanFxWorkspaceResource<?> columnRsrc) {
-
-    return contribs.stream()
-        .filter(c -> c.acceptsResource(columnRsrc));
   }
 }

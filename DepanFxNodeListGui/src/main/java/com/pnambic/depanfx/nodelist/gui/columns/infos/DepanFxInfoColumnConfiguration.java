@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
+import com.pnambic.depanfx.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableState;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;

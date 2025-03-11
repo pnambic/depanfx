@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.nodelist.gui.columns.infos;
+package com.pnambic.depanfx.nodeinfo;
 
-import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
+import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
 
 public class DepanFxNodeInfoProperty extends DepanFxBaseToolData {
 

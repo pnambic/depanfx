@@ -1,5 +1,8 @@
 package com.pnambic.depanfx.workspace;
 
+import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
+
+import java.util.Comparator;
 import java.util.Objects;
 
 public interface DepanFxWorkspaceResource<T> {
@@ -7,6 +10,20 @@ public interface DepanFxWorkspaceResource<T> {
   DepanFxProjectDocument getDocument();
 
   T getResource();
+
+  /**
+   * Provides an alphabetically ordered sequence of filter resources,
+   * based on the tool name of each resource.
+   * This helps ensure that consumers always see the same order,
+   * regardless of set construction.
+   *
+   * Only one required.
+   * Suitable for {@code .sorted(DepanFxWorkspaceResource.BY_RESOURCE_NAME)}
+   */
+  public static final Comparator<DepanFxWorkspaceResource<? extends DepanFxBaseToolData>>
+  BY_RESOURCE_NAME = (l, r) ->
+      DepanFxBaseToolData.BY_TOOL_NAME.compare(
+            l.getResource(), r.getResource());
 
   public static <T> DepanFxWorkspaceResource<T> forUpdate(
       DepanFxWorkspaceResource<T> originalRsrc, T updateData) {
@@ -16,6 +33,31 @@ public interface DepanFxWorkspaceResource<T> {
   public static <T> DepanFxWorkspaceResource<T> forSource(
       DepanFxProjectDocument rsrcDoc, T updateData) {
     return new StaticWorkspaceResource<>(rsrcDoc, updateData);
+  }
+
+  /**
+   * Indicates whether the resource is bound to a conserved project.
+   *
+   * The built-in project and user projects are conserved projects,
+   * such that their contents will be reliably restored after a restart.
+   *
+   * For update resources are not yet saved, and the scratch project
+   * is not a conserved project.
+   */
+  public static boolean isSavedResource(
+      DepanFxWorkspaceResource<?> resource, DepanFxWorkspace workspace) {
+    // For update resource have not be saved.
+    if (resource instanceof ForUpdateWorkspaceResource) {
+      return true;
+    }
+    // The scratch tree is not bound to a conversed project.
+    if (workspace.getScratchProjectTree()
+        .equals(resource.getDocument().getProject())) {
+      return true;
+    }
+
+    // Resource is bound to a persistent project.
+    return false;
   }
 
   /**
@@ -118,30 +160,4 @@ public interface DepanFxWorkspaceResource<T> {
     return Objects.equals(rsrc.getResource(), other.getResource())
         && Objects.equals(rsrc.getDocument(), other.getDocument());
   }
-
-  /**
-   * Indicates whether the resource is bound to a conserved project.
-   *
-   * The built-in project and user projects are conserved projects,
-   * such that their contents will be reliably restored after a restart.
-   *
-   * For update resources are not yet saved, and the scratch project
-   * is not a conserved project.
-   */
-  public static boolean isSavedResource(
-      DepanFxWorkspaceResource<?> resource, DepanFxWorkspace workspace) {
-    // For update resource have not be saved.
-    if (resource instanceof ForUpdateWorkspaceResource) {
-      return true;
-    }
-    // The scratch tree is not bound to a conversed project.
-    if (workspace.getScratchProjectTree()
-        .equals(resource.getDocument().getProject())) {
-      return true;
-    }
-
-    // Resource is bound to a persistent project.
-    return false;
-  }
-
 }

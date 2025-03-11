@@ -1,14 +1,14 @@
 package com.pnambic.depanfx.git.tooldata;
 
+import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
-import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import java.io.File;
 import java.nio.file.Path;
 
-public class DepanFxGitRepoData extends DepanFxBaseToolData{
+public class DepanFxGitRepoData extends DepanFxBaseToolData {
 
   public static final String GIT_REPOS_TOOL_DIR = "Git Repos";
 

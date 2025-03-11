@@ -6,6 +6,7 @@ module depanfx.filesystem.nodeview {
   requires spring.context;
   requires spring.beans;
 
+  requires depanfx.base;
   requires depanfx.graph;
   requires depanfx.nodelist;
   requires depanfx.filesystem;

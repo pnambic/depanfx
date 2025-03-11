@@ -5,6 +5,7 @@ module depanfx.git {
 
   requires pnambic.modxstream;
 
+  requires depanfx.base;
   requires depanfx.graph;
   requires depanfx.filesystem;
   requires depanfx.graph_doc;

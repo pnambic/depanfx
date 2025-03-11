@@ -12,6 +12,7 @@ module depanfx.nodelist.viewer {
 
   requires pnambic.modxstream;
 
+  requires depanfx.base;
   requires depanfx.graph;
   requires depanfx.nodelist;
   requires depanfx.nodefilters.gui;

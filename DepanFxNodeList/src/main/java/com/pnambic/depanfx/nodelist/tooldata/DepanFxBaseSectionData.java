@@ -15,9 +15,9 @@
  */
 package com.pnambic.depanfx.nodelist.tooldata;
 
+import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
-import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 /**
  * Persisted data for sections.

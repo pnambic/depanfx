@@ -15,11 +15,13 @@ module depanfx.nodelist.gui {
 
   requires depanfx.graph;
   requires depanfx.graph_doc;
+  requires depanfx.graph.info;
   requires depanfx.nodelist;
   requires depanfx.persistence;
   requires depanfx.perspective;
   requires depanfx.scene;
   requires depanfx.workspace;
+  requires depanfx.base;
 
   opens com.pnambic.depanfx.nodelist.gui
       to javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;

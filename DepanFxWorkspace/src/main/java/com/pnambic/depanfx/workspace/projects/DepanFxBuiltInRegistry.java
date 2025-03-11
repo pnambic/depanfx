@@ -1,10 +1,10 @@
 package com.pnambic.depanfx.workspace.projects;
 
+import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
 import com.pnambic.depanfx.workspace.DepanFxProjectContainer;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution.Dependent;
-import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

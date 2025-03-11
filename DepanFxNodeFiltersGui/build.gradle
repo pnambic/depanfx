@@ -15,8 +15,10 @@ dependencies {
   implementation "net.rgielen:javafx-weaver-core:${javafxWeaverVersion}"
   implementation "org.apache.commons:commons-csv:${apacheCsv}"
 
+  implementation project(':DepanFxBase')
   implementation project(':DepanFxGraph')
   implementation project(':DepanFxGraphDoc')
+  implementation project(':DepanFxGraphInfo')
   implementation project(':DepanFxNodeFilters')
   implementation project(':DepanFxNodeList')
   implementation project(':DepanFxNodeListGui')

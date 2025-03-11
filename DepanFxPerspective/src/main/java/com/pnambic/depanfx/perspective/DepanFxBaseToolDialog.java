@@ -1,8 +1,8 @@
 package com.pnambic.depanfx.perspective;
 
+import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;

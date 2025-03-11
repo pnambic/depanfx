@@ -9,6 +9,7 @@ module depanfx.nodefilters.gui {
   requires spring.context;
   requires spring.beans;
 
+  requires depanfx.base;
   requires depanfx.graph;
   requires depanfx.nodefilters;
   requires depanfx.nodelist;

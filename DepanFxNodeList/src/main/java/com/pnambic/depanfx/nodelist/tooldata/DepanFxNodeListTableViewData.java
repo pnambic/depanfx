@@ -15,8 +15,8 @@
  */
 package com.pnambic.depanfx.nodelist.tooldata;
 
+import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import java.nio.file.Path;
 import java.util.ArrayList;

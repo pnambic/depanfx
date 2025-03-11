@@ -12,6 +12,8 @@ module depanfx.scene {
     requires java.desktop;
     requires javafx.base;
 
+    requires depanfx.base;
+
     opens com.pnambic.depanfx.scene to
       javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;
 

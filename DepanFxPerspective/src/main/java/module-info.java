@@ -11,6 +11,7 @@ module depanfx.perspective {
     requires depanfx.graph_doc;
     requires depanfx.workspace;
     requires depanfx.scene;
+    requires depanfx.base;
 
     opens com.pnambic.depanfx.perspective
         to javafx.fxml, net.rgielen.fxweaver.core, spring.core;

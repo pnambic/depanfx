@@ -26,7 +26,6 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -195,7 +194,7 @@ public class EdgeDisplayController {
   public Stream<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
   streamAvailableMatchers() {
     return edgeVisibleGroup.keySet().stream()
-            .sorted(DepanFxBaseToolData.BY_RESOURCE_NAME);
+            .sorted(DepanFxWorkspaceResource.BY_RESOURCE_NAME);
   }
 
   /**
@@ -208,7 +207,7 @@ public class EdgeDisplayController {
   public Stream<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
   streamVisibilityMatchers() {
     return visibleMatcherRsrcs.stream()
-        .sorted(DepanFxBaseToolData.BY_RESOURCE_NAME);
+        .sorted(DepanFxWorkspaceResource.BY_RESOURCE_NAME);
   }
 
   public void setLinkDisplayResource(

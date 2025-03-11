@@ -1,8 +1,8 @@
 package com.pnambic.depanfx.nodefilters.tooldata;
 
+import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -11,7 +11,8 @@ public class DepanFxNodeFilterSequenceData extends DepanFxBaseToolData {
 
   public static final String NODE_FILTER_SEQUENCE_TOOL_EXT = "dnfsti";
 
-  public static final String NODE_VISIBILITY_CONTEXT_RESOURCE_NAME = "Node Visibility";
+  public static final String NODE_VISIBILITY_CONTEXT_RESOURCE_NAME =
+      "Node Visibility";
 
   private final ContextModelId contextModelId;
 

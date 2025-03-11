@@ -15,8 +15,9 @@
  */
 package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
+import com.pnambic.depanfx.nodeinfo.DepanFxInfoRegistry;
+import com.pnambic.depanfx.nodeinfo.DepanFxNodeInfoProperty;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxBaseColumnToolDialog;
-import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxInfoRegistry.Contribution;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
@@ -139,7 +140,7 @@ public class DepanFxInfoColumnToolDialog
 
   @Override
   protected DepanFxNodeInfoColumnData prepareResult() {
-    Contribution info = infoChoiceField.getValue();
+    DepanFxInfoRegistry.Contribution info = infoChoiceField.getValue();
     DepanFxNodeInfoProperty property = propertyChoiceField.getValue();
 
     return new DepanFxNodeInfoColumnData(
@@ -194,12 +195,12 @@ public class DepanFxInfoColumnToolDialog
       extends StringConverter<DepanFxInfoRegistry.Contribution> {
 
     @Override
-    public String toString(Contribution contribution) {
+    public String toString(DepanFxInfoRegistry.Contribution contribution) {
         return contribution.getInfoLabel();
     }
 
     @Override
-    public Contribution fromString(String label) {
+    public DepanFxInfoRegistry.Contribution fromString(String label) {
       return infoRegistry.streamByLabel(label)
           .findFirst()
           .orElse(null);

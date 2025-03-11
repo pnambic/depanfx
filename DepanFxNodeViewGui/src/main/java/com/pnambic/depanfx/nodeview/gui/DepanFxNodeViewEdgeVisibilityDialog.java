@@ -29,7 +29,6 @@ import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -345,7 +344,7 @@ public class DepanFxNodeViewEdgeVisibilityDialog
     return matcherVisibleProperties.entrySet().stream()
         .filter(e -> e.getValue().get())
         .map(e -> e.getKey())
-        .sorted(DepanFxBaseToolData.BY_RESOURCE_NAME)
+        .sorted(DepanFxWorkspaceResource.BY_RESOURCE_NAME)
         .collect(Collectors.toList());
   }
 

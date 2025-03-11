@@ -5,6 +5,7 @@ module depanfx.filesystem {
   requires spring.context;
   requires spring.beans;
 
+  requires depanfx.base;
   requires depanfx.graph;
   requires depanfx.graph_doc;
   requires depanfx.nodefilters;

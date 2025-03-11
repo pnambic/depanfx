@@ -16,6 +16,7 @@ dependencies {
 
   implementation "com.pnambic.modxstream:modxstream:${modxstreamVersion}"
 
+  implementation project(':DepanFxBase')
   implementation project(':DepanFxGraphDoc')
   implementation project(':DepanFxPersistence')
   implementation project(':DepanFxPerspective')

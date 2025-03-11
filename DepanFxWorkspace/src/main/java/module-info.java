@@ -4,6 +4,7 @@ module depanfx.workspace {
   requires spring.context;
   requires spring.beans;
 
+  requires depanfx.base;
   requires depanfx.persistence;
   requires pnambic.modxstream;
 
@@ -12,12 +13,8 @@ module depanfx.workspace {
   opens com.pnambic.depanfx.workspace.persistence to spring.core;
   opens com.pnambic.depanfx.workspace.projects to spring.core;
 
-  // For XStream persistence
-  opens com.pnambic.depanfx.workspace.tooldata;
-
   exports com.pnambic.depanfx.workspace;
   exports com.pnambic.depanfx.workspace.documents;
   exports com.pnambic.depanfx.workspace.persistence;
   exports com.pnambic.depanfx.workspace.projects;
-  exports com.pnambic.depanfx.workspace.tooldata;
 }

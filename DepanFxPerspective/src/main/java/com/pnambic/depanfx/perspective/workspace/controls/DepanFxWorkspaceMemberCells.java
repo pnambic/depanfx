@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.perspective.workspace.controls;
 
+import com.pnambic.depanfx.base.DepanFxOrderableContribution;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceMenuRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
@@ -22,7 +23,6 @@ import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry.Contribut
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
-import com.pnambic.depanfx.scene.plugins.DepanFxOrderableContribution;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;

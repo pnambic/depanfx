@@ -7,6 +7,7 @@ module depanfx.java.gui {
   requires spring.beans;
   requires spring.context;
 
+  requires depanfx.base;
   requires depanfx.bytecode;
   requires depanfx.filesystem;
   requires depanfx.graph;

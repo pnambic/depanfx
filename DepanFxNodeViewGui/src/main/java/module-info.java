@@ -27,6 +27,7 @@ module depanfx.nodeview.gui {
   requires depanfx.scene;
   requires depanfx.session.data;
   requires depanfx.workspace;
+  requires depanfx.graph.info;
 
   opens com.pnambic.depanfx.nodeview.gui
       to javafx.fxml, net.rgielen.fxweaver.core,

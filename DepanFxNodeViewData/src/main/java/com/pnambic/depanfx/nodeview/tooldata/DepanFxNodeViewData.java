@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodeview.tooldata;
 
+import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
@@ -8,7 +9,6 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
-import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import java.nio.file.Path;
 import java.util.ArrayList;

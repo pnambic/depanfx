@@ -15,7 +15,7 @@
  */
 package com.pnambic.depanfx.nodelist.tooldata;
 
-import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
+import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
 
 public class DepanFxBaseColumnData extends DepanFxBaseToolData {
 

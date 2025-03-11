@@ -29,7 +29,6 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData.NodeDisplayEntry;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -207,7 +206,7 @@ public class NodeDisplayController {
   streamVisibilityResource() {
 
     return visibleFilterRsrcs.stream()
-        .sorted(DepanFxBaseToolData.BY_RESOURCE_NAME);
+        .sorted(DepanFxWorkspaceResource.BY_RESOURCE_NAME);
   }
 
   public void forEachAvailablityFilter(
@@ -603,7 +602,7 @@ public class NodeDisplayController {
     public Stream<DepanFxWorkspaceResource<DepanFxBaseFilterData>>
     streamAvailableFilters() {
       return filterInfos.keySet().stream()
-          .sorted(DepanFxBaseToolData.BY_RESOURCE_NAME);
+          .sorted(DepanFxWorkspaceResource.BY_RESOURCE_NAME);
     }
 
     public Optional<DepanFxWorkspaceResource<DepanFxBaseFilterData>>

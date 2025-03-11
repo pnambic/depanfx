@@ -15,8 +15,8 @@
  */
 package com.pnambic.depanfx.session.tooldata;
 
+import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
 import com.pnambic.depanfx.session.viewdata.DepanFxBaseViewerData;
-import com.pnambic.depanfx.workspace.tooldata.DepanFxBaseToolData;
 
 import java.util.Collections;
 import java.util.List;
