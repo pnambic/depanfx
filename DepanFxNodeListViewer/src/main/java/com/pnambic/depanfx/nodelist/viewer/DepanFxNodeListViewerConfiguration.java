@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodelist.viewer;
 
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.graph_doc.persistence.GraphDocPersistenceContribution;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewBuiltIns;
@@ -68,14 +69,16 @@ public class DepanFxNodeListViewerConfiguration {
 
   @Bean
   public DepanFxResourceRegistry.Contribution
-  nodeListAsListResourceContribution(DepanFxColumnRegistry columnRegistry) {
-    return new NodeListResourceContribution(columnRegistry);
+  nodeListAsListResourceContribution(
+      DepanFxColumnRegistry columnRegistry, DepanFxInfoRegistry infoRegistry) {
+    return new NodeListResourceContribution(columnRegistry, infoRegistry);
   }
 
   @Bean
   public DepanFxResourceRegistry.Contribution
-  graphDocAsListResourceContribution(DepanFxColumnRegistry columnRegistry) {
-    return new GraphDocResourceContribution(columnRegistry);
+  graphDocAsListResourceContribution(
+      DepanFxColumnRegistry columnRegistry, DepanFxInfoRegistry infoRegistry) {
+    return new GraphDocResourceContribution(columnRegistry, infoRegistry);
   }
 
   @Bean
@@ -138,13 +141,17 @@ public class DepanFxNodeListViewerConfiguration {
 
     private final DepanFxColumnRegistry columnRegistry;
 
-    public NodeListResourceContribution(DepanFxColumnRegistry columnRegistry) {
+    private final DepanFxInfoRegistry infoRegistry;
+
+    public NodeListResourceContribution(
+        DepanFxColumnRegistry columnRegistry, DepanFxInfoRegistry infoRegistry) {
       super(
           OPEN_AS_LIST_LABEL,
           DepanFxNodeList.class,
           DepanFxNodeList.NODE_LIST_EXT,
           OPEN_AS_LIST_ORDER_KEY);
       this.columnRegistry = columnRegistry;
+      this.infoRegistry = infoRegistry;
     }
 
     @Override
@@ -160,13 +167,14 @@ public class DepanFxNodeListViewerConfiguration {
         DepanFxProjectDocument document) {
       workspace.getWorkspaceResource(document, DepanFxNodeList.class)
         .ifPresent(r -> addNodeListPanelToScene(
-            workspace, sceneSrvc, columnRegistry, r));
+            workspace, sceneSrvc, columnRegistry, infoRegistry, r));
     }
 
     private static void addNodeListPanelToScene(
         DepanFxWorkspace workspace,
         DepanFxSceneService sceneSrvc,
         DepanFxColumnRegistry columnRegistry,
+        DepanFxInfoRegistry infoRegistry,
         DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
 
       DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(
@@ -174,6 +182,7 @@ public class DepanFxNodeListViewerConfiguration {
           workspace,
           sceneSrvc.getDialogRunner(),
           columnRegistry,
+          infoRegistry,
           nodeListRsrc,
           getTableViewResource(workspace, nodeListRsrc));
 
@@ -187,7 +196,11 @@ public class DepanFxNodeListViewerConfiguration {
 
     private final DepanFxColumnRegistry columnRegistry;
 
-    public GraphDocResourceContribution(DepanFxColumnRegistry columnRegistry) {
+    private final DepanFxInfoRegistry infoRegistry;
+
+    public GraphDocResourceContribution(
+        DepanFxColumnRegistry columnRegistry,
+        DepanFxInfoRegistry infoRegistry) {
       super(
           OPEN_GRAPH_AS_LIST_LABEL,
           GraphDocument.class,
@@ -195,6 +208,7 @@ public class DepanFxNodeListViewerConfiguration {
           OPEN_GRAPH_AS_LIST_ORDER_KEY);
 
       this.columnRegistry = columnRegistry;
+      this.infoRegistry = infoRegistry;
     }
 
     @Override
@@ -210,13 +224,14 @@ public class DepanFxNodeListViewerConfiguration {
         DepanFxProjectDocument document) {
       workspace.getWorkspaceResource(document, GraphDocument.class)
         .ifPresent(r -> addGraphDocViewToScene(
-            workspace, sceneSrvc, columnRegistry, r));
+            workspace, sceneSrvc, columnRegistry, infoRegistry, r));
     }
 
     private static void addGraphDocViewToScene(
         DepanFxWorkspace workspace,
         DepanFxSceneService sceneSrvc,
         DepanFxColumnRegistry columnRegistry,
+        DepanFxInfoRegistry infoRegistry,
         DepanFxWorkspaceResource<GraphDocument> graphRsrc) {
 
       DepanFxNodeList nodeList = DepanFxNodeLists.buildNodeList(graphRsrc);
@@ -227,7 +242,8 @@ public class DepanFxNodeListViewerConfiguration {
           graphRsrc.getDocument()) + " nodes";
 
       DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(
-          viewerTitle, workspace, sceneSrvc.getDialogRunner(), columnRegistry,
+          viewerTitle, workspace, sceneSrvc.getDialogRunner(),
+          columnRegistry, infoRegistry,
           nodeListRsrc, getTableViewResource(workspace, nodeListRsrc));
 
       sceneSrvc.addViewer(viewer);

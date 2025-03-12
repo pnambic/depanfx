@@ -24,8 +24,19 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
 
+/**
+ * A node position info requires a NodeViewPanel as a source
+ * of location information.
+ */
 class NodePositionInfoContribution
     extends DepanFxInfoRegistry.Basic {
+
+  public static final String NODE_POSITION_LABEL = "Position";
+
+  public static final String NODE_POSITION_KEY = "Position";
+
+  public static final String NODE_POSITION_DESCR =
+      "Position of nodes in their rendered graph view.";
 
   private static final DepanFxNodeInfoProperty[] PROPERTIES =
       new DepanFxNodeInfoProperty[] {
@@ -39,10 +50,10 @@ class NodePositionInfoContribution
   public NodePositionInfoContribution(DepanFxNodeViewPanel panel) {
     super(
         DepanFxNodeLocationData.class.getName(),
-        DepanFxNodeViewPanelConfiguration.NODE_POSITION_LABEL,
-        DepanFxNodeViewPanelConfiguration.NODE_POSITION_DESCR,
+        NODE_POSITION_LABEL,
+        NODE_POSITION_DESCR,
         DepanFxNodeLocationData.class,
-        DepanFxNodeViewPanelConfiguration.NODE_POSITION_KEY,
+        NODE_POSITION_KEY,
         Arrays.asList(PROPERTIES));
     this.panel = panel;
   }
@@ -58,9 +69,10 @@ class NodePositionInfoContribution
   private static DepanFxNodeInfoProperty buildPosProperty(
       String toolName, String toolDescription,
       Function<DepanFxNodeLocationData, Double> extractValue) {
-    return new DepanFxNodeInfoProperty(
+    return new NodePosInfoProperty(
         toolName, toolDescription,
-        DepanFxNodeInfoProperty.PropertyKind.POS, true);
+        DepanFxNodeInfoProperty.PropertyKind.POS, true,
+        extractValue);
   }
 
   private static class NodePosInfoProperty extends DepanFxNodeInfoProperty {
@@ -79,8 +91,4 @@ class NodePositionInfoContribution
       return extractValue.apply(nodeLocationData);
     }
   }
-  // @Bean
-  // public DepanFxInfoRegistry.Contribution nodePositionsInfoContribution() {
-  //  return new NodePositionInfoContribution();
-  // }
 }

@@ -29,6 +29,9 @@ import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javafx.scene.control.ContextMenu;
 
 public class DepanFxInfoColumn
@@ -39,6 +42,9 @@ public class DepanFxInfoColumn
   public static final String NEW_INFO_COLUMN = "New Info Column...";
 
   public static final String SELECT_INFO_COLUMN = "Select Info Column...";
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxInfoColumn.class);
 
   public DepanFxInfoColumn(
       DepanFxNodeListTableAdapter tableAdapter,
@@ -58,31 +64,36 @@ public class DepanFxInfoColumn
 
   @Override
   public String toString(DepanFxNodeListGraphNode member) {
-    return tableAdapter.getInfoPropertyString(
-        member.getGraphNode(), getColumnData());
+    try {
+      return tableAdapter.getInfoPropertyString(
+          member.getGraphNode(), getColumnData());
+    } catch (Exception errAny) {
+      LOG.info("Trouble rendering {} due to {}",
+          member.getDisplayName(), errAny.getMessage());
+    }
+    return null;
   }
 
-  public static void addNewColumnAction(
+  public void addNewColumnAction(
       DepanFxContextMenuBuilder builder,
-      DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner) {
     builder.appendActionItem(NEW_INFO_COLUMN,
-        e -> openColumnCreate(workspace, dialogRunner));
+        e -> openColumnCreate(dialogRunner));
   }
 
-  private static void openColumnCreate(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+  private void openColumnCreate(DepanFxDialogRunner dialogRunner) {
     DepanFxNodeInfoColumnData initialData =
         DepanFxNodeInfoColumnData.buildInitialColumnData();
     DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnRsrc =
-        workspace.addScratchResource(initialData);
-    DepanFxInfoColumnToolDialog.runCreateDialog(columnRsrc, dialogRunner);
+        tableAdapter.getWorkspace().addScratchResource(initialData);
+    DepanFxInfoColumnToolDialog.runCreateDialog(
+        columnRsrc, dialogRunner, tableAdapter);
   }
 
   private void openColumnEditor(DepanFxDialogRunner dialogRunner) {
     Dialog<DepanFxInfoColumnToolDialog> nodeKeyColumnEditor =
           DepanFxInfoColumnToolDialog.runEditDialog(
-              forUpdate(buildEditData()), dialogRunner);
+              forUpdate(buildEditData()), dialogRunner, tableAdapter);
 
     nodeKeyColumnEditor.getController().getToolResource()
         .ifPresent(this::updateColumnDataRsrc);
@@ -100,9 +111,9 @@ public class DepanFxInfoColumn
   }
 
   private void openColumnChooser(DepanFxDialogRunner dialogRunner) {
+    DepanFxResourceChooser columnChooser = prepareChooser(dialogRunner);
+
     DepanFxWorkspace workspace = tableAdapter.getWorkspace();
-    DepanFxResourceChooser columnChooser =
-        prepareChooser(workspace, dialogRunner);
     columnChooser.showOpenDialog(getScene())
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
@@ -110,10 +121,10 @@ public class DepanFxInfoColumn
         .ifPresent(this::updateColumnDataRsrc);
   }
 
-  private static DepanFxResourceChooser prepareChooser(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+  private DepanFxResourceChooser prepareChooser(
+      DepanFxDialogRunner dialogRunner) {
     DepanFxResourceChooser result =
-        new DepanFxResourceChooser(workspace, dialogRunner);
+        new DepanFxResourceChooser(tableAdapter.getWorkspace(), dialogRunner);
     DepanFxResourcePerspectives.prepareResourceFinder(
         result, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
 

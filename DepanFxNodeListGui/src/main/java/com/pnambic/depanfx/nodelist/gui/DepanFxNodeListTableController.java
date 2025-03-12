@@ -38,6 +38,8 @@ public class DepanFxNodeListTableController
 
   private final DepanFxColumnRegistry columnRegistry;
 
+  private final DepanFxInfoRegistry infoRegistry;
+
   private final DepanFxNodeList nodeList;
 
   private final DepanFxNodeListTableState tableState;
@@ -46,6 +48,7 @@ public class DepanFxNodeListTableController
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxColumnRegistry columnRegistry,
+      DepanFxInfoRegistry infoRegistry,
       DepanFxNodeList nodeList,
       DepanFxNodeListSelection selectedNodes,
       DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc,
@@ -53,6 +56,7 @@ public class DepanFxNodeListTableController
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
     this.columnRegistry = columnRegistry;
+    this.infoRegistry = infoRegistry;
     this.nodeList = nodeList;
 
     tableState = prepareNodeListTable(
@@ -215,5 +219,16 @@ public class DepanFxNodeListTableController
         columnInfo.getInfoProperty())
         .map(v -> v.toString())
         .orElse("");
+  }
+
+  @Override
+  public Stream<DepanFxInfoRegistry.Contribution> streamInfoChoices() {
+    return infoRegistry.streamContributions();
+  }
+
+  @Override
+  public Stream<DepanFxInfoRegistry.Contribution> streamInfosByLabel(
+      String label) {
+    return infoRegistry.streamByLabel(label);
   }
 }

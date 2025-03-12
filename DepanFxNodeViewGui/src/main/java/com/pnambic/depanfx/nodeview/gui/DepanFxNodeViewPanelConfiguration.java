@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodeview.gui;
 
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.graph_doc.persistence.GraphDocPersistenceContribution;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
@@ -62,13 +63,6 @@ public class DepanFxNodeViewPanelConfiguration {
 
   public static final String NODE_DISPLAY_KEY = "Node Display";
 
-  public static final String NODE_POSITION_LABEL = "Position";
-
-  public static final String NODE_POSITION_KEY = "Position";
-
-  public static final String NODE_POSITION_DESCR =
-      "Position of nodes in their rendered graph view.";
-
   /////////////////////////////////////
   // Open various resources as node views
 
@@ -76,27 +70,30 @@ public class DepanFxNodeViewPanelConfiguration {
   public DepanFxResourceRegistry.Contribution
   nodeViewAsViewResourceContribution(
       DepanFxNodeLayoutRegistry layoutRegistry,
-      DepanFxNodeFiltersRegistry filterRegistry) {
+      DepanFxNodeFiltersRegistry filterRegistry,
+      DepanFxInfoRegistry infoRegistry) {
     return new NodeViewAsViewResourceContribution(
-        layoutRegistry, filterRegistry);
+        layoutRegistry, filterRegistry, infoRegistry);
   }
 
   @Bean
   public DepanFxResourceRegistry.Contribution
   nodeListAsViewResourceContribution(
       DepanFxNodeLayoutRegistry layoutRegistry,
-      DepanFxNodeFiltersRegistry filterRegistry) {
+      DepanFxNodeFiltersRegistry filterRegistry,
+      DepanFxInfoRegistry infoRegistry) {
     return new NodeListAsViewResourceContribution(
-        layoutRegistry, filterRegistry);
+        layoutRegistry, filterRegistry, infoRegistry);
   }
 
   @Bean
   public DepanFxResourceRegistry.Contribution
   graphDocAsViewResourceContribution(
       DepanFxNodeLayoutRegistry layoutRegistry,
-      DepanFxNodeFiltersRegistry filterRegistry) {
+      DepanFxNodeFiltersRegistry filterRegistry,
+      DepanFxInfoRegistry infoRegistry) {
     return new GraphDocAsViewResourceContribution(
-        layoutRegistry, filterRegistry);
+        layoutRegistry, filterRegistry, infoRegistry);
   }
 
   /////////////////////////////////////
@@ -194,15 +191,19 @@ public class DepanFxNodeViewPanelConfiguration {
 
     private final DepanFxNodeFiltersRegistry filterRegistry;
 
+    private final DepanFxInfoRegistry infoRegistry;
+
     public NodeViewAsViewResourceContribution(
         DepanFxNodeLayoutRegistry layoutRegistry,
-        DepanFxNodeFiltersRegistry filterRegistry) {
+        DepanFxNodeFiltersRegistry filterRegistry,
+        DepanFxInfoRegistry infoRegistry) {
       super(NODE_VIEW_LABEL,
           DepanFxNodeViewPanel.class,
           DepanFxNodeViewData.NODE_VIEW_TOOL_EXT,
           NODE_VIEW_KEY);
       this.layoutRegistry = layoutRegistry;
       this.filterRegistry = filterRegistry;
+      this.infoRegistry = infoRegistry;
     }
 
     @Override
@@ -211,7 +212,8 @@ public class DepanFxNodeViewPanelConfiguration {
       workspace.getWorkspaceResource(document, DepanFxNodeViewData.class)
           .ifPresent(r ->
               addNodeViewPanelToScene(
-                  workspace, sceneSrcv, r, layoutRegistry, filterRegistry));
+                  workspace, sceneSrcv, r,
+                  layoutRegistry, filterRegistry, infoRegistry));
     }
 
     @Override
@@ -230,16 +232,20 @@ public class DepanFxNodeViewPanelConfiguration {
 
     private final DepanFxNodeFiltersRegistry filterRegistry;
 
+    private final DepanFxInfoRegistry infoRegistry;
+
     private AdditionalAsViewResourceContribution(
         String resourceLabel,
         Class<T> dataType,
         String fileExt,
         String orderKey,
         DepanFxNodeLayoutRegistry layoutRegistry,
-        DepanFxNodeFiltersRegistry filterRegistry) {
+        DepanFxNodeFiltersRegistry filterRegistry,
+        DepanFxInfoRegistry infoRegistry) {
       super(resourceLabel, dataType, fileExt, orderKey);
       this.layoutRegistry = layoutRegistry;
       this.filterRegistry = filterRegistry;
+      this.infoRegistry = infoRegistry;
     }
 
     @Override
@@ -250,7 +256,8 @@ public class DepanFxNodeViewPanelConfiguration {
           .map(d -> workspace.addScratchResource(d))
           .ifPresent(r ->
               addNodeViewPanelToScene(
-                  workspace, sceneSrcv, r, layoutRegistry, filterRegistry));
+                  workspace, sceneSrcv, r,
+                  layoutRegistry, filterRegistry, infoRegistry));
     }
 
     @Override
@@ -271,14 +278,16 @@ public class DepanFxNodeViewPanelConfiguration {
 
     private NodeListAsViewResourceContribution(
         DepanFxNodeLayoutRegistry layoutRegistry,
-        DepanFxNodeFiltersRegistry filterRegistry) {
+        DepanFxNodeFiltersRegistry filterRegistry,
+        DepanFxInfoRegistry infoRegistry) {
       super(
           OPEN_NODE_LIST_AS_VIEW_LABEL,
           DepanFxNodeList.class,
           DepanFxNodeList.NODE_LIST_EXT,
           OPEN_NODE_LIST_AS_VIEW_KEY,
           layoutRegistry,
-          filterRegistry);
+          filterRegistry,
+          infoRegistry);
     }
 
     @Override
@@ -300,14 +309,16 @@ public class DepanFxNodeViewPanelConfiguration {
 
     private GraphDocAsViewResourceContribution(
         DepanFxNodeLayoutRegistry layoutRegistry,
-        DepanFxNodeFiltersRegistry filterRegistry) {
+        DepanFxNodeFiltersRegistry filterRegistry,
+        DepanFxInfoRegistry infoRegistry) {
       super(
           OPEN_GRAPH_DOC_AS_VIEW_LABEL,
           GraphDocument.class,
           GraphDocPersistenceContribution.EXTENSION,
           OPEN_GRAPH_DOC_AS_VIEW_KEY,
           layoutRegistry,
-          filterRegistry);
+          filterRegistry,
+          infoRegistry);
     }
 
     @Override
@@ -329,10 +340,10 @@ public class DepanFxNodeViewPanelConfiguration {
       DepanFxSceneService sceneSrvc,
       DepanFxWorkspaceResource<DepanFxNodeViewData> nodeViewRsrc,
       DepanFxNodeLayoutRegistry layoutRegistry,
-      DepanFxNodeFiltersRegistry filterRegistry) {
+      DepanFxNodeFiltersRegistry filterRegistry,
+      DepanFxInfoRegistry infoRegistry) {
     DepanFxNodeViewPanel viewPanel = new DepanFxNodeViewPanel(
-        workspace, layoutRegistry, filterRegistry, nodeViewRsrc);
+        workspace, layoutRegistry, filterRegistry, infoRegistry, nodeViewRsrc);
     sceneSrvc.addViewer(viewPanel);
   }
-
 }

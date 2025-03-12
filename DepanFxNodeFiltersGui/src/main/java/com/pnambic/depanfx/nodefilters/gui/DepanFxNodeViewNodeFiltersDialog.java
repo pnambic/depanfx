@@ -16,7 +16,7 @@
 package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoSource;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph_doc.model.GraphModel;
 import com.pnambic.depanfx.nodefilters.model.DepanFxBaseFilter;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
@@ -126,6 +126,8 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
 
   private DepanFxNodeList sourceNodes;
 
+  private DepanFxInfoRegistry infoRegistry;
+
   @Autowired
   public DepanFxNodeViewNodeFiltersDialog(
       DepanFxWorkspace workspace,
@@ -145,6 +147,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
    */
   public static Stage runEditDialog(
       DepanFxDialogRunner dialogRunner,
+      DepanFxInfoRegistry infoRegistry,
       DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc,
       DepanFxNodeList sourceNodes,
       Consumer<DepanFxNodeList> onUpdate) {
@@ -154,9 +157,12 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
     Dialog<DepanFxNodeViewNodeFiltersDialog> dlg =
         dialogRunner.createDialogAndParent(
             DepanFxNodeViewNodeFiltersDialog.class);
-    dlg.getController().setTableViewResource(tableViewRsrc);
-    dlg.getController().setSourceNodes(sourceNodes);
-    dlg.getController().setOnUpdate(onUpdate);
+
+    DepanFxNodeViewNodeFiltersDialog dlgState = dlg.getController();
+    dlgState.setInfoRegistry(infoRegistry);
+    dlgState.setTableViewResource(tableViewRsrc);
+    dlgState.setSourceNodes(sourceNodes);
+    dlgState.setOnUpdate(onUpdate);
     return dlg.runModeless(EDIT_NODE_FILTERS);
   }
 
@@ -220,6 +226,10 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
             .subtract(mergeColumn.widthProperty())
             .subtract(rowActionColumn.widthProperty())
             .subtract(1));
+  }
+
+  public void setInfoRegistry(DepanFxInfoRegistry infoRegistry) {
+    this.infoRegistry = infoRegistry;
   }
 
   public void setSourceNodes(DepanFxNodeList filteredNodes) {
@@ -319,7 +329,8 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
     nodeSelection.doSelectAllAction();
 
     return new DepanFxNodeListTableController(
-        workspace, dialogRunner, columnRegistry,
+        workspace, dialogRunner,
+        columnRegistry, infoRegistry,
         tableNodes, nodeSelection,
         tableViewRsrc, nodeSelectTable);
   }

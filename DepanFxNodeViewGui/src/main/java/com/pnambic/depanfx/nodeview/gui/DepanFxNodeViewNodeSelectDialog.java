@@ -121,7 +121,9 @@ public class DepanFxNodeViewNodeSelectDialog
 
     tableControl = new DepanFxNodeListTableController(
         workspace, dialogRunner, columnRegistry,
-        viewPanel.getViewNodesAsNodeList(), viewPanel.getNodeSelection(),
+        viewPanel.getInfoRegistry(),
+        viewPanel.getViewNodesAsNodeList(),
+        viewPanel.getNodeSelection(),
         tableViewRsrc, nodeSelectTable);
 
     nodeTableCommands.setContextMenu(buildContextMenu());

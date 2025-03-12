@@ -16,7 +16,9 @@
 package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry.Contribution;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxBaseColumnToolDialog;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
@@ -35,7 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -63,7 +64,8 @@ public class DepanFxInfoColumnToolDialog
   public static final String NEW_INFO_COLUMN_TITLE =
       "New Info Column";
 
-  private final DepanFxInfoRegistry infoRegistry;
+  @SuppressWarnings("unused") // Used in setter.
+  private DepanFxNodeListTableAdapter tableAdapter;
 
   @FXML
   private ComboBox<DepanFxInfoRegistry.Contribution> infoChoiceField;
@@ -81,48 +83,43 @@ public class DepanFxInfoColumnToolDialog
   private Label propertyDescrLabel;
 
   @Autowired
-  public DepanFxInfoColumnToolDialog(
-      DepanFxWorkspace workspace, DepanFxInfoRegistry infoRegistry) {
+  public DepanFxInfoColumnToolDialog( DepanFxWorkspace workspace) {
     super(workspace, DepanFxNodeInfoColumnData.class);
-    this.infoRegistry = infoRegistry;
   }
 
   public static Dialog<DepanFxInfoColumnToolDialog> runEditDialog(
       DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnRsrc,
-      DepanFxDialogRunner dialogRunner) {
+      DepanFxDialogRunner dialogRunner,
+      DepanFxNodeListTableAdapter tableAdapter) {
 
-    return DepanFxResourcePerspectives.runEditDialog(
-        columnRsrc, dialogRunner,
-        DepanFxInfoColumnToolDialog.class,
-        EDIT_INFO_COLUMN_TITLE);
+    Dialog<DepanFxInfoColumnToolDialog> result =
+        DepanFxResourcePerspectives.prepareDialog(
+            columnRsrc, dialogRunner, DepanFxInfoColumnToolDialog.class);
+    result.getController().setTableAdapter(tableAdapter);
+    result.runDialog(EDIT_INFO_COLUMN_TITLE);
+    return result;
   }
 
   public static Dialog<DepanFxInfoColumnToolDialog> runCreateDialog(
       DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnRsrc,
-      DepanFxDialogRunner dialogRunner) {
+      DepanFxDialogRunner dialogRunner,
+      DepanFxNodeListTableAdapter tableAdapter) {
 
-    return DepanFxResourcePerspectives.runCreateDialog(
-        columnRsrc, dialogRunner,
-        DepanFxInfoColumnToolDialog.class,
-        NEW_INFO_COLUMN_TITLE);
-  }
-
-  public static void setNodeKeyColumnTooldataFilters(FileChooser result) {
-    result.getExtensionFilters().add(INFO_COLUMN_FILTER);
-    result.setSelectedExtensionFilter(INFO_COLUMN_FILTER);
+    Dialog<DepanFxInfoColumnToolDialog> result =
+        DepanFxResourcePerspectives.prepareDialog(
+            columnRsrc, dialogRunner, DepanFxInfoColumnToolDialog.class);
+    result.getController().setTableAdapter(tableAdapter);
+    result.runDialog(NEW_INFO_COLUMN_TITLE);
+    return result;
   }
 
   @FXML
   public void initialize() {
-    ObservableList<DepanFxInfoRegistry.Contribution> infoItems =
-        infoChoiceField.getItems();
-    infoRegistry.streamContributions()
-        .forEach(infoItems::add);
-    infoChoiceField.setConverter(new ContributionConverter());
-    infoChoiceField.setOnAction(e -> handleInfoAction(e));
+    infoChoiceField.valueProperty().addListener(
+        (obs, old, upd) -> updateInfoDetails(upd));
 
-    propertyChoiceField.setConverter(new PropertyConverter());
-    propertyChoiceField.setOnAction(e -> handlePropertyAction(e));
+    propertyChoiceField.valueProperty().addListener(
+        (obs, old, upd) -> updatePropertyDetails(upd));
   }
 
   @Override
@@ -130,9 +127,24 @@ public class DepanFxInfoColumnToolDialog
       DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnRsrc) {
     super.setToolResource(columnRsrc);
 
-    DepanFxNodeInfoColumnData columnInfo = columnRsrc.getResource();
-    infoChoiceField.setValue(columnInfo.getInfoContribution());
-    propertyChoiceField.setValue(columnInfo.getInfoProperty());
+    updateChoiceFields();
+  }
+
+  public void setTableAdapter(DepanFxNodeListTableAdapter tableAdapter) {
+    this.tableAdapter = tableAdapter;
+
+    infoChoiceField.setConverter(new ContributionConverter(tableAdapter));
+    ObservableList<DepanFxInfoRegistry.Contribution> infoItems =
+        infoChoiceField.getItems();
+    tableAdapter.streamInfoChoices()
+        .forEach(infoItems::add);
+
+    updateChoiceFields();
+  }
+
+  public static void setNodeKeyColumnTooldataFilters(FileChooser result) {
+    result.getExtensionFilters().add(INFO_COLUMN_FILTER);
+    result.setSelectedExtensionFilter(INFO_COLUMN_FILTER);
   }
 
   /////////////////////////////////////
@@ -166,19 +178,16 @@ public class DepanFxInfoColumnToolDialog
     return  "Infos Column Save Confirmation Error";
   }
 
-  private void handleInfoAction(ActionEvent event) {
-    DepanFxInfoRegistry.Contribution infoContrib = infoChoiceField.getValue();
-    infoDescrLabel.setText(infoContrib.getInfoDescription());
-
-    ObservableList<DepanFxNodeInfoProperty> propertyItems =
-        propertyChoiceField.getItems();
-    propertyItems.clear();
-    infoContrib.streamProperties()
-        .forEach(propertyItems::add);
+  private void updateChoiceFields() {
+    getToolResource()
+        .map(r -> r.getResource())
+        .ifPresent(i -> {
+          infoChoiceField.setValue(i.getInfoContribution());
+          propertyChoiceField.setValue(i.getInfoProperty());
+        });
   }
 
-  private void handlePropertyAction(ActionEvent event) {
-    DepanFxNodeInfoProperty infoProp = propertyChoiceField.getValue();
+  private void updatePropertyDetails(DepanFxNodeInfoProperty infoProp) {
     if (infoProp != null) {
       propertyDetailsLabel.setText(infoProp.getPropertyKind().toString());
       propertyDescrLabel.setText(infoProp.getToolDescription());
@@ -188,11 +197,34 @@ public class DepanFxInfoColumnToolDialog
     propertyDescrLabel.setText(null);
   }
 
+  private void updateInfoDetails(DepanFxInfoRegistry.Contribution updContrib) {
+    if (updContrib == null) {
+      infoDescrLabel.setText(null);
+      propertyChoiceField.getItems().clear();
+      return;
+    }
+
+    infoDescrLabel.setText(updContrib.getInfoDescription());
+
+    propertyChoiceField.setConverter(new PropertyConverter(updContrib));
+    ObservableList<DepanFxNodeInfoProperty> propertyItems =
+        propertyChoiceField.getItems();
+    propertyItems.clear();
+    updContrib.streamProperties()
+        .forEach(propertyItems::add);
+  }
+
   /////////////////////////////////////
   //
 
-  private class ContributionConverter
+  private static class ContributionConverter
       extends StringConverter<DepanFxInfoRegistry.Contribution> {
+
+    private final DepanFxNodeListTableAdapter tableAdapter;
+
+    public ContributionConverter(DepanFxNodeListTableAdapter tableAdapter) {
+      this.tableAdapter = tableAdapter;
+    }
 
     @Override
     public String toString(DepanFxInfoRegistry.Contribution contribution) {
@@ -201,16 +233,20 @@ public class DepanFxInfoColumnToolDialog
 
     @Override
     public DepanFxInfoRegistry.Contribution fromString(String label) {
-      return infoRegistry.streamByLabel(label)
+      return tableAdapter.streamInfosByLabel(label)
           .findFirst()
           .orElse(null);
     }
   }
 
-  private class PropertyConverter
+  private static class PropertyConverter
       extends StringConverter<DepanFxNodeInfoProperty> {
 
-    DepanFxInfoRegistry.Contribution contrib;
+    private final DepanFxInfoRegistry.Contribution contrib;
+
+    private PropertyConverter(Contribution contrib) {
+      this.contrib = contrib;
+    }
 
     @Override
     public String toString(DepanFxNodeInfoProperty contribution) {

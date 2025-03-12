@@ -1,9 +1,27 @@
+/*
+ * Copyright 2024 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.pnambic.depanfx.nodeview.gui;
 
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.context.GraphContextKeys;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxCompositeInfoRegistry;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry.Contribution;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.graph_doc.model.GraphModel;
 import com.pnambic.depanfx.jogl.JoglMouseActionListener;
@@ -137,6 +155,8 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private final DepanFxNodeFiltersRegistry filterRegistry;
 
+  private final DepanFxInfoRegistry panelInfoRegistry;
+
   private DepanFxWorkspaceResource<DepanFxNodeViewData> nodeViewRsrc;
 
   private DepanFxNodeViewData viewData;
@@ -179,11 +199,13 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
       DepanFxWorkspace workspace,
       DepanFxNodeLayoutRegistry layoutRegistry,
       DepanFxNodeFiltersRegistry filterRegistry,
+      DepanFxInfoRegistry infoRegistry,
       DepanFxWorkspaceResource<DepanFxNodeViewData> nodeViewRsrc) {
     this.workspace = workspace;
     this.layoutRegistry = layoutRegistry;
     this.filterRegistry = filterRegistry;
     this.nodeViewRsrc = nodeViewRsrc;
+    this.panelInfoRegistry = preparePanelInfoRegistry(infoRegistry);
 
     // Unpack the interesting parts of the view data.
     this.viewData = nodeViewRsrc.getResource();
@@ -267,6 +289,10 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
    */
   public Stream<GraphNode> streamChosenNodes() {
     return nodeSelection.streamChosenNodes();
+  }
+
+  public DepanFxInfoRegistry getInfoRegistry() {
+    return panelInfoRegistry;
   }
 
   public Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
@@ -416,6 +442,17 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   }
 
   /////////////////////////////////////
+
+  private DepanFxInfoRegistry preparePanelInfoRegistry(
+      DepanFxInfoRegistry infoRegistry) {
+    List<Contribution> contribs = new ArrayList<>();
+    contribs.add(new NodePositionInfoContribution(this));
+
+    return DepanFxCompositeInfoRegistry.buildInfoRegistry(
+        infoRegistry, contribs );
+  }
+
+  /////////////////////////////////////
   // For NodeListTable integration
 
   private void runNodeSelectionDialog() {
@@ -461,7 +498,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
         getNodeSelection().getSelection(getNodeSelectionAsNodeList());
 
     Stage filterSelctionDialog = DepanFxNodeViewNodeFiltersDialog.runEditDialog(
-        getDialogRunner(), tableViewRsrc, filteredNodes,
+        getDialogRunner(), panelInfoRegistry, tableViewRsrc, filteredNodes,
         nl -> nodeSelection.doSelectGraphNodesAction(nl.getNodes()));
 
      sideViews.add(filterSelctionDialog);
