@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxBaseColumnCell;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
@@ -27,6 +28,10 @@ public class DepanFxInfoColumnCell extends DepanFxBaseColumnCell {
 
   @Override
   protected void stylizeCell(DepanFxNodeListMember member) {
-    super.stylizeCell(member);
+    if (member instanceof DepanFxNodeListGraphNode node) {
+      setText(getColumn().toString(node));
+      return;
+    }
+    setText("");
   }
 }

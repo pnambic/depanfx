@@ -219,8 +219,16 @@ public class DepanFxNodeListTableController
         graphNode,
         columnInfo.getInfoContribution(),
         columnInfo.getInfoProperty())
-        .map(v -> v.toString())
+        .map(v -> getInfoString(columnInfo, v))
         .orElse("");
+  }
+
+  private String getInfoString(
+      DepanFxNodeInfoColumnData columnInfo, Object value) {
+    if (columnInfo.getInfoProperty() != null) {
+      return columnInfo.getInfoProperty().getPropertyKind().toString(value);
+    }
+    return null;
   }
 
   @Override

@@ -20,9 +20,40 @@ import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
 public class DepanFxNodeInfoProperty extends DepanFxBaseToolData {
 
   public enum PropertyKind {
-    INT,
-    STRING,
-    POS;
+    INT {
+      @Override
+      public String toString(Object value) {
+        if (value instanceof Number numValue) {
+          int intValue = numValue.intValue();
+          return Integer.toString(intValue);
+        }
+        return null;
+      }
+    },
+    STRING {
+      @Override
+      public String toString(Object value) {
+        if (value instanceof String strValue) {
+          return strValue;
+        }
+        if (value != null) {
+          return value.toString();
+        }
+        return null;
+      }
+    },
+    POS {
+      @Override
+      public String toString(Object value) {
+        if (value instanceof Number numValue) {
+          double doubleValue = numValue.doubleValue();
+          return String.format("%.2f", doubleValue);
+        }
+        return null;
+      }
+    };
+
+    public abstract String toString(Object value);
   }
 
   public static final String NEW_PROPERTY_NAME = "Property";

@@ -131,6 +131,9 @@ public class DepanFxNodeInfoColumnDataConverter
       return contextRegistry;
     }
 
+    LOG.info(
+        "Unable to locate a contextual info registry,"
+        + " using the base info registry");
     return infoRegistry;
   }
 }
