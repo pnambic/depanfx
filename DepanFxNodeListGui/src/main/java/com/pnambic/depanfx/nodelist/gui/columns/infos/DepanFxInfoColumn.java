@@ -19,7 +19,6 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxAbstractColumn;
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxBaseColumnCell;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
@@ -61,7 +60,7 @@ public class DepanFxInfoColumn
   protected Callback<TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember>,
       TreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember>>
       buildCellFactory() {
-    return p -> new DepanFxBaseColumnCell(this);
+    return p -> new DepanFxInfoColumnCell(this);
   }
 
   @Override
