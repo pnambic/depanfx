@@ -16,8 +16,10 @@
 package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxAbstractColumn;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxBaseColumnCell;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
@@ -33,6 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.TreeTableCell;
+import javafx.scene.control.TreeTableColumn;
+import javafx.util.Callback;
 
 public class DepanFxInfoColumn
     extends DepanFxAbstractColumn<DepanFxNodeInfoColumnData> {
@@ -50,6 +55,13 @@ public class DepanFxInfoColumn
       DepanFxNodeListTableAdapter tableAdapter,
       DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnDataRsrc) {
     super(tableAdapter, columnDataRsrc);
+  }
+
+  @Override
+  protected Callback<TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember>,
+      TreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember>>
+      buildCellFactory() {
+    return p -> new DepanFxBaseColumnCell(this);
   }
 
   @Override

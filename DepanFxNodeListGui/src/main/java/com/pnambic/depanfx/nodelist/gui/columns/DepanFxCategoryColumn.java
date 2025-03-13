@@ -148,7 +148,8 @@ public class DepanFxCategoryColumn
   protected Callback<TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember>,
       TreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember>>
       buildCellFactory() {
-    return new CategoryCellFactory();
+    super.buildCellFactory();
+    return p -> new DepanFxCategoryColumnCell(this);
   }
 
   @Override
@@ -295,16 +296,5 @@ public class DepanFxCategoryColumn
     result.setSelectedExtensionFilter(
         DepanFxCategoryColumnToolDialog.CATEGORY_COLUMN__RSRC_FILTER);
     return result;
-  }
-
-  private class CategoryCellFactory implements
-      Callback<TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember>,
-      TreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember>> {
-
-    @Override
-    public TreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember> call(
-        TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember> param) {
-      return new DepanFxCategoryColumnCell(DepanFxCategoryColumn.this);
-    }
   }
 }

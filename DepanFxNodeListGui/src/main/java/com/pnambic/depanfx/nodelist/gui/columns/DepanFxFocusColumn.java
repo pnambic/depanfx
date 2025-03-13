@@ -139,7 +139,7 @@ public class DepanFxFocusColumn
   protected Callback<TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember>,
       TreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember>>
       buildCellFactory() {
-    return new FocusCellFactory();
+    return p -> new DepanFxFocusColumnCell(this);
   }
 
   public void setDecendantsCategories(DepanFxTreeFork forkItem) {
@@ -265,16 +265,5 @@ public class DepanFxFocusColumn
     result.setSelectedExtensionFilter(
         DepanFxFocusColumnToolDialog.FOCUS_COLUMN_RSRC_FILTER);
     return result;
-  }
-
-  private class FocusCellFactory implements
-      Callback<TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember>,
-      TreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember>> {
-
-    @Override
-    public TreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember> call(
-        TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember> param) {
-      return new DepanFxFocusColumnCell(DepanFxFocusColumn.this);
-    }
   }
 }
