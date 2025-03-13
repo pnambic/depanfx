@@ -76,7 +76,7 @@ public class DepanFxNodeInfoColumnDataConverter
             null, NodeInfoColumnDataTransport.class);
 
     Optional<DepanFxInfoRegistry.Contribution> optInfoKind =
-        infoRegistry.getById(columnTransport.infoContribution);
+        getInfoRegistry(srcContext).getById(columnTransport.infoContribution);
     Optional<DepanFxNodeInfoProperty> optInfoProperty =
         optInfoKind.flatMap(c -> c.getProperty(columnTransport.infoProperty));
 
@@ -120,5 +120,17 @@ public class DepanFxNodeInfoColumnDataConverter
       this.infoContribution = columnInfo.getInfoContribution().getInfoId();
       this.infoProperty = columnInfo.getInfoProperty().getToolName();
     }
+  }
+
+  private DepanFxInfoRegistry getInfoRegistry(
+      XstreamUnmarshalContext srcContext) {
+    DepanFxInfoRegistry contextRegistry =
+        (DepanFxInfoRegistry) srcContext.getContextValue(
+            DepanFxInfoRegistry.class);
+    if (contextRegistry != null) {
+      return contextRegistry;
+    }
+
+    return infoRegistry;
   }
 }

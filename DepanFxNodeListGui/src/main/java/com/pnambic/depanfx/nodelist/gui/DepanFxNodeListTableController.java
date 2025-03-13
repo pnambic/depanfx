@@ -19,6 +19,8 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -230,5 +232,12 @@ public class DepanFxNodeListTableController
   public Stream<DepanFxInfoRegistry.Contribution> streamInfosByLabel(
       String label) {
     return infoRegistry.streamByLabel(label);
+  }
+
+  @Override
+  public Map<?, ?> getLoadContext() {
+    Map<Object, Object> result = new HashMap<>();
+    result.put(DepanFxInfoRegistry.class, infoRegistry);
+    return result;
   }
 }

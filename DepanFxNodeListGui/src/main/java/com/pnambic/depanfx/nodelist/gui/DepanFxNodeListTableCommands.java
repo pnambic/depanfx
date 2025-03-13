@@ -202,7 +202,7 @@ public class DepanFxNodeListTableCommands {
     rsrcChooser.showOpenDialog(tableState.getScene())
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(m -> workspace.getWorkspaceResource(
-            m, DepanFxBaseColumnData.class))
+            m, DepanFxBaseColumnData.class, tableAdapter.getLoadContext()))
         .ifPresent(tableState::addColumn);
   }
 }

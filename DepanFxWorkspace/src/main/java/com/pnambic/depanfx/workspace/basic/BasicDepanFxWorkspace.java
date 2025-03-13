@@ -28,7 +28,9 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -167,10 +169,14 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
 
   @Override
   public <T> Optional<DepanFxWorkspaceResource<T>> loadDocument(
-      DepanFxProjectDocument projDoc, String expectedLabel) {
+      DepanFxProjectDocument projDoc,
+      String expectedLabel,
+      Map<?, ?> context) {
     XstreamDocumentTransport transport =
         persistRegistry.getDocumentTransport(getMemberUri(projDoc));
     transport.addContextValue(DepanFxWorkspace.class, this);
+    context.entrySet().stream()
+        .forEach(e -> transport.addContextValue(e.getKey(), e.getValue()));
 
     try (Reader importer = openForLoad(projDoc)) {
       @SuppressWarnings("unchecked")
@@ -182,7 +188,6 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
     }
     return Optional.empty();
   }
-
 
   @Override
   public Optional<DepanFxProjectContainer> toProjectContainer(URI uri) {
@@ -213,18 +218,6 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
         .map(p -> buildProjectDocument(p, resourcePath));
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
-      DepanFxProjectDocument resourceDoc, Class<T> type) {
-    return
-        getWorkspaceResource(resourceDoc, type.getName())
-            .filter(r ->expectType(type, r))
-            .map(r -> (DepanFxWorkspaceResource<T>) r)
-            .map(Optional::of)
-            .orElse(Optional.empty());
-  }
-
   /**
    * Provide a resource from a project document.
    *
@@ -232,9 +225,28 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
    * @param expectedContent - supplemental text for message load errors.
    *   This value is often the class name of the expected value.
    */
+
+  // @SuppressWarnings("unchecked")
   @Override
   public <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
-      DepanFxProjectDocument resourceDoc, String expectedContent) {
+      DepanFxProjectDocument resourceDoc, Class<T> type) {
+    return getWorkspaceResource(resourceDoc, type, Collections.emptyMap());
+  }
+
+  @Override
+  public <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
+      DepanFxProjectDocument resourceDoc, Class<T> type,
+      Map<?, ?> context) {
+
+    return getWorkspaceResource(resourceDoc, type.getName(), context);
+  }
+
+  @Override
+  public <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
+      DepanFxProjectDocument resourceDoc,
+      String expectedContent,
+      Map<?, ?> loadContext
+      ) {
     // Check for a built in resource.
     if (getBuiltInProjectTree().equals(resourceDoc.getProject())) {
       return builtInProj.getResource(resourceDoc);
@@ -251,7 +263,7 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
       return Optional.of(result);
     }
     // Obtain the resource from the store.
-    return loadDocument(resourceDoc, expectedContent);
+    return loadDocument(resourceDoc, expectedContent, loadContext);
   }
 
   @Override

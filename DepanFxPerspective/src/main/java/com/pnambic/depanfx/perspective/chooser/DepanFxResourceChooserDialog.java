@@ -18,6 +18,7 @@ import net.rgielen.fxweaver.core.FxmlView;
 
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -296,10 +297,11 @@ public class DepanFxResourceChooserDialog {
 
     // In the BuiltIn project, try the actual object ('cuz loads are cheap).
     if (workspace.getBuiltInProjectTree().equals(document.getProject())) {
-      return workspace.getWorkspaceResource(document, "resource chooser")
-        .map(r -> r.getResource())
-        .filter(activeFilter::matchDocument)
-        .isPresent();
+      return workspace.getWorkspaceResource(
+          document, "resource chooser", Collections.emptyMap())
+          .map(r -> r.getResource())
+          .filter(activeFilter::matchDocument)
+          .isPresent();
     }
     return false;
   }

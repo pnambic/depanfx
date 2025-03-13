@@ -3,6 +3,7 @@ package com.pnambic.depanfx.workspace;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
@@ -53,14 +54,18 @@ public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
    *    logging the failure.
    */
   <T> Optional<DepanFxWorkspaceResource<T>> loadDocument(
-      DepanFxProjectDocument projDoc, String expectedLabel);
+      DepanFxProjectDocument projDoc,
+      String expectedLabel,
+      Map<?, ?> context);
 
   /**
    * Provide the resource identified by the project document.
    * The contents may be loaded from storage or provided by the cache.
    */
   <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
-      DepanFxProjectDocument resourceDoc, String expectedContent);
+      DepanFxProjectDocument resourceDoc,
+      String expectedContent,
+      Map<?, ?> context);
 
   /**
    * Documents that do not match the supplied {@code docType} are quietly
@@ -68,6 +73,11 @@ public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
    */
   <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
       DepanFxProjectDocument resourceDoc, Class<T> type);
+
+  <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
+      DepanFxProjectDocument resourceDoc,
+      Class<T> type,
+      Map<?, ?> context);
 
   Optional<DepanFxProjectContainer> toProjectContainer(URI uri);
 

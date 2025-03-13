@@ -31,6 +31,7 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -98,4 +99,6 @@ public interface DepanFxNodeListTableAdapter {
       GraphNode graphNode, DepanFxNodeInfoColumnData columnInfo);
 
   Stream<Contribution> streamInfosByLabel(String label);
+
+  Map<?, ?> getLoadContext();
 }
