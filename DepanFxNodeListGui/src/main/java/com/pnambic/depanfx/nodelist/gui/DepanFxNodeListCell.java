@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javafx.collections.ObservableList;
@@ -258,11 +259,12 @@ public class DepanFxNodeListCell
 
   private void openTreeSectionFinder(DepanFxTreeSection member) {
     DepanFxWorkspace workspace = tableAdapter.getWorkspace();
+    Map<?, ?> loadContext = tableAdapter.getLoadContext();
 
     prepareTreeSectionChooser(workspace).showOpenDialog(getScene())
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
-            p, DepanFxTreeSectionData.class))
+            p, DepanFxTreeSectionData.class, loadContext))
         .ifPresent(d -> updateSectionDataRsrc(member, d));
   }
 
@@ -278,11 +280,12 @@ public class DepanFxNodeListCell
 
   private void openFlatSectionFinder(DepanFxFlatSection member) {
     DepanFxWorkspace workspace = tableAdapter.getWorkspace();
+    Map<?, ?> loadContext = tableAdapter.getLoadContext();
 
     prepareFlatSectionChooser(workspace).showOpenDialog(getScene())
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
-            p, DepanFxFlatSectionData.class))
+            p, DepanFxFlatSectionData.class, loadContext))
         .ifPresent(d -> updateSectionDataRsrc(member, d));
   }
 

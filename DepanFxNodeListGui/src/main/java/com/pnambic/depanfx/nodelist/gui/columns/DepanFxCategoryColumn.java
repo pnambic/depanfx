@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.ContextMenu;
@@ -254,12 +255,13 @@ public class DepanFxCategoryColumn
 
   private void openColumnChooser(DepanFxDialogRunner dialogRunner) {
     DepanFxWorkspace workspace = tableAdapter.getWorkspace();
+    Map<?, ?> loadContext = tableAdapter.getLoadContext();
     DepanFxResourceChooser columnChooser =
         prepareChooser(workspace, dialogRunner);
     columnChooser.showOpenDialog(getScene())
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
-              p, DepanFxCategoryColumnData.class))
+              p, DepanFxCategoryColumnData.class, loadContext))
         .ifPresent(this::updateColumnDataRsrc);
   }
 

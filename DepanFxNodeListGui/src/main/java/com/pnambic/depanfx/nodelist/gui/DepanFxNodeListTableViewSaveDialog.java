@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -83,7 +84,7 @@ public class DepanFxNodeListTableViewSaveDialog
     return chooser.showOpenDialog(scene)
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
-            p, DepanFxNodeListTableViewData.class));
+            p, DepanFxNodeListTableViewData.class, Collections.emptyMap()));
   }
 
   @Override

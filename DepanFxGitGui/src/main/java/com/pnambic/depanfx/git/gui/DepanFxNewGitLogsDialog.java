@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
@@ -126,8 +127,10 @@ public class DepanFxNewGitLogsDialog extends DepanFxBaseDialog {
     int logCount = Integer.parseInt(logCountField.getText());
 
     try {
-      DepanFxWorkspaceResource<GraphDocument> graphRsrc = optGraphDoc
-          .flatMap(d -> workspace.getWorkspaceResource(d, GraphDocument.class))
+      DepanFxWorkspaceResource<GraphDocument> graphRsrc =
+          optGraphDoc
+          .flatMap(d -> workspace.getWorkspaceResource(
+              d, GraphDocument.class, Collections.emptyMap()))
           .get();
 
       DepanFxProjectContainer dstDir = optDstDir.get();

@@ -225,22 +225,6 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
    * @param expectedContent - supplemental text for message load errors.
    *   This value is often the class name of the expected value.
    */
-
-  // @SuppressWarnings("unchecked")
-  @Override
-  public <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
-      DepanFxProjectDocument resourceDoc, Class<T> type) {
-    return getWorkspaceResource(resourceDoc, type, Collections.emptyMap());
-  }
-
-  @Override
-  public <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
-      DepanFxProjectDocument resourceDoc, Class<T> type,
-      Map<?, ?> context) {
-
-    return getWorkspaceResource(resourceDoc, type.getName(), context);
-  }
-
   @Override
   public <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
       DepanFxProjectDocument resourceDoc,
@@ -264,6 +248,14 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
     }
     // Obtain the resource from the store.
     return loadDocument(resourceDoc, expectedContent, loadContext);
+  }
+
+  @Override
+  public <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
+      DepanFxProjectDocument resourceDoc, Class<T> type,
+      Map<?, ?> context) {
+
+    return getWorkspaceResource(resourceDoc, type.getName(), context);
   }
 
   @Override

@@ -11,6 +11,7 @@ import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -77,7 +78,7 @@ public class DepanFxGitRepoToolDialogs {
     return chooser.showOpenDialog(scene)
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
-            p, DepanFxGitRepoData.class));
+            p, DepanFxGitRepoData.class, Collections.emptyMap()));
   }
 
   private static Optional<DepanFxWorkspaceResource<DepanFxGitRepoData>>

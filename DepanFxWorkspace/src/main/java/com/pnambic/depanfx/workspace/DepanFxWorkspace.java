@@ -72,9 +72,6 @@ public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
    * dropped.
    */
   <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
-      DepanFxProjectDocument resourceDoc, Class<T> type);
-
-  <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
       DepanFxProjectDocument resourceDoc,
       Class<T> type,
       Map<?, ?> context);

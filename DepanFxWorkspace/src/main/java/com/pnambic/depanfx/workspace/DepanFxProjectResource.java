@@ -4,6 +4,7 @@ import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Optional;
 
 public interface DepanFxProjectResource<T> {
@@ -42,7 +43,8 @@ public interface DepanFxProjectResource<T> {
     @Override
     public Optional<DepanFxWorkspaceResource<T>> getResource(
         DepanFxWorkspace workspace, Class<T> docType) {
-      return workspace.getWorkspaceResource(projDoc, docType);
+      return workspace.getWorkspaceResource(
+          projDoc, docType, Collections.emptyMap());
     }
   }
 

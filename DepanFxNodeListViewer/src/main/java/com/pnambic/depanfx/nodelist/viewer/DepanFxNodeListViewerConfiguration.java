@@ -41,6 +41,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Map;
 
 @Configuration
@@ -168,9 +169,13 @@ public class DepanFxNodeListViewerConfiguration {
     public void openPanel(DepanFxWorkspace workspace,
         DepanFxSceneService sceneSrvc,
         DepanFxProjectDocument document) {
-      workspace.getWorkspaceResource(document, DepanFxNodeList.class)
-        .ifPresent(r -> addNodeListPanelToScene(
-            workspace, sceneSrvc, columnRegistry, infoRegistry, r));
+      Map<?, ?> loadContext = Collections.singletonMap(
+          DepanFxInfoRegistry.class, infoRegistry);
+
+      workspace.getWorkspaceResource
+          (document, DepanFxNodeList.class, loadContext )
+          .ifPresent(r -> addNodeListPanelToScene(
+              workspace, sceneSrvc, columnRegistry, infoRegistry, r));
     }
 
     private static void addNodeListPanelToScene(
@@ -225,9 +230,13 @@ public class DepanFxNodeListViewerConfiguration {
     public void openPanel(DepanFxWorkspace workspace,
         DepanFxSceneService sceneSrvc,
         DepanFxProjectDocument document) {
-      workspace.getWorkspaceResource(document, GraphDocument.class)
-        .ifPresent(r -> addGraphDocViewToScene(
-            workspace, sceneSrvc, columnRegistry, infoRegistry, r));
+      Map<?, ?> loadContext = Collections.singletonMap(
+          DepanFxInfoRegistry.class, infoRegistry);
+
+      workspace.getWorkspaceResource(
+          document, GraphDocument.class, loadContext)
+          .ifPresent(r -> addGraphDocViewToScene(
+              workspace, sceneSrvc, columnRegistry, infoRegistry, r));
     }
 
     private static void addGraphDocViewToScene(

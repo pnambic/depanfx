@@ -17,6 +17,8 @@ import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import java.util.Map;
+
 import javafx.scene.control.ContextMenu;
 
 public class DepanFxNodeKeyColumn
@@ -118,12 +120,14 @@ public class DepanFxNodeKeyColumn
 
   private void openColumnChooser(DepanFxDialogRunner dialogRunner) {
     DepanFxWorkspace workspace = tableAdapter.getWorkspace();
+    Map<?, ?> loadContext = tableAdapter.getLoadContext();
+
     DepanFxResourceChooser columnChooser =
         prepareChooser(workspace, dialogRunner);
     columnChooser.showOpenDialog(getScene())
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
-              p, DepanFxNodeKeyColumnData.class))
+              p, DepanFxNodeKeyColumnData.class, loadContext))
         .ifPresent(this::updateColumnDataRsrc);
   }
 

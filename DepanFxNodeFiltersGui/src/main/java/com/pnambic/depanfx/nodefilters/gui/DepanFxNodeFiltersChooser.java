@@ -28,6 +28,7 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
@@ -191,7 +192,7 @@ public class DepanFxNodeFiltersChooser {
     return chooser.showOpenDialog(scene)
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
-            p, DepanFxBaseFilterData.class));
+            p, DepanFxBaseFilterData.class, Collections.emptyMap()));
   }
 
   private static DepanFxResourceChooser prepareChooser(

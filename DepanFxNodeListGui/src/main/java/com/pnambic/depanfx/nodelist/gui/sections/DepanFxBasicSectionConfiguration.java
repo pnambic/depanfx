@@ -40,6 +40,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -219,7 +220,9 @@ public class DepanFxBasicSectionConfiguration {
           workspace.getBuiltInProjectTree().asProjectDocument(
               DepanFxLinkMatcherBuiltIns.MEMBER_MATCHER_PATH);
       return  workspace.getWorkspaceResource(
-          matcherProjPath.get(), DepanFxLinkMatcherDocument.class)
+          matcherProjPath.get(),
+          DepanFxLinkMatcherDocument.class,
+          Collections.emptyMap())
           .map(m -> new DepanFxTreeSectionData(
                 NEW_TREE_SECTION_NAME, NEW_TREE_SECTION_DESCR,
                 NEW_TREE_SECTION_LABEL, true, m, true,

@@ -214,7 +214,8 @@ public class DepanFxNodeViewPanelConfiguration {
     @Override
     public void openPanel(DepanFxWorkspace workspace,
         DepanFxSceneService sceneSrcv, DepanFxProjectDocument document) {
-      workspace.getWorkspaceResource(document, DepanFxNodeViewData.class)
+      workspace.getWorkspaceResource(
+          document, DepanFxNodeViewData.class, Collections.emptyMap())
           .ifPresent(r ->
               addNodeViewPanelToScene(
                   workspace, sceneSrcv, r,

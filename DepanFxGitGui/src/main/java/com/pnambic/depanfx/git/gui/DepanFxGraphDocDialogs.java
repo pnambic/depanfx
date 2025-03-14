@@ -15,6 +15,7 @@ import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Optional;
 
 import javafx.scene.Scene;
@@ -45,7 +46,7 @@ public class DepanFxGraphDocDialogs {
     return chooser.showOpenDialog(scene)
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
-            p, GraphDocument.class));
+            p, GraphDocument.class, Collections.emptyMap()));
   }
 
   public static void runSaveGraphDocFileChooser(
