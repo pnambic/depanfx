@@ -28,6 +28,7 @@ import com.pnambic.depanfx.workspace.viewdata.DepanFxWorkspaceViewerData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.Optional;
 
 /**
@@ -74,7 +75,8 @@ public class DepanFxWorkspaceViewerContribution
       DepanFxSceneService sceneSrvc, DepanFxBaseViewerData viewData) {
 
     return Optional.of(new DepanFxWorkspaceViewer(
-        workspace, rsrcRegistry, rsrcMenuRegistry,
+        workspace,
+        rsrcRegistry, rsrcMenuRegistry, Collections.emptyMap(),
         DepanFxWorkspaceViewer.WORKSPACE_TAB));
   }
 

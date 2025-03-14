@@ -32,6 +32,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.Map;
 
 import javafx.scene.control.Cell;
 import javafx.scene.control.MenuItem;
@@ -89,8 +90,9 @@ public class DepanFxNodeFilterSequenceConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
+        DepanFxDialogRunner dialogRunner,
+        Map<?, ?> loadContext,
+        DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> wkspRsrc) {
       DepanFxNodeFilterSequenceToolDialog.runEditDialog(
           wkspRsrc, dialogRunner);
     }

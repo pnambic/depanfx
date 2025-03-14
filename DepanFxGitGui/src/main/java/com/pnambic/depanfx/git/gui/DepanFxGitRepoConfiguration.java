@@ -31,6 +31,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
+import java.util.Map;
 
 import javafx.scene.control.Cell;
 
@@ -73,8 +74,9 @@ public class DepanFxGitRepoConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxGitRepoData> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
+        DepanFxDialogRunner dialogRunner,
+        Map<?, ?> loadContext,
+        DepanFxWorkspaceResource<DepanFxGitRepoData> wkspRsrc) {
       DepanFxGitRepoToolDialog.runEditDialog(wkspRsrc, dialogRunner);
     }
   }

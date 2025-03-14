@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 
 import javafx.event.ActionEvent;
@@ -68,8 +69,9 @@ public class DepanFxNodeFiltersMatcherConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxMatcherFilterData> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
+        DepanFxDialogRunner dialogRunner,
+        Map<?, ?> loadContext,
+        DepanFxWorkspaceResource<DepanFxMatcherFilterData> wkspRsrc) {
       DepanFxNodeFiltersMatcherDialog.runEditDialog(dialogRunner, wkspRsrc);
     }
   }

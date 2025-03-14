@@ -27,6 +27,7 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import javafx.event.ActionEvent;
@@ -73,8 +74,8 @@ public class DepanFxFileOpenMenuContribution
   public void handleEvent(
       DepanFxSceneService sceneSrvc, ActionEvent event) {
     getDocument(sceneSrvc)
-        .ifPresent(d ->
-            openRegistry.openDocument(workspace, sceneSrvc, d));
+        .ifPresent(d -> openRegistry.openDocument(
+            workspace, sceneSrvc, Collections.emptyMap(), d));
   }
 
   private Optional<DepanFxProjectDocument> getDocument(

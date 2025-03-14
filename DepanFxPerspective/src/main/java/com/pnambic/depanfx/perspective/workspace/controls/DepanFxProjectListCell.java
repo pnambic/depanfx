@@ -7,6 +7,7 @@ import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 
+import java.util.Map;
 import java.util.Optional;
 
 import javafx.scene.control.ListCell;
@@ -24,9 +25,11 @@ public class DepanFxProjectListCell extends ListCell<DepanFxWorkspaceMember> {
       DepanFxWorkspace workspace,
       DepanFxWorkspaceMemberCells.DocumentDispatch dispatch,
       DepanFxResourceRegistry rsrcRegistry,
-      DepanFxResourceMenuRegistry rsrcMenuRegistry) {
+      DepanFxResourceMenuRegistry rsrcMenuRegistry,
+      Map<?, ?> loadContext) {
     this.memberCells = new DepanFxWorkspaceMemberCells(
-            workspace, dispatch, rsrcRegistry, rsrcMenuRegistry,
+            workspace, dispatch,
+            rsrcRegistry, rsrcMenuRegistry, loadContext,
             this::getCellIcon);
   }
 

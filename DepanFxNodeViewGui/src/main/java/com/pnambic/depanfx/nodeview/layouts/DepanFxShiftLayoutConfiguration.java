@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
 import java.text.MessageFormat;
+import java.util.Map;
 
 /**
  * Predefine a bunch of standard shift layouts.
@@ -179,8 +180,9 @@ public class DepanFxShiftLayoutConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxShiftLayoutData> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
+        DepanFxDialogRunner dialogRunner,
+        Map<?, ?> loadContext,
+        DepanFxWorkspaceResource<DepanFxShiftLayoutData> wkspRsrc) {
       DepanFxShiftLayoutToolDialog.runEditDialog(wkspRsrc, dialogRunner);
     }
   }

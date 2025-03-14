@@ -36,6 +36,9 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Collections;
+import java.util.Map;
+
 @Configuration
 public class DepanFxNodeViewPanelConfiguration {
 
@@ -156,8 +159,9 @@ public class DepanFxNodeViewPanelConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
+        DepanFxDialogRunner dialogRunner,
+        Map<?,?> loadContext,
+        DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> wkspRsrc) {
       DepanFxNodeViewLinkDisplayDialog.runEditDialog(wkspRsrc, dialogRunner);
     }
   }
@@ -174,8 +178,9 @@ public class DepanFxNodeViewPanelConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
+        DepanFxDialogRunner dialogRunner,
+        Map<?,?> loadContext,
+        DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> wkspRsrc) {
       DepanFxNodeViewNodeDisplayDialog.runEditDialog(wkspRsrc, dialogRunner);
     }
   }
@@ -218,8 +223,9 @@ public class DepanFxNodeViewPanelConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxNodeViewPanel> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
+        DepanFxDialogRunner dialogRunner,
+        Map<?,?> loadContext,
+        DepanFxWorkspaceResource<DepanFxNodeViewPanel> wkspRsrc) {
       throw new DepanFxResourceRegistry.UseOpenPanelException(this);
     }
   }
@@ -249,9 +255,11 @@ public class DepanFxNodeViewPanelConfiguration {
     }
 
     @Override
-    public void openPanel(DepanFxWorkspace workspace,
-        DepanFxSceneService sceneSrcv, DepanFxProjectDocument document) {
-      loadResource(workspace, document)
+    public void openPanel(
+        DepanFxWorkspace workspace,
+        DepanFxSceneService sceneSrcv,
+        DepanFxProjectDocument document) {
+      loadResource(workspace, Collections.emptyMap(),document)
           .map(r -> getNodeViewData(workspace, r, layoutRegistry))
           .map(d -> workspace.addScratchResource(d))
           .ifPresent(r ->
@@ -262,8 +270,9 @@ public class DepanFxNodeViewPanelConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource<T> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
+        DepanFxDialogRunner dialogRunner,
+        Map<?, ?> loadContext,
+        DepanFxWorkspaceResource<T> wkspRsrc) {
       throw new DepanFxResourceRegistry.UseOpenPanelException(this);
     }
 

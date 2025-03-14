@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javafx.collections.ObservableList;
@@ -71,6 +72,8 @@ public class DepanFxResourceChooserDialog {
 
   private List<PathMatcher> activeMatchers;
 
+  private Map<?, ?> loadContext = Collections.emptyMap();
+
   public DepanFxResourceChooserDialog(
       DepanFxDialogRunner dialogRunner,
       DepanFxResourceRegistry rsrcRegistry,
@@ -120,6 +123,10 @@ public class DepanFxResourceChooserDialog {
     resourceNameField.setText(initialResourceName);
   }
 
+  public void setLoadContext(Map<?, ?> loadContext) {
+    this.loadContext = loadContext;
+  }
+
   public void setWorkspace(DepanFxWorkspace workspace) {
     this.workspace = workspace;
 
@@ -151,7 +158,7 @@ public class DepanFxResourceChooserDialog {
     directoryTreeView.setShowRoot(false);
     directoryTreeView.setCellFactory(
         p -> new DepanFxProjectTreeCell(
-            workspace, dispatch, rsrcRegistry, rsrcMenuRegistry));
+            workspace, dispatch, rsrcRegistry, rsrcMenuRegistry, loadContext));
 
     directoryTreeView.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
@@ -165,7 +172,7 @@ public class DepanFxResourceChooserDialog {
       DepanFxWorkspaceMemberCells.DocumentDispatch dispatch) {
     fileListView.setCellFactory(
         p -> new DepanFxProjectListCell(
-            workspace, dispatch , rsrcRegistry, rsrcMenuRegistry));
+            workspace, dispatch, rsrcRegistry, rsrcMenuRegistry, loadContext));
     fileListView.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -298,7 +305,7 @@ public class DepanFxResourceChooserDialog {
     // In the BuiltIn project, try the actual object ('cuz loads are cheap).
     if (workspace.getBuiltInProjectTree().equals(document.getProject())) {
       return workspace.getWorkspaceResource(
-          document, "resource chooser", Collections.emptyMap())
+          document, "resource chooser", loadContext )
           .map(r -> r.getResource())
           .filter(activeFilter::matchDocument)
           .isPresent();

@@ -27,6 +27,8 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Collections;
+
 /**
  * Workspace panel installation for scene and UX menus.
  */
@@ -78,7 +80,9 @@ public class DepanFxWorkspaceViewerConfiguration {
     public DepanFxSceneViewer getSceneViewer(DepanFxSceneService sceneSrvc) {
 
       return new DepanFxWorkspaceViewer(
-          workspace, rsrcRegistry, rsrcMenuRegistry, getLabel());
+          workspace,
+          rsrcRegistry, rsrcMenuRegistry, Collections.emptyMap(),
+          getLabel());
     }
   }
 
@@ -114,7 +118,9 @@ public class DepanFxWorkspaceViewerConfiguration {
     public DepanFxSceneViewer getSceneViewer(DepanFxSceneService screenSrvc) {
 
       return new DepanFxWorkspaceViewer(
-          workspace, rsrcRegistry, rsrcMenuRegistry, getLabel());
+          workspace,
+          rsrcRegistry, rsrcMenuRegistry, Collections.emptyMap(),
+          getLabel());
     }
   }
 }

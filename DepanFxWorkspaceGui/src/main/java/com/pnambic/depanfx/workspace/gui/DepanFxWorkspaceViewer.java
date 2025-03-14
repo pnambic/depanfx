@@ -22,6 +22,7 @@ import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 
+import java.util.Map;
 import java.util.Optional;
 
 import javafx.scene.control.Tab;
@@ -36,6 +37,8 @@ public class DepanFxWorkspaceViewer implements DepanFxSceneViewer {
 
   private final DepanFxResourceMenuRegistry rsrcMenuRegistry;
 
+  private final Map<?, ?> loadContext;
+
   private final String tabLabel;
 
   private DepanFxProjectListViewer workspaceViewer;
@@ -44,17 +47,19 @@ public class DepanFxWorkspaceViewer implements DepanFxSceneViewer {
       DepanFxWorkspace workspace,
       DepanFxResourceRegistry rsrcRegistry,
       DepanFxResourceMenuRegistry rsrcMenuRegistry,
+      Map<?, ?> loadContext,
       String tabLabel) {
     this.workspace = workspace;
     this.rsrcRegistry = rsrcRegistry;
     this.rsrcMenuRegistry = rsrcMenuRegistry;
+    this.loadContext = loadContext;
     this.tabLabel = tabLabel;
   }
 
   @Override
   public Tab getSceneTab(DepanFxSceneService sceneSrvc) {
     workspaceViewer = new DepanFxProjectListViewer(
-          workspace, sceneSrvc, rsrcRegistry, rsrcMenuRegistry);
+          workspace, sceneSrvc, rsrcRegistry, rsrcMenuRegistry, loadContext);
     Tab workspaceTab = workspaceViewer.createWorkspaceTab(tabLabel);
 
     return workspaceTab;

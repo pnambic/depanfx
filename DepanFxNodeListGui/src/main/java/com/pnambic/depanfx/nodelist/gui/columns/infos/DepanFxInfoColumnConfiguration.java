@@ -38,6 +38,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 
 import javafx.event.Event;
@@ -132,8 +133,9 @@ public class DepanFxInfoColumnConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
+        DepanFxDialogRunner dialogRunner,
+        Map<?, ?> loadContext,
+        DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> wkspRsrc) {
       // Need a table context in order to run an info column editor.
       // DepanFxInfoColumnToolDialog.runEditDialog(wkspRsrc, dialogRunner);
     }

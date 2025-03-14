@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 
 import javafx.event.Event;
@@ -118,8 +119,9 @@ public class DepanFxCategoryColumnConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxCategoryColumnData> columnRsrc,
-        DepanFxDialogRunner dialogRunner) {
+        DepanFxDialogRunner dialogRunner,
+        Map<?, ?> loadContext,
+        DepanFxWorkspaceResource<DepanFxCategoryColumnData> columnRsrc) {
 
       DepanFxCategoryColumnToolDialog.runEditDialog(
           columnRsrc, dialogRunner, null);

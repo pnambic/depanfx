@@ -134,6 +134,8 @@ public class DepanFxNodeInfoColumnDataConverter
     LOG.info(
         "Unable to locate a contextual info registry,"
         + " using the base info registry");
-    return infoRegistry;
+    throw new IllegalStateException("Unable to locate a contextual info registry,"
+        + " using the base info registry");
+    // return infoRegistry;
   }
 }

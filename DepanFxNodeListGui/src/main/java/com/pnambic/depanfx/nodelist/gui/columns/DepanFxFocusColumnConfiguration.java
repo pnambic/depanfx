@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 
 import javafx.event.Event;
@@ -84,7 +85,8 @@ public class DepanFxFocusColumnConfiguration {
     }
 
     @Override
-    public Optional<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>> getNewColumn(
+    public Optional<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
+    getNewColumn(
         Event event,
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
@@ -115,8 +117,9 @@ public class DepanFxFocusColumnConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxFocusColumnData> columnRsrc,
-        DepanFxDialogRunner dialogRunner) {
+        DepanFxDialogRunner dialogRunner,
+        Map<?, ?> loadContext,
+        DepanFxWorkspaceResource<DepanFxFocusColumnData> columnRsrc) {
       DepanFxFocusColumnToolDialog.runEditDialog(
           columnRsrc, dialogRunner);
     }

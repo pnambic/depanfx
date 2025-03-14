@@ -41,6 +41,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
+import java.util.Map;
 
 @Configuration
 public class DepanFxNodeListViewerConfiguration {
@@ -124,8 +125,9 @@ public class DepanFxNodeListViewerConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxNodeListTableViewData> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
+        DepanFxDialogRunner dialogRunner,
+        Map<?, ?> loadContext,
+        DepanFxWorkspaceResource<DepanFxNodeListTableViewData> wkspRsrc) {
 
       LOG.info("No editor for DepanFxNodeListTableViewData");
       // DepanFxNodeListTableViewDialog.runEditDialog(dialogRunner, tableRsrc);
@@ -156,8 +158,9 @@ public class DepanFxNodeListViewerConfiguration {
 
     @Override
     protected void runDialog(
-        DepanFxWorkspaceResource<DepanFxNodeList> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
+        DepanFxDialogRunner dialogRunner,
+        Map<?, ?> loadContext,
+        DepanFxWorkspaceResource<DepanFxNodeList> wkspRsrc) {
       throw new DepanFxResourceRegistry.UseOpenPanelException(this);
     }
 
@@ -212,9 +215,9 @@ public class DepanFxNodeListViewerConfiguration {
     }
 
     @Override
-    protected void runDialog(
-        DepanFxWorkspaceResource<GraphDocument> wkspRsrc,
-        DepanFxDialogRunner dialogRunner) {
+    protected void runDialog(DepanFxDialogRunner dialogRunner,
+        Map<?, ?> loadContext,
+        DepanFxWorkspaceResource<GraphDocument> wkspRsrc) {
       throw new DepanFxResourceRegistry.UseOpenPanelException(this);
     }
 

@@ -245,8 +245,8 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
   public <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
       DepanFxProjectDocument resourceDoc,
       String expectedContent,
-      Map<?, ?> loadContext
-      ) {
+      Map<?, ?> loadContext) {
+
     // Check for a built in resource.
     if (getBuiltInProjectTree().equals(resourceDoc.getProject())) {
       return builtInProj.getResource(resourceDoc);
