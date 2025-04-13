@@ -149,7 +149,6 @@ public class DepanFxCategoryColumn
   protected Callback<TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember>,
       TreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember>>
       buildCellFactory() {
-    super.buildCellFactory();
     return p -> new DepanFxCategoryColumnCell(this);
   }
 

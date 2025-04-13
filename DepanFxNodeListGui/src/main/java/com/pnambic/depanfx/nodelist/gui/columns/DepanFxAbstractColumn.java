@@ -40,7 +40,7 @@ public abstract class DepanFxAbstractColumn<T extends DepanFxBaseColumnData>
     result.setPrefWidth(getWidthPx());
     result.setContextMenu(buildColumnContextMenu(tableAdapter.getDialogRunner()));
 
-    result.setCellFactory(p -> new DepanFxBaseColumnCell(this));
+    result.setCellFactory(buildCellFactory());
     result.setCellValueFactory(p ->
         new ReadOnlyObjectWrapper<>(p.getValue().getValue()));
     result.setSortable(false);
