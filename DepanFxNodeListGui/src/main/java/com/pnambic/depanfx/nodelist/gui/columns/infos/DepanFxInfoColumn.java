@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Optional;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TreeTableCell;
@@ -42,6 +43,8 @@ import javafx.util.Callback;
 
 public class DepanFxInfoColumn
     extends DepanFxAbstractColumn<DepanFxNodeInfoColumnData> {
+
+  private static final String ALIGN_CENTER_RIGHT = "-fx-alignment: CENTER-RIGHT;";
 
   public static final String EDIT_INFO_COLUMN = "Edit Info Column...";
 
@@ -59,10 +62,41 @@ public class DepanFxInfoColumn
   }
 
   @Override
+  public TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember> prepareColumn() {
+    TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember> result =
+        super.prepareColumn();
+    result.setEditable(getColumnData().getInfoProperty().isEditable());
+    return result;
+  }
+
+  @Override
+  public void prepareCell(TreeTableCell<DepanFxNodeListMember, ?> cell) {
+    super.prepareCell(cell);
+    getCellStyle().ifPresent(cell::setStyle);
+    cell.setEditable(getColumnData().getInfoProperty().isEditable());
+  }
+
+  private Optional<String> getCellStyle() {
+    // Can't be defined as a trait of property kind, 'cuz infos
+    // are a core Graph interface.
+    switch (getColumnData().getInfoProperty().getPropertyKind()) {
+    case INT:
+    case POS:
+      return Optional.of(ALIGN_CENTER_RIGHT);
+    case STRING:
+    }
+
+    return Optional.empty();
+  }
+
+  @Override
   protected Callback<TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember>,
       TreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember>>
       buildCellFactory() {
-    return p -> new DepanFxInfoColumnCell(this);
+    if (getColumnData().getInfoProperty().isEditable()) {
+      return p -> new DepanFxEditInfoColumnCell(this);
+    }
+    return p -> new DepanFxDisplayInfoColumnCell(this);
   }
 
   @Override

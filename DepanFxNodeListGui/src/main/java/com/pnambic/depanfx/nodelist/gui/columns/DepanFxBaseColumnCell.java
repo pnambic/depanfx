@@ -12,6 +12,7 @@ public class DepanFxBaseColumnCell
 
   public DepanFxBaseColumnCell(DepanFxNodeListColumn nodeListColumn) {
     this.nodeListColumn = nodeListColumn;
+    nodeListColumn.prepareCell(this);
   }
 
   public DepanFxNodeListColumn getColumn() {

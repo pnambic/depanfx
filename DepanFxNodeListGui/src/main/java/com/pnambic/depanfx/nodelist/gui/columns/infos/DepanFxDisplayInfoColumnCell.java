@@ -20,9 +20,9 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxBaseColumnCell;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 
-public class DepanFxInfoColumnCell extends DepanFxBaseColumnCell {
+public class DepanFxDisplayInfoColumnCell extends DepanFxBaseColumnCell {
 
-  public DepanFxInfoColumnCell(DepanFxNodeListColumn nodeListColumn) {
+  public DepanFxDisplayInfoColumnCell(DepanFxNodeListColumn nodeListColumn) {
     super(nodeListColumn);
   }
 

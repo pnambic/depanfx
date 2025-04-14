@@ -48,6 +48,11 @@ public abstract class DepanFxAbstractColumn<T extends DepanFxBaseColumnData>
     return result;
   }
 
+  @Override
+  public void prepareCell(TreeTableCell<DepanFxNodeListMember, ?> cell) {
+    // Mostly nothing to do
+  }
+
   public DepanFxWorkspaceResource<T> getColumnDataResource() {
     return columnDataRsrc;
   }

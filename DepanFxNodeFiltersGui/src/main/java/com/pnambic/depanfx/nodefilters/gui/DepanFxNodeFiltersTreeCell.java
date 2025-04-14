@@ -96,7 +96,7 @@ public class DepanFxNodeFiltersTreeCell
   private void appendFilterMenu(DepanFxContextMenuBuilder builder,
       DepanFxNodeFiltersDisplayMember<?> filterMember) {
     DepanFxBaseFilterData filterData = filterMember.getFilterData();
-    if (filterData instanceof DepanFxSequenceFilterData seqData) {
+    if (filterData instanceof DepanFxSequenceFilterData) {
       builder.appendConditionalSeparator();
       nodeFiltersDialogRegistry.appendAddFilters(
           builder, workspace, dialogRunner, getScene(),
