@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 
 import javafx.scene.control.cell.TextFieldTreeTableCell;
@@ -65,7 +66,9 @@ public class DepanFxEditInfoColumnCell
   public void commitEdit(String editValue) {
     super.commitEdit(editValue);
     if (editing) {
-      infoColumn.commitEdit(editValue);
+      if (getTableRow().getItem() instanceof DepanFxNodeListGraphNode node) {
+        infoColumn.commitEdit(node, editValue);
+      }
     }
     editing = false;
   }

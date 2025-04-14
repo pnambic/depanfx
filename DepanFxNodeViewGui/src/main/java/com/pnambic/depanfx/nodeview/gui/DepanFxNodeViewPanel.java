@@ -378,11 +378,17 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     return nodeLocations.get(node);
   }
 
+  public void updateNodeLocation(
+      GraphNode node, DepanFxNodeLocationData location) {
+    LOG.info("Updating location of node {}", node);
+    updateViewNodeLocation(node, location);
+  }
+
   public void updateNodeLocations(
       Map<GraphNode, DepanFxNodeLocationData> locations) {
     LOG.info("Updating location of {} nodes", locations.size());
     locations.entrySet().stream()
-        .forEach(e -> updateNodeLocation(e.getKey(), e.getValue()));
+        .forEach(e -> updateViewNodeLocation(e.getKey(), e.getValue()));
   }
 
   public void updateEdgeDisplayByMatcher(
@@ -952,7 +958,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     getViewEdges().forEach(edgeDisplay::installEdge);
   }
 
-  private void updateNodeLocation(
+  private void updateViewNodeLocation(
       GraphNode node, DepanFxNodeLocationData location) {
     if (viewNodes.contains(node)) {
       JoglShapes.updateLocation(joglPane, node, location);

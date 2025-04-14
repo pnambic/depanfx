@@ -91,6 +91,14 @@ public class DepanFxInfoContributions {
       NodeKeyInfoProperty nodeKeyProp = (NodeKeyInfoProperty) infoProperty;
       return Optional.of(nodeKeyProp.forNode(graphNode));
     }
+
+    @Override
+    public void setPropertyValue(
+        GraphNode graphNode,
+        DepanFxNodeInfoProperty infoProperty,
+        String input) {
+      // Do nothing: Node key cannot be set.
+    }
   }
 
   private static class NodeKeyInfoProperty extends DepanFxNodeInfoProperty {

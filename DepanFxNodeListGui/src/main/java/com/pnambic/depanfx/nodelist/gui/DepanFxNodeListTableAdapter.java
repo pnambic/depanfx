@@ -98,6 +98,11 @@ public interface DepanFxNodeListTableAdapter {
   String getInfoPropertyString(
       GraphNode graphNode, DepanFxNodeInfoColumnData columnInfo);
 
+  void setInfoPropertyValue(
+      GraphNode graphNode,
+      DepanFxNodeInfoColumnData columnData,
+      String input);
+
   Stream<Contribution> streamInfosByLabel(String label);
 
   Map<?, ?> getLoadContext();

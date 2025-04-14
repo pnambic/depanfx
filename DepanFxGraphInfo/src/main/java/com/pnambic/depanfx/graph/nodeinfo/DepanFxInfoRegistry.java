@@ -64,6 +64,10 @@ public interface DepanFxInfoRegistry {
 
     Optional<?> getPropertyValue(
         GraphNode graphNode, DepanFxNodeInfoProperty infoProperty);
+
+    void setPropertyValue(
+        GraphNode graphNode, DepanFxNodeInfoProperty infoProperty,
+        String input);
   }
 
   public static abstract class Basic implements Contribution {

@@ -22,6 +22,7 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -40,9 +41,12 @@ class NodePositionInfoContribution
 
   private static final DepanFxNodeInfoProperty[] PROPERTIES =
       new DepanFxNodeInfoProperty[] {
-          buildPosProperty("X Pos", "X position of the node", p -> p.xPos),
-          buildPosProperty("Y Pos", "Y position of the node", p -> p.yPos),
-          buildPosProperty("Z Pos", "Z position of the node", p -> p.zPos)
+          buildPosProperty("X Pos", "X position of the node",
+              p -> p.xPos, (l, d) -> updateX(l, d)),
+          buildPosProperty("Y Pos", "Y position of the node",
+              p -> p.yPos, (l, d) -> updateY(l, d)),
+          buildPosProperty("Z Pos", "Z position of the node",
+              p -> p.zPos, (l, d) -> updateZ(l, d)),
   };
 
   private final DepanFxNodeViewPanel panel;
@@ -68,27 +72,64 @@ class NodePositionInfoContribution
 
   private static DepanFxNodeInfoProperty buildPosProperty(
       String toolName, String toolDescription,
-      Function<DepanFxNodeLocationData, Double> extractValue) {
+      Function<DepanFxNodeLocationData, Double> extractValue,
+      BiFunction<DepanFxNodeLocationData, Double, DepanFxNodeLocationData> updateLocation) {
     return new NodePosInfoProperty(
         toolName, toolDescription,
         DepanFxNodeInfoProperty.PropertyKind.POS, true,
-        extractValue);
+        extractValue, updateLocation);
   }
 
   private static class NodePosInfoProperty extends DepanFxNodeInfoProperty {
 
     private Function<DepanFxNodeLocationData, Double> extractValue;
 
+    private BiFunction<DepanFxNodeLocationData, Double, DepanFxNodeLocationData> updateLocation;
+
     public NodePosInfoProperty(
         String toolName, String toolDescription,
         PropertyKind propertyKind, boolean isEditable,
-        Function<DepanFxNodeLocationData, Double> extractValue) {
+        Function<DepanFxNodeLocationData, Double> extractValue,
+        BiFunction<DepanFxNodeLocationData, Double, DepanFxNodeLocationData> updateLocation) {
       super(toolName, toolDescription, propertyKind, isEditable);
       this.extractValue = extractValue;
+      this.updateLocation = updateLocation;
     }
 
     public Double extractValue(DepanFxNodeLocationData nodeLocationData) {
       return extractValue.apply(nodeLocationData);
     }
+
+    public DepanFxNodeLocationData updateLocation(
+        DepanFxNodeLocationData nodePos, Double value) {
+      return updateLocation.apply(nodePos, value);
+    }
+  }
+
+  @Override
+  public void setPropertyValue(GraphNode graphNode,
+      DepanFxNodeInfoProperty infoProperty, String input) {
+    DepanFxNodeLocationData nodePos = panel.getNodeLocation(graphNode);
+    double updatePos = Double.parseDouble(input);
+    if (infoProperty instanceof NodePosInfoProperty posProperty) {
+      DepanFxNodeLocationData updateLoc =
+          posProperty.updateLocation(nodePos, updatePos);
+      panel.updateNodeLocation(graphNode, updateLoc);
+    }
+  }
+
+  private static DepanFxNodeLocationData updateX(
+      DepanFxNodeLocationData init, Double newX) {
+    return new DepanFxNodeLocationData(newX, init.yPos, init.zPos);
+  }
+
+  private static DepanFxNodeLocationData updateY(
+      DepanFxNodeLocationData init, Double newY) {
+    return new DepanFxNodeLocationData(init.xPos, newY, init.zPos);
+  }
+
+  private static DepanFxNodeLocationData updateZ(
+      DepanFxNodeLocationData init, Double newZ) {
+    return new DepanFxNodeLocationData(init.xPos, init.yPos, newZ);
   }
 }

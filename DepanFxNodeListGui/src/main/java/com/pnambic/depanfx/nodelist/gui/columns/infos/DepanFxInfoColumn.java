@@ -111,8 +111,9 @@ public class DepanFxInfoColumn
     return getColumnData().getInfoProperty().getPropertyKind().clean(input);
   }
 
-  public void commitEdit(String input) {
+  public void commitEdit(DepanFxNodeListGraphNode member, String input) {
     getColumnData().getInfoProperty().getPropertyKind();
+    tableAdapter.setInfoPropertyValue(member.getGraphNode(), getColumnData(), input);
   }
 
   public void addNewColumnAction(

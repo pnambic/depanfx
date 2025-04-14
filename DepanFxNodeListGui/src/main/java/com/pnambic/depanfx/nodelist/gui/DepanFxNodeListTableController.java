@@ -18,6 +18,9 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +36,9 @@ import javafx.scene.control.TreeTableView;
  */
 public class DepanFxNodeListTableController
     implements DepanFxNodeListTableAdapter {
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxNodeListTableController.class);
 
   private final DepanFxWorkspace workspace;
 
@@ -223,6 +229,13 @@ public class DepanFxNodeListTableController
         .orElse("");
   }
 
+  @Override
+  public void setInfoPropertyValue(GraphNode graphNode,
+      DepanFxNodeInfoColumnData columnData, String input) {
+    columnData.getInfoContribution().setPropertyValue(
+        graphNode, columnData.getInfoProperty(), input);
+  }
+
   private String getInfoString(
       DepanFxNodeInfoColumnData columnInfo, Object value) {
     if (columnInfo.getInfoProperty() != null) {
@@ -244,6 +257,7 @@ public class DepanFxNodeListTableController
 
   @Override
   public Map<?, ?> getLoadContext() {
+    LOG.info("Supplying load context");
     Map<Object, Object> result = new HashMap<>();
     result.put(DepanFxInfoRegistry.class, infoRegistry);
     return result;
