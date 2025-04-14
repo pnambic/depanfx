@@ -15,27 +15,27 @@
  */
 package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 
 import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.util.StringConverter;
 
 public class DepanFxEditInfoColumnCell
-    extends TextFieldTreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember> {
+    extends TextFieldTreeTableCell<DepanFxNodeListMember, String> {
 
-  private final DepanFxNodeListColumn nodeListColumn;
+  private final DepanFxInfoColumn infoColumn;
 
-  public DepanFxEditInfoColumnCell(DepanFxNodeListColumn nodeListColumn) {
+  private boolean editing;
+
+  public DepanFxEditInfoColumnCell(DepanFxInfoColumn infoColumn) {
     super();
     this.setConverter(new Converter());
-    this.nodeListColumn = nodeListColumn;
-    nodeListColumn.prepareCell(this);
+    this.infoColumn = infoColumn;
+    infoColumn.prepareCell(this);
   }
 
   @Override
-  public void updateItem(DepanFxNodeListMember member, boolean empty) {
+  public void updateItem(String member, boolean empty) {
     super.updateItem(member, empty);
 
     // Visual space reserved for future use.
@@ -44,32 +44,50 @@ public class DepanFxEditInfoColumnCell
     }
     // The normal case.
     if (member != null) {
-      stylizeCell(member);
+      stylizeCell();
       return;
     }
-    // Something unexpected.
-    setText("<null>");
-    setGraphic(null);
   }
 
-  protected void stylizeCell(DepanFxNodeListMember member) {
+  @Override
+  public void startEdit() {
+    super.startEdit();
+    editing = true;
   }
 
-  private class Converter extends StringConverter<DepanFxNodeListMember> {
+  @Override
+  public void cancelEdit() {
+    super.cancelEdit();
+    editing = false;
+  }
+
+  @Override
+  public void commitEdit(String editValue) {
+    super.commitEdit(editValue);
+    if (editing) {
+      infoColumn.commitEdit(editValue);
+    }
+    editing = false;
+  }
+
+  /**
+   * The value (a string) is rarely interesting for styling.
+   * Content specific rendering should probably access the underlying data
+   * with {@code getTableRow().getItem()}.
+   */
+  protected void stylizeCell() {
+  }
+
+  private class Converter extends StringConverter<String> {
 
     @Override
-    public String toString(DepanFxNodeListMember member) {
-      if (member instanceof DepanFxNodeListGraphNode node) {
-        return nodeListColumn.toString(node);
-      }
-
-      return null;
+    public String toString(String value) {
+      return value;
     }
 
     @Override
-    public DepanFxNodeListMember fromString(String string) {
-      throw new UnsupportedOperationException(
-          "Unable to transform trait value to graph node");
+    public String fromString(String value) {
+      return infoColumn.cleanInput(value);
     }
   }
 }

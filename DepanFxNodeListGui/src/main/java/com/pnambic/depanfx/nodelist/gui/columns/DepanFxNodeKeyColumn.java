@@ -3,6 +3,7 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 import com.pnambic.depanfx.graph.context.ContextNodeId;
 import com.pnambic.depanfx.graph.context.ContextNodeKindId;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData.KeyChoice;
@@ -20,9 +21,12 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import java.util.Map;
 
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.TreeTableCell;
+import javafx.scene.control.TreeTableColumn;
+import javafx.util.Callback;
 
 public class DepanFxNodeKeyColumn
-    extends DepanFxAbstractColumn<DepanFxNodeKeyColumnData> {
+    extends DepanFxMemberColumn<DepanFxNodeKeyColumnData> {
 
   public static final String EDIT_NODE_KEY_COLUMN =
       "Edit Node Key Column...";
@@ -89,6 +93,13 @@ public class DepanFxNodeKeyColumn
       DepanFxDialogRunner dialogRunner) {
     builder.appendActionItem(NEW_NODE_KEY_COLUMN,
         e -> openColumnCreate(workspace, dialogRunner));
+  }
+
+  @Override
+  protected Callback<TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember>,
+          TreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember>>
+      buildCellFactory() {
+    return p -> new DepanFxBaseColumnCell(this);
   }
 
   private static void openColumnCreate(

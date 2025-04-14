@@ -92,7 +92,6 @@ public class DepanFxNodeFiltersTreeCell
         e -> runUpdateFilter(filterMember));
   }
 
-
   private void appendFilterMenu(DepanFxContextMenuBuilder builder,
       DepanFxNodeFiltersDisplayMember<?> filterMember) {
     DepanFxBaseFilterData filterData = filterMember.getFilterData();

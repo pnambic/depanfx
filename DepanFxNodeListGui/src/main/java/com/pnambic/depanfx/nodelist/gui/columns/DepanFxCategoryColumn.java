@@ -53,7 +53,7 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.util.Callback;
 
 public class DepanFxCategoryColumn
-    extends DepanFxAbstractColumn<DepanFxCategoryColumnData> {
+    extends DepanFxMemberColumn<DepanFxCategoryColumnData> {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxCategoryColumn.class);
@@ -103,11 +103,6 @@ public class DepanFxCategoryColumn
   @Override
   public String getColumnLabel() {
     return getColumnData().getColumnLabel();
-  }
-
-  @Override
-  protected double getWidthMs() {
-    return getColumnData().getWidthMs();
   }
 
   @Override

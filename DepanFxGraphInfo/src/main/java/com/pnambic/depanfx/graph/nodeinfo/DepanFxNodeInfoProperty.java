@@ -17,7 +17,13 @@ package com.pnambic.depanfx.graph.nodeinfo;
 
 import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DepanFxNodeInfoProperty extends DepanFxBaseToolData {
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxNodeInfoProperty.class);
 
   public enum PropertyKind {
     INT {
@@ -26,6 +32,17 @@ public class DepanFxNodeInfoProperty extends DepanFxBaseToolData {
         if (value instanceof Number numValue) {
           int intValue = numValue.intValue();
           return Integer.toString(intValue);
+        }
+        return null;
+      }
+
+      @Override
+      public String clean(String input) {
+        try {
+          int value = Integer.parseInt(input);
+          return Integer.toString(value);
+        } catch (NumberFormatException e) {
+          LOG.info("Invalid integer value {}", input);
         }
         return null;
       }
@@ -41,19 +58,40 @@ public class DepanFxNodeInfoProperty extends DepanFxBaseToolData {
         }
         return null;
       }
+
+      @Override
+      public String clean(String source) {
+        return source;
+      }
     },
     POS {
       @Override
       public String toString(Object value) {
         if (value instanceof Number numValue) {
-          double doubleValue = numValue.doubleValue();
-          return String.format("%.2f", doubleValue);
+          return formatPosition(numValue.doubleValue());
+        }
+        return null;
+      }
+
+      @Override
+      public String clean(String input) {
+        try {
+          double value = Double.parseDouble(input);
+          return formatPosition(value);
+        } catch (NumberFormatException e) {
+          LOG.info("Invalid integer value {}", input);
         }
         return null;
       }
     };
 
     public abstract String toString(Object value);
+
+    /**
+     * Return cannonical text from the source,
+     * or {@code null} if it is invalid.
+     */
+    public abstract String clean(String input);
   }
 
   public static final String NEW_PROPERTY_NAME = "Property";
@@ -83,6 +121,10 @@ public class DepanFxNodeInfoProperty extends DepanFxBaseToolData {
     return new DepanFxNodeInfoProperty(
         NEW_PROPERTY_NAME, NEW_PROPERTY_DESCR,
         PropertyKind.STRING, false);
+  }
+
+  public static String formatPosition(double value) {
+    return String.format("%.2f", value);
   }
 
   public PropertyKind getPropertyKind() {

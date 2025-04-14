@@ -35,7 +35,7 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.util.Callback;
 
 public class DepanFxFocusColumn
-    extends DepanFxAbstractColumn<DepanFxFocusColumnData> {
+    extends DepanFxMemberColumn<DepanFxFocusColumnData> {
 
   public static final String EDIT_FOCUS_COLUMN =
       "Edit Focus Column...";
@@ -70,11 +70,6 @@ public class DepanFxFocusColumn
   @Override
   public String getColumnLabel() {
     return getColumnData().getColumnLabel();
-  }
-
-  @Override
-  protected double getWidthMs() {
-    return getColumnData().getWidthMs();
   }
 
   @Override

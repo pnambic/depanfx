@@ -11,19 +11,23 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import java.io.IOException;
 import java.util.Optional;
 
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
-import javafx.util.Callback;
 
+/**
+ * Use column data to configure a column in a node list table.
+ *
+ * Coordinate a resource of column data with column in a node list table.
+ * Handle serialization of an updated column (e.g. width or other user setting).
+ */
 public abstract class DepanFxAbstractColumn<T extends DepanFxBaseColumnData>
     implements DepanFxNodeListColumn {
 
   protected final DepanFxNodeListTableAdapter tableAdapter;
 
-  protected TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember> column;
+  protected TreeTableColumn<DepanFxNodeListMember, ?> column;
 
   private DepanFxWorkspaceResource<T> columnDataRsrc;
 
@@ -34,18 +38,11 @@ public abstract class DepanFxAbstractColumn<T extends DepanFxBaseColumnData>
   }
 
   @Override
-  public TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember> prepareColumn() {
-    TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember> result =
-        new TreeTableColumn<>(getColumnLabel());
-    result.setPrefWidth(getWidthPx());
-    result.setContextMenu(buildColumnContextMenu(tableAdapter.getDialogRunner()));
-
-    result.setCellFactory(buildCellFactory());
-    result.setCellValueFactory(p ->
-        new ReadOnlyObjectWrapper<>(p.getValue().getValue()));
-    result.setSortable(false);
+  public TreeTableColumn<DepanFxNodeListMember, ?> createColumn() {
+    TreeTableColumn<DepanFxNodeListMember, ?> result = buildColumn();
+    configColumn(result);
     column = result;
-    return result;
+    return column;
   }
 
   @Override
@@ -69,17 +66,9 @@ public abstract class DepanFxAbstractColumn<T extends DepanFxBaseColumnData>
     return DepanFxWorkspaceResource.forUpdate(columnDataRsrc, updateInfo);
   }
 
-  public double getWidthPx() {
-    return DepanFxSceneControls.layoutWidthMs(getWidthMs());
-  }
-
   @Override
   public String getColumnLabel() {
     return getColumnData().getColumnLabel();
-  }
-
-  protected double getWidthMs() {
-    return getColumnData().getWidthMs();
   }
 
   // For dialog boxes, especially tool selectors.
@@ -93,15 +82,7 @@ public abstract class DepanFxAbstractColumn<T extends DepanFxBaseColumnData>
   protected abstract ContextMenu buildColumnContextMenu(
       DepanFxDialogRunner depanFxDialogRunner);
 
-  /**
-   * Derived types are expect to override this method to provide
-   * a specialized column cell.
-   */
-  protected Callback<TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember>,
-      TreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember>>
-      buildCellFactory() {
-    return p -> new DepanFxBaseColumnCell(this);
-  }
+  protected abstract TreeTableColumn<DepanFxNodeListMember, ?> buildColumn();
 
   /**
    * Derived classes with cached presentation values (e.g. the
@@ -128,5 +109,21 @@ public abstract class DepanFxAbstractColumn<T extends DepanFxBaseColumnData>
       DepanFxWorkspaceResource<T> columnDataRsrc) {
     this.columnDataRsrc = columnDataRsrc;
     refreshColumn();
+  }
+
+  private void configColumn(
+      TreeTableColumn<DepanFxNodeListMember, ?> config) {
+    config.setPrefWidth(getWidthPx());
+    config.setContextMenu(
+        buildColumnContextMenu(tableAdapter.getDialogRunner()));
+    config.setSortable(false);
+  }
+
+  private double getWidthPx() {
+    return DepanFxSceneControls.layoutWidthMs(getWidthMs());
+  }
+
+  private double getWidthMs() {
+    return getColumnData().getWidthMs();
   }
 }

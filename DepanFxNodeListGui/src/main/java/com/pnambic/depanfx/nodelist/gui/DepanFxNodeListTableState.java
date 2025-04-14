@@ -224,7 +224,7 @@ public class DepanFxNodeListTableState {
     tableFactory.createTableColumn(columnRsrc)
         .ifPresentOrElse(c -> {
           columns.add(c);
-          nodeListTable.getColumns().add(c.prepareColumn());
+          nodeListTable.getColumns().add(c.createColumn());
         }, () ->
           LOG.warn("Unknown type {} for column construction",
               columnRsrc.getResource().getClass().getName()));

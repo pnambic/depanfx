@@ -12,7 +12,7 @@ public interface DepanFxNodeListColumn {
 
   String toString(DepanFxNodeListGraphNode member);
 
-  TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember> prepareColumn();
+  TreeTableColumn<DepanFxNodeListMember, ?> createColumn();
 
   void prepareCell(TreeTableCell<DepanFxNodeListMember, ?> cell);
 }

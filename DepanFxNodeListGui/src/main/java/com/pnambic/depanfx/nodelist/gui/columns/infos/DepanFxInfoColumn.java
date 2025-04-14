@@ -36,10 +36,10 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.Optional;
 
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
-import javafx.util.Callback;
 
 public class DepanFxInfoColumn
     extends DepanFxAbstractColumn<DepanFxNodeInfoColumnData> {
@@ -62,14 +62,6 @@ public class DepanFxInfoColumn
   }
 
   @Override
-  public TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember> prepareColumn() {
-    TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember> result =
-        super.prepareColumn();
-    result.setEditable(getColumnData().getInfoProperty().isEditable());
-    return result;
-  }
-
-  @Override
   public void prepareCell(TreeTableCell<DepanFxNodeListMember, ?> cell) {
     super.prepareCell(cell);
     getCellStyle().ifPresent(cell::setStyle);
@@ -87,16 +79,6 @@ public class DepanFxInfoColumn
     }
 
     return Optional.empty();
-  }
-
-  @Override
-  protected Callback<TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember>,
-      TreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember>>
-      buildCellFactory() {
-    if (getColumnData().getInfoProperty().isEditable()) {
-      return p -> new DepanFxEditInfoColumnCell(this);
-    }
-    return p -> new DepanFxDisplayInfoColumnCell(this);
   }
 
   @Override
@@ -121,11 +103,49 @@ public class DepanFxInfoColumn
     return null;
   }
 
+  /**
+   * Validate that the input string is an acceptable value for the field.
+   * @return
+   */
+  public String cleanInput(String input) {
+    return getColumnData().getInfoProperty().getPropertyKind().clean(input);
+  }
+
+  public void commitEdit(String input) {
+    getColumnData().getInfoProperty().getPropertyKind();
+  }
+
   public void addNewColumnAction(
       DepanFxContextMenuBuilder builder,
       DepanFxDialogRunner dialogRunner) {
     builder.appendActionItem(NEW_INFO_COLUMN,
         e -> openColumnCreate(dialogRunner));
+  }
+
+  @Override
+  protected TreeTableColumn<DepanFxNodeListMember, ?> buildColumn() {
+    if (getColumnData().getInfoProperty().isEditable()) {
+      TreeTableColumn<DepanFxNodeListMember, String> result =
+          new TreeTableColumn<>(getColumnLabel());
+      result.setCellFactory(p -> new DepanFxEditInfoColumnCell(this));
+      result.setCellValueFactory(p ->
+          new ReadOnlyObjectWrapper<>(getEditValue(p.getValue().getValue())));
+      return result;
+    }
+
+    TreeTableColumn<DepanFxNodeListMember, DepanFxNodeListMember> result =
+        new TreeTableColumn<>(getColumnLabel());
+    result.setCellFactory(p -> new DepanFxDisplayInfoColumnCell(this));
+    result.setCellValueFactory(p ->
+        new ReadOnlyObjectWrapper<>(p.getValue().getValue()));
+    return result;
+  }
+
+  private String getEditValue(DepanFxNodeListMember member) {
+    if (member instanceof DepanFxNodeListGraphNode node) {
+      return toString(node);
+    }
+    return null;
   }
 
   private void openColumnCreate(DepanFxDialogRunner dialogRunner) {
