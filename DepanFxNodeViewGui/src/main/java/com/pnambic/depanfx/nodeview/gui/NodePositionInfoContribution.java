@@ -46,14 +46,24 @@ class NodePositionInfoContribution
   public static final String NODE_POSITION_DESCR =
       "Position of nodes in their rendered graph view.";
 
+  public static final DepanFxNodeInfoProperty X_POS_PROPERTY =
+      buildPosProperty(
+          "X Pos", "X position of the node",
+          p -> p.xPos, (l, d) -> updateX(l, d));
+
+  public static final DepanFxNodeInfoProperty Y_POS_PROPERTY =
+      buildPosProperty(
+          "Y Pos", "Y position of the node",
+          p -> p.yPos, (l, d) -> updateY(l, d));
+
+  public static final DepanFxNodeInfoProperty Z_POS_PROPERTY =
+      buildPosProperty(
+          "Z Pos", "Z position of the node",
+          p -> p.zPos, (l, d) -> updateZ(l, d));
+
   private static final DepanFxNodeInfoProperty[] PROPERTIES =
       new DepanFxNodeInfoProperty[] {
-          buildPosProperty("X Pos", "X position of the node",
-              p -> p.xPos, (l, d) -> updateX(l, d)),
-          buildPosProperty("Y Pos", "Y position of the node",
-              p -> p.yPos, (l, d) -> updateY(l, d)),
-          buildPosProperty("Z Pos", "Z position of the node",
-              p -> p.zPos, (l, d) -> updateZ(l, d)),
+          X_POS_PROPERTY, Y_POS_PROPERTY, Z_POS_PROPERTY
   };
 
   public NodePositionInfoContribution() {

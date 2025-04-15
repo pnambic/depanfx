@@ -1,0 +1,162 @@
+/*
+ * Copyright 2025 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.pnambic.depanfx.nodeview.gui;
+
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumnBuiltIns;
+import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeInfoColumnData;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSectionBuiltIns;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
+import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Provide the built-in columns for node position.
+ */
+@Configuration
+public class NodePositionInfoConfiguration {
+
+  public static final Path NODE_VIEW_COLUMNS_PATH =
+      DepanFxNodeViewData.NODE_VIEW_TOOL_PATH.resolve("Columns");
+
+  public static final Path NODE_VIEW_TABLE_VIEWS_PATH =
+      DepanFxNodeViewData.NODE_VIEW_TOOL_PATH.resolve(
+          DepanFxNodeListTableViewData.TABLE_VIEWS_TOOL_DIR);
+
+  public static final Path NODE_VIEW_LOCATION_TABLE_VIEW_PATH =
+      NODE_VIEW_TABLE_VIEWS_PATH.resolve(
+          DepanFxNodeListTableViewData.TABLE_VIEW_CONTEXT_RESOURCE_NAME);
+
+  private static final String X_POS_LABEL = "X Pos";
+
+  private static final String X_POS_DESCR = "Node's x position in graph.";
+
+  public static final Path X_POS_COLUMNS_PATH =
+      NODE_VIEW_COLUMNS_PATH.resolve(X_POS_LABEL);
+
+  private static final String Y_POS_LABEL = "Y Pos";
+
+  private static final String Y_POS_DESCR = "Node's y position in graph.";
+
+  public static final Path Y_POS_COLUMNS_PATH =
+      NODE_VIEW_COLUMNS_PATH.resolve(Y_POS_LABEL);
+
+  private static final String Z_POS_LABEL = "Z Pos";
+
+  private static final String Z_POS_DESCR = "Node's z position in graph.";
+
+  public static final Path Z_POS_COLUMNS_PATH =
+      NODE_VIEW_COLUMNS_PATH.resolve(Z_POS_LABEL);
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxNodeInfoColumnData>
+  xNodePositionInfoColumnData(NodePositionInfoContribution infoContrib) {
+
+    DepanFxNodeInfoColumnData xPosDoc = buildInfoColumn(
+        X_POS_LABEL, X_POS_DESCR, infoContrib,
+        NodePositionInfoContribution.X_POS_PROPERTY);
+    return createBuiltIn(NODE_VIEW_COLUMNS_PATH.resolve(X_POS_LABEL), xPosDoc);
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxNodeInfoColumnData>
+  yNodePositionInfoColumnData(NodePositionInfoContribution infoContrib) {
+
+    DepanFxNodeInfoColumnData xPosDoc = buildInfoColumn(
+        Y_POS_LABEL, Y_POS_DESCR, infoContrib,
+        NodePositionInfoContribution.Y_POS_PROPERTY);
+    return createBuiltIn(NODE_VIEW_COLUMNS_PATH.resolve(Y_POS_LABEL), xPosDoc);
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxNodeInfoColumnData>
+  zNodePositionInfoColumnData(NodePositionInfoContribution infoContrib) {
+
+    DepanFxNodeInfoColumnData xPosDoc = buildInfoColumn(
+        Z_POS_LABEL, Z_POS_DESCR, infoContrib,
+        NodePositionInfoContribution.Z_POS_PROPERTY);
+    return createBuiltIn(NODE_VIEW_COLUMNS_PATH.resolve(Z_POS_LABEL), xPosDoc);
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
+  nodeViewLocationt( ) {
+    return new TableViewBuiltin(NODE_VIEW_LOCATION_TABLE_VIEW_PATH);
+  }
+
+  private DepanFxNodeInfoColumnData buildInfoColumn(
+      String axisLabel, String axisDescr,
+      NodePositionInfoContribution infoContrib,
+      DepanFxNodeInfoProperty axisProperty) {
+    return new DepanFxNodeInfoColumnData(
+        axisLabel, axisDescr, axisLabel, 6,
+        infoContrib, axisProperty);
+  }
+
+  private DepanFxBuiltInContribution<DepanFxNodeInfoColumnData> createBuiltIn(
+      Path docPath, DepanFxNodeInfoColumnData infoDoc) {
+    return new DepanFxBuiltInContribution.Simple<>(docPath, infoDoc);
+  }
+
+  private final class TableViewBuiltin extends
+      DepanFxBuiltInContribution.Dependent<DepanFxNodeListTableViewData> {
+
+    public TableViewBuiltin(Path path) {
+      super(path);
+    }
+
+    @Override
+    protected DepanFxNodeListTableViewData buildDocument(
+        DepanFxBuiltInProject project) {
+
+      // Flat and Members Sections
+      List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
+          sectionRsrcs = new ArrayList<>();
+      sectionRsrcs.add(getResource(project,
+          DepanFxNodeListSectionBuiltIns.MEMBER_TREE_SECTION_PATH));
+      sectionRsrcs.add(getResource(project,
+          DepanFxNodeListSectionBuiltIns.SIMPLE_SECTION_TOOL_PATH));
+
+      // Node Kind Column
+      List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
+          columnRsrcs = new ArrayList<>();
+      columnRsrcs.add(getResource(project,
+          DepanFxNodeKeyColumnBuiltIns.KIND_KEY_COLUMN_TOOL_PATH));
+
+      // Position Columns
+      columnRsrcs.add(getResource(project, X_POS_COLUMNS_PATH));
+      columnRsrcs.add(getResource(project, Y_POS_COLUMNS_PATH));
+      columnRsrcs.add(getResource(project, Z_POS_COLUMNS_PATH));
+
+      return new DepanFxNodeListTableViewData(
+          "Node View Table View",
+          "Node list view for node view by member relations"
+              + " with node positions.",
+          sectionRsrcs, columnRsrcs);
+    }
+  }
+}

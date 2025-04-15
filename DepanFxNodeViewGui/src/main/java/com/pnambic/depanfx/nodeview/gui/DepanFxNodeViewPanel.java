@@ -462,7 +462,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc =
         DepanFxProjects.getBuiltIn(
             workspace, DepanFxNodeListTableViewData.class,
-            DepanFxNodeListViewBuiltIns.MEMBER_TABLE_VIEW_PATH).get();
+            NodePositionInfoConfiguration.NODE_VIEW_LOCATION_TABLE_VIEW_PATH).get();
 
     Stage nodeSelectDialog = DepanFxNodeViewNodeSelectDialog.runEditDialog(
         getDialogRunner(), this, tableViewRsrc);
