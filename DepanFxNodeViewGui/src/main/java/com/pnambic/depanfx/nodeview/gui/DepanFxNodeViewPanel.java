@@ -17,6 +17,7 @@ package com.pnambic.depanfx.nodeview.gui;
 
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.context.GraphContextKeys;
+import com.pnambic.depanfx.graph.info.GraphNodeInfo;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxCompositeInfoRegistry;
@@ -69,6 +70,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -164,6 +166,9 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   private Collection<GraphNode> viewNodes;
 
   private Map<GraphNode, DepanFxNodeLocationData> nodeLocations;
+
+  private Map<GraphNode, Collection<GraphNodeInfo.Listener>> updateListeners =
+      new HashMap<>();
 
   private JoglPane joglPane;
 
@@ -376,6 +381,20 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   public DepanFxNodeLocationData getNodeLocation(GraphNode node) {
     return nodeLocations.get(node);
+  }
+
+  public void addLocationListener(
+      GraphNode node, GraphNodeInfo.Listener listener) {
+    Collection<GraphNodeInfo.Listener> listeners =
+        updateListeners.computeIfAbsent(node, n -> new ArrayList<>(2));
+    listeners.add(listener);
+  }
+
+  public void removeLocationListener(
+      GraphNode node, GraphNodeInfo.Listener listener) {
+    Collection<GraphNodeInfo.Listener> listeners =
+        updateListeners.getOrDefault(node, Collections.emptyList());
+    listeners.remove(listener);
   }
 
   public void updateNodeLocation(
@@ -963,7 +982,15 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     if (viewNodes.contains(node)) {
       JoglShapes.updateLocation(joglPane, node, location);
       nodeLocations.put(node, location);
+      fireLocationUpdateEvent(node, location);
     }
+  }
+
+  private void fireLocationUpdateEvent(
+      GraphNode node, DepanFxNodeLocationData location) {
+    Collection<GraphNodeInfo.Listener> listeners =
+        updateListeners.getOrDefault(node, Collections.emptyList());
+    listeners.forEach(l -> l.updateInfo(node, location));
   }
 
   private void installShape(GraphNode node) {

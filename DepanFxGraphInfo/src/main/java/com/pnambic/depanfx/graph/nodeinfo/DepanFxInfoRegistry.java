@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.graph.nodeinfo;
 
 import com.pnambic.depanfx.base.DepanFxOrderableContribution;
+import com.pnambic.depanfx.graph.info.GraphNodeInfo;
 import com.pnambic.depanfx.graph.model.GraphNode;
 
 import java.util.List;
@@ -68,6 +69,10 @@ public interface DepanFxInfoRegistry {
     void setPropertyValue(
         GraphNode graphNode, DepanFxNodeInfoProperty infoProperty,
         String input);
+
+    void addInfoListener(GraphNode node, GraphNodeInfo.Listener listener);
+
+    void removeInfoListener(GraphNode node, GraphNodeInfo.Listener listener);
   }
 
   public static abstract class Basic implements Contribution {

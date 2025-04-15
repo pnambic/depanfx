@@ -15,9 +15,15 @@
  */
 package com.pnambic.depanfx.graph.info;
 
+import com.pnambic.depanfx.graph.model.GraphNode;
+
 /**
  * Marker interface for graph node information.
  */
 public interface GraphNodeInfo {
 
+  @FunctionalInterface
+  public static interface Listener {
+    void updateInfo(GraphNode node, GraphNodeInfo info);
+  }
 }

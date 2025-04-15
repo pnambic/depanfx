@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodelist.gui;
 
+import com.pnambic.depanfx.graph.info.GraphNodeInfo;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry.Contribution;
@@ -102,6 +103,16 @@ public interface DepanFxNodeListTableAdapter {
       GraphNode graphNode,
       DepanFxNodeInfoColumnData columnData,
       String input);
+
+  void addInfoListener(
+      DepanFxNodeListGraphNode node,
+      DepanFxNodeInfoColumnData columnData,
+      GraphNodeInfo.Listener listener);
+
+  void removeInfoListener(
+      DepanFxNodeListGraphNode node,
+      DepanFxNodeInfoColumnData columnData,
+      GraphNodeInfo.Listener listener);
 
   Stream<Contribution> streamInfosByLabel(String label);
 

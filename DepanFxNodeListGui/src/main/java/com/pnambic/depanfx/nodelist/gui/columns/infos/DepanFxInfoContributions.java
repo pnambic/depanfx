@@ -17,6 +17,7 @@ package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
 import com.pnambic.depanfx.graph.context.ContextNodeId;
 import com.pnambic.depanfx.graph.context.GraphContextKeys;
+import com.pnambic.depanfx.graph.info.GraphNodeInfo.Listener;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
@@ -98,6 +99,16 @@ public class DepanFxInfoContributions {
         DepanFxNodeInfoProperty infoProperty,
         String input) {
       // Do nothing: Node key cannot be set.
+    }
+
+    @Override
+    public void addInfoListener(GraphNode node, Listener listener) {
+      // Do nothing: Node key cannot changed.
+    }
+
+    @Override
+    public void removeInfoListener(GraphNode node, Listener listener) {
+      // Do nothing: Node key cannot changed.
     }
   }
 

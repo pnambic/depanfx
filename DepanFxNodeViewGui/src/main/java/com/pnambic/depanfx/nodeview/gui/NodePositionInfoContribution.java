@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodeview.gui;
 
+import com.pnambic.depanfx.graph.info.GraphNodeInfo;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
@@ -70,6 +71,35 @@ class NodePositionInfoContribution
     return Optional.of(posProp.extractValue(nodePos));
   }
 
+  @Override
+  public void setPropertyValue(
+      GraphNode graphNode,
+      DepanFxNodeInfoProperty infoProperty,
+      String input) {
+    DepanFxNodeLocationData nodePos = panel.getNodeLocation(graphNode);
+    double updatePos = Double.parseDouble(input);
+    if (infoProperty instanceof NodePosInfoProperty posProperty) {
+      DepanFxNodeLocationData updateLoc =
+          posProperty.updateLocation(nodePos, updatePos);
+      panel.updateNodeLocation(graphNode, updateLoc);
+    }
+  }
+
+  private static DepanFxNodeLocationData updateX(
+      DepanFxNodeLocationData init, Double newX) {
+    return new DepanFxNodeLocationData(newX, init.yPos, init.zPos);
+  }
+
+  private static DepanFxNodeLocationData updateY(
+      DepanFxNodeLocationData init, Double newY) {
+    return new DepanFxNodeLocationData(init.xPos, newY, init.zPos);
+  }
+
+  private static DepanFxNodeLocationData updateZ(
+      DepanFxNodeLocationData init, Double newZ) {
+    return new DepanFxNodeLocationData(init.xPos, init.yPos, newZ);
+  }
+
   private static DepanFxNodeInfoProperty buildPosProperty(
       String toolName, String toolDescription,
       Function<DepanFxNodeLocationData, Double> extractValue,
@@ -107,29 +137,12 @@ class NodePositionInfoContribution
   }
 
   @Override
-  public void setPropertyValue(GraphNode graphNode,
-      DepanFxNodeInfoProperty infoProperty, String input) {
-    DepanFxNodeLocationData nodePos = panel.getNodeLocation(graphNode);
-    double updatePos = Double.parseDouble(input);
-    if (infoProperty instanceof NodePosInfoProperty posProperty) {
-      DepanFxNodeLocationData updateLoc =
-          posProperty.updateLocation(nodePos, updatePos);
-      panel.updateNodeLocation(graphNode, updateLoc);
-    }
+  public void addInfoListener(GraphNode node, GraphNodeInfo.Listener listener) {
+    panel.addLocationListener(node, listener);
   }
 
-  private static DepanFxNodeLocationData updateX(
-      DepanFxNodeLocationData init, Double newX) {
-    return new DepanFxNodeLocationData(newX, init.yPos, init.zPos);
-  }
-
-  private static DepanFxNodeLocationData updateY(
-      DepanFxNodeLocationData init, Double newY) {
-    return new DepanFxNodeLocationData(init.xPos, newY, init.zPos);
-  }
-
-  private static DepanFxNodeLocationData updateZ(
-      DepanFxNodeLocationData init, Double newZ) {
-    return new DepanFxNodeLocationData(init.xPos, init.yPos, newZ);
+  @Override
+  public void removeInfoListener(GraphNode node, GraphNodeInfo.Listener listener) {
+    panel.removeLocationListener(node, listener);
   }
 }

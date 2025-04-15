@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui;
 
+import com.pnambic.depanfx.graph.info.GraphNodeInfo;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
@@ -234,6 +235,24 @@ public class DepanFxNodeListTableController
       DepanFxNodeInfoColumnData columnData, String input) {
     columnData.getInfoContribution().setPropertyValue(
         graphNode, columnData.getInfoProperty(), input);
+  }
+
+  @Override
+  public void addInfoListener(
+      DepanFxNodeListGraphNode node,
+      DepanFxNodeInfoColumnData columnData,
+      GraphNodeInfo.Listener listener) {
+    columnData.getInfoContribution().addInfoListener(
+        node.getGraphNode(), listener);
+  }
+
+  @Override
+  public void removeInfoListener(
+      DepanFxNodeListGraphNode node,
+      DepanFxNodeInfoColumnData columnData,
+      GraphNodeInfo.Listener listener) {
+    columnData.getInfoContribution().removeInfoListener(
+        node.getGraphNode(), listener);
   }
 
   private String getInfoString(

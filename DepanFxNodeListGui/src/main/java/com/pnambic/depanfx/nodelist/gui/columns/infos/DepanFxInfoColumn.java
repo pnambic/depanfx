@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
+import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
@@ -37,9 +38,11 @@ import java.util.Map;
 import java.util.Optional;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableColumn.CellDataFeatures;
 
 public class DepanFxInfoColumn
     extends DepanFxAbstractColumn<DepanFxNodeInfoColumnData> {
@@ -103,6 +106,17 @@ public class DepanFxInfoColumn
     return null;
   }
 
+  public String toString(GraphNode node) {
+    try {
+      return tableAdapter.getInfoPropertyString(node, getColumnData());
+    } catch (Exception errAny) {
+      LOG.info("Trouble rendering {} property {} due to {}",
+          node.getId(), getColumnData().getInfoContribution().getInfoLabel(),
+          errAny.getMessage());
+    }
+    return null;
+  }
+
   /**
    * Validate that the input string is an acceptable value for the field.
    * @return
@@ -112,8 +126,8 @@ public class DepanFxInfoColumn
   }
 
   public void commitEdit(DepanFxNodeListGraphNode member, String input) {
-    getColumnData().getInfoProperty().getPropertyKind();
-    tableAdapter.setInfoPropertyValue(member.getGraphNode(), getColumnData(), input);
+    tableAdapter.setInfoPropertyValue(
+        member.getGraphNode(), getColumnData(), input);
   }
 
   public void addNewColumnAction(
@@ -129,8 +143,7 @@ public class DepanFxInfoColumn
       TreeTableColumn<DepanFxNodeListMember, String> result =
           new TreeTableColumn<>(getColumnLabel());
       result.setCellFactory(p -> new DepanFxEditInfoColumnCell(this));
-      result.setCellValueFactory(p ->
-          new ReadOnlyObjectWrapper<>(getEditValue(p.getValue().getValue())));
+      result.setCellValueFactory(p -> buildObservedInfo(p));
       return result;
     }
 
@@ -142,10 +155,19 @@ public class DepanFxInfoColumn
     return result;
   }
 
-  private String getEditValue(DepanFxNodeListMember member) {
+  private ObservableValue<String> buildObservedInfo(
+      CellDataFeatures<DepanFxNodeListMember, String> p) {
+    DepanFxNodeListMember member = p.getValue().getValue();
     if (member instanceof DepanFxNodeListGraphNode node) {
-      return toString(node);
+      ReadOnlyObjectWrapper<String> result =
+          new ReadOnlyObjectWrapper<>(toString(node));
+      tableAdapter.addInfoListener(
+          node, getColumnData(),
+          (n, i) -> result.setValue(
+              tableAdapter.getInfoPropertyString(n, getColumnData())));
+      return result;
     }
+
     return null;
   }
 
