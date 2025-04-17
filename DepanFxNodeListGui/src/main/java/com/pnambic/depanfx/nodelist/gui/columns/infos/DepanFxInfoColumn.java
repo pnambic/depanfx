@@ -69,7 +69,7 @@ public class DepanFxInfoColumn
       DepanFxInfoRegistry.PropertyStore propStore) {
     super(tableAdapter, columnDataRsrc);
 
-    this.infoStore = uncastStore(propStore);
+    this.infoStore = upcastStore(propStore);
   }
 
   @Override
@@ -180,7 +180,7 @@ public class DepanFxInfoColumn
     return result;
   }
 
-  private static DepanFxInfoColumnStore uncastStore(
+  private static DepanFxInfoColumnStore upcastStore(
       DepanFxInfoRegistry.PropertyStore propStore) {
 
     if (propStore instanceof DepanFxInfoColumnStore infoStore) {

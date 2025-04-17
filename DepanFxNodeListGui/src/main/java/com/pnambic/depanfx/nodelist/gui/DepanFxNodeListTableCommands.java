@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
+import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeInfoColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
@@ -54,7 +55,7 @@ public class DepanFxNodeListTableCommands {
       Arrays.asList(new Class<?>[] {
         DepanFxCategoryColumnData.class,
         DepanFxFocusColumnData.class,
-        DepanFxNodeKeyColumnData.class
+        DepanFxNodeInfoColumnData.class
   });
 
   public static final DepanFxResourceFilter ANY_COLUMN_RSRC_FILTER =

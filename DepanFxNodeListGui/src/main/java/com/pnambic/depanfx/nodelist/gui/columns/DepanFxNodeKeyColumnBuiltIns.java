@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Configuration;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 
-@Configuration
+// @Configuration
 public class DepanFxNodeKeyColumnBuiltIns {
 
   public static final String MODEL_KEY_COLUMN_NAME = "Model Key Column";
