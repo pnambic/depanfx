@@ -173,12 +173,12 @@ public class DepanFxNodeViewNodeSelectDialog
     }
 
     @Override
-    public Optional<?> getInfoProperty(GraphNode graphNode) {
+    public Optional<?> getInfoValue(GraphNode graphNode) {
       return Optional.ofNullable(viewPanel.getNodeLocation(graphNode));
     }
 
     @Override
-    public void setPropertyValue(GraphNode graphNode, Object value) {
+    public void setInfoValue(GraphNode graphNode, Object value) {
       if (value instanceof DepanFxNodeLocationData location) {
         viewPanel.updateNodeLocation(graphNode, location);
       }

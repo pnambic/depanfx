@@ -23,15 +23,18 @@ import java.util.Optional;
 
 /**
  * Define the interactions with a property store.
+ *
+ * Instances from derived types typically have an underlying info source
+ * and an info key that further define the info retrieval results.
  */
 public interface DepanFxInfoColumnStore extends PropertyStore {
 
-  Optional<?> getInfoProperty(GraphNode graphNode);
+  Optional<?> getInfoValue(GraphNode graphNode);
 
   /**
-   * Same type as returned from {@link #getInfoProperty(GraphNode)}.
+   * Same type as returned from {@link #getInfoValue(GraphNode)}.
    */
-  void setPropertyValue(GraphNode graphNode, Object value);
+  void setInfoValue(GraphNode graphNode, Object value);
 
   void addInfoListener(GraphNode graphNode, Listener listener);
 

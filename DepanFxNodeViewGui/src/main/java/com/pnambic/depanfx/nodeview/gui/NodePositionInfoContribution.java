@@ -96,7 +96,7 @@ class NodePositionInfoContribution
       DepanFxNodeInfoProperty infoProperty) {
     if (store instanceof DepanFxInfoColumnStore infos) {
       NodePosInfoProperty posProp = (NodePosInfoProperty) infoProperty;
-      return infos.getInfoProperty(graphNode)
+      return infos.getInfoValue(graphNode)
           .map(DepanFxNodeLocationData.class::cast)
           .map(posProp::extractValue);
     }
@@ -111,10 +111,10 @@ class NodePositionInfoContribution
     if (store instanceof DepanFxInfoColumnStore infos) {
       NodePosInfoProperty posProp = (NodePosInfoProperty) infoProperty;
       double updatePos = Double.parseDouble(input);
-      infos.getInfoProperty(graphNode)
+      infos.getInfoValue(graphNode)
           .map(DepanFxNodeLocationData.class::cast)
           .map(p -> posProp.updateLocation(p, updatePos))
-          .ifPresent(p -> infos.setPropertyValue(graphNode, p));
+          .ifPresent(p -> infos.setInfoValue(graphNode, p));
     }
   }
 
