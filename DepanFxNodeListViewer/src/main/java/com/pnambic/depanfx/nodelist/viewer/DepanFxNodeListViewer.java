@@ -62,7 +62,8 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
         workspace, dialogRunner, columnRegistry,
         infoRegistry, nodeList,
         DepanFxNodeListSelection.forNodes(nodeList.getNodes()),
-        tableViewRsrc, new TreeTableView<>());
+        new TreeTableView<>());
+    tableControl.setTableViewResource(tableViewRsrc);
   }
 
   @Override

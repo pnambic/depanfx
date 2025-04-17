@@ -61,7 +61,6 @@ public class DepanFxNodeListTableController
       DepanFxDialogRunner dialogRunner, DepanFxColumnRegistry columnRegistry,
       DepanFxInfoRegistry infoRegistry, DepanFxNodeList nodeList,
       DepanFxNodeListSelection selectedNodes,
-      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc,
       TreeTableView<DepanFxNodeListMember> treeTable) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
@@ -69,7 +68,7 @@ public class DepanFxNodeListTableController
     this.infoRegistry = infoRegistry;
     this.nodeList = nodeList;
 
-    tableState = prepareNodeListTable(tableViewRsrc, treeTable, selectedNodes);
+    tableState = prepareNodeListTable(treeTable, selectedNodes);
   }
 
   @Override // DepanFxNodeListTableAdapter
@@ -202,16 +201,13 @@ public class DepanFxNodeListTableController
   }
 
   private DepanFxNodeListTableState prepareNodeListTable(
-      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc,
+      // DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc,
       TreeTableView<DepanFxNodeListMember> treeTable,
       DepanFxNodeListSelection selectedNodes) {
 
-    DepanFxNodeListTableState result = new DepanFxNodeListTableState(workspace,
+    return new DepanFxNodeListTableState(workspace,
         nodeList, selectedNodes, treeTable,
         new DepanFxNodeListTableFactory(this));
-
-    result.setTableViewResource(tableViewRsrc);
-    return result;
   }
 
   @Override

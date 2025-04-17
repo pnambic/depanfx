@@ -131,11 +131,11 @@ public class DepanFxNodeViewNodeSelectDialog
     tableControl = new DepanFxNodeListTableController(
         workspace, dialogRunner, columnRegistry, infoRegistry,
         viewPanel.getViewNodesAsNodeList(),
-        viewPanel.getNodeSelection(),
-        tableViewRsrc, nodeSelectTable);
+        viewPanel.getNodeSelection(), nodeSelectTable);
     tableControl.addInfoStore(
         DepanFxNodeLocationData.class,
         new PanelLocationStore(viewPanel));
+    tableControl.setTableViewResource(tableViewRsrc);
 
     nodeTableCommands.setContextMenu(buildContextMenu());
   }

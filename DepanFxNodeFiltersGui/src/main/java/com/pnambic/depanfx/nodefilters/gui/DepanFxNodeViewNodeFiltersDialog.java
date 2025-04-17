@@ -324,11 +324,11 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
         DepanFxNodeListSelection.forNodes(tableNodes.getNodes());
     nodeSelection.doSelectAllAction();
 
-    return new DepanFxNodeListTableController(
-        workspace, dialogRunner,
-        columnRegistry, infoRegistry,
-        tableNodes, nodeSelection,
-        tableViewRsrc, nodeSelectTable);
+    DepanFxNodeListTableController result = new DepanFxNodeListTableController(
+        workspace, dialogRunner, columnRegistry, infoRegistry,
+        tableNodes, nodeSelection, nodeSelectTable);
+    result.setTableViewResource(tableViewRsrc);
+    return result;
   }
 
   private ContextMenu buildNodeTableCommandMenu() {
