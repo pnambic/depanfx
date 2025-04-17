@@ -16,8 +16,8 @@
 package com.pnambic.depanfx.nodeview.gui;
 
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeKeyColumnBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeInfoColumnData;
+import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeKeyColumnBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSectionBuiltIns;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;

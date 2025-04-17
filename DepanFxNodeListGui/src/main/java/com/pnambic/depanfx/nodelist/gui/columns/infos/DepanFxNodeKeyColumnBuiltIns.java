@@ -55,7 +55,7 @@ public class DepanFxNodeKeyColumnBuiltIns {
   public static final Path NODE_KEY_COLUMN_TOOL_PATH =
       DepanFxNodeListColumnData.COLUMNS_TOOL_PATH.resolve(NODE_KEY_COLUMN_NAME);
 
-  private static final String SIMPLE_NAME_COLUMN_LABEL = "Short Name";
+  private static final String SIMPLE_NAME_COLUMN_LABEL = "Simple Name";
 
   public static final String SIMPLE_NAME_COLUMN_NAME = "Simple Name Column";
 
@@ -81,7 +81,7 @@ public class DepanFxNodeKeyColumnBuiltIns {
         DepanFxNodeKeyInfoContribution.GRAPH_MODEL_PROPERTY,
         MODEL_KEY_COLUMN_WIDTH);
     return new DepanFxBuiltInContribution.Simple<>(
-        NODE_KEY_COLUMN_TOOL_PATH, toolData);
+        MODEL_KEY_COLUMN_TOOL_PATH, toolData);
   }
 
   @Bean
