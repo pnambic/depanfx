@@ -18,9 +18,8 @@ package com.pnambic.depanfx.nodelist.gui.columns.infos;
 import com.pnambic.depanfx.graph.info.GraphNodeInfo.Listener;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
-import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry.Contribution;
-import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry.PropertyStore;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
@@ -30,8 +29,8 @@ import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
-import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
+import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -62,22 +61,15 @@ public class DepanFxInfoColumn
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxInfoColumn.class);
 
-  private final DepanFxInfoRegistry.PropertyStore infoStore;
-
-  public DepanFxInfoColumn(
-      DepanFxNodeListTableAdapter tableAdapter,
-      DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnDataRsrc) {
-    super(tableAdapter, columnDataRsrc);
-    infoStore = null;
-  }
+  private final DepanFxInfoColumnStore infoStore;
 
   public DepanFxInfoColumn(
       DepanFxNodeListTableAdapter tableAdapter,
       DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnDataRsrc,
-      PropertyStore infoStore) {
+      DepanFxInfoRegistry.PropertyStore propStore) {
     super(tableAdapter, columnDataRsrc);
-    // TODO: Hoist this to an infoStore, or refuse .. null info store?
-    this.infoStore = infoStore;
+
+    this.infoStore = uncastStore(propStore);
   }
 
   @Override
@@ -186,6 +178,19 @@ public class DepanFxInfoColumn
     result.setCellValueFactory(p ->
         new ReadOnlyObjectWrapper<>(p.getValue().getValue()));
     return result;
+  }
+
+  private static DepanFxInfoColumnStore uncastStore(
+      DepanFxInfoRegistry.PropertyStore propStore) {
+
+    if (propStore instanceof DepanFxInfoColumnStore infoStore) {
+      return infoStore;
+    }
+    LOG.warn(
+        "Supplied property store of type {} "
+            + "is not suitable for an info column.",
+        propStore.getClass());
+    return null;
   }
 
   private ObservableValue<String> buildObservedInfo(
