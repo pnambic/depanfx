@@ -61,19 +61,17 @@ public class DepanFxInfoColumnConfiguration {
     return new NodeInfoColumnContribution();
   }
 
-  @Bean  // Down: File.Open does not open with a table adapter.
+  @Bean
   public DepanFxResourceRegistry.Contribution infoColumnFileOpenMenu() {
     return new InfoColumnFileOpenContribution();
   }
 
-  @Bean  // Down: Path create does not open with a table adapter.
+  @Bean
   public DepanFxResourcePathMenuContribution infoColumnPathMenu() {
     return new InfoColumnPathContribution();
   }
 
   @Bean
-  // With only the base info registry, only simple infos can be deserialized
-  // using this @Autowire injected persistence contribution.
   public DocumentPersistenceContribution infoColumnPersistenceContribution(
       DepanFxInfoRegistry infoRegistry) {
     return new InfoColumnPersistenceContribution(infoRegistry);
@@ -125,7 +123,7 @@ public class DepanFxInfoColumnConfiguration {
 
     public InfoColumnFileOpenContribution() {
       super(
-          INFOS_COLUMN_LABEL + " [down]",
+          INFOS_COLUMN_LABEL,
           DepanFxNodeInfoColumnData.class,
           DepanFxNodeInfoColumnData.NODE_INFO_COLUMN_TOOL_EXT,
           INFOS_COLUMN_KEY);
@@ -135,8 +133,7 @@ public class DepanFxInfoColumnConfiguration {
     protected void runDialog(
         DepanFxDialogRunner dialogRunner,
         DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> wkspRsrc) {
-      // Need a table context in order to run an info column editor.
-      // DepanFxInfoColumnToolDialog.runEditDialog(wkspRsrc, dialogRunner);
+      DepanFxInfoColumnToolDialog.runEditDialog(wkspRsrc, dialogRunner);
     }
   }
 
@@ -153,7 +150,7 @@ public class DepanFxInfoColumnConfiguration {
         DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
-      // DepanFxInfoColumn.addNewColumnAction(builder, dialogRunner);
+      DepanFxInfoColumn.addNewColumnAction(builder, workspace, dialogRunner);
     }
 
     @Override

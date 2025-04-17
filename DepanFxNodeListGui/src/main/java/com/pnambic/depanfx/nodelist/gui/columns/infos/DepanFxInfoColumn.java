@@ -72,6 +72,14 @@ public class DepanFxInfoColumn
     this.infoStore = upcastStore(propStore);
   }
 
+  public static void addNewColumnAction(
+      DepanFxContextMenuBuilder builder,
+      DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner) {
+    builder.appendActionItem(NEW_INFO_COLUMN,
+        e -> openColumnCreate(workspace, dialogRunner));
+  }
+
   @Override
   public void prepareCell(TreeTableCell<DepanFxNodeListMember, ?> cell) {
     super.prepareCell(cell);
@@ -159,7 +167,7 @@ public class DepanFxInfoColumn
       DepanFxContextMenuBuilder builder,
       DepanFxDialogRunner dialogRunner) {
     builder.appendActionItem(NEW_INFO_COLUMN,
-        e -> openColumnCreate(dialogRunner));
+        e -> openColumnCreate(tableAdapter.getWorkspace(), dialogRunner));
   }
 
   @Override
@@ -193,6 +201,16 @@ public class DepanFxInfoColumn
     return null;
   }
 
+  private static void openColumnCreate(
+      DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner) {
+    DepanFxNodeInfoColumnData initialData =
+        DepanFxNodeInfoColumnData.buildInitialColumnData();
+    DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnRsrc =
+        workspace.addScratchResource(initialData);
+    DepanFxInfoColumnToolDialog.runCreateDialog(columnRsrc, dialogRunner);
+  }
+
   private ObservableValue<String> buildObservedInfo(
       CellDataFeatures<DepanFxNodeListMember, String> p) {
     DepanFxNodeListMember member = p.getValue().getValue();
@@ -208,18 +226,10 @@ public class DepanFxInfoColumn
     return null;
   }
 
-  private void openColumnCreate(DepanFxDialogRunner dialogRunner) {
-    DepanFxNodeInfoColumnData initialData =
-        DepanFxNodeInfoColumnData.buildInitialColumnData();
-    DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnRsrc =
-        tableAdapter.getWorkspace().addScratchResource(initialData);
-    DepanFxInfoColumnToolDialog.runCreateDialog(columnRsrc, dialogRunner);
-  }
-
   private void openColumnEditor(DepanFxDialogRunner dialogRunner) {
     Dialog<DepanFxInfoColumnToolDialog> nodeKeyColumnEditor =
           DepanFxInfoColumnToolDialog.runEditDialog(
-              forUpdate(buildEditData()), dialogRunner, tableAdapter);
+              forUpdate(buildEditData()), dialogRunner);
 
     nodeKeyColumnEditor.getController().getToolResource()
         .ifPresent(this::updateColumnDataRsrc);

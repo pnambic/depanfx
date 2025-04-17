@@ -18,7 +18,6 @@ package com.pnambic.depanfx.nodelist.gui.columns.infos;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry.Contribution;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxBaseColumnToolDialog;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
@@ -92,8 +91,7 @@ public class DepanFxInfoColumnToolDialog
 
   public static Dialog<DepanFxInfoColumnToolDialog> runEditDialog(
       DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnRsrc,
-      DepanFxDialogRunner dialogRunner,
-      DepanFxNodeListTableAdapter tableAdapter) {
+      DepanFxDialogRunner dialogRunner) {
 
     Dialog<DepanFxInfoColumnToolDialog> result =
         DepanFxResourcePerspectives.prepareDialog(
