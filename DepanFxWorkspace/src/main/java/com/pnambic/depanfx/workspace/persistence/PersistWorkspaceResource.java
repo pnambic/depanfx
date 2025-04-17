@@ -6,7 +6,6 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.Optional;
 
 /**
@@ -41,7 +40,6 @@ public class PersistWorkspaceResource {
         workspace.toProjectDocument(
             persistWkspRsrc.projectName, persistWkspRsrc.resourcePath);
     return optProjDoc.flatMap(d ->
-        workspace.getWorkspaceResource(
-            d, "PersistWorkspaceResource", Collections.emptyMap()));
+        workspace.getWorkspaceResource(d, "PersistWorkspaceResource"));
   }
 }

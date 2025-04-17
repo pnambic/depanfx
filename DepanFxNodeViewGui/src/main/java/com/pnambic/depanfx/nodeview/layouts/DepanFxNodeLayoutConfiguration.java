@@ -150,7 +150,6 @@ public class DepanFxNodeLayoutConfiguration {
     @Override
     protected void runDialog(
         DepanFxDialogRunner dialogRunner,
-        Map<?, ?> loadContext,
         DepanFxWorkspaceResource<DepanFxRadialLayoutData> wkspRsrc) {
       DepanFxRadialLayoutToolDialog.runEditDialog(wkspRsrc, dialogRunner);
     }
@@ -170,7 +169,6 @@ public class DepanFxNodeLayoutConfiguration {
     @Override
     protected void runDialog(
         DepanFxDialogRunner dialogRunner,
-        Map<?, ?> loadContext,
         DepanFxWorkspaceResource<DepanFxTreeLayoutData> wkspRsrc) {
       DepanFxTreeLayoutToolDialog.runEditDialog(wkspRsrc, dialogRunner);
     }

@@ -5,8 +5,6 @@ import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 
-import java.util.Map;
-
 import javafx.scene.control.TreeCell;
 
 /**
@@ -21,11 +19,10 @@ public class DepanFxProjectTreeCell extends TreeCell<DepanFxWorkspaceMember> {
       DepanFxWorkspace workspace,
       DepanFxWorkspaceMemberCells.DocumentDispatch dispatch,
       DepanFxResourceRegistry rsrcRegistry,
-      DepanFxResourceMenuRegistry rsrcMenuRegistry,
-      Map<?, ?> loadContext) {
+      DepanFxResourceMenuRegistry rsrcMenuRegistry) {
     this.memberCells = new DepanFxWorkspaceMemberCells(
         workspace, dispatch,
-        rsrcRegistry, rsrcMenuRegistry, loadContext,
+        rsrcRegistry, rsrcMenuRegistry,
         m -> null);
   }
 

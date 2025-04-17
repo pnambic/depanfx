@@ -8,7 +8,6 @@ import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
-import java.util.Collections;
 import java.util.Optional;
 
 import javafx.scene.Scene;
@@ -40,8 +39,6 @@ public class DepanFxLinkMatcherSequenceChooser {
     return rsrcChooser.showOpenDialog(scene)
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
-            p,
-            DepanFxLinkMatcherSequenceDocument.class,
-            Collections.emptyMap()));
+            p, DepanFxLinkMatcherSequenceDocument.class));
   }
 }

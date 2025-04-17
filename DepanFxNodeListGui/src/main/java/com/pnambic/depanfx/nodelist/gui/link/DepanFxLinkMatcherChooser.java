@@ -11,7 +11,6 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
-import java.util.Collections;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
@@ -158,7 +157,7 @@ public class DepanFxLinkMatcherChooser {
     return chooser.showOpenDialog(scene)
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
-            p, DepanFxLinkMatcherDocument.class, Collections.emptyMap()));
+            p, DepanFxLinkMatcherDocument.class));
   }
 
   private static DepanFxResourceChooser prepareChooser(

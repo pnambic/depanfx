@@ -17,7 +17,6 @@ package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableState;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeInfoColumnDataConverter;
@@ -38,7 +37,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.Optional;
 
 import javafx.event.Event;
@@ -98,22 +96,24 @@ public class DepanFxInfoColumnConfiguration {
       @SuppressWarnings("unchecked")
       DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> infoRsrc =
           (DepanFxWorkspaceResource<DepanFxNodeInfoColumnData>) columnRsrc;
-      return new DepanFxInfoColumn(tableAdapter, infoRsrc);
+      DepanFxInfoRegistry.PropertyStore infoStore =
+          infoRsrc.getResource().getInfoContribution()
+              .getInfoStore(tableAdapter);
+      return new DepanFxInfoColumn(tableAdapter, infoRsrc, infoStore);
     }
 
     @Override
     public Optional<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>> getNewColumn(
         Event event, DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxNodeListTableAdapter tableAdapter,
-        DepanFxNodeListTableState tableState) {
+        DepanFxNodeListTableAdapter tableAdapter) {
       DepanFxNodeInfoColumnData columnData =
           DepanFxNodeInfoColumnData.buildInitialColumnData();
       DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnRsrc =
           workspace.addScratchResource(columnData);
 
       return DepanFxInfoColumnToolDialog.runCreateDialog(
-          columnRsrc, dialogRunner, tableAdapter)
+          columnRsrc, dialogRunner)
           .getController()
           .getToolResource()
           .map(r -> r);
@@ -134,7 +134,6 @@ public class DepanFxInfoColumnConfiguration {
     @Override
     protected void runDialog(
         DepanFxDialogRunner dialogRunner,
-        Map<?, ?> loadContext,
         DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> wkspRsrc) {
       // Need a table context in order to run an info column editor.
       // DepanFxInfoColumnToolDialog.runEditDialog(wkspRsrc, dialogRunner);

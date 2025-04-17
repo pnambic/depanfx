@@ -86,6 +86,8 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
 
   private final DepanFxDialogRunner dialogRunner;
 
+  private final DepanFxInfoRegistry infoRegistry;
+
   private final DepanFxColumnRegistry columnRegistry;
 
   private final DepanFxNodeFiltersRegistry nodeFiltersRegistry;
@@ -126,17 +128,17 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
 
   private DepanFxNodeList sourceNodes;
 
-  private DepanFxInfoRegistry infoRegistry;
-
   @Autowired
   public DepanFxNodeViewNodeFiltersDialog(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
+      DepanFxInfoRegistry infoRegistry,
       DepanFxColumnRegistry columnRegistry,
       DepanFxNodeFiltersRegistry nodeFiltersRegistry,
       DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
     super(workspace);
     this.dialogRunner = dialogRunner;
+    this.infoRegistry = infoRegistry;
     this.columnRegistry = columnRegistry;
     this.nodeFiltersRegistry = nodeFiltersRegistry;
     this.nodeFiltersDialogRegistry = nodeFiltersDialogRegistry;
@@ -147,7 +149,6 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
    */
   public static Stage runEditDialog(
       DepanFxDialogRunner dialogRunner,
-      DepanFxInfoRegistry infoRegistry,
       DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc,
       DepanFxNodeList sourceNodes,
       Consumer<DepanFxNodeList> onUpdate) {
@@ -159,7 +160,6 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
             DepanFxNodeViewNodeFiltersDialog.class);
 
     DepanFxNodeViewNodeFiltersDialog dlgState = dlg.getController();
-    dlgState.setInfoRegistry(infoRegistry);
     dlgState.setTableViewResource(tableViewRsrc);
     dlgState.setSourceNodes(sourceNodes);
     dlgState.setOnUpdate(onUpdate);
@@ -226,10 +226,6 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
             .subtract(mergeColumn.widthProperty())
             .subtract(rowActionColumn.widthProperty())
             .subtract(1));
-  }
-
-  public void setInfoRegistry(DepanFxInfoRegistry infoRegistry) {
-    this.infoRegistry = infoRegistry;
   }
 
   public void setSourceNodes(DepanFxNodeList filteredNodes) {

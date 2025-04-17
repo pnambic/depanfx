@@ -15,14 +15,12 @@
  */
 package com.pnambic.depanfx.nodelist.gui;
 
-import com.pnambic.depanfx.graph.info.GraphNodeInfo;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
-import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry.Contribution;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
-import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeInfoColumnData;
+import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxInfoColumnStore;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
@@ -32,7 +30,6 @@ import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -46,6 +43,10 @@ import javafx.beans.value.ObservableValue;
  * - As part of a main screen panel.
  * - As part of a node selection dialog connected to a node view panel.
  * - As part of the node node filter dialog connected to a node view panel.
+ *
+ * Node list tables are also the stores for info about their nodes.
+ * The same info for the same node may vary across different tables
+ * (e.g. position).
  */
 public interface DepanFxNodeListTableAdapter {
 
@@ -56,6 +57,15 @@ public interface DepanFxNodeListTableAdapter {
   DepanFxNodeList buildEmptyList();
 
   DepanFxDialogRunner getDialogRunner();
+
+  /**
+   * Provides original or last assigned table view data.  Any revision to the
+   * table view data will be available from
+   */
+  DepanFxWorkspaceResource<DepanFxNodeListTableViewData> getTableViewResource();
+
+  void setTableViewResource(
+      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc);
 
   // Selected node operations
   DepanFxNodeList getSelection();
@@ -68,8 +78,32 @@ public interface DepanFxNodeListTableAdapter {
 
   void refreshTableView();
 
-  // Section operations
+  // Column operations.
+
+  /**
+   * Provide a stream of possible columns.
+   */
   Stream<DepanFxNodeListColumn> streamColumns();
+
+  Stream<DepanFxColumnRegistry.Contribution> streamColumnChoices();
+
+  Stream<DepanFxInfoRegistry.Contribution> streamInfosByLabel(String label);
+
+  Optional<DepanFxNodeListColumn> toColumn(
+      DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc);
+
+  // Node info support.
+
+  /**
+   * @param infoKey For simple singleton types (e.g. location), the key
+   *   is often the class.  For user types with multiple instances, the key
+   *   is likely to be an instance-unique string.
+   */
+  Optional<DepanFxInfoColumnStore> getInfoStore(Object infoKey);
+
+  void addInfoStore(Object infoKey, DepanFxInfoColumnStore infoStore);
+
+  // Section operations
 
   DepanFxNodeListSection insertSection(
       DepanFxNodeListSection before,
@@ -78,43 +112,4 @@ public interface DepanFxNodeListTableAdapter {
   void updateSection(
       DepanFxNodeListSection section,
       DepanFxWorkspaceResource<? extends DepanFxBaseSectionData> sectionRsrc);
-
-  /**
-   * Provides original or last assigned table view data.  Any revision to the
-   * table view data will be available from
-   */
-  DepanFxWorkspaceResource<DepanFxNodeListTableViewData> getTableViewResource();
-
-  void setTableViewResource(
-      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc);
-
-  Optional<DepanFxNodeListColumn> toColumn(
-      DepanFxNodeListTableAdapter tableAdapter,
-      DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc);
-
-  Stream<DepanFxColumnRegistry.Contribution> streamColumnChoices();
-
-  Stream<DepanFxInfoRegistry.Contribution> streamInfoChoices();
-
-  String getInfoPropertyString(
-      GraphNode graphNode, DepanFxNodeInfoColumnData columnInfo);
-
-  void setInfoPropertyValue(
-      GraphNode graphNode,
-      DepanFxNodeInfoColumnData columnData,
-      String input);
-
-  void addInfoListener(
-      DepanFxNodeListGraphNode node,
-      DepanFxNodeInfoColumnData columnData,
-      GraphNodeInfo.Listener listener);
-
-  void removeInfoListener(
-      DepanFxNodeListGraphNode node,
-      DepanFxNodeInfoColumnData columnData,
-      GraphNodeInfo.Listener listener);
-
-  Stream<Contribution> streamInfosByLabel(String label);
-
-  Map<?, ?> getLoadContext();
 }

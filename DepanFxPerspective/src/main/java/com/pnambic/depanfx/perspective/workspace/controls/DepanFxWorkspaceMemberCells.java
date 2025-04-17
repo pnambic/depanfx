@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
-import java.util.Map;
 import java.util.function.Function;
 
 import javafx.scene.control.Cell;
@@ -53,7 +52,6 @@ public class DepanFxWorkspaceMemberCells {
     void dispatchContribution(
         Contribution contrib,
         DepanFxWorkspace workspace,
-        Map<?, ?> loadContext,
         DepanFxProjectDocument document);
 
     DepanFxDialogRunner getDialogRunner();
@@ -71,10 +69,9 @@ public class DepanFxWorkspaceMemberCells {
     public void dispatchContribution(
         Contribution contrib,
         DepanFxWorkspace workspace,
-        Map<?, ?> loadContext,
         DepanFxProjectDocument document) {
       DepanFxResourceRegistry.dispatchContribution(
-          contrib, workspace, dialogRunner, loadContext, document);
+          contrib, workspace, dialogRunner, document);
     }
 
     @Override
@@ -95,10 +92,9 @@ public class DepanFxWorkspaceMemberCells {
     public void dispatchContribution(
         Contribution contrib,
         DepanFxWorkspace workspace,
-        Map<?, ?> loadContext,
         DepanFxProjectDocument document) {
       DepanFxResourceRegistry.dispatchContribution(
-          contrib, workspace, sceneSrvc, loadContext, document);
+          contrib, workspace, sceneSrvc, document);
     }
 
     @Override
@@ -131,20 +127,16 @@ public class DepanFxWorkspaceMemberCells {
   // Manage Font tweeks (e.g. embolden).
   private Font previousFont;
 
-  private final Map<?, ?> loadContext;
-
   public DepanFxWorkspaceMemberCells(
       DepanFxWorkspace workspace,
       DocumentDispatch dispatch,
       DepanFxResourceRegistry rsrcRegistry,
       DepanFxResourceMenuRegistry rsrcMenuRegistry,
-      Map<?, ?> loadContext,
       Function<DepanFxWorkspaceMember, ImageView> rsrcImageSrc) {
     this.workspace = workspace;
     this.dispatch = dispatch;
     this.rsrcRegistry = rsrcRegistry;
     this.rsrcMenuRegistry = rsrcMenuRegistry;
-    this.loadContext = loadContext;
     this.rsrcImageSrc = rsrcImageSrc;
   }
 
@@ -259,18 +251,17 @@ public class DepanFxWorkspaceMemberCells {
 
     if (contrib instanceof DepanFxResourceRegistry.Principal<?>) {
       DepanFxResourcePerspectives.installOnOpen(cell, document.getMemberPath(),
-          p -> dispatchContribution(contrib, loadContext, document));
+          p -> dispatchContribution(contrib, document));
     }
     builder.appendActionItem(
         fmtEditAction(contrib),
-        e -> dispatchContribution(contrib, loadContext, document));
+        e -> dispatchContribution(contrib, document));
   }
 
   protected void dispatchContribution(
       Contribution contrib,
-      Map<?, ?> loadContext,
       DepanFxProjectDocument document) {
-    dispatch.dispatchContribution(contrib, workspace, loadContext, document);
+    dispatch.dispatchContribution(contrib, workspace, document);
   }
 
   private void appendProjectContextMenu(

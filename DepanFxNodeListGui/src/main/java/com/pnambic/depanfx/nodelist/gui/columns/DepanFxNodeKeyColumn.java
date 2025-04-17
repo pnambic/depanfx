@@ -18,8 +18,6 @@ import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
-import java.util.Map;
-
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
@@ -131,14 +129,13 @@ public class DepanFxNodeKeyColumn
 
   private void openColumnChooser(DepanFxDialogRunner dialogRunner) {
     DepanFxWorkspace workspace = tableAdapter.getWorkspace();
-    Map<?, ?> loadContext = tableAdapter.getLoadContext();
 
     DepanFxResourceChooser columnChooser =
         prepareChooser(workspace, dialogRunner);
     columnChooser.showOpenDialog(getScene())
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
-              p, DepanFxNodeKeyColumnData.class, loadContext))
+              p, DepanFxNodeKeyColumnData.class))
         .ifPresent(this::updateColumnDataRsrc);
   }
 

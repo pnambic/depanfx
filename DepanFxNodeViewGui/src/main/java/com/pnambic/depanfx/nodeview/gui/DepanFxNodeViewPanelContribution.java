@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package com.pnambic.depanfx.nodeview.gui;
-
-import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
 import com.pnambic.depanfx.nodeview.viewdata.DepanFxNodeViewPanelData;
@@ -48,18 +46,14 @@ public class DepanFxNodeViewPanelContribution
 
   private final DepanFxNodeFiltersRegistry filterRegistry;
 
-  private final DepanFxInfoRegistry infoRegistry;
-
   @Autowired
   private DepanFxNodeViewPanelContribution(
       DepanFxWorkspace workspace,
     DepanFxNodeLayoutRegistry layoutRegistry,
-    DepanFxNodeFiltersRegistry filterRegistry,
-    DepanFxInfoRegistry infoRegistry) {
+    DepanFxNodeFiltersRegistry filterRegistry) {
     this.workspace = workspace;
     this.layoutRegistry = layoutRegistry;
     this.filterRegistry = filterRegistry;
-    this.infoRegistry = infoRegistry;
   }
 
   @Override
@@ -80,7 +74,7 @@ public class DepanFxNodeViewPanelContribution
 
     DepanFxNodeViewPanelData viewerData = (DepanFxNodeViewPanelData) baseData;
     return Optional.of(new DepanFxNodeViewPanel(
-        workspace, layoutRegistry, filterRegistry, infoRegistry,
+        workspace, layoutRegistry, filterRegistry,
         viewerData.getNodeViewRsrc()));
   }
 

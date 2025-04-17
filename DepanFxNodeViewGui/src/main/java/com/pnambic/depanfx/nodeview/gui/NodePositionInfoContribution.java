@@ -15,11 +15,16 @@
  */
 package com.pnambic.depanfx.nodeview.gui;
 
-import com.pnambic.depanfx.graph.info.GraphNodeInfo;
+import com.pnambic.depanfx.graph.info.GraphNodeInfo.Listener;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry.PropertyStore;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
+import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxInfoColumnStore;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
+
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -30,6 +35,7 @@ import java.util.function.Function;
  * A node position info requires a NodeViewPanel as a source
  * of location information.
  */
+@Component
 class NodePositionInfoContribution
     extends DepanFxInfoRegistry.Basic {
 
@@ -50,9 +56,7 @@ class NodePositionInfoContribution
               p -> p.zPos, (l, d) -> updateZ(l, d)),
   };
 
-  private final DepanFxNodeViewPanel panel;
-
-  public NodePositionInfoContribution(DepanFxNodeViewPanel panel) {
+  public NodePositionInfoContribution() {
     super(
         DepanFxNodeLocationData.class.getName(),
         NODE_POSITION_LABEL,
@@ -60,28 +64,63 @@ class NodePositionInfoContribution
         DepanFxNodeLocationData.class,
         NODE_POSITION_KEY,
         Arrays.asList(PROPERTIES));
-    this.panel = panel;
+  }
+
+  @Override
+  public DepanFxInfoRegistry.PropertyStore getInfoStore(Object storeContainer) {
+    if (storeContainer instanceof DepanFxNodeListTableAdapter tableAdapter) {
+      Optional<DepanFxInfoColumnStore> result =
+          tableAdapter.getInfoStore(DepanFxNodeLocationData.class);
+      // Since a basic PropertyStore is not a DepanFxInfoColumnStore,
+      // a return with an .orElse runs into type problems.
+      if (result.isPresent() ) {
+        return result.get();
+      }
+    }
+    return DepanFxInfoRegistry.NULL_STORE;
   }
 
   @Override
   public Optional<?> getPropertyValue(
-      GraphNode graphNode, DepanFxNodeInfoProperty infoProperty) {
-    DepanFxNodeLocationData nodePos = panel.getNodeLocation(graphNode);
-    NodePosInfoProperty posProp = (NodePosInfoProperty) infoProperty;
-    return Optional.of(posProp.extractValue(nodePos));
+      PropertyStore store, GraphNode graphNode,
+      DepanFxNodeInfoProperty infoProperty) {
+    if (store instanceof DepanFxInfoColumnStore infos) {
+      NodePosInfoProperty posProp = (NodePosInfoProperty) infoProperty;
+      return infos.getInfoProperty(graphNode)
+          .map(DepanFxNodeLocationData.class::cast)
+          .map(posProp::extractValue);
+    }
+
+    return Optional.empty();
   }
 
   @Override
   public void setPropertyValue(
-      GraphNode graphNode,
-      DepanFxNodeInfoProperty infoProperty,
-      String input) {
-    DepanFxNodeLocationData nodePos = panel.getNodeLocation(graphNode);
-    double updatePos = Double.parseDouble(input);
-    if (infoProperty instanceof NodePosInfoProperty posProperty) {
-      DepanFxNodeLocationData updateLoc =
-          posProperty.updateLocation(nodePos, updatePos);
-      panel.updateNodeLocation(graphNode, updateLoc);
+      PropertyStore store, GraphNode graphNode,
+      DepanFxNodeInfoProperty infoProperty, String input) {
+    if (store instanceof DepanFxInfoColumnStore infos) {
+      NodePosInfoProperty posProp = (NodePosInfoProperty) infoProperty;
+      double updatePos = Double.parseDouble(input);
+      infos.getInfoProperty(graphNode)
+          .map(DepanFxNodeLocationData.class::cast)
+          .map(p -> posProp.updateLocation(p, updatePos))
+          .ifPresent(p -> infos.setPropertyValue(graphNode, p));
+    }
+  }
+
+  @Override
+  public void addInfoListener(PropertyStore store, GraphNode node,
+      DepanFxNodeInfoProperty infoProperty, Listener listener) {
+    if (store instanceof DepanFxInfoColumnStore infos) {
+      infos.addInfoListener(node, listener);
+    }
+  }
+
+  @Override
+  public void removeInfoListener(PropertyStore store, GraphNode node,
+      DepanFxNodeInfoProperty infoProperty, Listener listener) {
+    if (store instanceof DepanFxInfoColumnStore infos) {
+      infos.removeInfoListener(node, listener);
     }
   }
 
@@ -134,15 +173,5 @@ class NodePositionInfoContribution
         DepanFxNodeLocationData nodePos, Double value) {
       return updateLocation.apply(nodePos, value);
     }
-  }
-
-  @Override
-  public void addInfoListener(GraphNode node, GraphNodeInfo.Listener listener) {
-    panel.addLocationListener(node, listener);
-  }
-
-  @Override
-  public void removeInfoListener(GraphNode node, GraphNodeInfo.Listener listener) {
-    panel.removeLocationListener(node, listener);
   }
 }

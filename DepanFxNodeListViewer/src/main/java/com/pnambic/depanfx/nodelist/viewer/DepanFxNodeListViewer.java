@@ -1,6 +1,5 @@
 package com.pnambic.depanfx.nodelist.viewer;
 
-import com.pnambic.depanfx.graph.nodeinfo.DepanFxCompositeInfoRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeViewNodeFiltersDialog;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
@@ -19,7 +18,6 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javafx.scene.control.ContextMenu;
@@ -46,8 +44,6 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
    */
   private List<Stage> sideViews = new ArrayList<Stage>();
 
-  private final DepanFxInfoRegistry panelInfoRegistry;
-
   public DepanFxNodeListViewer(
       String viewerTitle,
       DepanFxWorkspace workspace,
@@ -59,21 +55,14 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
 
     this.viewerTitle = viewerTitle;
     this.nodeListRsrc = nodeListRsrc;
-    this.panelInfoRegistry = preparePanelInfoRegistry(infoRegistry);
 
     DepanFxNodeList nodeList = nodeListRsrc.getResource();
 
     tableControl = new DepanFxNodeListTableController(
         workspace, dialogRunner, columnRegistry,
-        panelInfoRegistry, nodeList,
+        infoRegistry, nodeList,
         DepanFxNodeListSelection.forNodes(nodeList.getNodes()),
         tableViewRsrc, new TreeTableView<>());
-  }
-
-  private DepanFxInfoRegistry preparePanelInfoRegistry(
-      DepanFxInfoRegistry baseRegistry) {
-    return DepanFxCompositeInfoRegistry.buildInfoRegistry(
-        baseRegistry, Collections.emptyList());
   }
 
   @Override
@@ -135,7 +124,7 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
 
     Stage filterSelectionDialog =
         DepanFxNodeViewNodeFiltersDialog.runEditDialog(
-            tableControl.getDialogRunner(), panelInfoRegistry,
+            tableControl.getDialogRunner(),
             tableViewRsrc, tableControl.getSelection(),
             nl -> tableControl.doSelectGraphNodesAction(nl.getNodes()));
 

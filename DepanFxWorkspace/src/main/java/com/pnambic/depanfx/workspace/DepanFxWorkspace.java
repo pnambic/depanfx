@@ -63,18 +63,14 @@ public interface DepanFxWorkspace extends DepanFxWorkspaceMember {
    * The contents may be loaded from storage or provided by the cache.
    */
   <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
-      DepanFxProjectDocument resourceDoc,
-      String expectedContent,
-      Map<?, ?> context);
+      DepanFxProjectDocument resourceDoc, String expectedContent);
 
   /**
    * Documents that do not match the supplied {@code docType} are quietly
    * dropped.
    */
   <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
-      DepanFxProjectDocument resourceDoc,
-      Class<T> type,
-      Map<?, ?> context);
+      DepanFxProjectDocument resourceDoc, Class<T> type);
 
   Optional<DepanFxProjectContainer> toProjectContainer(URI uri);
 

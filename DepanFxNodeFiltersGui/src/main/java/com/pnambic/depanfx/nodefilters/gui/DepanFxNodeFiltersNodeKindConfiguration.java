@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.Optional;
 
 import javafx.event.ActionEvent;
@@ -73,7 +72,6 @@ public class DepanFxNodeFiltersNodeKindConfiguration {
     @Override
     protected void runDialog(
         DepanFxDialogRunner dialogRunner,
-        Map<?, ?> loadContext,
         DepanFxWorkspaceResource<DepanFxNodeKindFilterData> wkspRsrc) {
       LOG.info("No editor for NodeKindFilterFileOpenContribution");
       // DepanFxNodeFiltersMatcherDialog.runEditDialog(dialogRunner, wkspRsrc);

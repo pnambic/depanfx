@@ -15,7 +15,12 @@
  */
 package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
+import com.pnambic.depanfx.graph.info.GraphNodeInfo.Listener;
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry.Contribution;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry.PropertyStore;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
@@ -25,8 +30,8 @@ import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
-import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -34,7 +39,6 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
 import java.util.Optional;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -58,23 +62,35 @@ public class DepanFxInfoColumn
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxInfoColumn.class);
 
+  private final DepanFxInfoRegistry.PropertyStore infoStore;
+
   public DepanFxInfoColumn(
       DepanFxNodeListTableAdapter tableAdapter,
       DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnDataRsrc) {
     super(tableAdapter, columnDataRsrc);
+    infoStore = null;
+  }
+
+  public DepanFxInfoColumn(
+      DepanFxNodeListTableAdapter tableAdapter,
+      DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnDataRsrc,
+      PropertyStore infoStore) {
+    super(tableAdapter, columnDataRsrc);
+    // TODO: Hoist this to an infoStore, or refuse .. null info store?
+    this.infoStore = infoStore;
   }
 
   @Override
   public void prepareCell(TreeTableCell<DepanFxNodeListMember, ?> cell) {
     super.prepareCell(cell);
     getCellStyle().ifPresent(cell::setStyle);
-    cell.setEditable(getColumnData().getInfoProperty().isEditable());
+    cell.setEditable(getInfoProperty().isEditable());
   }
 
   private Optional<String> getCellStyle() {
     // Can't be defined as a trait of property kind, 'cuz infos
     // are a core Graph interface.
-    switch (getColumnData().getInfoProperty().getPropertyKind()) {
+    switch (getInfoProperty().getPropertyKind()) {
     case INT:
     case POS:
       return Optional.of(ALIGN_CENTER_RIGHT);
@@ -97,8 +113,7 @@ public class DepanFxInfoColumn
   @Override
   public String toString(DepanFxNodeListGraphNode member) {
     try {
-      return tableAdapter.getInfoPropertyString(
-          member.getGraphNode(), getColumnData());
+      return getPropertyString(member.getGraphNode());
     } catch (Exception errAny) {
       LOG.info("Trouble rendering {} due to {}",
           member.getDisplayName(), errAny.getMessage());
@@ -108,10 +123,10 @@ public class DepanFxInfoColumn
 
   public String toString(GraphNode node) {
     try {
-      return tableAdapter.getInfoPropertyString(node, getColumnData());
+      return getPropertyString(node);
     } catch (Exception errAny) {
       LOG.info("Trouble rendering {} property {} due to {}",
-          node.getId(), getColumnData().getInfoContribution().getInfoLabel(),
+          node.getId(), getInfoContribution().getInfoLabel(),
           errAny.getMessage());
     }
     return null;
@@ -119,15 +134,33 @@ public class DepanFxInfoColumn
 
   /**
    * Validate that the input string is an acceptable value for the field.
-   * @return
    */
   public String cleanInput(String input) {
-    return getColumnData().getInfoProperty().getPropertyKind().clean(input);
+    return getInfoProperty().getPropertyKind().clean(input);
   }
 
   public void commitEdit(DepanFxNodeListGraphNode member, String input) {
-    tableAdapter.setInfoPropertyValue(
-        member.getGraphNode(), getColumnData(), input);
+    setPropertyValue(member.getGraphNode(), input);
+  }
+
+  public Optional<?> getPropertyValue(GraphNode graphNode) {
+    return getInfoContribution().getPropertyValue(
+        infoStore, graphNode, getInfoProperty());
+  }
+
+  public void setPropertyValue(GraphNode graphNode, String input) {
+    getInfoContribution().setPropertyValue(
+        infoStore, graphNode, getInfoProperty(), input);
+  }
+
+  public void addInfoListener(GraphNode graphNode, Listener listener) {
+    getInfoContribution().addInfoListener(
+        infoStore, graphNode, getInfoProperty(), listener);
+  }
+
+  public void removeInfoListener(GraphNode graphNode, Listener listener) {
+    getInfoContribution().removeInfoListener(
+        infoStore, graphNode, getInfoProperty(), listener);
   }
 
   public void addNewColumnAction(
@@ -139,7 +172,7 @@ public class DepanFxInfoColumn
 
   @Override
   protected TreeTableColumn<DepanFxNodeListMember, ?> buildColumn() {
-    if (getColumnData().getInfoProperty().isEditable()) {
+    if (getInfoProperty().isEditable()) {
       TreeTableColumn<DepanFxNodeListMember, String> result =
           new TreeTableColumn<>(getColumnLabel());
       result.setCellFactory(p -> new DepanFxEditInfoColumnCell(this));
@@ -161,10 +194,9 @@ public class DepanFxInfoColumn
     if (member instanceof DepanFxNodeListGraphNode node) {
       ReadOnlyObjectWrapper<String> result =
           new ReadOnlyObjectWrapper<>(toString(node));
-      tableAdapter.addInfoListener(
-          node, getColumnData(),
-          (n, i) -> result.setValue(
-              tableAdapter.getInfoPropertyString(n, getColumnData())));
+      getInfoContribution().addInfoListener(
+          infoStore, node.getGraphNode(), null, 
+          (n, i) -> result.setValue(getPropertyString(n)));
       return result;
     }
 
@@ -176,8 +208,7 @@ public class DepanFxInfoColumn
         DepanFxNodeInfoColumnData.buildInitialColumnData();
     DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnRsrc =
         tableAdapter.getWorkspace().addScratchResource(initialData);
-    DepanFxInfoColumnToolDialog.runCreateDialog(
-        columnRsrc, dialogRunner, tableAdapter);
+    DepanFxInfoColumnToolDialog.runCreateDialog(columnRsrc, dialogRunner);
   }
 
   private void openColumnEditor(DepanFxDialogRunner dialogRunner) {
@@ -202,13 +233,12 @@ public class DepanFxInfoColumn
 
   private void openColumnChooser(DepanFxDialogRunner dialogRunner) {
     DepanFxResourceChooser columnChooser = prepareChooser(dialogRunner);
-    Map<?, ?> loadContext = tableAdapter.getLoadContext();
 
     DepanFxWorkspace workspace = tableAdapter.getWorkspace();
     columnChooser.showOpenDialog(getScene())
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
-              p, DepanFxNodeInfoColumnData.class, loadContext))
+              p, DepanFxNodeInfoColumnData.class))
         .ifPresent(this::updateColumnDataRsrc);
   }
 
@@ -224,5 +254,23 @@ public class DepanFxInfoColumn
     result.setSelectedExtensionFilter(
         DepanFxInfoColumnToolDialog.INFO_COLUMN_RSRC_FILTER);
     return result;
+  }
+
+  private String getPropertyString(GraphNode graphNode) {
+    return getPropertyValue(graphNode)
+        .map(v -> getInfoString(v))
+        .orElse("");
+  }
+
+  private String getInfoString(Object value) {
+      return getInfoProperty().getPropertyKind().toString(value);
+  }
+
+  private DepanFxNodeInfoProperty getInfoProperty() {
+    return getColumnData().getInfoProperty();
+  }
+
+  private Contribution getInfoContribution() {
+    return getColumnData().getInfoContribution();
   }
 }

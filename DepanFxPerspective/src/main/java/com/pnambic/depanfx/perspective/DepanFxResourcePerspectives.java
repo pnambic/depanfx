@@ -15,7 +15,6 @@ import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -55,8 +54,7 @@ public class DepanFxResourcePerspectives {
   public static <T> Optional<DepanFxWorkspaceResource<T>> toResource(
       DepanFxWorkspace workspace, TextField text, Class<T> rsrcType) {
     return toProjecDocument( workspace, text)
-        .flatMap(p -> workspace .getWorkspaceResource(
-            p, rsrcType, Collections.emptyMap()));
+        .flatMap(p -> workspace.getWorkspaceResource(p, rsrcType));
   }
 
   public static void prepareResourceFinder(

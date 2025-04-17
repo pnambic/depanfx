@@ -19,6 +19,7 @@ import java.util.Optional;
  */
 public class DepanFxWorkspaceFactory {
 
+  @SuppressWarnings("unused")
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxWorkspaceFactory.class);
 

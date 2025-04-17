@@ -127,7 +127,6 @@ public class DepanFxNodeListViewerConfiguration {
     @Override
     protected void runDialog(
         DepanFxDialogRunner dialogRunner,
-        Map<?, ?> loadContext,
         DepanFxWorkspaceResource<DepanFxNodeListTableViewData> wkspRsrc) {
 
       LOG.info("No editor for DepanFxNodeListTableViewData");
@@ -160,7 +159,6 @@ public class DepanFxNodeListViewerConfiguration {
     @Override
     protected void runDialog(
         DepanFxDialogRunner dialogRunner,
-        Map<?, ?> loadContext,
         DepanFxWorkspaceResource<DepanFxNodeList> wkspRsrc) {
       throw new DepanFxResourceRegistry.UseOpenPanelException(this);
     }
@@ -169,11 +167,8 @@ public class DepanFxNodeListViewerConfiguration {
     public void openPanel(DepanFxWorkspace workspace,
         DepanFxSceneService sceneSrvc,
         DepanFxProjectDocument document) {
-      Map<?, ?> loadContext = Collections.singletonMap(
-          DepanFxInfoRegistry.class, infoRegistry);
 
-      workspace.getWorkspaceResource
-          (document, DepanFxNodeList.class, loadContext )
+      workspace.getWorkspaceResource(document, DepanFxNodeList.class)
           .ifPresent(r -> addNodeListPanelToScene(
               workspace, sceneSrvc, columnRegistry, infoRegistry, r));
     }
@@ -221,7 +216,6 @@ public class DepanFxNodeListViewerConfiguration {
 
     @Override
     protected void runDialog(DepanFxDialogRunner dialogRunner,
-        Map<?, ?> loadContext,
         DepanFxWorkspaceResource<GraphDocument> wkspRsrc) {
       throw new DepanFxResourceRegistry.UseOpenPanelException(this);
     }
@@ -230,11 +224,9 @@ public class DepanFxNodeListViewerConfiguration {
     public void openPanel(DepanFxWorkspace workspace,
         DepanFxSceneService sceneSrvc,
         DepanFxProjectDocument document) {
-      Map<?, ?> loadContext = Collections.singletonMap(
-          DepanFxInfoRegistry.class, infoRegistry);
 
       workspace.getWorkspaceResource(
-          document, GraphDocument.class, loadContext)
+          document, GraphDocument.class)
           .ifPresent(r -> addGraphDocViewToScene(
               workspace, sceneSrvc, columnRegistry, infoRegistry, r));
     }

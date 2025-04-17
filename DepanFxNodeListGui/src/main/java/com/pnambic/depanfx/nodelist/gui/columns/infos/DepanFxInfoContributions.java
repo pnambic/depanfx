@@ -21,7 +21,6 @@ import com.pnambic.depanfx.graph.info.GraphNodeInfo.Listener;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
-import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty.PropertyKind;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -70,12 +69,13 @@ public class DepanFxInfoContributions {
       Function<GraphNode, String> nodeTransform) {
     return new NodeKeyInfoProperty(
         toolName, toolDescription,
-        PropertyKind.STRING, false,
+        DepanFxNodeInfoProperty.PropertyKind.STRING, false,
         nodeTransform);
   }
 
   private static class NodeKeyInfoContribution
       extends DepanFxInfoRegistry.Basic {
+
     public NodeKeyInfoContribution() {
       super(
           ContextNodeId.class.getName(),
@@ -88,6 +88,7 @@ public class DepanFxInfoContributions {
 
     @Override
     public Optional<?> getPropertyValue(
+        DepanFxInfoRegistry.PropertyStore store,
         GraphNode graphNode, DepanFxNodeInfoProperty infoProperty) {
       NodeKeyInfoProperty nodeKeyProp = (NodeKeyInfoProperty) infoProperty;
       return Optional.of(nodeKeyProp.forNode(graphNode));
@@ -95,20 +96,30 @@ public class DepanFxInfoContributions {
 
     @Override
     public void setPropertyValue(
-        GraphNode graphNode,
-        DepanFxNodeInfoProperty infoProperty,
-        String input) {
-      // Do nothing: Node key cannot be set.
-    }
-
-    @Override
-    public void addInfoListener(GraphNode node, Listener listener) {
+        DepanFxInfoRegistry.PropertyStore store, GraphNode graphNode,
+        DepanFxNodeInfoProperty infoProperty, String input) {
       // Do nothing: Node key cannot changed.
     }
 
     @Override
-    public void removeInfoListener(GraphNode node, Listener listener) {
+    public void addInfoListener(
+        DepanFxInfoRegistry.PropertyStore store, GraphNode node,
+        DepanFxNodeInfoProperty infoProperty, Listener listener) {
       // Do nothing: Node key cannot changed.
+    }
+
+    @Override
+    public void removeInfoListener(
+        DepanFxInfoRegistry.PropertyStore store, GraphNode node,
+        DepanFxNodeInfoProperty infoProperty, Listener listener) {
+      // Do nothing: Node key cannot changed.
+    }
+
+    @Override
+    public DepanFxInfoRegistry.PropertyStore getInfoStore(
+        Object storeContainer) {
+      // No store used, so a dummy entity.
+      return DepanFxInfoRegistry.NULL_STORE;
     }
   }
 

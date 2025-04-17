@@ -40,8 +40,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 
 import javafx.scene.control.Cell;
@@ -98,7 +96,6 @@ public class DepanFxBasicSectionConfiguration {
     @Override
     protected void runDialog(
         DepanFxDialogRunner dialogRunner,
-        Map<?, ?> loadContext,
         DepanFxWorkspaceResource<DepanFxFlatSectionData> wkspRsrc) {
       DepanFxFlatSectionToolDialog.runEditDialog(wkspRsrc, dialogRunner);
     }
@@ -170,7 +167,6 @@ public class DepanFxBasicSectionConfiguration {
     @Override
     protected void runDialog(
         DepanFxDialogRunner dialogRunner,
-        Map<?, ?> loadContext,
         DepanFxWorkspaceResource<DepanFxTreeSectionData> wkspRsrc) {
       DepanFxTreeSectionToolDialog.runEditDialog(wkspRsrc, dialogRunner);
     }
@@ -221,8 +217,7 @@ public class DepanFxBasicSectionConfiguration {
               DepanFxLinkMatcherBuiltIns.MEMBER_MATCHER_PATH);
       return  workspace.getWorkspaceResource(
           matcherProjPath.get(),
-          DepanFxLinkMatcherDocument.class,
-          Collections.emptyMap())
+          DepanFxLinkMatcherDocument.class)
           .map(m -> new DepanFxTreeSectionData(
                 NEW_TREE_SECTION_NAME, NEW_TREE_SECTION_DESCR,
                 NEW_TREE_SECTION_LABEL, true, m, true,

@@ -31,6 +31,19 @@ public interface DepanFxInfoRegistry {
 
   Stream<Contribution> streamContributions();
 
+  /**
+   * Marker interface for shared stores of property values.
+   */
+  public interface PropertyStore {
+  }
+
+  public final PropertyStore NULL_STORE = new PropertyStore() {};
+
+  /**
+   * A contribution represents one bundle of GraphNodeInfo.  Specific elements
+   * from a node info can manipulated by specifying the desired
+   * node info property.
+   */
   public interface Contribution extends DepanFxOrderableContribution {
 
     /**
@@ -63,16 +76,26 @@ public interface DepanFxInfoRegistry {
 
     Optional<DepanFxNodeInfoProperty> getProperty(String label);
 
+    PropertyStore getInfoStore(Object storeContainer);
+
     Optional<?> getPropertyValue(
-        GraphNode graphNode, DepanFxNodeInfoProperty infoProperty);
+        PropertyStore store, GraphNode graphNode,
+        DepanFxNodeInfoProperty infoProperty);
 
     void setPropertyValue(
-        GraphNode graphNode, DepanFxNodeInfoProperty infoProperty,
+        PropertyStore store, GraphNode graphNode,
+        DepanFxNodeInfoProperty infoProperty,
         String input);
 
-    void addInfoListener(GraphNode node, GraphNodeInfo.Listener listener);
+    void addInfoListener(
+        PropertyStore store, GraphNode node,
+        DepanFxNodeInfoProperty infoProperty,
+        GraphNodeInfo.Listener listener);
 
-    void removeInfoListener(GraphNode node, GraphNodeInfo.Listener listener);
+    void removeInfoListener(
+        PropertyStore store, GraphNode node,
+        DepanFxNodeInfoProperty infoProperty,
+        GraphNodeInfo.Listener listener);
   }
 
   public static abstract class Basic implements Contribution {
@@ -110,6 +133,11 @@ public interface DepanFxInfoRegistry {
     }
 
     @Override
+    public boolean acceptsInfo(Object info) {
+      return acceptType.isAssignableFrom(info.getClass());
+    }
+
+    @Override
     public String getInfoLabel() {
       return label;
     }
@@ -134,11 +162,6 @@ public interface DepanFxInfoRegistry {
       return properties.stream()
           .filter(p -> label.equals(p.getToolName()))
           .findFirst();
-    }
-
-    @Override
-    public boolean acceptsInfo(Object info) {
-      return acceptType.isAssignableFrom(info.getClass());
     }
   }
 }

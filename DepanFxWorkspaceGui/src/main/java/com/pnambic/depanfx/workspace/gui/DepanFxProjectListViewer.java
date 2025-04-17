@@ -16,7 +16,6 @@ import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.Optional;
 
 import javafx.scene.control.ContextMenu;
@@ -48,19 +47,15 @@ public class DepanFxProjectListViewer {
 
   private TreeView<DepanFxWorkspaceMember> workspaceView;
 
-  private final Map<?, ?> loadContext;
-
   public DepanFxProjectListViewer(
       DepanFxWorkspace workspace,
       DepanFxSceneService sceneSrvc,
       DepanFxResourceRegistry rsrcRegistry,
-      DepanFxResourceMenuRegistry rsrcMenuRegistry,
-      Map<?, ?> loadContext) {
+      DepanFxResourceMenuRegistry rsrcMenuRegistry) {
     this.workspace = workspace;
     this.sceneSrvc = sceneSrvc;
     this.rsrcRegistry = rsrcRegistry;
     this.rsrcMenuRegistry = rsrcMenuRegistry;
-    this.loadContext = loadContext;
 
     workspaceView = createView();
   }
@@ -119,7 +114,7 @@ public class DepanFxProjectListViewer {
     result.setShowRoot(false);
     result.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     result.setCellFactory(p -> new DepanFxProjectTreeCell(
-        workspace, dispatch, rsrcRegistry, rsrcMenuRegistry, loadContext));
+        workspace, dispatch, rsrcRegistry, rsrcMenuRegistry));
     result.setContextMenu(buildWorkspaceMenu());
     return result;
   }

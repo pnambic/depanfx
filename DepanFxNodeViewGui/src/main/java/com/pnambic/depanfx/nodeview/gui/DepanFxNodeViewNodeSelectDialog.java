@@ -1,12 +1,17 @@
 package com.pnambic.depanfx.nodeview.gui;
 
+import com.pnambic.depanfx.graph.info.GraphNodeInfo.Listener;
+import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableController;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
+import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxInfoColumnStore;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.perspective.DepanFxWorkspaceDialog;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -21,6 +26,8 @@ import net.rgielen.fxweaver.core.FxmlView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -47,6 +54,10 @@ public class DepanFxNodeViewNodeSelectDialog
 
   private final DepanFxDialogRunner dialogRunner;
 
+  private final DepanFxColumnRegistry columnRegistry;
+
+  private final DepanFxInfoRegistry infoRegistry;
+
   /**
    * Place holder for the context menu.
    */
@@ -62,20 +73,18 @@ public class DepanFxNodeViewNodeSelectDialog
 
   private DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc;
 
-  // private DepanFxNodeListTableViewData tableView;
-
   private DepanFxNodeListTableController tableControl;
-
-  private final DepanFxColumnRegistry columnRegistry;
 
   @Autowired
   public DepanFxNodeViewNodeSelectDialog(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
-      DepanFxColumnRegistry columnRegistry) {
+      DepanFxColumnRegistry columnRegistry,
+      DepanFxInfoRegistry infoRegistry) {
     super(workspace);
     this.dialogRunner = dialogRunner;
     this.columnRegistry = columnRegistry;
+    this.infoRegistry = infoRegistry;
   }
 
   /**
@@ -120,11 +129,13 @@ public class DepanFxNodeViewNodeSelectDialog
     }
 
     tableControl = new DepanFxNodeListTableController(
-        workspace, dialogRunner, columnRegistry,
-        viewPanel.getInfoRegistry(),
+        workspace, dialogRunner, columnRegistry, infoRegistry,
         viewPanel.getViewNodesAsNodeList(),
         viewPanel.getNodeSelection(),
         tableViewRsrc, nodeSelectTable);
+    tableControl.addInfoStore(
+        DepanFxNodeLocationData.class,
+        new PanelLocationStore(viewPanel));
 
     nodeTableCommands.setContextMenu(buildContextMenu());
   }
@@ -151,5 +162,36 @@ public class DepanFxNodeViewNodeSelectDialog
     cmds.addLoadSaveItems(builder);
     cmds.addTableViewItems(builder);
     return builder.build();
+  }
+
+  private static class PanelLocationStore implements DepanFxInfoColumnStore {
+
+    private final DepanFxNodeViewPanel viewPanel;
+
+    public PanelLocationStore(DepanFxNodeViewPanel viewPanel) {
+      this.viewPanel = viewPanel;
+    }
+
+    @Override
+    public Optional<?> getInfoProperty(GraphNode graphNode) {
+      return Optional.ofNullable(viewPanel.getNodeLocation(graphNode));
+    }
+
+    @Override
+    public void setPropertyValue(GraphNode graphNode, Object value) {
+      if (value instanceof DepanFxNodeLocationData location) {
+        viewPanel.updateNodeLocation(graphNode, location);
+      }
+    }
+
+    @Override
+    public void addInfoListener(GraphNode graphNode, Listener listener) {
+      viewPanel.addLocationListener(graphNode, listener);
+    }
+
+    @Override
+    public void removeInfoListener(GraphNode graphNode, Listener listener) {
+      viewPanel.removeLocationListener(graphNode, listener);
+    }
   }
 }

@@ -135,8 +135,7 @@ public class DepanFxNodeListTableCommands {
     return DepanFxContextMenuBuilder.createActionItem(
         fmtLabel,
         e ->
-          contrib.getNewColumn(
-              e, workspace, dialogRunner, tableAdapter, tableState)
+          contrib.getNewColumn(e, workspace, dialogRunner, tableAdapter)
               .ifPresent(tableState::addColumn)
         );
   }
@@ -202,7 +201,7 @@ public class DepanFxNodeListTableCommands {
     rsrcChooser.showOpenDialog(tableState.getScene())
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(m -> workspace.getWorkspaceResource(
-            m, DepanFxBaseColumnData.class, tableAdapter.getLoadContext()))
+            m, DepanFxBaseColumnData.class))
         .ifPresent(tableState::addColumn);
   }
 }

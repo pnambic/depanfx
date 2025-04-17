@@ -27,7 +27,7 @@ public class DepanFxNodeListTableFactory {
 
   public Optional<DepanFxNodeListColumn> createTableColumn(
       DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc) {
-    return tableAdapter.toColumn(tableAdapter, columnRsrc);
+    return tableAdapter.toColumn(columnRsrc);
   }
 
   public DepanFxNodeListSection createTableSection(

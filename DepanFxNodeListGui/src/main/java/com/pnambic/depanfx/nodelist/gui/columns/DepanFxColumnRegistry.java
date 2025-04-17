@@ -17,7 +17,6 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.base.DepanFxOrderableContribution;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableState;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -53,12 +52,14 @@ public class DepanFxColumnRegistry {
         DepanFxNodeListTableAdapter tableAdapter,
         DepanFxWorkspaceResource<?> columnRsrc);
 
+    /**
+     * @param tableAdapter table containing information about nodes.
+     */
     Optional<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>> getNewColumn(
         Event event,
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxNodeListTableAdapter tableAdapter,
-        DepanFxNodeListTableState tableState);
+        DepanFxNodeListTableAdapter tableAdapter);
   }
 
   public static abstract class Basic implements Contribution {

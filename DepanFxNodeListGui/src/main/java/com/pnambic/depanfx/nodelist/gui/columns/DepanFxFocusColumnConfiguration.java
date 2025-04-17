@@ -1,7 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableState;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
@@ -90,8 +89,7 @@ public class DepanFxFocusColumnConfiguration {
         Event event,
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxNodeListTableAdapter tableAdapter,
-        DepanFxNodeListTableState tableState) {
+        DepanFxNodeListTableAdapter tableAdpater) {
       DepanFxFocusColumnData columnData =
           DepanFxFocusColumnData.buildInitialFocusColumnData(null);
       DepanFxWorkspaceResource<DepanFxFocusColumnData> columnRsrc =
@@ -118,7 +116,6 @@ public class DepanFxFocusColumnConfiguration {
     @Override
     protected void runDialog(
         DepanFxDialogRunner dialogRunner,
-        Map<?, ?> loadContext,
         DepanFxWorkspaceResource<DepanFxFocusColumnData> columnRsrc) {
       DepanFxFocusColumnToolDialog.runEditDialog(
           columnRsrc, dialogRunner);

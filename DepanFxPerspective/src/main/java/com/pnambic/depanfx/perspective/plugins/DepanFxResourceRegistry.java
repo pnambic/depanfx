@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -74,7 +73,6 @@ public class DepanFxResourceRegistry {
     void openDocument(
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        Map<?,?> loadContext,
         DepanFxProjectDocument document);
 
     /**
@@ -82,7 +80,6 @@ public class DepanFxResourceRegistry {
      */
     void openResource(
         DepanFxDialogRunner dialogRunner,
-        Map<?,?> loadContext,
         DepanFxWorkspaceResource<?> resource);
   }
 
@@ -144,7 +141,6 @@ public class DepanFxResourceRegistry {
 
     abstract protected void runDialog(
         DepanFxDialogRunner dialogRunner,
-        Map<?,?> loadContext,
         DepanFxWorkspaceResource<T> wkspRsrc);
 
     @Override
@@ -156,29 +152,26 @@ public class DepanFxResourceRegistry {
     public void openDocument(
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        Map<?,?> loadContext,
         DepanFxProjectDocument document) {
-      loadResource(workspace, loadContext, document)
-          .ifPresent(r -> runDialog(dialogRunner, loadContext, r));
+      loadResource(workspace, document)
+          .ifPresent(r -> runDialog(dialogRunner, r));
     }
 
     @Override
     public void openResource(
         DepanFxDialogRunner dialogRunner,
-        Map<?,?> loadContext,
         DepanFxWorkspaceResource<?> rsrc) {
       @SuppressWarnings("unchecked")
       DepanFxWorkspaceResource<T> typedRsrc =
           (DepanFxWorkspaceResource<T>) rsrc;
-      runDialog(dialogRunner, loadContext, typedRsrc);
+      runDialog(dialogRunner, typedRsrc);
     }
 
     public Optional<DepanFxWorkspaceResource<T>> loadResource(
         DepanFxWorkspace workspace,
-        Map<?,?> loadContext,
         DepanFxProjectDocument document) {
       try {
-        return workspace.getWorkspaceResource(document, dataType, loadContext);
+        return workspace.getWorkspaceResource(document, dataType);
       } catch (RuntimeException errCaught) {
         LOG.error("Unable to open {}",
             document.getMemberPath().toUri(), errCaught);
@@ -232,7 +225,6 @@ public class DepanFxResourceRegistry {
       Contribution contrib,
       DepanFxWorkspace workspace,
       DepanFxSceneService sceneSrvc,
-      Map<?,?> loadContext,
       DepanFxProjectDocument document) {
 
     if (contrib instanceof Panel panel) {
@@ -244,25 +236,24 @@ public class DepanFxResourceRegistry {
         getBuiltInResource(workspace, document);
     DepanFxDialogRunner dialogRunner = sceneSrvc.getDialogRunner();
     optRsrc.ifPresentOrElse(
-        r -> contrib.openResource(dialogRunner, loadContext, r),
+        r -> contrib.openResource(dialogRunner, r),
         () -> contrib.openDocument(
-            workspace, dialogRunner, loadContext, document));
+            workspace, dialogRunner, document));
   }
 
   public static void dispatchContribution(
       Contribution contrib,
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
-      Map<?,?> loadContext,
       DepanFxProjectDocument document) {
 
     Optional<DepanFxWorkspaceResource<?>> optRsrc =
         getBuiltInResource(workspace, document);
 
     optRsrc.ifPresentOrElse(
-        r -> contrib.openResource(dialogRunner, loadContext, r),
+        r -> contrib.openResource(dialogRunner, r),
         () -> contrib.openDocument(
-            workspace, dialogRunner, loadContext, document));
+            workspace, dialogRunner, document));
   }
 
   private final Collection<Contribution> contribs;
@@ -332,14 +323,13 @@ public class DepanFxResourceRegistry {
   public void openDocument(
       DepanFxWorkspace workspace,
       DepanFxSceneService sceneSrvc,
-      Map<?,?> loadContext,
       DepanFxProjectDocument document) {
 
     selectContributions(
         streamPrincipalContributions(), workspace, document)
         .findFirst()
         .ifPresent(c -> dispatchContribution(
-            c, workspace, sceneSrvc, loadContext, document));
+            c, workspace, sceneSrvc, document));
   }
 
   /**
@@ -348,14 +338,13 @@ public class DepanFxResourceRegistry {
   public void openDialog(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
-      Map<?,?> loadContext,
       DepanFxProjectDocument document) {
 
     selectContributions(streamPrincipalContributions(), workspace, document)
         .filter(c -> !(c instanceof Panel))
         .findFirst()
         .ifPresent(c -> dispatchContribution(
-            c, workspace, dialogRunner, loadContext, document));
+            c, workspace, dialogRunner, document));
   }
 
   private Stream<Contribution> streamPrincipalContributions() {

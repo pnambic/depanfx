@@ -24,7 +24,6 @@ import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
-import java.util.Collections;
 import java.util.Optional;
 
 import javafx.scene.Scene;
@@ -50,7 +49,7 @@ public class DepanFxNodeDisplayDataChooser {
     return rsrcChooser.showOpenDialog(scene)
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
-            p, DepanFxNodeViewNodeDisplayData.class, Collections.emptyMap()));
+            p, DepanFxNodeViewNodeDisplayData.class));
   }
 
   private static DepanFxResourceChooser prepareChooser(

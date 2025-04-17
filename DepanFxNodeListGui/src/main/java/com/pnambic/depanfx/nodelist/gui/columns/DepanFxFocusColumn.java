@@ -3,8 +3,8 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
-import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
+import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeFork;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData.CategoryEntry;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
@@ -25,7 +25,6 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -220,14 +219,13 @@ public class DepanFxFocusColumn
 
   private void openColumnChooser(DepanFxDialogRunner dialogRunner) {
     DepanFxWorkspace workspace = tableAdapter.getWorkspace();
-    Map<?, ?> loadContext = tableAdapter.getLoadContext();
 
     DepanFxResourceChooser columnChooser =
         prepareChooser(workspace, dialogRunner);
     columnChooser.showOpenDialog(getScene())
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
-              p, DepanFxFocusColumnData.class, loadContext))
+              p, DepanFxFocusColumnData.class))
         .ifPresent(this::updateColumnDataRsrc);
   }
 

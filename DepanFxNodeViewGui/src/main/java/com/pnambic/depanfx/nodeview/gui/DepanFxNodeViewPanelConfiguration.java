@@ -73,10 +73,9 @@ public class DepanFxNodeViewPanelConfiguration {
   public DepanFxResourceRegistry.Contribution
   nodeViewAsViewResourceContribution(
       DepanFxNodeLayoutRegistry layoutRegistry,
-      DepanFxNodeFiltersRegistry filterRegistry,
-      DepanFxInfoRegistry infoRegistry) {
+      DepanFxNodeFiltersRegistry filterRegistry) {
     return new NodeViewAsViewResourceContribution(
-        layoutRegistry, filterRegistry, infoRegistry);
+        layoutRegistry, filterRegistry);
   }
 
   @Bean
@@ -160,7 +159,6 @@ public class DepanFxNodeViewPanelConfiguration {
     @Override
     protected void runDialog(
         DepanFxDialogRunner dialogRunner,
-        Map<?,?> loadContext,
         DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> wkspRsrc) {
       DepanFxNodeViewLinkDisplayDialog.runEditDialog(wkspRsrc, dialogRunner);
     }
@@ -179,7 +177,6 @@ public class DepanFxNodeViewPanelConfiguration {
     @Override
     protected void runDialog(
         DepanFxDialogRunner dialogRunner,
-        Map<?,?> loadContext,
         DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> wkspRsrc) {
       DepanFxNodeViewNodeDisplayDialog.runEditDialog(wkspRsrc, dialogRunner);
     }
@@ -196,36 +193,30 @@ public class DepanFxNodeViewPanelConfiguration {
 
     private final DepanFxNodeFiltersRegistry filterRegistry;
 
-    private final DepanFxInfoRegistry infoRegistry;
-
     public NodeViewAsViewResourceContribution(
         DepanFxNodeLayoutRegistry layoutRegistry,
-        DepanFxNodeFiltersRegistry filterRegistry,
-        DepanFxInfoRegistry infoRegistry) {
+        DepanFxNodeFiltersRegistry filterRegistry) {
       super(NODE_VIEW_LABEL,
           DepanFxNodeViewPanel.class,
           DepanFxNodeViewData.NODE_VIEW_TOOL_EXT,
           NODE_VIEW_KEY);
       this.layoutRegistry = layoutRegistry;
       this.filterRegistry = filterRegistry;
-      this.infoRegistry = infoRegistry;
     }
 
     @Override
     public void openPanel(DepanFxWorkspace workspace,
         DepanFxSceneService sceneSrcv, DepanFxProjectDocument document) {
-      workspace.getWorkspaceResource(
-          document, DepanFxNodeViewData.class, Collections.emptyMap())
+      workspace.getWorkspaceResource(document, DepanFxNodeViewData.class)
           .ifPresent(r ->
               addNodeViewPanelToScene(
                   workspace, sceneSrcv, r,
-                  layoutRegistry, filterRegistry, infoRegistry));
+                  layoutRegistry, filterRegistry));
     }
 
     @Override
     protected void runDialog(
         DepanFxDialogRunner dialogRunner,
-        Map<?,?> loadContext,
         DepanFxWorkspaceResource<DepanFxNodeViewPanel> wkspRsrc) {
       throw new DepanFxResourceRegistry.UseOpenPanelException(this);
     }
@@ -239,20 +230,16 @@ public class DepanFxNodeViewPanelConfiguration {
 
     private final DepanFxNodeFiltersRegistry filterRegistry;
 
-    private final DepanFxInfoRegistry infoRegistry;
-
     private AdditionalAsViewResourceContribution(
         String resourceLabel,
         Class<T> dataType,
         String fileExt,
         String orderKey,
         DepanFxNodeLayoutRegistry layoutRegistry,
-        DepanFxNodeFiltersRegistry filterRegistry,
-        DepanFxInfoRegistry infoRegistry) {
+        DepanFxNodeFiltersRegistry filterRegistry) {
       super(resourceLabel, dataType, fileExt, orderKey);
       this.layoutRegistry = layoutRegistry;
       this.filterRegistry = filterRegistry;
-      this.infoRegistry = infoRegistry;
     }
 
     @Override
@@ -260,19 +247,18 @@ public class DepanFxNodeViewPanelConfiguration {
         DepanFxWorkspace workspace,
         DepanFxSceneService sceneSrcv,
         DepanFxProjectDocument document) {
-      loadResource(workspace, Collections.emptyMap(),document)
+      loadResource(workspace, document)
           .map(r -> getNodeViewData(workspace, r, layoutRegistry))
           .map(d -> workspace.addScratchResource(d))
           .ifPresent(r ->
               addNodeViewPanelToScene(
                   workspace, sceneSrcv, r,
-                  layoutRegistry, filterRegistry, infoRegistry));
+                  layoutRegistry, filterRegistry));
     }
 
     @Override
     protected void runDialog(
         DepanFxDialogRunner dialogRunner,
-        Map<?, ?> loadContext,
         DepanFxWorkspaceResource<T> wkspRsrc) {
       throw new DepanFxResourceRegistry.UseOpenPanelException(this);
     }
@@ -296,8 +282,7 @@ public class DepanFxNodeViewPanelConfiguration {
           DepanFxNodeList.NODE_LIST_EXT,
           OPEN_NODE_LIST_AS_VIEW_KEY,
           layoutRegistry,
-          filterRegistry,
-          infoRegistry);
+          filterRegistry);
     }
 
     @Override
@@ -327,8 +312,7 @@ public class DepanFxNodeViewPanelConfiguration {
           GraphDocPersistenceContribution.EXTENSION,
           OPEN_GRAPH_DOC_AS_VIEW_KEY,
           layoutRegistry,
-          filterRegistry,
-          infoRegistry);
+          filterRegistry);
     }
 
     @Override
@@ -350,10 +334,9 @@ public class DepanFxNodeViewPanelConfiguration {
       DepanFxSceneService sceneSrvc,
       DepanFxWorkspaceResource<DepanFxNodeViewData> nodeViewRsrc,
       DepanFxNodeLayoutRegistry layoutRegistry,
-      DepanFxNodeFiltersRegistry filterRegistry,
-      DepanFxInfoRegistry infoRegistry) {
+      DepanFxNodeFiltersRegistry filterRegistry) {
     DepanFxNodeViewPanel viewPanel = new DepanFxNodeViewPanel(
-        workspace, layoutRegistry, filterRegistry, infoRegistry, nodeViewRsrc);
+        workspace, layoutRegistry, filterRegistry, nodeViewRsrc);
     sceneSrvc.addViewer(viewPanel);
   }
 }

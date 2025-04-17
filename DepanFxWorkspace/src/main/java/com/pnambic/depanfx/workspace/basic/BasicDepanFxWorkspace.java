@@ -227,9 +227,7 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
    */
   @Override
   public <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
-      DepanFxProjectDocument resourceDoc,
-      String expectedContent,
-      Map<?, ?> loadContext) {
+      DepanFxProjectDocument resourceDoc, String expectedContent) {
 
     // Check for a built in resource.
     if (getBuiltInProjectTree().equals(resourceDoc.getProject())) {
@@ -247,15 +245,14 @@ public class BasicDepanFxWorkspace implements DepanFxWorkspace {
       return Optional.of(result);
     }
     // Obtain the resource from the store.
-    return loadDocument(resourceDoc, expectedContent, loadContext);
+    return loadDocument(resourceDoc, expectedContent, Collections.emptyMap());
   }
 
   @Override
   public <T> Optional<DepanFxWorkspaceResource<T>> getWorkspaceResource(
-      DepanFxProjectDocument resourceDoc, Class<T> type,
-      Map<?, ?> context) {
+      DepanFxProjectDocument resourceDoc, Class<T> type) {
 
-    return getWorkspaceResource(resourceDoc, type.getName(), context);
+    return getWorkspaceResource(resourceDoc, type.getName());
   }
 
   @Override

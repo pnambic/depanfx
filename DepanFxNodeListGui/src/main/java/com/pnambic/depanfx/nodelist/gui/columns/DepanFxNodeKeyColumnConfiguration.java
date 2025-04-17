@@ -1,7 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableState;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeKeyColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
@@ -20,7 +19,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.Optional;
 
 import javafx.event.Event;
@@ -85,8 +83,7 @@ public class DepanFxNodeKeyColumnConfiguration {
     public Optional<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>> getNewColumn(
         Event event, DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxNodeListTableAdapter tableAdapter,
-        DepanFxNodeListTableState tableState) {
+        DepanFxNodeListTableAdapter tableAdapter) {
       DepanFxNodeKeyColumnData columnData =
           DepanFxNodeKeyColumn.buildInitialNodeKeyColumnData();
       DepanFxWorkspaceResource<DepanFxNodeKeyColumnData> columnRsrc =
@@ -113,7 +110,6 @@ public class DepanFxNodeKeyColumnConfiguration {
 
     @Override
     protected void runDialog(DepanFxDialogRunner dialogRunner,
-        Map<?, ?> loadContext,
         DepanFxWorkspaceResource<DepanFxNodeKeyColumnData> wkspRsrc) {
       DepanFxNodeKeyColumnToolDialog.runEditDialog(wkspRsrc, dialogRunner);
     }
