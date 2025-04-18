@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../../../../img/favicon.ico">
-        <title>Keyboard Commands - DepanFX User Documentation</title>
+        <title>Resource Kinds - DepanFX User Documentation</title>
         <link href="../../../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../../../css/brands.min.css" rel="stylesheet">
@@ -111,7 +111,7 @@
     <ul class="dropdown-menu">
             
 <li>
-    <a href="./" class="dropdown-item active" aria-current="page">Keyboard Commands</a>
+    <a href="../../../nodeview/keyboard_cmnds/KeyboardCommands/" class="dropdown-item">Keyboard Commands</a>
 </li>
     </ul>
   </li>
@@ -121,7 +121,7 @@
     <ul class="dropdown-menu">
             
 <li>
-    <a href="../../../resources/resource_kinds/ResourceKinds/" class="dropdown-item">Resource Kinds</a>
+    <a href="./" class="dropdown-item active" aria-current="page">Resource Kinds</a>
 </li>
     </ul>
   </li>
@@ -145,12 +145,12 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../../../../introduction/Summary/" class="nav-link">
+                                <a rel="prev" href="../../../nodeview/keyboard_cmnds/KeyboardCommands/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../../../resources/resource_kinds/ResourceKinds/" class="nav-link">
+                                <a rel="next" href="../../../../release_notes/v0.0.0-h/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -172,17 +172,21 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-bs-level="1"><a href="#node-view-panel-commands" class="nav-link">Node View Panel Commands</a>
+            <li class="nav-item" data-bs-level="1"><a href="#depanfx-resources" class="nav-link">DepanFX Resources</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#node-view-motion" class="nav-link">Node View Motion</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#keyboard-commands" class="nav-link">Keyboard Commands</a>
+            <li class="nav-item" data-bs-level="2"><a href="#graph-documents" class="nav-link">Graph Documents</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#mouse-commands" class="nav-link">Mouse Commands</a>
+            <li class="nav-item" data-bs-level="2"><a href="#node-list-panel-documents" class="nav-link">Node List Panel Documents</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#node-list-panel-documents_1" class="nav-link">Node List Panel Documents</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#graph-query-documents" class="nav-link">Graph Query Documents</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -193,187 +197,228 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="node-view-panel-commands">Node View Panel Commands</h1>
-<p>The node view panel provides a number of actions that may be triggered
-by user actions within the view rendering panel.</p>
-<h2 id="node-view-motion">Node View Motion</h2>
-<p>DepanFX provides a number of ways to change the view of node graph.
-Many of the view changing commands act on the viewpoint, or camera.
-The actions of these commands can be broken done into a number of categories.</p>
-<ul>
-<li>dolly: move the camera on the indicated direction,
-typically one of the three standard axes.</li>
-<li>rotate: rotate the camera on the indicated axis.</li>
-<li>forward: move the camera in the direction it is looking.</li>
-<li>reverse: move the camera in the away from the direction it is looking.</li>
-</ul>
-<p>Note that forward or reverse have effects that resemble zooming in or out.
-Zooming in changes the cameras field of view,
-effectively magnifying the included items.
-Moving forward brings the camera closer,
-which also magnifies the included items.</p>
-<h2 id="keyboard-commands">Keyboard Commands</h2>
-<p>The node view panel provides a number of keyboard commands.</p>
+<h1 id="depanfx-resources">DepanFX Resources</h1>
+<p>DepanFX uses many different tool and data types.
+This provides fine control over various organizational and presentation
+aspects of interesting graph features.</p>
+<p>Many of the resource types used by DepanFX are specific to a particular
+presentation panel, such as the Node List panel or the Node View panel.</p>
+<p>The following sections provide a list of the resource types used by DepanFX.</p>
+<h2 id="graph-documents">Graph Documents</h2>
+<p>Graph documents provide the source snapshot of a system to analyze.</p>
 <table>
 <thead>
 <tr>
-<th>Key</th>
-<th>Ctrl</th>
-<th>Action</th>
+<th>Type</th>
+<th>Ext</th>
+<th>Type</th>
+<th>Locations</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Home</td>
-<td>no</td>
-<td>home</td>
+<td>Graph</td>
+<td><code>dgi</code></td>
+<td>Graph</td>
+<td>Graphs/*</td>
 </tr>
 <tr>
-<td>Up</td>
-<td>no</td>
-<td>dolly y one unit positive</td>
-</tr>
-<tr>
-<td></td>
-<td>yes</td>
-<td>rotate about x 10° negative</td>
-</tr>
-<tr>
-<td>Down</td>
-<td>no</td>
-<td>dolly y one unit negative</td>
-</tr>
-<tr>
-<td></td>
-<td>yes</td>
-<td>rotate about x 10° positive</td>
-</tr>
-<tr>
-<td>Left</td>
-<td>no</td>
-<td>dolly x one unit positive</td>
-</tr>
-<tr>
-<td></td>
-<td>yes</td>
-<td>rotate about y 10° negative</td>
-</tr>
-<tr>
-<td>Right</td>
-<td>no</td>
-<td>dolly x one unit negative</td>
-</tr>
-<tr>
-<td></td>
-<td>yes</td>
-<td>rotate about y 10° positive</td>
-</tr>
-<tr>
-<td>Page Up</td>
-<td>no</td>
-<td>dolly z one unit positive</td>
-</tr>
-<tr>
-<td></td>
-<td>yes</td>
-<td>forward one unit</td>
-</tr>
-<tr>
-<td>Page Down</td>
-<td>no</td>
-<td>dolly z one unit negative</td>
-</tr>
-<tr>
-<td></td>
-<td>yes</td>
-<td>reverse one unit</td>
-</tr>
-<tr>
-<td>Plus ("+")</td>
-<td>no</td>
-<td>zoom in (90%)</td>
-</tr>
-<tr>
-<td>Minus ("-")</td>
-<td>no</td>
-<td>zoom out (110%)</td>
+<td>Git Repo</td>
+<td><code>dgrti</code></td>
+<td>Tool</td>
+<td>Tools/*</td>
 </tr>
 </tbody>
 </table>
-<h2 id="mouse-commands">Mouse Commands</h2>
+<h2 id="node-list-panel-documents">Node List Panel Documents</h2>
+<p>The Node List panel provides a tabular view of selected or interesting nodes
+from a graph.</p>
+<p>The Node List (<code>dnli</code>) content type is a selection of nodes from a graph.
+Node Lists provide the core abstraction for node selection.</p>
+<p>This view is the composition of several components:</p>
+<ul>
+<li>A sequence of section that each group and organize nodes.
+Sections often provide hiearachries for '</li>
+<li>A final flat section that captures remaining nodes.</li>
+<li>A sequence of columns that provide additional details about each displayed nodes.</li>
+</ul>
 <table>
 <thead>
 <tr>
-<th>Gesture</th>
-<th>Shift</th>
-<th>Ctrl</th>
-<th>Alt</th>
-<th>Action</th>
+<th>Type</th>
+<th>Ext</th>
+<th>Type</th>
+<th>Locations</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Mouse Drag</td>
-<td>no</td>
-<td>no</td>
-<td>no</td>
-<td>Dolly camera</td>
+<td>Node List</td>
+<td><code>dnli</code></td>
+<td>Analysis</td>
+<td>Analysis/**</td>
 </tr>
 <tr>
-<td>Mouse Drag</td>
-<td></td>
-<td></td>
-<td></td>
-<td>Move selection</td>
+<td>Category Column</td>
+<td><code>dccti</code></td>
+<td>Tool (column)</td>
+<td>Tools/Node List/Columns/*</td>
 </tr>
 <tr>
-<td>Mouse Drag</td>
-<td>yes</td>
-<td>no</td>
-<td>no</td>
-<td>Selection rectangle</td>
+<td>Focus Column</td>
+<td><code>dfcti</code></td>
+<td>Tool (column)</td>
+<td>Tools/Node List/Columns/*</td>
 </tr>
 <tr>
-<td>Mouse Click</td>
-<td>no</td>
-<td>no</td>
-<td>no</td>
-<td>Select node</td>
+<td>Node Key Column</td>
+<td><code>dnkcti</code></td>
+<td>Tool (column)</td>
+<td>Tools/Node List/Columns/*</td>
 </tr>
 <tr>
-<td>Mouse Click</td>
-<td>no</td>
-<td>yes</td>
-<td>no</td>
-<td>Add selected node</td>
+<td>Flat Section</td>
+<td><code>dfsti</code></td>
+<td>Tool (section)</td>
+<td>Tools/Node List/Sections/*</td>
 </tr>
 <tr>
-<td>Mouse Click</td>
-<td>no</td>
-<td>no</td>
-<td>yes</td>
-<td>Remove selected node</td>
+<td>Tree Section</td>
+<td><code>dtsti</code></td>
+<td>Tool (section)</td>
+<td>Tools/Node List/Sections/*</td>
 </tr>
 <tr>
-<td>Mouse Release</td>
-<td>X - drag option</td>
-<td>no</td>
-<td>no</td>
-<td>Select nodes</td>
+<td>Table View</td>
+<td><code>dtvti</code></td>
+<td>Tool (table)</td>
+<td>Tools/Node List/Table Views/*</td>
+</tr>
+</tbody>
+</table>
+<h2 id="node-list-panel-documents_1">Node List Panel Documents</h2>
+<p>The Node View panel provides a graphical view of the selected nodes.
+Each Node View panel corresponds to an Analysis document that
+encapsulates the rendering options.</p>
+<p>This view is the composition of several components.</p>
+<ul>
+<li>Directives for rendering displayed edges from the graph.</li>
+<li>Directions for rendering displayed nodes from the graph.</li>
+<li>View specific rendering directives and location for each node and edge.</li>
+</ul>
+<p>The Node View tool information document expands a Node List to include</p>
+<ul>
+<li>A reference to the default for edge display directives.</li>
+<li>A reference to the default for node display directives.</li>
+<li>Set of visible nodes.</li>
+<li>Each node's location.</li>
+<li>Node specific rendering directives.</li>
+<li>Edge specific rendering directives.</li>
+</ul>
+<p>The options for representation are configured
+ through their association documents.</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Ext</th>
+<th>Type</th>
+<th>Locations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Link/Edge Display</td>
+<td><code>dnvedi</code></td>
+<td>Tool (view)</td>
+<td>Analysis/*</td>
 </tr>
 <tr>
-<td>Mouse Release</td>
-<td>X - drag option</td>
-<td>yes</td>
-<td>no</td>
-<td>Add selected nodes</td>
+<td>Node Display</td>
+<td><code>dnvndi</code></td>
+<td>Tool (view)</td>
+<td>Tools/Node View/Edge Display/**</td>
 </tr>
 <tr>
-<td>Mouse Release</td>
-<td>X - drag option</td>
-<td>no</td>
-<td>yes</td>
-<td>Remove selected nodes</td>
+<td>Node View</td>
+<td><code>dnvi</code></td>
+<td>Tool (view)</td>
+<td>Tools/Node View/Node Display/**</td>
+</tr>
+<tr>
+<td>Radial Layout</td>
+<td><code>drlti</code></td>
+<td>Tool (layout)</td>
+<td>Tools/Node View/Layouts/*</td>
+</tr>
+<tr>
+<td>Shift Layout</td>
+<td><code>dslti</code></td>
+<td>Tool (layout)</td>
+<td>Tools/Node View/Layouts/*</td>
+</tr>
+<tr>
+<td>Tree Layout</td>
+<td><code>dtlti</code></td>
+<td>Tool (layout)</td>
+<td>Tools/Node View/Layouts/*</td>
+</tr>
+</tbody>
+</table>
+<h2 id="graph-query-documents">Graph Query Documents</h2>
+<p>The various graph query documents provide a variety of tools
+for selecting nodes and edges or traversing elements of the graph</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Ext</th>
+<th>Type</th>
+<th>Locations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Link Matcher Sequence</td>
+<td><code>dlmsti</code></td>
+<td>Tool (filter)</td>
+<td>Tools/Link Matchers/**</td>
+</tr>
+<tr>
+<td>List Filter</td>
+<td><code>dlfti</code></td>
+<td>Tool (filter)</td>
+<td>Tools/Link Matchers/**</td>
+</tr>
+<tr>
+<td>Matcher Filter</td>
+<td><code>dmfti</code></td>
+<td>Tool (filter)</td>
+<td>Tools/Link Matchers/**</td>
+</tr>
+<tr>
+<td>Filter Sequence</td>
+<td><code>dnfsti</code></td>
+<td>Tool (filter)</td>
+<td>Tools/Link Matchers/**</td>
+</tr>
+<tr>
+<td>Node Kind Filter</td>
+<td><code>dlfti</code></td>
+<td>Tool (filter)</td>
+<td>Tools/Link Matchers/**</td>
+</tr>
+<tr>
+<td>Reference Filter</td>
+<td><code>drfti</code></td>
+<td>Tool (filter)</td>
+<td>Tools/Link Matchers/**</td>
+</tr>
+<tr>
+<td>Sequence Filter</td>
+<td><code>dsfti</code></td>
+<td>Tool (filter)</td>
+<td>Tools/Link Matchers/**</td>
 </tr>
 </tbody>
 </table></div>
