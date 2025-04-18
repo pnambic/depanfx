@@ -218,7 +218,7 @@ public class DepanFxInfoColumn
       ReadOnlyObjectWrapper<String> result =
           new ReadOnlyObjectWrapper<>(toString(node));
       getInfoContribution().addInfoListener(
-          infoStore, node.getGraphNode(), null, 
+          infoStore, node.getGraphNode(), null,
           (n, i) -> result.setValue(getPropertyString(n)));
       return result;
     }

@@ -63,8 +63,6 @@ public class DepanFxInfoColumnToolDialog
   public static final String NEW_INFO_COLUMN_TITLE =
       "New Info Column";
 
-  @SuppressWarnings("unused") // Used in setter.
-  // private DepanFxNodeListTableAdapter tableAdapter;
   private final DepanFxInfoRegistry infoRegistry;
 
   @FXML
