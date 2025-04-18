@@ -94,9 +94,8 @@ public class ExportColumn {
 
     public void addNodeList(
         String columnLabel, String columnValue, DepanFxNodeList nodeList) {
-      ExportColumn column = new ExportColumn(columnLabel,
-          n -> nodeList.getNodes().contains(n) ? columnValue : "");
-      result.add(column);
+      addTransform(
+          columnLabel, n -> nodeList.getNodes().contains(n) ? columnValue : "");
     }
 
     public List<ExportColumn> build() {
@@ -149,8 +148,7 @@ public class ExportColumn {
     }
     if (column instanceof DepanFxInfoColumn infoCol) {
       String columnLabel = infoCol.getColumnData().getColumnLabel();
-      builder.addTransform(
-          columnLabel, n -> infoCol.getPropertyValue(n).toString());
+      builder.addTransform(columnLabel, n -> infoCol.toString(n));
     }
   }
 
