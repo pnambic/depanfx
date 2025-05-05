@@ -8,6 +8,9 @@
 bin
 build
 
+# mkdocs working area
+mkdocs/site
+
 # Log file
 *.log
 
