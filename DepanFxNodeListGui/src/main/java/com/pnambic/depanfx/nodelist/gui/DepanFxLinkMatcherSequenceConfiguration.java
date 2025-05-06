@@ -38,7 +38,7 @@ import javafx.scene.control.MenuItem;
 @Configuration
 public class DepanFxLinkMatcherSequenceConfiguration {
 
-  private static final String LINK_MATCHER_SEQUENCE = "Link Matcher Sequence";
+  public static final String LINK_MATCHER_SEQUENCE = "Link Matcher Sequence";
 
   public static final String EDIT_LINK_MATCHER_SEQUENCE_FILTER =
       "Edit Link Matcher Sequence...";
@@ -59,9 +59,7 @@ public class DepanFxLinkMatcherSequenceConfiguration {
       "Link matcher sequence.";
 
   @Bean
-  public  DepanFxResourceRegistry.Contribution
-      linkMatcherFileOpenContrib() {
-
+  public DepanFxResourceRegistry.Contribution linkMatcherFileOpenContrib() {
     return new LinkMatcherSequenceFileOpenContribution();
   }
 

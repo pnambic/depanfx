@@ -10,5 +10,6 @@ module depanfx.graph.info {
   opens com.pnambic.depanfx.graph.nodeinfo to spring.core;
 
   exports com.pnambic.depanfx.graph.info;
+  exports com.pnambic.depanfx.graph.nodeanno;
   exports com.pnambic.depanfx.graph.nodeinfo;
 }
