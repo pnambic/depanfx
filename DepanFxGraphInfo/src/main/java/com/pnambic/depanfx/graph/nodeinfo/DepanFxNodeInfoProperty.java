@@ -118,9 +118,7 @@ public class DepanFxNodeInfoProperty extends DepanFxBaseToolData {
   }
 
   public static DepanFxNodeInfoProperty buildInitialColumnData() {
-    return new DepanFxNodeInfoProperty(
-        NEW_PROPERTY_NAME, NEW_PROPERTY_DESCR,
-        PropertyKind.STRING, false);
+    return buildStringProperty(NEW_PROPERTY_NAME, NEW_PROPERTY_DESCR);
   }
 
   public static String formatPosition(double value) {
