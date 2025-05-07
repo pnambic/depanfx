@@ -18,8 +18,9 @@
 import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DepanFxAnnotationIndexData extends DepanFxBaseToolData {
@@ -29,7 +30,7 @@ public class DepanFxAnnotationIndexData extends DepanFxBaseToolData {
   public static class AnnotationSpecification {
 
     /**
-     * Value of the label use to identify the annotation specification
+     * Value of the label used to identify the annotation specification
      * for people.
      * */
     private final String annoLabel;
@@ -65,13 +66,13 @@ public class DepanFxAnnotationIndexData extends DepanFxBaseToolData {
     }
   }
 
-  private final Collection<AnnotationSpecification> annos;
+  private final List<AnnotationSpecification> annos;
 
   public DepanFxAnnotationIndexData(
       String toolName, String toolDescription,
       Collection<AnnotationSpecification> annos) {
     super(toolName, toolDescription);
-    this.annos = new ArrayList<>(annos);
+    this.annos = annos.stream().collect(Collectors.toList());
   }
 
   public Stream<AnnotationSpecification> streamAnnotations() {

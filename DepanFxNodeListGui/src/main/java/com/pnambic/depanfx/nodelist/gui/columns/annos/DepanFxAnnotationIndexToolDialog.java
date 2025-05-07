@@ -293,9 +293,7 @@ public class DepanFxAnnotationIndexToolDialog
 
     @Override
     public DepanFxInfoRegistry.Contribution fromString(String label) {
-      return infoRegistry.streamByLabel(label)
-          .findFirst()
-          .orElse(null);
+      return DepanFxInfoRegistry.fromLabel(infoRegistry, label);
     }
   }
 

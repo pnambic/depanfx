@@ -98,6 +98,16 @@ public interface DepanFxInfoRegistry {
         GraphNodeInfo.Listener listener);
   }
 
+  /**
+   * Discourage, but works for {@code StringConverter} compliance.
+   */
+  public static Contribution fromLabel(
+      DepanFxInfoRegistry infoRegistry, String label) {
+    return infoRegistry.streamByLabel(label)
+        .findFirst()
+        .orElse(null);
+  }
+
   public static abstract class Basic implements Contribution {
 
     private final String id;

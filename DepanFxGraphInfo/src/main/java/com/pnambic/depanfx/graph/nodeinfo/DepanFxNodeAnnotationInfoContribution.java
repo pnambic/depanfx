@@ -15,7 +15,6 @@
  */
 package com.pnambic.depanfx.graph.nodeinfo;
 
-import com.pnambic.depanfx.graph.context.ContextNodeId;
 import com.pnambic.depanfx.graph.info.GraphNodeInfo.Listener;
 import com.pnambic.depanfx.graph.model.GraphNode;
 
@@ -52,7 +51,7 @@ public class DepanFxNodeAnnotationInfoContribution
 
   public DepanFxNodeAnnotationInfoContribution() {
     super(
-        ContextNodeId.class.getName(),
+        String.class.getName(),
         ANNOTATION_INFO_LABEL,
         ANNOTATION_INFO_DESCR,
         String.class,

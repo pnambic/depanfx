@@ -62,6 +62,7 @@ application {
   applicationDefaultJvmArgs = [
     '-Xmx4G',
     '-Djava.awt.headless=false',
+    '--add-opens', 'java.base/java.util=ALL-UNNAMED',
     '--add-opens', 'javafx.graphics/com.sun.javafx.tk=ALL-UNNAMED',
     '--add-opens', 'javafx.graphics/javafx.stage=ALL-UNNAMED',
     '--add-opens', 'javafx.graphics/com.sun.javafx.tk.quantum=ALL-UNNAMED',
