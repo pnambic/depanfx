@@ -18,8 +18,6 @@ package com.pnambic.depanfx.nodelist.gui.columns.annos;
 import com.pnambic.depanfx.graph.nodeanno.DepanFxAnnotationIndexData;
 import com.pnambic.depanfx.graph.nodeanno.DepanFxAnnotationIndexData.AnnotationSpecification;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
-import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListData;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
@@ -66,8 +64,6 @@ import javafx.util.StringConverter;
 @FxmlView("annotation-index-tool-dialog.fxml")
 public class DepanFxAnnotationIndexToolDialog
     extends DepanFxBaseToolDialog<DepanFxAnnotationIndexData>{
-
-  public static final String SELECT_INFO = "Select Info";
 
   // Annotation definitions probably belong somewhere else
   public static final String ANNOTATIONS_TOOL_DIR = "Annotations";
@@ -264,19 +260,7 @@ public class DepanFxAnnotationIndexToolDialog
 
     @Override
     protected void populateContextMenu(DepanFxContextMenuBuilder builder) {
-      builder.appendActionItem(SELECT_INFO,
-          e -> runInfoChooser(getIndex()));
-    }
-
-    private void runInfoChooser(int index) {
-      DepanFxNodeListChooser.runNodeListChooser(
-          workspace, dialogRunner, getScene())
-      .ifPresent(r -> updateCellResource(index, r));
-    }
-
-    private void updateCellResource(
-        int cellIndex,
-        DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
+      // Nothing added
     }
   }
 

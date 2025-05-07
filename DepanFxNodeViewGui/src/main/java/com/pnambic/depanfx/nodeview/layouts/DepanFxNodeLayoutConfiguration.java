@@ -3,7 +3,6 @@ package com.pnambic.depanfx.nodeview.layouts;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewPanel;
-import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry.Contribution;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxRadialLayoutData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxTreeLayoutData;
@@ -29,25 +28,25 @@ public class DepanFxNodeLayoutConfiguration {
 
   public static final String GRID_LAYOUT = "Grid Layout";
 
-  public String RADIAL_LAYOUT_LABEL = "Radial Layout";
+  public static final String RADIAL_LAYOUT_LABEL = "Radial Layout";
 
-  public String RADIAL_LAYOUT_KEY = "Radial Layout";
+  public static final String RADIAL_LAYOUT_KEY = "Radial Layout";
 
-  public String TREE_LAYOUT_LABEL = "Tree Layout";
+  public static final String TREE_LAYOUT_LABEL = "Tree Layout";
 
-  public String TREE_LAYOUT_KEY = "Tree Layout";
+  public static final String TREE_LAYOUT_KEY = "Tree Layout";
 
   @Autowired
   public DepanFxNodeLayoutConfiguration() {
   }
 
   @Bean
-  public Contribution gridLayoutContribution() {
+  public DepanFxNodeLayoutRegistry.Contribution gridLayoutContribution() {
     return new GridLayoutContribution();
   }
 
   @Bean
-  public Contribution shuffleLayoutContribution() {
+  public DepanFxNodeLayoutRegistry.Contribution shuffleLayoutContribution() {
     return new ShuffleLayoutContribution();
   }
 
@@ -61,7 +60,8 @@ public class DepanFxNodeLayoutConfiguration {
     return new TreeLayoutResourceContribution();
   }
 
-  private static class GridLayoutContribution implements Contribution {
+  private static class GridLayoutContribution
+      implements DepanFxNodeLayoutRegistry.Contribution {
 
     @Override
     public String getLabel() {
@@ -98,7 +98,8 @@ public class DepanFxNodeLayoutConfiguration {
     }
   }
 
-  private static class ShuffleLayoutContribution implements Contribution {
+  private static class ShuffleLayoutContribution
+    implements DepanFxNodeLayoutRegistry.Contribution {
 
     @Override
     public String getLabel() {

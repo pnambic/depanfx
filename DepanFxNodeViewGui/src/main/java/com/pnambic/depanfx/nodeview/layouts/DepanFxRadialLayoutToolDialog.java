@@ -1,7 +1,6 @@
 package com.pnambic.depanfx.nodeview.layouts;
 
 import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser;
-import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser.LinkMatcherControl;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayoutData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxRadialLayoutData;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
@@ -44,7 +43,7 @@ public class DepanFxRadialLayoutToolDialog
   @FXML
   private TextField hierarchyMatcherRsrcField;
 
-  private LinkMatcherControl hierarchyMatcherControl;
+  private DepanFxLinkMatcherChooser.LinkMatcherControl hierarchyMatcherControl;
 
   @Autowired
   public DepanFxRadialLayoutToolDialog(

@@ -22,6 +22,8 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 public class DepanFxAnnotationStoreData extends DepanFxBaseToolData {
 
+  public static final String ANNOTATION_STORE_TOOL_EXT = "dasti";
+
   private final DepanFxWorkspaceResource<GraphDocument> graphDocRsrc;
 
   private final DepanFxWorkspaceResource<DepanFxAnnotationIndexData> annoIndexRsrc;
@@ -33,6 +35,13 @@ public class DepanFxAnnotationStoreData extends DepanFxBaseToolData {
     super(toolName, toolDescription);
     this.graphDocRsrc = graphDocRsrc;
     this.annoIndexRsrc = annoIndexRsrc;
+  }
+
+  public DepanFxAnnotationStoreData buildUpdate(
+      String toolName, String toolDescription,
+      DepanFxWorkspaceResource<DepanFxAnnotationIndexData> annoIndexRsrc) {
+    return new DepanFxAnnotationStoreData(
+        toolName, toolDescription, graphDocRsrc, annoIndexRsrc);
   }
 
   public GraphDocument getGraphDoc() {

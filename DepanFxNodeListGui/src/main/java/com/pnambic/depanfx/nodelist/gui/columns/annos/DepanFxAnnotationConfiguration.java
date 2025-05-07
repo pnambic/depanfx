@@ -16,10 +16,15 @@
 package com.pnambic.depanfx.nodelist.gui.columns.annos;
 
 import com.pnambic.depanfx.graph.nodeanno.DepanFxAnnotationIndexData;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
+import com.pnambic.depanfx.graph_doc.persistence.GraphDocPersistenceContribution;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxAnnotationStoreData;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceContribution;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,6 +46,12 @@ public class DepanFxAnnotationConfiguration {
   public DepanFxNewResourceContribution newAnnotationIndex(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
     return new NewAnnotationIndexContribution(workspace, dialogRunner);
+  }
+
+  @Bean
+  public DepanFxResourceRegistry.Contribution newAnnotationStore(
+      DepanFxWorkspace workspace) {
+    return new NodeInfoResourceContribution(workspace);
   }
 
   private class NewAnnotationIndexContribution
@@ -69,6 +80,39 @@ public class DepanFxAnnotationConfiguration {
               Collections.emptyList());
       DepanFxAnnotationIndexToolDialog.runCreateDialog(
           dialogRunner, workspace.addScratchResource(annoData));
+    }
+  }
+
+
+  private static class NodeInfoResourceContribution
+      extends DepanFxResourceRegistry.Additional<GraphDocument> {
+
+    private static final String CREATE_NODE_INFO_STORE_LABEL =
+        "Create Node Info Store...";
+
+    private static final String CREATE_NODE_INFO_STORE_LABEL_KEY =
+        "Node Info Store";
+
+    private final DepanFxWorkspace workspace;
+
+    public NodeInfoResourceContribution(DepanFxWorkspace workspace) {
+      super(
+          CREATE_NODE_INFO_STORE_LABEL,
+          GraphDocument.class,
+          GraphDocPersistenceContribution.EXTENSION,
+          CREATE_NODE_INFO_STORE_LABEL_KEY);
+      this.workspace = workspace;
+    }
+
+    @Override
+    protected void runDialog(DepanFxDialogRunner dialogRunner,
+        DepanFxWorkspaceResource<GraphDocument> wkspRsrc) {
+      DepanFxAnnotationStoreData newStore =
+          new DepanFxAnnotationStoreData(
+              "Node Info Store", "New node info store.",
+              wkspRsrc, null);
+      DepanFxAnnotationStoreToolDialog.runCreateDialog(
+          workspace, dialogRunner, workspace.addScratchResource(newStore));
     }
   }
 }
