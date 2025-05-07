@@ -39,6 +39,24 @@ public interface DepanFxNodeInfoStore extends DepanFxInfoRegistry.PropertyStore 
 
   void removeInfoListener(GraphNode graphNode, Listener listener);
 
+  public static Optional<?> getValue(
+      DepanFxInfoRegistry.PropertyStore store,
+      GraphNode node) {
+    if (store instanceof DepanFxNodeInfoStore infos) {
+      return infos.getInfoValue(node);
+    }
+    return Optional.empty();
+  }
+
+  public static void setInfoValue(
+      DepanFxInfoRegistry.PropertyStore store,
+      GraphNode node,
+      Object value) {
+    if (store instanceof DepanFxNodeInfoStore infos) {
+      infos.setInfoValue(node, value);
+    }
+  }
+
   public static void addListener(
       DepanFxInfoRegistry.PropertyStore store,
       GraphNode node,
