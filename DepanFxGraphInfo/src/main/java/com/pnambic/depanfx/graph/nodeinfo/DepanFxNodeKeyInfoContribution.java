@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.nodelist.gui.columns.infos;
+package com.pnambic.depanfx.graph.nodeinfo;
 
 import com.pnambic.depanfx.graph.context.ContextNodeId;
 import com.pnambic.depanfx.graph.context.GraphContextKeys;
 import com.pnambic.depanfx.graph.info.GraphNodeInfo.Listener;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
-import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
 
 import org.springframework.stereotype.Component;
 
@@ -74,9 +73,6 @@ public class DepanFxNodeKeyInfoContribution
           SIMPLE_NAME_PROPERTY, FULL_KEY_PROPERTY
   };
 
-  private static final DepanFxInfoColumnStore NODE_KEY_INFO__STORE =
-      new NodeKeyInfoStore();
-
   public DepanFxNodeKeyInfoContribution() {
     super(
         ContextNodeId.class.getName(),
@@ -117,8 +113,8 @@ public class DepanFxNodeKeyInfoContribution
   }
 
   @Override
-  public DepanFxInfoColumnStore getInfoStore(Object storeContainer) {
-    return NODE_KEY_INFO__STORE;
+  public DepanFxInfoRegistry.PropertyStore getInfoStore(Object storeContainer) {
+    return DepanFxInfoRegistry.NULL_STORE;
   }
 
   private static String toFullNodeId(GraphNode graphnode) {
@@ -147,34 +143,6 @@ public class DepanFxNodeKeyInfoContribution
 
     public String forNode(GraphNode graphNode) {
       return nodeTransform.apply(graphNode);
-    }
-  }
-
-  /**
-   * Necessary to pass type check in {@code DepanFxInfoColumn constructor}.
-   *
-   * Not used internally, since it just adds additional indirections.
-   */
-  private static class NodeKeyInfoStore implements DepanFxInfoColumnStore {
-
-    @Override
-    public Optional<?> getInfoValue(GraphNode graphNode) {
-      return Optional.of(graphNode);
-    }
-
-    @Override
-    public void setInfoValue(GraphNode graphNode, Object value) {
-      // Do nothing: Node key cannot changed.
-    }
-
-    @Override
-    public void addInfoListener(GraphNode graphNode, Listener listener) {
-      // Do nothing: Node key cannot changed.
-    }
-
-    @Override
-    public void removeInfoListener(GraphNode graphNode, Listener listener) {
-      // Do nothing: Node key cannot changed.
     }
   }
 }

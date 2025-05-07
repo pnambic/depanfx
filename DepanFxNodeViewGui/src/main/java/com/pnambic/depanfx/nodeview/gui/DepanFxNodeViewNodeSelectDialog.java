@@ -2,6 +2,7 @@ package com.pnambic.depanfx.nodeview.gui;
 
 import com.pnambic.depanfx.graph.info.GraphNodeInfo.Listener;
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoStore;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
@@ -9,7 +10,6 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableController;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
-import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxInfoColumnStore;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.perspective.DepanFxWorkspaceDialog;
@@ -164,7 +164,7 @@ public class DepanFxNodeViewNodeSelectDialog
     return builder.build();
   }
 
-  private static class PanelLocationStore implements DepanFxInfoColumnStore {
+  private static class PanelLocationStore implements DepanFxNodeInfoStore {
 
     private final DepanFxNodeViewPanel viewPanel;
 

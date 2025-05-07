@@ -1,11 +1,11 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoStore;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
-import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxInfoColumnStore;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
@@ -54,7 +54,7 @@ public class DepanFxNodeListTableController
   /**
    * Some keys might be classes, some keys might by instance-unique strings.
    */
-  private final Map<Object, DepanFxInfoColumnStore> infoProviders =
+  private final Map<Object, DepanFxNodeInfoStore> infoProviders =
       new HashMap<>();
 
   public DepanFxNodeListTableController(DepanFxWorkspace workspace,
@@ -113,17 +113,13 @@ public class DepanFxNodeListTableController
 
   @Override // DepanFxNodeListTableAdapter
   public void addInfoStore(
-      Object infoKey, DepanFxInfoColumnStore infoStore) {
+      Object infoKey, DepanFxNodeInfoStore infoStore) {
     infoProviders.put(infoKey, infoStore);
   }
 
   @Override // DepanFxNodeListTableAdapter
-  public Optional<DepanFxInfoColumnStore> getInfoStore(Object infoKey) {
-    DepanFxInfoColumnStore store = infoProviders.get(infoKey);
-    if (store != null) {
-      return Optional.of(store);
-    }
-    return Optional.empty();
+  public Optional<DepanFxNodeInfoStore> getInfoStore(Object infoKey) {
+    return Optional.ofNullable(infoProviders.get(infoKey));
   }
 
   public TreeTableView<DepanFxNodeListMember> getNodeListTable() {

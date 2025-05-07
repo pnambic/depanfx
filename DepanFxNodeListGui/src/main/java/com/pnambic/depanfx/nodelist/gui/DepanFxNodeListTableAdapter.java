@@ -16,11 +16,11 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoStore;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
-import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxInfoColumnStore;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
@@ -99,9 +99,9 @@ public interface DepanFxNodeListTableAdapter {
    *   is often the class.  For user types with multiple instances, the key
    *   is likely to be an instance-unique string.
    */
-  Optional<DepanFxInfoColumnStore> getInfoStore(Object infoKey);
+  Optional<DepanFxNodeInfoStore> getInfoStore(Object infoKey);
 
-  void addInfoStore(Object infoKey, DepanFxInfoColumnStore infoStore);
+  void addInfoStore(Object infoKey, DepanFxNodeInfoStore infoStore);
 
   // Section operations
 

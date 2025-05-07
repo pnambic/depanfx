@@ -61,7 +61,7 @@ public class DepanFxInfoColumn
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxInfoColumn.class);
 
-  private final DepanFxInfoColumnStore infoStore;
+  private final DepanFxInfoRegistry.PropertyStore infoStore;
 
   public DepanFxInfoColumn(
       DepanFxNodeListTableAdapter tableAdapter,
@@ -69,7 +69,7 @@ public class DepanFxInfoColumn
       DepanFxInfoRegistry.PropertyStore propStore) {
     super(tableAdapter, columnDataRsrc);
 
-    this.infoStore = upcastStore(propStore);
+    this.infoStore = propStore;
   }
 
   public static void addNewColumnAction(
@@ -186,19 +186,6 @@ public class DepanFxInfoColumn
     result.setCellValueFactory(p ->
         new ReadOnlyObjectWrapper<>(p.getValue().getValue()));
     return result;
-  }
-
-  private static DepanFxInfoColumnStore upcastStore(
-      DepanFxInfoRegistry.PropertyStore propStore) {
-
-    if (propStore instanceof DepanFxInfoColumnStore infoStore) {
-      return infoStore;
-    }
-    LOG.warn(
-        "Supplied property store of type {} "
-            + "is not suitable for an info column.",
-        propStore.getClass());
-    return null;
   }
 
   private static void openColumnCreate(

@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.nodelist.gui.columns.infos;
+package com.pnambic.depanfx.graph.nodeinfo;
 
 import com.pnambic.depanfx.graph.info.GraphNodeInfo.Listener;
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry.PropertyStore;
 
 import java.util.Optional;
 
@@ -27,7 +26,7 @@ import java.util.Optional;
  * Instances from derived types typically have an underlying info source
  * and an info key that further define the info retrieval results.
  */
-public interface DepanFxInfoColumnStore extends PropertyStore {
+public interface DepanFxNodeInfoStore extends DepanFxInfoRegistry.PropertyStore {
 
   Optional<?> getInfoValue(GraphNode graphNode);
 
@@ -39,4 +38,44 @@ public interface DepanFxInfoColumnStore extends PropertyStore {
   void addInfoListener(GraphNode graphNode, Listener listener);
 
   void removeInfoListener(GraphNode graphNode, Listener listener);
+
+  public static void addListener(
+      DepanFxInfoRegistry.PropertyStore store,
+      GraphNode node,
+      Listener listener) {
+    if (store instanceof DepanFxNodeInfoStore infos) {
+      infos.addInfoListener(node, listener);
+    }
+  }
+
+  public static void removeListener(
+      DepanFxInfoRegistry.PropertyStore store,
+      GraphNode node,
+      Listener listener) {
+    if (store instanceof DepanFxNodeInfoStore infos) {
+      infos.removeInfoListener(node, listener);
+    }
+  }
+
+  /**
+   * Starting point for read-only stores.
+   * An {@code getInfoValue(GraphNode)} implementation is still required.
+   */
+  public static abstract class AbstractReadOnly implements DepanFxNodeInfoStore {
+
+    @Override
+    public void setInfoValue(GraphNode graphNode, Object value) {
+      // Do nothing, nothing changes.
+    }
+
+    @Override
+    public void addInfoListener(GraphNode graphNode, Listener listener) {
+      // Do nothing, nothing changes.
+    }
+
+    @Override
+    public void removeInfoListener(GraphNode graphNode, Listener listener) {
+      // Do nothing, nothing changes.
+    }
+  }
 }
