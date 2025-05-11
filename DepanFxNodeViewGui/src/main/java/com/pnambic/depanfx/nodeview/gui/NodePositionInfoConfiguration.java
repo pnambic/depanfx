@@ -89,7 +89,7 @@ public class NodePositionInfoConfiguration {
 
   public static final Path NODE_POSITION_ANNOTATION_INDEX_PATH =
       DepanFxNodeInfoData.NODE_INFO_TOOL_PATH.resolve(
-          NODE_POSITION_ANNOTATION_SPEC_NAME);
+          NODE_POSITION_ANNOTATION_INDEX_NAME);
 
   protected static final String NODE_POSITION_STORE_NAME =
       "Node Position Store";
@@ -105,35 +105,35 @@ public class NodePositionInfoConfiguration {
   public DepanFxBuiltInContribution<DepanFxNodeInfoColumnData>
   xNodePositionInfoColumnData(NodePositionInfoContribution infoContrib) {
 
-    DepanFxNodeInfoColumnData xPosDoc = buildInfoColumn(
+    return buildNodePositionContrib(
+        NODE_VIEW_COLUMNS_PATH.resolve(X_POS_LABEL),
         X_POS_LABEL, X_POS_DESCR, infoContrib,
         NodePositionInfoContribution.X_POS_PROPERTY);
-    return createBuiltIn(NODE_VIEW_COLUMNS_PATH.resolve(X_POS_LABEL), xPosDoc);
   }
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeInfoColumnData>
   yNodePositionInfoColumnData(NodePositionInfoContribution infoContrib) {
 
-    DepanFxNodeInfoColumnData xPosDoc = buildInfoColumn(
+    return buildNodePositionContrib(
+        NODE_VIEW_COLUMNS_PATH.resolve(Y_POS_LABEL),
         Y_POS_LABEL, Y_POS_DESCR, infoContrib,
         NodePositionInfoContribution.Y_POS_PROPERTY);
-    return createBuiltIn(NODE_VIEW_COLUMNS_PATH.resolve(Y_POS_LABEL), xPosDoc);
   }
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeInfoColumnData>
   zNodePositionInfoColumnData(NodePositionInfoContribution infoContrib) {
 
-    DepanFxNodeInfoColumnData xPosDoc = buildInfoColumn(
+    return buildNodePositionContrib(
+        NODE_VIEW_COLUMNS_PATH.resolve(Z_POS_LABEL),
         Z_POS_LABEL, Z_POS_DESCR, infoContrib,
         NodePositionInfoContribution.Z_POS_PROPERTY);
-    return createBuiltIn(NODE_VIEW_COLUMNS_PATH.resolve(Z_POS_LABEL), xPosDoc);
   }
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
-  nodeViewLocationt( ) {
+  nodeViewLocation( ) {
     return new TableViewBuiltin(NODE_VIEW_LOCATION_TABLE_VIEW_PATH);
   }
 
@@ -175,18 +175,37 @@ public class NodePositionInfoConfiguration {
     };
   }
 
-  private DepanFxNodeInfoColumnData buildInfoColumn(
+  private DepanFxBuiltInContribution<DepanFxNodeInfoColumnData>
+  buildNodePositionContrib(
+      Path columnPath,
       String axisLabel, String axisDescr,
+      NodePositionInfoContribution infoContrib,
+      DepanFxNodeInfoProperty axisProperty) {
+
+    return new DepanFxBuiltInContribution.Dependent<DepanFxNodeInfoColumnData>(columnPath) {
+
+      @Override
+      protected DepanFxNodeInfoColumnData buildDocument(
+          DepanFxBuiltInProject project) {
+        DepanFxWorkspaceResource<DepanFxInfoStoreData> nodeIdStore =
+            getResource(project, NODE_POSITION_STORE_PATH);
+
+        return buildNodePositionColumn(
+            X_POS_LABEL, X_POS_DESCR,
+            nodeIdStore, infoContrib,
+            NodePositionInfoContribution.X_POS_PROPERTY);
+      }
+    };
+  }
+
+  private DepanFxNodeInfoColumnData buildNodePositionColumn(
+      String axisLabel, String axisDescr,
+      DepanFxWorkspaceResource<DepanFxInfoStoreData> infoStoreRsrc,
       NodePositionInfoContribution infoContrib,
       DepanFxNodeInfoProperty axisProperty) {
     return new DepanFxNodeInfoColumnData(
         axisLabel, axisDescr, axisLabel, 6,
-        infoContrib, axisProperty);
-  }
-
-  private DepanFxBuiltInContribution<DepanFxNodeInfoColumnData> createBuiltIn(
-      Path docPath, DepanFxNodeInfoColumnData infoDoc) {
-    return new DepanFxBuiltInContribution.Simple<>(docPath, infoDoc);
+        infoStoreRsrc, infoContrib, axisProperty);
   }
 
   private final class TableViewBuiltin extends

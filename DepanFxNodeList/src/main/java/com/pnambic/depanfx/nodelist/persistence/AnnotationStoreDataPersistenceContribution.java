@@ -17,6 +17,7 @@ package com.pnambic.depanfx.nodelist.persistence;
 
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxAnnotationStoreData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxInfoStoreData;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
 import com.pnambic.depanfx.persistence.plugins.GraphNodePersistencePluginRegistry;
@@ -29,7 +30,7 @@ public class AnnotationStoreDataPersistenceContribution
     implements DocumentPersistenceContribution {
 
   public static final String EXTENSION =
-      DepanFxAnnotationStoreData.ANNOTATION_STORE_TOOL_EXT;
+      DepanFxInfoStoreData.INFO_STORE_TOOL_EXT;
 
   public static final String ANNOTATION_STORE_INFO_TAG =
       "annotation-store-info";
@@ -66,6 +67,5 @@ public class AnnotationStoreDataPersistenceContribution
     builder.addAlias(ANNOTATION_STORE_INFO_TAG,
         DepanFxAnnotationStoreData.class);
     graphNodeRegistry.applyExtensions(builder, DepanFxWorkspaceResource.class);
-
   }
 }

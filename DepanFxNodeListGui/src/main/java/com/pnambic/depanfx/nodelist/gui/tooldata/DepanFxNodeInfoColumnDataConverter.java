@@ -94,6 +94,7 @@ public class DepanFxNodeInfoColumnDataConverter
         columnTransport.toolDescription,
         columnTransport.columnLabel,
         columnTransport.widthMs,
+        null, // info source
         optInfoKind.orElse(null),
         optInfoProperty.orElse(null));
   }

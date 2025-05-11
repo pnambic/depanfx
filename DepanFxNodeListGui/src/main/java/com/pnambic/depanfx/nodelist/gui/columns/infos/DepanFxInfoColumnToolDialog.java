@@ -19,6 +19,7 @@ import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry.Contribution;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxBaseColumnToolDialog;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxInfoStoreData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
@@ -39,6 +40,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.StringConverter;
@@ -63,7 +65,17 @@ public class DepanFxInfoColumnToolDialog
   public static final String NEW_INFO_COLUMN_TITLE =
       "New Info Column";
 
+  private final DepanFxDialogRunner dialogRunner;
+
   private final DepanFxInfoRegistry infoRegistry;
+
+  @FXML
+  private TextField infoStoreRsrcField;
+
+  @FXML
+  private Label infoStoreDescrLabel;
+
+  private DepanFxInfoStoreChooser infoStoreControl;
 
   @FXML
   private ComboBox<DepanFxInfoRegistry.Contribution> infoChoiceField;
@@ -82,8 +94,11 @@ public class DepanFxInfoColumnToolDialog
 
   @Autowired
   public DepanFxInfoColumnToolDialog(
-      DepanFxWorkspace workspace, DepanFxInfoRegistry infoRegistry) {
+      DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner,
+      DepanFxInfoRegistry infoRegistry) {
     super(workspace, DepanFxNodeInfoColumnData.class);
+    this.dialogRunner = dialogRunner;
     this.infoRegistry = infoRegistry;
   }
 
@@ -111,19 +126,19 @@ public class DepanFxInfoColumnToolDialog
 
   @FXML
   public void initialize() {
+    infoStoreControl = new DepanFxInfoStoreChooser(
+        workspace, dialogRunner, infoStoreRsrcField);
+    infoStoreRsrcField.textProperty().addListener(
+        (obs, old, upd) -> updateInfoSourceDetails(upd));
+
     infoChoiceField.setConverter(new ContributionConverter(infoRegistry));
     infoChoiceField.valueProperty().addListener(
         (obs, old, upd) -> updateInfoDetails(upd));
 
-    ObservableList<DepanFxInfoRegistry.Contribution> infoItems =
-        infoChoiceField.getItems();
-    infoRegistry.streamContributions()
-        .forEach(infoItems::add);
-
-    updateChoiceFields();
-
     propertyChoiceField.valueProperty().addListener(
         (obs, old, upd) -> updatePropertyDetails(upd));
+
+    updateInfoSourceFields();
   }
 
   @Override
@@ -131,7 +146,12 @@ public class DepanFxInfoColumnToolDialog
       DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnRsrc) {
     super.setToolResource(columnRsrc);
 
-    updateChoiceFields();
+    updateInfoSourceFields();
+  }
+
+  @FXML
+  public void handleBrowseInfoStore() {
+    infoStoreControl.runInfoStoreFinder();
   }
 
   public static void setNodeKeyColumnTooldataFilters(FileChooser result) {
@@ -144,13 +164,12 @@ public class DepanFxInfoColumnToolDialog
 
   @Override
   protected DepanFxNodeInfoColumnData prepareResult() {
-    DepanFxInfoRegistry.Contribution info = infoChoiceField.getValue();
-    DepanFxNodeInfoProperty property = propertyChoiceField.getValue();
-
     return new DepanFxNodeInfoColumnData(
         getToolName(), getToolDescription(),
         getColumnLabel(), getColumnWidthMs(),
-        info, property);
+        infoStoreControl.getStoreResource(),
+        infoChoiceField.getValue(),
+        propertyChoiceField.getValue());
   }
 
   @Override
@@ -170,13 +189,49 @@ public class DepanFxInfoColumnToolDialog
     return  "Infos Column Save Confirmation Error";
   }
 
-  private void updateChoiceFields() {
+  private void updateInfoSourceFields() {
     getToolResource()
         .map(r -> r.getResource())
         .ifPresent(i -> {
+          infoStoreControl.setInfoStoreResource(i.getInfoSourceResource());
           infoChoiceField.setValue(i.getInfoContribution());
           propertyChoiceField.setValue(i.getInfoProperty());
         });
+  }
+
+  private void updateInfoSourceDetails(String upd) {
+    DepanFxWorkspaceResource<DepanFxInfoStoreData> infoStoreRsrc =
+        infoStoreControl.getStoreResource();
+    if (infoStoreRsrc != null) {
+      DepanFxInfoStoreData infoStore = infoStoreRsrc.getResource();
+      infoStoreDescrLabel.setText(infoStore.getToolDescription());
+      updateInfoChoices(infoStore);
+      return;
+    }
+
+    infoStoreDescrLabel.setText(null);
+    infoChoiceField.getItems().clear();
+  }
+
+  private void updateInfoDetails(DepanFxInfoRegistry.Contribution updContrib) {
+    if (updContrib != null) {
+      infoDescrLabel.setText(updContrib.getInfoDescription());
+      infoDescrLabel.setText(updContrib.getInfoDescription());
+      updatePropertyChoices(updContrib);
+      return;
+    }
+    infoDescrLabel.setText(null);
+    propertyChoiceField.getItems().clear();
+  }
+
+  private void updateInfoChoices(DepanFxInfoStoreData infoStore) {
+    ObservableList<Contribution> infoItems =
+        infoChoiceField.getItems();
+
+    infoItems.clear();
+    infoStore.getAnnotationIndex().streamAnnotations()
+        .map(a -> a.getAnnotationInfo())
+        .forEach(infoItems::add);
   }
 
   private void updatePropertyDetails(DepanFxNodeInfoProperty infoProp) {
@@ -189,16 +244,9 @@ public class DepanFxInfoColumnToolDialog
     propertyDescrLabel.setText(null);
   }
 
-  private void updateInfoDetails(DepanFxInfoRegistry.Contribution updContrib) {
-    if (updContrib == null) {
-      infoDescrLabel.setText(null);
-      propertyChoiceField.getItems().clear();
-      return;
-    }
-
-    infoDescrLabel.setText(updContrib.getInfoDescription());
-
+  private void updatePropertyChoices(Contribution updContrib) {
     propertyChoiceField.setConverter(new PropertyConverter(updContrib));
+
     ObservableList<DepanFxNodeInfoProperty> propertyItems =
         propertyChoiceField.getItems();
     propertyItems.clear();

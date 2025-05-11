@@ -17,8 +17,13 @@ package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeKeyInfoContribution;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxAnnotationStoreDataConfiguration;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxInfoStoreData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
+import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution.Dependent;
+import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -77,60 +82,84 @@ public class DepanFxNodeKeyColumnBuiltIns {
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeInfoColumnData> modelKeyColumn(
       DepanFxNodeKeyInfoContribution infoContrib) {
-    DepanFxNodeInfoColumnData toolData = buildInfoColumn(
-        MODEL_KEY_COLUMN_LABEL, infoContrib,
-        DepanFxNodeKeyInfoContribution.GRAPH_MODEL_PROPERTY,
+
+    return buildNodeKeyContrib(
+        infoContrib,
+        MODEL_KEY_COLUMN_TOOL_PATH,
+        MODEL_KEY_COLUMN_LABEL,
         MODEL_KEY_COLUMN_WIDTH);
-    return new DepanFxBuiltInContribution.Simple<>(
-        MODEL_KEY_COLUMN_TOOL_PATH, toolData);
   }
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeInfoColumnData> kindKeyColumn(
       DepanFxNodeKeyInfoContribution infoContrib) {
-    DepanFxNodeInfoColumnData toolData = buildInfoColumn(
-        KIND_KEY_COLUMN_LABEL, infoContrib,
-        DepanFxNodeKeyInfoContribution.NODE_KIND_PROPERTY,
+
+    return buildNodeKeyContrib(
+        infoContrib,
+        KIND_KEY_COLUMN_TOOL_PATH,
+        KIND_KEY_COLUMN_LABEL,
         KIND_KEY_COLUMN_WIDTH);
-    return new DepanFxBuiltInContribution.Simple<>(
-        KIND_KEY_COLUMN_TOOL_PATH, toolData);
   }
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeInfoColumnData> nodeKeyColumn(
       DepanFxNodeKeyInfoContribution infoContrib) {
-    DepanFxNodeInfoColumnData toolData = buildInfoColumn(
-        NODE_KEY_COLUMN_LABEL, infoContrib,
-        DepanFxNodeKeyInfoContribution.NODE_KEY_PROPERTY,
+
+    return buildNodeKeyContrib(
+        infoContrib,
+        NODE_KEY_COLUMN_TOOL_PATH,
+        NODE_KEY_COLUMN_LABEL,
         NODE_KEY_COLUMN_WIDTH);
-    return new DepanFxBuiltInContribution.Simple<>(
-        NODE_KEY_COLUMN_TOOL_PATH, toolData);
   }
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeInfoColumnData> simpleNameColumn(
       DepanFxNodeKeyInfoContribution infoContrib) {
-    DepanFxNodeInfoColumnData toolData = buildInfoColumn(
-        SIMPLE_NAME_COLUMN_LABEL, infoContrib,
-        DepanFxNodeKeyInfoContribution.SIMPLE_NAME_PROPERTY,
+
+    return buildNodeKeyContrib(
+        infoContrib,
+        SIMPLE_NAME_COLUMN_TOOL_PATH,
+        SIMPLE_NAME_COLUMN_LABEL,
         SIMPLE_NAME_COLUMN_WIDTH);
-    return new DepanFxBuiltInContribution.Simple<>(
-        SIMPLE_NAME_COLUMN_TOOL_PATH, toolData);
   }
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeInfoColumnData> fullKeyColumn(
       DepanFxNodeKeyInfoContribution infoContrib) {
-    DepanFxNodeInfoColumnData toolData = buildInfoColumn(
-        FULL_KEY_COLUMN_LABEL, infoContrib,
-        DepanFxNodeKeyInfoContribution.FULL_KEY_PROPERTY,
+
+    return buildNodeKeyContrib(
+        infoContrib,
+        FULL_KEY_COLUMN_TOOL_PATH,
+        FULL_KEY_COLUMN_LABEL,
         FULL_KEY_COLUMN_WIDTH);
-    return new DepanFxBuiltInContribution.Simple<>(
-        FULL_KEY_COLUMN_TOOL_PATH, toolData);
+  }
+
+  private Dependent<DepanFxNodeInfoColumnData> buildNodeKeyContrib(
+      DepanFxNodeKeyInfoContribution infoContrib,
+      Path toolPath, String columnLabel, int ColumnWidth) {
+
+    return new DepanFxBuiltInContribution.Dependent<DepanFxNodeInfoColumnData>(
+        toolPath) {
+
+      @Override
+      protected DepanFxNodeInfoColumnData buildDocument(
+          DepanFxBuiltInProject project) {
+        DepanFxWorkspaceResource<DepanFxInfoStoreData> nodeIdStore =
+            getResource(
+                project,
+                DepanFxAnnotationStoreDataConfiguration.NODE_ID_STORE_PATH);
+
+        return buildInfoColumn(
+            columnLabel, nodeIdStore, infoContrib,
+            DepanFxNodeKeyInfoContribution.GRAPH_MODEL_PROPERTY,
+            MODEL_KEY_COLUMN_WIDTH);
+      }
+    };
   }
 
   private DepanFxNodeInfoColumnData buildInfoColumn(
       String keyLabel,
+      DepanFxWorkspaceResource<DepanFxInfoStoreData> infoStoreRsrc,
       DepanFxNodeKeyInfoContribution infoContrib,
       DepanFxNodeInfoProperty infoProperty,
       int columnWidth) {
@@ -138,7 +167,7 @@ public class DepanFxNodeKeyColumnBuiltIns {
     String columnDescr = fmtNodeKeyDescr(keyLabel);
     return new DepanFxNodeInfoColumnData(
         columnName, columnDescr, keyLabel, columnWidth,
-        infoContrib, infoProperty);
+        infoStoreRsrc, infoContrib, infoProperty);
   }
 
   private String fmtNodeKeyName(String keyLabel) {

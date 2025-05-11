@@ -230,7 +230,9 @@ public class DepanFxInfoColumn
     return new DepanFxNodeInfoColumnData(
         columnData.getToolName(), columnData.getToolDescription(),
         columnData.getColumnLabel(), widthMs,
-        columnData.getInfoContribution(), columnData.getInfoProperty());
+        columnData.getInfoSourceResource(),
+        columnData.getInfoContribution(),
+        columnData.getInfoProperty());
   }
 
   private void openColumnChooser(DepanFxDialogRunner dialogRunner) {

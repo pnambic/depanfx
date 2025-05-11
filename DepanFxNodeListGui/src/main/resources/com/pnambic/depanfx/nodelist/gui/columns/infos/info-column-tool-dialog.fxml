@@ -33,19 +33,32 @@
                   prefWidth="40" alignment="BASELINE_RIGHT"/>
          </HBox>
 
+         <Label text="Info Source"/>
+
+         <HBox spacing="10">
+            <Label text="Source"/>
+            <TextField fx:id="infoStoreRsrcField" editable="true"
+                  promptText="Select info source"
+                  HBox.hgrow="ALWAYS"/>
+            <Button text="Browse..." onAction="#handleBrowseInfoStore"/>
+         </HBox>
+
+         <Label fx:id="infoStoreDescrLabel" HBox.hgrow="ALWAYS"/>
+
          <Label text="Info Selection"/>
 
          <HBox spacing="10">
             <Label text="Info"/>
-            <ComboBox fx:id="infoChoiceField" promptText="Select"/>
-            <Label fx:id="infoDescrLabel" HBox.hgrow="ALWAYS"/>
+            <ComboBox fx:id="infoChoiceField" promptText="Select info "/>
          </HBox>
+
+          <Label fx:id="infoDescrLabel" HBox.hgrow="ALWAYS"/>
 
          <Label text="Property Selection"/>
 
          <HBox spacing="10">
             <Label text="Property"/>
-            <ComboBox fx:id="propertyChoiceField" promptText="Select"/>
+            <ComboBox fx:id="propertyChoiceField" promptText="Select info property"/>
             <Label fx:id="propertyDetailsLabel" HBox.hgrow="ALWAYS"/>
          </HBox>
 

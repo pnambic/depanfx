@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.nodelist.persistence;
+package com.pnambic.depanfx.nodelist.tooldata;
 
 import com.pnambic.depanfx.graph.nodeanno.DepanFxAnnotationIndexData;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeKeyInfoContribution;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxInfoStoreData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeInfoData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
@@ -31,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
-public class AnnotationStoreDataConfiguration {
+public class DepanFxAnnotationStoreDataConfiguration {
 
   private static final String NODE_ID_ANNOTATION_SPEC_NAME = "Node Id properties";
 

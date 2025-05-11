@@ -18,6 +18,8 @@ package com.pnambic.depanfx.nodelist.gui.columns.infos;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxInfoStoreData;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.util.stream.Stream;
 
@@ -33,16 +35,29 @@ public class DepanFxNodeInfoColumnData extends DepanFxBaseColumnData {
 
   public static final String NODE_INFO_COLUMN_TOOL_EXT = "dnicti";
 
+  /**
+   * Where the obtain the info.
+   */
+  private final DepanFxWorkspaceResource<DepanFxInfoStoreData> infoStoreRsrc;
+
+  /**
+   * What info to obtain.
+   */
   private final DepanFxInfoRegistry.Contribution infoContribution;
 
+  /**
+   * What piece of info to use and how to present it.
+   */
   private final DepanFxNodeInfoProperty infoProperty;
 
   public DepanFxNodeInfoColumnData(
       String toolName, String toolDescription,
       String columnLabel, int widthMs,
+      DepanFxWorkspaceResource<DepanFxInfoStoreData> infoStoreRsrc,
       DepanFxInfoRegistry.Contribution infoContribution,
       DepanFxNodeInfoProperty infoProperty) {
     super(toolName, toolDescription, columnLabel, widthMs);
+    this.infoStoreRsrc = infoStoreRsrc;
     this.infoContribution = infoContribution;
     this.infoProperty = infoProperty;
   }
@@ -51,7 +66,11 @@ public class DepanFxNodeInfoColumnData extends DepanFxBaseColumnData {
     return new DepanFxNodeInfoColumnData(
         NEW_INFO_COLUMN_NAME, NEW_INFO_COLUMN_DESCR,
         NEW_INFO_COLUMN_LABEL, COLUMN_WIDTH_MS,
-        null, null);
+        null, null, null);
+  }
+
+  public DepanFxWorkspaceResource<DepanFxInfoStoreData> getInfoSourceResource() {
+    return infoStoreRsrc;
   }
 
   public DepanFxInfoRegistry.Contribution getInfoContribution() {

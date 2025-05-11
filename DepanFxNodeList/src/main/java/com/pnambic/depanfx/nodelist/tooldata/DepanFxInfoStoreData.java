@@ -24,7 +24,7 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
  */
 public class DepanFxInfoStoreData extends DepanFxBaseToolData {
 
-  public static final String ANNOTATION_STORE_TOOL_EXT = "disti";
+  public static final String INFO_STORE_TOOL_EXT = "disti";
 
   protected final DepanFxWorkspaceResource<DepanFxAnnotationIndexData> annoIndexRsrc;
 
@@ -32,6 +32,11 @@ public class DepanFxInfoStoreData extends DepanFxBaseToolData {
       DepanFxWorkspaceResource<DepanFxAnnotationIndexData> annoIndexRsrc) {
     super(toolName, toolDescription);
     this.annoIndexRsrc = annoIndexRsrc;
+  }
+
+  public DepanFxWorkspaceResource<DepanFxAnnotationIndexData>
+  getAnnotationResource() {
+    return annoIndexRsrc;
   }
 
   public DepanFxAnnotationIndexData getAnnotationIndex() {

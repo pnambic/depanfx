@@ -18,6 +18,7 @@ package com.pnambic.depanfx.nodelist.gui.columns.annos;
 import com.pnambic.depanfx.graph.nodeanno.DepanFxAnnotationIndexData;
 import com.pnambic.depanfx.nodelist.gui.columns.annos.DepanFxAnnotationIndexChooser.AnnotationIndexControl;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxAnnotationStoreData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxInfoStoreData;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -47,8 +48,7 @@ public class DepanFxAnnotationStoreToolDialog
 
   public static final ExtensionFilter ANNOTATION_STORE_FILTER =
       DepanFxSceneControls.buildExtFilter(
-          "Annotation Store",
-          DepanFxAnnotationStoreData.ANNOTATION_STORE_TOOL_EXT);
+          "Annotation Store", DepanFxInfoStoreData.INFO_STORE_TOOL_EXT);
 
   private final DepanFxDialogRunner dialogRunner;
 
@@ -92,14 +92,19 @@ public class DepanFxAnnotationStoreToolDialog
       DepanFxWorkspaceResource<DepanFxAnnotationStoreData> toolRsrc) {
     super.setToolResource(toolRsrc);
 
+    DepanFxAnnotationStoreData annoStore = toolRsrc.getResource();
     annotationStoreDetailsLabel.setText(
         MessageFormat.format(
-            "Node info for graph {0}.",
-            toolRsrc.getDocument().getMemberName()));
+            "Node info for graph {0}. {1}",
+            annoStore.getGraphDoc().getGraphName(),
+            annoStore.getGraphDoc().getGraphDescription()));
+
+    annotationIndexControl.setAnnotationIndexRsrc(
+        annoStore.getAnnotationResource());
   }
 
   @FXML
-  private void handleBrowseAnnotationIndex() {
+  public void handleBrowseAnnotationIndex() {
     annotationIndexControl.runAnnotationIndexFinder();
   }
 
@@ -124,7 +129,7 @@ public class DepanFxAnnotationStoreToolDialog
   @Override
   protected File buildInitialDestinationFile() {
     return buildToolInitialDestination(
-        DepanFxAnnotationStoreData.ANNOTATION_STORE_TOOL_EXT,
+        DepanFxInfoStoreData.INFO_STORE_TOOL_EXT,
         DepanFxAnnotationIndexToolDialog.ANNOTATION_TOOL_PATH);
   }
 

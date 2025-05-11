@@ -19,6 +19,7 @@ import com.pnambic.depanfx.graph.nodeanno.DepanFxAnnotationIndexData;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.graph_doc.persistence.GraphDocPersistenceContribution;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxAnnotationStoreData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxInfoStoreData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -42,6 +43,15 @@ public class DepanFxAnnotationConfiguration {
   public static final String ANNOTATION_INDEX_TOOL_DESCR =
       "Index of annotation keys to their infos.";
 
+  private static final String ANNOTATION_STORE_TOOL_NAME =
+      "Node Info Store";
+
+  public static final String ANNOTATION_STORE_TOOL_DESCR =
+      "Store of info about nodes.";
+
+  /////////////////////////////////////
+  // Annotation Index Beans
+
   @Bean
   public DepanFxNewResourceContribution newAnnotationIndex(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
@@ -49,10 +59,28 @@ public class DepanFxAnnotationConfiguration {
   }
 
   @Bean
+  public DepanFxResourceRegistry.Contribution
+  annotationIndexFileOpenContribution() {
+    return new AnnotationIndexFileOpenContribution();
+  }
+
+  /////////////////////////////////////
+  // Info Index Beans
+
+  @Bean
   public DepanFxResourceRegistry.Contribution newAnnotationStore(
       DepanFxWorkspace workspace) {
     return new NodeInfoResourceContribution(workspace);
   }
+
+  @Bean
+  public DepanFxResourceRegistry.Contribution
+  annotationStoreFileOpenContribution(DepanFxWorkspace workspace) {
+    return new InfoStoreFileOpenContribution(workspace);
+  }
+
+  /////////////////////////////////////
+  // Class definitions
 
   private class NewAnnotationIndexContribution
     implements DepanFxNewResourceContribution {
@@ -83,6 +111,25 @@ public class DepanFxAnnotationConfiguration {
     }
   }
 
+  private static class AnnotationIndexFileOpenContribution
+      extends DepanFxResourceRegistry.Principal<DepanFxAnnotationIndexData> {
+
+    public AnnotationIndexFileOpenContribution() {
+      super(
+          ANNOTATION_INDEX_TOOL_NAME,
+          DepanFxAnnotationIndexData.class,
+          DepanFxAnnotationIndexData.ANNOTATION_INDEX_TOOL_EXT,
+          ANNOTATION_INDEX_TOOL_NAME);
+    }
+
+    @Override
+    protected void runDialog(
+        DepanFxDialogRunner dialogRunner,
+        DepanFxWorkspaceResource<DepanFxAnnotationIndexData> annoIndexRsrc) {
+      DepanFxAnnotationIndexToolDialog.runCreateDialog(
+          dialogRunner, annoIndexRsrc);
+    }
+  }
 
   private static class NodeInfoResourceContribution
       extends DepanFxResourceRegistry.Additional<GraphDocument> {
@@ -105,14 +152,39 @@ public class DepanFxAnnotationConfiguration {
     }
 
     @Override
-    protected void runDialog(DepanFxDialogRunner dialogRunner,
+    protected void runDialog(
+        DepanFxDialogRunner dialogRunner,
         DepanFxWorkspaceResource<GraphDocument> wkspRsrc) {
       DepanFxAnnotationStoreData newStore =
           new DepanFxAnnotationStoreData(
-              "Node Info Store", "New node info store.",
+              ANNOTATION_STORE_TOOL_NAME,
+              ANNOTATION_STORE_TOOL_DESCR,
               wkspRsrc, null);
       DepanFxAnnotationStoreToolDialog.runCreateDialog(
           workspace, dialogRunner, workspace.addScratchResource(newStore));
+    }
+  }
+
+  private static class InfoStoreFileOpenContribution
+      extends DepanFxResourceRegistry.Principal<DepanFxAnnotationStoreData> {
+
+    private final DepanFxWorkspace workspace;
+
+    public InfoStoreFileOpenContribution(DepanFxWorkspace workspace) {
+      super(
+          ANNOTATION_STORE_TOOL_NAME,
+          DepanFxAnnotationStoreData.class,
+          DepanFxInfoStoreData.INFO_STORE_TOOL_EXT,
+          ANNOTATION_STORE_TOOL_NAME);
+      this.workspace = workspace;
+    }
+
+    @Override
+    protected void runDialog(
+        DepanFxDialogRunner dialogRunner,
+        DepanFxWorkspaceResource<DepanFxAnnotationStoreData> infoStoreRsrc) {
+      DepanFxAnnotationStoreToolDialog.runCreateDialog(
+            workspace, dialogRunner, infoStoreRsrc);
     }
   }
 }

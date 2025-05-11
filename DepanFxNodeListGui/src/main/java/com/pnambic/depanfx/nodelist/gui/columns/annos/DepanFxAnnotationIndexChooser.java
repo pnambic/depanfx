@@ -53,10 +53,10 @@ public class DepanFxAnnotationIndexChooser {
 
     private final DepanFxDialogRunner dialogRunner;
 
+    private final TextField annoIndexField;
+
     private DepanFxWorkspaceResource<DepanFxAnnotationIndexData>
         annoIndexRsrc;
-
-    private final TextField annoIndexField;
 
     public AnnotationIndexControl(
         DepanFxWorkspace workspace,
@@ -82,7 +82,7 @@ public class DepanFxAnnotationIndexChooser {
 
     public String getAnnotationIndexRsrcName() {
       if (annoIndexRsrc != null) {
-        return annoIndexRsrc.getDocument().getMemberPath().toString();
+        return DepanFxProjects.getDocumentLabel(annoIndexRsrc.getDocument());
       }
       // Let the text input field show a prompt text.
       return null;
