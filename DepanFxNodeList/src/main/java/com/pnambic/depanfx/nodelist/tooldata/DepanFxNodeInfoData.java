@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 The Depan Project Authors
+ * Copyright 2025 The Depan Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,12 @@ import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 import java.nio.file.Path;
 
 /**
- * Common data and paths for node list section tool data.
- *
- * Possibly provide sharable field validation methods in the future.
+ * Common data and paths for node info tool data.
  */
-public class DepanFxNodeListData {
+public class DepanFxNodeInfoData {
 
-  public static final String NODE_LIST_DIR = "Node Lists";
+  public static final String NODE_INFO_DIR = "Node Infos";
 
-  public static final Path NODE_LIST_TOOL_PATH =
-      DepanFxProjects.TOOLS_PATH.resolve(NODE_LIST_DIR);
+  public static final Path NODE_INFO_TOOL_PATH =
+      DepanFxProjects.TOOLS_PATH.resolve(NODE_INFO_DIR);
 }

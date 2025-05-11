@@ -15,12 +15,15 @@
  */
 package com.pnambic.depanfx.nodeview.gui;
 
+import com.pnambic.depanfx.graph.nodeanno.DepanFxAnnotationIndexData;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
 import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeInfoColumnData;
 import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeKeyColumnBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSectionBuiltIns;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxInfoStoreData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeInfoData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -72,6 +75,32 @@ public class NodePositionInfoConfiguration {
   public static final Path Z_POS_COLUMNS_PATH =
       NODE_VIEW_COLUMNS_PATH.resolve(Z_POS_LABEL);
 
+  private static final String NODE_POSITION_ANNOTATION_SPEC_NAME =
+      "Node Position Properties";
+
+  private static final String NODE_POSITION_ANNOTATION_SPEC_DESCR =
+      "Node position properties.";
+
+  private static final String NODE_POSITION_ANNOTATION_INDEX_NAME =
+      "Node Position Info";
+
+  private static final String NODE_POSITION_ANNOTATION_INDEX_DESCR =
+      "Node position info.";
+
+  public static final Path NODE_POSITION_ANNOTATION_INDEX_PATH =
+      DepanFxNodeInfoData.NODE_INFO_TOOL_PATH.resolve(
+          NODE_POSITION_ANNOTATION_SPEC_NAME);
+
+  protected static final String NODE_POSITION_STORE_NAME =
+      "Node Position Store";
+
+  protected static final String NODE_POSITION_STORE_DESCR =
+      "Node position store.";
+
+  public static final Path NODE_POSITION_STORE_PATH =
+      DepanFxNodeInfoData.NODE_INFO_TOOL_PATH.resolve(
+          NODE_POSITION_STORE_NAME);
+
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeInfoColumnData>
   xNodePositionInfoColumnData(NodePositionInfoContribution infoContrib) {
@@ -106,6 +135,44 @@ public class NodePositionInfoConfiguration {
   public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
   nodeViewLocationt( ) {
     return new TableViewBuiltin(NODE_VIEW_LOCATION_TABLE_VIEW_PATH);
+  }
+
+  @Bean DepanFxBuiltInContribution<DepanFxAnnotationIndexData>
+  nodePositionInfoAnnotationIndex(NodePositionInfoContribution nodePosInfo) {
+    DepanFxAnnotationIndexData.AnnotationSpecification nodePosProps =
+        new DepanFxAnnotationIndexData.AnnotationSpecification(
+            NODE_POSITION_ANNOTATION_SPEC_NAME,
+            NODE_POSITION_ANNOTATION_SPEC_DESCR,
+            nodePosInfo);
+
+    List<DepanFxAnnotationIndexData.AnnotationSpecification> nodePosInfos =
+        new ArrayList<>();
+    nodePosInfos.add(nodePosProps);
+
+    DepanFxAnnotationIndexData annoIndex = new DepanFxAnnotationIndexData(
+        NODE_POSITION_ANNOTATION_INDEX_NAME,
+        NODE_POSITION_ANNOTATION_INDEX_DESCR,
+        nodePosInfos);
+
+    return new DepanFxBuiltInContribution.Simple<>(
+        NODE_POSITION_ANNOTATION_INDEX_PATH, annoIndex);
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxInfoStoreData>
+  nodePositionInfoStore() {
+    return new DepanFxBuiltInContribution.Dependent<DepanFxInfoStoreData>(
+        NODE_POSITION_STORE_PATH) {
+
+      @Override
+      protected DepanFxInfoStoreData buildDocument(
+          DepanFxBuiltInProject project) {
+        DepanFxWorkspaceResource<DepanFxAnnotationIndexData> annoIndexRsc =
+            getResource(project, NODE_POSITION_ANNOTATION_INDEX_PATH);
+        return new DepanFxInfoStoreData(
+            NODE_POSITION_STORE_NAME, NODE_POSITION_STORE_DESCR, annoIndexRsc);
+      }
+    };
   }
 
   private DepanFxNodeInfoColumnData buildInfoColumn(

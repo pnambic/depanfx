@@ -13,7 +13,7 @@ module depanfx.nodelist {
   requires depanfx.base;
 
   opens com.pnambic.depanfx.nodelist.link to spring.beans, spring.core;
-  opens com.pnambic.depanfx.nodelist.persistence to spring.beans;
+  opens com.pnambic.depanfx.nodelist.persistence to spring.beans, spring.context, spring.core;
   opens com.pnambic.depanfx.nodelist.tooldata;
 
   exports com.pnambic.depanfx.nodelist.link;

@@ -15,26 +15,26 @@
  */
 package com.pnambic.depanfx.nodelist.tooldata;
 
-import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
 import com.pnambic.depanfx.graph.nodeanno.DepanFxAnnotationIndexData;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+/**
+ * An info store retaining infos for nodes of a specific graph.
+ */
+public class DepanFxAnnotationStoreData extends DepanFxInfoStoreData {
 
-public class DepanFxAnnotationStoreData extends DepanFxBaseToolData {
-
-  public static final String ANNOTATION_STORE_TOOL_EXT = "dasti";
-
-  private final DepanFxWorkspaceResource<GraphDocument> graphDocRsrc;
-
-  private final DepanFxWorkspaceResource<DepanFxAnnotationIndexData> annoIndexRsrc;
+  final DepanFxWorkspaceResource<GraphDocument> graphDocRsrc;
 
   public DepanFxAnnotationStoreData(
       String toolName, String toolDescription,
       DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
       DepanFxWorkspaceResource<DepanFxAnnotationIndexData> annoIndexRsrc) {
-    super(toolName, toolDescription);
+    super(toolName, toolDescription, annoIndexRsrc);
     this.graphDocRsrc = graphDocRsrc;
-    this.annoIndexRsrc = annoIndexRsrc;
+  }
+
+  public GraphDocument getGraphDoc() {
+    return graphDocRsrc.getResource();
   }
 
   public DepanFxAnnotationStoreData buildUpdate(
@@ -42,13 +42,5 @@ public class DepanFxAnnotationStoreData extends DepanFxBaseToolData {
       DepanFxWorkspaceResource<DepanFxAnnotationIndexData> annoIndexRsrc) {
     return new DepanFxAnnotationStoreData(
         toolName, toolDescription, graphDocRsrc, annoIndexRsrc);
-  }
-
-  public GraphDocument getGraphDoc() {
-    return graphDocRsrc.getResource();
-  }
-
-  public DepanFxAnnotationIndexData getAnnotationIndex() {
-    return annoIndexRsrc.getResource();
   }
 }
