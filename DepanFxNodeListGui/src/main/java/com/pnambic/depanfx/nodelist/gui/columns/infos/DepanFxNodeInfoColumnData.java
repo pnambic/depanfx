@@ -15,12 +15,14 @@
  */
 package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
+import com.pnambic.depanfx.graph.nodeanno.DepanFxAnnotationIndexData.AnnotationSpecification;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxInfoStoreData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class DepanFxNodeInfoColumnData extends DepanFxBaseColumnData {
@@ -41,9 +43,9 @@ public class DepanFxNodeInfoColumnData extends DepanFxBaseColumnData {
   private final DepanFxWorkspaceResource<DepanFxInfoStoreData> infoStoreRsrc;
 
   /**
-   * What info to obtain.
+   * What info to obtain by info store annotation key.
    */
-  private final DepanFxInfoRegistry.Contribution infoContribution;
+  private final String infoKey;
 
   /**
    * What piece of info to use and how to present it.
@@ -54,11 +56,10 @@ public class DepanFxNodeInfoColumnData extends DepanFxBaseColumnData {
       String toolName, String toolDescription,
       String columnLabel, int widthMs,
       DepanFxWorkspaceResource<DepanFxInfoStoreData> infoStoreRsrc,
-      DepanFxInfoRegistry.Contribution infoContribution,
-      DepanFxNodeInfoProperty infoProperty) {
+      String infoKey, DepanFxNodeInfoProperty infoProperty) {
     super(toolName, toolDescription, columnLabel, widthMs);
     this.infoStoreRsrc = infoStoreRsrc;
-    this.infoContribution = infoContribution;
+    this.infoKey = infoKey;
     this.infoProperty = infoProperty;
   }
 
@@ -73,8 +74,13 @@ public class DepanFxNodeInfoColumnData extends DepanFxBaseColumnData {
     return infoStoreRsrc;
   }
 
-  public DepanFxInfoRegistry.Contribution getInfoContribution() {
-    return infoContribution;
+  public String getInfoKey() {
+    return infoKey;
+  }
+
+  public Optional<DepanFxInfoRegistry.Contribution> getInfoContribution() {
+    return getAnnotationByKey()
+        .map(a -> a.getAnnotationInfo());
   }
 
   public DepanFxNodeInfoProperty getInfoProperty() {
@@ -82,6 +88,13 @@ public class DepanFxNodeInfoColumnData extends DepanFxBaseColumnData {
   }
 
   public Stream<DepanFxNodeInfoProperty> streamProperties() {
-    return infoContribution.streamProperties();
+    AnnotationSpecification anno = getAnnotationByKey()
+        .orElseThrow();
+    return anno.getAnnotationInfo().streamProperties();
+  }
+
+  private Optional<AnnotationSpecification> getAnnotationByKey() {
+    return infoStoreRsrc.getResource().getAnnotationIndex()
+        .getByAnnotationKey(infoKey);
   }
 }

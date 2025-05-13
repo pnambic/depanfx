@@ -20,10 +20,13 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxNodeInfoColumnDataConverter;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxAnnotationStoreData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxInfoStoreData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
+import com.pnambic.depanfx.persistence.plugins.GraphNodePersistencePluginRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -73,8 +76,10 @@ public class DepanFxInfoColumnConfiguration {
 
   @Bean
   public DocumentPersistenceContribution infoColumnPersistenceContribution(
+      GraphNodePersistencePluginRegistry graphNodeRegistry,
       DepanFxInfoRegistry infoRegistry) {
-    return new InfoColumnPersistenceContribution(infoRegistry);
+    return new InfoColumnPersistenceContribution(
+        graphNodeRegistry, infoRegistry);
   }
 
   private static class NodeInfoColumnContribution
@@ -94,10 +99,10 @@ public class DepanFxInfoColumnConfiguration {
       @SuppressWarnings("unchecked")
       DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> infoRsrc =
           (DepanFxWorkspaceResource<DepanFxNodeInfoColumnData>) columnRsrc;
-      DepanFxInfoRegistry.PropertyStore infoStore =
-          infoRsrc.getResource().getInfoContribution()
-              .getInfoStore(tableAdapter);
-      return new DepanFxInfoColumn(tableAdapter, infoRsrc, infoStore);
+
+      return getPropertyStore(infoRsrc.getResource(), tableAdapter)
+          .map(ps -> new DepanFxInfoColumn(tableAdapter, infoRsrc, ps))
+          .get();
     }
 
     @Override
@@ -115,6 +120,19 @@ public class DepanFxInfoColumnConfiguration {
           .getController()
           .getToolResource()
           .map(r -> r);
+    }
+
+    private Optional<DepanFxInfoRegistry.PropertyStore> getPropertyStore(
+        DepanFxNodeInfoColumnData infoColumn,
+        DepanFxNodeListTableAdapter tableAdapter) {
+      DepanFxInfoStoreData columnInfoStore =
+          infoColumn.getInfoSourceResource().getResource();
+
+      if (columnInfoStore instanceof DepanFxAnnotationStoreData annoStore) {
+        return Optional.of(annoStore.getPropertyStore(infoColumn.getInfoKey()));
+      }
+      return infoColumn.getInfoContribution()
+          .map(c -> c.getInfoStore(tableAdapter));
     }
   }
 
@@ -162,10 +180,14 @@ public class DepanFxInfoColumnConfiguration {
   private static class InfoColumnPersistenceContribution
       implements DocumentPersistenceContribution {
 
+    private final GraphNodePersistencePluginRegistry graphNodeRegistry;
+
     private final DepanFxInfoRegistry infoRegistry;
 
     public InfoColumnPersistenceContribution(
+        GraphNodePersistencePluginRegistry graphNodeRegistry,
         DepanFxInfoRegistry infoRegistry) {
+      this.graphNodeRegistry = graphNodeRegistry;
       this.infoRegistry = infoRegistry;
     }
 
@@ -182,6 +204,8 @@ public class DepanFxInfoColumnConfiguration {
     @Override
     public void prepareTransport(PersistDocumentTransportBuilder builder) {
       builder.addConverter(new DepanFxNodeInfoColumnDataConverter(infoRegistry));
+      graphNodeRegistry.applyExtensions(
+          builder, DepanFxWorkspaceResource.class);
     }
   }
 }

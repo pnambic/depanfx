@@ -150,7 +150,8 @@ public class DepanFxNodeKeyColumnBuiltIns {
                 DepanFxAnnotationStoreDataConfiguration.NODE_ID_STORE_PATH);
 
         return buildInfoColumn(
-            columnLabel, nodeIdStore, infoContrib,
+            columnLabel, nodeIdStore,
+            DepanFxAnnotationStoreDataConfiguration.NODE_ID_ANNOTATION_SPEC_KEY,
             DepanFxNodeKeyInfoContribution.GRAPH_MODEL_PROPERTY,
             MODEL_KEY_COLUMN_WIDTH);
       }
@@ -160,14 +161,14 @@ public class DepanFxNodeKeyColumnBuiltIns {
   private DepanFxNodeInfoColumnData buildInfoColumn(
       String keyLabel,
       DepanFxWorkspaceResource<DepanFxInfoStoreData> infoStoreRsrc,
-      DepanFxNodeKeyInfoContribution infoContrib,
+      String infoKey,
       DepanFxNodeInfoProperty infoProperty,
       int columnWidth) {
     String columnName = fmtNodeKeyName(keyLabel);
     String columnDescr = fmtNodeKeyDescr(keyLabel);
     return new DepanFxNodeInfoColumnData(
         columnName, columnDescr, keyLabel, columnWidth,
-        infoStoreRsrc, infoContrib, infoProperty);
+        infoStoreRsrc, infoKey, infoProperty);
   }
 
   private String fmtNodeKeyName(String keyLabel) {

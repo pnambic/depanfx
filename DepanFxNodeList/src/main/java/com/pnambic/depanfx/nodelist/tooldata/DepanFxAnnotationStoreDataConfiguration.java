@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodelist.tooldata;
 
+import com.pnambic.depanfx.graph.info.GraphNodeInfo;
 import com.pnambic.depanfx.graph.nodeanno.DepanFxAnnotationIndexData;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeKeyInfoContribution;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -31,21 +32,23 @@ import java.util.List;
 @Configuration
 public class DepanFxAnnotationStoreDataConfiguration {
 
-  private static final String NODE_ID_ANNOTATION_SPEC_NAME = "Node Id properties";
+  public static final String NODE_ID_ANNOTATION_SPEC_NAME =
+      "Node Id properties";
 
-  private static final String NODE_ID_ANNOTATION_SPEC_DESCR = "Node id properties.";
+  public static final String NODE_ID_ANNOTATION_SPEC_KEY =
+      GraphNodeInfo.class.getName();
 
-  private static final String NODE_ID_ANNOTATION_INDEX_NAME = "Node Id Info";
+  public static final String NODE_ID_ANNOTATION_INDEX_NAME = "Node Id Info";
 
-  private static final String NODE_ID_ANNOTATION_INDEX_DESCR = "Node id info";
+  public static final String NODE_ID_ANNOTATION_INDEX_DESCR = "Node id info";
 
-  private static final Path NODE_ID_ANNOTATION_INDEX_PATH = 
+  public static final Path NODE_ID_ANNOTATION_INDEX_PATH =
       DepanFxNodeInfoData.NODE_INFO_TOOL_PATH.resolve(
           NODE_ID_ANNOTATION_INDEX_NAME);
 
-  private static final String NODE_ID_STORE_NAME = "Node Id Store";
+  public static final String NODE_ID_STORE_NAME = "Node Id Store";
 
-  private static final String NODE_ID_STORE_DESCR = "Node id store.";
+  public static final String NODE_ID_STORE_DESCR = "Node id store.";
 
   public static final Path NODE_ID_STORE_PATH =
       DepanFxNodeInfoData.NODE_INFO_TOOL_PATH.resolve(NODE_ID_STORE_NAME);
@@ -55,7 +58,7 @@ public class DepanFxAnnotationStoreDataConfiguration {
     DepanFxAnnotationIndexData.AnnotationSpecification nodeKeyProps =
         new DepanFxAnnotationIndexData.AnnotationSpecification(
             NODE_ID_ANNOTATION_SPEC_NAME,
-            NODE_ID_ANNOTATION_SPEC_DESCR,
+            NODE_ID_ANNOTATION_SPEC_KEY,
             nodeKeyInfo);
 
     List<DepanFxAnnotationIndexData.AnnotationSpecification> nodeKeyInfos =

@@ -20,6 +20,7 @@ import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,7 +38,8 @@ public class DepanFxAnnotationIndexData extends DepanFxBaseToolData {
 
     /**
      * Value of the key used to retrieve an annotation value
-     * from the annotation store.
+     * from the annotation store.  The annotation key should be unique
+     * over the annotation index.
      * */
     private final String annoKey;
 
@@ -77,5 +79,11 @@ public class DepanFxAnnotationIndexData extends DepanFxBaseToolData {
 
   public Stream<AnnotationSpecification> streamAnnotations() {
     return annos.stream();
+  }
+
+  public Optional<AnnotationSpecification> getByAnnotationKey(String annoKey) {
+    return streamAnnotations()
+        .filter(a -> annoKey.equals(a.getAnnotationKey()))
+        .findFirst();
   }
 }

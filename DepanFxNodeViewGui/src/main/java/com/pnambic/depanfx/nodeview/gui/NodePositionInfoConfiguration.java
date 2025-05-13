@@ -25,6 +25,7 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxInfoStoreData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeInfoData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
@@ -78,8 +79,8 @@ public class NodePositionInfoConfiguration {
   private static final String NODE_POSITION_ANNOTATION_SPEC_NAME =
       "Node Position Properties";
 
-  private static final String NODE_POSITION_ANNOTATION_SPEC_DESCR =
-      "Node position properties.";
+  private static final String NODE_POSITION_ANNOTATION_SPEC_KEY =
+      DepanFxNodeLocationData.class.getName();
 
   private static final String NODE_POSITION_ANNOTATION_INDEX_NAME =
       "Node Position Info";
@@ -142,7 +143,7 @@ public class NodePositionInfoConfiguration {
     DepanFxAnnotationIndexData.AnnotationSpecification nodePosProps =
         new DepanFxAnnotationIndexData.AnnotationSpecification(
             NODE_POSITION_ANNOTATION_SPEC_NAME,
-            NODE_POSITION_ANNOTATION_SPEC_DESCR,
+            NODE_POSITION_ANNOTATION_SPEC_KEY,
             nodePosInfo);
 
     List<DepanFxAnnotationIndexData.AnnotationSpecification> nodePosInfos =
@@ -205,7 +206,7 @@ public class NodePositionInfoConfiguration {
       DepanFxNodeInfoProperty axisProperty) {
     return new DepanFxNodeInfoColumnData(
         axisLabel, axisDescr, axisLabel, 6,
-        infoStoreRsrc, infoContrib, axisProperty);
+        infoStoreRsrc, NODE_POSITION_ANNOTATION_SPEC_KEY, axisProperty);
   }
 
   private final class TableViewBuiltin extends

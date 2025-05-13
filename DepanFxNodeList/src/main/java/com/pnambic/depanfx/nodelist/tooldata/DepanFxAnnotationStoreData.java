@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.nodelist.tooldata;
 
 import com.pnambic.depanfx.graph.nodeanno.DepanFxAnnotationIndexData;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 /**
@@ -42,5 +43,10 @@ public class DepanFxAnnotationStoreData extends DepanFxInfoStoreData {
       DepanFxWorkspaceResource<DepanFxAnnotationIndexData> annoIndexRsrc) {
     return new DepanFxAnnotationStoreData(
         toolName, toolDescription, graphDocRsrc, annoIndexRsrc);
+  }
+
+  public DepanFxInfoRegistry.PropertyStore getPropertyStore(String infoKey) {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

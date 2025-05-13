@@ -18,7 +18,9 @@ package com.pnambic.depanfx.nodelist.gui.tooldata;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
 import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeInfoColumnData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxInfoStoreData;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.modxstream.XstreamMarshalContext;
 import com.pnambic.modxstream.XstreamUnmarshalContext;
 
@@ -76,15 +78,13 @@ public class DepanFxNodeInfoColumnDataConverter
             null, NodeInfoColumnDataTransport.class);
 
     Optional<DepanFxInfoRegistry.Contribution> optInfoKind =
-        infoRegistry.getById(columnTransport.infoContribution);
+        columnTransport.infoSourceRsrc.getResource()
+        .getAnnotationIndex()
+        .getByAnnotationKey(columnTransport.infoKey)
+        .map(a -> a.getAnnotationInfo());
+
     Optional<DepanFxNodeInfoProperty> optInfoProperty =
         optInfoKind.flatMap(c -> c.getProperty(columnTransport.infoProperty));
-
-    if (optInfoKind.isEmpty()) {
-      LOG.error("Unable to find info kind {}",
-          columnTransport.infoContribution);
-    }
-
     if (optInfoProperty.isEmpty()) {
       LOG.error("Unable to find info property {}",
           columnTransport.infoProperty);
@@ -94,8 +94,8 @@ public class DepanFxNodeInfoColumnDataConverter
         columnTransport.toolDescription,
         columnTransport.columnLabel,
         columnTransport.widthMs,
-        null, // info source
-        optInfoKind.orElse(null),
+        columnTransport.infoSourceRsrc,
+        columnTransport.infoKey,
         optInfoProperty.orElse(null));
   }
 
@@ -109,7 +109,9 @@ public class DepanFxNodeInfoColumnDataConverter
 
     public int widthMs;
 
-    public String infoContribution;
+    private DepanFxWorkspaceResource<DepanFxInfoStoreData> infoSourceRsrc;
+
+    public String infoKey;
 
     public String infoProperty;
 
@@ -118,7 +120,8 @@ public class DepanFxNodeInfoColumnDataConverter
       this.toolDescription = columnInfo.getToolDescription();
       this.columnLabel = columnInfo.getColumnLabel();
       this.widthMs = columnInfo.getWidthMs();
-      this.infoContribution = columnInfo.getInfoContribution().getInfoId();
+      this.infoSourceRsrc = columnInfo.getInfoSourceResource();
+      this.infoKey = columnInfo.getInfoKey();
       this.infoProperty = columnInfo.getInfoProperty().getToolName();
     }
   }

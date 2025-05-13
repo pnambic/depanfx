@@ -15,6 +15,8 @@
  */
 package com.pnambic.depanfx.nodelist.gui.columns.infos;
 
+import com.pnambic.depanfx.graph.nodeanno.DepanFxAnnotationIndexData;
+import com.pnambic.depanfx.graph.nodeanno.DepanFxAnnotationIndexData.AnnotationSpecification;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry.Contribution;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
@@ -77,8 +79,8 @@ public class DepanFxInfoColumnToolDialog
 
   private DepanFxInfoStoreChooser infoStoreControl;
 
-  @FXML
-  private ComboBox<DepanFxInfoRegistry.Contribution> infoChoiceField;
+  @FXML private ComboBox<DepanFxAnnotationIndexData.AnnotationSpecification>
+      infoChoiceField;
 
   @FXML
   private Label infoDescrLabel;
@@ -131,7 +133,7 @@ public class DepanFxInfoColumnToolDialog
     infoStoreRsrcField.textProperty().addListener(
         (obs, old, upd) -> updateInfoSourceDetails(upd));
 
-    infoChoiceField.setConverter(new ContributionConverter(infoRegistry));
+    infoChoiceField.setConverter(new ContributionConverter());
     infoChoiceField.valueProperty().addListener(
         (obs, old, upd) -> updateInfoDetails(upd));
 
@@ -168,7 +170,7 @@ public class DepanFxInfoColumnToolDialog
         getToolName(), getToolDescription(),
         getColumnLabel(), getColumnWidthMs(),
         infoStoreControl.getStoreResource(),
-        infoChoiceField.getValue(),
+        infoChoiceField.getValue().getAnnotationKey(),
         propertyChoiceField.getValue());
   }
 
@@ -194,9 +196,20 @@ public class DepanFxInfoColumnToolDialog
         .map(r -> r.getResource())
         .ifPresent(i -> {
           infoStoreControl.setInfoStoreResource(i.getInfoSourceResource());
-          infoChoiceField.setValue(i.getInfoContribution());
+          infoChoiceField.setValue(getInfoChoice(i));
           propertyChoiceField.setValue(i.getInfoProperty());
         });
+  }
+
+  private AnnotationSpecification getInfoChoice(DepanFxNodeInfoColumnData i) {
+    DepanFxWorkspaceResource<DepanFxInfoStoreData> infoSourceRsrc =
+        i.getInfoSourceResource();
+    if (infoSourceRsrc != null) {
+      return infoSourceRsrc.getResource().getAnnotationIndex()
+          .getByAnnotationKey(i.getInfoKey())
+          .get();
+    }
+    return null;
   }
 
   private void updateInfoSourceDetails(String upd) {
@@ -213,11 +226,11 @@ public class DepanFxInfoColumnToolDialog
     infoChoiceField.getItems().clear();
   }
 
-  private void updateInfoDetails(DepanFxInfoRegistry.Contribution updContrib) {
-    if (updContrib != null) {
-      infoDescrLabel.setText(updContrib.getInfoDescription());
-      infoDescrLabel.setText(updContrib.getInfoDescription());
-      updatePropertyChoices(updContrib);
+  private void updateInfoDetails(AnnotationSpecification upd) {
+    if (upd != null) {
+      infoDescrLabel.setText(upd.getAnnotationLabel());
+      infoDescrLabel.setText(upd.getAnnotationKey());
+      updatePropertyChoices(upd);
       return;
     }
     infoDescrLabel.setText(null);
@@ -225,12 +238,11 @@ public class DepanFxInfoColumnToolDialog
   }
 
   private void updateInfoChoices(DepanFxInfoStoreData infoStore) {
-    ObservableList<Contribution> infoItems =
+    ObservableList<AnnotationSpecification> infoItems =
         infoChoiceField.getItems();
 
     infoItems.clear();
     infoStore.getAnnotationIndex().streamAnnotations()
-        .map(a -> a.getAnnotationInfo())
         .forEach(infoItems::add);
   }
 
@@ -244,13 +256,15 @@ public class DepanFxInfoColumnToolDialog
     propertyDescrLabel.setText(null);
   }
 
-  private void updatePropertyChoices(Contribution updContrib) {
-    propertyChoiceField.setConverter(new PropertyConverter(updContrib));
+  private void updatePropertyChoices(AnnotationSpecification upd) {
+    DepanFxInfoRegistry.Contribution contrib = upd.getAnnotationInfo();
+    propertyChoiceField.setConverter(
+        new PropertyConverter(contrib));
 
     ObservableList<DepanFxNodeInfoProperty> propertyItems =
         propertyChoiceField.getItems();
     propertyItems.clear();
-    updContrib.streamProperties()
+    contrib.streamProperties()
         .forEach(propertyItems::add);
   }
 
@@ -258,22 +272,18 @@ public class DepanFxInfoColumnToolDialog
   //
 
   private static class ContributionConverter
-      extends StringConverter<DepanFxInfoRegistry.Contribution> {
+      extends StringConverter<DepanFxAnnotationIndexData.AnnotationSpecification> {
 
-    private final DepanFxInfoRegistry infoRegistry;
-
-    public ContributionConverter(DepanFxInfoRegistry infoRegistry) {
-      this.infoRegistry = infoRegistry;
+    @Override
+    public String toString(
+        DepanFxAnnotationIndexData.AnnotationSpecification annoDef) {
+      return annoDef.getAnnotationLabel();
     }
 
     @Override
-    public String toString(DepanFxInfoRegistry.Contribution contribution) {
-        return contribution.getInfoLabel();
-    }
-
-    @Override
-    public DepanFxInfoRegistry.Contribution fromString(String label) {
-      return DepanFxInfoRegistry.fromLabel(infoRegistry, label);
+    public DepanFxAnnotationIndexData.AnnotationSpecification fromString(
+        String label) {
+      return null;
     }
   }
 

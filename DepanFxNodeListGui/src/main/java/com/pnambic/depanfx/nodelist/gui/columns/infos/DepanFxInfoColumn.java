@@ -231,7 +231,7 @@ public class DepanFxInfoColumn
         columnData.getToolName(), columnData.getToolDescription(),
         columnData.getColumnLabel(), widthMs,
         columnData.getInfoSourceResource(),
-        columnData.getInfoContribution(),
+        columnData.getInfoKey(),
         columnData.getInfoProperty());
   }
 
@@ -275,6 +275,6 @@ public class DepanFxInfoColumn
   }
 
   private Contribution getInfoContribution() {
-    return getColumnData().getInfoContribution();
+    return getColumnData().getInfoContribution().get();
   }
 }
