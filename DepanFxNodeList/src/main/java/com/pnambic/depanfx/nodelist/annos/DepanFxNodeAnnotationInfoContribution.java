@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.graph.nodeinfo;
+package com.pnambic.depanfx.nodelist.annos;
 
 import com.pnambic.depanfx.graph.info.GraphNodeInfo.Listener;
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoProperty;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoStore;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeAnnotationData;
 
 import org.springframework.stereotype.Component;
 
@@ -63,14 +67,26 @@ public class DepanFxNodeAnnotationInfoContribution
   public Optional<?> getPropertyValue(
       DepanFxInfoRegistry.PropertyStore store,
       GraphNode graphNode, DepanFxNodeInfoProperty infoProperty) {
-    return DepanFxNodeInfoStore.getValue(store, graphNode);
+    if (store instanceof DepanFxNodeInfoStore infos) {
+      return infos.getInfoValue(graphNode)
+          .map(DepanFxNodeAnnotationData.class::cast)
+          .map(a -> a.getAnnotation());
+    }
+    return Optional.empty();
   }
 
   @Override
   public void setPropertyValue(
       DepanFxInfoRegistry.PropertyStore store, GraphNode graphNode,
       DepanFxNodeInfoProperty infoProperty, String input) {
-    DepanFxNodeInfoStore.setInfoValue(store, graphNode, input);
+    if (store instanceof DepanFxNodeInfoStore infos) {
+      infos.getInfoValue(graphNode)
+          .map(a -> updateAnnotation(a, input))
+          .ifPresentOrElse(
+              a -> infos.setInfoValue(graphNode, a),
+              () -> infos.setInfoValue(
+                  graphNode, new DepanFxNodeAnnotationData(input)));
+    }
   }
 
   @Override
@@ -90,5 +106,14 @@ public class DepanFxNodeAnnotationInfoContribution
   @Override
   public DepanFxInfoRegistry.PropertyStore getInfoStore(Object storeContainer) {
     return (DepanFxInfoRegistry.PropertyStore) storeContainer;
+  }
+
+  private DepanFxNodeAnnotationData updateAnnotation(
+      Object nodeInfo, String input) {
+    if (nodeInfo instanceof DepanFxNodeAnnotationData annoInfo) {
+      annoInfo.setAnnotation(input);
+      return annoInfo;
+    }
+    return null;
   }
 }

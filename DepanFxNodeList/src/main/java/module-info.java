@@ -12,11 +12,13 @@ module depanfx.nodelist {
   requires pnambic.modxstream;
   requires depanfx.base;
 
+  opens com.pnambic.depanfx.nodelist.annos to spring.core;
   opens com.pnambic.depanfx.nodelist.link to spring.beans, spring.core;
   opens com.pnambic.depanfx.nodelist.persistence
       to spring.beans, spring.context, spring.core;
   opens com.pnambic.depanfx.nodelist.tooldata;
 
+  exports com.pnambic.depanfx.nodelist.annos;
   exports com.pnambic.depanfx.nodelist.link;
   exports com.pnambic.depanfx.nodelist.model;
   exports com.pnambic.depanfx.nodelist.tooldata;

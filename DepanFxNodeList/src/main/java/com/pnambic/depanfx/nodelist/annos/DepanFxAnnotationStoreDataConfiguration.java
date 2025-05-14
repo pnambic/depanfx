@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.nodelist.tooldata;
+package com.pnambic.depanfx.nodelist.annos;
 
 import com.pnambic.depanfx.graph.info.GraphNodeInfo;
 import com.pnambic.depanfx.graph.nodeanno.DepanFxAnnotationIndexData;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeKeyInfoContribution;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxInfoStoreData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeInfoData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
@@ -31,6 +33,29 @@ import java.util.List;
 
 @Configuration
 public class DepanFxAnnotationStoreDataConfiguration {
+
+  /////////////////////////////////////
+  // Annotation infos provided only as an annotation index.
+  // No built-in store for annotations,
+  // but a starting point for creating task specific annotations.
+
+  public static final String NODE_ANNOTATION_ANNOTATION_SPEC_NAME =
+      "Node Annotation";
+
+  public static final String NODE_ANNOTATION_ANNOTATION_SPEC_KEY = "Annotation";
+
+  public static final String NODE_ANNOTATION_ANNOTATION_INDEX_NAME =
+      "Node Annotation Info";
+
+  public static final String NODE_ANNOTATION_ANNOTATION_INDEX_DESCR =
+      "Node annotation info.";
+
+  public static final Path NODE_ANNOTATION_ANNOTATION_INDEX_PATH =
+      DepanFxNodeInfoData.NODE_INFO_TOOL_PATH.resolve(
+          NODE_ANNOTATION_ANNOTATION_INDEX_NAME);
+
+  /////////////////////////////////////
+  // Node Id infos get a built in annotation index and a store.
 
   public static final String NODE_ID_ANNOTATION_SPEC_NAME =
       "Node Id properties";
@@ -52,6 +77,27 @@ public class DepanFxAnnotationStoreDataConfiguration {
 
   public static final Path NODE_ID_STORE_PATH =
       DepanFxNodeInfoData.NODE_INFO_TOOL_PATH.resolve(NODE_ID_STORE_NAME);
+
+  @Bean DepanFxBuiltInContribution<DepanFxAnnotationIndexData>
+  nodeAnnotationInfoAnnotationIndex(DepanFxNodeKeyInfoContribution nodeKeyInfo) {
+    DepanFxAnnotationIndexData.AnnotationSpecification nodeAnnoProps =
+        new DepanFxAnnotationIndexData.AnnotationSpecification(
+            NODE_ANNOTATION_ANNOTATION_SPEC_NAME,
+            NODE_ANNOTATION_ANNOTATION_SPEC_KEY,
+            nodeKeyInfo);
+
+    List<DepanFxAnnotationIndexData.AnnotationSpecification> nodeAnnoInfos =
+        new ArrayList<>();
+    nodeAnnoInfos.add(nodeAnnoProps);
+
+    DepanFxAnnotationIndexData annoIndex = new DepanFxAnnotationIndexData(
+        NODE_ANNOTATION_ANNOTATION_INDEX_NAME,
+        NODE_ANNOTATION_ANNOTATION_INDEX_DESCR,
+        nodeAnnoInfos);
+
+    return new DepanFxBuiltInContribution.Simple<>(
+        NODE_ID_ANNOTATION_INDEX_PATH, annoIndex);
+  }
 
   @Bean DepanFxBuiltInContribution<DepanFxAnnotationIndexData>
   nodeIdInfoAnnotationIndex(DepanFxNodeKeyInfoContribution nodeKeyInfo) {
