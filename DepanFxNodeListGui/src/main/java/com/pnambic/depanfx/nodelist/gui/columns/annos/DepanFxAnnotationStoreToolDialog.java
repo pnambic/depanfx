@@ -113,7 +113,7 @@ public class DepanFxAnnotationStoreToolDialog
     DepanFxWorkspaceResource<DepanFxAnnotationIndexData> annoIndexRsrc =
         getAnnoIndexRsrc();
     return getToolResource().get().getResource().buildUpdate(
-        getToolName(), getToolDescription(), annoIndexRsrc );
+        getToolName(), getToolDescription(), annoIndexRsrc);
   }
 
   private DepanFxWorkspaceResource<DepanFxAnnotationIndexData> getAnnoIndexRsrc() {

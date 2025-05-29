@@ -32,13 +32,6 @@ public class AnnotationStoreDataPersistenceContribution
   public static final String EXTENSION =
       DepanFxInfoStoreData.INFO_STORE_TOOL_EXT;
 
-  public static final String ANNOTATION_STORE_INFO_TAG =
-      "annotation-store-info";
-
-  private static final Class<?>[] ALLOW_TYPES = new Class[] {
-      DepanFxAnnotationStoreData.class
-  };
-
   private final DepanFxInfoRegistry infoRegistry;
 
   private final GraphNodePersistencePluginRegistry graphNodeRegistry;
@@ -63,9 +56,8 @@ public class AnnotationStoreDataPersistenceContribution
 
   @Override
   public void prepareTransport(PersistDocumentTransportBuilder builder) {
-    builder.addAllowedType(ALLOW_TYPES);
-    builder.addAlias(ANNOTATION_STORE_INFO_TAG,
-        DepanFxAnnotationStoreData.class);
+    AnnotationStoreDataConverter.installIn(builder);
+
     graphNodeRegistry.applyExtensions(builder, DepanFxWorkspaceResource.class);
   }
 }

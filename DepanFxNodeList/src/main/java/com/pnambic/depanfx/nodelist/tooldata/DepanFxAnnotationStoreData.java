@@ -21,19 +21,45 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.annos.DepanFxKeyAnnotationInfoStore;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * An info store retaining infos for nodes of a specific graph.
  */
 public class DepanFxAnnotationStoreData extends DepanFxInfoStoreData {
 
-  final DepanFxWorkspaceResource<GraphDocument> graphDocRsrc;
+  private final DepanFxWorkspaceResource<GraphDocument> graphDocRsrc;
 
-  public DepanFxAnnotationStoreData(
+  private final Map<String, DepanFxInfoRegistry.PropertyStore> infoStores;
+
+  private DepanFxAnnotationStoreData(
       String toolName, String toolDescription,
       DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
-      DepanFxWorkspaceResource<DepanFxAnnotationIndexData> annoIndexRsrc) {
+      DepanFxWorkspaceResource<DepanFxAnnotationIndexData> annoIndexRsrc,
+      Map<String, DepanFxInfoRegistry.PropertyStore> infoStores) {
     super(toolName, toolDescription, annoIndexRsrc);
     this.graphDocRsrc = graphDocRsrc;
+    this.infoStores = infoStores;
+  }
+
+  public static DepanFxAnnotationStoreData buildAnnotationStore(
+    String toolName, String toolDescription,
+    DepanFxWorkspaceResource<GraphDocument> graphDocRsrc) {
+    return new DepanFxAnnotationStoreData(
+        toolName, toolDescription,
+        graphDocRsrc, null, new HashMap<>());
+  }
+
+  public static DepanFxAnnotationStoreData forUnmarshal(
+      DepanFxAnnotationStoreData result) {
+    if (result.infoStores == null) {
+      result = new DepanFxAnnotationStoreData(
+          result.getToolName(), result.getToolDescription(),
+          result.graphDocRsrc, result.getAnnotationResource(),
+          new HashMap<>());
+    }
+    return result;
   }
 
   public GraphDocument getGraphDoc() {
@@ -44,10 +70,22 @@ public class DepanFxAnnotationStoreData extends DepanFxInfoStoreData {
       String toolName, String toolDescription,
       DepanFxWorkspaceResource<DepanFxAnnotationIndexData> annoIndexRsrc) {
     return new DepanFxAnnotationStoreData(
-        toolName, toolDescription, graphDocRsrc, annoIndexRsrc);
+        toolName, toolDescription, graphDocRsrc, annoIndexRsrc, infoStores);
   }
 
   public DepanFxInfoRegistry.PropertyStore getPropertyStore(String infoKey) {
-    return new DepanFxKeyAnnotationInfoStore(infoKey);
+    return infoStores
+        .computeIfAbsent(infoKey, DepanFxKeyAnnotationInfoStore::new);
+  }
+
+  @Override
+  public DepanFxInfoStoreData forUpdate() {
+    return new DepanFxAnnotationStoreData(
+        getToolName(), getToolDescription(),
+        graphDocRsrc, annoIndexRsrc, infoStores);
+  }
+
+  private Object readResolve() {
+    return DepanFxAnnotationStoreData.forUnmarshal(this);
   }
 }

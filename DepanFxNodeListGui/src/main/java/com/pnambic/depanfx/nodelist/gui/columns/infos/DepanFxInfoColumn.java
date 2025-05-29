@@ -24,6 +24,7 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxAbstractColumn;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxInfoStoreData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
@@ -34,15 +35,19 @@ import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.CellDataFeatures;
@@ -58,10 +63,25 @@ public class DepanFxInfoColumn
 
   public static final String SELECT_INFO_COLUMN = "Select Info Column...";
 
+  public static final String SAVE_NODE_INFOS = "Save Node Infos...";
+
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxInfoColumn.class);
 
   private final DepanFxInfoRegistry.PropertyStore infoStore;
+
+  /////////////////////////////////////
+  // Visibility and enablement controlled by change status.
+
+  private MenuItem selectAction;
+
+  private MenuItem editAction;
+
+  private SeparatorMenuItem saveSeparator;
+
+  private MenuItem saveAction;
+
+  private boolean columnEdit = false;
 
   public DepanFxInfoColumn(
       DepanFxNodeListTableAdapter tableAdapter,
@@ -103,11 +123,34 @@ public class DepanFxInfoColumn
   @Override
   public ContextMenu buildColumnContextMenu(DepanFxDialogRunner dialogRunner) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem(SELECT_INFO_COLUMN,
+    selectAction = builder.appendActionItem(SELECT_INFO_COLUMN,
         e -> openColumnChooser(dialogRunner));
-    builder.appendActionItem(EDIT_INFO_COLUMN,
+    editAction = builder.appendActionItem(EDIT_INFO_COLUMN,
         e -> openColumnEditor(dialogRunner));
-    return builder.build();
+
+    // These actions are hidden if the node list is unchanged.
+    saveSeparator = builder.appendSeparator();
+    saveAction = builder.appendActionItem(
+        SAVE_NODE_INFOS, e1 -> runSaveNodeInfos());
+
+    ContextMenu result = builder.build();
+    result.setOnShowing(e -> onColumnMenuShowing());
+    return result;
+  }
+
+  private void runSaveNodeInfos() {
+    DepanFxWorkspaceResource<DepanFxInfoStoreData> infoSrcRsrc =
+        getColumnData().getInfoSourceResource();
+    DepanFxProjectDocument dstDoc = infoSrcRsrc.getDocument();
+    DepanFxInfoStoreData updRsrc = infoSrcRsrc.getResource().forUpdate();
+
+    try {
+      saveDocument(dstDoc, updRsrc);
+    } catch (IOException errIo) {
+      LOG.error("Unable to save node info for {}",
+          DepanFxProjects.getDocumentLabel(dstDoc), errIo);
+    }
+    columnEdit = false;
   }
 
   @Override
@@ -140,6 +183,7 @@ public class DepanFxInfoColumn
   }
 
   public void commitEdit(DepanFxNodeListGraphNode member, String input) {
+    columnEdit = true;
     setPropertyValue(member.getGraphNode(), input);
   }
 
@@ -196,6 +240,23 @@ public class DepanFxInfoColumn
     DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnRsrc =
         workspace.addScratchResource(initialData);
     DepanFxInfoColumnToolDialog.runCreateDialog(columnRsrc, dialogRunner);
+  }
+
+  private void onColumnMenuShowing() {
+    updateActions();
+  }
+
+  private void updateActions() {
+    boolean hasEdits = hasNodeInfoEdits();
+    selectAction.setDisable(hasEdits);
+    editAction.setDisable(hasEdits);
+
+    saveSeparator.setVisible(hasEdits);
+    saveAction.setVisible(hasEdits);
+  }
+
+  private boolean hasNodeInfoEdits() {
+    return columnEdit;
   }
 
   private ObservableValue<String> buildObservedInfo(

@@ -116,7 +116,7 @@ public class DepanFxCategoryColumn
     // These actions are hidden if the node list is unchanged.
     saveSeparator = builder.appendSeparator();
     saveAction = builder.appendActionItem(
-        SAVE_NODE_LISTS, e1 -> runSaveNodeList());
+        SAVE_NODE_LISTS, e -> runSaveNodeList());
 
     ContextMenu result = builder.build();
     result.setOnShowing(e -> onColumnMenuShowing());

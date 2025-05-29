@@ -42,4 +42,9 @@ public class DepanFxInfoStoreData extends DepanFxBaseToolData {
   public DepanFxAnnotationIndexData getAnnotationIndex() {
     return annoIndexRsrc.getResource();
   }
+
+  public DepanFxInfoStoreData forUpdate() {
+    return new DepanFxInfoStoreData(getToolName(), getToolDescription(),
+        getAnnotationResource());
+  }
 }
