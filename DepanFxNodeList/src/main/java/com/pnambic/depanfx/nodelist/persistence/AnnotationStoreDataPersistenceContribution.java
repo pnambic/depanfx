@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodelist.persistence;
 
+import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxAnnotationStoreData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxInfoStoreData;
@@ -58,6 +59,7 @@ public class AnnotationStoreDataPersistenceContribution
   public void prepareTransport(PersistDocumentTransportBuilder builder) {
     AnnotationStoreDataConverter.installIn(builder);
 
+    graphNodeRegistry.applyExtensions(builder, GraphNode.class);
     graphNodeRegistry.applyExtensions(builder, DepanFxWorkspaceResource.class);
   }
 }

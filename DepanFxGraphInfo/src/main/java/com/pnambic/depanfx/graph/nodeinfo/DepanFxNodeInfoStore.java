@@ -19,6 +19,7 @@ import com.pnambic.depanfx.graph.info.GraphNodeInfo.Listener;
 import com.pnambic.depanfx.graph.model.GraphNode;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Define the interactions with a property store.
@@ -27,6 +28,8 @@ import java.util.Optional;
  * and an info key that further define the info retrieval results.
  */
 public interface DepanFxNodeInfoStore extends DepanFxInfoRegistry.PropertyStore {
+
+  Stream<GraphNode> streamNodes();
 
   Optional<?> getInfoValue(GraphNode graphNode);
 

@@ -16,13 +16,14 @@
 package com.pnambic.depanfx.nodelist.persistence;
 
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxAnnotationStoreData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxKeyPropertyStoreConverter;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.modxstream.XstreamMarshalContext;
 import com.pnambic.modxstream.XstreamUnmarshalContext;
 
 /**
- * 
+ * Handle serialization for {@link DepanFxAnnotationStoreData}.
  */
 public class AnnotationStoreDataConverter
     extends BasePersistObjectConverter<DepanFxAnnotationStoreData> {
@@ -38,7 +39,9 @@ public class AnnotationStoreDataConverter
     // builder.addConverter(new AnnotationStoreDataConverter());
     // builder.addAllowedType(ALLOW_TYPES);
     builder.addAllowedType(ALLOW_TYPES);
-    builder.addAliasType(ANNOTATION_STORE_INFO_TAG, DepanFxAnnotationStoreData.class);
+    builder.addAliasType(
+        ANNOTATION_STORE_INFO_TAG, DepanFxAnnotationStoreData.class);
+    DepanFxKeyPropertyStoreConverter.installIn(builder);
   }
 
   @Override

@@ -207,7 +207,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
     // Unpack the interesting parts of the view data.
     this.viewData = nodeViewRsrc.getResource();
-    this.viewNodes = viewData .getViewNodes();
+    this.viewNodes = viewData.getViewNodes();
     this.nodeLocations = viewData.getNodeLocations();
 
     // Handle node selections.
@@ -330,7 +330,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
    * Provides the full set of view nodes as a node list.
    */
   public DepanFxNodeList getNodeSelectionAsNodeList() {
-    return viewNodesAsNodeList;
+    return buildSelectionAsNodeList();
   }
 
   /**
@@ -481,6 +481,18 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
         "Nodes from " + getToolName(),
         getGraphDocRsrc(),
         new ArrayList<>(viewNodes));
+  }
+
+  /**
+   * Provides the set of selected view nodes as a node list.
+   */
+  private DepanFxNodeList buildSelectionAsNodeList() {
+    List<GraphNode> selection = getNodeSelection().streamSelectedNodes()
+        .collect(Collectors.toList());
+    return DepanFxNodeLists.buildNodeList(
+        getToolName() + " selection",
+        "Selections from " + getToolName(),
+        getGraphDocRsrc(), selection);
   }
 
   private void onSelectionChange(GraphNode node, boolean value) {

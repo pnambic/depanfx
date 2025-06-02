@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -170,6 +171,11 @@ public class DepanFxNodeViewNodeSelectDialog
 
     public PanelLocationStore(DepanFxNodeViewPanel viewPanel) {
       this.viewPanel = viewPanel;
+    }
+
+    @Override
+    public Stream<GraphNode> streamNodes() {
+      return viewPanel.getViewNodesAsNodeList().getNodes().stream();
     }
 
     @Override

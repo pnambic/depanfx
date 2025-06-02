@@ -78,13 +78,15 @@ public class DepanFxAnnotationStoreDataConfiguration {
   public static final Path NODE_ID_STORE_PATH =
       DepanFxNodeInfoData.NODE_INFO_TOOL_PATH.resolve(NODE_ID_STORE_NAME);
 
-  @Bean DepanFxBuiltInContribution<DepanFxAnnotationIndexData>
-  nodeAnnotationInfoAnnotationIndex(DepanFxNodeKeyInfoContribution nodeKeyInfo) {
+  @Bean
+  DepanFxBuiltInContribution<DepanFxAnnotationIndexData>
+  nodeAnnotationInfoAnnotationIndex(
+      DepanFxNodeAnnotationInfoContribution annoKeyInfo) {
     DepanFxAnnotationIndexData.AnnotationSpecification nodeAnnoProps =
         new DepanFxAnnotationIndexData.AnnotationSpecification(
             NODE_ANNOTATION_ANNOTATION_SPEC_NAME,
             NODE_ANNOTATION_ANNOTATION_SPEC_KEY,
-            nodeKeyInfo);
+            annoKeyInfo);
 
     List<DepanFxAnnotationIndexData.AnnotationSpecification> nodeAnnoInfos =
         new ArrayList<>();
@@ -96,10 +98,11 @@ public class DepanFxAnnotationStoreDataConfiguration {
         nodeAnnoInfos);
 
     return new DepanFxBuiltInContribution.Simple<>(
-        NODE_ID_ANNOTATION_INDEX_PATH, annoIndex);
+        NODE_ANNOTATION_ANNOTATION_INDEX_PATH, annoIndex);
   }
 
-  @Bean DepanFxBuiltInContribution<DepanFxAnnotationIndexData>
+  @Bean
+  DepanFxBuiltInContribution<DepanFxAnnotationIndexData>
   nodeIdInfoAnnotationIndex(DepanFxNodeKeyInfoContribution nodeKeyInfo) {
     DepanFxAnnotationIndexData.AnnotationSpecification nodeKeyProps =
         new DepanFxAnnotationIndexData.AnnotationSpecification(

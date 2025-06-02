@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Connect an info key to a selected annotation in an annotation store.
@@ -41,6 +42,11 @@ public class DepanFxKeyAnnotationInfoStore implements DepanFxNodeInfoStore {
 
   public DepanFxKeyAnnotationInfoStore(String infoKey) {
     this.infoKey = infoKey;
+  }
+
+  @Override
+  public Stream<GraphNode> streamNodes() {
+    return infoStore.keySet().stream();
   }
 
   @Override
