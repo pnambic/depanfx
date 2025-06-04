@@ -15,31 +15,9 @@
  */
 package com.pnambic.depanfx.nodelist.annos;
 
-import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
-import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry.PropertyStore;
+/**
+ * Opaque type to hide implementation of property storage.
+ */
+public interface DepanFxKeyPropertyStore {
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Stream;
-
-public class DepanFxKeyPropertyStore {
-
-  private final Map<String, DepanFxInfoRegistry.PropertyStore> infoStores;
-
-  private DepanFxKeyPropertyStore(Map<String, PropertyStore> infoStores) {
-    this.infoStores = infoStores;
-  }
-
-  public static DepanFxKeyPropertyStore forNew() {
-    return new DepanFxKeyPropertyStore(new HashMap<>());
-  }
-
-  public PropertyStore getPropertyStore(String infoKey) {
-    return infoStores
-        .computeIfAbsent(infoKey, DepanFxKeyAnnotationInfoStore::new);
-  }
-
-  public Stream<String> streamPropertyStoreKeys() {
-    return infoStores.keySet().stream();
-  }
 }

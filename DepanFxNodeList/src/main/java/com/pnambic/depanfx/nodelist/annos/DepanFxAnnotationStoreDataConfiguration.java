@@ -42,7 +42,8 @@ public class DepanFxAnnotationStoreDataConfiguration {
   public static final String NODE_ANNOTATION_ANNOTATION_SPEC_NAME =
       "Node Annotation";
 
-  public static final String NODE_ANNOTATION_ANNOTATION_SPEC_KEY = "Annotation";
+  public static final String NODE_ANNOTATION_ANNOTATION_SPEC_KEY =
+      "Annotation";
 
   public static final String NODE_ANNOTATION_ANNOTATION_INDEX_NAME =
       "Node Annotation Info";

@@ -18,8 +18,10 @@ package com.pnambic.depanfx.nodelist.tooldata;
 import com.pnambic.depanfx.graph.info.GraphNodeInfo;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
+import com.pnambic.depanfx.graph_doc.model.GraphModel;
+import com.pnambic.depanfx.graph_doc.model.GraphModels;
 import com.pnambic.depanfx.nodelist.annos.DepanFxKeyAnnotationInfoStore;
-import com.pnambic.depanfx.nodelist.annos.DepanFxKeyPropertyStore;
+import com.pnambic.depanfx.nodelist.annos.DepanFxSimpleKeyPropertyStore;
 import com.pnambic.depanfx.persistence.BasePersistObjectConverter;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.modxstream.XstreamMarshalContext;
@@ -29,10 +31,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Handle serialization for {@link DepanFxKeyPropertyStore}.
+ * Handle serialization for {@link DepanFxKeyPropertyStoreX}.
  */
-public class DepanFxKeyPropertyStoreConverter
-    extends BasePersistObjectConverter<DepanFxKeyPropertyStore> {
+public class DepanFxSimpleKeyPropertyStoreConverter
+    extends BasePersistObjectConverter<DepanFxSimpleKeyPropertyStore> {
 
   public static final String KEY_PROPERTY_TAG = "key-property";
 
@@ -41,22 +43,22 @@ public class DepanFxKeyPropertyStoreConverter
   public static final String ANNO_DATA_TAG = "annotation-data";
 
   private static final Class<?>[] ALLOW_TYPES = new Class[] {
-      DepanFxKeyPropertyStore.class,
-      DepanFxKeyPropertyStoreConverter.KeyInfo.class,
+      DepanFxSimpleKeyPropertyStore.class,
+      DepanFxSimpleKeyPropertyStoreConverter.KeyInfo.class,
       DepanFxNodeAnnotationData.class
     };
 
   public static void installIn(PersistDocumentTransportBuilder builder) {
-    builder.addConverter(new DepanFxKeyPropertyStoreConverter());
-    builder.addAliasType(KEY_PROPERTY_TAG, DepanFxKeyPropertyStore.class);
+    builder.addConverter(new DepanFxSimpleKeyPropertyStoreConverter());
+    builder.addAliasType(KEY_PROPERTY_TAG, DepanFxSimpleKeyPropertyStore.class);
     builder.addAliasType(ANNO_DATA_TAG, DepanFxNodeAnnotationData.class);
     builder.addAliasType(
-        KEY_INFO_TAG, DepanFxKeyPropertyStoreConverter.KeyInfo.class);
+        KEY_INFO_TAG, DepanFxSimpleKeyPropertyStoreConverter.KeyInfo.class);
   }
 
   @Override
   public Class<?> forType() {
-    return DepanFxKeyPropertyStore.class;
+    return DepanFxSimpleKeyPropertyStore.class;
   }
 
   @Override
@@ -71,20 +73,24 @@ public class DepanFxKeyPropertyStoreConverter
 
   @Override
   public void marshal(XstreamMarshalContext dstContext, Object source) {
-    DepanFxKeyPropertyStore store = (DepanFxKeyPropertyStore) source;
+    DepanFxSimpleKeyPropertyStore store =
+        (DepanFxSimpleKeyPropertyStore) source;
     dstContext.convertAnother(byNodeKeyInfo(store));
   }
 
   @Override
-  public DepanFxKeyPropertyStore unmarshal(
+  public DepanFxSimpleKeyPropertyStore unmarshal(
       XstreamUnmarshalContext srcContext) {
     @SuppressWarnings("unchecked")
     Map<GraphNode, KeyInfo> byNode =
         (Map<GraphNode, KeyInfo>) srcContext.convertAnother(null, Map.class);
-    return forUnmarshal(byNode);
+    GraphModel graphModel =
+        (GraphModel) srcContext.getContextValue(GraphModel.class);
+    return forUnmarshal(byNode, graphModel);
   }
 
-  private Map<GraphNode, KeyInfo> byNodeKeyInfo(DepanFxKeyPropertyStore store) {
+  private Map<GraphNode, KeyInfo> byNodeKeyInfo(
+      DepanFxSimpleKeyPropertyStore store) {
     Map<GraphNode, KeyInfo> byKey = new HashMap<>();
     store.streamPropertyStoreKeys()
         .forEach(k -> populateByKey(byKey, store, k));
@@ -93,10 +99,11 @@ public class DepanFxKeyPropertyStoreConverter
 
   private void populateByKey(
       Map<GraphNode, KeyInfo> byKey,
-      DepanFxKeyPropertyStore store,
+      DepanFxSimpleKeyPropertyStore store,
       String infoKey) {
     DepanFxKeyAnnotationInfoStore saveStore =
         (DepanFxKeyAnnotationInfoStore) store.getPropertyStore(infoKey);
+
     saveStore.streamNodes()
         .forEach(n -> populateNodeKeyValue(byKey, n, saveStore));
   }
@@ -111,23 +118,24 @@ public class DepanFxKeyPropertyStoreConverter
       .ifPresent(v -> byKey.put(node, new KeyInfo(saveStore.getInfoKey(), v)));
   }
 
-  private DepanFxKeyPropertyStore forUnmarshal(
-      Map<GraphNode, KeyInfo> byNode) {
+  private DepanFxSimpleKeyPropertyStore forUnmarshal(
+      Map<GraphNode, KeyInfo> byNode, GraphModel graphModel) {
     Map<String, DepanFxInfoRegistry.PropertyStore> infoStores =
         new HashMap<>();
 
-    byNode.entrySet().forEach(
-        e -> populateInfoStore(infoStores, e.getKey(), e.getValue()));
-    return null;
+    byNode.entrySet().forEach(e ->
+        populateInfoStore(infoStores, graphModel, e.getKey(), e.getValue()));
+    return DepanFxSimpleKeyPropertyStore.fromStores(infoStores);
   }
 
   private void populateInfoStore(
       Map<String, DepanFxInfoRegistry.PropertyStore> infoStores,
-      GraphNode node, KeyInfo value) {
+      GraphModel graphModel, GraphNode node, KeyInfo value) {
+    GraphNode infoNode = GraphModels.mapGraphNode(node, graphModel);
     DepanFxKeyAnnotationInfoStore nodeValueMap =
         (DepanFxKeyAnnotationInfoStore) infoStores.computeIfAbsent(
             value.infoKey, k -> new DepanFxKeyAnnotationInfoStore(k));
-    nodeValueMap.setInfoValue(node, value.infoValue);
+    nodeValueMap.setInfoValue(infoNode, value.infoValue);
   }
 
   private class KeyInfo {

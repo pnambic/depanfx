@@ -19,6 +19,7 @@ import com.pnambic.depanfx.graph.nodeanno.DepanFxAnnotationIndexData;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.annos.DepanFxKeyPropertyStore;
+import com.pnambic.depanfx.nodelist.annos.DepanFxSimpleKeyPropertyStore;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 /**
@@ -30,7 +31,7 @@ public class DepanFxAnnotationStoreData extends DepanFxInfoStoreData {
 
   private final DepanFxKeyPropertyStore infoStore;
 
-  private DepanFxAnnotationStoreData(
+  public DepanFxAnnotationStoreData(
       String toolName, String toolDescription,
       DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
       DepanFxWorkspaceResource<DepanFxAnnotationIndexData> annoIndexRsrc,
@@ -40,48 +41,45 @@ public class DepanFxAnnotationStoreData extends DepanFxInfoStoreData {
     this.infoStore = infoStore;
   }
 
-  public static DepanFxAnnotationStoreData buildAnnotationStore(
+  public static DepanFxAnnotationStoreData forNew(
     String toolName, String toolDescription,
     DepanFxWorkspaceResource<GraphDocument> graphDocRsrc) {
     return new DepanFxAnnotationStoreData(
         toolName, toolDescription,
-        graphDocRsrc, null, DepanFxKeyPropertyStore.forNew());
+        graphDocRsrc, null, DepanFxSimpleKeyPropertyStore.forNew());
   }
 
-  public static DepanFxAnnotationStoreData forUnmarshal(
-      DepanFxAnnotationStoreData result) {
-    if (result.infoStore == null) {
-      result = new DepanFxAnnotationStoreData(
-          result.getToolName(), result.getToolDescription(),
-          result.graphDocRsrc, result.getAnnotationResource(),
-          DepanFxKeyPropertyStore.forNew());
-    }
-    return result;
+  public DepanFxWorkspaceResource<GraphDocument> getGraphDocResource() {
+    return graphDocRsrc;
   }
 
   public GraphDocument getGraphDoc() {
-    return graphDocRsrc.getResource();
+    return getGraphDocResource().getResource();
+  }
+
+  public DepanFxKeyPropertyStore getInfoStore() {
+    return infoStore;
   }
 
   public DepanFxAnnotationStoreData buildUpdate(
       String toolName, String toolDescription,
       DepanFxWorkspaceResource<DepanFxAnnotationIndexData> annoIndexRsrc) {
     return new DepanFxAnnotationStoreData(
-        toolName, toolDescription, graphDocRsrc, annoIndexRsrc, infoStore);
+        toolName, toolDescription,
+        getGraphDocResource(), annoIndexRsrc, getInfoStore());
   }
 
   public DepanFxInfoRegistry.PropertyStore getPropertyStore(String infoKey) {
-    return infoStore.getPropertyStore(infoKey);
+    if (infoStore instanceof DepanFxSimpleKeyPropertyStore simpleStore) {
+      return simpleStore.getPropertyStore(infoKey);
+    }
+    return null;
   }
 
   @Override
   public DepanFxInfoStoreData forUpdate() {
     return new DepanFxAnnotationStoreData(
         getToolName(), getToolDescription(),
-        graphDocRsrc, annoIndexRsrc, infoStore);
-  }
-
-  private Object readResolve() {
-    return DepanFxAnnotationStoreData.forUnmarshal(this);
+        getGraphDocResource(), annoIndexRsrc, getInfoStore());
   }
 }

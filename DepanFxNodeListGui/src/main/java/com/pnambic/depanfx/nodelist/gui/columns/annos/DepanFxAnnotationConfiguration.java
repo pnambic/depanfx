@@ -156,7 +156,7 @@ public class DepanFxAnnotationConfiguration {
         DepanFxDialogRunner dialogRunner,
         DepanFxWorkspaceResource<GraphDocument> wkspRsrc) {
       DepanFxAnnotationStoreData newStore =
-          DepanFxAnnotationStoreData.buildAnnotationStore(
+          DepanFxAnnotationStoreData.forNew(
               ANNOTATION_STORE_TOOL_NAME,
               ANNOTATION_STORE_TOOL_DESCR,
               wkspRsrc);
