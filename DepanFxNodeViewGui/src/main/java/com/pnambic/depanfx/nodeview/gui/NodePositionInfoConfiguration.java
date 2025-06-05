@@ -192,9 +192,7 @@ public class NodePositionInfoConfiguration {
             getResource(project, NODE_POSITION_STORE_PATH);
 
         return buildNodePositionColumn(
-            X_POS_LABEL, X_POS_DESCR,
-            nodeIdStore, infoContrib,
-            NodePositionInfoContribution.X_POS_PROPERTY);
+            axisLabel, axisDescr, nodeIdStore, infoContrib, axisProperty);
       }
     };
   }
