@@ -89,6 +89,7 @@ public class PersistTagDataLoader {
   /**
    * Uses lightweight null for bad values on an internal API.
    * Avoid extra Optional creation for normal case of valid values.
+   *
    * @return {@code null} if unmarshalling fails
    */
   private Object unmarshalValue(
@@ -97,8 +98,8 @@ public class PersistTagDataLoader {
       Class<?> childClass = descr.getDataType();
       return childClass.cast(srcContext.convertAnother(null, childClass));
     } catch (Exception errAny) {
-      LOG.error("Failed to unmarshal value for tag {}",
-          descr.getDataTag(), errAny);
+      LOG.error("Failed to unmarshal value for tag {} due to {}",
+          descr.getDataTag(), errAny.getClass().getName());
     }
     return null;
   }
