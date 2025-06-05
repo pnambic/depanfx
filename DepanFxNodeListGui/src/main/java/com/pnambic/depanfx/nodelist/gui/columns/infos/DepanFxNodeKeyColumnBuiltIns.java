@@ -84,7 +84,7 @@ public class DepanFxNodeKeyColumnBuiltIns {
       DepanFxNodeKeyInfoContribution infoContrib) {
 
     return buildNodeKeyContrib(
-        infoContrib,
+        infoContrib, DepanFxNodeKeyInfoContribution.GRAPH_MODEL_PROPERTY,
         MODEL_KEY_COLUMN_TOOL_PATH,
         MODEL_KEY_COLUMN_LABEL,
         MODEL_KEY_COLUMN_WIDTH);
@@ -95,7 +95,7 @@ public class DepanFxNodeKeyColumnBuiltIns {
       DepanFxNodeKeyInfoContribution infoContrib) {
 
     return buildNodeKeyContrib(
-        infoContrib,
+        infoContrib, DepanFxNodeKeyInfoContribution.NODE_KIND_PROPERTY,
         KIND_KEY_COLUMN_TOOL_PATH,
         KIND_KEY_COLUMN_LABEL,
         KIND_KEY_COLUMN_WIDTH);
@@ -106,7 +106,7 @@ public class DepanFxNodeKeyColumnBuiltIns {
       DepanFxNodeKeyInfoContribution infoContrib) {
 
     return buildNodeKeyContrib(
-        infoContrib,
+        infoContrib, DepanFxNodeKeyInfoContribution.NODE_KEY_PROPERTY,
         NODE_KEY_COLUMN_TOOL_PATH,
         NODE_KEY_COLUMN_LABEL,
         NODE_KEY_COLUMN_WIDTH);
@@ -117,7 +117,7 @@ public class DepanFxNodeKeyColumnBuiltIns {
       DepanFxNodeKeyInfoContribution infoContrib) {
 
     return buildNodeKeyContrib(
-        infoContrib,
+        infoContrib, DepanFxNodeKeyInfoContribution.SIMPLE_NAME_PROPERTY,
         SIMPLE_NAME_COLUMN_TOOL_PATH,
         SIMPLE_NAME_COLUMN_LABEL,
         SIMPLE_NAME_COLUMN_WIDTH);
@@ -128,7 +128,7 @@ public class DepanFxNodeKeyColumnBuiltIns {
       DepanFxNodeKeyInfoContribution infoContrib) {
 
     return buildNodeKeyContrib(
-        infoContrib,
+        infoContrib, DepanFxNodeKeyInfoContribution.FULL_KEY_PROPERTY,
         FULL_KEY_COLUMN_TOOL_PATH,
         FULL_KEY_COLUMN_LABEL,
         FULL_KEY_COLUMN_WIDTH);
@@ -136,6 +136,7 @@ public class DepanFxNodeKeyColumnBuiltIns {
 
   private Dependent<DepanFxNodeInfoColumnData> buildNodeKeyContrib(
       DepanFxNodeKeyInfoContribution infoContrib,
+      DepanFxNodeInfoProperty infoProp,
       Path toolPath, String columnLabel, int ColumnWidth) {
 
     return new DepanFxBuiltInContribution.Dependent<DepanFxNodeInfoColumnData>(
@@ -152,7 +153,7 @@ public class DepanFxNodeKeyColumnBuiltIns {
         return buildInfoColumn(
             columnLabel, nodeIdStore,
             DepanFxAnnotationStoreDataConfiguration.NODE_ID_ANNOTATION_SPEC_KEY,
-            DepanFxNodeKeyInfoContribution.GRAPH_MODEL_PROPERTY,
+            infoProp,
             MODEL_KEY_COLUMN_WIDTH);
       }
     };
