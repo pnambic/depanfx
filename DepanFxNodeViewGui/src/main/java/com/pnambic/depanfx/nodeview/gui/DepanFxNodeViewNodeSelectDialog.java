@@ -66,8 +66,8 @@ public class DepanFxNodeViewNodeSelectDialog
   private Label nodeTableCommands;
 
   /**
-   * Let FXML place the table.  Other behavior is implemented by the
-   * {@link}.
+   * Let FXML place the table.  Other behavior is implemented by
+   * {@link #tableControl}.
    */
   @FXML
   private TreeTableView<DepanFxNodeListMember> nodeSelectTable;

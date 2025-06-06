@@ -15,7 +15,12 @@
  */
 package com.pnambic.depanfx.nodeview.gui;
 
+import com.pnambic.depanfx.nodelist.gui.columns.annos.DepanFxAnnotationIndexToolDialog.EditAnnotationSpec;
+import com.pnambic.depanfx.perspective.DepanFxBaseDialog;
+import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
+import com.pnambic.depanfx.perspective.DepanFxProctor;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxFxmlDialog;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
@@ -23,16 +28,76 @@ import net.rgielen.fxweaver.core.FxmlView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javafx.fxml.FXML;
+import javafx.scene.Scene;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 
 @DepanFxFxmlDialog
 @FxmlView("node-views-merge-dialog.fxml")
-public class DepanFxNodeViewsMergeDialog {
+public class DepanFxNodeViewsMergeDialog extends DepanFxBaseDialog {
 
   private static final Logger LOG = LoggerFactory.getLogger(
       DepanFxNodeViewsMergeDialog.class);
 
-  public static void runMergeDialog(
+  public static final String MERGE_NODE_VIEWS = "Merge Node Views";
+
+  @FXML
+  private TableView<EditAnnotationSpec> nodeViewsTable;
+
+  @FXML
+  private TextField dstDirectoryField;
+
+  @Autowired
+  public DepanFxNodeViewsMergeDialog(DepanFxWorkspace workspace) {
+    super(workspace);
+  }
+
+  public static DepanFxNodeViewsMergeDialog runMergeDialog(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
-    LOG.info("merging");
+
+    Dialog<DepanFxNodeViewsMergeDialog> result =
+        dialogRunner.createDialogAndParent(DepanFxNodeViewsMergeDialog.class);
+    result.runDialog(MERGE_NODE_VIEWS);
+
+    return result.getController();
+  }
+
+  @FXML
+  public void addNodeView() {
+    LOG.info("Add node view");
+  }
+
+  @FXML
+  public void openDestinationChooser() {
+    LOG.info("open destination chooser");
+  }
+
+  @FXML
+  private void handleMerge() {
+    if (hasInputErrors()) {
+      return;
+    }
+
+    closeDialog();
+    LOG.info("Would merge here");
+  }
+
+  @Override
+  protected String getInputCheckFailureText() {
+    return "Node Views Merge Confirmation Error";
+  }
+
+  @Override
+  protected void checkInput(DepanFxProctor proctor) {
+    DepanFxDialogChecks.checkDestinationFile(
+        proctor, dstDirectoryField.getText());
+  }
+
+  @Override
+  public Scene getScene() {
+    return nodeViewsTable.getScene();
   }
 }
