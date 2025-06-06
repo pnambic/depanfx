@@ -117,7 +117,7 @@ public class DepanFxLinkMatcherSequenceConfiguration {
     }
   }
 
-  private class NewContribution
+  private static class NewContribution
     implements DepanFxNewResourceContribution {
 
     private final DepanFxWorkspace workspace;
