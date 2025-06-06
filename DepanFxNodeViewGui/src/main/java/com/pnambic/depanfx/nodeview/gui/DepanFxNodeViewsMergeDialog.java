@@ -52,6 +52,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 public class DepanFxNodeViewsMergeDialog
     extends DepanFxBaseToolDialog<DepanFxNodeViewData> {
 
+  @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(
       DepanFxNodeViewsMergeDialog.class);
 
@@ -153,11 +154,13 @@ public class DepanFxNodeViewsMergeDialog
   protected DepanFxNodeViewData prepareResult() {
     ObservableList<DepanFxWorkspaceResource<DepanFxNodeViewData>> srcs =
         nodeViewsTable.getItems();
-    DepanFxNodeViewData base = DepanFxNodeViews.updateNameDescr(
-        srcs.get(0).getResource(), getToolName(), getToolDescription());
+    DepanFxNodeViewData baseView = srcs.get(0).getResource();
 
-    LOG.info("Would merge here");
-    return base;
+    DepanFxNodeViewMerger merger =
+        new DepanFxNodeViewMerger(baseView.getGraphDocRsrc());
+    srcs.forEach(r -> merger.merge(r.getResource()));
+
+    return merger.buildResult(getToolName(), getToolDescription(), baseView);
   }
 
   @Override
@@ -198,8 +201,7 @@ public class DepanFxNodeViewsMergeDialog
   }
 
   private void addNodeView() {
-    DepanFxNodeViewChooser.runChooser(
-        workspace, dialogRunner, getScene())
+    DepanFxNodeViewChooser.runChooser(workspace, dialogRunner, getScene())
         .ifPresent(nv -> nodeViewsTable.getItems().add(nv));
   }
 
