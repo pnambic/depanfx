@@ -15,9 +15,9 @@
  */
 package com.pnambic.depanfx.nodeview.gui;
 
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
-import com.pnambic.depanfx.perspective.DepanFxBaseDialog;
+import com.pnambic.depanfx.perspective.DepanFxBaseDocumentDialog;
+import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
 import com.pnambic.depanfx.perspective.DepanFxProctor;
 import com.pnambic.depanfx.scene.DepanFxActionTableCell;
@@ -25,6 +25,7 @@ import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxFxmlDialog;
+import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -35,21 +36,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
+
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 @DepanFxFxmlDialog
 @FxmlView("node-views-merge-dialog.fxml")
-public class DepanFxNodeViewsMergeDialog extends DepanFxBaseDialog {
+public class DepanFxNodeViewsMergeDialog
+    extends DepanFxBaseToolDialog<DepanFxNodeViewData> {
 
   private static final Logger LOG = LoggerFactory.getLogger(
       DepanFxNodeViewsMergeDialog.class);
 
   public static final String MERGE_NODE_VIEWS = "Merge Node Views";
+
+  private static final String EXT = DepanFxNodeViewData.NODE_VIEW_TOOL_EXT;
+
+  private static final ExtensionFilter EXT_FILTER =
+      DepanFxSceneControls.buildExtFilter("Node View", EXT);
 
   private final DepanFxDialogRunner dialogRunner;
 
@@ -62,18 +74,20 @@ public class DepanFxNodeViewsMergeDialog extends DepanFxBaseDialog {
   @Autowired
   public DepanFxNodeViewsMergeDialog(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
-    super(workspace);
+    super(workspace, DepanFxNodeViewData.class);
     this.dialogRunner = dialogRunner;
   }
 
   public static DepanFxNodeViewsMergeDialog runMergeDialog(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
 
-    Dialog<DepanFxNodeViewsMergeDialog> result =
+    Dialog<DepanFxNodeViewsMergeDialog> dlg =
         dialogRunner.createDialogAndParent(DepanFxNodeViewsMergeDialog.class);
-    result.runDialog(MERGE_NODE_VIEWS);
+    DepanFxNodeViewsMergeDialog result = dlg.getController();
+    result.clearToolResource();
 
-    return result.getController();
+    dlg.runDialog(MERGE_NODE_VIEWS);
+    return result;
   }
 
   @FXML
@@ -110,21 +124,6 @@ public class DepanFxNodeViewsMergeDialog extends DepanFxBaseDialog {
     addNodeView();
   }
 
-  @FXML
-  public void openDestinationChooser() {
-    LOG.info("open destination chooser");
-  }
-
-  @FXML
-  private void handleMerge() {
-    if (hasInputErrors()) {
-      return;
-    }
-
-    closeDialog();
-    LOG.info("Would merge here");
-  }
-
   @Override
   protected String getInputCheckFailureText() {
     return "Node Views Merge Confirmation Error";
@@ -132,13 +131,42 @@ public class DepanFxNodeViewsMergeDialog extends DepanFxBaseDialog {
 
   @Override
   protected void checkInput(DepanFxProctor proctor) {
-    DepanFxDialogChecks.checkDestinationFile(
-        proctor, destinationField.getText());
+    super.checkInput(proctor);
   }
 
   @Override
-  public Scene getScene() {
-    return nodeViewsTable.getScene();
+  protected DepanFxNodeViewData prepareResult() {
+    LOG.info("Would merge here");
+    return null;
+  }
+
+  @Override
+  protected void setTooldataFilters(FileChooser chooser) {
+    chooser.getExtensionFilters().add(EXT_FILTER);
+    chooser.setSelectedExtensionFilter(EXT_FILTER);
+  }
+
+  @Override
+  protected File buildInitialDestinationFile() {
+    return buildAnalysisInitialDestination(EXT);
+  }
+
+  @Override
+  protected String getDocumentName() {
+    ObservableList<DepanFxWorkspaceResource<DepanFxNodeViewData>> srcs =
+        nodeViewsTable.getItems();
+    if (srcs.isEmpty()) {
+      return "Empty";
+    }
+    String baseName = srcs.get(0).getResource().getToolName();
+    int mergeSize = srcs.size();
+    if (mergeSize == 1) {
+      return baseName;
+    }
+    if (mergeSize < 100) {
+      return baseName + "+" + String.valueOf(mergeSize - 1);
+    }
+    return baseName + "+++";
   }
 
   /////////////////////////////////////
@@ -150,10 +178,9 @@ public class DepanFxNodeViewsMergeDialog extends DepanFxBaseDialog {
   }
 
   private void addNodeView() {
-    DepanFxNodeListChooser.runNodeListChooser(
+    DepanFxNodeViewChooser.runChooser(
         workspace, dialogRunner, getScene())
-        .ifPresent(nv -> LOG.info("Should pick a view"));
-    //  .ifPresent(nv -> nodeViewsTable.getItems().add(nv));
+        .ifPresent(nv -> nodeViewsTable.getItems().add(nv));
   }
 
   private class NodeViewsMergeActions

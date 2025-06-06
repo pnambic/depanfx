@@ -44,6 +44,22 @@
             <Button text="Add Node View" onAction="#handleAddNodeView" />
          </HBox>
 
+         <Label text="Node View Name"/>
+
+         <HBox spacing="10">
+            <TextField fx:id="toolNameField" editable="true"
+                  promptText="Display label for data source"
+                  HBox.hgrow="ALWAYS"/>
+         </HBox>
+
+         <Label text="Node View Description"/>
+
+         <HBox spacing="10">
+            <TextField fx:id="toolDescriptionField" editable="true"
+                  promptText="Description"
+                  HBox.hgrow="ALWAYS"/>
+         </HBox>
+
          <Label text="Select Destination File"/>
 
          <HBox spacing="10">
@@ -55,7 +71,7 @@
          <HBox spacing="10">
             <Button text="Cancel" onAction="#handleCancel"/>
             <Region HBox.hgrow="ALWAYS" />
-            <Button text="Merge" onAction="#handleMerge"/>
+            <Button text="Merge" onAction="#handleConfirm"/>
          </HBox>
 
    </VBox>

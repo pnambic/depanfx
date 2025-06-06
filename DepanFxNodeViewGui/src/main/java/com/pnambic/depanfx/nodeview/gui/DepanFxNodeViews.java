@@ -23,6 +23,7 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayoutData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewSceneData;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -47,6 +48,12 @@ public class DepanFxNodeViews {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeViews.class);
+
+  public static final DepanFxResourceFilter NODE_VIEW_RSRC_FILTER =
+      DepanFxResourceFilter.buildResourceFilter(
+          "Node View",
+          DepanFxNodeViewData.NODE_VIEW_TOOL_EXT,
+          DepanFxNodeViewData.class);
 
   public static final Color DEFAULT_BACKGROUND_COLOR =
       Color.rgb(240, 240, 240);     // cream
