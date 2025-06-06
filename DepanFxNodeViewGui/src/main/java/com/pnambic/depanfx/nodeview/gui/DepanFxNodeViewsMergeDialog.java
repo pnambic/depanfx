@@ -16,9 +16,8 @@
 package com.pnambic.depanfx.nodeview.gui;
 
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
-import com.pnambic.depanfx.perspective.DepanFxBaseDocumentDialog;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewMerger;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
-import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
 import com.pnambic.depanfx.perspective.DepanFxProctor;
 import com.pnambic.depanfx.scene.DepanFxActionTableCell;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -38,9 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -95,25 +94,34 @@ public class DepanFxNodeViewsMergeDialog
     nodeViewsTable.setContextMenu(buildNodeViewsMergeTableMenu());
 
     DepanFxTableColumnBinder<DepanFxWorkspaceResource<DepanFxNodeViewData>>
-    columnBinder =
-        new DepanFxTableColumnBinder<>(nodeViewsTable);
+    columnBinder = new DepanFxTableColumnBinder<>(nodeViewsTable);
 
     TableColumn<DepanFxWorkspaceResource<DepanFxNodeViewData>, String>
-    labelColumn =
-        columnBinder.next();
+    rsrcColumn = columnBinder.next();
+    rsrcColumn.setCellValueFactory(
+        r -> new SimpleStringProperty(
+            r.getValue().getDocument().getMemberName()));
 
     TableColumn<DepanFxWorkspaceResource<DepanFxNodeViewData>, String>
-    descrColumn =
-        columnBinder.next();
+    labelColumn = columnBinder.next();
+    labelColumn.setCellValueFactory(
+        r -> new SimpleStringProperty(
+            r.getValue().getResource().getToolName()));
 
     TableColumn<DepanFxWorkspaceResource<DepanFxNodeViewData>, String>
-    rowActionColumn =
-        columnBinder.next();
+    descrColumn = columnBinder.next();
+    descrColumn.setCellValueFactory(
+        r -> new SimpleStringProperty(
+            r.getValue().getResource().getToolDescription()));
+
+    TableColumn<DepanFxWorkspaceResource<DepanFxNodeViewData>, String>
+    rowActionColumn = columnBinder.next();
     DepanFxActionTableCell.prepareColumn(
         rowActionColumn, p -> new NodeViewsMergeActions());
 
     descrColumn.prefWidthProperty().bind(
         nodeViewsTable.widthProperty()
+            .subtract(rsrcColumn.widthProperty())
             .subtract(labelColumn.widthProperty())
             .subtract(rowActionColumn.widthProperty())
             .subtract(1));
@@ -132,12 +140,24 @@ public class DepanFxNodeViewsMergeDialog
   @Override
   protected void checkInput(DepanFxProctor proctor) {
     super.checkInput(proctor);
+    ObservableList<DepanFxWorkspaceResource<DepanFxNodeViewData>> srcs =
+        nodeViewsTable.getItems();
+    if (srcs.isEmpty()) {
+      proctor.addError(
+          "At least one input view required",
+          "Node view merge requires at least one input view.");
+    }
   }
 
   @Override
   protected DepanFxNodeViewData prepareResult() {
+    ObservableList<DepanFxWorkspaceResource<DepanFxNodeViewData>> srcs =
+        nodeViewsTable.getItems();
+    DepanFxNodeViewData base = DepanFxNodeViews.updateNameDescr(
+        srcs.get(0).getResource(), getToolName(), getToolDescription());
+
     LOG.info("Would merge here");
-    return null;
+    return base;
   }
 
   @Override
@@ -192,7 +212,15 @@ public class DepanFxNodeViewsMergeDialog
 
     @Override
     protected void populateContextMenu(DepanFxContextMenuBuilder builder) {
+
+      builder.appendActionItem("Select Node View...",
+          e -> runNodeViewChooser(getIndex()));
       appendMoveOps(builder);
+    }
+
+    private void runNodeViewChooser(int index) {
+      DepanFxNodeViewChooser.runChooser(workspace, dialogRunner, getScene())
+          .ifPresent(nv -> setRow(index, nv));
     }
   }
 }
