@@ -15,14 +15,19 @@
  */
 package com.pnambic.depanfx.nodeview.gui;
 
-import com.pnambic.depanfx.nodelist.gui.columns.annos.DepanFxAnnotationIndexToolDialog.EditAnnotationSpec;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.perspective.DepanFxBaseDialog;
 import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
 import com.pnambic.depanfx.perspective.DepanFxProctor;
+import com.pnambic.depanfx.scene.DepanFxActionTableCell;
+import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxFxmlDialog;
+import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -32,6 +37,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
@@ -44,15 +51,19 @@ public class DepanFxNodeViewsMergeDialog extends DepanFxBaseDialog {
 
   public static final String MERGE_NODE_VIEWS = "Merge Node Views";
 
-  @FXML
-  private TableView<EditAnnotationSpec> nodeViewsTable;
+  private final DepanFxDialogRunner dialogRunner;
 
   @FXML
-  private TextField dstDirectoryField;
+  private TableView<DepanFxWorkspaceResource<DepanFxNodeViewData>> nodeViewsTable;
+
+  @FXML
+  private TextField destinationField;
 
   @Autowired
-  public DepanFxNodeViewsMergeDialog(DepanFxWorkspace workspace) {
+  public DepanFxNodeViewsMergeDialog(
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
     super(workspace);
+    this.dialogRunner = dialogRunner;
   }
 
   public static DepanFxNodeViewsMergeDialog runMergeDialog(
@@ -66,8 +77,37 @@ public class DepanFxNodeViewsMergeDialog extends DepanFxBaseDialog {
   }
 
   @FXML
-  public void addNodeView() {
-    LOG.info("Add node view");
+  public void initialize() {
+    nodeViewsTable.setContextMenu(buildNodeViewsMergeTableMenu());
+
+    DepanFxTableColumnBinder<DepanFxWorkspaceResource<DepanFxNodeViewData>>
+    columnBinder =
+        new DepanFxTableColumnBinder<>(nodeViewsTable);
+
+    TableColumn<DepanFxWorkspaceResource<DepanFxNodeViewData>, String>
+    labelColumn =
+        columnBinder.next();
+
+    TableColumn<DepanFxWorkspaceResource<DepanFxNodeViewData>, String>
+    descrColumn =
+        columnBinder.next();
+
+    TableColumn<DepanFxWorkspaceResource<DepanFxNodeViewData>, String>
+    rowActionColumn =
+        columnBinder.next();
+    DepanFxActionTableCell.prepareColumn(
+        rowActionColumn, p -> new NodeViewsMergeActions());
+
+    descrColumn.prefWidthProperty().bind(
+        nodeViewsTable.widthProperty()
+            .subtract(labelColumn.widthProperty())
+            .subtract(rowActionColumn.widthProperty())
+            .subtract(1));
+  }
+
+  @FXML
+  public void handleAddNodeView() {
+    addNodeView();
   }
 
   @FXML
@@ -93,11 +133,39 @@ public class DepanFxNodeViewsMergeDialog extends DepanFxBaseDialog {
   @Override
   protected void checkInput(DepanFxProctor proctor) {
     DepanFxDialogChecks.checkDestinationFile(
-        proctor, dstDirectoryField.getText());
+        proctor, destinationField.getText());
   }
 
   @Override
   public Scene getScene() {
     return nodeViewsTable.getScene();
+  }
+
+  /////////////////////////////////////
+
+  private ContextMenu buildNodeViewsMergeTableMenu() {
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    builder.appendActionItem("Add Node View", e -> addNodeView());
+    return builder.build();
+  }
+
+  private void addNodeView() {
+    DepanFxNodeListChooser.runNodeListChooser(
+        workspace, dialogRunner, getScene())
+        .ifPresent(nv -> LOG.info("Should pick a view"));
+    //  .ifPresent(nv -> nodeViewsTable.getItems().add(nv));
+  }
+
+  private class NodeViewsMergeActions
+      extends DepanFxActionTableCell<DepanFxWorkspaceResource<DepanFxNodeViewData>> {
+
+    public NodeViewsMergeActions() {
+      super(nodeViewsTable.getItems());
+    }
+
+    @Override
+    protected void populateContextMenu(DepanFxContextMenuBuilder builder) {
+      appendMoveOps(builder);
+    }
   }
 }

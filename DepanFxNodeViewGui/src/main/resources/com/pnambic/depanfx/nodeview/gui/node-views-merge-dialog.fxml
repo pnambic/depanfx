@@ -41,7 +41,7 @@
          </TableView>
 
          <HBox>
-            <Button text="Add Node View" onAction="#addNodeView" />
+            <Button text="Add Node View" onAction="#handleAddNodeView" />
          </HBox>
 
          <Label text="Select Destination File"/>
