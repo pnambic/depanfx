@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class DepanFxSimpleAdjacencyModel implements DepanFxAdjacencyModel {
 
@@ -48,5 +49,9 @@ public class DepanFxSimpleAdjacencyModel implements DepanFxAdjacencyModel {
         link.getSource().getId().getNodeKey(),
         link.getTarget().getId().getNodeKey());
     addAdjacency(link.getSource(), link.getTarget());
+  }
+
+  public Stream<GraphNode> streamHeadNodes() {
+    return adjacencyData.keySet().stream();
   }
 }
