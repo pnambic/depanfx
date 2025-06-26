@@ -54,6 +54,8 @@ public interface DepanFxNodeListTableAdapter {
 
   GraphDocument getGraphDoc();
 
+  DepanFxWorkspaceResource<GraphDocument> getGraphDocResource();
+
   DepanFxNodeList buildEmptyList();
 
   DepanFxDialogRunner getDialogRunner();

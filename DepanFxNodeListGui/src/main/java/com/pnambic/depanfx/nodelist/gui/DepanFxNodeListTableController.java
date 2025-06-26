@@ -87,6 +87,11 @@ public class DepanFxNodeListTableController
   }
 
   @Override // DepanFxNodeListTableAdapter
+  public DepanFxWorkspaceResource<GraphDocument> getGraphDocResource() {
+    return nodeList.getGraphDocResource();
+  }
+
+  @Override // DepanFxNodeListTableAdapter
   public DepanFxNodeList buildEmptyList() {
     return DepanFxNodeLists.buildEmptyNodeList(nodeList);
   }
