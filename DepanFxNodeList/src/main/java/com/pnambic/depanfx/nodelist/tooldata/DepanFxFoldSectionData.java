@@ -24,6 +24,7 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -34,7 +35,7 @@ public class DepanFxFoldSectionData extends DepanFxBaseSectionData {
 
   public static final String FOLD_SECTION_TOOL_EXT = "dfsti";
 
-  public static final String BASE_SECTION_LABEL = "Fold";
+  public static final String FOLD_SECTION_LABEL = "Fold";
 
   public enum ContainerOrder { FIRST, MIXED, LAST };
 
@@ -85,6 +86,15 @@ public class DepanFxFoldSectionData extends DepanFxBaseSectionData {
 
     // Collation criteria
     this.containerOrder = containerOrder;
+  }
+
+  public static DepanFxFoldSectionData emptyFoldSectionData(
+      DepanFxWorkspaceResource<GraphDocument> graphRsrc) {
+    return new DepanFxFoldSectionData(
+        "Empty Fold Section", "Empty fold section.",
+        FOLD_SECTION_LABEL, true,
+        OrderBy.NODE_KEY, ContainerOrder.FIRST,
+        OrderDirection.FORWARD, graphRsrc, Collections.emptyList());
   }
 
   public ContainerOrder getContainerOrder() {

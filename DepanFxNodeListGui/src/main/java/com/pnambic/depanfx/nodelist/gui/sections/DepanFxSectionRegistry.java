@@ -1,8 +1,10 @@
 package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
+import com.pnambic.depanfx.nodelist.gui.sections.folds.DepanFxFoldSection;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxFoldSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -45,6 +47,9 @@ public class DepanFxSectionRegistry {
     case DepanFxTreeSectionData tree:
       return new DepanFxTreeSection(tableAdapter,
           (DepanFxWorkspaceResource<DepanFxTreeSectionData>) dataRsrc);
+    case DepanFxFoldSectionData fold:
+      return new DepanFxFoldSection(tableAdapter,
+          (DepanFxWorkspaceResource<DepanFxFoldSectionData>) dataRsrc);
     case DepanFxFlatSectionData flat:
       return new DepanFxFlatSection(
           (DepanFxWorkspaceResource<DepanFxFlatSectionData>) dataRsrc);

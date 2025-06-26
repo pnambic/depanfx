@@ -342,7 +342,7 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
     }
   }
 
-  private static class FoldFork extends DepanFxNodeListGraphNode {
+  public static class FoldFork extends DepanFxNodeListGraphNode {
 
     public FoldFork(GraphNode node, DepanFxFoldSection section) {
       super(node, section);
@@ -399,7 +399,7 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
     }
   }
 
-  private static class FoldLeaf extends DepanFxNodeListGraphNode {
+  public static class FoldLeaf extends DepanFxNodeListGraphNode {
 
     public FoldLeaf(GraphNode node, DepanFxFoldSection depanFxFoldSection) {
       super(node, depanFxFoldSection);
