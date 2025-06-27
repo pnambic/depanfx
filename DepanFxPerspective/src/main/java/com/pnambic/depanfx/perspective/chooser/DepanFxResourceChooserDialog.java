@@ -53,7 +53,7 @@ public class DepanFxResourceChooserDialog {
   private ListView<DepanFxWorkspaceMember> fileListView;
 
   @FXML
-  private ComboBox<DepanFxResourceFilter> fileTypeComboBox;
+  private ComboBox<DepanFxResourceFilterModel> fileTypeComboBox;
 
   @FXML
   private TextField resourceNameField;
@@ -62,7 +62,7 @@ public class DepanFxResourceChooserDialog {
 
   private DepanFxWorkspaceMember selectedResource;
 
-  private DepanFxResourceFilter activeFilter;
+  private DepanFxResourceFilterModel activeFilter;
 
   private String initialResourceName;
 
@@ -89,11 +89,11 @@ public class DepanFxResourceChooserDialog {
     initComboBox();
   }
 
-  public void setExtension(ObservableList<DepanFxResourceFilter> items) {
+  public void setExtension(ObservableList<DepanFxResourceFilterModel> items) {
     fileTypeComboBox.setItems(items);
   }
 
-  public void setActiveFilter(DepanFxResourceFilter activeFilter) {
+  public void setActiveFilter(DepanFxResourceFilterModel activeFilter) {
     this.activeFilter = activeFilter;
     fileTypeComboBox.setValue(activeFilter);
 
@@ -312,10 +312,10 @@ public class DepanFxResourceChooserDialog {
     }
   }
 
-  private class ComboBoxCell extends ListCell<DepanFxResourceFilter> {
+  private class ComboBoxCell extends ListCell<DepanFxResourceFilterModel> {
 
     @Override
-    protected void updateItem(DepanFxResourceFilter item, boolean empty) {
+    protected void updateItem(DepanFxResourceFilterModel item, boolean empty) {
         super.updateItem(item, empty);
 
         if (item == null || empty) {

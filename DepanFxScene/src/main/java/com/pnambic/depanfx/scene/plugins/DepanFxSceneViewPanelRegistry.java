@@ -1,7 +1,7 @@
 package com.pnambic.depanfx.scene.plugins;
 
 import com.pnambic.depanfx.base.DepanFxOrderableContribution;
-import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
+import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 
@@ -60,7 +60,7 @@ public class DepanFxSceneViewPanelRegistry {
 
   private MenuItem buildContribMenuItem(
       DepanFxSceneService sceneSrvc, Contribution contrib) {
-    return DepanFxContextMenuBuilder.createActionItem(
+    return DepanFxMenuItemFactory.createActionItem(
         contrib.getLabel(),
         e -> sceneSrvc.addViewer(contrib.getSceneViewer(sceneSrvc)));
   }

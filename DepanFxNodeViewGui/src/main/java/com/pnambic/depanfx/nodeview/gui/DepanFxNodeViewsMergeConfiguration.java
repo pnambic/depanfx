@@ -15,8 +15,8 @@
  */
 package com.pnambic.depanfx.nodeview.gui;
 
-import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceContribution;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 
@@ -57,7 +57,7 @@ public class DepanFxNodeViewsMergeConfiguration {
 
     @Override
     public MenuItem createNewResourceMenuItem() {
-      return DepanFxContextMenuBuilder.createActionItem(
+      return DepanFxMenuItemFactory.createActionItem(
           MERGE_NODE_VIEWS_LABEL, e -> runCreateDialog(workspace, dialogRunner));
     }
   }

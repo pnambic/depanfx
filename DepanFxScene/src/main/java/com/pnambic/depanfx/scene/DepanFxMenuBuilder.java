@@ -17,19 +17,18 @@ package com.pnambic.depanfx.scene;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 
-public class DepanFxContextMenuBuilder {
+public class DepanFxMenuBuilder {
 
-  private final ContextMenu result;
+  private final Menu result;
 
   private final DepanFxMenuItemFactory itemFactory;
 
-  public DepanFxContextMenuBuilder() {
-    this.result = new ContextMenu();
+  public DepanFxMenuBuilder(String menuLabel) {
+    this.result = new Menu(menuLabel);
     this.itemFactory = new DepanFxMenuItemFactory(result.getItems());
   }
 
@@ -50,7 +49,11 @@ public class DepanFxContextMenuBuilder {
     itemFactory.appendSubMenu(subMenu);
   }
 
-  public ContextMenu build() {
+  public Menu build() {
     return result;
+  }
+
+  public void appendMenuItem(MenuItem item) {
+    itemFactory.appendMenuItem(item);
   }
 }

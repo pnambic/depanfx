@@ -1,7 +1,7 @@
 package com.pnambic.depanfx.filesystem.gui;
 
-import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceContribution;
 
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ public class DepanFxNewFileSystemContribution
 
   @Override
   public MenuItem createNewResourceMenuItem() {
-    return DepanFxContextMenuBuilder.createActionItem(
+    return DepanFxMenuItemFactory.createActionItem(
         "File System", e -> runDialog());
   }
 

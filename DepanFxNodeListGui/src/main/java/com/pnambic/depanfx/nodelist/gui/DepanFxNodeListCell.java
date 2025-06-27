@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.context.ContextModelId;
@@ -23,8 +38,10 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilterModel;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
+import com.pnambic.depanfx.scene.DepanFxMenuBuilder;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -42,7 +59,6 @@ import java.util.Optional;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.cell.CheckBoxTreeTableCell;
 import javafx.scene.input.Clipboard;
@@ -52,12 +68,21 @@ import javafx.util.StringConverter;
 public class DepanFxNodeListCell
     extends CheckBoxTreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember> {
 
+  private static final String INSERT_SECTION = "Insert Section";
+
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeListCell.class);
+
+  private static final String SELECT_SECTION = "Select Section...";
 
   private static final String SELECT_FLAT_SECTION = "Select Flat Section...";
 
   private static final String EDIT_FLAT_SECTION = "Edit Flat Section...";
+
+  // Fold section actions
+  private static final String SELECT_FOLD_SECTION = "Select Fold Section...";
+
+  private static final String EDIT_FOLD_SECTION = "Edit Fold Section...";
 
   // Tree section actions
   private static final String SELECT_TREE_SECTION = "Select Tree Section...";
@@ -159,6 +184,9 @@ public class DepanFxNodeListCell
     setContextMenu(null);
   }
 
+  /////////////////////////////////////
+  // Context menu for flat sections
+
   private ContextMenu flatSectionMenu(DepanFxFlatSection member) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
     builder.appendActionItem(SELECT_FLAT_SECTION,
@@ -166,20 +194,16 @@ public class DepanFxNodeListCell
     builder.appendActionItem(EDIT_FLAT_SECTION,
         e -> openFlatSectionEditor(member));
 
+    builder.appendSubMenu(newSectionMenu(member));
     builder.appendSeparator();
     builder.appendActionItem(
         EXPORT_TO_CSV,
         e -> runExportToCsvAction(member));
-
-    builder.appendSeparator();
-    builder.appendActionItem(
-        INSERT_ABOVE_MEMBER_TREE_SECTION,
-        e -> runInsertMemberTreeSectionAction(member));
-    builder.appendActionItem(
-        INSERT_ABOVE_FOLD_SECTION,
-        e -> runInsertFoldSectionAction(member));
     return builder.build();
   }
+
+  /////////////////////////////////////
+  // Context menu for tree sections
 
   private ContextMenu treeSectionMenu(DepanFxTreeSection member) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
@@ -188,6 +212,7 @@ public class DepanFxNodeListCell
     builder.appendActionItem(EDIT_TREE_SECTION,
         e -> openTreeSectionEditor(member));
 
+    builder.appendSubMenu(newSectionMenu(member));
     builder.appendSeparator();
     builder.appendActionItem(
         EXPORT_TO_CSV,
@@ -227,13 +252,17 @@ public class DepanFxNodeListCell
     return builder.build();
   }
 
+  /////////////////////////////////////
+  // Context menu for tree sections
+
   private ContextMenu foldSectionMenu(DepanFxFoldSection section) {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem(SELECT_TREE_SECTION,
+    builder.appendActionItem(SELECT_FOLD_SECTION,
         e -> openFoldSectionFinder(section));
-    builder.appendActionItem(EDIT_TREE_SECTION,
+    builder.appendActionItem(EDIT_FOLD_SECTION,
         e -> openFoldSectionEditor(section));
 
+    builder.appendSubMenu(newSectionMenu(section));
     builder.appendSeparator();
     builder.appendActionItem(
         EXPORT_TO_CSV,
@@ -274,18 +303,17 @@ public class DepanFxNodeListCell
   }
 
   private Menu buildCopyMenu(DepanFxNodeListGraphNode node) {
-    Menu result = new Menu(COPY_AS_ITEM);
-    ObservableList<MenuItem> items = result.getItems();
-    items.add(DepanFxContextMenuBuilder.createActionItem(
+    DepanFxMenuBuilder result = new DepanFxMenuBuilder(COPY_AS_ITEM);
+    result.appendActionItem(
         COPY_DISPLAY_ITEM,
-        e -> runCopyFrom(node.getDisplayName())));
-    items.add(DepanFxContextMenuBuilder.createActionItem(
+        e -> runCopyFrom(node.getDisplayName()));
+    result.appendActionItem(
         COPY_NODE_KEY,
-        e -> runCopyFrom(node.getGraphNode().getId().getNodeKey())));
-    items.add(DepanFxContextMenuBuilder.createActionItem(
+        e -> runCopyFrom(node.getGraphNode().getId().getNodeKey()));
+    result.appendActionItem(
         COPY_SIMPLE_NAME,
-        e -> runCopyFrom(node.getGraphNode().getId().getSimpleName())));
-    return result;
+        e -> runCopyFrom(node.getGraphNode().getId().getSimpleName()));
+    return result.build();
   }
 
   private void runCopyFrom(String src) {
@@ -314,6 +342,22 @@ public class DepanFxNodeListCell
   private void runExportToCsvAction(DepanFxTreeSection treeSection) {
     DepanFxExportTreeSectionDialog.runExportDialog(
         treeSection, tableAdapter.getDialogRunner());
+  }
+
+
+  private Menu newSectionMenu(DepanFxNodeListSection before) {
+    DepanFxMenuBuilder builder = new DepanFxMenuBuilder(INSERT_SECTION);
+    builder.appendActionItem(
+        SELECT_SECTION,
+        e -> runInsertSelectSection(before));
+    builder.appendSeparator();
+    builder.appendActionItem(
+        INSERT_ABOVE_MEMBER_TREE_SECTION,
+        e -> runInsertMemberTreeSectionAction(before));
+    builder.appendActionItem(
+        INSERT_ABOVE_FOLD_SECTION,
+        e -> runInsertFoldSectionAction(before));
+    return builder.build();
   }
 
   private void openTreeSectionEditor(DepanFxTreeSection member) {
@@ -381,6 +425,16 @@ public class DepanFxNodeListCell
     tableAdapter.updateSection(member, dataRsrc);
   }
 
+  private void runInsertSelectSection(DepanFxNodeListSection before) {
+    DepanFxWorkspace workspace = tableAdapter.getWorkspace();
+
+    prepareSectionChooser(workspace).showOpenDialog(getScene())
+        .map(DepanFxProjectDocument.class::cast)
+        .flatMap(p -> workspace.getWorkspaceResource(
+            p, DepanFxFlatSectionData.class))
+        .ifPresent(r -> tableAdapter.insertSection(before, r));
+  }
+
   private void runInsertMemberTreeSectionAction(DepanFxNodeListSection before) {
     getInitialTreeSectionResource()
         .ifPresent(r -> tableAdapter.insertSection(before, r));
@@ -436,6 +490,19 @@ public class DepanFxNodeListCell
     tableAdapter.doSelectGraphNodesAction(nodes.stream(), value);
   }
 
+  private DepanFxResourceChooser prepareSectionChooser(
+      DepanFxWorkspace workspace) {
+    DepanFxResourceFilterModel.Composite rsrcFilter =
+        new DepanFxResourceFilterModel.Composite(
+            "Node List Sections",
+            new DepanFxResourceFilter[] {
+                DepanFxFlatSectionToolDialog.FLAT_SECTION_RSRC_FILTER,
+                DepanFxFoldSectionToolDialog.FOLD_SECTION_RSRC_FILTER,
+                DepanFxTreeSectionToolDialog.TREE_SECTION_RSRC_FILTER
+            });
+    return prepareSectionChooser(workspace, rsrcFilter);
+  }
+
   private DepanFxResourceChooser prepareFoldSectionChooser(
       DepanFxWorkspace workspace) {
     return prepareSectionChooser(
@@ -455,7 +522,7 @@ public class DepanFxNodeListCell
   }
 
   private DepanFxResourceChooser prepareSectionChooser(
-      DepanFxWorkspace workspace, DepanFxResourceFilter rsrcFilter) {
+      DepanFxWorkspace workspace, DepanFxResourceFilterModel rsrcFilter) {
     DepanFxResourceChooser result =
         new DepanFxResourceChooser(workspace, tableAdapter.getDialogRunner());
     DepanFxResourcePerspectives.prepareResourceFinder(

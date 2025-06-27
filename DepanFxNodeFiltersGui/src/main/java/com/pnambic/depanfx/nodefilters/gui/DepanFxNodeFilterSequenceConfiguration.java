@@ -21,6 +21,7 @@ import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContributi
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceContribution;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -134,7 +135,7 @@ public class DepanFxNodeFilterSequenceConfiguration {
 
     @Override
     public MenuItem createNewResourceMenuItem() {
-      return DepanFxContextMenuBuilder.createActionItem(
+      return DepanFxMenuItemFactory.createActionItem(
           NODE_FILTER_SEQUENCE, e -> runCreateDialog(workspace, dialogRunner));
     }
   }

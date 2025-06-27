@@ -29,10 +29,10 @@ public class DepanFxResourceChooser {
   /////////////////////////////////////
   // Stolen from javafx.stage.FileChooser
 
-  private ObservableList<DepanFxResourceFilter> extensionFilters =
+  private ObservableList<DepanFxResourceFilterModel> extensionFilters =
       FXCollections.observableArrayList();
 
-  private ObjectProperty<DepanFxResourceFilter> selectedExtensionFilter =
+  private ObjectProperty<DepanFxResourceFilterModel> selectedExtensionFilter =
       new SimpleObjectProperty<>();
 
   public DepanFxResourceChooser(
@@ -59,17 +59,17 @@ public class DepanFxResourceChooser {
     this.initialContainer = initialContainer;
   }
 
-  public ObservableList<DepanFxResourceFilter> getExtensionFilters() {
+  public ObservableList<DepanFxResourceFilterModel> getExtensionFilters() {
     return extensionFilters;
   }
 
   public void setExtensionFilters(
-      ObservableList<DepanFxResourceFilter> extensionFilters) {
+      ObservableList<DepanFxResourceFilterModel> extensionFilters) {
     this.extensionFilters = extensionFilters;
   }
 
   public void setSelectedExtensionFilter(
-      DepanFxResourceFilter resourceFilter) {
+      DepanFxResourceFilterModel resourceFilter) {
     selectedExtensionFilter.set(resourceFilter);
   }
 

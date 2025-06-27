@@ -21,8 +21,8 @@ import com.pnambic.depanfx.graph_doc.persistence.GraphDocPersistenceContribution
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxAnnotationStoreData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxInfoStoreData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
-import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceContribution;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -97,7 +97,7 @@ public class DepanFxAnnotationConfiguration {
 
     @Override
     public MenuItem createNewResourceMenuItem() {
-      return DepanFxContextMenuBuilder.createActionItem(
+      return DepanFxMenuItemFactory.createActionItem(
           ANNOTATION_INDEX_TOOL_NAME, e -> runCreateDialog());
     }
 

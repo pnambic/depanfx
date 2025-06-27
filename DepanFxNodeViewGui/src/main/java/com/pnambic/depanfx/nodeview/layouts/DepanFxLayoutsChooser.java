@@ -4,6 +4,7 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilterModel;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -34,7 +35,7 @@ public class DepanFxLayoutsChooser {
     DepanFxResourcePerspectives.prepareResourceFinder(
         rsrcChooser, DepanFxNodeViewData.NODE_VIEW_TOOL_PATH);
 
-    ObservableList<DepanFxResourceFilter> filters =
+    ObservableList<DepanFxResourceFilterModel> filters =
         rsrcChooser.getExtensionFilters();
 
     filters.addAll(layoutRegistry.getOpenFilters(c -> true));

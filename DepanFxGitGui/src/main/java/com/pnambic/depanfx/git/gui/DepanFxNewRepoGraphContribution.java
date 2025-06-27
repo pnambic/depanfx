@@ -1,9 +1,9 @@
 package com.pnambic.depanfx.git.gui;
 
 import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
-import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
+import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewResourceContribution;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -30,7 +30,7 @@ public class DepanFxNewRepoGraphContribution
 
   @Override
   public MenuItem createNewResourceMenuItem() {
-    return DepanFxContextMenuBuilder.createActionItem(
+    return DepanFxMenuItemFactory.createActionItem(
         "Git Repo", e -> runDialog());
   }
 

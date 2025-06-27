@@ -10,8 +10,11 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilterModel;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxMenuBuilder;
+import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -26,7 +29,6 @@ import java.util.List;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
 
 public class DepanFxNodeListTableCommands {
 
@@ -114,25 +116,23 @@ public class DepanFxNodeListTableCommands {
   }
 
   private Menu newColumnMenu() {
-    Menu result = new Menu(ADD_COLUMN);
-    ObservableList<MenuItem> items = result.getItems();
-    items.add(DepanFxContextMenuBuilder.createActionItem(
-        SELECT_COLUMN,
-        e -> doSelectColumnAction()));
+    DepanFxMenuBuilder menuBuilder = new DepanFxMenuBuilder(ADD_COLUMN);
+    menuBuilder.appendActionItem(
+        SELECT_COLUMN, e -> doSelectColumnAction());
+    menuBuilder.appendSeparator();
 
-    items.add(new SeparatorMenuItem());
     tableAdapter.streamColumnChoices()
         .map(this::buildColumnItem)
-        .forEach(items::add);
+        .forEach(menuBuilder::appendMenuItem);
 
-    return result;
+    return menuBuilder.build();
   }
 
   private MenuItem buildColumnItem(
       DepanFxColumnRegistry.Contribution contrib) {
     String fmtLabel = MessageFormat.format(
         "New {0} Column...", contrib.getColumnLabel());
-    return DepanFxContextMenuBuilder.createActionItem(
+    return DepanFxMenuItemFactory.createActionItem(
         fmtLabel,
         e ->
           contrib.getNewColumn(e, workspace, dialogRunner, tableAdapter)
@@ -141,17 +141,18 @@ public class DepanFxNodeListTableCommands {
   }
 
   private Menu buildTableViewMenu() {
-    Menu result = new Menu(TABLE_VIEW);
-    ObservableList<MenuItem> items = result.getItems();
-    items.add(newColumnMenu());
-    items.add(new SeparatorMenuItem());
-    items.add(DepanFxContextMenuBuilder.createActionItem(
+    DepanFxMenuBuilder menuBuilder = new DepanFxMenuBuilder(TABLE_VIEW);
+    menuBuilder.appendMenuItem(newColumnMenu());
+
+    menuBuilder.appendSeparator();
+    menuBuilder.appendActionItem(
         DepanFxNodeListTableViewSaveDialog.SELECT_TABLE_VIEW,
-        e -> runNodeListTableViewChooser()));
-    items.add(DepanFxContextMenuBuilder.createActionItem(
+        e -> runNodeListTableViewChooser());
+    menuBuilder.appendActionItem(
         DepanFxNodeListTableViewSaveDialog.SAVE_TABLE_VIEW,
-        e -> runNodeListTableViewSaveDialog()));
-    return result;
+        e -> runNodeListTableViewSaveDialog());
+
+    return menuBuilder.build();
   }
 
   private void runNodeListTableViewChooser() {
@@ -189,7 +190,7 @@ public class DepanFxNodeListTableCommands {
     DepanFxResourcePerspectives.prepareResourceFinder(
         rsrcChooser, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
 
-    ObservableList<DepanFxResourceFilter> filters =
+    ObservableList<DepanFxResourceFilterModel> filters =
         rsrcChooser.getExtensionFilters();
     tableAdapter.streamColumnChoices()
         .map(c -> c.getColumnFilter())

@@ -50,6 +50,8 @@ import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
+import com.pnambic.depanfx.scene.DepanFxMenuBuilder;
+import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
@@ -87,7 +89,6 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tab;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -541,17 +542,16 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   }
 
   private Menu buildEdgeDisplayMenu() {
-    Menu result = new Menu(EDGE_DISPLAY);
 
-    ObservableList<MenuItem> items = result.getItems();
-    items.add(DepanFxContextMenuBuilder.createActionItem(
-        SELECT_EDGE_DISPLAY, e -> doSelectEdgeDisplayAction()));
-
-    items.add(new SeparatorMenuItem());
-    items.add(DepanFxContextMenuBuilder.createActionItem(
+    DepanFxMenuBuilder menuBuilder = new DepanFxMenuBuilder(EDGE_DISPLAY);
+    menuBuilder.appendActionItem(
+        SELECT_EDGE_DISPLAY, e -> doSelectEdgeDisplayAction());
+    menuBuilder.appendSeparator();
+    menuBuilder.appendActionItem(
         DepanFxNodeViewLinkDisplayDialog.EDIT_LINK_DISPLAY_ITEM,
-        e -> runEditLinkDisplayDialog()));
-    return result;
+        e -> runEditLinkDisplayDialog());
+
+    return menuBuilder.build();
   }
 
   private void doSelectEdgeDisplayAction() {
@@ -572,18 +572,14 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   }
 
   private Menu buildNodeDisplayMenu() {
-    Menu result = new Menu(NODE_DISPLAY);
-
-    ObservableList<MenuItem> items = result.getItems();
-    items.add(DepanFxContextMenuBuilder.createActionItem(
-        SELECT_NODE_DISPLAY, e -> doSelectNodeDisplayAction()));
-
-    items.add(new SeparatorMenuItem());
-    items.add(DepanFxContextMenuBuilder.createActionItem(
+    DepanFxMenuBuilder result = new DepanFxMenuBuilder(NODE_DISPLAY);
+    result.appendActionItem(
+        SELECT_NODE_DISPLAY, e -> doSelectNodeDisplayAction());
+    result.appendSeparator();
+    result.appendActionItem(
         DepanFxNodeViewNodeDisplayDialog.EDIT_NODE_DISPLAY_ITEM,
-        e -> runEditNodeDisplayDialog()));
-
-    return result;
+        e -> runEditNodeDisplayDialog());
+    return result.build();
   }
 
   private void doSelectNodeDisplayAction() {
@@ -673,30 +669,31 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   private void populateEdgeVisibilityMenu(Menu vizMenu) {
     ObservableList<MenuItem> items = vizMenu.getItems();
     items.clear();
+    DepanFxMenuItemFactory itemFactory = new DepanFxMenuItemFactory(items);
 
     // Toggles for each (non-zero) matcher
     edgeDisplay.streamAvailableMatchers()
         .filter(d -> edgeDisplay.getVisiblityMatcherEdgeCount(d) > 0)
-        .forEach(m -> items.add(buildEdgeVisibleItem(m)));
+        .forEach(m -> itemFactory.appendMenuItem(buildEdgeVisibleItem(m)));
 
     // Add one for the remainders
-    items.add(buildEgdeVisibleItem(
+    itemFactory.appendMenuItem(buildEgdeVisibleItem(
         edgeDisplay.getRemainderLabel(),
         edgeDisplay.getRemainderVisibility(),
         edgeDisplay.getRemainderCount(),
         e -> doToggleRemainderVisibleAction()));
 
-    items.add(new SeparatorMenuItem());
-    items.add(DepanFxContextMenuBuilder.createActionItem(
-        ALL_EDGES_VISIBLE, e -> doAllEdgesVisibleAction()));
-    items.add(DepanFxContextMenuBuilder.createActionItem(
-        NO_EDGES_VISIBLE, e -> doNoEdgesVisibleAction()));
-    items.add(DepanFxContextMenuBuilder.createActionItem(
-        INVERT_EDGES_VISIBLE, e -> doInvertEdgesVisibleAction()));
+    itemFactory.appendSeparator();
+    itemFactory.appendActionItem(
+        ALL_EDGES_VISIBLE, e -> doAllEdgesVisibleAction());
+    itemFactory.appendActionItem(
+        NO_EDGES_VISIBLE, e -> doNoEdgesVisibleAction());
+    itemFactory.appendActionItem(
+        INVERT_EDGES_VISIBLE, e -> doInvertEdgesVisibleAction());
 
-    items.add(new SeparatorMenuItem());
-    items.add(DepanFxContextMenuBuilder.createActionItem(
-        MORE_EDGE_VIBILITY, e -> runEditVisibleEdgesDialog()));
+    itemFactory.appendSeparator();
+    itemFactory.appendActionItem(
+        MORE_EDGE_VIBILITY, e -> runEditVisibleEdgesDialog());
   }
 
   private void doAllEdgesVisibleAction() {
@@ -765,30 +762,31 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   private void populateNodeVisibilityMenu(Menu vizMenu) {
     ObservableList<MenuItem> items = vizMenu.getItems();
     items.clear();
+    DepanFxMenuItemFactory itemFactory = new DepanFxMenuItemFactory(items);
 
     // Toggles for each (non-zero) matcher
     nodeDisplay.streamAvailableResources()
         .filter(d -> nodeDisplay.getVisiblityFilterNodeCount(d) > 0)
-        .forEach(r -> items.add(buildNodeVisibleItem(r)));
+        .forEach(r -> itemFactory.appendMenuItem(buildNodeVisibleItem(r)));
 
     // Add one for the remainders
-    items.add(buildEgdeVisibleItem(
+    itemFactory.appendMenuItem(buildEgdeVisibleItem(
         edgeDisplay.getRemainderLabel(),
         edgeDisplay.getRemainderVisibility(),
         edgeDisplay.getRemainderCount(),
         e -> doToggleRemainderVisibleAction()));
 
-    items.add(new SeparatorMenuItem());
-    items.add(DepanFxContextMenuBuilder.createActionItem(
-        ALL_NODES_VISIBLE, e -> doAllNodesVisibleAction()));
-    items.add(DepanFxContextMenuBuilder.createActionItem(
-        NO_NODES_VISIBLE, e -> doNoNodeVisibleAction()));
-    items.add(DepanFxContextMenuBuilder.createActionItem(
-        INVERT_NODES_VISIBLE, e -> doInvertNodesVisibleAction()));
+    itemFactory.appendSeparator();
+    itemFactory.appendActionItem(
+        ALL_NODES_VISIBLE, e -> doAllNodesVisibleAction());
+    itemFactory.appendActionItem(
+        NO_NODES_VISIBLE, e -> doNoNodeVisibleAction());
+    itemFactory.appendActionItem(
+        INVERT_NODES_VISIBLE, e -> doInvertNodesVisibleAction());
 
-    items.add(new SeparatorMenuItem());
-    items.add(DepanFxContextMenuBuilder.createActionItem(
-        MORE_NODE_VIBILITY, e -> runEditVisibleNodesDialog()));
+    itemFactory.appendSeparator();
+    itemFactory.appendActionItem(
+        MORE_NODE_VIBILITY, e -> runEditVisibleNodesDialog());
   }
 
   private void doAllNodesVisibleAction() {
@@ -839,13 +837,11 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   // Layouts Menu
 
   private Menu buildLayoutNodesMenu() {
-    Menu result = new Menu(LAYOUT_NODES);
-
-    ObservableList<MenuItem> items = result.getItems();
-    items.add(DepanFxContextMenuBuilder.createActionItem(
-        SELECT_LAYOUT, e -> doSelectLayoutAction()));
-
-    items.add(new SeparatorMenuItem());
+    DepanFxMenuBuilder menuBuilder = new DepanFxMenuBuilder(LAYOUT_NODES);
+    menuBuilder.appendActionItem(
+        SELECT_LAYOUT, e -> doSelectLayoutAction());
+    menuBuilder.appendSeparator();
+    Menu result = menuBuilder.build();
     layoutRegistry.popuplateLayoutMenu(result, c -> true, this);
     return result;
   }

@@ -1,9 +1,9 @@
 package com.pnambic.depanfx.git.gui;
 
 import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
-import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
+import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
 import com.pnambic.depanfx.scene.plugins.DepanFxNewAnalysisContribution;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -30,7 +30,7 @@ public class DepanFxNewLogsAnalysisContribution
 
   @Override
   public MenuItem createNewResourceMenuItem() {
-    return DepanFxContextMenuBuilder.createActionItem(
+    return DepanFxMenuItemFactory.createActionItem(
         "Git Logs", e -> runGitLogsDialog());
   }
 

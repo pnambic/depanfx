@@ -15,10 +15,15 @@
  */
 package com.pnambic.depanfx.nodelist.gui.sections.folds;
 
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxFoldSectionData;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 
 public class DepanFxFoldSectionToolDialog {
 
-  public static final DepanFxResourceFilter FOLD_SECTION_RSRC_FILTER = null;
+  public static final DepanFxResourceFilter FOLD_SECTION_RSRC_FILTER = 
+      DepanFxResourceFilter.buildResourceFilter(
+          "Fold Sections",
+          DepanFxFoldSectionData.FOLD_SECTION_TOOL_EXT,
+          DepanFxFoldSectionData.class);
 
 }

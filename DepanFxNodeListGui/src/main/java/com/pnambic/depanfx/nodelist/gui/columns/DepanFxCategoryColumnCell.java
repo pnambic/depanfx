@@ -5,6 +5,8 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeFork;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData.CategoryEntry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
+import com.pnambic.depanfx.scene.DepanFxMenuBuilder;
+import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,6 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
 
 public class DepanFxCategoryColumnCell extends DepanFxBaseColumnCell {
 
@@ -69,7 +70,8 @@ public class DepanFxCategoryColumnCell extends DepanFxBaseColumnCell {
     builder.appendActionItem("None", e -> setCategoryAction(null));
 
     builder.appendSeparator();
-    Menu multiMenu = new Menu("Multiple...");
+    DepanFxMenuBuilder menuBuilder = new DepanFxMenuBuilder("Multiple...");
+    Menu multiMenu = menuBuilder.build();
     populateMultipleMenu(multiMenu.getItems());
     builder.appendSubMenu(multiMenu);
 
@@ -84,18 +86,21 @@ public class DepanFxCategoryColumnCell extends DepanFxBaseColumnCell {
   }
 
   private void populateMultipleMenu(ObservableList<MenuItem> multiItems) {
+    DepanFxMenuItemFactory menuFactory =
+        new DepanFxMenuItemFactory(multiItems);
     streamCategories()
         .map(this::buildCheckBox)
-        .forEach(multiItems::add);
+        .forEach(menuFactory::appendMenuItem);
+
     if (getItem() instanceof DepanFxTreeFork) {
-      multiItems.add(new SeparatorMenuItem());
-      multiItems.add(DepanFxContextMenuBuilder.createActionItem(
-          "Set recursive", e -> setRecursiveAction()));
-      multiItems.add(DepanFxContextMenuBuilder.createActionItem(
-          "Add recursive", e -> addRecursiveAction()));
-      multiItems.add(new SeparatorMenuItem());
-      multiItems.add(DepanFxContextMenuBuilder.createActionItem(
-          "Hoist", e -> hoistSelectsAction()));
+      menuFactory.appendSeparator();
+      menuFactory.appendActionItem(
+          "Set recursive", e -> setRecursiveAction());
+      menuFactory.appendActionItem(
+          "Add recursive", e -> addRecursiveAction());
+      menuFactory.appendSeparator();
+      menuFactory.appendActionItem(
+          "Hoist", e -> hoistSelectsAction());
     }
   }
 

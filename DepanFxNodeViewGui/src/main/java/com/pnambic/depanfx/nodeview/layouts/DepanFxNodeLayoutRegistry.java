@@ -5,7 +5,7 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewPanel;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
-import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
+import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -21,10 +21,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
 
 @Component
 public class DepanFxNodeLayoutRegistry {
@@ -91,11 +89,10 @@ public class DepanFxNodeLayoutRegistry {
       Menu menu, Predicate<Contribution> layoutFilter,
       DepanFxNodeViewPanel view) {
 
-    ObservableList<MenuItem> item = menu.getItems();
+    DepanFxMenuItemFactory menuFactory = new DepanFxMenuItemFactory(menu);
     ordered(layoutFilter)
-        .forEach(c -> item.add(
-            DepanFxContextMenuBuilder.createActionItem(
-                c.getLabel(), e -> c.handleLayout(e, view))));
+        .forEach(c -> menuFactory.appendActionItem(
+            c.getLabel(), e -> c.handleLayout(e, view)));
   }
 
   public List<DepanFxResourceFilter> getOpenFilters(
