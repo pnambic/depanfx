@@ -15,8 +15,10 @@
  */
 package com.pnambic.depanfx.nodelist.gui.sections.folds;
 
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxBaseSectionToolDialog;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFoldSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
@@ -59,7 +61,9 @@ public class DepanFxFoldSectionToolDialog
   private final DepanFxDialogRunner dialogRunner;
 
   @FXML
-  private TextField foldNestResourceField;
+  private TextField nodeFoldingResourceField;
+
+  private DepanFxNodeFoldChooser.NodeFoldingControl foldNestControl;
 
   @FXML
   private CheckBox inferMissingParentsField;
@@ -92,6 +96,9 @@ public class DepanFxFoldSectionToolDialog
   public void initialize() {
     super.initialize();
 
+    foldNestControl = new DepanFxNodeFoldChooser.NodeFoldingControl(
+        getWorkspace(), dialogRunner, nodeFoldingResourceField);
+
     populateOrderBy(orderByField);
 
     containerOrderField.getItems().add(
@@ -102,13 +109,33 @@ public class DepanFxFoldSectionToolDialog
         DepanFxFoldSectionData.ContainerOrder.MIXED);
   }
 
+  @FXML
+  public void onOpenNodeFoldingChooser() {
+    foldNestControl.runNodeFoldingFinder();
+  }
+
+  @FXML
+  public void onNewNodeFolding() {
+    DepanFxWorkspaceResource<GraphDocument> graphRsrc =
+        getToolResource().get().getResource().getNodeFoldResource().getResource().getGraphResource();
+    DepanFxWorkspaceResource<DepanFxNodeFoldData> foldInfo =
+        workspace.addScratchResource(
+            DepanFxNodeFoldData.emptyNodeFoldData(graphRsrc));
+
+    DepanFxNodeFoldToolDialog.runCreateDialog(
+        workspace, dialogRunner, foldInfo)
+        .getController()
+        .getToolResource()
+        .ifPresent(r -> foldNestControl.setNodeFoldResource(r));
+  }
+
   @Override
   public void setToolResource(
       DepanFxWorkspaceResource<DepanFxFoldSectionData> sectionRsrc) {
     super.setToolResource(sectionRsrc);
 
     DepanFxFoldSectionData sectionData = sectionRsrc.getResource();
-    // linkMatcherControl.setLinkMatcherRsrc(sectionData .getNodeFoldResource());
+    foldNestControl.setNodeFoldResource(sectionData.getNodeFoldResource());
 
     orderByField.setValue(sectionData.getOrderBy());
     containerOrderField.setValue(sectionData.getContainerOrder());
@@ -121,8 +148,7 @@ public class DepanFxFoldSectionToolDialog
         getSectionLabel(), displayNodeCount(),
         orderByField.getValue(), getOrderDirection(),
         containerOrderField.getValue(),
-        null);
-        // foldNestResourceField.getText());
+        foldNestControl.getNodeFoldingResource());
   }
 
   @Override

@@ -28,12 +28,18 @@
                   text="Show node count"/>
          </HBox>
 
-         <Label text="Fold Nest"/>
+         <HBox spacing="10">
+            <Label text="Fold Folding"/>
+            <Region HBox.hgrow="ALWAYS" />
+            <Label text="New Node Folding..."
+                onMouseClicked="#onNewNodeFolding" />
+         </HBox>
 
          <HBox spacing="10">
-            <TextField fx:id="foldNestResourceField" editable="false"
-                  promptText="No fold nest selected"
+            <TextField fx:id="nodeFoldingResourceField" editable="false"
+                  promptText="No node folding selected"
                   HBox.hgrow="ALWAYS"/>
+            <Button text="Browse" onAction="#onOpenNodeFoldingChooser" />
          </HBox>
 
          <Label text="Node ordering"/>
@@ -74,8 +80,7 @@
          <HBox spacing="10">
             <TextField fx:id="destinationField" editable="false" promptText="No file selected"
                   HBox.hgrow="ALWAYS"/>
-            <Button text="Browse" onAction="#openDestinationChooser"
-                  HBox.hgrow="ALWAYS"/>
+            <Button text="Browse" onAction="#openDestinationChooser" />
          </HBox>
 
          <Region VBox.vgrow="ALWAYS" />

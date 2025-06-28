@@ -23,6 +23,7 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -80,6 +81,12 @@ public class DepanFxNodeFoldData extends DepanFxBaseToolData {
     return new DepanFxNodeFoldData(
         "Empty Fold Data", "Empty fold data.",
         graphRsrc, Collections.emptyList());
+  }
+
+  public DepanFxNodeFoldData forUpdate(
+      String toolName, String toolDescription) {
+    return new DepanFxNodeFoldData(toolName, toolDescription,
+        graphRsrc, new ArrayList<>(foldNests));
   }
 
   public DepanFxWorkspaceResource<GraphDocument> getGraphResource() {

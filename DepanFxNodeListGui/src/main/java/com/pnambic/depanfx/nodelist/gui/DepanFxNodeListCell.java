@@ -379,7 +379,7 @@ public class DepanFxNodeListCell
   }
 
   private void openFoldSectionEditor(DepanFxFoldSection member) {
-    LOG.info("Fold section editor not yet implemented");
+
     Dialog<DepanFxFoldSectionToolDialog> foldSectionEditor =
         DepanFxFoldSectionToolDialog.runEditDialog(
             member.getSectionResource(), tableAdapter.getDialogRunner());

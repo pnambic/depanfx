@@ -175,6 +175,22 @@ public class DepanFxProjects {
     return proj.getMemberName() + ":" + docPath.toString();
   }
 
+  public static Optional<DepanFxProjectDocument> asSaveDocument(
+      DepanFxWorkspace workspace, DepanFxWorkspaceResource<?> rsrc) {
+
+    DepanFxProjectDocument document = rsrc.getDocument();
+
+    // Don't allow a destination in the built-in or scratch project.
+    if (document.getProject().equals(workspace.getBuiltInProjectTree())) {
+      return Optional.empty();
+    }
+    if (document.getProject().equals(workspace.getScratchProjectTree())) {
+      return Optional.empty();
+    }
+    return Optional.of(document);
+  }
+
+
   /**
    * By the time a candidate built in hits the filter,
    * it has already been filtered to be of the requested type.
