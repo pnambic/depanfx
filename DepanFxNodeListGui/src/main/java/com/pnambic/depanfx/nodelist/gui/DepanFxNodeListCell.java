@@ -380,13 +380,11 @@ public class DepanFxNodeListCell
 
   private void openFoldSectionEditor(DepanFxFoldSection member) {
     LOG.info("Fold section editor not yet implemented");
-/*
-    Dialog<DepanFxTreeSectionToolDialog> treeSectionEditor =
+    Dialog<DepanFxFoldSectionToolDialog> foldSectionEditor =
         DepanFxFoldSectionToolDialog.runEditDialog(
             member.getSectionResource(), tableAdapter.getDialogRunner());
-    treeSectionEditor.getController().getToolResource()
+    foldSectionEditor.getController().getToolResource()
         .ifPresent(d -> updateSectionDataRsrc(member, d));
-*/
   }
 
   private void openFoldSectionFinder(DepanFxFoldSection member) {
@@ -458,7 +456,7 @@ public class DepanFxNodeListCell
       getInitialFoldSectionResource() {
     DepanFxFoldSectionData result =
         DepanFxFoldSectionData.emptyFoldSectionData(
-            tableAdapter.getGraphDocResource());
+            tableAdapter.getWorkspace(), tableAdapter.getGraphDocResource());
     return Optional.of(tableAdapter.getWorkspace().addScratchResource(result));
   }
 

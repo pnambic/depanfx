@@ -15,17 +15,15 @@
  */
 package com.pnambic.depanfx.nodelist.tooldata;
 
-import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -39,74 +37,47 @@ public class DepanFxFoldSectionData extends DepanFxBaseSectionData {
 
   public enum ContainerOrder { FIRST, MIXED, LAST };
 
-  public static class NodeNest {
-
-    private final GraphNode memberNode;
-
-    private final GraphNode nestNode;
-
-    public NodeNest(GraphNode memberNode, GraphNode nestNode) {
-      this.memberNode = memberNode;
-      this.nestNode = nestNode;
-    }
-
-    public GraphNode getMemberNode() {
-      return memberNode;
-    }
-
-    public GraphNode getNestNode() {
-      return nestNode;
-    }
-  }
-
   private final ContainerOrder containerOrder;
 
-  private final DepanFxWorkspaceResource<GraphDocument> graphRsrc;
-
-  /*
-   * In use, this is logically a map from member to containing node.
-   * For persistence, we use a list of NodeNest objects.
-   */
-  private final List<NodeNest> foldNests;
+  private final DepanFxWorkspaceResource<DepanFxNodeFoldData> foldRsrc;
 
   public DepanFxFoldSectionData(
       String toolName, String toolDescription,
       String sectionLabel, boolean displayNodeCount,
       OrderBy orderBy,
-      ContainerOrder containerOrder,
       OrderDirection orderDirection,
-      DepanFxWorkspaceResource<GraphDocument> graphRsrc,
-      List<NodeNest> foldNests) {
+      ContainerOrder containerOrder,
+      DepanFxWorkspaceResource<DepanFxNodeFoldData> foldRsrc) {
     super(toolName, toolDescription,
         sectionLabel, displayNodeCount, orderBy, orderDirection);
 
-    // Folding is over a specific graph doucment.
-    this.graphRsrc = graphRsrc;
-    this.foldNests = foldNests;
-
     // Collation criteria
     this.containerOrder = containerOrder;
+
+    this.foldRsrc = foldRsrc;
   }
 
   public static DepanFxFoldSectionData emptyFoldSectionData(
-      DepanFxWorkspaceResource<GraphDocument> graphRsrc) {
+      DepanFxWorkspace workspace, DepanFxWorkspaceResource<GraphDocument> graphRsrc) {
+
     return new DepanFxFoldSectionData(
         "Empty Fold Section", "Empty fold section.",
         FOLD_SECTION_LABEL, true,
-        OrderBy.NODE_KEY, ContainerOrder.FIRST,
-        OrderDirection.FORWARD, graphRsrc, Collections.emptyList());
+        OrderBy.NODE_KEY, OrderDirection.FORWARD, ContainerOrder.FIRST,
+        workspace.addScratchResource(
+            DepanFxNodeFoldData.emptyNodeFoldData(graphRsrc)));
   }
 
   public ContainerOrder getContainerOrder() {
     return containerOrder;
   }
 
-  public DepanFxWorkspaceResource<GraphDocument> getGraphResource() {
-    return graphRsrc;
+  public DepanFxWorkspaceResource<DepanFxNodeFoldData> getNodeFoldResource() {
+    return foldRsrc;
   }
 
-  public Stream<NodeNest> streamNodeNests() {
-    return foldNests.stream();
+  public Stream<DepanFxNodeFoldData.NodeNest> streamNodeNests() {
+    return foldRsrc.getResource().streamNodeNests();
   }
 
   public static File buildCurrentToolFile(

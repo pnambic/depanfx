@@ -17,7 +17,7 @@ package com.pnambic.depanfx.nodelist.tree;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxFoldSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.util.HashMap;
@@ -38,7 +38,7 @@ public class DepanFxNodeParentsToTreeModelBuilder {
   }
 
   public void importNodeParents(
-      Stream<DepanFxFoldSectionData.NodeNest> parentInfo) {
+      Stream<DepanFxNodeFoldData.NodeNest> parentInfo) {
     parentInfo.forEach(np ->
         nodeParents.computeIfAbsent(
             np.getMemberNode(), n -> np.getNestNode()));

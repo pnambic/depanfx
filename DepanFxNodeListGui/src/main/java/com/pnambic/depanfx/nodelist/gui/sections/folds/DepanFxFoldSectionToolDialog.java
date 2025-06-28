@@ -15,10 +15,40 @@
  */
 package com.pnambic.depanfx.nodelist.gui.sections.folds;
 
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxBaseSectionToolDialog;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFoldSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
+import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxFxmlDialog;
+import com.pnambic.depanfx.scene.DepanFxSceneControls;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
-public class DepanFxFoldSectionToolDialog {
+import net.rgielen.fxweaver.core.FxmlView;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.File;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+
+@DepanFxFxmlDialog
+@FxmlView("fold-section-tool-dialog.fxml")
+public class DepanFxFoldSectionToolDialog
+    extends DepanFxBaseSectionToolDialog<DepanFxFoldSectionData> {
+
+  public static final ExtensionFilter FOLD_SECTION_FILTER =
+      DepanFxSceneControls.buildExtFilter(
+          "Fold Sections", DepanFxFoldSectionData.FOLD_SECTION_TOOL_EXT);
 
   public static final DepanFxResourceFilter FOLD_SECTION_RSRC_FILTER = 
       DepanFxResourceFilter.buildResourceFilter(
@@ -26,4 +56,90 @@ public class DepanFxFoldSectionToolDialog {
           DepanFxFoldSectionData.FOLD_SECTION_TOOL_EXT,
           DepanFxFoldSectionData.class);
 
+  private final DepanFxDialogRunner dialogRunner;
+
+  @FXML
+  private TextField foldNestResourceField;
+
+  @FXML
+  private CheckBox inferMissingParentsField;
+
+  @FXML
+  private ComboBox<OrderBy> orderByField;
+
+  @FXML
+  private ComboBox<DepanFxFoldSectionData.ContainerOrder> containerOrderField;
+
+  @Autowired
+  public DepanFxFoldSectionToolDialog(
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+    super(workspace, DepanFxFoldSectionData.class);
+    this.dialogRunner = dialogRunner;
+  }
+
+  public static Dialog<DepanFxFoldSectionToolDialog> runEditDialog(
+      DepanFxWorkspaceResource<DepanFxFoldSectionData> sectionRsrc,
+      DepanFxDialogRunner dialogRunner) {
+
+    return DepanFxResourcePerspectives.runEditDialog(
+        sectionRsrc, dialogRunner,
+        DepanFxFoldSectionToolDialog.class,
+        DepanFxFoldSection.EDIT_FOLD_SECTION_DATA);
+  }
+
+  @FXML
+  @Override // DepanFxBaseSectionToolDialog
+  public void initialize() {
+    super.initialize();
+
+    populateOrderBy(orderByField);
+
+    containerOrderField.getItems().add(
+        DepanFxFoldSectionData.ContainerOrder.FIRST);
+    containerOrderField.getItems().add(
+        DepanFxFoldSectionData.ContainerOrder.LAST);
+    containerOrderField.getItems().add(
+        DepanFxFoldSectionData.ContainerOrder.MIXED);
+  }
+
+  @Override
+  public void setToolResource(
+      DepanFxWorkspaceResource<DepanFxFoldSectionData> sectionRsrc) {
+    super.setToolResource(sectionRsrc);
+
+    DepanFxFoldSectionData sectionData = sectionRsrc.getResource();
+    // linkMatcherControl.setLinkMatcherRsrc(sectionData .getNodeFoldResource());
+
+    orderByField.setValue(sectionData.getOrderBy());
+    containerOrderField.setValue(sectionData.getContainerOrder());
+  }
+
+  @Override
+  protected DepanFxFoldSectionData prepareResult() {
+    return new DepanFxFoldSectionData(
+        getToolName(), getToolDescription(),
+        getSectionLabel(), displayNodeCount(),
+        orderByField.getValue(), getOrderDirection(),
+        containerOrderField.getValue(),
+        null);
+        // foldNestResourceField.getText());
+  }
+
+  @Override
+  protected void setTooldataFilters(FileChooser result) {
+    result.getExtensionFilters().add(FOLD_SECTION_FILTER);
+    result.setSelectedExtensionFilter(FOLD_SECTION_FILTER);
+  }
+
+  @Override
+  protected File buildInitialDestinationFile() {
+    return buildToolInitialDestination(
+        DepanFxFoldSectionData.FOLD_SECTION_TOOL_EXT,
+        DepanFxNodeListSectionData.SECTIONS_TOOL_PATH);
+  }
+
+  @Override
+  protected String getInputCheckFailureText() {
+    return  "Fold Section Save Confirmation Error";
+  }
 }

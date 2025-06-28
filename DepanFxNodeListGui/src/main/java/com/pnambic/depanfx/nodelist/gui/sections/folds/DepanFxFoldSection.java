@@ -26,6 +26,7 @@ import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSectionItem;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSections;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFoldSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.nodelist.tree.DepanFxNodeParentsToTreeModelBuilder;
@@ -50,9 +51,9 @@ import javafx.scene.control.TreeItem;
 
 public class DepanFxFoldSection implements DepanFxNodeListSection {
 
-  public static final String NEW_TREE_SECTION_DATA = "New Fold Section Data...";
+  public static final String NEW_FOLD_SECTION_DATA = "New Fold Section Data...";
 
-  public static final String EDIT_TREE_SECTION_DATA = "Edit Fold Section Data...";
+  public static final String EDIT_FOLD_SECTION_DATA = "Edit Fold Section Data...";
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxFoldSection.class);
@@ -134,7 +135,9 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
   @Override
   public DepanFxNodeListSectionItem buildSectionItem(
       DepanFxNodeList baseNodes) {
-    DepanFxFoldSectionData foldInfo = getSectionResource().getResource();
+    DepanFxFoldSectionData sectionInfo = getSectionResource().getResource();
+    DepanFxNodeFoldData foldInfo =
+        sectionInfo.getNodeFoldResource().getResource();
     DepanFxNodeParentsToTreeModelBuilder builder = 
         new DepanFxNodeParentsToTreeModelBuilder(foldInfo.getGraphResource());
     builder.importNodeParents(foldInfo.streamNodeNests());
