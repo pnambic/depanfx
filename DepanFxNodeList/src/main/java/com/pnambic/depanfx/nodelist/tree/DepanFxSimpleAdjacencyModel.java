@@ -10,7 +10,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DepanFxSimpleAdjacencyModel implements DepanFxAdjacencyModel {
@@ -38,6 +41,18 @@ public class DepanFxSimpleAdjacencyModel implements DepanFxAdjacencyModel {
     return Collections.emptyList();
   }
 
+  public void addAdjacencies(DepanFxAdjacencyModel source) {
+    if (source instanceof DepanFxSimpleAdjacencyModel simple) {
+
+      // Only import new adjacency data.
+      simple.adjacencyData.forEach((key, value) -> {
+        adjacencyData.computeIfAbsent(
+            key, k -> new ArrayList<>()).addAll(value);
+      });
+      return;
+    }
+  }
+
   public void addAdjacency(GraphNode source, GraphNode target) {
     adjacencyData
         .computeIfAbsent(source, k-> new ArrayList<>())
@@ -53,5 +68,15 @@ public class DepanFxSimpleAdjacencyModel implements DepanFxAdjacencyModel {
 
   public Stream<GraphNode> streamHeadNodes() {
     return adjacencyData.keySet().stream();
+  }
+
+  public List<GraphNode> computeRootNodes() {
+    Set<GraphNode> headNodes = adjacencyData.keySet().stream()
+        .collect(Collectors.toSet());
+    adjacencyData.values().stream()
+        .flatMap(Collection::stream)
+        .filter(c -> headNodes.contains(c))
+        .forEach(n -> headNodes.remove(n));
+    return new ArrayList<>(headNodes);
   }
 }

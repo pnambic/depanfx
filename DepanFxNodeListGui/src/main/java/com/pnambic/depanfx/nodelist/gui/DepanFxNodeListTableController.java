@@ -194,6 +194,11 @@ public class DepanFxNodeListTableController
     tableState.updateSection(section, sectionRsrc);
   }
 
+  @Override // DepanFxNodeListTableAdapter
+  public Stream<DepanFxNodeListSection> streamSections() {
+    return tableState.streamSections();
+  }
+
   /**
    * Nodes in the collections are selected, all other nodes are not.
    */

@@ -214,6 +214,10 @@ public class DepanFxNodeListTableState {
         section.getDisplayName(), dataRsrc.getDocument().toString());
   }
 
+  public Stream<DepanFxNodeListSection> streamSections() {
+    return sections.stream();
+  }
+
   /////////////////////////////////////
   // Table columns
 

@@ -35,6 +35,7 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFoldSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
+import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
@@ -42,6 +43,7 @@ import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilterModel;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxMenuBuilder;
+import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -57,8 +59,10 @@ import java.util.List;
 import java.util.Optional;
 
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.cell.CheckBoxTreeTableCell;
 import javafx.scene.input.Clipboard;
@@ -118,6 +122,8 @@ public class DepanFxNodeListCell
   private static final String EXPAND_TREE_20 = "Expand Tree (20)";
 
   private static final String EXPAND_TREE_100 = "Expand Tree (100)";
+
+  private static final String FOLD_TREE_INTO = "Fold Tree Into";
 
   // Allow cells to act on viewer (e.g. change sections, etc.)
   private final DepanFxNodeListTableAdapter tableAdapter;
@@ -233,6 +239,7 @@ public class DepanFxNodeListCell
         COPY_ITEM,
         e -> runCopyFrom(fork.getDisplayName()));
     builder.appendSubMenu(buildCopyMenu(fork));
+    appendFoldIntoMenu(builder, fork);
     builder.appendSeparator();
     builder.appendActionItem(
         EXPAND_TREE_5, e -> runExpandTreeAction(5));
@@ -323,6 +330,45 @@ public class DepanFxNodeListCell
     clipboard.setContent(content);
   }
 
+  private void appendFoldIntoMenu(
+      DepanFxContextMenuBuilder builder, DepanFxNodeListGraphNode node) {
+
+    DepanFxMenuBuilder menuBuilder = new DepanFxMenuBuilder(FOLD_TREE_INTO);
+    tableAdapter.streamSections()
+        .filter(DepanFxFoldSection.class::isInstance)
+        .map(DepanFxFoldSection.class::cast)
+        .forEach(f -> menuBuilder.appendMenuItem(buildFoldTreeIntoItem(f, node)));
+
+    if (menuBuilder.isEmpty()) {
+      return;
+    }
+
+    // Only append the fold into menu if there are fold sections.
+    builder.appendSeparator();
+    builder.appendSubMenu(menuBuilder.build());
+  }
+
+  private MenuItem buildFoldTreeIntoItem(
+      DepanFxFoldSection foldSection, DepanFxNodeListGraphNode node) {
+    String label = foldSection.getDisplayName();
+    return DepanFxMenuItemFactory.createActionItem(
+        label, e -> runFoldTreeInto(e, foldSection, node));
+  }
+
+  private void runFoldTreeInto(
+      ActionEvent e,
+      DepanFxFoldSection foldSection,
+      DepanFxNodeListGraphNode node) {
+    node.getGraphNode();
+    DepanFxTreeSection srcSection = (DepanFxTreeSection) node.getSection();
+    DepanFxTreeModel srcTree = srcSection.getTreeModel();
+    DepanFxTreeModel subModel = srcTree.subTreeModel(node.getGraphNode());
+
+    foldSection.addTreeModel(subModel);
+    LOG.info("Folding a tree into section {} not yet implemented",
+        foldSection.getDisplayName());
+  }
+
   private void runExpandTreeAction(int expandLimit) {
     TreeItem<DepanFxNodeListMember> tree = getTableRow().getTreeItem();
     BreadthExpander expander = new BreadthExpander(expandLimit);
@@ -343,7 +389,6 @@ public class DepanFxNodeListCell
     DepanFxExportTreeSectionDialog.runExportDialog(
         treeSection, tableAdapter.getDialogRunner());
   }
-
 
   private Menu newSectionMenu(DepanFxNodeListSection before) {
     DepanFxMenuBuilder builder = new DepanFxMenuBuilder(INSERT_SECTION);
@@ -429,7 +474,7 @@ public class DepanFxNodeListCell
     prepareSectionChooser(workspace).showOpenDialog(getScene())
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
-            p, DepanFxFlatSectionData.class))
+            p, DepanFxBaseSectionData.class))
         .ifPresent(r -> tableAdapter.insertSection(before, r));
   }
 

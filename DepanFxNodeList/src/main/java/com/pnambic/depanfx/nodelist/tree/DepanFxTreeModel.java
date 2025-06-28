@@ -45,4 +45,9 @@ public interface DepanFxTreeModel {
    */
   DepanFxNodeList getReachableGraphNodes(
       Collection<GraphNode> startNodes, Collection<GraphNode> filterNodes);
+
+  /**
+   * Provide a new tree model that is a sub-tree rooted with the supplied node.
+   */
+  DepanFxTreeModel subTreeModel(GraphNode graphNode);
 }

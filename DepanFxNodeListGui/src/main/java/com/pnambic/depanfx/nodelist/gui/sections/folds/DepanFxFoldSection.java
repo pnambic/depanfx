@@ -30,6 +30,7 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.nodelist.tree.DepanFxNodeParentsToTreeModelBuilder;
+import com.pnambic.depanfx.nodelist.tree.DepanFxSimpleTreeModel;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -74,6 +75,7 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
       DepanFxWorkspaceResource<DepanFxFoldSectionData> sectionDataRsrc) {
     this.tableAdapter = tableAdapter;
     this.sectionDataRsrc = sectionDataRsrc;
+    this.treeModel = buildTreeModel(sectionDataRsrc.getResource());
 
     this.treeMemberCompare = updateCompare();
   }
@@ -81,7 +83,17 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
   public void setSectionDataRsrc(
       DepanFxWorkspaceResource<DepanFxFoldSectionData> sectionDataRsrc) {
     this.sectionDataRsrc = sectionDataRsrc;
+    this.treeModel = buildTreeModel(sectionDataRsrc.getResource());
+
     this.treeMemberCompare = updateCompare();
+  }
+
+  private DepanFxTreeModel buildTreeModel(DepanFxFoldSectionData resource) {
+    DepanFxNodeFoldData foldInfo = resource.getNodeFoldResource().getResource();
+    DepanFxNodeParentsToTreeModelBuilder builder =
+        new DepanFxNodeParentsToTreeModelBuilder(foldInfo.getGraphResource());
+    builder.importNodeParents(foldInfo.streamNodeNests());
+    return builder.build();
   }
 
   public DepanFxWorkspaceResource<DepanFxFoldSectionData> getSectionResource() {
@@ -135,13 +147,6 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
   @Override
   public DepanFxNodeListSectionItem buildSectionItem(
       DepanFxNodeList baseNodes) {
-    DepanFxFoldSectionData sectionInfo = getSectionResource().getResource();
-    DepanFxNodeFoldData foldInfo =
-        sectionInfo.getNodeFoldResource().getResource();
-    DepanFxNodeParentsToTreeModelBuilder builder = 
-        new DepanFxNodeParentsToTreeModelBuilder(foldInfo.getGraphResource());
-    builder.importNodeParents(foldInfo.streamNodeNests());
-    treeModel = builder.build();
     sectionNodes = treeModel.getReachableGraphNodes(
         treeModel.getRoots(), baseNodes.getNodes());
 
@@ -171,6 +176,13 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
   @Override
   public DepanFxNodeList getSectionNodes() {
     return sectionNodes;
+  }
+
+  public void addTreeModel(DepanFxTreeModel subModel) {
+    if (treeModel instanceof DepanFxSimpleTreeModel simple) {
+      simple.addTreeModel(subModel);
+      return;
+    }
   }
 
   private FoldFork buildFoldFork(GraphNode fork) {

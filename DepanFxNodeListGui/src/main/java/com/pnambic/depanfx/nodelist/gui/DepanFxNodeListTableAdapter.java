@@ -114,4 +114,6 @@ public interface DepanFxNodeListTableAdapter {
   void updateSection(
       DepanFxNodeListSection section,
       DepanFxWorkspaceResource<? extends DepanFxBaseSectionData> sectionRsrc);
+
+  Stream<DepanFxNodeListSection> streamSections();
 }

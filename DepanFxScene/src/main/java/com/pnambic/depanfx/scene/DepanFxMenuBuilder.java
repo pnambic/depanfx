@@ -56,4 +56,8 @@ public class DepanFxMenuBuilder {
   public void appendMenuItem(MenuItem item) {
     itemFactory.appendMenuItem(item);
   }
+
+  public boolean isEmpty() {
+    return itemFactory.isEmpty();
+  }
 }

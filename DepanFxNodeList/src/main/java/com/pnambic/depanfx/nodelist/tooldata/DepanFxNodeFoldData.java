@@ -94,7 +94,11 @@ public class DepanFxNodeFoldData extends DepanFxBaseToolData {
   }
 
   public Stream<NodeNest> streamNodeNests() {
-    return foldNests.stream();
+    // Deserialization of empty fold data creates a null list.
+    if (foldNests != null) {
+      return foldNests.stream();
+    }
+    return Stream.empty();
   }
 
   public static File buildCurrentToolFile(

@@ -31,7 +31,7 @@ import java.util.stream.Stream;
  */
 public class DepanFxFoldSectionData extends DepanFxBaseSectionData {
 
-  public static final String FOLD_SECTION_TOOL_EXT = "dfsti";
+  public static final String FOLD_SECTION_TOOL_EXT = "dxsti";
 
   public static final String FOLD_SECTION_LABEL = "Fold";
 
