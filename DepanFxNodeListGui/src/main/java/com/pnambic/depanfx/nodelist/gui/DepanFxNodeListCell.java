@@ -200,7 +200,7 @@ public class DepanFxNodeListCell
     builder.appendActionItem(EDIT_FLAT_SECTION,
         e -> openFlatSectionEditor(member));
 
-    builder.appendSubMenu(newSectionMenu(member));
+    builder.appendSubMenu(buildNewSectionMenu(member));
     builder.appendSeparator();
     builder.appendActionItem(
         EXPORT_TO_CSV,
@@ -218,7 +218,7 @@ public class DepanFxNodeListCell
     builder.appendActionItem(EDIT_TREE_SECTION,
         e -> openTreeSectionEditor(member));
 
-    builder.appendSubMenu(newSectionMenu(member));
+    builder.appendSubMenu(buildNewSectionMenu(member));
     builder.appendSeparator();
     builder.appendActionItem(
         EXPORT_TO_CSV,
@@ -269,11 +269,15 @@ public class DepanFxNodeListCell
     builder.appendActionItem(EDIT_FOLD_SECTION,
         e -> openFoldSectionEditor(section));
 
-    builder.appendSubMenu(newSectionMenu(section));
+    builder.appendSubMenu(buildNewSectionMenu(section));
     builder.appendSeparator();
     builder.appendActionItem(
         EXPORT_TO_CSV,
         e -> runExportToCsvAction(section));
+    builder.appendSeparator();
+    builder.appendActionItem(
+        "Save Fold Info",
+        e -> runSaveFoldInfoAction(section));
     return builder.build();
   }
 
@@ -309,6 +313,9 @@ public class DepanFxNodeListCell
     return builder.build();
   }
 
+  /////////////////////////////////////
+  // Common menu commponents
+
   private Menu buildCopyMenu(DepanFxNodeListGraphNode node) {
     DepanFxMenuBuilder result = new DepanFxMenuBuilder(COPY_AS_ITEM);
     result.appendActionItem(
@@ -323,11 +330,19 @@ public class DepanFxNodeListCell
     return result.build();
   }
 
-  private void runCopyFrom(String src) {
-    Clipboard clipboard = Clipboard.getSystemClipboard();
-    ClipboardContent content = new ClipboardContent();
-    content.putString(src);
-    clipboard.setContent(content);
+  private Menu buildNewSectionMenu(DepanFxNodeListSection before) {
+    DepanFxMenuBuilder builder = new DepanFxMenuBuilder(INSERT_SECTION);
+    builder.appendActionItem(
+        SELECT_SECTION,
+        e -> runInsertSelectSection(before));
+    builder.appendSeparator();
+    builder.appendActionItem(
+        INSERT_ABOVE_MEMBER_TREE_SECTION,
+        e -> runInsertMemberTreeSectionAction(before));
+    builder.appendActionItem(
+        INSERT_ABOVE_FOLD_SECTION,
+        e -> runInsertFoldSectionAction(before));
+    return builder.build();
   }
 
   private void appendFoldIntoMenu(
@@ -353,6 +368,21 @@ public class DepanFxNodeListCell
     String label = foldSection.getDisplayName();
     return DepanFxMenuItemFactory.createActionItem(
         label, e -> runFoldTreeInto(e, foldSection, node));
+  }
+
+  /////////////////////////////////////
+  // Menu item actions
+
+
+  private void runSaveFoldInfoAction(DepanFxFoldSection section) {
+    section.saveFoldInfoResource();
+  }
+
+  private void runCopyFrom(String src) {
+    Clipboard clipboard = Clipboard.getSystemClipboard();
+    ClipboardContent content = new ClipboardContent();
+    content.putString(src);
+    clipboard.setContent(content);
   }
 
   private void runFoldTreeInto(
@@ -388,21 +418,6 @@ public class DepanFxNodeListCell
   private void runExportToCsvAction(DepanFxTreeSection treeSection) {
     DepanFxExportTreeSectionDialog.runExportDialog(
         treeSection, tableAdapter.getDialogRunner());
-  }
-
-  private Menu newSectionMenu(DepanFxNodeListSection before) {
-    DepanFxMenuBuilder builder = new DepanFxMenuBuilder(INSERT_SECTION);
-    builder.appendActionItem(
-        SELECT_SECTION,
-        e -> runInsertSelectSection(before));
-    builder.appendSeparator();
-    builder.appendActionItem(
-        INSERT_ABOVE_MEMBER_TREE_SECTION,
-        e -> runInsertMemberTreeSectionAction(before));
-    builder.appendActionItem(
-        INSERT_ABOVE_FOLD_SECTION,
-        e -> runInsertFoldSectionAction(before));
-    return builder.build();
   }
 
   private void openTreeSectionEditor(DepanFxTreeSection member) {

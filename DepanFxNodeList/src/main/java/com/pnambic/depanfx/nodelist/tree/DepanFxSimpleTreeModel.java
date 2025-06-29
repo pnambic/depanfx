@@ -3,6 +3,7 @@ package com.pnambic.depanfx.nodelist.tree;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData.NodeNest;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class DepanFxSimpleTreeModel
     implements DepanFxTreeModel, DepanFxAdjacencyModel {
@@ -112,5 +114,10 @@ public class DepanFxSimpleTreeModel
           result.addAdjacency(subRoot, members);
           recurseTreeModel(result, members);
         });
+  }
+
+  @Override
+  public Stream<NodeNest> streamNodeParent() {
+    return nodeMembers.streamNodeParent();
   }
 }

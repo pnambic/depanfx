@@ -3,9 +3,11 @@ package com.pnambic.depanfx.nodelist.tree;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData.NodeNest;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.util.Collection;
+import java.util.stream.Stream;
 
 public interface DepanFxTreeModel {
 
@@ -50,4 +52,6 @@ public interface DepanFxTreeModel {
    * Provide a new tree model that is a sub-tree rooted with the supplied node.
    */
   DepanFxTreeModel subTreeModel(GraphNode graphNode);
+
+  Stream<NodeNest> streamNodeParent();
 }

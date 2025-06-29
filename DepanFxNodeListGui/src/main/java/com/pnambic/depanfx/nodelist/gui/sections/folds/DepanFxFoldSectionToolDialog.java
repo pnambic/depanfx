@@ -52,7 +52,7 @@ public class DepanFxFoldSectionToolDialog
       DepanFxSceneControls.buildExtFilter(
           "Fold Sections", DepanFxFoldSectionData.FOLD_SECTION_TOOL_EXT);
 
-  public static final DepanFxResourceFilter FOLD_SECTION_RSRC_FILTER = 
+  public static final DepanFxResourceFilter FOLD_SECTION_RSRC_FILTER =
       DepanFxResourceFilter.buildResourceFilter(
           "Fold Sections",
           DepanFxFoldSectionData.FOLD_SECTION_TOOL_EXT,
@@ -117,7 +117,7 @@ public class DepanFxFoldSectionToolDialog
   @FXML
   public void onNewNodeFolding() {
     DepanFxWorkspaceResource<GraphDocument> graphRsrc =
-        getToolResource().get().getResource().getNodeFoldResource().getResource().getGraphResource();
+        getToolResource().get().getResource().getNodeFoldResource().getResource().getGraphDocResource();
     DepanFxWorkspaceResource<DepanFxNodeFoldData> foldInfo =
         workspace.addScratchResource(
             DepanFxNodeFoldData.emptyNodeFoldData(graphRsrc));

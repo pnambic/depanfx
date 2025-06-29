@@ -89,7 +89,7 @@ public class DepanFxNodeFoldData extends DepanFxBaseToolData {
         graphRsrc, new ArrayList<>(foldNests));
   }
 
-  public DepanFxWorkspaceResource<GraphDocument> getGraphResource() {
+  public DepanFxWorkspaceResource<GraphDocument> getGraphDocResource() {
     return graphRsrc;
   }
 

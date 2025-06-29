@@ -8,9 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.net.URI;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class DocumentPersistenceRegistry {

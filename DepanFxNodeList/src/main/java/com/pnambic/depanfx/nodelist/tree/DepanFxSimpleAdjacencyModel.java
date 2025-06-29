@@ -2,6 +2,7 @@ package com.pnambic.depanfx.nodelist.tree;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLink;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData.NodeNest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class DepanFxSimpleAdjacencyModel implements DepanFxAdjacencyModel {
+public class DepanFxSimpleAdjacencyModel
+    implements DepanFxAdjacencyModel {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxSimpleAdjacencyModel.class);
@@ -39,6 +41,18 @@ public class DepanFxSimpleAdjacencyModel implements DepanFxAdjacencyModel {
       return result;
     }
     return Collections.emptyList();
+  }
+
+  @Override
+  public Stream<NodeNest> streamNodeParent() {
+    return adjacencyData.entrySet().stream()
+        .flatMap(e -> streamNodeParent(e.getKey(), e.getValue()));
+  }
+
+  private Stream<NodeNest> streamNodeParent(
+      GraphNode nest, Collection<GraphNode> members) {
+    return members.stream()
+        .map(m -> new NodeNest(m, nest));
   }
 
   public void addAdjacencies(DepanFxAdjacencyModel source) {

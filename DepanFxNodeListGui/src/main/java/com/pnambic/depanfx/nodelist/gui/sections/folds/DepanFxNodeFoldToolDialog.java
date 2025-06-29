@@ -48,6 +48,7 @@ public class DepanFxNodeFoldToolDialog
       DepanFxSceneControls.buildExtFilter(
           "Node Folding", DepanFxNodeFoldData.NODE_FOLD_TOOL_EXT);
 
+  @SuppressWarnings("unused")
   private final DepanFxDialogRunner dialogRunner;
 
   @FXML
@@ -83,7 +84,7 @@ public class DepanFxNodeFoldToolDialog
     super.setToolResource(toolRsrc);
 
     DepanFxNodeFoldData foldInfo = toolRsrc.getResource();
-    GraphDocument graphDoc = foldInfo.getGraphResource().getResource();
+    GraphDocument graphDoc = foldInfo.getGraphDocResource().getResource();
     nodeFoldDetailsLabel.setText(
         MessageFormat.format(
             "Node folding for graph {0}. {1}",

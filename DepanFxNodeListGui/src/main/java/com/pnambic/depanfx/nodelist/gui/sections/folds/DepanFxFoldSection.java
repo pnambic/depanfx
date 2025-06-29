@@ -38,11 +38,13 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -80,7 +82,7 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
     this.treeMemberCompare = updateCompare();
   }
 
-  public void setSectionDataRsrc(
+  public void setSectionDataResource(
       DepanFxWorkspaceResource<DepanFxFoldSectionData> sectionDataRsrc) {
     this.sectionDataRsrc = sectionDataRsrc;
     this.treeModel = buildTreeModel(sectionDataRsrc.getResource());
@@ -91,7 +93,7 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
   private DepanFxTreeModel buildTreeModel(DepanFxFoldSectionData resource) {
     DepanFxNodeFoldData foldInfo = resource.getNodeFoldResource().getResource();
     DepanFxNodeParentsToTreeModelBuilder builder =
-        new DepanFxNodeParentsToTreeModelBuilder(foldInfo.getGraphResource());
+        new DepanFxNodeParentsToTreeModelBuilder(foldInfo.getGraphDocResource());
     builder.importNodeParents(foldInfo.streamNodeNests());
     return builder.build();
   }
@@ -195,6 +197,30 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
 
   private FoldLeaf buildFoldLeaf(GraphNode leaf) {
     return new FoldLeaf(leaf, this);
+  }
+
+  public Optional<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
+  saveFoldInfoResource() {
+
+    List<DepanFxNodeFoldData.NodeNest> nodeParents =
+        treeModel.streamNodeParent()
+        .collect(Collectors.toList());
+    DepanFxProjectDocument srcFoldDoc =
+        getSectionData().getNodeFoldResource().getDocument();
+    DepanFxNodeFoldData srcFoldInfo =
+        getSectionData().getNodeFoldResource().getResource();
+    DepanFxNodeFoldData updateFoldInfo = new DepanFxNodeFoldData(
+        srcFoldInfo.getToolName(),
+        srcFoldInfo.getToolDescription(),
+        srcFoldInfo.getGraphDocResource(),
+        nodeParents);
+    try {
+      return tableAdapter.getWorkspace().saveDocument(srcFoldDoc, updateFoldInfo);
+    } catch (IOException err) {
+      LOG.error("Unable to save fold info resource for section {}",
+          getSectionLabel(), err);
+    }
+    return Optional.empty();
   }
 
   /////////////////////////////////////
@@ -307,8 +333,8 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
       List<TreeItem<DepanFxNodeListMember>> result =
           new ArrayList<>(nodes.size());
       nodes.stream()
-      .map(section::buildNodeItem)
-      .forEach(result::add);
+          .map(section::buildNodeItem)
+          .forEach(result::add);
       section.sortTreeItems(result);
 
       return FXCollections.observableList(result);

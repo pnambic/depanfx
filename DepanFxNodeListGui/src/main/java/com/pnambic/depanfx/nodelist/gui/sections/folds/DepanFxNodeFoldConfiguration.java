@@ -15,7 +15,6 @@
  */
 package com.pnambic.depanfx.nodelist.gui.sections.folds;
 
-import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.graph_doc.persistence.GraphDocPersistenceContribution;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFoldSectionData;
@@ -38,12 +37,6 @@ public class DepanFxNodeFoldConfiguration {
   public DepanFxResourceRegistry.Contribution newNodeFold(
       DepanFxWorkspace workspace) {
     return new NodeFoldResourceContribution(workspace);
-  }
-
-  @Bean
-  public DocumentPersistenceContribution nodeFoldDataPeristenceContribution(
-      GraphNodePersistencePluginRegistry graphNodeRegistry) {
-    return new NodeFoldDataPersistenceContribution(graphNodeRegistry);
   }
 
   @Bean
@@ -83,45 +76,6 @@ public class DepanFxNodeFoldConfiguration {
           DepanFxNodeFoldData.emptyNodeFoldData(wkspRsrc);
       DepanFxNodeFoldToolDialog.runCreateDialog(
           workspace, dialogRunner, workspace.addScratchResource(foldInfo));
-    }
-  }
-
-  private class NodeFoldDataPersistenceContribution
-      implements DocumentPersistenceContribution {
-
-    private static final Class<?>[] ALLOWED_TYPES = new Class<?>[] {
-        DepanFxNodeFoldData.class,
-        DepanFxNodeFoldData.NodeNest.class
-    };
-
-    private final GraphNodePersistencePluginRegistry graphNodeRegistry;
-
-    public NodeFoldDataPersistenceContribution(
-        GraphNodePersistencePluginRegistry graphNodeRegistry) {
-      this.graphNodeRegistry = graphNodeRegistry;
-    }
-
-    @Override
-    public boolean acceptsDocument(Object document) {
-      return DepanFxNodeFoldData.class.isAssignableFrom(
-          document.getClass());
-    }
-
-    @Override
-    public boolean acceptsExt(String extText) {
-      return DepanFxNodeFoldData.NODE_FOLD_TOOL_EXT.equalsIgnoreCase(extText);
-    }
-
-    @Override
-    public void prepareTransport(PersistDocumentTransportBuilder builder) {
-      builder.addAllowedType(ALLOWED_TYPES);
-      builder.addAlias("node-fold-info", DepanFxNodeFoldData.class);
-      builder.addAlias("node-fold", DepanFxNodeFoldData.NodeNest.class);
-      builder.addImplicitCollection(DepanFxNodeFoldData.class, "foldNests");
-
-      graphNodeRegistry.applyExtensions(builder, GraphNode.class);
-      graphNodeRegistry.applyExtensions(
-          builder, DepanFxWorkspaceResource.class);
     }
   }
 
