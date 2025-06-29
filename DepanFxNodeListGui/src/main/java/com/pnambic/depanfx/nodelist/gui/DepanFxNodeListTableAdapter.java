@@ -78,7 +78,17 @@ public interface DepanFxNodeListTableAdapter {
 
   void doSelectGraphNodesAction(Stream<GraphNode> nodes, boolean value);
 
+  /**
+   * Refresh the table with the current sections and columns.
+   */
   void refreshTableView();
+
+  /**
+   * Reset the table view to newly calculated section roots,
+   * typically as a result of internal changes in a section
+   * that may impact successive sections.
+   */
+  void resetTableView();
 
   // Column operations.
 

@@ -158,6 +158,11 @@ public class DepanFxNodeListTableController
   }
 
   @Override // DepanFxNodeListTableAdapter
+  public void resetTableView() {
+    tableState.resetTableView();
+  }
+
+  @Override // DepanFxNodeListTableAdapter
   public DepanFxNodeList getSelection() {
     return tableState.getSelection();
   }

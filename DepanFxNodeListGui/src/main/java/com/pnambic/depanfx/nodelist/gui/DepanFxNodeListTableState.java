@@ -96,8 +96,20 @@ public class DepanFxNodeListTableState {
     return nodeListTable;
   }
 
+  /**
+   * Refresh the table with the current sections and columns.
+   */
   public void refreshTableView() {
     nodeListTable.refresh();
+  }
+
+  /**
+   * Reset the table view to newly calculated section roots,
+   * typically as a result of internal changes in a section
+   * that may impact successive sections.
+   */
+  public void resetTableView() {
+    resetTableRoot();
   }
 
   public ObservableValue<Boolean> getCheckBoxObservable(int treeIndex) {

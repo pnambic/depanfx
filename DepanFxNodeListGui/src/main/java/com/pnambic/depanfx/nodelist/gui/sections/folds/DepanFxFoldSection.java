@@ -181,8 +181,12 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
   public void addTreeModel(DepanFxTreeModel subModel) {
     if (treeModel instanceof DepanFxSimpleTreeModel simple) {
       simple.addTreeModel(subModel);
+      tableAdapter.resetTableView();
       return;
     }
+    // Waiting for a more generic modifiable tree model.
+    LOG.info(
+        "Cannot add section model to section {}", getSectionLabel());
   }
 
   private FoldFork buildFoldFork(GraphNode fork) {
