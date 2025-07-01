@@ -20,9 +20,10 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,10 +50,11 @@ public class DepanFxNodeParentsToTreeModelBuilder {
     nodeParents.entrySet().stream()
         .forEach(e -> adjInfo.addAdjacency(e.getValue(), e.getKey()));
 
-    List<GraphNode> headNodes = nodeParents.values().stream()
+    Set<GraphNode> headNodes = nodeParents.values().stream()
         .filter(n -> ! nodeParents.containsKey(n))
-        .collect(Collectors.toList());
+        .collect(Collectors.toSet());
 
-    return new DepanFxSimpleTreeModel(graphRsrc, adjInfo, headNodes);
+    return new DepanFxSimpleTreeModel(
+        graphRsrc, adjInfo, new ArrayList<>(headNodes));
   }
 }

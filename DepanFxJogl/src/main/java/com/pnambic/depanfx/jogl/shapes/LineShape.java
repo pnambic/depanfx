@@ -63,6 +63,11 @@ public class LineShape implements JoglShape {
       return;
     }
 
+    // Drop lines that resolve to the same node folding nest.
+    if (sourceShape == targetShape) {
+      return;
+    }
+
     if (lineRender == null) {
       lineRender = buildRenderer();
     }
@@ -84,8 +89,9 @@ public class LineShape implements JoglShape {
   private NodeShape getShape(Object end, JoglRenderer renderer) {
     JoglShape sourceShape = renderer.getRenderShape(end);
     if (sourceShape instanceof NodeShape node) {
-      if (node.isVisible) {
-        return node;
+      NodeShape endNode = node.getApparentShape(renderer);
+      if (endNode.isVisible) {
+        return endNode;
       }
       return null;
     }

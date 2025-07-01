@@ -208,7 +208,7 @@ public class DepanFxNodeListTableState {
     int index = Integer.max(0, sections.indexOf(before));
     DepanFxNodeListSection result = installSectionAt(index, sectionRsrc);
 
-    resetTableRoot();
+    resetTableView();
     return result;
   }
 
@@ -218,7 +218,10 @@ public class DepanFxNodeListTableState {
     if (sectionIndex >= 0) {
       sectionResources.set(sectionIndex, dataRsrc);
       if (DepanFxSectionRegistry.updateSection(section, dataRsrc)) {
-        resetTableRoot();
+        // resetTableRoot();
+        // refreshTableView();
+        resetTableView();
+        // refreshTableView();
       }
       return;
     }

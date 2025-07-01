@@ -17,8 +17,14 @@ package com.pnambic.depanfx.nodeview.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
+import com.pnambic.depanfx.nodeview.jogl.JoglPane;
+import com.pnambic.depanfx.nodeview.jogl.JoglShapes;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +43,14 @@ import java.util.stream.Collectors;
  */
 public class NodeFoldController {
 
-  private final Function<GraphNode, DepanFxNodeLocationData> nodeLocation;
+  private static final Logger LOG =
+      LoggerFactory.getLogger(NodeFoldController.class);
+
+  private final DepanFxWorkspace workspace;
+
+  private final JoglPane joglPane;
+
+  private final Function<GraphNode, DepanFxNodeLocationData> nodeLocationSrc;
 
   /**
    * Source, or last saved version, of the node fold data..
@@ -46,9 +59,15 @@ public class NodeFoldController {
 
   private Map<GraphNode, DepanFxNodeLocationData> nodeDeltas = new HashMap<>();
 
+  private boolean hasNodeFoldChanges = false;
+
   public NodeFoldController(
-      Function<GraphNode, DepanFxNodeLocationData> nodeLocation) {
-    this.nodeLocation = nodeLocation;
+      DepanFxWorkspace workspace,
+      JoglPane joglPane,
+      Function<GraphNode, DepanFxNodeLocationData> nodeLocationSrc) {
+    this.workspace = workspace;
+    this.joglPane = joglPane;
+    this.nodeLocationSrc = nodeLocationSrc;
   }
 
   public void installNodeFoldResource(
@@ -60,38 +79,75 @@ public class NodeFoldController {
 
     // Install the initial deltas
     nodeFoldRsrc.getResource().streamNodeNests()
-        .forEach(this::installDelta);
+        .forEach(this::installNodeNest);
+
+    hasNodeFoldChanges = false;
   }
 
-  private void installDelta(DepanFxNodeFoldData.NodeNest nodeNest) {
+  /**
+   * Returns {@code null} if
+   * - no node folds are installed,
+   * - no node persistent fold resource is installed. (i.e. is scratch).
+   *
+   * The behaviors are appropriate for the methods intended use in container
+   * serialization methods.
+   */
+  public DepanFxWorkspaceResource<DepanFxNodeFoldData>
+  forUpdateNodeFoldResource() {
+    if (nodeFoldRsrc == null) {
+      return null;
+    }
+
+    // No persistent node fold data, no update.
+    if (nodeFoldRsrc.getDocument().getProject() ==
+        workspace.getScratchProjectTree()) {
+      return null;
+    }
+
+    if (hasNodeFoldChanges) {
+      DepanFxNodeFoldData nodeFoldInfo = nodeFoldRsrc.getResource();
+      DepanFxNodeFoldData updateFoldInfo =
+          new DepanFxNodeFoldData(
+              nodeFoldInfo.getToolName(),
+              nodeFoldInfo.getToolDescription(),
+              nodeFoldInfo.getGraphDocResource(),
+              forUpdateNodeNests());
+
+      return DepanFxWorkspaceResource.forUpdate(nodeFoldRsrc, updateFoldInfo);
+    }
+
+    // Just use the original resource.
+    return nodeFoldRsrc;
+  }
+
+  private void installNodeNest(DepanFxNodeFoldData.NodeNest nodeNest) {
+    LOG.info("folding node {} into {}",
+        nodeNest.getMemberNode().getId().getSimpleName(),
+        nodeNest.getNestNode().getId().getSimpleName());
     GraphNode memberNode = nodeNest.getMemberNode();
-    DepanFxNodeLocationData memberLocation = nodeLocation.apply(memberNode);
+    DepanFxNodeLocationData memberLocation = nodeLocationSrc.apply(memberNode);
 
     GraphNode nestNode = nodeNest.getNestNode();
-    DepanFxNodeLocationData nestLocation = nodeLocation.apply(nestNode);
+    DepanFxNodeLocationData nestLocation = nodeLocationSrc.apply(nestNode);
 
     DepanFxNodeLocationData nodeDelta =
         DepanFxNodeLocationData.calcDelta(nestLocation, memberLocation);
     nodeDeltas.put(memberNode, nodeDelta);
+    updateNodeFolding(memberNode, nestNode);
   }
 
-  public DepanFxWorkspaceResource<DepanFxNodeFoldData> forUpdateNodeFoldResource() {
-    DepanFxNodeFoldData nodeFoldInfo = nodeFoldRsrc.getResource();
-    DepanFxNodeFoldData updateFoldInfo =
-        new DepanFxNodeFoldData(
-            nodeFoldInfo.getToolName(),
-            nodeFoldInfo.getToolDescription(),
-            nodeFoldInfo.getGraphDocResource(),
-            updateNodeNests());
-
-    return DepanFxWorkspaceResource.forUpdate(nodeFoldRsrc, updateFoldInfo);
-  }
-
-  private List<DepanFxNodeFoldData.NodeNest> updateNodeNests() {
+  private List<DepanFxNodeFoldData.NodeNest> forUpdateNodeNests() {
     if (nodeFoldRsrc != null) {
       return nodeFoldRsrc.getResource().streamNodeNests()
           .collect(Collectors.toList());
     }
     return null;
+  }
+
+  private void updateNodeFolding(GraphNode nodeMember, GraphNode nodeNest) {
+    LOG.debug("folding node shape {} into {}",
+        nodeMember.getId().getSimpleName(),
+        nodeNest.getId().getSimpleName());
+    JoglShapes.updateNodeFolding(joglPane, nodeMember, nodeNest);
   }
 }

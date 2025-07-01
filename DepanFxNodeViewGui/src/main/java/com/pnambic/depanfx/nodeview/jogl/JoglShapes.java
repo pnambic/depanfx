@@ -86,6 +86,17 @@ public class JoglShapes {
     }
   }
 
+  public static void updateNodeFolding(
+      JoglPane joglPane, GraphNode memberNode, GraphNode nestNode) {
+    if (joglPane.getShape(memberNode) instanceof NodeShape memberShape) {
+      if (joglPane.getShape(nestNode) instanceof NodeShape nestShape) {
+
+        memberShape.setNodeNestKey(nestNode, nestShape);
+        joglPane.updateShape(memberNode, memberShape);
+      }
+    }
+  }
+
   private static void updateNodeSelection(
       NodeShape nodeShape, boolean isSelected) {
     if (isSelected) {

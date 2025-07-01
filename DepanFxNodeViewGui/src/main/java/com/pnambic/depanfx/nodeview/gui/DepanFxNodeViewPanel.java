@@ -983,7 +983,8 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
     getViewEdges().forEach(edgeDisplay::installEdge);
 
-    nodeFold = new NodeFoldController(this::getNodeLocation);
+    nodeFold = new NodeFoldController(
+        workspace, joglPane, this::getNodeLocation);
     viewData.optNodeFoldResource()
         .ifPresent(nodeFold::installNodeFoldResource);
   }

@@ -47,6 +47,11 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
 
   public Object pickObject;
 
+  /**
+   * The nest object when this node is folded.
+   */
+  private Object nodeNestKey;
+
   /////////////////////////////////////
   // Cached rendering entities
 
@@ -75,6 +80,8 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
     this.showLabel = showLabel;
     this.labelText = labelText;
     this.pickObject = pickObject;
+
+    this.nodeNestKey = pickObject;
   }
 
   public NodeShape(
@@ -94,6 +101,9 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
   @Override
   public void draw(GL2 gl, JoglRenderer renderer) {
     if (!isVisible) {
+      return;
+    }
+    if (getApparentShape(renderer) != this) {
       return;
     }
 
@@ -143,6 +153,38 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
     shapeZ = targetZ;
   }
 
+  public NodeShape getApparentShape(JoglRenderer renderer) {
+    JoglShape nodeNestShape = renderer.getRenderShape(nodeNestKey);
+    if (nodeNestShape != this) {
+      if (nodeNestShape instanceof NodeShape nodeShape) {
+        return nodeShape.getApparentShape(renderer);
+      }
+    }
+    return this;
+  }
+
+  public NodeShape getNestNodeShape(JoglRenderer renderer) {
+    if (isBelowTolerance()) {
+      if (renderer.getRenderShape(nodeNestKey) instanceof
+          NodeShape nestNodeShape) {
+        return nestNodeShape;
+      }
+    }
+    return this;
+  }
+
+  public void setNodeNestKey(Object nodeNestKey, NodeShape nestNodeShape) {
+    this.nodeNestKey = nodeNestKey;
+
+    this.targetX = nestNodeShape.shapeX;
+    this.targetY = nestNodeShape.shapeY;
+    this.targetZ = nestNodeShape.shapeZ;
+  }
+
+  public void clearApparentShape() {
+    this.nodeNestKey = pickObject;
+  }
+
   abstract public boolean contains(double posX, double posY);
 
   /////////////////////////////////////
@@ -156,6 +198,7 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
    * Allow derived types to create update clones.
    */
   protected void fillUpdate(NodeShape updateShape) {
+    updateShape.nodeNestKey = nodeNestKey;
     updateShape.labelTexture = labelTexture;
   }
 
