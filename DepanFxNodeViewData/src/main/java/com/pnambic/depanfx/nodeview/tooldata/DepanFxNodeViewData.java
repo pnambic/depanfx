@@ -6,6 +6,7 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
@@ -66,6 +67,13 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
    */
   private final DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
       availableNodeRsrc;
+
+  /**
+   * Nodes which are folded into the nest structure for rendering.
+   *
+   * May be {@code null} if no folding is used.
+   */
+  private final DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc;
 
   /**
    * The set of nodes that are visible in the render.
@@ -138,6 +146,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
 
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableNodeRsrc,
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc,
+      DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc,
       DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> nodeDisplayDocRsrc,
       boolean remainerNodesVisible,
       DepanFxNodeDisplayData remainderNodesDisplay,
@@ -160,6 +169,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
 
     this.availableNodeRsrc = availableNodeRsrc;
     this.visibleNodeRsrc = visibleNodeRsrc;
+    this.nodeFoldRsrc = nodeFoldRsrc;
     this.nodeDisplayDocRsrc = nodeDisplayDocRsrc;
     this.remainderNodesVisible = remainerNodesVisible;
     this.remainderNodesDisplay = remainderNodesDisplay;
@@ -246,6 +256,10 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   public DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData>
       getVisibleNodeResource() {
     return visibleNodeRsrc;
+  }
+
+  public DepanFxWorkspaceResource<DepanFxNodeFoldData> getNodeFoldResource() {
+    return nodeFoldRsrc;
   }
 
   public DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData>

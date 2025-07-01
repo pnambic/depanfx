@@ -30,10 +30,12 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
+import com.pnambic.depanfx.nodelist.gui.sections.folds.DepanFxNodeFoldChooser;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodeview.jogl.JoglPane;
 import com.pnambic.depanfx.nodeview.jogl.JoglShapes;
@@ -127,6 +129,8 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   private static final String INVERT_NODES_VISIBLE = "Invert Visible Nodes";
 
   private static final String MORE_NODE_VIBILITY = "More Node Visibility...";
+
+  private static final String SELECT_NODE_FOLDING = "Select Node Folding...";
 
   private static final String SAVE_NODE_VIEW_ITEM = "Save Node View...";
 
@@ -360,6 +364,17 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
           .map(GraphNode.class::cast);
       nodeSelection.doSelectGraphNodesAction(process, true);
     }
+  }
+
+  public void doSelectNodeFoldingAction() {
+    DepanFxNodeFoldChooser.runNodeFoldingFinder(
+        workspace, getDialogRunner(), joglPane.getScene())
+        .ifPresent(this::setNodeFoldingResource);
+  }
+
+  private void setNodeFoldingResource(
+      DepanFxWorkspaceResource<DepanFxNodeFoldData> foldRsrc) {
+    nodeDisplay.setNodeFoldingResource(foldRsrc);
   }
 
   public Map<GraphNode, DepanFxNodeLocationData> getNodeLocations(
@@ -644,6 +659,9 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
     builder.appendSeparator();
     builder.appendSubMenu(buildLayoutNodesMenu());
+    builder.appendActionItem(SELECT_NODE_FOLDING,
+        e -> doSelectNodeFoldingAction());
+
 
     builder.appendSeparator();
     builder.appendActionItem(TAKE_SCREENSHOT, e -> takeScreenshot());
@@ -918,6 +936,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
         nodeDisplay.forUpdateAvailableFilterResource(),
         nodeDisplay.forUpdateVisibleFilterResource(),
+        nodeDisplay.forNodeDisplayResource(),
         nodeDisplay.getNodeDisplayResource(),
         nodeDisplay.getRemainderVisibility(),
         nodeDisplay.getRemainderDisplay(),

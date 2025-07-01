@@ -21,6 +21,8 @@ import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry.NodeFilterFactory;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData.NodeNest;
 import com.pnambic.depanfx.nodeview.jogl.JoglPane;
 import com.pnambic.depanfx.nodeview.jogl.JoglShapes;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
@@ -45,6 +47,12 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Controller for node display, including visibility and display data.
+ *
+ * This controller is responsible for managing the visibility of nodes
+ * based on filters, as well as their display properties.
+ */
 public class NodeDisplayController {
 
   private static final Logger LOG =
@@ -110,6 +118,8 @@ public class NodeDisplayController {
   ///////////////////////////////////
   // Node Display
 
+  private DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc;
+
   private Map<DepanFxBaseFilterData, DepanFxNodeDisplayData> displayByFilter;
 
   /**
@@ -122,11 +132,14 @@ public class NodeDisplayController {
    */
   private DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> displayRsrc;
 
+  private DepanFxNodeFoldData foldTree;
+
   public NodeDisplayController(
       JoglPane joglPane,
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableFilterRsrc,
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc,
       DepanFxNodeFiltersRegistry.NodeFilterFactory filterFactory,
+      DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc,
       DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> displayRsrc,
       Map<GraphNode, DepanFxNodeDisplayData> nodeDisplay,
       boolean remainderVisible,
@@ -135,6 +148,7 @@ public class NodeDisplayController {
     this.availableFilterRsrc = availableFilterRsrc;
     this.visibleNodeRsrc = visibleNodeRsrc;
     this.filterFactory = filterFactory;
+    this.nodeFoldRsrc = nodeFoldRsrc;
     this.displayRsrc = displayRsrc;
     this.nodeDisplay = nodeDisplay;
     this.remainderVisible = remainderVisible;
@@ -159,6 +173,7 @@ public class NodeDisplayController {
         viewData.getAvailableNodeResource(),
         viewData.getVisibleNodeResource(),
         filterFactory,
+        viewData.getNodeFoldResource(),
         viewData.getNodeDisplayDocRsrc(),
         viewData.getNodeDisplay(),
         viewData.getRemainderNodesVisible(),
@@ -212,6 +227,12 @@ public class NodeDisplayController {
   public void forEachAvailablityFilter(
       Consumer<DepanFxWorkspaceResource<DepanFxBaseFilterData>> filterUpdate) {
     visibleGroup.streamAvailableFilters().forEach(filterUpdate);
+  }
+
+  public void setNodeFoldingResource(
+      DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc) {
+    this.nodeFoldRsrc = nodeFoldRsrc;
+    // and other things
   }
 
   public void setNodeDisplayResource(
@@ -350,6 +371,26 @@ public class NodeDisplayController {
             visibleFilterRsrcs);
 
     return DepanFxWorkspaceResource.forUpdate(visibleNodeRsrc, filterInfo);
+  }
+
+  public DepanFxWorkspaceResource<DepanFxNodeFoldData> forNodeDisplayResource() {
+    DepanFxNodeFoldData nodeFoldInfo = nodeFoldRsrc.getResource();
+    DepanFxNodeFoldData updateFoldInfo =
+        new DepanFxNodeFoldData(
+            nodeFoldInfo.getToolName(),
+            nodeFoldInfo.getToolDescription(),
+            nodeFoldInfo.getGraphDocResource(),
+            updateNodeNests());
+
+    return DepanFxWorkspaceResource.forUpdate(nodeFoldRsrc, updateFoldInfo);
+  }
+
+  private List<NodeNest> updateNodeNests() {
+    if (foldTree != null) {
+      return foldTree.streamNodeNests()
+          .collect(Collectors.toList());
+    }
+    return null;
   }
 
   private void increaseVisible(GraphNode node) {

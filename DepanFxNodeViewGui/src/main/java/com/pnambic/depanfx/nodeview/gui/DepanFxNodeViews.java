@@ -8,6 +8,7 @@ import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.nodeview.builtins.DepanFxGraphLinkViewBuiltIns;
 import com.pnambic.depanfx.nodeview.builtins.DepanFxGraphNodeViewBuiltIns;
 import com.pnambic.depanfx.nodeview.jogl.JoglCameras;
@@ -129,6 +130,7 @@ public class DepanFxNodeViews {
 
         viewDoc.getAvailableNodeResource(),
         viewDoc.getVisibleNodeResource(),
+        viewDoc.getNodeFoldResource(),
         viewDoc.getNodeDisplayDocRsrc(),
         viewDoc.getRemainderNodesVisible(),
         viewDoc.getRemainderNodesDisplay(),
@@ -162,6 +164,8 @@ public class DepanFxNodeViews {
           getContextNodeAvailable(workspace, nodeDisplayRsrc);
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc =
           availableNodeRsrc;
+      // Start with no node folding.
+      DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc = null;
 
       // Edges
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayRsrc =
@@ -182,7 +186,7 @@ public class DepanFxNodeViews {
 
         sceneData,
 
-        availableNodeRsrc, visibleNodeRsrc, nodeDisplayRsrc,
+        availableNodeRsrc, visibleNodeRsrc, nodeFoldRsrc, nodeDisplayRsrc,
         DepanFxNodeViewData.DEFAULT_REMAINDER_NODES_VISIBLE,
         DepanFxNodeViewData.DEFAULT_REMAINDER_NODE_DISPLAY,
 
