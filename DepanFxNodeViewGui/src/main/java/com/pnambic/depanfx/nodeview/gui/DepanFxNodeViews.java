@@ -130,7 +130,7 @@ public class DepanFxNodeViews {
 
         viewDoc.getAvailableNodeResource(),
         viewDoc.getVisibleNodeResource(),
-        viewDoc.getNodeFoldResource(),
+        viewDoc.optNodeFoldResource().orElse(null),
         viewDoc.getNodeDisplayDocRsrc(),
         viewDoc.getRemainderNodesVisible(),
         viewDoc.getRemainderNodesDisplay(),

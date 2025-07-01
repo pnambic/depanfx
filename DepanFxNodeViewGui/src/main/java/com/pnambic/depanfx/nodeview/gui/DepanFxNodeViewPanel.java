@@ -179,6 +179,8 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private NodeDisplayController nodeDisplay;
 
+  private NodeFoldController nodeFold;
+
   /////////////////////////////////////
   // Link display state
 
@@ -374,7 +376,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private void setNodeFoldingResource(
       DepanFxWorkspaceResource<DepanFxNodeFoldData> foldRsrc) {
-    nodeDisplay.setNodeFoldingResource(foldRsrc);
+    nodeFold.installNodeFoldResource(foldRsrc);
   }
 
   public Map<GraphNode, DepanFxNodeLocationData> getNodeLocations(
@@ -936,7 +938,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
         nodeDisplay.forUpdateAvailableFilterResource(),
         nodeDisplay.forUpdateVisibleFilterResource(),
-        nodeDisplay.forNodeDisplayResource(),
+        nodeFold.forUpdateNodeFoldResource(),
         nodeDisplay.getNodeDisplayResource(),
         nodeDisplay.getRemainderVisibility(),
         nodeDisplay.getRemainderDisplay(),
@@ -980,6 +982,10 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     linkDisplayDirty = false;
 
     getViewEdges().forEach(edgeDisplay::installEdge);
+
+    nodeFold = new NodeFoldController(this::getNodeLocation);
+    viewData.optNodeFoldResource()
+        .ifPresent(nodeFold::installNodeFoldResource);
   }
 
   private void updateViewNodeLocation(

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javafx.scene.paint.Color;
 
@@ -258,8 +259,9 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
     return visibleNodeRsrc;
   }
 
-  public DepanFxWorkspaceResource<DepanFxNodeFoldData> getNodeFoldResource() {
-    return nodeFoldRsrc;
+  public Optional<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
+  optNodeFoldResource() {
+    return Optional.ofNullable(nodeFoldRsrc);
   }
 
   public DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData>

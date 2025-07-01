@@ -41,4 +41,22 @@ public class DepanFxNodeLocationData implements GraphNodeInfo {
     return new DepanFxNodeLocationData(
         base.xPos + shiftX, base.yPos + shiftY, base.zPos + shiftZ);
   }
+
+  public static DepanFxNodeLocationData calcDelta(
+      DepanFxNodeLocationData base,
+      DepanFxNodeLocationData target) {
+    return new DepanFxNodeLocationData(
+        target.xPos - base.xPos,
+        target.yPos - base.yPos,
+        target.zPos - base.zPos);
+  }
+
+  public static DepanFxNodeLocationData applyDelta(
+      DepanFxNodeLocationData base,
+      DepanFxNodeLocationData delta) {
+    return new DepanFxNodeLocationData(
+        base.xPos + delta.xPos,
+        base.yPos + delta.yPos,
+        base.zPos + delta.zPos);
+  }
 }
