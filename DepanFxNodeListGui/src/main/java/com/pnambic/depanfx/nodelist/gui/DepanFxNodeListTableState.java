@@ -109,7 +109,10 @@ public class DepanFxNodeListTableState {
    * that may impact successive sections.
    */
   public void resetTableView() {
-    resetTableRoot();
+    rebuildTableRoot();
+
+    // Apparently, changes to the table root are not "observed by the table".
+    refreshTableView();
   }
 
   public ObservableValue<Boolean> getCheckBoxObservable(int treeIndex) {
@@ -218,10 +221,7 @@ public class DepanFxNodeListTableState {
     if (sectionIndex >= 0) {
       sectionResources.set(sectionIndex, dataRsrc);
       if (DepanFxSectionRegistry.updateSection(section, dataRsrc)) {
-        // resetTableRoot();
-        // refreshTableView();
         resetTableView();
-        // refreshTableView();
       }
       return;
     }
@@ -262,7 +262,7 @@ public class DepanFxNodeListTableState {
     nodeListTable.setEditable(true);
   }
 
-  private void resetTableRoot() {
+  private void rebuildTableRoot() {
     TreeItem<DepanFxNodeListMember> treeRoot = createTreeRoot();
     nodeListTable.setRoot(treeRoot);
   }
@@ -319,7 +319,7 @@ public class DepanFxNodeListTableState {
     }
 
     // 'cuz we changed the table's sections
-    resetTableRoot();
+    rebuildTableRoot();
   }
 
   @SuppressWarnings("unchecked")

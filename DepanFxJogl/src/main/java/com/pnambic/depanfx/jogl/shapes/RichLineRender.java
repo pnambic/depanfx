@@ -103,10 +103,6 @@ public class RichLineRender implements LineRender {
   }
 
   private boolean haveChanged(NodeShape sourceShape, NodeShape targetShape) {
-    return true;
-  }
-
-  private boolean XhaveChanged(NodeShape sourceShape, NodeShape targetShape) {
     if (sourceShape.shapeX != sourcePosX) {
       return true;
     }

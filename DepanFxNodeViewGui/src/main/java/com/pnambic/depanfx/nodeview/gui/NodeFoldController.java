@@ -121,7 +121,7 @@ public class NodeFoldController {
   }
 
   private void installNodeNest(DepanFxNodeFoldData.NodeNest nodeNest) {
-    LOG.info("folding node {} into {}",
+    LOG.debug("folding node {} into {}",
         nodeNest.getMemberNode().getId().getSimpleName(),
         nodeNest.getNestNode().getId().getSimpleName());
     GraphNode memberNode = nodeNest.getMemberNode();
