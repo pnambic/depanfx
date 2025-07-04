@@ -28,6 +28,7 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.util.Optional;
@@ -126,4 +127,6 @@ public interface DepanFxNodeListTableAdapter {
       DepanFxWorkspaceResource<? extends DepanFxBaseSectionData> sectionRsrc);
 
   Stream<DepanFxNodeListSection> streamSections();
+
+  Stream<DepanFxWorkspaceMember> streamSectionChoices();
 }

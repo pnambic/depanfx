@@ -2,9 +2,12 @@ package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeInfoColumnData;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSections;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
@@ -63,6 +66,10 @@ public class DepanFxNodeListTableCommands {
       DepanFxResourceFilter.buildResourceFilter(
           "Any Column", COLUMN_TOOL_EXT, COLUMN_TYPES);
 
+  private static final String ADD_SECTION = null;
+
+  private static final String SELECT_SECTION = null;
+
   private final DepanFxWorkspace workspace;
 
   private final DepanFxDialogRunner dialogRunner;
@@ -115,6 +122,9 @@ public class DepanFxNodeListTableCommands {
         INVERT_SELECTION_ITEM, e -> tableState.doInvertSelectionAction());
   }
 
+  /////////////////////////////////////
+  // Columns
+
   private Menu newColumnMenu() {
     DepanFxMenuBuilder menuBuilder = new DepanFxMenuBuilder(ADD_COLUMN);
     menuBuilder.appendActionItem(
@@ -126,6 +136,29 @@ public class DepanFxNodeListTableCommands {
         .forEach(menuBuilder::appendMenuItem);
 
     return menuBuilder.build();
+  }
+
+  private void doSelectColumnAction() {
+    DepanFxResourceChooser rsrcChooser =
+        new DepanFxResourceChooser(workspace, dialogRunner);
+
+    DepanFxResourcePerspectives.prepareResourceFinder(
+        rsrcChooser, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
+
+    ObservableList<DepanFxResourceFilterModel> filters =
+        rsrcChooser.getExtensionFilters();
+    tableAdapter.streamColumnChoices()
+        .map(c -> c.getColumnFilter())
+        .forEach(filters::add);
+
+    filters.add(ANY_COLUMN_RSRC_FILTER);
+    rsrcChooser.setSelectedExtensionFilter(ANY_COLUMN_RSRC_FILTER);
+
+    rsrcChooser.showOpenDialog(tableState.getScene())
+        .map(DepanFxProjectDocument.class::cast)
+        .flatMap(m -> workspace.getWorkspaceResource(
+            m, DepanFxBaseColumnData.class))
+        .ifPresent(tableState::addColumn);
   }
 
   private MenuItem buildColumnItem(
@@ -140,9 +173,24 @@ public class DepanFxNodeListTableCommands {
         );
   }
 
+  /////////////////////////////////////
+  // Sections
+
+  private Menu newSectionMenu() {
+    // Should never get a table with no sections.
+    DepanFxNodeListSection topSection =
+        tableAdapter.streamSections().findFirst().get();
+    return DepanFxNodeListSections.newSectionMenu(
+        tableState.getScene(), tableAdapter, topSection);
+  }
+
+  /////////////////////////////////////
+  // Table
+
   private Menu buildTableViewMenu() {
     DepanFxMenuBuilder menuBuilder = new DepanFxMenuBuilder(TABLE_VIEW);
     menuBuilder.appendMenuItem(newColumnMenu());
+    menuBuilder.appendMenuItem(newSectionMenu());
 
     menuBuilder.appendSeparator();
     menuBuilder.appendActionItem(
@@ -181,28 +229,5 @@ public class DepanFxNodeListTableCommands {
     DepanFxNodeListTableViewSaveDialog
         .runSaveTableView(dialogRunner, updateViewRsrc)
         .ifPresent(tableAdapter::setTableViewResource);
-  }
-
-  private void doSelectColumnAction() {
-    DepanFxResourceChooser rsrcChooser =
-        new DepanFxResourceChooser(workspace, dialogRunner);
-
-    DepanFxResourcePerspectives.prepareResourceFinder(
-        rsrcChooser, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
-
-    ObservableList<DepanFxResourceFilterModel> filters =
-        rsrcChooser.getExtensionFilters();
-    tableAdapter.streamColumnChoices()
-        .map(c -> c.getColumnFilter())
-        .forEach(filters::add);
-
-    filters.add(ANY_COLUMN_RSRC_FILTER);
-    rsrcChooser.setSelectedExtensionFilter(ANY_COLUMN_RSRC_FILTER);
-
-    rsrcChooser.showOpenDialog(tableState.getScene())
-        .map(DepanFxProjectDocument.class::cast)
-        .flatMap(m -> workspace.getWorkspaceResource(
-            m, DepanFxBaseColumnData.class))
-        .ifPresent(tableState::addColumn);
   }
 }

@@ -15,7 +15,6 @@
  */
 package com.pnambic.depanfx.nodelist.gui;
 
-import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxExportFlatSectionDialog;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxExportTreeSectionDialog;
@@ -23,13 +22,13 @@ import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatLeaf;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSectionToolDialog;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSections;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeFork;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeLeaf;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxTreeSectionToolDialog;
 import com.pnambic.depanfx.nodelist.gui.sections.folds.DepanFxFoldSection;
 import com.pnambic.depanfx.nodelist.gui.sections.folds.DepanFxFoldSectionToolDialog;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFoldSectionData;
@@ -38,7 +37,6 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
-import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilterModel;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -47,8 +45,6 @@ import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
-import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +52,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -72,12 +67,8 @@ import javafx.util.StringConverter;
 public class DepanFxNodeListCell
     extends CheckBoxTreeTableCell<DepanFxNodeListMember, DepanFxNodeListMember> {
 
-  private static final String INSERT_SECTION = "Insert Section";
-
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeListCell.class);
-
-  private static final String SELECT_SECTION = "Select Section...";
 
   private static final String SELECT_FLAT_SECTION = "Select Flat Section...";
 
@@ -94,12 +85,6 @@ public class DepanFxNodeListCell
   private static final String EDIT_TREE_SECTION = "Edit Tree Section...";
 
   private static final String EXPORT_TO_CSV = "Export to CSV...";
-
-  private static final String INSERT_ABOVE_FOLD_SECTION =
-      "Insert Fold Section";
-
-  private static final String INSERT_ABOVE_MEMBER_TREE_SECTION =
-      "Insert Member Tree Section";
 
   // Copy behaviors
   private static final String COPY_ITEM = "Copy";
@@ -331,18 +316,7 @@ public class DepanFxNodeListCell
   }
 
   private Menu buildNewSectionMenu(DepanFxNodeListSection before) {
-    DepanFxMenuBuilder builder = new DepanFxMenuBuilder(INSERT_SECTION);
-    builder.appendActionItem(
-        SELECT_SECTION,
-        e -> runInsertSelectSection(before));
-    builder.appendSeparator();
-    builder.appendActionItem(
-        INSERT_ABOVE_MEMBER_TREE_SECTION,
-        e -> runInsertMemberTreeSectionAction(before));
-    builder.appendActionItem(
-        INSERT_ABOVE_FOLD_SECTION,
-        e -> runInsertFoldSectionAction(before));
-    return builder.build();
+    return DepanFxNodeListSections.newSectionMenu(getScene(), tableAdapter, before);
   }
 
   private void appendFoldIntoMenu(
@@ -483,50 +457,6 @@ public class DepanFxNodeListCell
     tableAdapter.updateSection(member, dataRsrc);
   }
 
-  private void runInsertSelectSection(DepanFxNodeListSection before) {
-    DepanFxWorkspace workspace = tableAdapter.getWorkspace();
-
-    prepareSectionChooser(workspace).showOpenDialog(getScene())
-        .map(DepanFxProjectDocument.class::cast)
-        .flatMap(p -> workspace.getWorkspaceResource(
-            p, DepanFxBaseSectionData.class))
-        .ifPresent(r -> tableAdapter.insertSection(before, r));
-  }
-
-  private void runInsertMemberTreeSectionAction(DepanFxNodeListSection before) {
-    getInitialTreeSectionResource()
-        .ifPresent(r -> tableAdapter.insertSection(before, r));
-  }
-
-  private void runInsertFoldSectionAction(DepanFxNodeListSection before) {
-    getInitialFoldSectionResource()
-        .ifPresent(r -> tableAdapter.insertSection(before, r));
-  }
-
-  private Optional<DepanFxWorkspaceResource<DepanFxTreeSectionData>>
-      getInitialTreeSectionResource() {
-    ContextModelId modelId = tableAdapter.getGraphDoc().getContextModelId();
-
-    return DepanFxProjects.getBuiltIn(
-        tableAdapter.getWorkspace(), DepanFxTreeSectionData.class,
-        c -> isContextModelMatcherResource(c, modelId));
-  }
-
-  private Optional<DepanFxWorkspaceResource<DepanFxFoldSectionData>>
-      getInitialFoldSectionResource() {
-    DepanFxFoldSectionData result =
-        DepanFxFoldSectionData.emptyFoldSectionData(
-            tableAdapter.getWorkspace(), tableAdapter.getGraphDocResource());
-    return Optional.of(tableAdapter.getWorkspace().addScratchResource(result));
-  }
-
-  private boolean isContextModelMatcherResource(
-      DepanFxBuiltInContribution<DepanFxTreeSectionData> contrib,
-      ContextModelId modelId) {
-    return DepanFxLinkMatcherGroup.isContextModelMatcherResource(
-        modelId, contrib.getDocument().getLinkMatcherRsrc());
-  }
-
   private void runSelectRecursiveAction(
       DepanFxFoldSection.FoldFork fork, boolean value) {;
     // Do the root
@@ -546,19 +476,6 @@ public class DepanFxNodeListCell
     // Then all the reachable nodes.
     Collection<GraphNode> nodes = fork.getDecendants();
     tableAdapter.doSelectGraphNodesAction(nodes.stream(), value);
-  }
-
-  private DepanFxResourceChooser prepareSectionChooser(
-      DepanFxWorkspace workspace) {
-    DepanFxResourceFilterModel.Composite rsrcFilter =
-        new DepanFxResourceFilterModel.Composite(
-            "Node List Sections",
-            new DepanFxResourceFilter[] {
-                DepanFxFlatSectionToolDialog.FLAT_SECTION_RSRC_FILTER,
-                DepanFxFoldSectionToolDialog.FOLD_SECTION_RSRC_FILTER,
-                DepanFxTreeSectionToolDialog.TREE_SECTION_RSRC_FILTER
-            });
-    return prepareSectionChooser(workspace, rsrcFilter);
   }
 
   private DepanFxResourceChooser prepareFoldSectionChooser(

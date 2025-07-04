@@ -14,6 +14,7 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.slf4j.Logger;
@@ -202,6 +203,12 @@ public class DepanFxNodeListTableController
   @Override // DepanFxNodeListTableAdapter
   public Stream<DepanFxNodeListSection> streamSections() {
     return tableState.streamSections();
+  }
+
+  @Override
+  public Stream<DepanFxWorkspaceMember> streamSectionChoices() {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   /**
