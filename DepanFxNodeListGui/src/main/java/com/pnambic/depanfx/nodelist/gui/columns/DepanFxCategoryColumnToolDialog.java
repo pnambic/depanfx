@@ -51,6 +51,18 @@ import javafx.stage.FileChooser.ExtensionFilter;
 public class DepanFxCategoryColumnToolDialog
     extends DepanFxBaseColumnToolDialog<DepanFxCategoryColumnData> {
 
+  public static final String ADD_CATEGORY_ROW = "Add Category Row";
+
+  public static final String EMPTY_CATEGORY = "Empty category";
+
+  public static final String SELECTION_CATEGORY = "Selection category";
+
+  public static final String NODE_LIST_CATEGORY = "Node List category";
+
+  public static final String NEW_EMPTY_CATEGORY = "New Empty Category...";
+
+  public static final String NEW_SELECTION_CATEGORY = "New Selection Category...";
+
   @SuppressWarnings("unused")
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxCategoryColumnToolDialog.class);
@@ -235,10 +247,14 @@ public class DepanFxCategoryColumnToolDialog
 
   private ContextMenu buildCategoriesTableMenu() {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem("Node List category", this::addNewList);
-    sectionItem = builder.appendActionItem("Selection category", this::addSelectionCategory);
-    newItem = builder.appendActionItem("New category", this::addNewCategory);
-    builder.appendActionItem("Empty category", this::addEmptyCategory);
+    builder.appendActionItem(
+        NODE_LIST_CATEGORY, this::addNewList);
+    sectionItem = builder.appendActionItem(
+        SELECTION_CATEGORY, this::addSelectionCategory);
+    newItem = builder.appendActionItem(
+        EMPTY_CATEGORY, this::addNewCategory);
+    builder.appendActionItem(
+        ADD_CATEGORY_ROW, this::addBlankCategory);
     return builder.build();
   }
 
@@ -267,7 +283,7 @@ public class DepanFxCategoryColumnToolDialog
         .ifPresent(categoryTableData::add);
   }
 
-  private void addEmptyCategory(Event event) {
+  private void addBlankCategory(Event event) {
     addEmptyCategory();
   }
 
@@ -291,8 +307,31 @@ public class DepanFxCategoryColumnToolDialog
 
     @Override
     protected void populateContextMenu(DepanFxContextMenuBuilder builder) {
-      builder.appendActionItem(DepanFxNodeListTableCommands.SELECT_NODE_LIST,
+      builder.appendActionItem(
+          DepanFxNodeListTableCommands.SELECT_NODE_LIST,
           e -> runNodeListChooser(getIndex()));
+      builder.appendActionItem(
+          NEW_SELECTION_CATEGORY,
+          e -> updateSelectionCategory(getIndex()));
+      builder.appendActionItem(
+          NEW_EMPTY_CATEGORY,
+          e -> updateNewCategory(getIndex()));
+    }
+
+    private void updateSelectionCategory(int index) {
+      DepanFxNodeList selectList = tableAdapter.getSelection();
+      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc =
+          workspace.addScratchResource(selectList);
+      DepanFxSaveNodeListDialog.runSaveNodeList(dialogRunner, nodeListRsrc)
+          .ifPresent(r -> updateCellResource(index, r));
+    }
+
+    private void updateNewCategory(int index) {
+      DepanFxNodeList emptyList = tableAdapter.buildEmptyList();
+      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc =
+          workspace.addScratchResource(emptyList);
+      DepanFxSaveNodeListDialog.runSaveNodeList(dialogRunner, nodeListRsrc)
+          .ifPresent(r -> updateCellResource(index, r));
     }
 
     private void runNodeListChooser(int index) {
