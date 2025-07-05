@@ -234,6 +234,13 @@ public class DepanFxNodeListTableController
   }
 
   @Override
+  public Optional<DepanFxNodeListColumn> addColumn(
+      DepanFxNodeListColumn after,
+      DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc) {
+    return tableState.addColumn(after, columnRsrc);
+  }
+
+  @Override
   public Stream<DepanFxInfoRegistry.Contribution> streamInfosByLabel(
       String label) {
     return infoRegistry.streamByLabel(label);

@@ -94,6 +94,13 @@ public interface DepanFxNodeListTableAdapter {
   // Column operations.
 
   /**
+   * Returns an empty result if the resource cannot be added as a column.
+   */
+  Optional<DepanFxNodeListColumn> addColumn(
+      DepanFxNodeListColumn after,
+      DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc);
+
+  /**
    * Provide a stream of possible columns.
    */
   Stream<DepanFxNodeListColumn> streamColumns();
@@ -104,17 +111,6 @@ public interface DepanFxNodeListTableAdapter {
 
   Optional<DepanFxNodeListColumn> toColumn(
       DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc);
-
-  // Node info support.
-
-  /**
-   * @param infoKey For simple singleton types (e.g. location), the key
-   *   is often the class.  For user types with multiple instances, the key
-   *   is likely to be an instance-unique string.
-   */
-  Optional<DepanFxNodeInfoStore> getInfoStore(Object infoKey);
-
-  void addInfoStore(Object infoKey, DepanFxNodeInfoStore infoStore);
 
   // Section operations
 
@@ -129,4 +125,15 @@ public interface DepanFxNodeListTableAdapter {
   Stream<DepanFxNodeListSection> streamSections();
 
   Stream<DepanFxWorkspaceMember> streamSectionChoices();
+
+  // Node info support.
+
+  /**
+   * @param infoKey For simple singleton types (e.g. location), the key
+   *   is often the class.  For user types with multiple instances, the key
+   *   is likely to be an instance-unique string.
+   */
+  Optional<DepanFxNodeInfoStore> getInfoStore(Object infoKey);
+
+  void addInfoStore(Object infoKey, DepanFxNodeInfoStore infoStore);
 }

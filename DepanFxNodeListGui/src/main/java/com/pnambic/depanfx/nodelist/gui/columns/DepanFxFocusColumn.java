@@ -78,6 +78,8 @@ public class DepanFxFocusColumn
         SELECT_FOCUS_COLUMN, e -> openColumnChooser(dialogRunner));
     builder.appendActionItem(
         EDIT_FOCUS_COLUMN, e -> openColumnEditor(dialogRunner));
+    builder.appendSubMenu(
+        DepanFxNodeListColumns.newColumnMenu(this, tableAdapter));
 
     // These actions are hidden if the node list is unchanged.
     saveSeparator = builder.appendSeparator();

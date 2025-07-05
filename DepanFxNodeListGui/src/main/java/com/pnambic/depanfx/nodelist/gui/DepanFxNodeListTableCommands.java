@@ -1,37 +1,20 @@
 package com.pnambic.depanfx.nodelist.gui;
 
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
-import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeInfoColumnData;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumns;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSections;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxCategoryColumnData;
-import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
-import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
-import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
-import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
-import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilterModel;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxMenuBuilder;
-import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.List;
-
-import javafx.collections.ObservableList;
 import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
 
 public class DepanFxNodeListTableCommands {
 
@@ -49,27 +32,6 @@ public class DepanFxNodeListTableCommands {
 
   public static final String TABLE_VIEW = "Table View";
 
-  public static final String ADD_COLUMN = "Add Column";
-
-  public static final String SELECT_COLUMN = "Select Column...";
-
-  private static final String COLUMN_TOOL_EXT = "d*cti";
-
-  private static final List<Class<?>> COLUMN_TYPES =
-      Arrays.asList(new Class<?>[] {
-        DepanFxCategoryColumnData.class,
-        DepanFxFocusColumnData.class,
-        DepanFxNodeInfoColumnData.class
-  });
-
-  public static final DepanFxResourceFilter ANY_COLUMN_RSRC_FILTER =
-      DepanFxResourceFilter.buildResourceFilter(
-          "Any Column", COLUMN_TOOL_EXT, COLUMN_TYPES);
-
-  private static final String ADD_SECTION = null;
-
-  private static final String SELECT_SECTION = null;
-
   private final DepanFxWorkspace workspace;
 
   private final DepanFxDialogRunner dialogRunner;
@@ -77,6 +39,9 @@ public class DepanFxNodeListTableCommands {
   private final DepanFxNodeListTableAdapter tableAdapter;
 
   private final DepanFxNodeListTableState tableState;
+
+  // Column needs to be refreshed due to columns being added or removed.
+  private Menu newColumnMenu;
 
   public DepanFxNodeListTableCommands(
       DepanFxWorkspace workspace,
@@ -122,61 +87,30 @@ public class DepanFxNodeListTableCommands {
         INVERT_SELECTION_ITEM, e -> tableState.doInvertSelectionAction());
   }
 
+  public void updateOnShowing() {
+
+    // The last column may have changed.
+    DepanFxNodeListColumn after = tableAdapter.streamColumns()
+        .reduce((first, second) -> second).get();
+    DepanFxNodeListColumns.updateNewColumnMenu(
+        newColumnMenu, after, tableAdapter);
+  }
+
   /////////////////////////////////////
   // Columns
 
-  private Menu newColumnMenu() {
-    DepanFxMenuBuilder menuBuilder = new DepanFxMenuBuilder(ADD_COLUMN);
-    menuBuilder.appendActionItem(
-        SELECT_COLUMN, e -> doSelectColumnAction());
-    menuBuilder.appendSeparator();
+  private Menu buildNewColumnMenu() {
 
-    tableAdapter.streamColumnChoices()
-        .map(this::buildColumnItem)
-        .forEach(menuBuilder::appendMenuItem);
-
-    return menuBuilder.build();
-  }
-
-  private void doSelectColumnAction() {
-    DepanFxResourceChooser rsrcChooser =
-        new DepanFxResourceChooser(workspace, dialogRunner);
-
-    DepanFxResourcePerspectives.prepareResourceFinder(
-        rsrcChooser, DepanFxNodeListColumnData.COLUMNS_TOOL_PATH);
-
-    ObservableList<DepanFxResourceFilterModel> filters =
-        rsrcChooser.getExtensionFilters();
-    tableAdapter.streamColumnChoices()
-        .map(c -> c.getColumnFilter())
-        .forEach(filters::add);
-
-    filters.add(ANY_COLUMN_RSRC_FILTER);
-    rsrcChooser.setSelectedExtensionFilter(ANY_COLUMN_RSRC_FILTER);
-
-    rsrcChooser.showOpenDialog(tableState.getScene())
-        .map(DepanFxProjectDocument.class::cast)
-        .flatMap(m -> workspace.getWorkspaceResource(
-            m, DepanFxBaseColumnData.class))
-        .ifPresent(tableState::addColumn);
-  }
-
-  private MenuItem buildColumnItem(
-      DepanFxColumnRegistry.Contribution contrib) {
-    String fmtLabel = MessageFormat.format(
-        "New {0} Column...", contrib.getColumnLabel());
-    return DepanFxMenuItemFactory.createActionItem(
-        fmtLabel,
-        e ->
-          contrib.getNewColumn(e, workspace, dialogRunner, tableAdapter)
-              .ifPresent(tableState::addColumn)
-        );
+    // There should always be a last column in the table.
+    DepanFxNodeListColumn after = tableAdapter.streamColumns()
+        .reduce((first, second) -> second).get();
+    return DepanFxNodeListColumns.newColumnMenu(after, tableAdapter);
   }
 
   /////////////////////////////////////
   // Sections
 
-  private Menu newSectionMenu() {
+  private Menu buildNewSectionMenu() {
     // Should never get a table with no sections.
     DepanFxNodeListSection topSection =
         tableAdapter.streamSections().findFirst().get();
@@ -188,9 +122,12 @@ public class DepanFxNodeListTableCommands {
   // Table
 
   private Menu buildTableViewMenu() {
+
     DepanFxMenuBuilder menuBuilder = new DepanFxMenuBuilder(TABLE_VIEW);
-    menuBuilder.appendMenuItem(newColumnMenu());
-    menuBuilder.appendMenuItem(newSectionMenu());
+
+    newColumnMenu = buildNewColumnMenu();
+    menuBuilder.appendSubMenu(newColumnMenu);
+    menuBuilder.appendSubMenu(buildNewSectionMenu());
 
     menuBuilder.appendSeparator();
     menuBuilder.appendActionItem(

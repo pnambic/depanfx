@@ -187,7 +187,8 @@ public class DepanFxNodeListTableState {
 
   public DepanFxNodeListTableViewData getTableView() {
     @SuppressWarnings("unchecked")
-    List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>> columnResources = columns.stream()
+    List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
+    columnResources = columns.stream()
         .filter(c -> DepanFxAbstractColumn.class.isAssignableFrom(c.getClass()))
         .map(DepanFxAbstractColumn.class::cast)
         .map(c -> c.getColumnDataResource())
@@ -235,6 +236,34 @@ public class DepanFxNodeListTableState {
 
   /////////////////////////////////////
   // Table columns
+
+  public Optional<DepanFxNodeListColumn> addColumn(
+      DepanFxNodeListColumn after,
+      DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc) {
+    Optional<DepanFxNodeListColumn> result = tableFactory.createTableColumn(columnRsrc);
+    int insertPos = getInsertPos(after);
+
+    // Account for table's view, with node name in position 0.
+    int tablePos = insertPos + 1;
+
+    result.ifPresentOrElse(c -> {
+      columns.add(insertPos, c);
+      nodeListTable.getColumns().add(tablePos, c.createColumn());
+    }, () ->
+      LOG.warn("Unknown type {} for column construction",
+          columnRsrc.getResource().getClass().getName()));
+
+    return result;
+  }
+
+  private int getInsertPos(DepanFxNodeListColumn after) {
+    int columnPos = columns.indexOf(after);
+    if (columnPos < 0) {
+      LOG.warn("unknown after column {}", after.getColumnLabel());
+      return columns.size();
+    }
+    return columnPos + 1;
+  }
 
   public void addColumn(
       DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc) {

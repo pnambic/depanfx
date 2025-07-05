@@ -105,25 +105,6 @@ public class DepanFxCategoryColumn
   }
 
   @Override
-  public ContextMenu buildColumnContextMenu(DepanFxDialogRunner dialogRunner) {
-    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    // These actions are disabled is the node list has changes.
-    selectAction = builder.appendActionItem(SELECT_CATEGORY_COLUMN,
-        e -> openColumnChooser(dialogRunner));
-    editAction = builder.appendActionItem(EDIT_CATEGORY_COLUMN,
-        e -> openColumnEditor(dialogRunner, tableAdapter));
-
-    // These actions are hidden if the node list is unchanged.
-    saveSeparator = builder.appendSeparator();
-    saveAction = builder.appendActionItem(
-        SAVE_NODE_LISTS, e -> runSaveNodeList());
-
-    ContextMenu result = builder.build();
-    result.setOnShowing(e -> onColumnMenuShowing());
-    return result;
-  }
-
-  @Override
   public String toString(DepanFxNodeListGraphNode member) {
     GraphNode graphNode = member.getGraphNode();
     Collection<CategoryEntry> nodeCategories = getCurrentCategories(graphNode);
@@ -137,6 +118,30 @@ public class DepanFxCategoryColumn
     }
     // Not in any collections.
     return "";
+  }
+
+  @Override // DepanFxAbstractColumn
+  protected ContextMenu buildColumnContextMenu(DepanFxDialogRunner dialogRunner) {
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    // These actions are disabled is the node list has changes.
+    selectAction = builder.appendActionItem(
+        SELECT_CATEGORY_COLUMN,
+        e -> openColumnChooser(dialogRunner));
+    editAction = builder.appendActionItem(
+        EDIT_CATEGORY_COLUMN,
+        e -> openColumnEditor(dialogRunner, tableAdapter));
+    builder.appendSubMenu(
+        DepanFxNodeListColumns.newColumnMenu(this, tableAdapter));
+
+    // These actions are hidden if the node list is unchanged.
+    saveSeparator = builder.appendSeparator();
+    saveAction = builder.appendActionItem(
+        SAVE_NODE_LISTS,
+        e -> runSaveNodeList());
+
+    ContextMenu result = builder.build();
+    result.setOnShowing(e -> onColumnMenuShowing());
+    return result;
   }
 
   @Override

@@ -27,9 +27,13 @@ public class DepanFxMenuBuilder {
 
   private final DepanFxMenuItemFactory itemFactory;
 
-  public DepanFxMenuBuilder(String menuLabel) {
-    this.result = new Menu(menuLabel);
+  public DepanFxMenuBuilder(Menu menu) {
+    this.result = menu;
     this.itemFactory = new DepanFxMenuItemFactory(result.getItems());
+  }
+
+  public DepanFxMenuBuilder(String menuLabel) {
+    this(new Menu(menuLabel));
   }
 
   public MenuItem appendActionItem(

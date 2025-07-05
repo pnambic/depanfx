@@ -114,7 +114,9 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
 
     cmds.addLoadSaveItems(builder);
     cmds.addTableViewItems(builder);
-    return builder.build();
+    ContextMenu result = builder.build();
+    result.setOnShowing(e -> cmds.updateOnShowing());
+    return result;
   }
 
   private void runFilterSelectionDialog() {

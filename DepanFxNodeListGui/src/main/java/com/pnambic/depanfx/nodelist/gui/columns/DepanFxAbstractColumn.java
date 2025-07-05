@@ -38,10 +38,19 @@ public abstract class DepanFxAbstractColumn<T extends DepanFxBaseColumnData>
   }
 
   @Override
+  /**
+   * Creates the column with the chosen configuration.
+   *
+   * @return GUI column entityfor this node list column.
+   */
   public TreeTableColumn<DepanFxNodeListMember, ?> createColumn() {
-    TreeTableColumn<DepanFxNodeListMember, ?> result = buildColumn();
-    configColumn(result);
-    column = result;
+    column = buildColumn();
+
+    column.setPrefWidth(getWidthPx());
+    column.setSortable(false);
+
+    column.setContextMenu(
+        buildColumnContextMenu(tableAdapter.getDialogRunner()));
     return column;
   }
 
@@ -109,14 +118,6 @@ public abstract class DepanFxAbstractColumn<T extends DepanFxBaseColumnData>
       DepanFxWorkspaceResource<T> columnDataRsrc) {
     this.columnDataRsrc = columnDataRsrc;
     refreshColumn();
-  }
-
-  private void configColumn(
-      TreeTableColumn<DepanFxNodeListMember, ?> config) {
-    config.setPrefWidth(getWidthPx());
-    config.setContextMenu(
-        buildColumnContextMenu(tableAdapter.getDialogRunner()));
-    config.setSortable(false);
   }
 
   private double getWidthPx() {

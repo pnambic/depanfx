@@ -24,6 +24,7 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxAbstractColumn;
+import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumns;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxInfoStoreData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
@@ -127,6 +128,8 @@ public class DepanFxInfoColumn
         e -> openColumnChooser(dialogRunner));
     editAction = builder.appendActionItem(EDIT_INFO_COLUMN,
         e -> openColumnEditor(dialogRunner));
+    builder.appendSubMenu(
+        DepanFxNodeListColumns.newColumnMenu(this, tableAdapter));
 
     // These actions are hidden if the node list is unchanged.
     saveSeparator = builder.appendSeparator();
