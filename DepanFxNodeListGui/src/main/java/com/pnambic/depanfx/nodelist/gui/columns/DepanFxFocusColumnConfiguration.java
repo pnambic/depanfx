@@ -2,6 +2,7 @@ package com.pnambic.depanfx.nodelist.gui.columns;
 
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
@@ -15,6 +16,7 @@ import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -89,8 +91,11 @@ public class DepanFxFocusColumnConfiguration {
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
         DepanFxNodeListTableAdapter tableAdpater) {
+      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc =
+          workspace.addScratchResource(tableAdpater.buildEmptyList());
+
       DepanFxFocusColumnData columnData =
-          DepanFxFocusColumnData.buildInitialFocusColumnData(null);
+          DepanFxFocusColumnData.buildInitialFocusColumnData(nodeListRsrc);
       DepanFxWorkspaceResource<DepanFxFocusColumnData> columnRsrc =
           workspace.addScratchResource(columnData);
       return DepanFxFocusColumnToolDialog.runCreateDialog(

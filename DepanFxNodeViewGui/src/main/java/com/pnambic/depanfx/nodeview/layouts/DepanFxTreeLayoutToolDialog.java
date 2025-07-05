@@ -84,7 +84,7 @@ public class DepanFxTreeLayoutToolDialog
       DepanFxWorkspaceResource<DepanFxTreeLayoutData> toolRsrc) {
     super.setToolResource(toolRsrc);
 
-    hierarchyMatcherControl.setLinkMatcherRsrc(
+    hierarchyMatcherControl.setLinkMatcherResource(
         toolRsrc.getResource().getHierarchyMatcherRsrc());
   }
 

@@ -190,6 +190,14 @@ public class DepanFxProjects {
     return Optional.of(document);
   }
 
+  public static String asSaveLabel(
+      DepanFxWorkspace workspace, DepanFxWorkspaceResource<?> rsrc) {
+    return DepanFxProjects.asSaveDocument(workspace, rsrc)
+        .map(DepanFxProjects::getDocumentLabel)
+
+        // Let the text input field show a prompt text.
+        .orElse(null);
+  }
 
   /**
    * By the time a candidate built in hits the filter,

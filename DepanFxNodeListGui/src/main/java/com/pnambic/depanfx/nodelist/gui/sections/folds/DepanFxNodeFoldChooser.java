@@ -69,7 +69,8 @@ public class DepanFxNodeFoldChooser {
     public void setNodeFoldResource(
         DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldingRsrc) {
       this.nodeFoldingRsrc = nodeFoldingRsrc;
-      nodeFoldingField.setText(getNodeFoldingRsrcName());
+      nodeFoldingField.setText(
+          DepanFxProjects.asSaveLabel(workspace, nodeFoldingRsrc));
     }
 
     public DepanFxWorkspaceResource<DepanFxNodeFoldData>
@@ -90,14 +91,6 @@ public class DepanFxNodeFoldChooser {
       builder.appendActionItem(
           SELECT_NODE_FOLDING, e -> runNodeFoldingFinder());
       return builder.build();
-    }
-
-    private String getNodeFoldingRsrcName() {
-      return DepanFxProjects.asSaveDocument(workspace, nodeFoldingRsrc)
-          .map(DepanFxProjects::getDocumentLabel)
-
-          // Let the text input field show a prompt text.
-          .orElse(null);
     }
   }
 

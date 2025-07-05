@@ -1,16 +1,16 @@
 package com.pnambic.depanfx.nodelist.gui.columns;
 
-import com.google.common.base.Strings;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
+import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.tooldata.DepanFxFocusColumnData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
-import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
-import com.pnambic.depanfx.scene.DepanFxFxmlDialog;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
+import com.pnambic.depanfx.scene.DepanFxFxmlDialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -20,10 +20,8 @@ import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
-import java.util.Optional;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -50,6 +48,8 @@ public class DepanFxFocusColumnToolDialog
 
   @FXML
   private TextField focusNodeListRsrcField;
+
+  DepanFxNodeListChooser.NodeListControl focusNodeListControl;
 
   @Autowired
   public DepanFxFocusColumnToolDialog(
@@ -85,7 +85,10 @@ public class DepanFxFocusColumnToolDialog
 
   @FXML
   public void initialize() {
-    focusNodeListRsrcField.setContextMenu(buildNodeListChoiceMenu());
+    focusNodeListControl = new DepanFxNodeListChooser.NodeListControl(
+        getWorkspace(), dialogRunner, focusNodeListRsrcField);
+    focusNodeListRsrcField.textProperty().addListener(
+        (v, o, n) -> updateFocusLabel());
   }
 
   @Override
@@ -95,39 +98,26 @@ public class DepanFxFocusColumnToolDialog
 
     DepanFxFocusColumnData columnData = columnRsrc.getResource();
     focusLabelField.setText(columnData.getFocusLabel());
-    focusNodeListRsrcField.setText(getNodeListRsrcName(columnData));
+    focusNodeListControl.setNodeListResource(
+        columnData.getNodeListRsrc());
   }
 
-  private String getNodeListRsrcName(DepanFxFocusColumnData columnData) {
-    if (columnData.getNodeListRsrc() != null) {
-      return columnData.getNodeListRsrc().getDocument()
-          .getMemberPath().toString();
-    }
-    // Let the text input field show a prompt text.
-    return null;
+  @FXML
+  public void handleNodeListBrowse() {
+    focusNodeListControl.runNodeListFinder();
   }
 
-  private ContextMenu buildNodeListChoiceMenu() {
-    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
-    builder.appendActionItem("Select Node List...",
-        e -> runNodeListFinder());
-    return builder.build();
-  }
+  @FXML
+  public void handleNewNodeList() {
+    DepanFxNodeList focusNodeList =
+        getToolResource().get().getResource().getNodeListRsrc().getResource();
 
-  private void runNodeListFinder() {
-    DepanFxNodeListChooser.runNodeListChooser(
-        getWorkspace(), dialogRunner, focusNodeListRsrcField.getScene())
-        .ifPresent(this::updateNodeListFields);
-  }
+    DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc =
+        getWorkspace().addScratchResource(
+            DepanFxNodeLists.buildEmptyNodeList(focusNodeList));
 
-  private void updateNodeListFields(
-      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
-    focusNodeListRsrcField.setText(
-        nodeListRsrc.getDocument().getMemberPath().toString());
-
-    if (Strings.isNullOrEmpty(focusLabelField.getText())) {
-      focusLabelField.setText(nodeListRsrc.getResource().getNodeListName());
-    }
+    DepanFxSaveNodeListDialog.runSaveNodeList(dialogRunner, nodeListRsrc)
+        .ifPresent(r -> focusNodeListControl.setNodeListResource(r));
   }
 
   /////////////////////////////////////
@@ -135,14 +125,12 @@ public class DepanFxFocusColumnToolDialog
 
   @Override
   protected DepanFxFocusColumnData prepareResult() {
-    Optional<DepanFxWorkspaceResource<DepanFxNodeList>> optNodeListRsrc =
-        DepanFxResourcePerspectives.toResource(
-            getWorkspace(), focusNodeListRsrcField, DepanFxNodeList.class);
 
     return new DepanFxFocusColumnData(
         getToolName(), getToolDescription(),
         getColumnLabel(), getColumnWidthMs(),
-        focusLabelField.getText(), optNodeListRsrc.get());
+        focusLabelField.getText(),
+        focusNodeListControl.getNodeListResource());
   }
 
   @Override
@@ -160,5 +148,11 @@ public class DepanFxFocusColumnToolDialog
   @Override
   protected String getInputCheckFailureText() {
     return  "Focus Column Save Confirmation Error";
+  }
+
+  private void updateFocusLabel() {
+    String focusLabel = focusNodeListControl.getNodeListResource()
+        .getResource().getNodeListName();
+    updateBlankField(focusLabelField, focusLabel);
   }
 }

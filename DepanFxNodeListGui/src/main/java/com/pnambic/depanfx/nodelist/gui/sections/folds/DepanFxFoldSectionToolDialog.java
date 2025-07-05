@@ -117,7 +117,9 @@ public class DepanFxFoldSectionToolDialog
   @FXML
   public void onNewNodeFolding() {
     DepanFxWorkspaceResource<GraphDocument> graphRsrc =
-        getToolResource().get().getResource().getNodeFoldResource().getResource().getGraphDocResource();
+        getToolResource().get()
+            .getResource().getNodeFoldResource()
+            .getResource().getGraphDocResource();
     DepanFxWorkspaceResource<DepanFxNodeFoldData> foldInfo =
         workspace.addScratchResource(
             DepanFxNodeFoldData.emptyNodeFoldData(graphRsrc));

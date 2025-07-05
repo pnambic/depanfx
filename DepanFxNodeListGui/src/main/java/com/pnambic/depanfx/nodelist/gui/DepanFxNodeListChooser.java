@@ -17,6 +17,7 @@ import java.util.function.BiConsumer;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableCell;
+import javafx.scene.control.TextField;
 
 public class DepanFxNodeListChooser {
 
@@ -49,6 +50,55 @@ public class DepanFxNodeListChooser {
     result.getExtensionFilters().add(NODE_LIST_RSRC_FILTER);
     result.setSelectedExtensionFilter(NODE_LIST_RSRC_FILTER);
     return result;
+  }
+
+  /**
+   * Bind a pop-up to text field for the resource name.
+   */
+  public static class NodeListControl {
+
+    private final DepanFxWorkspace workspace;
+
+    private final DepanFxDialogRunner dialogRunner;
+
+    private DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc;
+
+    private final TextField nodeListField;
+
+    public NodeListControl(
+        DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner,
+        TextField nodeListField) {
+      this.workspace = workspace;
+      this.dialogRunner = dialogRunner;
+      this.nodeListField = nodeListField;
+      nodeListField.setContextMenu(buildContextMenu());
+    }
+
+    public void runNodeListFinder() {
+      runNodeListChooser(workspace, dialogRunner, nodeListField.getScene())
+          .ifPresent(this::setNodeListResource);
+    }
+
+    public void setNodeListResource(
+        DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
+      this.nodeListRsrc = nodeListRsrc;
+      nodeListField.setText(
+          DepanFxProjects.asSaveLabel(workspace, nodeListRsrc));
+    }
+
+    public DepanFxWorkspaceResource<DepanFxNodeList>
+    getNodeListResource() {
+      return nodeListRsrc;
+    }
+
+    private ContextMenu buildContextMenu() {
+      DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+      builder.appendActionItem(
+          DepanFxNodeListTableCommands.SELECT_NODE_LIST,
+          e -> runNodeListFinder());
+      return builder.build();
+    }
   }
 
   /**

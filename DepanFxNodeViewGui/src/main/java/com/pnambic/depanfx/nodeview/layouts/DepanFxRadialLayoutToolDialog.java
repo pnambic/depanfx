@@ -85,7 +85,7 @@ public class DepanFxRadialLayoutToolDialog
       DepanFxWorkspaceResource<DepanFxRadialLayoutData> toolRsrc) {
     super.setToolResource(toolRsrc);
 
-    hierarchyMatcherControl.setLinkMatcherRsrc(
+    hierarchyMatcherControl.setLinkMatcherResource(
         toolRsrc.getResource().getHierarchyMatcherRsrc());
   }
 

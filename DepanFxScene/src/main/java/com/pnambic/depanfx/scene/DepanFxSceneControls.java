@@ -86,7 +86,7 @@ public class DepanFxSceneControls {
   }
 
   public static void updateBlankField(TextField updateField, String newValue) {
-    if (isPresent(updateField.getText())) {
+    if (!isPresent(updateField.getText())) {
       updateField.setText(newValue);
     }
   }

@@ -53,7 +53,7 @@ public class DepanFxLinkMatcherChooser {
       linkMatcherField.setContextMenu(buildContextMenu());
     }
 
-    public void setLinkMatcherRsrc(
+    public void setLinkMatcherResource(
         DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkMatcherRsrc) {
       this.linkMatcherRsrc = linkMatcherRsrc;
       linkMatcherField.setText(getLinkMatcherRsrcName());
@@ -77,7 +77,7 @@ public class DepanFxLinkMatcherChooser {
       DepanFxLinkMatcherChooser
           .runLinkMatcherFinder(
                 workspace, dialogRunner, linkMatcherField.getScene())
-          .ifPresent(this::setLinkMatcherRsrc);
+          .ifPresent(this::setLinkMatcherResource);
     }
 
     private ContextMenu buildContextMenu() {

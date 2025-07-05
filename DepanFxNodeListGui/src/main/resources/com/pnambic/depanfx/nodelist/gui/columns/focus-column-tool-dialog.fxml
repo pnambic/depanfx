@@ -33,14 +33,25 @@
                   prefWidth="40" alignment="BASELINE_RIGHT"/>
          </HBox>
 
-         <Label text="Focus List"/>
+         <HBox spacing="10">
+            <Label text="Focus List"/>
+            <Region HBox.hgrow="ALWAYS" />
+            <Label text="New Node Folding..."
+                onMouseClicked="#handleNewNodeList" />
+         </HBox>
 
          <HBox spacing="10">
-            <TextField fx:id="focusLabelField" editable="true"
-                  promptText="Focus label in cells"
-                  HBox.hgrow="ALWAYS"/>
+            <Label text="Node List"/>
             <TextField fx:id="focusNodeListRsrcField" editable="false"
                   promptText="No node list selected"
+                  HBox.hgrow="ALWAYS"/>
+            <Button text="Browse" onAction="#handleNodeListBrowse" />
+         </HBox>
+
+         <HBox spacing="10">
+            <Label text="Shown Value"/>
+            <TextField fx:id="focusLabelField" editable="true"
+                  promptText="Focus label in cells"
                   HBox.hgrow="ALWAYS"/>
          </HBox>
 

@@ -112,7 +112,7 @@ public class DepanFxTreeSectionToolDialog
     super.setToolResource(sectionRsrc);
 
     DepanFxTreeSectionData sectionData = sectionRsrc.getResource();
-    linkMatcherControl.setLinkMatcherRsrc(sectionData .getLinkMatcherRsrc());
+    linkMatcherControl.setLinkMatcherResource(sectionData.getLinkMatcherRsrc());
 
     inferMissingParentsField.setSelected(sectionData.inferMissingParents());
 
