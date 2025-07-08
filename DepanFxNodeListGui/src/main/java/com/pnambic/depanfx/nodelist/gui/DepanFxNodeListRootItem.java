@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui;
 
+import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSectionBuiltIns;
@@ -15,6 +16,8 @@ import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TreeItem;
 
 public class DepanFxNodeListRootItem extends DepanFxNodeListItem {
@@ -38,6 +41,13 @@ public class DepanFxNodeListRootItem extends DepanFxNodeListItem {
     }
 
     return super.getChildren();
+  }
+
+  @Override
+  public ContextMenu getNodeContextMenu(Scene scene,
+      DepanFxNodeListTableAdapter tableAdapter, GraphNode node) {
+    // The root is never displayed in the table.
+    return null;
   }
 
   private ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {

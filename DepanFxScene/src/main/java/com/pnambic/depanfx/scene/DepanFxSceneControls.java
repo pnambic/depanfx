@@ -29,6 +29,8 @@ import java.util.function.Supplier;
 
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
@@ -89,6 +91,13 @@ public class DepanFxSceneControls {
     if (!isPresent(updateField.getText())) {
       updateField.setText(newValue);
     }
+  }
+
+  public static void setSystemClipboard(String src) {
+    Clipboard clipboard = Clipboard.getSystemClipboard();
+    ClipboardContent content = new ClipboardContent();
+    content.putString(src);
+    clipboard.setContent(content);
   }
 
   public static void handleDoubleClickOpenPath(

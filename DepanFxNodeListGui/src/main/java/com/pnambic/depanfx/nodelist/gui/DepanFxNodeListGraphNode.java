@@ -32,7 +32,7 @@ public abstract class DepanFxNodeListGraphNode
     return node;
   }
 
-  protected DepanFxNodeListSection getSection() {
+  public DepanFxNodeListSection getSection() {
     return section;
   }
 }

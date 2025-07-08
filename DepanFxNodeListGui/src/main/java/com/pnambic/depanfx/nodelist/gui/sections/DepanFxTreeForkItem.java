@@ -1,59 +1,82 @@
 package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListItem;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
+import com.pnambic.depanfx.nodelist.gui.sections.folds.DepanFxFoldSection;
+import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
+import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
+import com.pnambic.depanfx.scene.DepanFxMenuBuilder;
+import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+public class DepanFxTreeForkItem extends DepanFxNodeListForkItem {
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.control.TreeItem;
-
-public class DepanFxTreeForkItem extends DepanFxNodeListItem {
-
-  private static final Logger LOG =
-      LoggerFactory.getLogger(DepanFxTreeForkItem.class);
-
-  private boolean treeLoaded = false;
+  public static final String FOLD_TREE_INTO = "Fold Tree Into";
 
   public DepanFxTreeForkItem(DepanFxTreeFork fork) {
     super(fork);
   }
 
   @Override
-  public boolean isLeaf() {
-    return false;
+  public ContextMenu getNodeContextMenu(Scene scene,
+      DepanFxNodeListTableAdapter tableAdapter, GraphNode node) {
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+
+    appendRecursiveActionItems(builder, tableAdapter);
+
+    builder.appendSeparator();
+    appendCopyActionItems(builder);
+
+    builder.appendSeparator();
+    appendExpandTreeActionItems(builder);
+
+    // Conditional, with separator if needed.
+    appendFoldIntoMenu(builder, tableAdapter);
+
+    builder.appendSeparator();
+    appendExpandTreeActionItems(builder);
+
+    return builder.build();
   }
 
-  @Override
-  public ObservableList<TreeItem<DepanFxNodeListMember>> getChildren() {
-    if (!treeLoaded) {
-      treeLoaded = true;
-      super.getChildren().setAll(buildChildren());
+  private void appendFoldIntoMenu(
+      DepanFxContextMenuBuilder builder,
+      DepanFxNodeListTableAdapter tableAdapter) {
+
+    DepanFxMenuBuilder menuBuilder = new DepanFxMenuBuilder(FOLD_TREE_INTO);
+    tableAdapter.streamSections()
+        .filter(DepanFxFoldSection.class::isInstance)
+        .map(DepanFxFoldSection.class::cast)
+        .forEach(f -> menuBuilder.appendMenuItem(
+            buildFoldTreeIntoItem(f, getFork())));
+
+    if (menuBuilder.isEmpty()) {
+      return;
     }
 
-    return super.getChildren();
+    // Only append the fold into menu if there are fold sections.
+    builder.appendSeparator();
+    builder.appendSubMenu(menuBuilder.build());
   }
 
-  private ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
-    DepanFxTreeFork folder = (DepanFxTreeFork) getValue();
-    LOG.debug("building children for {}", folder.getDisplayName());
+  private MenuItem buildFoldTreeIntoItem(
+      DepanFxFoldSection foldSection, DepanFxNodeListGraphNode node) {
+    String label = foldSection.getDisplayName();
+    return DepanFxMenuItemFactory.createActionItem(
+        label, e -> runFoldTreeInto(foldSection, node));
+  }
 
-    Collection<GraphNode> nodes = folder.getMembers();
+  private void runFoldTreeInto(
+      DepanFxFoldSection foldSection,
+      DepanFxNodeListGraphNode node) {
+    DepanFxTreeSection srcSection = (DepanFxTreeSection) node.getSection();
+    DepanFxTreeModel srcTree = srcSection.getTreeModel();
+    DepanFxTreeModel subModel = srcTree.subTreeModel(node.getGraphNode());
 
-    List<TreeItem<DepanFxNodeListMember>> result =
-        new ArrayList<>(nodes.size());
-    nodes.stream()
-      .map(folder::buildTreeMember)
-      .forEach(result::add);
-    folder.sortTreeItems(result);
-
-    return FXCollections.observableList(result);
+    foldSection.addTreeModel(subModel);
   }
 }

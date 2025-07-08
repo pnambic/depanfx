@@ -21,6 +21,9 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListItem;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListFork;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListForkItem;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListLeafItem;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSectionItem;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSections;
@@ -32,7 +35,9 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDir
 import com.pnambic.depanfx.nodelist.tree.DepanFxNodeParentsToTreeModelBuilder;
 import com.pnambic.depanfx.nodelist.tree.DepanFxSimpleTreeModel;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
+import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.slf4j.Logger;
@@ -41,18 +46,22 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TreeItem;
 
 public class DepanFxFoldSection implements DepanFxNodeListSection {
+
+  public static final String SELECT_FOLD_SECTION = "Select Fold Section...";
+
+  public static final String EDIT_FOLD_SECTION = "Edit Fold Section...";
 
   public static final String NEW_FOLD_SECTION_DATA = "New Fold Section Data...";
 
@@ -324,6 +333,26 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
       return super.getChildren();
     }
 
+    @Override
+    public ContextMenu getNodeContextMenu(
+        Scene scene,
+        DepanFxNodeListTableAdapter tableAdapter,
+        GraphNode node) {
+      DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+      builder.appendActionItem(SELECT_FOLD_SECTION,
+          e -> openFoldSectionFinder(scene, tableAdapter));
+      builder.appendActionItem(EDIT_FOLD_SECTION,
+          e -> openFoldSectionEditor(tableAdapter));
+
+      builder.appendSubMenu(
+          buildNewSectionMenu(scene, tableAdapter, getSection()));
+      builder.appendSeparator();
+      builder.appendActionItem(
+          EXPORT_TO_CSV,
+          e -> runExportToCsvAction(tableAdapter));
+      return builder.build();
+    }
+
     private ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
       DepanFxNodeListSection section = getSection();
 
@@ -339,115 +368,91 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
 
       return FXCollections.observableList(result);
     }
+
+    private void openFoldSectionFinder(
+        Scene scene, DepanFxNodeListTableAdapter tableAdapter) {
+      DepanFxWorkspace workspace = tableAdapter.getWorkspace();
+
+      prepareSectionChooser(
+          tableAdapter, DepanFxFoldSectionToolDialog.FOLD_SECTION_RSRC_FILTER)
+          .showOpenDialog(scene)
+          .map(DepanFxProjectDocument.class::cast)
+          .flatMap(p -> workspace.getWorkspaceResource(
+              p, DepanFxFoldSectionData.class))
+          .ifPresent(d -> updateSectionDataResource(tableAdapter, d));
+    }
+
+    private void openFoldSectionEditor(
+        DepanFxNodeListTableAdapter tableAdapter) {
+
+      if (getSection() instanceof DepanFxFoldSection section) {
+        DepanFxFoldSectionToolDialog.runEditDialog(
+            section.getSectionResource(), tableAdapter.getDialogRunner())
+            .getController()
+            .getToolResource()
+            .ifPresent(d -> tableAdapter.updateSection(getSection(), d));
+        return;
+      }
+      LOG.warn("Unexpected fold section edit for type {}",
+          getSection().getClass().getName());
+    }
+
+    private void runExportToCsvAction(
+        DepanFxNodeListTableAdapter tableAdapter) {
+      LOG.info("Fold section to CVS export not yet implemented");
+    }
   }
 
   /////////////////////////////////////
   // Fork components
 
-  private static class FoldForkItem extends DepanFxNodeListItem {
+  public static class FoldFork extends DepanFxNodeListFork {
 
-    private static final Logger LOG =
-        LoggerFactory.getLogger(FoldForkItem.class);
+    public FoldFork(GraphNode node, DepanFxFoldSection section) {
+      super(node, section);
+    }
+  }
 
-    private boolean treeLoaded = false;
+  private static class FoldForkItem extends DepanFxNodeListForkItem {
 
     public FoldForkItem(FoldFork fork) {
       super(fork);
     }
 
     @Override
-    public boolean isLeaf() {
-      return false;
-    }
+    public ContextMenu getNodeContextMenu(Scene scene,
+        DepanFxNodeListTableAdapter tableAdapter, GraphNode node) {
+      DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
 
-    @Override
-    public ObservableList<TreeItem<DepanFxNodeListMember>> getChildren() {
-      if (!treeLoaded) {
-        treeLoaded = true;
-        super.getChildren().setAll(buildChildren());
-      }
+      appendRecursiveActionItems(builder, tableAdapter);
 
-      return super.getChildren();
-    }
+      builder.appendSeparator();
+      appendCopyActionItems(builder);
 
-    private ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
-      FoldFork folder = (FoldFork) getValue();
-      LOG.debug("building children for {}", folder.getDisplayName());
+      builder.appendSeparator();
+      appendExpandTreeActionItems(builder);
 
-      Collection<GraphNode> nodes = folder.getMembers();
+      builder.appendSeparator();
+      appendExpandTreeActionItems(builder);
 
-      List<TreeItem<DepanFxNodeListMember>> result =
-          new ArrayList<>(nodes.size());
-      nodes.stream()
-          .map(folder::buildTreeMember)
-          .forEach(result::add);
-      folder.sortTreeItems(result);
-
-      return FXCollections.observableList(result);
-    }
-  }
-
-  public static class FoldFork extends DepanFxNodeListGraphNode {
-
-    public FoldFork(GraphNode node, DepanFxFoldSection section) {
-      super(node, section);
-    }
-
-    /**
-     * Direct members of graph node for this tree fork.
-     */
-    public Collection<GraphNode> getMembers() {
-      return getTreeModel().getMembers(getGraphNode());
-    }
-
-    /**
-     * Transitive collection of all members below the graph node for this
-     * tree fork.  The graph node for this tree fork will not included
-     * (unless there is a loop in the graph .. oops).
-     */
-    public Collection<GraphNode> getDecendants() {
-
-      Set<GraphNode> roots = Collections.singleton(getGraphNode());
-      Collection<GraphNode> filter =
-          getSection().getSectionNodes().getNodes();
-      return getTreeModel()
-          .getReachableGraphNodes(roots, filter)
-          .getNodes();
-    }
-
-    public DepanFxTreeModel getTreeModel() {
-      return ((DepanFxFoldSection) getSection()).getTreeModel();
-    }
-
-    public void sortTreeItems(
-        List<TreeItem<DepanFxNodeListMember>> items) {
-      getSection().sortTreeItems(items);
-    }
-
-    public TreeItem<DepanFxNodeListMember> buildTreeMember(GraphNode node) {
-      return getSection().buildNodeItem(node);
+      return builder.build();
     }
   }
 
   /////////////////////////////////////
   // Item components
 
-  private static class FoldLeafItem extends DepanFxNodeListItem {
-
-    public FoldLeafItem(FoldLeaf leaf) {
-      super(leaf);
-    }
-
-    @Override
-    public boolean isLeaf() {
-      return true;
-    }
-  }
-
   public static class FoldLeaf extends DepanFxNodeListGraphNode {
 
     public FoldLeaf(GraphNode node, DepanFxFoldSection depanFxFoldSection) {
       super(node, depanFxFoldSection);
+    }
+  }
+
+  private static class FoldLeafItem extends DepanFxNodeListLeafItem {
+
+    public FoldLeafItem(FoldLeaf leaf) {
+      super(leaf);
     }
   }
 }
