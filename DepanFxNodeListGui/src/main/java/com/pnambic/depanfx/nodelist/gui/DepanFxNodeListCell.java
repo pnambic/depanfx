@@ -71,6 +71,11 @@ public class DepanFxNodeListCell
     contextMenu.getItems().clear();
     DepanFxNodeListItem cellItem =
         (DepanFxNodeListItem) getTableRow().getTreeItem();
+    // Unlikely condition that occurs during loading.
+    if (cellItem == null) {
+      return;
+    }
+
     TreeTableViewSelectionModel<DepanFxNodeListMember> selected =
         getTreeTableView().getSelectionModel();
 

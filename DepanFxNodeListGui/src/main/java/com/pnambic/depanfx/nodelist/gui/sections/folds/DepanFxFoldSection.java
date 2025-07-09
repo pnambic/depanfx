@@ -49,6 +49,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -199,12 +200,15 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
         "Cannot add section model to section {}", getSectionLabel());
   }
 
-  private FoldFork buildFoldFork(GraphNode fork) {
-    return new FoldFork(fork, this);
-  }
-
-  private FoldLeaf buildFoldLeaf(GraphNode leaf) {
-    return new FoldLeaf(leaf, this);
+  public void addTreeModels(Stream<DepanFxTreeModel> subModels) {
+    if (treeModel instanceof DepanFxSimpleTreeModel simple) {
+      subModels.forEach(simple::addTreeModel);
+      tableAdapter.resetTableView();
+      return;
+    }
+    // Waiting for a more generic modifiable tree model.
+    LOG.info(
+        "Cannot add section model to section {}", getSectionLabel());
   }
 
   public Optional<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
@@ -229,6 +233,14 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
           getSectionLabel(), err);
     }
     return Optional.empty();
+  }
+
+  private FoldFork buildFoldFork(GraphNode fork) {
+    return new FoldFork(fork, this);
+  }
+
+  private FoldLeaf buildFoldLeaf(GraphNode leaf) {
+    return new FoldLeaf(leaf, this);
   }
 
   /////////////////////////////////////
@@ -331,25 +343,31 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
 
       builder.appendSubMenu(
           buildNewSectionMenu(scene, tableAdapter, getSection()));
+
       builder.appendSeparator();
       builder.appendActionItem(
           EXPORT_TO_CSV,
           e -> runExportToCsvAction(tableAdapter));
+
+      builder.appendSeparator();
+      builder.appendActionItem(
+          "Save Fold Info",
+          e -> getFoldSection().saveFoldInfoResource());
     }
 
     @Override
     protected ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
-      DepanFxNodeListSection section = getSection();
+      DepanFxFoldSection foldSection = getFoldSection();
 
-      DepanFxTreeModel treeModel = ((DepanFxFoldSection) section).getTreeModel();
+      DepanFxTreeModel treeModel = foldSection.getTreeModel();
       Collection<GraphNode> nodes = treeModel.getRoots();
 
       List<TreeItem<DepanFxNodeListMember>> result =
           new ArrayList<>(nodes.size());
       nodes.stream()
-          .map(section::buildNodeItem)
+          .map(foldSection::buildNodeItem)
           .forEach(result::add);
-      section.sortTreeItems(result);
+      foldSection.sortTreeItems(result);
 
       return FXCollections.observableList(result);
     }
@@ -370,21 +388,22 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
     private void openFoldSectionEditor(
         DepanFxNodeListTableAdapter tableAdapter) {
 
-      if (getSection() instanceof DepanFxFoldSection section) {
-        DepanFxFoldSectionToolDialog.runEditDialog(
-            section.getSectionResource(), tableAdapter.getDialogRunner())
-            .getController()
-            .getToolResource()
-            .ifPresent(d -> tableAdapter.updateSection(getSection(), d));
-        return;
-      }
-      LOG.warn("Unexpected fold section edit for type {}",
-          getSection().getClass().getName());
+      DepanFxFoldSection foldSection = getFoldSection();
+      DepanFxFoldSectionToolDialog.runEditDialog(
+          foldSection.getSectionResource(),
+          tableAdapter.getDialogRunner())
+        .getController()
+        .getToolResource()
+        .ifPresent(d -> tableAdapter.updateSection(foldSection, d));
     }
 
     private void runExportToCsvAction(
         DepanFxNodeListTableAdapter tableAdapter) {
       LOG.info("Fold section to CVS export not yet implemented");
+    }
+
+    private DepanFxFoldSection getFoldSection() {
+      return (DepanFxFoldSection) getSection();
     }
   }
 
@@ -419,6 +438,17 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
 
       builder.appendSeparator();
       appendExpandTreeActionItems(builder);
+    }
+
+    @Override
+    public void fillMultiContextMenu(
+        ContextMenu contextMenu, Scene scene,
+        DepanFxNodeListTableAdapter tableAdapter,
+        ObservableList<TreeItem<DepanFxNodeListMember>> choices) {
+      DepanFxContextMenuBuilder builder =
+          new DepanFxContextMenuBuilder(contextMenu);
+
+      appendRecursiveMulitActionItems(builder, tableAdapter, choices);
     }
   }
 

@@ -51,17 +51,7 @@ public abstract class DepanFxNodeListItem
 
   /**
    * Provide the context menu when multiple graph nodes are selected.
-   *
-   * Unless this method is overridden, the default behavior is to use the
-   * single item context menu.
    */
-  public ContextMenu xgetMultiContextMenu(
-      Scene scene,
-      DepanFxNodeListTableAdapter tableAdapter,
-      ObservableList<TreeItem<DepanFxNodeListMember>> choices) {
-    return null;
-  }
-
   public void fillMultiContextMenu(
       ContextMenu contextMenu,
       Scene scene,
@@ -69,12 +59,9 @@ public abstract class DepanFxNodeListItem
       ObservableList<TreeItem<DepanFxNodeListMember>> choices) {
 
     // Pick one.
-     GraphNode node = choices.stream()
-        .map(t -> t.getValue())
-        .filter(DepanFxNodeListGraphNode.class::isInstance)
-        .map(DepanFxNodeListGraphNode.class::cast)
-        .map(gn -> gn.getGraphNode())
-        .findFirst().orElse(null);
+     GraphNode node = DepanFxNodeListGraphNode.streamMultiNodes(choices)
+        .findFirst()
+        .orElse(null);
     fillNodeContextMenu(
         contextMenu, scene, tableAdapter, node);
   };

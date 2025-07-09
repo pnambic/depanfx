@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListItem;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
@@ -38,6 +39,10 @@ public abstract class DepanFxNodeListForkItem extends DepanFxNodeListItem {
   public static final String SELECT_RECURSIVE = "Select Recursive";
 
   public static final String CLEAR_RECURSIVE = "Clear Recursive";
+
+  public static final String SELECT_MULTI_RECURSIVE = "Select Recursive*";
+
+  public static final String CLEAR_MULTI_RECURSIVE = "Clear Recursive*";
 
   public static final String EXPAND_TREE_5 = "Expand Tree (5)";
 
@@ -84,6 +89,18 @@ public abstract class DepanFxNodeListForkItem extends DepanFxNodeListItem {
         e -> runSelectRecursiveAction(getFork(), tableAdapter, false));
   }
 
+  protected void appendRecursiveMulitActionItems(
+      DepanFxContextMenuBuilder builder,
+      DepanFxNodeListTableAdapter tableAdapter,
+      ObservableList<TreeItem<DepanFxNodeListMember>> choices) {
+    builder.appendActionItem(
+        SELECT_MULTI_RECURSIVE,
+        e -> runSelectMultiRecursiveAction(getFork(), tableAdapter, choices, true));
+    builder.appendActionItem(
+        CLEAR_MULTI_RECURSIVE,
+        e -> runSelectMultiRecursiveAction(getFork(), tableAdapter, choices, false));
+  }
+
   protected void appendExpandTreeActionItems(
       DepanFxContextMenuBuilder builder) {
     builder.appendActionItem(
@@ -121,6 +138,16 @@ public abstract class DepanFxNodeListForkItem extends DepanFxNodeListItem {
     // Then all the reachable nodes.
     Collection<GraphNode> nodes = fork.getDecendants();
     tableAdapter.doSelectGraphNodesAction(nodes.stream(), value);
+  }
+
+  private void runSelectMultiRecursiveAction(
+      DepanFxNodeListFork fork,
+      DepanFxNodeListTableAdapter tableAdapter,
+      ObservableList<TreeItem<DepanFxNodeListMember>> choices,
+      boolean value) {
+
+    tableAdapter.doSelectGraphNodesAction(
+        DepanFxNodeListGraphNode.streamMultiNodes(choices), value);
   }
 
   private void runExpandTreeAction(int expandLimit) {
