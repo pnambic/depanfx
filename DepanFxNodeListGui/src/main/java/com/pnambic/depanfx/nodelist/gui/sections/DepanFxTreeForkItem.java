@@ -22,25 +22,23 @@ public class DepanFxTreeForkItem extends DepanFxNodeListForkItem {
   }
 
   @Override
-  public ContextMenu getNodeContextMenu(Scene scene,
-      DepanFxNodeListTableAdapter tableAdapter, GraphNode node) {
-    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+  public void fillNodeContextMenu(
+      ContextMenu contextMenu,
+      Scene scene,
+      DepanFxNodeListTableAdapter tableAdapter,
+      GraphNode node) {
+    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder(contextMenu);
 
     appendRecursiveActionItems(builder, tableAdapter);
 
     builder.appendSeparator();
     appendCopyActionItems(builder);
 
-    builder.appendSeparator();
-    appendExpandTreeActionItems(builder);
-
     // Conditional, with separator if needed.
     appendFoldIntoMenu(builder, tableAdapter);
 
     builder.appendSeparator();
     appendExpandTreeActionItems(builder);
-
-    return builder.build();
   }
 
   private void appendFoldIntoMenu(

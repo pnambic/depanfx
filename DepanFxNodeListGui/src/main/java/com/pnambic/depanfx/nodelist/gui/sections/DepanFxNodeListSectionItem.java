@@ -17,6 +17,7 @@ package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListItem;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.sections.folds.DepanFxFoldSectionToolDialog;
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherGroup;
@@ -36,8 +37,10 @@ import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import java.util.Optional;
 
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
+import javafx.scene.control.TreeItem;
 
 /**
  * Common behavior for all node list section items.
@@ -58,6 +61,8 @@ public abstract class DepanFxNodeListSectionItem extends DepanFxNodeListItem {
   private static final String INSERT_ABOVE_MEMBER_TREE_SECTION =
       "Insert Member Tree Section";
 
+  private boolean sectionLoaded = false;
+
   public DepanFxNodeListSectionItem(DepanFxNodeListSection section) {
     super(section);
   }
@@ -66,6 +71,19 @@ public abstract class DepanFxNodeListSectionItem extends DepanFxNodeListItem {
   public boolean isLeaf() {
     return false;
   }
+
+  @Override
+  public ObservableList<TreeItem<DepanFxNodeListMember>> getChildren() {
+    if (!sectionLoaded) {
+      sectionLoaded = true;
+      super.getChildren().setAll(buildChildren());
+    }
+
+    return super.getChildren();
+  }
+
+  abstract protected ObservableList<TreeItem<DepanFxNodeListMember>>
+  buildChildren();
 
   protected DepanFxNodeListSection getSection() {
     return (DepanFxNodeListSection) getValue();
@@ -91,13 +109,6 @@ public abstract class DepanFxNodeListSectionItem extends DepanFxNodeListItem {
   }
 
   protected Menu buildNewSectionMenu(
-      Scene scene,
-      DepanFxNodeListTableAdapter tableAdapter,
-      DepanFxNodeListSection before) {
-    return newSectionMenu(scene, tableAdapter, before);
-  }
-
-  public Menu newSectionMenu(
       Scene scene,
       DepanFxNodeListTableAdapter tableAdapter,
       DepanFxNodeListSection before) {

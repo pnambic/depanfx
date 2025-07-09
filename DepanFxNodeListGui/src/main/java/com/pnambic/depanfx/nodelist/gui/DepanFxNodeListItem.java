@@ -1,15 +1,16 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
+import javafx.scene.control.TreeItem;
 
 public abstract class DepanFxNodeListItem
     extends CheckBoxTreeItem<DepanFxNodeListMember> {
@@ -34,7 +35,16 @@ public abstract class DepanFxNodeListItem
    * Note that node may be null if the item is not a GraphNode or no items are
    * selected.
    */
-  abstract public ContextMenu getNodeContextMenu(
+  // abstract public ContextMenu getNodeContextMenu(
+  public ContextMenu xgetNodeContextMenu(
+      Scene scene,
+      DepanFxNodeListTableAdapter tableAdapter,
+      GraphNode node) {
+    return null;
+  }
+
+  abstract public void fillNodeContextMenu(
+      ContextMenu contextMenu,
       Scene scene,
       DepanFxNodeListTableAdapter tableAdapter,
       GraphNode node);
@@ -42,17 +52,31 @@ public abstract class DepanFxNodeListItem
   /**
    * Provide the context menu when multiple graph nodes are selected.
    *
-   * Default behavior is to use the single item context menu.
-   * @return
+   * Unless this method is overridden, the default behavior is to use the
+   * single item context menu.
    */
-  public ContextMenu getMultiContextMenu(
-    Scene scene,
-    DepanFxNodeListTableAdapter tableAdapter,
-    DepanFxNodeList itemList) {
+  public ContextMenu xgetMultiContextMenu(
+      Scene scene,
+      DepanFxNodeListTableAdapter tableAdapter,
+      ObservableList<TreeItem<DepanFxNodeListMember>> choices) {
+    return null;
+  }
+
+  public void fillMultiContextMenu(
+      ContextMenu contextMenu,
+      Scene scene,
+      DepanFxNodeListTableAdapter tableAdapter,
+      ObservableList<TreeItem<DepanFxNodeListMember>> choices) {
+
     // Pick one.
-    GraphNode node = itemList.getNodes().stream().findFirst().orElse(null);
-    return getNodeContextMenu(
-        scene, tableAdapter, node);
+     GraphNode node = choices.stream()
+        .map(t -> t.getValue())
+        .filter(DepanFxNodeListGraphNode.class::isInstance)
+        .map(DepanFxNodeListGraphNode.class::cast)
+        .map(gn -> gn.getGraphNode())
+        .findFirst().orElse(null);
+    fillNodeContextMenu(
+        contextMenu, scene, tableAdapter, node);
   };
 
   protected void appendCopyActionItems(DepanFxContextMenuBuilder builder) {

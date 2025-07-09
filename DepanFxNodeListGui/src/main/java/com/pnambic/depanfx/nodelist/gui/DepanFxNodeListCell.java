@@ -15,6 +15,12 @@
  */
 package com.pnambic.depanfx.nodelist.gui;
 
+import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
+
+import javafx.collections.ObservableList;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableView.TreeTableViewSelectionModel;
 import javafx.scene.control.cell.CheckBoxTreeTableCell;
 import javafx.util.StringConverter;
 
@@ -50,10 +56,42 @@ public class DepanFxNodeListCell
   }
 
   private void stylizeCell(DepanFxNodeListMember member) {
+
+    setContextMenu(getLiveContextMenu());
+  }
+
+  private ContextMenu getLiveContextMenu() {
+    ContextMenu result = new DepanFxContextMenuBuilder().build();
+    fillContextMenu(result);
+    result.setOnShowing(e -> fillContextMenu(result));
+    return result;
+  }
+
+  private void fillContextMenu(ContextMenu contextMenu) {
+    contextMenu.getItems().clear();
     DepanFxNodeListItem cellItem =
         (DepanFxNodeListItem) getTableRow().getTreeItem();
-    setContextMenu(
-        cellItem.getNodeContextMenu(getScene(), tableAdapter, null));
+    TreeTableViewSelectionModel<DepanFxNodeListMember> selected =
+        getTreeTableView().getSelectionModel();
+
+    if (selected.isEmpty()) {
+      cellItem.fillNodeContextMenu(
+          contextMenu, getScene(), tableAdapter, null);
+      return;
+    }
+
+    ObservableList<TreeItem<DepanFxNodeListMember>> choices =
+        selected.getSelectedItems();
+    if (choices.size() == 1) {
+      DepanFxNodeListMember node = choices.get(0).getValue();
+      if (node instanceof DepanFxNodeListGraphNode graphNode) {
+        cellItem.fillNodeContextMenu(
+            contextMenu, getScene(), tableAdapter, graphNode.getGraphNode());
+        return;
+      } 
+    }
+    cellItem.fillMultiContextMenu(
+        contextMenu, getScene(), tableAdapter, choices);
   }
 
   private static class NameConverter

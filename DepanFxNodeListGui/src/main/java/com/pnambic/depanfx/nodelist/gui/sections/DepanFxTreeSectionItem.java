@@ -30,33 +30,18 @@ public class DepanFxTreeSectionItem
 
   public static final String EDIT_TREE_SECTION = "Edit Tree Section...";
 
-  private boolean treeLoaded = false;
-
   public DepanFxTreeSectionItem(DepanFxTreeSection section) {
     super(section);
   }
 
-  @Override
-  public boolean isLeaf() {
-    return false;
-  }
-
-  @Override
-  public ObservableList<TreeItem<DepanFxNodeListMember>> getChildren() {
-    if (!treeLoaded) {
-      treeLoaded = true;
-      super.getChildren().setAll(buildChildren());
-    }
-
-    return super.getChildren();
-  }
-
   @Override // DepanFxNodeListMember
-  public ContextMenu getNodeContextMenu(
+  public void fillNodeContextMenu(
+      ContextMenu contextMenu,
       Scene scene,
       DepanFxNodeListTableAdapter tableAdapter,
       GraphNode node) {
-    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    DepanFxContextMenuBuilder builder =
+        new DepanFxContextMenuBuilder(contextMenu);
     builder.appendActionItem(SELECT_TREE_SECTION,
         e -> openTreeSectionFinder(scene, tableAdapter));
     builder.appendActionItem(EDIT_TREE_SECTION,
@@ -69,10 +54,10 @@ public class DepanFxTreeSectionItem
     builder.appendActionItem(
         EXPORT_TO_CSV,
         e -> runExportToCsvAction(tableAdapter));
-    return builder.build();
   }
 
-  private ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
+  @Override
+  protected ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
     DepanFxNodeListSection section = getSection();
 
     DepanFxTreeModel treeModel = ((DepanFxTreeSection) section).getTreeModel();

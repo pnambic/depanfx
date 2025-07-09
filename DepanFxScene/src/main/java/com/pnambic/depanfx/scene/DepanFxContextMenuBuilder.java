@@ -28,9 +28,13 @@ public class DepanFxContextMenuBuilder {
 
   private final DepanFxMenuItemFactory itemFactory;
 
-  public DepanFxContextMenuBuilder() {
-    this.result = new ContextMenu();
+  public DepanFxContextMenuBuilder(ContextMenu result) {
+    this.result = result;
     this.itemFactory = new DepanFxMenuItemFactory(result.getItems());
+  }
+
+  public DepanFxContextMenuBuilder() {
+    this(new ContextMenu());
   }
 
   public MenuItem appendActionItem(

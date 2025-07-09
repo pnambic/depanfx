@@ -39,28 +39,17 @@ public class DepanFxFlatSectionItem extends DepanFxNodeListSectionItem {
 
   public static final String EDIT_FLAT_SECTION = "Edit Flat Section...";
 
-  private boolean sectionLoaded = false;
-
   public DepanFxFlatSectionItem(DepanFxFlatSection section) {
     super(section);
   }
 
+
   @Override
-  public ObservableList<TreeItem<DepanFxNodeListMember>> getChildren() {
-    if (!sectionLoaded) {
-      sectionLoaded = true;
-      super.getChildren().setAll(buildChildren());
-    }
+  public void fillNodeContextMenu(ContextMenu contextMenu, Scene scene,
+      DepanFxNodeListTableAdapter tableAdapter, GraphNode node) {
 
-    return super.getChildren();
-  }
-
-  @Override // DepanFxNodeListMember
-  public ContextMenu getNodeContextMenu(
-      Scene scene,
-      DepanFxNodeListTableAdapter tableAdapter,
-      GraphNode node) {
-    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    DepanFxContextMenuBuilder builder =
+        new DepanFxContextMenuBuilder(contextMenu);
     builder.appendActionItem(SELECT_FLAT_SECTION,
         e -> openFlatSectionFinder(scene, tableAdapter));
     builder.appendActionItem(EDIT_FLAT_SECTION,
@@ -72,10 +61,10 @@ public class DepanFxFlatSectionItem extends DepanFxNodeListSectionItem {
     builder.appendActionItem(
         EXPORT_TO_CSV,
         e -> runExportToCsvAction(tableAdapter));
-    return builder.build();
   }
 
-  private ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
+  @Override
+  protected ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
     DepanFxNodeListSection section = getSection();
 
     Collection<GraphNode> nodes = section.getSectionNodes().getNodes();

@@ -17,7 +17,6 @@ package com.pnambic.depanfx.nodelist.gui.sections.folds;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListItem;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
@@ -312,33 +311,19 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
 
   private static class FoldSectionItem extends DepanFxNodeListSectionItem {
 
-    private boolean treeLoaded = false;
-
     public FoldSectionItem(DepanFxFoldSection depanFxFoldSection) {
       super(depanFxFoldSection);
     }
 
     @Override
-    public boolean isLeaf() {
-      return false;
-    }
-
-    @Override
-    public ObservableList<TreeItem<DepanFxNodeListMember>> getChildren() {
-      if (!treeLoaded) {
-        treeLoaded = true;
-        super.getChildren().setAll(buildChildren());
-      }
-
-      return super.getChildren();
-    }
-
-    @Override
-    public ContextMenu getNodeContextMenu(
+    public void fillNodeContextMenu(
+        ContextMenu contextMenu,
         Scene scene,
         DepanFxNodeListTableAdapter tableAdapter,
         GraphNode node) {
-      DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+      DepanFxContextMenuBuilder builder =
+          new DepanFxContextMenuBuilder(contextMenu);
+
       builder.appendActionItem(SELECT_FOLD_SECTION,
           e -> openFoldSectionFinder(scene, tableAdapter));
       builder.appendActionItem(EDIT_FOLD_SECTION,
@@ -350,10 +335,10 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
       builder.appendActionItem(
           EXPORT_TO_CSV,
           e -> runExportToCsvAction(tableAdapter));
-      return builder.build();
     }
 
-    private ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
+    @Override
+    protected ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
       DepanFxNodeListSection section = getSection();
 
       DepanFxTreeModel treeModel = ((DepanFxFoldSection) section).getTreeModel();
@@ -420,9 +405,12 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
     }
 
     @Override
-    public ContextMenu getNodeContextMenu(Scene scene,
-        DepanFxNodeListTableAdapter tableAdapter, GraphNode node) {
-      DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    public void fillNodeContextMenu(
+        ContextMenu contextMenu,
+        Scene scene,
+        DepanFxNodeListTableAdapter tableAdapter,
+        GraphNode node) {
+      DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder(contextMenu);
 
       appendRecursiveActionItems(builder, tableAdapter);
 
@@ -431,11 +419,6 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
 
       builder.appendSeparator();
       appendExpandTreeActionItems(builder);
-
-      builder.appendSeparator();
-      appendExpandTreeActionItems(builder);
-
-      return builder.build();
     }
   }
 

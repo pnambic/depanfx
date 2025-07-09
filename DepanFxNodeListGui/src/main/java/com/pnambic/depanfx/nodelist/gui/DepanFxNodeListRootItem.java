@@ -44,10 +44,12 @@ public class DepanFxNodeListRootItem extends DepanFxNodeListItem {
   }
 
   @Override
-  public ContextMenu getNodeContextMenu(Scene scene,
-      DepanFxNodeListTableAdapter tableAdapter, GraphNode node) {
-    // The root is never displayed in the table.
-    return null;
+  public void fillNodeContextMenu(
+      ContextMenu contextMenu,
+      Scene scene,
+      DepanFxNodeListTableAdapter tableAdapter,
+      GraphNode node) {
+    // No operations.  The root is never displayed in the table.
   }
 
   private ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {

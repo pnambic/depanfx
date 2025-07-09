@@ -40,13 +40,14 @@ public abstract class DepanFxNodeListLeafItem extends DepanFxNodeListItem {
   }
 
   @Override
-  public ContextMenu getNodeContextMenu(
+  public void fillNodeContextMenu(
+      ContextMenu contextMenu,
       Scene scene,
       DepanFxNodeListTableAdapter tableAdapter,
       GraphNode node) {
 
-    DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+    DepanFxContextMenuBuilder builder =
+        new DepanFxContextMenuBuilder(contextMenu);
     appendCopyActionItems(builder);
-    return builder.build();
   }
 }
