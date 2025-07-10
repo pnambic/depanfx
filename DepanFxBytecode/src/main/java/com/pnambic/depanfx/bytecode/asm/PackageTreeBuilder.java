@@ -69,10 +69,15 @@ public class PackageTreeBuilder {
    */
   public PackageNode installPackageTree(
       File packageFile, File treeFile) {
-    updatePkgDirNodes(packageFile, treeFile.toPath());
+
+    PackageNode baseNode = createPackage(packageFile);
+    installPkgDirNodes(baseNode, treeFile.toPath());
     PackageNode result = packageNode;
 
-    createPackageParents(packageFile, treeFile);
+    // If the package is named, create all of its parents.
+    if (packageFile != null) {
+      createPackageParents(packageFile, treeFile);
+    }
     return result;
   }
 
@@ -84,18 +89,18 @@ public class PackageTreeBuilder {
    * @param packageFile path to a package
    * @param treeFile path to a directory
    */
-  private void createPackageParents(File packageFile, File treeFile) {
-    if (null == packageFile) {
-      return;
-    }
 
+  private void createPackageParents(File packageFile, File treeFile) {
     TreeClimber treePath = new TreeClimber(treeFile);
-    GraphNode lookupNode = packageNode;
 
     // If the lookup is not the same node, then a node with that identity
     // already exists.  No need to add that package (or its parents) again.
-    while (lookupNode == packageNode) {
-      // Set up for parent of current entities
+    for(;;) {
+
+      PackageNode childNode = packageNode;
+      DirectoryNode childDir = packageDir;
+
+      // Set up for parents of current entities
       packageFile = packageFile.getParentFile();
       treePath.ascendTree();
 
@@ -104,28 +109,37 @@ public class PackageTreeBuilder {
         return;
       }
 
-      PackageNode childNode = packageNode;
-      DirectoryNode childDir = packageDir;
+      // If the parent package already exists,
+      // then this is the last set of links to the children.
+      PackageNode baseNode = createPackage(packageFile);
+      GraphNode foundNode = builder.findNode(baseNode.getId());
 
-      updatePkgDirNodes(packageFile, treePath.getTreePath());
+      // Update nodes (packageNode, packageDir)
+      // to the new parent package and directory.
+      installPkgDirNodes(baseNode, treePath.getTreePath());
 
+      // Create the children links.
       addEdge(packageNode, childNode, JavaRelation.PACKAGE);
       addEdge(packageDir, childDir, FileSystemRelation.CONTAINS_DIR);
-      lookupNode = packageNode;
+
+      // If the parent package already existed, we are done.
+      if (foundNode != null) {
+        return;
+      };
     }
   }
 
   /**
-   * Create both a package and directory, and the container dependency
+   * Map the package, create the directory, and the container dependency
    * between them.
    *
-   * @param packageFile path to package
-   * @param treePath path to directory
+   * @param packageNode preliminary node for package
+   * @param dirPath path to directory
    */
-  private void updatePkgDirNodes(File packageFile, Path treePath) {
-    packageNode = (PackageNode) builder.mapNode(createPackage(packageFile));
+  private void installPkgDirNodes(PackageNode pkgBase, Path dirPath) {
+    packageNode = (PackageNode) builder.mapNode(pkgBase);
 
-    packageDir = (DirectoryNode) builder.mapNode(new DirectoryNode(treePath));
+    packageDir = (DirectoryNode) builder.mapNode(new DirectoryNode(dirPath));
     addEdge(packageDir, packageNode, JavaRelation.PACKAGEDIR);
   }
 

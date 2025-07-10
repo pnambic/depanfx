@@ -126,7 +126,7 @@ public interface AsmFactory {
 
   public static final AsmFactory ASM4_FACTORY = new Simple(Opcodes.ASM4);
 
-  public static final AsmFactory ASM5_FACTORY = new Simple(Opcodes.ASM4);
+  public static final AsmFactory ASM5_FACTORY = new Simple(Opcodes.ASM5);
 
   public static final AsmFactory ASM9_FACTORY = new Simple(Opcodes.ASM9);
 }

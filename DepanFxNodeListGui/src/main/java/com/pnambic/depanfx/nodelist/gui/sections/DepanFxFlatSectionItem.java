@@ -43,7 +43,6 @@ public class DepanFxFlatSectionItem extends DepanFxNodeListSectionItem {
     super(section);
   }
 
-
   @Override
   public void fillNodeContextMenu(ContextMenu contextMenu, Scene scene,
       DepanFxNodeListTableAdapter tableAdapter, GraphNode node) {
