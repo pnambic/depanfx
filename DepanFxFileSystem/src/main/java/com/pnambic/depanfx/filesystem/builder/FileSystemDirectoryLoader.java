@@ -209,6 +209,9 @@ public class FileSystemDirectoryLoader {
    */
   private Path getElementPath(File elementPath) throws IOException {
     String dirPath = elementPath.getCanonicalPath();
+    if (dirPath.equals(prefixPath)) {
+      return Path.of(elementPath.getName());
+    }
     if (dirPath.startsWith(prefixPath)) {
       return Path.of(dirPath.substring(prefixPath.length()));
     }
