@@ -10,15 +10,15 @@ import com.jogamp.opengl.fixedfunc.GLLightingFunc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
+import java.awt.Color;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,18 +29,16 @@ public class JoglRenderer {
   private static final Logger LOG =
       LoggerFactory.getLogger(JoglRenderer.class);
 
-  private static final int BYTES_PER_INT = (Integer.SIZE / Byte.SIZE);
+  // A nice light gray background for the canvas.
+  private static final int BACKGROUND_RED = 240;
 
-  private static final float BACKGROUND_RED =
-      (float) JoglTransforms.colorByte(240);
+  private static final int BACKGROUND_GREEN = 240;
 
-  private static final float BACKGROUND_GREEN =
-      (float) JoglTransforms.colorByte(240);
+  private static final int BACKGROUND_BLUE = 240;
 
-  private static final float BACKGROUND_BLUE =
-      (float) JoglTransforms.colorByte(240);
+  private static final float BACKGROUND_ALPHA_FLT = 1.0f;
 
-  private static final float BACKGROUND_ALPHA = 1.0f;
+  private static final int RGB_PARTS_PER_PIXEL = 3;
 
   private final JoglCamera camera;
 
@@ -54,7 +52,13 @@ public class JoglRenderer {
 
   private int viewportHeight;
 
+  private JoglPickBuffer pickBuffer = new JoglPickBuffer();
+
   private JoglSelectRectangle selectionRect;
+
+  private Color drawBackground;
+
+  private Color pickBackground = Color.BLACK;
 
   public JoglRenderer(JoglCamera camera) {
     this.camera = camera;
@@ -62,8 +66,8 @@ public class JoglRenderer {
 
   public void init(final GLAutoDrawable drawable) {
     GL2 gl = drawable.getGL().getGL2();
-    gl.glClearColor(
-        BACKGROUND_RED, BACKGROUND_GREEN, BACKGROUND_BLUE, BACKGROUND_ALPHA);
+
+    setBackgroundColor(gl, BACKGROUND_RED, BACKGROUND_GREEN, BACKGROUND_BLUE);
     gl.glClearDepth(1.0f);
 
     gl.glEnable(GL.GL_DEPTH_TEST);
@@ -122,6 +126,7 @@ public class JoglRenderer {
       final int x, final int y, final int width, final int height) {
     GL2 gl = drawable.getGL().getGL2();
     camera.reshapeCanvas(gl, x, y, width, height);
+    pickBuffer.dispose(gl);
     viewportWidth = width;
     viewportHeight = height;
     LOG.debug("reshape to {}x{} @ ({}, {})", width, height, x, y);
@@ -136,6 +141,9 @@ public class JoglRenderer {
     };
 
     final GL2 gl = drawable.getGL().getGL2();
+    GLContext glContext = drawable.getContext();
+    glContext.makeCurrent();
+
     gl.glClear(GL.GL_COLOR_BUFFER_BIT);
     gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
 
@@ -147,9 +155,11 @@ public class JoglRenderer {
     if (selectionRect != null) {
       selectionRect.drawSelectRectangle(gl);
     }
+    gl.glFlush();
+    glContext.release();
   }
 
-  public List<Object> getHits(GLAutoDrawable drawable,
+  public Collection<Object> getHits(GLAutoDrawable drawable,
       float mouseX, float mouseY, float selectWidth, float selectHeight) {
     LOG.info("hit test x:{}, y:{}, w:{}, h:{}",
         mouseX, mouseY, selectWidth, selectHeight);
@@ -157,27 +167,40 @@ public class JoglRenderer {
     // Lock down list to ensure repeatable order.
     List<JoglPickable> pickables =
         getPickableShapes().collect(Collectors.toList());
-    IntBuffer selectBuffer = getSelectBuffer(pickables.size());
-    selectBuffer.rewind();
 
     GL2 gl = drawable.getGL().getGL2();
     GLContext glContext = drawable.getContext();
     glContext.makeCurrent();
 
-    gl.glSelectBuffer(selectBuffer.capacity(), selectBuffer);
-    gl.glRenderMode(GL2.GL_SELECT);
-    gl.glInitNames();
+    // Render into off screen buffer so that selection render does not disturb
+    // the visible frame.  This prepares for color based picking.
+    pickBuffer.use(gl, viewportWidth, viewportHeight);
+
+    installBackgroundColor(gl, pickBackground);
+
+    gl.glClear(GL.GL_COLOR_BUFFER_BIT);
+    gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
 
     camera.preparePicker(gl, mouseX, mouseY, selectWidth, selectHeight);
 
     // draw stuff
-    pickHits(gl, pickables);
+    drawPickables(gl, pickables);
+    installBackgroundColor(gl, drawBackground);
 
-    // Collect and process hits
-    int hits = gl.glRenderMode(GL2.GL_RENDER);
+    int mouseXPx = (int) mouseX;
+    int mouseYPx = (int) mouseY;
+    int selectWidthPx = (int) selectWidth;
+    int selectHeightPx = (int) selectHeight;
+
+    int pixelAlloc = selectWidthPx * selectHeightPx * RGB_PARTS_PER_PIXEL;
+    FloatBuffer mousePixels = FloatBuffer.allocate(pixelAlloc);
+    gl.glReadPixels(mouseXPx, mouseYPx, selectWidthPx, selectHeightPx,
+        GL.GL_RGB, GL.GL_FLOAT, mousePixels);
+
+    pickBuffer.release(gl);
     glContext.release();
 
-    return processHits(hits, selectBuffer, pickables);
+    return processHits(pickables, mousePixels);
   }
 
   public void dispose(final GLAutoDrawable drawable) {
@@ -213,6 +236,19 @@ public class JoglRenderer {
     */
   }
 
+  private void setBackgroundColor(GL gl, int red, int green, int blue) {
+    this.drawBackground = new Color(red, green, blue);
+    installBackgroundColor(gl, drawBackground);
+  }
+
+  private void installBackgroundColor(GL gl, Color backgroundColor) {
+    gl.glClearColor(
+        (float) JoglTransforms.colorByte(backgroundColor.getRed()),
+        (float) JoglTransforms.colorByte(backgroundColor.getGreen()),
+        (float) JoglTransforms.colorByte(backgroundColor.getBlue()),
+        BACKGROUND_ALPHA_FLT);
+  }
+
   private void drawShape(GL2 gl, JoglShape shape) {
     gl.glPushMatrix();
     shape.draw(gl, this);
@@ -246,16 +282,19 @@ public class JoglRenderer {
    * @param pickables ordered list of drawable items.
    *   The ids in the GL select buffer are the indexes for this list.
    */
-  private void pickHits(GL2 gl, List<JoglPickable> pickables) {
-
-    // Ensure that the index is the name.
-    int name = 0;
-    while(name < pickables.size() ) {
+  private void drawPickables(GL2 gl, List<JoglPickable> pickables) {
+    // Zero is the background, so we start at 1.
+    int name = 1;
+    for (JoglPickable pickable : pickables) {
       gl.glPushMatrix();
-      pickables.get(name).draw(gl, this, name);
+      JoglColor indexColor = indexToColor(name);
+      LOG.debug("Pickable {} with RGB {}, {}, {}", name,
+          indexColor.red, indexColor.green, indexColor.blue);
+      pickable.draw(gl, this, indexColor);
       gl.glPopMatrix();
       name++;
     }
+    gl.glFlush();
   }
 
   /**
@@ -267,51 +306,64 @@ public class JoglRenderer {
         .map(JoglPickable.class::cast);
   }
 
-  /**
-   * Must provide a "direct buffer".
-   */
-  private IntBuffer getSelectBuffer(int pickMax) {
-    pickMax *= 100;
-    int allocBytes = pickMax * 6 * BYTES_PER_INT;
-    ByteBuffer result = ByteBuffer.allocateDirect(allocBytes);
-    result.order(ByteOrder.nativeOrder());
-    return result.asIntBuffer();
+  private Collection<Object> processHits(
+      List<JoglPickable> pickables, FloatBuffer mousePixels) {
+
+    int bkgrndColor = fromColor(pickBackground);
+    int pickLimit = pickables.size();
+
+    Set<Object> result = new HashSet<>();
+    while (mousePixels.hasRemaining()) {
+      int pickColor = nextPixel(mousePixels);
+
+      // Skip the background color.
+      if (pickColor == bkgrndColor) {
+        continue;
+      }
+      int pickIndex = pickColor - 1;
+      if (pickIndex >= pickLimit) {
+        LOG.warn("Pick index {} exceeds limit {}", pickIndex, pickLimit);
+        continue;
+      }
+      if (pickIndex < 0 ) {
+        LOG.warn("Negative pick index {}", pickIndex, pickLimit);
+        continue;
+      }
+      Object pickObject = pickables.get(pickIndex).getObject();
+      if (pickObject == null) {
+        LOG.warn("Pick index {} returned null", pickIndex);
+        continue;
+      }
+      result.add(pickObject);
+    }
+    return result;
   }
 
-  /**
-   * Provide the objects that were hit during a picking operation.
-   */
-  private List<Object> processHits(
-      int hits, IntBuffer buffer, List<JoglPickable> pickables) {
-    if (hits == 0) {
-      LOG.info("zero hits");
-      return Collections.emptyList();
-    }
-    if (hits < 0) {
-      LOG.warn(
-          "Too many hits!! IntBuffer capacity = {}", buffer.capacity());
-      return Collections.emptyList();
-    }
-    // int[] hitsResults = new int[hits];
-    List<Object> results = new ArrayList<>(hits);
+  private JoglColor indexToColor(int pickIndex) {
+    double red = JoglTransforms.colorByte((pickIndex >> 16) & 0xFF);
+    double green = JoglTransforms.colorByte((pickIndex >> 8) & 0xFF);
+    double blue = JoglTransforms.colorByte(pickIndex & 0xFF);
+    return new JoglColor(red, green, blue);
+  }
 
-    int offset = 0;
-    int names;
-    for (int i = 0; i < hits; i++) {
-      names = buffer.get(offset); offset++;
-      offset++; // z1 (first z)
-      offset++; // z2 (last z)
+  private int nextPixel(FloatBuffer mousePixels) {
+    float[] pixelColor = new float[RGB_PARTS_PER_PIXEL];
+    mousePixels.get(pixelColor);
 
-      for (int j = 0; j < names; j++) {
-        if (j == (names - 1)) {
-          int hitIndex = buffer.get(offset);
-          JoglPickable hitOject = pickables.get(hitIndex);
-          results.add(hitOject.getObject());
-        }
-        offset++;
-      }
-    }
-    LOG.info("hits = {}; offset = {}", hits, offset);
-    return results;
+    return (cleanByte(pixelColor[0]) << 16) |
+        (cleanByte(pixelColor[1]) << 8) |
+        cleanByte(pixelColor[2]);
+  }
+
+  private int fromColor(Color color) {
+    // Ignore alpha in high byte.
+    return color.getRGB() & 0x00FFFFFF;
+  }
+
+  private int cleanByte(Float value) {
+    int intValue = (int) (value * 255);
+    // Byte values greater than 127 are negative in Java,
+    // due to two's complement representation.
+    return intValue & 0xFF;
   }
 }

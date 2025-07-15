@@ -95,8 +95,6 @@ public class AwtShape extends NodeShape {
     float[] lastMoveTo = new float[6];
     float[] currSegment = new float[6];
 
-    setShapeColor(gl);
-
     PathIterator it = shapeAwt.getPathIterator(null, SHAPE_FLATNESS);
     int opened = 0;
     int closed = 0;
@@ -135,7 +133,6 @@ public class AwtShape extends NodeShape {
     float[] lastMoveTo = new float[6];
     float[] currSegment = new float[6];
 
-    setEdgeColor(gl);
     gl.glLineWidth(borderWidth);
 
     PathIterator it = shapeAwt.getPathIterator(null, SHAPE_FLATNESS);

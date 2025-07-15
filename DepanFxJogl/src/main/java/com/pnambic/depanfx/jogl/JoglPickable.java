@@ -7,7 +7,7 @@ public interface JoglPickable {
   /**
    * Draw the existing shape with a pickable name.
    */
-  void draw(GL2 gl, JoglRenderer renderer, int name);
+  void draw(GL2 gl, JoglRenderer renderer, JoglColor pickColor);
 
   /**
    * Provides the {@code Object} that is picked with this shape.

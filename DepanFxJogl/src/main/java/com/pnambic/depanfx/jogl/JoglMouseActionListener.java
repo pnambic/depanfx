@@ -1,6 +1,6 @@
 package com.pnambic.depanfx.jogl;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface JoglMouseActionListener {
 
@@ -19,22 +19,22 @@ public interface JoglMouseActionListener {
   /**
    * Set the current selection to the supplied list.
    */
-  void setSelection(List<Object> selection);
+  void setSelection(Collection<Object> selection);
 
   /**
    * Remove the supplied list from the current selection.
    */
-  void reduceSelection(List<Object> reduction);
+  void reduceSelection(Collection<Object> reduction);
 
   /**
    * Add the supplied list tothe current selection.
    */
-  void extendSelection(List<Object> extension);
+  void extendSelection(Collection<Object> extension);
 
   /**
    * If current selection includes all elements of the supplied list,
    * leave the current selection.  Otherwise, set the current selection
    * to the supplied list.
    */
-  void reviseSelection(List<Object> extension);
+  void reviseSelection(Collection<Object> extension);
 }

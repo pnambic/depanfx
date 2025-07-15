@@ -1069,7 +1069,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     }
 
     @Override
-    public void setSelection(List<Object> selection) {
+    public void setSelection(Collection<Object> selection) {
       // Used for lookups, so a set is appropriate here.
       Collection<GraphNode> nodes = new HashSet<>(selection.size());
       streamNodes(selection).forEach(nodes::add);
@@ -1077,21 +1077,21 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     }
 
     @Override
-    public void reduceSelection(List<Object> reduction) {
+    public void reduceSelection(Collection<Object> reduction) {
       nodeSelection.doSelectGraphNodesAction(streamNodes(reduction), false);
     }
 
     @Override
-    public void extendSelection(List<Object> extension) {
+    public void extendSelection(Collection<Object> extension) {
       nodeSelection.doSelectGraphNodesAction(streamNodes(extension), true);
     }
 
     @Override
-    public void reviseSelection(List<Object> selection) {
+    public void reviseSelection(Collection<Object> selection) {
       doReviseSelectionAction(selection);
     }
 
-    private Stream<GraphNode> streamNodes(List<?> source) {
+    private Stream<GraphNode> streamNodes(Collection<?> source) {
       return source.stream()
           .filter(o -> o instanceof GraphNode)
           .map(GraphNode.class::cast);

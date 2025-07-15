@@ -22,8 +22,8 @@ import com.jogamp.newt.opengl.GLWindow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 public class JoglMouseListener implements MouseListener {
 
@@ -157,8 +157,8 @@ public class JoglMouseListener implements MouseListener {
     anchorX = priorX = event.getX();
     anchorY = priorY = event.getY();
 
-    List<Object> hits = getMouseHits(anchorX, anchorY);
-    boolean hasHits = hits.size() > 0;
+    Collection<Object> hits = getMouseHits(anchorX, anchorY);
+    boolean hasHits = !hits.isEmpty();
 
     // The user clicked on an object without control or shift
     // Entry move mode, and make the picked node the select node if it
@@ -197,18 +197,18 @@ public class JoglMouseListener implements MouseListener {
           && state == State.MovingObject) {
         // instead of moving the node, the mouse stayed at the same place.
         // we replace the selection.
-        List<Object> hits = getMouseHits(anchorX, anchorY);
+        Collection<Object> hits = getMouseHits(anchorX, anchorY);
         actionListener.setSelection(hits);
       }
       else if (anchorX == eventX && anchorY == eventY
           && state == State.RectangleSelection) {
         // a rectangle when the mouse hasn't moved... select nothing
         if (event.isControlDown()) {
-          List<Object> hits = getMouseHits(anchorX, anchorY);
+          Collection<Object> hits = getMouseHits(anchorX, anchorY);
           actionListener.extendSelection(hits);
         }
         else if (event.isAltDown()) {
-          List<Object> hits = getMouseHits(anchorX, anchorY);
+          Collection<Object> hits = getMouseHits(anchorX, anchorY);
           actionListener.reduceSelection(hits);
         }
         else {
@@ -216,7 +216,7 @@ public class JoglMouseListener implements MouseListener {
         }
       }
       else if (state == State.RectangleSelection) {
-        List<Object> hits = getRectangleHits(anchorX, anchorY, eventX, eventY);
+        Collection<Object> hits = getRectangleHits(anchorX, anchorY, eventX, eventY);
         if (event.isControlDown()) {
           actionListener.extendSelection(hits);
         }
@@ -242,14 +242,14 @@ public class JoglMouseListener implements MouseListener {
   /////////////////////////////////////
   // Hit tests
 
-  private List<Object> getMouseHits(float mouseX, float mouseY) {
+  private Collection<Object> getMouseHits(float mouseX, float mouseY) {
     int viewportHeight = renderer.getViewportHeight();
     return renderer.getHits(
         glWindow, mouseX, viewportHeight - mouseY,
         1.0f, 1.0f);
   }
 
-  private List<Object> getRectangleHits(
+  private Collection<Object> getRectangleHits(
       float anchorX, float anchorY, float eventX, float eventY) {
     int viewportHeight = renderer.getViewportHeight();
     float selectX = (float) renderer.scaleMouseX(anchorX);

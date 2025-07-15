@@ -151,13 +151,6 @@ public class JoglCamera {
 
     gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
     gl.glLoadIdentity();
-
-    int[] viewPort = new int[4];
-    gl.glGetIntegerv(GL2.GL_VIEWPORT, viewPort, 0);
-    glu.gluPickMatrix(
-        mouseX, mouseY, selectionWidth, selectionHeight,
-        viewPort, 0);
-
     double fh = renderCamera.zoom;
     double fw = fh * aspect;
     gl.glFrustum(-fw, fw, -fh, fh, HOME_Z_NEAR, HOME_Z_FAR);

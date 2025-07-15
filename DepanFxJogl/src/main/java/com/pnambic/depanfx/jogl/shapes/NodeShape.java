@@ -108,7 +108,11 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
     }
 
     gl.glTranslated(shapeX, shapeY, shapeZ);
+
+    setShapeColor(gl);
     renderShape(gl);
+
+    setEdgeColor(gl);
     renderBorder(gl);
 
     if (showLabel) {
@@ -126,14 +130,18 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
   }
 
   @Override // Pickable
-  public void draw(GL2 gl, JoglRenderer renderer, int name) {
-    gl.glPushName(name);
+  public void draw(GL2 gl, JoglRenderer renderer, JoglColor pickColor) {
+    if (!isVisible) {
+      return;
+    }
+    if (getApparentShape(renderer) != this) {
+      return;
+    }
+
     gl.glTranslated(shapeX, shapeY, shapeZ);
+    setPickColor(gl, pickColor);
     renderShape(gl);
     renderBorder(gl);
-
-    // Don't draw the label
-    gl.glPushName(name);
   }
 
   @Override // Pickable
@@ -212,6 +220,10 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
 
   protected void setHighlightColor(GL2 gl) {
     setColor(gl, highlightColor);
+  }
+
+  protected void setPickColor(GL2 gl, JoglColor pickColor) {
+    setColor(gl, pickColor);
   }
 
   private void setColor(GL2 gl, JoglColor toColor) {
