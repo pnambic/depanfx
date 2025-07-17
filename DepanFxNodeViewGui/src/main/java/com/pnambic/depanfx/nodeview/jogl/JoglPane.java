@@ -6,6 +6,8 @@ import com.pnambic.depanfx.jogl.JoglShape;
 import com.pnambic.depanfx.nodeview.gui.CameraControl;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewKeyActions;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewStatusPanel;
+import com.pnambic.depanfx.nodeview.gui.FlightControl;
+import com.pnambic.depanfx.nodeview.gui.FlightKeyActions;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 
@@ -32,6 +34,8 @@ public class JoglPane extends BorderPane {
 
   private final CameraControl cameraControl;
 
+  private final FlightControl flightControl;
+
   private final DepanFxDialogRunner dialogRunner;
 
   private ScrollBar hScrollBar;
@@ -46,7 +50,9 @@ public class JoglPane extends BorderPane {
     this.jogl = jogl;
     this.dialogRunner = dialogRunner;
     this.cameraControl = new CameraControl(jogl);
+    this.flightControl = new FlightControl(jogl, cameraControl);
     DepanFxNodeViewKeyActions.addActions(jogl, cameraControl);
+    FlightKeyActions.addActions(jogl, flightControl);
   }
 
   public static JoglPane createJoglPane(
@@ -75,6 +81,8 @@ public class JoglPane extends BorderPane {
 
     jogl.demoDisplay();
 
+    flightControl.start();
+
     // JogAmp Bug #1504: Should start jogl rendering here,
     // not in viewport layout children.
     // jogl.start();
@@ -83,6 +91,8 @@ public class JoglPane extends BorderPane {
   public void release() {
     LOG.info("JoglPane release");
     jogl.stop();
+
+    flightControl.stop();
 
     // May not have allocated if never activated.
     if (statusPanel != null) {

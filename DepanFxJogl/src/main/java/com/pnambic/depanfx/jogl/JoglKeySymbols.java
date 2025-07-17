@@ -25,4 +25,15 @@ public class JoglKeySymbols {
 
   public static final short KS_MINUS = KeyEvent.VK_MINUS;
   public static final short KS_PLUS = KeyEvent.VK_PLUS;
+
+  // Letter key symbols for flight controls
+  public static final short KS_W = KeyEvent.VK_W;
+  public static final short KS_S = KeyEvent.VK_S;
+  public static final short KS_A = KeyEvent.VK_A;
+  public static final short KS_D = KeyEvent.VK_D;
+  public static final short KS_Q = KeyEvent.VK_Q;
+  public static final short KS_E = KeyEvent.VK_E;
+  public static final short KS_R = KeyEvent.VK_R;
+  public static final short KS_F = KeyEvent.VK_F;
+  public static final short KS_X = KeyEvent.VK_X;
 }

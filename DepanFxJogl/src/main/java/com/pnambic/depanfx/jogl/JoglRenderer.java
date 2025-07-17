@@ -155,6 +155,8 @@ public class JoglRenderer {
     if (selectionRect != null) {
       selectionRect.drawSelectRectangle(gl);
     }
+
+    drawTarget(gl);
     gl.glFlush();
     glContext.release();
   }
@@ -365,5 +367,57 @@ public class JoglRenderer {
     // Byte values greater than 127 are negative in Java,
     // due to two's complement representation.
     return intValue & 0xFF;
+  }
+
+  /////////////////////////////////////
+  // Target indicator
+
+  private static final double TARGET_SIZE = 5.0d;
+
+  private void drawTarget(GL2 gl) {
+    JoglCamera.CameraData data = camera.getCurrent();
+
+    float[] camV3 = data.captureCamera();
+    float[] lookV3 = data.captureLookAt();
+    float[] dir = JoglTransforms.direction(lookV3, camV3);
+
+    float[] up = new float[] {0f, 1f, 0f};
+    float[] right = normalize(cross(dir, up));
+    float[] perp = normalize(cross(dir, right));
+
+    scale(right, (float) TARGET_SIZE);
+    scale(perp, (float) TARGET_SIZE);
+
+    float cx = (float) data.lookAtX;
+    float cy = (float) data.lookAtY;
+    float cz = (float) data.lookAtZ;
+
+    gl.glLineWidth(2.0f);
+    gl.glColor3d(1.0, 0.0, 0.0);
+    gl.glBegin(GL2.GL_LINES);
+    gl.glVertex3f(cx - right[0], cy - right[1], cz - right[2]);
+    gl.glVertex3f(cx + right[0], cy + right[1], cz + right[2]);
+    gl.glVertex3f(cx - perp[0], cy - perp[1], cz - perp[2]);
+    gl.glVertex3f(cx + perp[0], cy + perp[1], cz + perp[2]);
+    gl.glEnd();
+  }
+
+  private static float[] cross(float[] a, float[] b) {
+    return new float[] {
+        a[1] * b[2] - a[2] * b[1],
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0]
+    };
+  }
+
+  private static float[] normalize(float[] v) {
+    float len = (float) Math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+    return new float[] { v[0]/len, v[1]/len, v[2]/len };
+  }
+
+  private static void scale(float[] v, float s) {
+    v[0] *= s;
+    v[1] *= s;
+    v[2] *= s;
   }
 }
