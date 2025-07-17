@@ -1,32 +1,71 @@
+/*
+ * Copyright 2025 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Synthesized by Codex.
+ */
 package com.pnambic.depanfx.nodeview.gui;
+
+import static com.pnambic.depanfx.jogl.JoglKeySymbols.*;
 
 import com.pnambic.depanfx.jogl.JoglModule;
 import com.pnambic.depanfx.jogl.JoglTransforms;
 import com.pnambic.depanfx.jogl.JoglCamera;
+import com.pnambic.depanfx.jogl.JoglKeyListener.SymbolAction;
 import javafx.animation.AnimationTimer;
 
 /**
  * Provide basic flight style controls over the camera.
  */
-public class FlightControl {
+public class FlightController {
 
-  public static final double UNIT_TURN_D = 5.0d; // degrees per key press
+  public static final double UNIT_TURN_D = 2.0d; // degrees per key press
+
   public static final double THROTTLE_STEP = 1.0d; // units per second
 
   private final JoglModule jogl;
+
   private final CameraControl cameraControl;
 
   private double throttle = 0.0d;
 
   private AnimationTimer flightTimer;
 
-  public FlightControl(JoglModule jogl, CameraControl cameraControl) {
+  public FlightController(JoglModule jogl, CameraControl cameraControl) {
     this.jogl = jogl;
     this.cameraControl = cameraControl;
   }
 
-  public CameraControl getCameraControl() {
-    return cameraControl;
+  public static void addActions(JoglModule jogl, FlightController flight) {
+    jogl.addPressAction(new SymbolAction(KS_W, EMPTY_MASK,
+        (s, m) -> flight.pitchDown()));
+    jogl.addPressAction(new SymbolAction(KS_S, EMPTY_MASK,
+        (s, m) -> flight.pitchUp()));
+    jogl.addPressAction(new SymbolAction(KS_A, EMPTY_MASK,
+        (s, m) -> flight.rollLeft()));
+    jogl.addPressAction(new SymbolAction(KS_D, EMPTY_MASK,
+        (s, m) -> flight.rollRight()));
+    jogl.addPressAction(new SymbolAction(KS_Q, EMPTY_MASK,
+        (s, m) -> flight.yawLeft()));
+    jogl.addPressAction(new SymbolAction(KS_E, EMPTY_MASK,
+        (s, m) -> flight.yawRight()));
+    jogl.addPressAction(new SymbolAction(KS_R, EMPTY_MASK,
+        (s, m) -> flight.increaseThrottle()));
+    jogl.addPressAction(new SymbolAction(KS_F, EMPTY_MASK,
+        (s, m) -> flight.decreaseThrottle()));
+    jogl.addPressAction(new SymbolAction(KS_X, EMPTY_MASK,
+        (s, m) -> flight.cutThrottle()));
   }
 
   public void start() {
@@ -124,4 +163,3 @@ public class FlightControl {
     return new float[] { v[0]/len, v[1]/len, v[2]/len };
   }
 }
-

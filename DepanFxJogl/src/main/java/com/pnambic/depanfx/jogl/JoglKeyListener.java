@@ -50,7 +50,7 @@ public class JoglKeyListener implements KeyListener {
     @Override
     public void apply(KeyEvent event) {
       keyAction.accept(event.getKeySymbol(), event.getModifiers());
-      LOG.info("Applied action for key event {}", event);
+      LOG.debug("Applied symbol action for key event {}", event);
     }
   }
 
@@ -74,7 +74,7 @@ public class JoglKeyListener implements KeyListener {
     @Override
     public void apply(KeyEvent event) {
       keyAction.accept(event.getKeyChar(), event.getModifiers());
-      LOG.info("Applied action for key event {}", event);
+      LOG.debug("Applied char action for key event {}", event);
     }
   }
 

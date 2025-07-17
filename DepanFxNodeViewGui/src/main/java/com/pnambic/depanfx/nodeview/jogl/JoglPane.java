@@ -6,7 +6,7 @@ import com.pnambic.depanfx.jogl.JoglShape;
 import com.pnambic.depanfx.nodeview.gui.CameraControl;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewKeyActions;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewStatusPanel;
-import com.pnambic.depanfx.nodeview.gui.FlightControl;
+import com.pnambic.depanfx.nodeview.gui.FlightController;
 import com.pnambic.depanfx.nodeview.gui.FlightKeyActions;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -34,7 +34,7 @@ public class JoglPane extends BorderPane {
 
   private final CameraControl cameraControl;
 
-  private final FlightControl flightControl;
+  private final FlightController flightControl;
 
   private final DepanFxDialogRunner dialogRunner;
 
@@ -50,9 +50,9 @@ public class JoglPane extends BorderPane {
     this.jogl = jogl;
     this.dialogRunner = dialogRunner;
     this.cameraControl = new CameraControl(jogl);
-    this.flightControl = new FlightControl(jogl, cameraControl);
+    this.flightControl = new FlightController(jogl, cameraControl);
     DepanFxNodeViewKeyActions.addActions(jogl, cameraControl);
-    FlightKeyActions.addActions(jogl, flightControl);
+    FlightController.addActions(jogl, flightControl);
   }
 
   public static JoglPane createJoglPane(

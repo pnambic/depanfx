@@ -1,3 +1,18 @@
+/*
+ * Copyright 2024 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.pnambic.depanfx.jogl;
 
 import com.jogamp.opengl.GL;
@@ -36,6 +51,8 @@ public class JoglRenderer {
 
   private static final int BACKGROUND_BLUE = 240;
 
+  private static final double TARGET_SIZE = 0.5d;
+
   private static final float BACKGROUND_ALPHA_FLT = 1.0f;
 
   private static final int RGB_PARTS_PER_PIXEL = 3;
@@ -52,13 +69,17 @@ public class JoglRenderer {
 
   private int viewportHeight;
 
+  // Object picking
   private JoglPickBuffer pickBuffer = new JoglPickBuffer();
 
   private JoglSelectRectangle selectionRect;
 
+  private Color pickBackground = Color.BLACK;
+
+  // Potential user options
   private Color drawBackground;
 
-  private Color pickBackground = Color.BLACK;
+  private Color targetColor = Color.YELLOW;
 
   public JoglRenderer(JoglCamera camera) {
     this.camera = camera;
@@ -372,8 +393,6 @@ public class JoglRenderer {
   /////////////////////////////////////
   // Target indicator
 
-  private static final double TARGET_SIZE = 5.0d;
-
   private void drawTarget(GL2 gl) {
     JoglCamera.CameraData data = camera.getCurrent();
 
@@ -393,7 +412,10 @@ public class JoglRenderer {
     float cz = (float) data.lookAtZ;
 
     gl.glLineWidth(2.0f);
-    gl.glColor3d(1.0, 0.0, 0.0);
+    gl.glColor3d(
+        0.0d, 1.0d, 1.0d);
+    // gl.glColor3i(
+    //    targetColor.getRed(), targetColor.getGreen(), targetColor.getBlue());
     gl.glBegin(GL2.GL_LINES);
     gl.glVertex3f(cx - right[0], cy - right[1], cz - right[2]);
     gl.glVertex3f(cx + right[0], cy + right[1], cz + right[2]);
