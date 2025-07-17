@@ -7,7 +7,6 @@ import com.pnambic.depanfx.nodeview.gui.CameraControl;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewKeyActions;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewStatusPanel;
 import com.pnambic.depanfx.nodeview.gui.FlightController;
-import com.pnambic.depanfx.nodeview.gui.FlightKeyActions;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 

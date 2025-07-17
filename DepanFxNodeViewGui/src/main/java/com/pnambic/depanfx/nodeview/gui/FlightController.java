@@ -113,11 +113,11 @@ public class FlightController {
   }
 
   public void yawLeft() {
-    rotateOnAxis(-UNIT_TURN_D, new float[] {0f, 1f, 0f});
+    rotateOnAxis(-UNIT_TURN_D, getUpAxis());
   }
 
   public void yawRight() {
-    rotateOnAxis(UNIT_TURN_D, new float[] {0f, 1f, 0f});
+    rotateOnAxis(UNIT_TURN_D, getUpAxis());
   }
 
   public void increaseThrottle() {
@@ -136,30 +136,22 @@ public class FlightController {
   // Helpers
 
   private void rotateOnAxis(double angle, float[] axis) {
-    cameraControl.rotate(angle, axis[0], axis[1], axis[2]);
+    cameraControl.rotateMoveTo(angle, axis[0], axis[1], axis[2]);
   }
 
   private float[] getForwardAxis() {
     JoglCamera.CameraData data = jogl.getCurrentCamera();
-    return JoglTransforms.directionV3(data);
+    return JoglTransforms.cameraMoveDirectionV3(data);
   }
 
   private float[] getRightAxis() {
     float[] forward = getForwardAxis();
-    float[] up = new float[] {0f, 1f, 0f};
-    return normalize(cross(forward, up));
+    float[] up = getUpAxis();
+    return JoglTransforms.normalizeV3(JoglTransforms.crossV3(forward, up));
   }
 
-  private static float[] cross(float[] a, float[] b) {
-    return new float[] {
-        a[1] * b[2] - a[2] * b[1],
-        a[2] * b[0] - a[0] * b[2],
-        a[0] * b[1] - a[1] * b[0]
-    };
-  }
-
-  private static float[] normalize(float[] v) {
-    float len = (float) Math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-    return new float[] { v[0]/len, v[1]/len, v[2]/len };
+  private float[] getUpAxis() {
+    JoglCamera.CameraData data = jogl.getCurrentCamera();
+    return data.captureMoveUp();
   }
 }

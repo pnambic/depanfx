@@ -10,14 +10,16 @@ public interface CameraChangeListener {
   // Absolute camera actions
   void setCamera(double cameraToX, double cameraToY, double cameraToZ);
 
-  void setLookAt(double lookAtToX, double lookAtToY, double lookAtToZ);
+  void setMoveTo(double lookAtToX, double lookAtToY, double lookAtToZ);
+
+  void setMoveUp(double lookUpToX, double lookUpToY, double lookUpToZ);
 
   void setZoom(double zoomTo);
 
   // Relative camera actions
   void dolly(double dollyX, double dollyY, double dollyZ);
 
-  void rotate(double angle, double rotateX, double rotateY, double rotateZ);
+  void rotateMoveTo(double angle, double rotateX, double rotateY, double rotateZ);
 
   void move(double moveDistance);
 

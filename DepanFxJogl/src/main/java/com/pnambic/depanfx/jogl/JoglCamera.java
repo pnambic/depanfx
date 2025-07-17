@@ -4,6 +4,9 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.fixedfunc.GLMatrixFunc;
 import com.jogamp.opengl.glu.GLU;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Define the camera to render the view.
  */
@@ -14,28 +17,49 @@ public class JoglCamera {
 
   public static final double HOME_CAMERA_Y = 0.0d;
 
-  public static final double HOME_CAMERA_Z = 10.0d;
+  public static final double HOME_CAMERA_Z = 100.0d;
 
   // Home lookat is the origin.
-  public static final double HOME_LOOKAT_X = 0.0d;
+  public static final double HOME_LOOKAT_X = HOME_CAMERA_X;
 
-  public static final double HOME_LOOKAT_Y = 0.0d;
+  public static final double HOME_LOOKAT_Y = HOME_CAMERA_Y;
 
-  public static final double HOME_LOOKAT_Z = 0.0d;
+  public static final double HOME_LOOKAT_Z = 80.0d;
+
+  // When looking down into the Z axis, the Y axis points up.
+  public static final double HOME_LOOKUP_X = 0.0d;
+
+  public static final double HOME_LOOKUP_Y = 1.0d;
+
+  public static final double HOME_LOOKUP_Z = 0.0d;
+
+  // Move starts in sync with looking at.
+  public static final double HOME_MOVETO_X = HOME_LOOKAT_X;
+
+  public static final double HOME_MOVETO_Y = HOME_LOOKAT_Y;
+
+  public static final double HOME_MOVETO_Z = HOME_LOOKAT_Z;
+
+  public static final double HOME_MOVEUP_X = HOME_LOOKUP_X;
+
+  public static final double HOME_MOVEUP_Y = HOME_LOOKUP_Y;
+
+  public static final double HOME_MOVEUP_Z = HOME_LOOKUP_Z;
 
   // Full laptop screen vertical space:
   // 7" vertical from 22" is ~ 20 degrees.
   public static final double HOME_FOV = 20.0d;
 
   // For 45-degree FOV
-  private static final double HOME_ZOOM_100 = 0.5d;
+  public static final double HOME_ZOOM_100 = 0.5d;
 
-  private static final double HOME_Z_NEAR = 1.0d;
+  public static final double HOME_Z_NEAR = 1.0d;
 
-  private static final double HOME_Z_FAR = 3000.0d;
+  public static final double HOME_Z_FAR = 3000.0d;
+
+  private static final Logger LOG = LoggerFactory.getLogger(JoglCamera.class);
 
   public static class CameraData {
-
     public double cameraX;
     public double cameraY;
     public double cameraZ;
@@ -44,27 +68,70 @@ public class JoglCamera {
     public double lookAtY;
     public double lookAtZ;
 
+    public double lookUpX;
+    public double lookUpY;
+    public double lookUpZ;
+
+    public double moveToX;
+    public double moveToY;
+    public double moveToZ;
+
+    public double moveUpX;
+    public double moveUpY;
+    public double moveUpZ;
+
     public double zoom;
 
     public CameraData(
         double cameraX, double cameraY, double cameraZ,
         double lookAtX, double lookAtY, double lookAtZ,
+        double lookUpX, double lookUpY, double lookUpZ,
+        double moveToX, double moveToY, double moveToZ,
+        double moveUpX, double moveUpY, double moveUpZ,
         double zoom) {
+      if (lookAtX != moveToX) {
+        LOG.warn("wtf");
+      }
       this.cameraX = cameraX;
       this.cameraY = cameraY;
       this.cameraZ = cameraZ;
       this.lookAtX = lookAtX;
       this.lookAtY = lookAtY;
       this.lookAtZ = lookAtZ;
+      this.lookUpX = lookUpX;
+      this.lookUpY = lookUpY;
+      this.lookUpZ = lookUpZ;
+      this.moveToX = moveToX;
+      this.moveToY = moveToY;
+      this.moveToZ = moveToZ;
+      this.moveUpX = moveUpX;
+      this.moveUpY = moveUpY;
+      this.moveUpZ = moveUpZ;
       this.zoom = zoom;
+    }
+
+    public CameraData(
+        double cameraX, double cameraY, double cameraZ,
+        double lookAtX, double lookAtY, double lookAtZ,
+        double zoom) {
+      this(cameraX, cameraY, cameraZ,
+          lookAtX, lookAtY, lookAtZ,
+          0.0d, 1.0d, 0.0d,
+          lookAtX, lookAtY, lookAtZ,
+          0.0d, 1.0d, 0.0d,
+          zoom);
     }
 
     /**
      * Clone a new camera data from a source.
      */
     public CameraData(CameraData source) {
-      this(source.cameraX, source.cameraY, source.cameraZ,
+      this(
+          source.cameraX, source.cameraY, source.cameraZ,
           source.lookAtX, source.lookAtY, source.lookAtZ,
+          source.lookUpX, source.lookUpY, source.lookUpZ,
+          source.moveToX, source.moveToY, source.moveToZ,
+          source.moveUpX, source.moveUpY, source.moveUpZ,
           source.zoom);
     }
 
@@ -74,6 +141,9 @@ public class JoglCamera {
     public CameraData() {
       this(HOME_CAMERA_X, HOME_CAMERA_Y, HOME_CAMERA_Z,
           HOME_LOOKAT_X, HOME_LOOKAT_Y, HOME_LOOKAT_Z,
+          HOME_LOOKUP_X, HOME_LOOKUP_Y, HOME_LOOKUP_Z,
+          HOME_MOVETO_X, HOME_MOVETO_Y, HOME_MOVETO_Z,
+          HOME_MOVEUP_X, HOME_MOVEUP_Y, HOME_MOVEUP_Z,
           HOME_ZOOM_100);
     }
 
@@ -84,6 +154,15 @@ public class JoglCamera {
       lookAtX = source.lookAtX;
       lookAtY = source.lookAtY;
       lookAtZ = source.lookAtZ;
+      lookUpX = source.lookUpX;
+      lookUpY = source.lookUpY;
+      lookUpZ = source.lookUpZ;
+      moveToX = source.moveToX;
+      moveToY = source.moveToY;
+      moveToZ = source.moveToZ;
+      moveUpX = source.moveUpX;
+      moveUpY = source.moveUpY;
+      moveUpZ = source.moveUpZ;
       zoom = source.zoom;
     }
 
@@ -96,6 +175,24 @@ public class JoglCamera {
     public float[] captureLookAt() {
       return new float[] {
           (float) lookAtX, (float) lookAtY, (float) lookAtZ
+      };
+    }
+
+    public float[] captureLookUp() {
+      return new float[] {
+          (float) lookUpX, (float) lookUpY, (float) lookUpZ
+      };
+    }
+
+    public float[] captureMoveTo() {
+      return new float[] {
+          (float) moveToX, (float) moveToY, (float) moveToZ
+      };
+    }
+
+    public float[] captureMoveUp() {
+      return new float[] {
+          (float) moveUpX, (float) moveUpY, (float) moveUpZ
       };
     }
   }
@@ -127,43 +224,42 @@ public class JoglCamera {
   }
 
   public void prepareCamera(GL2 gl) {
-    GLU glu = GLU.createGLU(gl);
     renderCamera.capture(updateCamera);
 
-    gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
-    gl.glLoadIdentity();
-    double fh = renderCamera.zoom;
-    double fw = fh * aspect;
-    gl.glFrustum(-fw, fw, -fh, fh, HOME_Z_NEAR, HOME_Z_FAR);
-
-    gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
-    gl.glLoadIdentity();
-    glu.gluLookAt(
-        renderCamera.cameraX, renderCamera.cameraY, renderCamera.cameraZ,
-        renderCamera.lookAtX, renderCamera.lookAtY, renderCamera.lookAtZ,
-        0.0f, 1.0f, 0.0f);
+    prepareProjection(gl);
+    prepareModelView(gl);
   }
 
   public void preparePicker(
       GL2 gl, float mouseX, float mouseY,
       float selectionWidth, float selectionHeight) {
-    GLU glu = GLU.createGLU(gl);
 
+    prepareProjection(gl);
+    prepareModelView(gl);
+  }
+
+  public void updateCamera(CameraData updateData) {
+    updateCamera.capture(updateData);
+  }
+
+  private void prepareProjection(GL2 gl) {
     gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
     gl.glLoadIdentity();
     double fh = renderCamera.zoom;
     double fw = fh * aspect;
     gl.glFrustum(-fw, fw, -fh, fh, HOME_Z_NEAR, HOME_Z_FAR);
+  }
 
+  private void prepareModelView(GL2 gl) {
     gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
     gl.glLoadIdentity();
+
+    // For now, lookAt tracks the moveTo position,
+    // and the moveTo up is also the lookAt up.
+    GLU glu = GLU.createGLU(gl);
     glu.gluLookAt(
         renderCamera.cameraX, renderCamera.cameraY, renderCamera.cameraZ,
         renderCamera.lookAtX, renderCamera.lookAtY, renderCamera.lookAtZ,
-        0.0f, 1.0f, 0.0f);
-  }
-
-  public void updateCamera(CameraData updateData) {
-    updateCamera.capture(updateData);
+        renderCamera.moveUpX, renderCamera.moveUpY, renderCamera.moveUpZ);
   }
 }

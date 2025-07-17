@@ -79,7 +79,9 @@ public class JoglRenderer {
   // Potential user options
   private Color drawBackground;
 
-  private Color targetColor = Color.YELLOW;
+  private Color targetHorzColor = Color.YELLOW;
+
+  private Color targetVertColor = Color.ORANGE;
 
   public JoglRenderer(JoglCamera camera) {
     this.camera = camera;
@@ -266,9 +268,9 @@ public class JoglRenderer {
 
   private void installBackgroundColor(GL gl, Color backgroundColor) {
     gl.glClearColor(
-        (float) JoglTransforms.colorByte(backgroundColor.getRed()),
-        (float) JoglTransforms.colorByte(backgroundColor.getGreen()),
-        (float) JoglTransforms.colorByte(backgroundColor.getBlue()),
+        colorByteF(backgroundColor.getRed()),
+        colorByteF(backgroundColor.getGreen()),
+        colorByteF(backgroundColor.getBlue()),
         BACKGROUND_ALPHA_FLT);
   }
 
@@ -391,55 +393,50 @@ public class JoglRenderer {
   }
 
   /////////////////////////////////////
-  // Target indicator
+  // Move To target indicator
 
   private void drawTarget(GL2 gl) {
     JoglCamera.CameraData data = camera.getCurrent();
 
     float[] camV3 = data.captureCamera();
-    float[] lookV3 = data.captureLookAt();
-    float[] dir = JoglTransforms.direction(lookV3, camV3);
+    float[] moveToV3 = data.captureMoveTo();
+    float[] moveUpV3 = data.captureMoveUp();
+    float[] moveDirV3 = JoglTransforms.direction(moveToV3, camV3);
 
-    float[] up = new float[] {0f, 1f, 0f};
-    float[] right = normalize(cross(dir, up));
-    float[] perp = normalize(cross(dir, right));
-
-    scale(right, (float) TARGET_SIZE);
-    scale(perp, (float) TARGET_SIZE);
-
-    float cx = (float) data.lookAtX;
-    float cy = (float) data.lookAtY;
-    float cz = (float) data.lookAtZ;
+    float[] rightPosV3 = calcAxisPos(moveDirV3, moveUpV3);
+    float[] perpPosV3 = calcAxisPos(moveDirV3, rightPosV3);
 
     gl.glLineWidth(2.0f);
-    gl.glColor3d(
-        0.0d, 1.0d, 1.0d);
-    // gl.glColor3i(
-    //    targetColor.getRed(), targetColor.getGreen(), targetColor.getBlue());
     gl.glBegin(GL2.GL_LINES);
-    gl.glVertex3f(cx - right[0], cy - right[1], cz - right[2]);
-    gl.glVertex3f(cx + right[0], cy + right[1], cz + right[2]);
-    gl.glVertex3f(cx - perp[0], cy - perp[1], cz - perp[2]);
-    gl.glVertex3f(cx + perp[0], cy + perp[1], cz + perp[2]);
+    drawAxis(gl, moveToV3, rightPosV3, targetHorzColor);
+    drawAxis(gl, moveToV3, perpPosV3, targetVertColor);
     gl.glEnd();
   }
 
-  private static float[] cross(float[] a, float[] b) {
-    return new float[] {
-        a[1] * b[2] - a[2] * b[1],
-        a[2] * b[0] - a[0] * b[2],
-        a[0] * b[1] - a[1] * b[0]
-    };
+  protected float[] calcAxisPos(float[] forwardV3, float[] axisV3) {
+    return JoglTransforms.scaleV3(
+        JoglTransforms.normalizeV3(
+            JoglTransforms.crossV3(forwardV3, axisV3)),
+        (float) TARGET_SIZE);
   }
 
-  private static float[] normalize(float[] v) {
-    float len = (float) Math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-    return new float[] { v[0]/len, v[1]/len, v[2]/len };
+  protected void drawAxis(
+      GL2 gl, float[] centerV3, float[] axisV3, Color axisColor) {
+    gl.glColor3d(
+        colorByteF(axisColor.getRed()),
+        colorByteF(axisColor.getGreen()),
+        colorByteF(axisColor.getBlue()));
+    gl.glVertex3f(
+        centerV3[0] - axisV3[0],
+        centerV3[1] - axisV3[1],
+        centerV3[2] - axisV3[2]);
+    gl.glVertex3f(
+        centerV3[0] + axisV3[0],
+        centerV3[1] + axisV3[1],
+        centerV3[2] + axisV3[2]);
   }
 
-  private static void scale(float[] v, float s) {
-    v[0] *= s;
-    v[1] *= s;
-    v[2] *= s;
+  private float colorByteF(int colorByte) {
+    return (float) JoglTransforms.colorByte(colorByte);
   }
 }

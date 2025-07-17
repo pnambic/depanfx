@@ -76,17 +76,33 @@ public class CameraControl implements CameraChangeListener {
     cameraZ.set(updateData.cameraZ);
   }
 
+  /**
+   * In the current implementation, lookAt always tracks moveTo.
+   */
   @Override
-  public void setLookAt(double lookAtToX, double lookAtToY, double lookAtToZ) {
+  public void setMoveTo(double moveToX, double moveToY, double moveToZ) {
     JoglCamera.CameraData updateData = jogl.getCurrentCamera();
-    updateData.lookAtX = lookAtToX;
-    updateData.lookAtY = lookAtToY;
-    updateData.lookAtZ = lookAtToZ;
+
+    updateData.moveToX = moveToX;
+    updateData.moveToY = moveToY;
+    updateData.moveToZ = moveToZ;
+    trackMoveTo(updateData);
+
     jogl.updateCamera(updateData);
 
     lookAtX.set(updateData.lookAtX);
     lookAtY.set(updateData.lookAtY);
     lookAtZ.set(updateData.lookAtZ);
+  }
+
+  @Override
+  public void setMoveUp(double moveUpX, double moveUpY, double moveUpZ) {
+    JoglCamera.CameraData updateData = jogl.getCurrentCamera();
+    updateData.moveUpX = moveUpX;
+    updateData.moveUpY = moveUpY;
+    updateData.moveUpZ = moveUpZ;
+    // LookUp remains (0,1,0) unless explicitly changed
+    jogl.updateCamera(updateData);
   }
 
   @Override
@@ -105,9 +121,11 @@ public class CameraControl implements CameraChangeListener {
     updateData.cameraY += dollyY;
     updateData.cameraZ += dollyZ;
 
-    updateData.lookAtX += dollyX;
-    updateData.lookAtY += dollyY;
-    updateData.lookAtZ += dollyZ;
+    updateData.moveToX += dollyX;
+    updateData.moveToY += dollyY;
+    updateData.moveToZ += dollyZ;
+    trackMoveTo(updateData);
+
     jogl.updateCamera(updateData);
 
     cameraX.set(updateData.cameraX);
@@ -120,18 +138,36 @@ public class CameraControl implements CameraChangeListener {
   }
 
   @Override
-  public void rotate(
+  public void rotateMoveTo(
       double angle, double rotateX, double rotateY, double rotateZ) {
+
+    // Prepare the gimble for rotations
+    float[] rotateV3 = new float[] {
+        (float) rotateX, (float) rotateY, (float) rotateZ };
+    float radians = (float) Math.toRadians(angle);
+    JoglTransforms.Gimbel gimble =
+        new JoglTransforms.Gimbel(radians, rotateV3);
+
     JoglCamera.CameraData cameraData = jogl.getCurrentCamera();
-    float[] rotatedLookAt = JoglTransforms.rotate(cameraData,
-        (float) angle, (float) rotateX, (float) rotateY, (float) rotateZ);
-    setLookAt(rotatedLookAt[0], rotatedLookAt[1], rotatedLookAt[2]);
+
+    float[] rotatedMoveUp = gimble.rotate(cameraData.captureMoveUp());
+    setMoveUp(rotatedMoveUp[0], rotatedMoveUp[1], rotatedMoveUp[2]);
+
+    float[] cameraV3 = cameraData.captureCamera();
+    float[] dirToV3 =
+        JoglTransforms.subtractV3(cameraData.captureMoveTo(), cameraV3);
+    float[] rotateToV3 = gimble.rotate(JoglTransforms.normalizeV3(dirToV3));
+
+    float[] rotDirToV3 =
+        JoglTransforms.scaleV3(rotateToV3, JoglTransforms.lengthV3(dirToV3));
+    float[] rotMoveToV3 = JoglTransforms.addV3(cameraV3, rotDirToV3);
+    setMoveTo(rotMoveToV3[0], rotMoveToV3[1], rotMoveToV3[2]);
   }
 
   @Override
   public void move(double moveDistance) {
     JoglCamera.CameraData joglCamera = jogl.getCurrentCamera();
-    float[] directionV3 = JoglTransforms.directionV3(joglCamera);
+    float[] directionV3 = JoglTransforms.cameraMoveDirectionV3(joglCamera);
     float[] dollyV3 = JoglTransforms.scaleV3(directionV3, (float) moveDistance);
 
     dolly(dollyV3[0], dollyV3[1], dollyV3[2]);
@@ -142,5 +178,11 @@ public class CameraControl implements CameraChangeListener {
     JoglCamera.CameraData updateData = jogl.getCurrentCamera();
     double newZoom = updateData.zoom * zoomRatio;
     setZoom(newZoom);
+  }
+
+  private void trackMoveTo(JoglCamera.CameraData updateData) {
+    updateData.lookAtX = updateData.moveToX;
+    updateData.lookAtY = updateData.moveToY;
+    updateData.lookAtZ = updateData.moveToZ;
   }
 }

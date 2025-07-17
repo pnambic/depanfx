@@ -54,21 +54,21 @@ public class DepanFxNodeViewKeyActions {
     // Tilt: rotate about the X axis
     jogl.addPressAction(
         new SymbolAction(KS_UP, CTRL_MASK,
-            (s, m) -> listener.rotate(
+            (s, m) -> listener.rotateMoveTo(
                 -UNIT_TURN_D, UNIT_AXIS_D, ZERO_AXIS_D, ZERO_AXIS_D)));
     jogl.addPressAction(
         new SymbolAction(KS_DOWN, CTRL_MASK,
-            (s, m) -> listener.rotate(
+            (s, m) -> listener.rotateMoveTo(
                 UNIT_TURN_D, UNIT_AXIS_D, ZERO_AXIS_D, ZERO_AXIS_D)));
 
     // Pan: rotate about the Y axis
     jogl.addPressAction(
         new SymbolAction(KS_LEFT, CTRL_MASK,
-            (s, m) -> listener.rotate(
+            (s, m) -> listener.rotateMoveTo(
                 -UNIT_TURN_D, ZERO_AXIS_D, UNIT_AXIS_D, ZERO_AXIS_D)));
     jogl.addPressAction(
         new SymbolAction(KS_RIGHT, CTRL_MASK,
-            (s, m) -> listener.rotate(
+            (s, m) -> listener.rotateMoveTo(
                 UNIT_TURN_D, ZERO_AXIS_D, UNIT_AXIS_D, ZERO_AXIS_D)));
 
     // Move: forward and backward on line of sight
