@@ -18,7 +18,7 @@ public class JoglTransforms {
       return 0.0f;
     }
     if (color >= COLOR_BYTE_MAX) {
-      return 0.0f;
+      return 1.0f;
     }
     return ((float) color) / ((float) COLOR_BYTE_MAX);
   }
