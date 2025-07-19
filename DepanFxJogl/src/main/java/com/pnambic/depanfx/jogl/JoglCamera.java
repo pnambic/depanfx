@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
  * Define the camera to render the view.
  */
 public class JoglCamera {
+  public static final double TURN_RADIUS = 20.d;
 
   // Home position is 100 above origin
   public static final double HOME_CAMERA_X = 0.0d;
@@ -19,32 +20,30 @@ public class JoglCamera {
 
   public static final double HOME_CAMERA_Z = 100.0d;
 
-  // Home lookat is the origin.
-  public static final double HOME_LOOKAT_X = HOME_CAMERA_X;
+  // Move target coordinates and up.
+  public static final double HOME_MOVETO_X = HOME_CAMERA_X;
 
-  public static final double HOME_LOOKAT_Y = HOME_CAMERA_Y;
+  public static final double HOME_MOVETO_Y = HOME_CAMERA_Y;
 
-  public static final double HOME_LOOKAT_Z = 80.0d;
+  public static final double HOME_MOVETO_Z = HOME_CAMERA_Z - TURN_RADIUS;
 
-  // When looking down into the Z axis, the Y axis points up.
-  public static final double HOME_LOOKUP_X = 0.0d;
+  public static final double HOME_MOVEUP_X = 0.0d;
 
-  public static final double HOME_LOOKUP_Y = 1.0d;
+  public static final double HOME_MOVEUP_Y = 1.0d;
 
-  public static final double HOME_LOOKUP_Z = 0.0d;
+  public static final double HOME_MOVEUP_Z = 0.0d;
 
-  // Move starts in sync with looking at.
-  public static final double HOME_MOVETO_X = HOME_LOOKAT_X;
+  // LookAt starts with move target.
+  public static final double HOME_LOOKAT_X = HOME_MOVETO_X;
 
-  public static final double HOME_MOVETO_Y = HOME_LOOKAT_Y;
+  public static final double HOME_LOOKAT_Y = HOME_MOVETO_Y;
 
-  public static final double HOME_MOVETO_Z = HOME_LOOKAT_Z;
+  public static final double HOME_LOOKAT_Z = HOME_MOVETO_Z;
+  public static final double HOME_LOOKUP_X = HOME_MOVEUP_X;
 
-  public static final double HOME_MOVEUP_X = HOME_LOOKUP_X;
+  public static final double HOME_LOOKUP_Y = HOME_MOVEUP_Y;
 
-  public static final double HOME_MOVEUP_Y = HOME_LOOKUP_Y;
-
-  public static final double HOME_MOVEUP_Z = HOME_LOOKUP_Z;
+  public static final double HOME_LOOKUP_Z = HOME_MOVEUP_Z;
 
   // Full laptop screen vertical space:
   // 7" vertical from 22" is ~ 20 degrees.
@@ -89,9 +88,6 @@ public class JoglCamera {
         double moveToX, double moveToY, double moveToZ,
         double moveUpX, double moveUpY, double moveUpZ,
         double zoom) {
-      if (lookAtX != moveToX) {
-        LOG.warn("wtf");
-      }
       this.cameraX = cameraX;
       this.cameraY = cameraY;
       this.cameraZ = cameraZ;
@@ -254,12 +250,10 @@ public class JoglCamera {
     gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
     gl.glLoadIdentity();
 
-    // For now, lookAt tracks the moveTo position,
-    // and the moveTo up is also the lookAt up.
     GLU glu = GLU.createGLU(gl);
     glu.gluLookAt(
         renderCamera.cameraX, renderCamera.cameraY, renderCamera.cameraZ,
         renderCamera.lookAtX, renderCamera.lookAtY, renderCamera.lookAtZ,
-        renderCamera.moveUpX, renderCamera.moveUpY, renderCamera.moveUpZ);
+        renderCamera.lookUpX, renderCamera.lookUpY, renderCamera.lookUpZ);
   }
 }

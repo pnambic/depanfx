@@ -21,8 +21,13 @@ import static com.pnambic.depanfx.jogl.JoglKeySymbols.*;
 
 import com.pnambic.depanfx.jogl.JoglModule;
 import com.pnambic.depanfx.jogl.JoglTransforms;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pnambic.depanfx.jogl.JoglCamera;
 import com.pnambic.depanfx.jogl.JoglKeyListener.SymbolAction;
+import com.pnambic.depanfx.jogl.JoglKeyListener.CharAction;
 import javafx.animation.AnimationTimer;
 
 /**
@@ -32,7 +37,18 @@ public class FlightController {
 
   public static final double UNIT_TURN_D = 2.0d; // degrees per key press
 
+  public static final double UNIT_MOVE_D = 1.0d; // distance per key press
+
   public static final double THROTTLE_STEP = 1.0d; // units per second
+
+  public static final double ZOOM_IN_D = 0.9d;
+
+  public static final double ZOOM_OUT_D = 1.10d;
+
+  public static final char ZOOM_IN_CHAR = '+';
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(FlightController.class);
 
   private final JoglModule jogl;
 
@@ -48,24 +64,89 @@ public class FlightController {
   }
 
   public static void addActions(JoglModule jogl, FlightController flight) {
+    jogl.addPressAction(new SymbolAction(KS_HOME, EMPTY_MASK,
+            (s, m) -> flight.home()));
+    jogl.addPressAction(new SymbolAction(KS_HOME, CTRL_MASK,
+        (s, m) -> flight.lookAtMoveTo()));
+
+    // RotateMoveTo: pitch, roll, yaw
     jogl.addPressAction(new SymbolAction(KS_W, EMPTY_MASK,
-        (s, m) -> flight.pitchDown()));
+        (s, m) -> flight.pitchMoveToDown()));
     jogl.addPressAction(new SymbolAction(KS_S, EMPTY_MASK,
-        (s, m) -> flight.pitchUp()));
+        (s, m) -> flight.pitchMoveToUp()));
     jogl.addPressAction(new SymbolAction(KS_A, EMPTY_MASK,
-        (s, m) -> flight.rollLeft()));
+        (s, m) -> flight.rollMoveToLeft()));
     jogl.addPressAction(new SymbolAction(KS_D, EMPTY_MASK,
-        (s, m) -> flight.rollRight()));
+        (s, m) -> flight.rollMoveToRight()));
     jogl.addPressAction(new SymbolAction(KS_Q, EMPTY_MASK,
-        (s, m) -> flight.yawLeft()));
+        (s, m) -> flight.yawMoveToLeft()));
     jogl.addPressAction(new SymbolAction(KS_E, EMPTY_MASK,
-        (s, m) -> flight.yawRight()));
+        (s, m) -> flight.yawMoveToRight()));
+
+    // RotateMoveTo: Extended Keys pitch, roll, yaw
+    jogl.addPressAction(new SymbolAction(KS_UP, CTRL_MASK,
+        (s, m) -> flight.pitchMoveToDown()));
+    jogl.addPressAction(new SymbolAction(KS_DOWN, CTRL_MASK,
+        (s, m) -> flight.pitchMoveToUp()));
+    jogl.addPressAction(new SymbolAction(KS_PAGE_UP, CTRL_MASK,
+        (s, m) -> flight.rollMoveToLeft()));
+    jogl.addPressAction(new SymbolAction(KS_PAGE_DOWN, CTRL_MASK,
+        (s, m) -> flight.rollMoveToRight()));
+    jogl.addPressAction(new SymbolAction(KS_LEFT, CTRL_MASK,
+        (s, m) -> flight.yawMoveToLeft()));
+    jogl.addPressAction(new SymbolAction(KS_RIGHT, CTRL_MASK,
+        (s, m) -> flight.yawMoveToRight()));
+
+    // RotateLookAt: pitch, roll, yaw
+    jogl.addPressAction(new SymbolAction(KS_W, CTRL_MASK,
+        (s, m) -> flight.pitchLookAtDown()));
+    jogl.addPressAction(new SymbolAction(KS_S, CTRL_MASK,
+        (s, m) -> flight.pitchLookAtUp()));
+    jogl.addPressAction(new SymbolAction(KS_A, CTRL_MASK,
+        (s, m) -> flight.rollLookAtLeft()));
+    jogl.addPressAction(new SymbolAction(KS_D, CTRL_MASK,
+        (s, m) -> flight.rollLookAtRight()));
+    jogl.addPressAction(new SymbolAction(KS_Q, CTRL_MASK,
+        (s, m) -> flight.yawLookAtLeft()));
+    jogl.addPressAction(new SymbolAction(KS_E, CTRL_MASK,
+        (s, m) -> flight.yawLookAtRight()));
+    jogl.addPressAction(new SymbolAction(KS_X, CTRL_MASK,
+        (s, m) -> flight.lookAtMoveTo()));
+
+    // Movement: left, right, up, down, forward, reverse
+    // along line of movement (moveTo0
+    jogl.addPressAction(new SymbolAction(KS_LEFT, EMPTY_MASK,
+        (s, m) -> flight.moveLeft()));
+    jogl.addPressAction(new SymbolAction(KS_RIGHT, EMPTY_MASK,
+        (s, m) -> flight.moveRight()));
+    jogl.addPressAction(new SymbolAction(KS_UP, EMPTY_MASK,
+        (s, m) -> flight.moveUp()));
+    jogl.addPressAction(new SymbolAction(KS_DOWN, EMPTY_MASK,
+        (s, m) -> flight.moveDown()));
+    jogl.addPressAction(new SymbolAction(KS_PAGE_UP, EMPTY_MASK,
+        (s, m) -> flight.moveForward()));
+    jogl.addPressAction(new SymbolAction(KS_PAGE_DOWN, EMPTY_MASK,
+        (s, m) -> flight.moveReverse()));
+
+    // Throttle Control
     jogl.addPressAction(new SymbolAction(KS_R, EMPTY_MASK,
         (s, m) -> flight.increaseThrottle()));
     jogl.addPressAction(new SymbolAction(KS_F, EMPTY_MASK,
         (s, m) -> flight.decreaseThrottle()));
     jogl.addPressAction(new SymbolAction(KS_X, EMPTY_MASK,
         (s, m) -> flight.cutThrottle()));
+
+    // Zoom: narrow or widen the field of view.
+    jogl.addPressAction(new SymbolAction(KS_PLUS, EMPTY_MASK,
+        (s, m) -> flight.zoom(ZOOM_IN_D)));
+    jogl.addPressAction(new CharAction(ZOOM_IN_CHAR,
+        (c, m) -> flight.zoom(ZOOM_IN_D)));
+    jogl.addPressAction(new SymbolAction(KS_MINUS, EMPTY_MASK,
+        (s, m) -> flight.zoom(ZOOM_OUT_D)));
+  }
+
+  public void addActions() {
+    addActions(jogl, this);
   }
 
   public void start() {
@@ -93,32 +174,123 @@ public class FlightController {
     }
   }
 
-  /////////////////
-  // Flight actions
+  /////////////////////////////////////
+  // Camera basics
 
-  public void pitchDown() { // nose down
-    rotateOnAxis(-UNIT_TURN_D, getRightAxis());
+  public void home() {
+    cameraControl.home();
+    cutThrottle();
   }
 
-  public void pitchUp() {
-    rotateOnAxis(UNIT_TURN_D, getRightAxis());
+  public void zoom(double zooom) {
+    cameraControl.zoom(zooom);
   }
 
-  public void rollLeft() {
-    rotateOnAxis(-UNIT_TURN_D, getForwardAxis());
+  /////////////////////////////////////
+  // MoveTo rotations
+
+  public void pitchMoveToDown() {
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    rotateMoveToOnAxis(-UNIT_TURN_D, getMoveRightAxis(camera));
   }
 
-  public void rollRight() {
-    rotateOnAxis(UNIT_TURN_D, getForwardAxis());
+  public void pitchMoveToUp() {
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    rotateMoveToOnAxis(UNIT_TURN_D, getMoveRightAxis(camera));
   }
 
-  public void yawLeft() {
-    rotateOnAxis(-UNIT_TURN_D, getUpAxis());
+  public void rollMoveToLeft() {
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    rotateMoveToOnAxis(-UNIT_TURN_D, getMoveForwardAxis(camera));
   }
 
-  public void yawRight() {
-    rotateOnAxis(UNIT_TURN_D, getUpAxis());
+  public void rollMoveToRight() {
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    rotateMoveToOnAxis(UNIT_TURN_D, getMoveForwardAxis(camera));
   }
+
+  public void yawMoveToLeft() {
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    rotateMoveToOnAxis(-UNIT_TURN_D, getMoveUpAxis(camera));
+  }
+
+  public void yawMoveToRight() {
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    rotateMoveToOnAxis(UNIT_TURN_D, getMoveUpAxis(camera));
+  }
+
+  /////////////////////////////////////
+  // LookAt rotations
+
+  public void pitchLookAtDown() {
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    rotateLookAtOnAxis(-UNIT_TURN_D, getLookRightAxis(camera));
+  }
+
+  public void pitchLookAtUp() {
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    rotateLookAtOnAxis(UNIT_TURN_D, getLookRightAxis(camera));
+  }
+
+  public void rollLookAtLeft() {
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    rotateLookAtOnAxis(-UNIT_TURN_D, getLookForwardAxis(camera));
+  }
+
+  public void rollLookAtRight() {
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    rotateLookAtOnAxis(UNIT_TURN_D, getLookForwardAxis(camera));
+  }
+
+  public void yawLookAtLeft() {
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    rotateLookAtOnAxis(-UNIT_TURN_D, getLookUpAxis(camera));
+  }
+
+  public void yawLookAtRight() {
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    rotateLookAtOnAxis(UNIT_TURN_D, getLookUpAxis(camera));
+  }
+
+  public void lookAtMoveTo() {
+    cameraControl.lookAtMoveTo();
+  }
+
+  /////////////////////////////////////
+  // MoveTo movements
+
+  public void moveLeft() { // nose down
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    moveMoveToOnAxis(-UNIT_MOVE_D, getMoveRightAxis(camera));
+  }
+
+  public void moveRight() {
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    moveMoveToOnAxis(UNIT_MOVE_D, getMoveRightAxis(camera));
+  }
+
+  public void moveForward() {
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    moveMoveToOnAxis(UNIT_MOVE_D, getMoveForwardAxis(camera));
+  }
+
+  public void moveReverse() {
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    moveMoveToOnAxis(-UNIT_MOVE_D, getMoveForwardAxis(camera));
+  }
+
+  public void moveUp() {
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    moveMoveToOnAxis(-UNIT_MOVE_D, getMoveUpAxis(camera));
+  }
+
+  public void moveDown() {
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    moveMoveToOnAxis(UNIT_MOVE_D, getMoveUpAxis(camera));
+  }
+
+  /////////////////////////////////////
+  // Throttle controls
 
   public void increaseThrottle() {
     throttle += THROTTLE_STEP;
@@ -135,23 +307,50 @@ public class FlightController {
   /////////////////////////
   // Helpers
 
-  private void rotateOnAxis(double angle, float[] axis) {
+  private void rotateMoveToOnAxis(double angle, float[] axis) {
+    LOG.debug("rotateMoveToOnAxis {} on ({}, {}, {})",
+        angle, axis[0], axis[1], axis[2]);
     cameraControl.rotateMoveTo(angle, axis[0], axis[1], axis[2]);
   }
 
-  private float[] getForwardAxis() {
-    JoglCamera.CameraData data = jogl.getCurrentCamera();
-    return JoglTransforms.cameraMoveDirectionV3(data);
+  private void rotateLookAtOnAxis(double angle, float[] axis) {
+    LOG.debug("rotateLookAtOnAxis {} on ({}, {}, {})",
+        angle, axis[0], axis[1], axis[2]);
+    cameraControl.rotateLookAt(angle, axis[0], axis[1], axis[2]);
   }
 
-  private float[] getRightAxis() {
-    float[] forward = getForwardAxis();
-    float[] up = getUpAxis();
+  private void moveMoveToOnAxis(double dist, float[] axis) {
+    LOG.debug("moveMoveToOnAxis {} on ({}, {}, {})",
+        dist, axis[0], axis[1], axis[2]);
+    float[] moveToV3 = JoglTransforms.scaleV3(axis, (float) dist);
+    cameraControl.dolly(moveToV3[0], moveToV3[1], moveToV3[2]);
+  }
+
+  private float[] getMoveForwardAxis(JoglCamera.CameraData camera) {
+    return JoglTransforms.cameraMoveDirectionV3(camera);
+  }
+
+  private float[] getMoveRightAxis(JoglCamera.CameraData camera) {
+    float[] forward = getMoveForwardAxis(camera);
+    float[] up = getMoveUpAxis(camera);
     return JoglTransforms.normalizeV3(JoglTransforms.crossV3(forward, up));
   }
 
-  private float[] getUpAxis() {
-    JoglCamera.CameraData data = jogl.getCurrentCamera();
-    return data.captureMoveUp();
+  private float[] getMoveUpAxis(JoglCamera.CameraData camera) {
+    return camera.captureMoveUp();
+  }
+
+  private float[] getLookForwardAxis(JoglCamera.CameraData camera) {
+    return JoglTransforms.cameraLookDirectionV3(camera);
+  }
+
+  private float[] getLookRightAxis(JoglCamera.CameraData camera) {
+    float[] forward = getLookForwardAxis(camera);
+    float[] up = getLookUpAxis(camera);
+    return JoglTransforms.normalizeV3(JoglTransforms.crossV3(forward, up));
+  }
+
+  private float[] getLookUpAxis(JoglCamera.CameraData camera) {
+    return camera.captureLookUp();
   }
 }
