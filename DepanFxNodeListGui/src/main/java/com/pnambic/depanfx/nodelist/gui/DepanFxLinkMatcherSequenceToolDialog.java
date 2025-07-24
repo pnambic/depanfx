@@ -30,6 +30,7 @@ import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -136,7 +137,7 @@ public class DepanFxLinkMatcherSequenceToolDialog
     resourceColumn = columnBinder.next();
     resourceColumn.setCellValueFactory(
         r -> new SimpleStringProperty(
-            r.getValue().getDocument().getMemberPath().toString()));
+            DepanFxProjects.asReferenceLabel(workspace, r.getValue())));
 
     TableColumn<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>, String>
     filePathColumn = columnBinder.next();

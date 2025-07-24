@@ -35,9 +35,7 @@ public class DepanFxFoldSectionData extends DepanFxBaseSectionData {
 
   public static final String FOLD_SECTION_LABEL = "Fold";
 
-  public enum ContainerOrder { FIRST, MIXED, LAST };
-
-  private final ContainerOrder containerOrder;
+  private final DepanFxContainerOrder containerOrder;
 
   private final DepanFxWorkspaceResource<DepanFxNodeFoldData> foldRsrc;
 
@@ -46,7 +44,7 @@ public class DepanFxFoldSectionData extends DepanFxBaseSectionData {
       String sectionLabel, boolean displayNodeCount,
       OrderBy orderBy,
       OrderDirection orderDirection,
-      ContainerOrder containerOrder,
+      DepanFxContainerOrder containerOrder,
       DepanFxWorkspaceResource<DepanFxNodeFoldData> foldRsrc) {
     super(toolName, toolDescription,
         sectionLabel, displayNodeCount, orderBy, orderDirection);
@@ -63,12 +61,12 @@ public class DepanFxFoldSectionData extends DepanFxBaseSectionData {
     return new DepanFxFoldSectionData(
         "Empty Fold Section", "Empty fold section.",
         FOLD_SECTION_LABEL, true,
-        OrderBy.NODE_KEY, OrderDirection.FORWARD, ContainerOrder.FIRST,
+        OrderBy.NODE_KEY, OrderDirection.FORWARD, DepanFxContainerOrder.FIRST,
         workspace.addScratchResource(
             DepanFxNodeFoldData.emptyNodeFoldData(graphRsrc)));
   }
 
-  public ContainerOrder getContainerOrder() {
+  public DepanFxContainerOrder getContainerOrder() {
     return containerOrder;
   }
 

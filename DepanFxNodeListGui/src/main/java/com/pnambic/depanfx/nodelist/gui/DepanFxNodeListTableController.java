@@ -7,10 +7,12 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -58,9 +60,13 @@ public class DepanFxNodeListTableController
   private final Map<Object, DepanFxNodeInfoStore> infoProviders =
       new HashMap<>();
 
-  public DepanFxNodeListTableController(DepanFxWorkspace workspace,
-      DepanFxDialogRunner dialogRunner, DepanFxColumnRegistry columnRegistry,
-      DepanFxInfoRegistry infoRegistry, DepanFxNodeList nodeList,
+  public DepanFxNodeListTableController(
+      DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner,
+      DepanFxColumnRegistry columnRegistry,
+      DepanFxInfoRegistry infoRegistry,
+      DepanFxNodeFoldController nodeFolding,
+      DepanFxNodeList nodeList,
       DepanFxNodeListSelection selectedNodes,
       TreeTableView<DepanFxNodeListMember> treeTable) {
     this.workspace = workspace;
@@ -69,7 +75,7 @@ public class DepanFxNodeListTableController
     this.infoRegistry = infoRegistry;
     this.nodeList = nodeList;
 
-    tableState = prepareNodeListTable(treeTable, selectedNodes);
+    tableState = prepareNodeListTable(treeTable, selectedNodes, nodeFolding);
   }
 
   @Override // DepanFxNodeListTableAdapter
@@ -117,17 +123,6 @@ public class DepanFxNodeListTableController
     tableState.setTableViewResource(tableViewRsrc);
   }
 
-  @Override // DepanFxNodeListTableAdapter
-  public void addInfoStore(
-      Object infoKey, DepanFxNodeInfoStore infoStore) {
-    infoProviders.put(infoKey, infoStore);
-  }
-
-  @Override // DepanFxNodeListTableAdapter
-  public Optional<DepanFxNodeInfoStore> getInfoStore(Object infoKey) {
-    return Optional.ofNullable(infoProviders.get(infoKey));
-  }
-
   public TreeTableView<DepanFxNodeListMember> getNodeListTable() {
     return tableState.getNodeListTable();
   }
@@ -135,6 +130,31 @@ public class DepanFxNodeListTableController
   public DepanFxNodeListTableCommands buildTableCommands() {
     return new DepanFxNodeListTableCommands(workspace, dialogRunner, this,
         tableState);
+  }
+
+  @Override // DepanFxNodeListTableAdapter
+  public DepanFxNodeList getSelection() {
+    return tableState.getSelection();
+  }
+
+  @Override // DepanFxNodeListTableAdapter
+  public boolean someSelection() {
+    return tableState.someSelection();
+  }
+
+  @Override // DepanFxNodeListTableAdapter
+  public ObservableValue<Boolean> getCheckBoxObservable(int intValue) {
+    return tableState.getCheckBoxObservable(intValue);
+  }
+
+  @Override // DepanFxNodeListTableAdapter
+  public void doSelectGraphNodeAction(GraphNode selectNode, boolean value) {
+    tableState.doSelectGraphNodeAction(selectNode, value);
+  }
+
+  @Override // DepanFxNodeListTableAdapter
+  public void doSelectGraphNodesAction(Stream<GraphNode> nodes, boolean value) {
+    tableState.doSelectGraphNodesAction(nodes, value);
   }
 
   public void doSelectAllAction() {
@@ -164,28 +184,26 @@ public class DepanFxNodeListTableController
   }
 
   @Override // DepanFxNodeListTableAdapter
-  public DepanFxNodeList getSelection() {
-    return tableState.getSelection();
-  }
-
-  @Override // DepanFxNodeListTableAdapter
-  public ObservableValue<Boolean> getCheckBoxObservable(int intValue) {
-    return tableState.getCheckBoxObservable(intValue);
-  }
-
-  @Override // DepanFxNodeListTableAdapter
-  public void doSelectGraphNodeAction(GraphNode selectNode, boolean value) {
-    tableState.doSelectGraphNodeAction(selectNode, value);
-  }
-
-  @Override // DepanFxNodeListTableAdapter
-  public void doSelectGraphNodesAction(Stream<GraphNode> nodes, boolean value) {
-    tableState.doSelectGraphNodesAction(nodes, value);
+  public Optional<DepanFxNodeListColumn> addColumn(
+      DepanFxNodeListColumn after,
+      DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc) {
+    return tableState.addColumn(after, columnRsrc);
   }
 
   @Override // DepanFxNodeListTableAdapter
   public Stream<DepanFxNodeListColumn> streamColumns() {
     return tableState.streamColumns();
+  }
+
+  @Override // DepanFxNodeListTableAdapter
+  public Stream<DepanFxColumnRegistry.Contribution> streamColumnChoices() {
+    return columnRegistry.streamContributions();
+  }
+
+  @Override // DepanFxNodeListTableAdapter
+  public Optional<DepanFxNodeListColumn> toColumn(
+      DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc) {
+    return columnRegistry.toColumn(this, columnRsrc);
   }
 
   @Override // DepanFxNodeListTableAdapter
@@ -207,8 +225,18 @@ public class DepanFxNodeListTableController
 
   @Override
   public Stream<DepanFxWorkspaceMember> streamSectionChoices() {
-    // TODO Auto-generated method stub
     return null;
+  }
+
+  @Override
+  public DepanFxNodeFoldController getNodeFolding() {
+    return tableState.getNodeFolding();
+  }
+
+  @Override
+  public Stream<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
+  streamNodeFoldResources() {
+    return tableState.streamNodeFoldResources();
   }
 
   /**
@@ -218,37 +246,31 @@ public class DepanFxNodeListTableController
     tableState.doSelectGraphNodesAction(nodes);
   }
 
-  private DepanFxNodeListTableState prepareNodeListTable(
-      // DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc,
-      TreeTableView<DepanFxNodeListMember> treeTable,
-      DepanFxNodeListSelection selectedNodes) {
-
-    return new DepanFxNodeListTableState(workspace,
-        nodeList, selectedNodes, treeTable,
-        new DepanFxNodeListTableFactory(this));
-  }
-
-  @Override
-  public Stream<DepanFxColumnRegistry.Contribution> streamColumnChoices() {
-    return columnRegistry.streamContributions();
-  }
-
-  @Override
-  public Optional<DepanFxNodeListColumn> addColumn(
-      DepanFxNodeListColumn after,
-      DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc) {
-    return tableState.addColumn(after, columnRsrc);
-  }
-
   @Override
   public Stream<DepanFxInfoRegistry.Contribution> streamInfosByLabel(
       String label) {
     return infoRegistry.streamByLabel(label);
   }
 
-  @Override
-  public Optional<DepanFxNodeListColumn> toColumn(
-      DepanFxWorkspaceResource<? extends DepanFxBaseColumnData> columnRsrc) {
-    return columnRegistry.toColumn(this, columnRsrc);
+  @Override // DepanFxNodeListTableAdapter
+  public void addInfoStore(
+      Object infoKey, DepanFxNodeInfoStore infoStore) {
+    infoProviders.put(infoKey, infoStore);
+  }
+
+  @Override // DepanFxNodeListTableAdapter
+  public Optional<DepanFxNodeInfoStore> getInfoStore(Object infoKey) {
+    return Optional.ofNullable(infoProviders.get(infoKey));
+  }
+
+  private DepanFxNodeListTableState prepareNodeListTable(
+      TreeTableView<DepanFxNodeListMember> treeTable,
+      DepanFxNodeListSelection selectedNodes,
+      DepanFxNodeFoldController nodeFolding) {
+
+    return new DepanFxNodeListTableState(workspace,
+        nodeList, selectedNodes, treeTable,
+        new DepanFxNodeListTableFactory(this),
+        nodeFolding);
   }
 }

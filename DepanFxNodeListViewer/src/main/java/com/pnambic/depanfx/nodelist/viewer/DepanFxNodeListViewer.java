@@ -7,6 +7,7 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableController;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -50,6 +51,7 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
       DepanFxDialogRunner dialogRunner,
       DepanFxColumnRegistry columnRegistry,
       DepanFxInfoRegistry infoRegistry,
+      DepanFxNodeFoldController nodeFolding,
       DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc,
       DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc) {
 
@@ -59,8 +61,9 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
     DepanFxNodeList nodeList = nodeListRsrc.getResource();
 
     tableControl = new DepanFxNodeListTableController(
-        workspace, dialogRunner, columnRegistry,
-        infoRegistry, nodeList,
+        workspace, dialogRunner,
+        columnRegistry, infoRegistry, nodeFolding,
+        nodeList,
         DepanFxNodeListSelection.forNodes(nodeList.getNodes()),
         new TreeTableView<>());
     tableControl.setTableViewResource(tableViewRsrc);
@@ -112,6 +115,9 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
         FILTER_SELECTION_ITEM,
         e -> runFilterSelectionDialog());
 
+    builder.appendSeparator();
+    cmds.addNodeFoldItems(builder);
+
     cmds.addLoadSaveItems(builder);
     cmds.addTableViewItems(builder);
     ContextMenu result = builder.build();
@@ -128,7 +134,7 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
     Stage filterSelectionDialog =
         DepanFxNodeViewNodeFiltersDialog.runEditDialog(
             tableControl.getDialogRunner(),
-            tableViewRsrc, tableControl.getSelection(),
+            tableViewRsrc, tableControl.getNodeFolding(), tableControl.getSelection(),
             nl -> tableControl.doSelectGraphNodesAction(nl.getNodes()));
 
      sideViews.add(filterSelectionDialog);

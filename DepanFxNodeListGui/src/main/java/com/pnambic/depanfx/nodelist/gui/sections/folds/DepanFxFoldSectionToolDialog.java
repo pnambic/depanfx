@@ -17,6 +17,7 @@ package com.pnambic.depanfx.nodelist.gui.sections.folds;
 
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxBaseSectionToolDialog;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxContainerOrder;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFoldSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
@@ -72,7 +73,7 @@ public class DepanFxFoldSectionToolDialog
   private ComboBox<OrderBy> orderByField;
 
   @FXML
-  private ComboBox<DepanFxFoldSectionData.ContainerOrder> containerOrderField;
+  private ComboBox<DepanFxContainerOrder> containerOrderField;
 
   @Autowired
   public DepanFxFoldSectionToolDialog(
@@ -101,12 +102,9 @@ public class DepanFxFoldSectionToolDialog
 
     populateOrderBy(orderByField);
 
-    containerOrderField.getItems().add(
-        DepanFxFoldSectionData.ContainerOrder.FIRST);
-    containerOrderField.getItems().add(
-        DepanFxFoldSectionData.ContainerOrder.LAST);
-    containerOrderField.getItems().add(
-        DepanFxFoldSectionData.ContainerOrder.MIXED);
+    containerOrderField.getItems().add(DepanFxContainerOrder.FIRST);
+    containerOrderField.getItems().add(DepanFxContainerOrder.LAST);
+    containerOrderField.getItems().add(DepanFxContainerOrder.MIXED);
   }
 
   @FXML

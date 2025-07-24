@@ -5,10 +5,14 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.sections.folds.DepanFxFoldSection;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.stream.Stream;
 
@@ -23,6 +27,11 @@ public class DepanFxTreeForkItem extends DepanFxNodeListForkItem {
   public static final String FOLD_TREE_INTO = "Fold Tree Into";
 
   public static final String FOLD_TREE_INTO_MULTI = "Fold Trees Into";
+
+  public static final String FOLD_SELECTION_INTO = "Fold Selection Into...";
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxTreeForkItem.class);
 
   public DepanFxTreeForkItem(DepanFxTreeFork fork) {
     super(fork);
@@ -56,7 +65,7 @@ public class DepanFxTreeForkItem extends DepanFxNodeListForkItem {
     DepanFxContextMenuBuilder builder =
         new DepanFxContextMenuBuilder(contextMenu);
 
-    appendRecursiveMulitActionItems(builder, tableAdapter, choices);
+    appendRecursiveMultiActionItems(builder, tableAdapter, choices);
 
     // Conditional, with separator if needed.
     appendFoldIntoMultiMenu(builder, tableAdapter, choices);
@@ -72,14 +81,22 @@ public class DepanFxTreeForkItem extends DepanFxNodeListForkItem {
         .map(DepanFxFoldSection.class::cast)
         .forEach(f -> menuBuilder.appendMenuItem(
             buildFoldTreeIntoItem(f, getFork())));
-
     if (menuBuilder.isEmpty()) {
       return;
     }
+    DepanFxNodeList selectNodes = tableAdapter.getSelection();
 
     // Only append the fold into menu if there are fold sections.
     builder.appendSeparator();
     builder.appendSubMenu(menuBuilder.build());
+    if (selectNodes.getNodes().size() >= 2) {
+      builder.appendActionItem(FOLD_SELECTION_INTO,
+          e -> runFoldSelectionInto());
+    };
+  }
+
+  private void runFoldSelectionInto() {
+    LOG.warn("Fold selection into not implemented yet");
   }
 
   private void appendFoldIntoMultiMenu(

@@ -88,12 +88,15 @@ public class DepanFxNodeListCell
     ObservableList<TreeItem<DepanFxNodeListMember>> choices =
         selected.getSelectedItems();
     if (choices.size() == 1) {
-      DepanFxNodeListMember node = choices.get(0).getValue();
-      if (node instanceof DepanFxNodeListGraphNode graphNode) {
-        cellItem.fillNodeContextMenu(
-            contextMenu, getScene(), tableAdapter, graphNode.getGraphNode());
-        return;
-      } 
+      TreeItem<DepanFxNodeListMember> treeItem = choices.get(0);
+      if (treeItem != null) {
+        DepanFxNodeListMember node = treeItem.getValue();
+        if (node instanceof DepanFxNodeListGraphNode graphNode) {
+          cellItem.fillNodeContextMenu(
+              contextMenu, getScene(), tableAdapter, graphNode.getGraphNode());
+          return;
+        }
+      }
     }
     cellItem.fillMultiContextMenu(
         contextMenu, getScene(), tableAdapter, choices);

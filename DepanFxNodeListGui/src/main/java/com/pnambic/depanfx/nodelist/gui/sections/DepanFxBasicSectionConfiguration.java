@@ -16,13 +16,13 @@
 package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherBuiltIns;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxContainerOrder;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData.ContainerOrder;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -221,7 +221,7 @@ public class DepanFxBasicSectionConfiguration {
           .map(m -> new DepanFxTreeSectionData(
                 NEW_TREE_SECTION_NAME, NEW_TREE_SECTION_DESCR,
                 NEW_TREE_SECTION_LABEL, true, m, true,
-                OrderBy.NODE_LEAF, ContainerOrder.LAST, OrderDirection.FORWARD))
+                OrderBy.NODE_LEAF, DepanFxContainerOrder.LAST, OrderDirection.FORWARD))
           .get();
     }
 

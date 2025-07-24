@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -165,8 +166,8 @@ public class DepanFxNodeViews {
           getContextNodeAvailable(workspace, nodeDisplayRsrc);
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc =
           availableNodeRsrc;
-      // Start with no node folding.
-      Collection<DepanFxWorkspaceResource<DepanFxNodeFoldData>> nodeFoldRsrcs =
+      // Start with no node folding, with room for the first one.
+      List<DepanFxWorkspaceResource<DepanFxNodeFoldData>> nodeFoldRsrcs =
           new ArrayList<>(1);
 
       // Edges

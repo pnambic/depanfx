@@ -29,6 +29,7 @@
          <HBox spacing="10">
             <Button text="Close" onAction="#handleCancel"/>
             <Region HBox.hgrow="ALWAYS" />
+            <Button text="Fold Selection" onAction="#handleFoldSelection"/>
             <Button text="Save Selection" onAction="#handleSaveSelection"/>
          </HBox>
 

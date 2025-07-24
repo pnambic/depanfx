@@ -2,10 +2,10 @@ package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser;
 import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser.LinkMatcherControl;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxContainerOrder;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData.ContainerOrder;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -55,7 +55,7 @@ public class DepanFxTreeSectionToolDialog
   private ComboBox<OrderBy> orderByField;
 
   @FXML
-  private ComboBox<ContainerOrder> containerOrderField;
+  private ComboBox<DepanFxContainerOrder> containerOrderField;
 
   private LinkMatcherControl linkMatcherControl;
 
@@ -101,9 +101,9 @@ public class DepanFxTreeSectionToolDialog
 
     populateOrderBy(orderByField);
 
-    containerOrderField.getItems().add(ContainerOrder.FIRST);
-    containerOrderField.getItems().add(ContainerOrder.LAST);
-    containerOrderField.getItems().add(ContainerOrder.MIXED);
+    containerOrderField.getItems().add(DepanFxContainerOrder.FIRST);
+    containerOrderField.getItems().add(DepanFxContainerOrder.LAST);
+    containerOrderField.getItems().add(DepanFxContainerOrder.MIXED);
   }
 
   @Override

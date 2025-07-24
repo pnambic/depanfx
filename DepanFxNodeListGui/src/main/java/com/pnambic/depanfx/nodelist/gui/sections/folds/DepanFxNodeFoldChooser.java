@@ -27,9 +27,12 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TextField;
 
 public class DepanFxNodeFoldChooser {
@@ -108,6 +111,62 @@ public class DepanFxNodeFoldChooser {
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
             p, DepanFxNodeFoldData.class));
+  }
+
+  /**
+   * Bind a pop-up to table cell for the resource name.
+   */
+  public static class NodeFoldingCell<T>
+      extends TableCell<T, String> {
+
+    private final DepanFxWorkspace workspace;
+
+    private final DepanFxDialogRunner dialogRunner;
+
+    private final Scene scene;
+
+    private final BiConsumer<
+            TableRow<T>,
+            DepanFxWorkspaceResource<DepanFxNodeFoldData>> foldConsumer;
+
+    public NodeFoldingCell(
+        DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner,
+        Scene scene,
+        BiConsumer<
+        TableRow<T>,
+            DepanFxWorkspaceResource<DepanFxNodeFoldData>> foldConsumer) {
+      this.workspace = workspace;
+      this.dialogRunner = dialogRunner;
+      this.scene = scene;
+      this.foldConsumer = foldConsumer;
+    }
+
+    @Override
+    protected void updateItem(String displayName, boolean empty) {
+      super.updateItem(displayName, empty);
+
+      if (empty) {
+        setGraphic(null);
+        setContextMenu(null);
+        return;
+      }
+      setText(displayName);
+      setContextMenu(buildContextMenu());
+    }
+
+    private ContextMenu buildContextMenu() {
+      DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
+      builder.appendActionItem(
+          SELECT_NODE_FOLDING, e -> runNodeFolderFinder());
+      return builder.build();
+    }
+
+    private void runNodeFolderFinder() {
+      DepanFxNodeFoldChooser
+          .runNodeFoldingFinder(workspace, dialogRunner, scene)
+          .ifPresent(r -> foldConsumer.accept(getTableRow(), r));
+    }
   }
 
   private static DepanFxResourceChooser prepareChooser(

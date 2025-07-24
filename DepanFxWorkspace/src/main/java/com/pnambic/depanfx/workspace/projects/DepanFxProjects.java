@@ -175,12 +175,33 @@ public class DepanFxProjects {
     return proj.getMemberName() + ":" + docPath.toString();
   }
 
+  public static Optional<DepanFxProjectDocument> asReferenceDocument(
+      DepanFxWorkspace workspace, DepanFxWorkspaceResource<?> rsrc) {
+
+    DepanFxProjectDocument document = rsrc.getDocument();
+
+    // Don't allow a saved reference to the scratch project.
+    if (document.getProject().equals(workspace.getScratchProjectTree())) {
+      return Optional.empty();
+    }
+    return Optional.of(document);
+  }
+
+  public static String asReferenceLabel(
+      DepanFxWorkspace workspace, DepanFxWorkspaceResource<?> rsrc) {
+    return DepanFxProjects.asReferenceDocument(workspace, rsrc)
+        .map(DepanFxProjects::getDocumentLabel)
+
+        // Let the text input field show a prompt text.
+        .orElse(null);
+  }
+
   public static Optional<DepanFxProjectDocument> asSaveDocument(
       DepanFxWorkspace workspace, DepanFxWorkspaceResource<?> rsrc) {
 
     DepanFxProjectDocument document = rsrc.getDocument();
 
-    // Don't allow a destination in the built-in or scratch project.
+    // Don't allow a destination in the built-in or the scratch project.
     if (document.getProject().equals(workspace.getBuiltInProjectTree())) {
       return Optional.empty();
     }

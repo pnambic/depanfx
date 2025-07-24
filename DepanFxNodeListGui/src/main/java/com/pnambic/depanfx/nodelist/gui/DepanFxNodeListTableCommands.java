@@ -30,6 +30,8 @@ public class DepanFxNodeListTableCommands {
 
   public static final String SELECT_NODE_LIST = "Select Node List...";
 
+  public static final String NODE_FOLDING = "Node Folding...";
+
   public static final String TABLE_VIEW = "Table View";
 
   private final DepanFxWorkspace workspace;
@@ -72,6 +74,11 @@ public class DepanFxNodeListTableCommands {
     builder.appendActionItem(
         DepanFxSaveNodeListDialog.SAVE_NODE_LIST,
         e -> runSaveNodeListDialog());
+  }
+
+  public void addNodeFoldItems(DepanFxContextMenuBuilder builder) {
+    builder.appendActionItem(NODE_FOLDING,
+        e -> runNodeFoldingDialog());
   }
 
   /**
@@ -144,6 +151,11 @@ public class DepanFxNodeListTableCommands {
     DepanFxNodeListTableViewSaveDialog
         .runTableViewChooser(workspace, dialogRunner, tableState.getScene())
         .ifPresent(tableState::setTableViewResource);
+  }
+
+  public void runNodeFoldingDialog() {
+    DepanFxNodeFoldDialog.runEditDialog(
+        tableState.getNodeFolding(), dialogRunner);
   }
 
   private void runSelectionNodeListDialog() {

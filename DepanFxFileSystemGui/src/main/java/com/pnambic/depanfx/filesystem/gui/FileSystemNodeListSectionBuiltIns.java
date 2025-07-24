@@ -17,11 +17,11 @@ package com.pnambic.depanfx.filesystem.gui;
 
 import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
 import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemLinkMatcherBuiltIns;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxContainerOrder;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData.ContainerOrder;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 
@@ -63,7 +63,7 @@ public class FileSystemNodeListSectionBuiltIns {
                 FileSystemLinkMatcherBuiltIns.FILE_SYSTEM_MEMBER_MATCHER_PATH),
             false,
             OrderBy.NODE_LEAF,
-            ContainerOrder.LAST,
+            DepanFxContainerOrder.LAST,
             OrderDirection.FORWARD);
       }
     };

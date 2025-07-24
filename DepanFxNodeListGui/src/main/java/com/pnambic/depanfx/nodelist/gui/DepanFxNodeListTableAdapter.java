@@ -22,9 +22,11 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -72,6 +74,8 @@ public interface DepanFxNodeListTableAdapter {
 
   // Selected node operations
   DepanFxNodeList getSelection();
+
+  boolean someSelection();
 
   ObservableValue<Boolean> getCheckBoxObservable(int treeIndex);
 
@@ -125,6 +129,12 @@ public interface DepanFxNodeListTableAdapter {
   Stream<DepanFxNodeListSection> streamSections();
 
   Stream<DepanFxWorkspaceMember> streamSectionChoices();
+
+  // Node fold support.
+
+  Stream<DepanFxWorkspaceResource<DepanFxNodeFoldData>> streamNodeFoldResources();
+
+  DepanFxNodeFoldController getNodeFolding();
 
   // Node info support.
 

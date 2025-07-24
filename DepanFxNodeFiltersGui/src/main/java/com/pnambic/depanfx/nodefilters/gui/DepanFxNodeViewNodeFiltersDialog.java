@@ -30,6 +30,7 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableController;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
@@ -124,6 +125,8 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
 
   private DepanFxNodeListTableController tableControl;
 
+  private DepanFxNodeFoldController nodeFolding;
+
   private Consumer<DepanFxNodeList> onUpdate;
 
   private DepanFxNodeList sourceNodes;
@@ -150,6 +153,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
   public static Stage runEditDialog(
       DepanFxDialogRunner dialogRunner,
       DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc,
+      DepanFxNodeFoldController nodeFolding,
       DepanFxNodeList sourceNodes,
       Consumer<DepanFxNodeList> onUpdate) {
 
@@ -161,9 +165,14 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
 
     DepanFxNodeViewNodeFiltersDialog dlgState = dlg.getController();
     dlgState.setTableViewResource(tableViewRsrc);
+    dlgState.setNodeFolding(nodeFolding);
     dlgState.setSourceNodes(sourceNodes);
     dlgState.setOnUpdate(onUpdate);
     return dlg.runModeless(EDIT_NODE_FILTERS);
+  }
+
+  private void setNodeFolding(DepanFxNodeFoldController nodeFolding) {
+    this.nodeFolding = nodeFolding;
   }
 
   @Override // DepanFxWorkspaceDialog
@@ -230,9 +239,10 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
 
   public void setSourceNodes(DepanFxNodeList filteredNodes) {
     if (tableControl == null) {
+      // With separated Optional, easier to get types to match.
       Optional<DepanFxWorkspaceResource<DepanFxNodeListTableViewData>> optFlatView =
           ((DepanFxBuiltInProject) workspace.getBuiltInProject())
-              .getResource(DepanFxNodeListViewBuiltIns.FLAT_TABLE_VIEW_PATH);
+          .getResource(DepanFxNodeListViewBuiltIns.FLAT_TABLE_VIEW_PATH);
       optFlatView.ifPresent(r -> tableControl = buildTable(r, filteredNodes));
     }
 
@@ -325,7 +335,7 @@ public class DepanFxNodeViewNodeFiltersDialog extends DepanFxWorkspaceDialog {
     nodeSelection.doSelectAllAction();
 
     DepanFxNodeListTableController result = new DepanFxNodeListTableController(
-        workspace, dialogRunner, columnRegistry, infoRegistry,
+        workspace, dialogRunner, columnRegistry, infoRegistry, nodeFolding,
         tableNodes, nodeSelection, nodeSelectTable);
     result.setTableViewResource(tableViewRsrc);
     return result;

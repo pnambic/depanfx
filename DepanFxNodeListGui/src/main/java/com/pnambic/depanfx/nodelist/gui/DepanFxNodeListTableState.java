@@ -8,11 +8,15 @@ import com.pnambic.depanfx.nodelist.gui.sections.DepanFxFlatSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSectionBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxSectionRegistry;
+import com.pnambic.depanfx.nodelist.gui.sections.folds.DepanFxFoldSection;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxFoldSectionData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -58,6 +62,8 @@ public class DepanFxNodeListTableState {
 
   private final DepanFxNodeListTableFactory tableFactory;
 
+  private final DepanFxNodeFoldController nodeFoldings;
+
   private DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc;
 
   private List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
@@ -81,12 +87,14 @@ public class DepanFxNodeListTableState {
       DepanFxNodeList nodeList,
       DepanFxNodeListSelection selectedNodes,
       TreeTableView<DepanFxNodeListMember> nodeListTable,
-      DepanFxNodeListTableFactory tableFactory) {
+      DepanFxNodeListTableFactory tableFactory,
+      DepanFxNodeFoldController nodeFoldings) {
     this.workspace = workspace;
     this.nodeList = nodeList;
     this.selectedNodes = selectedNodes;
     this.nodeListTable = nodeListTable;
     this.tableFactory = tableFactory;
+    this.nodeFoldings = nodeFoldings;
 
     // Force the provided table into the required behaviors.
     configTable();
@@ -153,6 +161,13 @@ public class DepanFxNodeListTableState {
 
   public void doSelectGraphNodeAction(GraphNode node, boolean value) {
     setSelectGraphNode(node, value);
+  }
+
+  /**
+   * True if the selection is none-empty.
+   */
+  public boolean someSelection() {
+    return selectedNodes.streamSelectedNodes().findAny().isPresent();
   }
 
   public DepanFxNodeList getSelection() {
@@ -282,6 +297,14 @@ public class DepanFxNodeListTableState {
     return columns.stream();
   }
 
+  public Stream<DepanFxWorkspaceResource<DepanFxNodeFoldData>> streamNodeFoldResources() {
+    return nodeFoldings.streamNodeFoldResources();
+  }
+
+  public DepanFxNodeFoldController getNodeFolding() {
+    return nodeFoldings;
+  }
+
   /////////////////////////////////////
   // Tree root and table construction
 
@@ -398,16 +421,51 @@ public class DepanFxNodeListTableState {
 
     sections.add(result);
     sectionResources.add(sectionRsrc);
+    appendSectionResource(sectionRsrc.getResource());
   }
 
-  private DepanFxNodeListSection installSectionAt(int index,
+  private DepanFxNodeListSection installSectionAt(
+      int index,
       DepanFxWorkspaceResource<? extends DepanFxBaseSectionData> sectionRsrc) {
     DepanFxNodeListSection result =
         tableFactory.createTableSection(sectionRsrc);
 
     sections.add(index, result);
     sectionResources.add(index, sectionRsrc);
+    installSectionResourceAt(index, sectionRsrc.getResource());
+    return result;
+  }
 
+  private void installSectionResourceAt(
+      int sectionIndex, DepanFxBaseSectionData sectionInfo) {
+    switch (sectionInfo) {
+    case DepanFxFoldSectionData foldData:
+      nodeFoldings.installNodeFoldResourceAt(
+          getFoldIndex(sectionIndex), foldData.getNodeFoldResource());
+      return;
+    default:
+      // Fall through
+    }
+  }
+
+  private void appendSectionResource(DepanFxBaseSectionData sectionInfo) {
+    switch (sectionInfo) {
+    case DepanFxFoldSectionData foldData:
+      nodeFoldings.appendNodeFoldResource(foldData.getNodeFoldResource());
+      return;
+    default:
+      // Fall through
+    }
+  }
+
+  private int getFoldIndex(int index) {
+    int result = 0;
+    for (int i = 0; i < index; ++i) {
+      if (sections.get(i) instanceof DepanFxFoldSection) {
+        continue;
+      }
+      ++result;
+    }
     return result;
   }
 }

@@ -35,14 +35,6 @@ public abstract class DepanFxNodeListItem
    * Note that node may be null if the item is not a GraphNode or no items are
    * selected.
    */
-  // abstract public ContextMenu getNodeContextMenu(
-  public ContextMenu xgetNodeContextMenu(
-      Scene scene,
-      DepanFxNodeListTableAdapter tableAdapter,
-      GraphNode node) {
-    return null;
-  }
-
   abstract public void fillNodeContextMenu(
       ContextMenu contextMenu,
       Scene scene,

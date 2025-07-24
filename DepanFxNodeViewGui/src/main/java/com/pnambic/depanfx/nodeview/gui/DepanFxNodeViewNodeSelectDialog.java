@@ -4,12 +4,15 @@ import com.pnambic.depanfx.graph.info.GraphNodeInfo.Listener;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoStore;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeFoldNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableController;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.perspective.DepanFxWorkspaceDialog;
@@ -76,6 +79,8 @@ public class DepanFxNodeViewNodeSelectDialog
 
   private DepanFxNodeListTableController tableControl;
 
+  private DepanFxNodeViewPanel viewPanel;
+
   @Autowired
   public DepanFxNodeViewNodeSelectDialog(
       DepanFxWorkspace workspace,
@@ -122,6 +127,7 @@ public class DepanFxNodeViewNodeSelectDialog
    * @param viewPanel
    */
   public void setViewPanel(DepanFxNodeViewPanel viewPanel) {
+    this.viewPanel = viewPanel;
     if (tableViewRsrc == null) {
       tableViewRsrc = DepanFxProjects.getBuiltIn(
           workspace, DepanFxNodeListTableViewData.class,
@@ -130,7 +136,8 @@ public class DepanFxNodeViewNodeSelectDialog
     }
 
     tableControl = new DepanFxNodeListTableController(
-        workspace, dialogRunner, columnRegistry, infoRegistry,
+        workspace, dialogRunner,
+        columnRegistry, infoRegistry, viewPanel.getNodeFolding(),
         viewPanel.getViewNodesAsNodeList(),
         viewPanel.getNodeSelection(), nodeSelectTable);
     tableControl.addInfoStore(
@@ -146,6 +153,12 @@ public class DepanFxNodeViewNodeSelectDialog
     DepanFxSaveNodeListDialog.runSaveNodeList(
         dialogRunner,
         workspace.addScratchResource(tableControl.getSelection()));
+  }
+
+  @FXML
+  public void handleFoldSelection() {
+    DepanFxNodeFoldNodeListDialog.runNodeFoldDialog(
+        dialogRunner, tableControl, tableControl.getSelection());
   }
 
   /////////////////////////////////////

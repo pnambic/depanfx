@@ -254,9 +254,11 @@ public class DepanFxNodeViewDataConverter
         metaData.getObject(VISIBLE_NODE_RSRC, DepanFxWorkspaceResource.class);
 
     @SuppressWarnings("unchecked")
-    // Ok to be null.
-    Collection<DepanFxWorkspaceResource<DepanFxNodeFoldData>> nodeFoldRsrcs =
-        metaData.getObject(NODE_FOLD_RSRCS, Collection.class);
+    List<DepanFxWorkspaceResource<DepanFxNodeFoldData>> nodeFoldRsrcs =
+        metaData.getObject(NODE_FOLD_RSRCS, List.class);
+    if (nodeFoldRsrcs == null ) {
+      nodeFoldRsrcs = new ArrayList<>();
+    }
 
     @SuppressWarnings("unchecked")
     DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableEdgeRsrc =

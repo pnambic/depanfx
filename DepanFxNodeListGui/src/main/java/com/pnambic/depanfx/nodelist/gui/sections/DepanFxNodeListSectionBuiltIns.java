@@ -16,12 +16,12 @@
 package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherBuiltIns;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxContainerOrder;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData.ContainerOrder;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 
@@ -67,7 +67,7 @@ public class DepanFxNodeListSectionBuiltIns {
             getResource(project, DepanFxLinkMatcherBuiltIns.MEMBER_MATCHER_PATH),
             true,
             OrderBy.NODE_LEAF,
-            ContainerOrder.LAST,
+            DepanFxContainerOrder.LAST,
             OrderDirection.FORWARD);
       }
     };

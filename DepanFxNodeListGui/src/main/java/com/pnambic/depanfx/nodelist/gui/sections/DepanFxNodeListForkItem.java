@@ -89,7 +89,7 @@ public abstract class DepanFxNodeListForkItem extends DepanFxNodeListItem {
         e -> runSelectRecursiveAction(getFork(), tableAdapter, false));
   }
 
-  protected void appendRecursiveMulitActionItems(
+  protected void appendRecursiveMultiActionItems(
       DepanFxContextMenuBuilder builder,
       DepanFxNodeListTableAdapter tableAdapter,
       ObservableList<TreeItem<DepanFxNodeListMember>> choices) {
@@ -115,7 +115,7 @@ public abstract class DepanFxNodeListForkItem extends DepanFxNodeListItem {
   // Overridable.
 
   protected ObservableList<TreeItem<DepanFxNodeListMember>> buildChildren() {
-    DepanFxTreeFork folder = (DepanFxTreeFork) getValue();
+    DepanFxNodeListFork folder = (DepanFxNodeListFork) getValue();
 
     Collection<GraphNode> nodes = folder.getMembers();
 

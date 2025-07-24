@@ -34,14 +34,12 @@ public class DepanFxTreeSectionData extends DepanFxBaseSectionData {
 
   public static final String BASE_SECTION_LABEL = "Tree";
 
-  public enum ContainerOrder { FIRST, MIXED, LAST };
-
   private final DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>
       linkMatcherRsrc;
 
   private final boolean inferMissingParents;
 
-  private final ContainerOrder containerOrder;
+  private final DepanFxContainerOrder containerOrder;
 
   public DepanFxTreeSectionData(
       String toolName, String toolDescription,
@@ -49,7 +47,7 @@ public class DepanFxTreeSectionData extends DepanFxBaseSectionData {
       DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkMatcherRsrc,
       boolean inferMissingParents,
       OrderBy orderBy,
-      ContainerOrder containerOrder,
+      DepanFxContainerOrder containerOrder,
       OrderDirection orderDirection) {
     super(toolName, toolDescription,
         sectionLabel, displayNodeCount, orderBy, orderDirection);
@@ -71,7 +69,7 @@ public class DepanFxTreeSectionData extends DepanFxBaseSectionData {
     return linkMatcherRsrc.getResource().getMatcher();
   }
 
-  public ContainerOrder getContainerOrder() {
+  public DepanFxContainerOrder getContainerOrder() {
     return containerOrder;
   }
 

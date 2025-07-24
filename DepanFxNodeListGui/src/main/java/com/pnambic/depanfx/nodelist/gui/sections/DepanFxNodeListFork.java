@@ -56,7 +56,7 @@ public abstract class DepanFxNodeListFork extends DepanFxNodeListGraphNode {
   }
 
   public DepanFxTreeModel getTreeModel() {
-    return ((DepanFxTreeSection) getSection()).getTreeModel();
+    return ((DepanFxNodeTreeSection) getSection()).getTreeModel();
   }
 
   public void sortTreeItems(

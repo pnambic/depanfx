@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodelist.persistence;
 
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxContainerOrder;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
@@ -27,7 +28,7 @@ public class TreeSectionDataPersistenceContribution
 
   private static final Class<?>[] ALLOW_TYPES = new Class[] {
       DepanFxTreeSectionData.class,
-      DepanFxTreeSectionData.ContainerOrder.class,
+      DepanFxContainerOrder.class,
       DepanFxNodeListSectionData.class,
       DepanFxNodeListSectionData.OrderBy.class,
       DepanFxNodeListSectionData.OrderDirection.class
@@ -54,7 +55,7 @@ public class TreeSectionDataPersistenceContribution
   public void prepareTransport(PersistDocumentTransportBuilder builder) {
     builder.addAlias(TREE_SECTION_INFO_TAG, DepanFxTreeSectionData.class);
     builder.addAlias(
-        CONTAINER_ORDER_TAG, DepanFxTreeSectionData.ContainerOrder.class);
+        CONTAINER_ORDER_TAG, DepanFxContainerOrder.class);
 
     builder.addAlias(ORDER_BY_TAG, DepanFxNodeListSectionData.OrderBy.class);
     builder.addAlias(

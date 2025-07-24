@@ -19,19 +19,16 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
-import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListFork;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListForkItem;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListLeafItem;
-import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSectionItem;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSections;
+import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeTreeSection;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFoldSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
-import com.pnambic.depanfx.nodelist.tree.DepanFxNodeParentsToTreeModelBuilder;
 import com.pnambic.depanfx.nodelist.tree.DepanFxSimpleTreeModel;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
@@ -45,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -57,7 +53,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TreeItem;
 
-public class DepanFxFoldSection implements DepanFxNodeListSection {
+public class DepanFxFoldSection extends DepanFxNodeTreeSection {
 
   public static final String SELECT_FOLD_SECTION = "Select Fold Section...";
 
@@ -70,103 +66,51 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxFoldSection.class);
 
-  private final DepanFxNodeListTableAdapter tableAdapter;
-
   private DepanFxWorkspaceResource<DepanFxFoldSectionData> sectionDataRsrc;
-
-  // Update this whenever sectionDataRsrc is revised.
-  private Comparator<TreeItem<DepanFxNodeListMember>> treeMemberCompare;
-
-  private DepanFxTreeModel treeModel;
-
-  private DepanFxNodeList sectionNodes;
 
   public DepanFxFoldSection(
       DepanFxNodeListTableAdapter tableAdapter,
       DepanFxWorkspaceResource<DepanFxFoldSectionData> sectionDataRsrc) {
-    this.tableAdapter = tableAdapter;
+    super(tableAdapter);
     this.sectionDataRsrc = sectionDataRsrc;
-    this.treeModel = buildTreeModel(sectionDataRsrc.getResource());
-
-    this.treeMemberCompare = updateCompare();
+    updateCompare();
   }
 
-  public void setSectionDataResource(
-      DepanFxWorkspaceResource<DepanFxFoldSectionData> sectionDataRsrc) {
-    this.sectionDataRsrc = sectionDataRsrc;
-    this.treeModel = buildTreeModel(sectionDataRsrc.getResource());
-
-    this.treeMemberCompare = updateCompare();
-  }
-
-  private DepanFxTreeModel buildTreeModel(DepanFxFoldSectionData resource) {
-    DepanFxNodeFoldData foldInfo = resource.getNodeFoldResource().getResource();
-    DepanFxNodeParentsToTreeModelBuilder builder =
-        new DepanFxNodeParentsToTreeModelBuilder(foldInfo.getGraphDocResource());
-    builder.importNodeParents(foldInfo.streamNodeNests());
-    return builder.build();
-  }
-
-  public DepanFxWorkspaceResource<DepanFxFoldSectionData> getSectionResource() {
-    return sectionDataRsrc;
-  }
-
-  public DepanFxFoldSectionData getSectionData() {
-    return sectionDataRsrc.getResource();
-  }
-
-  public DepanFxProjectDocument getProjDoc() {
-    return sectionDataRsrc.getDocument();
-  }
-
-  public DepanFxTreeModel getTreeModel() {
-    return treeModel;
-  }
-
-  public List<DepanFxNodeListColumn> getColumns() {
-    return tableAdapter.streamColumns().collect(Collectors.toList());
-  }
-
-  @Override
+  @Override // DepanFxNodeListSection
   public String getSectionLabel() {
     return getSectionData().getSectionLabel();
   }
 
-  @Override
+  @Override // DepanFxNodeListSection
   public String getDisplayName() {
     return DepanFxNodeListSections.fmtDisplayName(
         getSectionData().getSectionLabel(),
-        sectionNodes.getNodes().size(),
+        getSectionNodes().getNodes().size(),
         getSectionData().displayNodeCount());
   }
 
-  @Override
-  public String getDisplayName(GraphNode node) {
-    if (treeModel.getRoots().contains(node)) {
-      return node.getId().getNodeKey();
-    }
-
-    return node.getId().getSimpleName();
-  }
-
-  @Override
+  @Override // DepanFxNodeListSection
   public String getSortKey(GraphNode node) {
     OrderBy orderBy = getSectionData().getOrderBy();
     return DepanFxNodeListSections.getSortKey(node, orderBy);
   }
 
-  @Override
+  @Override // DepanFxNodeListSection
   public DepanFxNodeListSectionItem buildSectionItem(
       DepanFxNodeList baseNodes) {
-    sectionNodes = treeModel.getReachableGraphNodes(
+
+    DepanFxTreeModel treeModel = getTreeModel();
+    DepanFxNodeList sectionNodes = treeModel.getReachableGraphNodes(
         treeModel.getRoots(), baseNodes.getNodes());
+
+    updateSectionNodes(sectionNodes);
 
     return new FoldSectionItem(this);
   }
 
-  @Override
+  @Override // DepanFxNodeListSection
   public TreeItem<DepanFxNodeListMember> buildNodeItem(GraphNode node) {
-    switch (treeModel.getTreeMode(node)) {
+    switch (getTreeMode(node)) {
 
     case FORK:
       FoldFork foldFork = buildFoldFork(node);
@@ -179,31 +123,55 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
     return null;
   }
 
-  @Override
-  public void sortTreeItems(List<TreeItem<DepanFxNodeListMember>> items) {
-    items.sort(treeMemberCompare);
+  public void setSectionDataResource(
+      DepanFxWorkspaceResource<DepanFxFoldSectionData> sectionDataRsrc) {
+    this.sectionDataRsrc = sectionDataRsrc;
+    updateCompare();
+  }
+
+  public DepanFxWorkspaceResource<DepanFxFoldSectionData> getSectionResource() {
+    return sectionDataRsrc;
   }
 
   @Override
-  public DepanFxNodeList getSectionNodes() {
-    return sectionNodes;
+  public DepanFxTreeModel getTreeModel() {
+    return getNodeFolding().getTreeModel(getNodeFoldResource()).get();
+  }
+
+  @Override
+  protected void updateTreeModel(
+      DepanFxTreeModel treeModel, DepanFxNodeList sectionNodes) {
+    DepanFxWorkspaceResource<DepanFxNodeFoldData> foldRsrc =
+        getNodeFoldResource();
+    getNodeFolding().updateTreeModel(foldRsrc, treeModel);
+    super.updateSectionNodes(sectionNodes);
+  }
+
+  private DepanFxFoldSectionData getSectionData() {
+    return sectionDataRsrc.getResource();
+  }
+
+  private void updateCompare() {
+    DepanFxFoldSectionData sectionData = sectionDataRsrc.getResource();
+    updateTreeCompare(
+        sectionData.getOrderDirection(), sectionData.getContainerOrder());
   }
 
   public void addTreeModel(DepanFxTreeModel subModel) {
-    if (treeModel instanceof DepanFxSimpleTreeModel simple) {
-      simple.addTreeModel(subModel);
-      tableAdapter.resetTableView();
+    if (getNodeFolding().addTreeModel(getNodeFoldResource(), subModel)) {
+      resetTableView();
       return;
     }
+
     // Waiting for a more generic modifiable tree model.
     LOG.info(
         "Cannot add section model to section {}", getSectionLabel());
   }
 
   public void addTreeModels(Stream<DepanFxTreeModel> subModels) {
-    if (treeModel instanceof DepanFxSimpleTreeModel simple) {
+    if (getTreeModel() instanceof DepanFxSimpleTreeModel simple) {
       subModels.forEach(simple::addTreeModel);
-      tableAdapter.resetTableView();
+      resetTableView();
       return;
     }
     // Waiting for a more generic modifiable tree model.
@@ -215,7 +183,7 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
   saveFoldInfoResource() {
 
     List<DepanFxNodeFoldData.NodeNest> nodeParents =
-        treeModel.streamNodeParent()
+        getTreeModel().streamNodeParent()
         .collect(Collectors.toList());
     DepanFxProjectDocument srcFoldDoc =
         getSectionData().getNodeFoldResource().getDocument();
@@ -227,12 +195,16 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
         srcFoldInfo.getGraphDocResource(),
         nodeParents);
     try {
-      return tableAdapter.getWorkspace().saveDocument(srcFoldDoc, updateFoldInfo);
+      return getWorkspace().saveDocument(srcFoldDoc, updateFoldInfo);
     } catch (IOException err) {
       LOG.error("Unable to save fold info resource for section {}",
           getSectionLabel(), err);
     }
     return Optional.empty();
+  }
+
+  private DepanFxWorkspaceResource<DepanFxNodeFoldData> getNodeFoldResource() {
+    return sectionDataRsrc.getResource().getNodeFoldResource();
   }
 
   private FoldFork buildFoldFork(GraphNode fork) {
@@ -241,81 +213,6 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
 
   private FoldLeaf buildFoldLeaf(GraphNode leaf) {
     return new FoldLeaf(leaf, this);
-  }
-
-  /////////////////////////////////////
-  // Sorting and ordering
-
-  private Comparator<TreeItem<DepanFxNodeListMember>> updateCompare() {
-    DepanFxFoldSectionData sectionData = getSectionData();
-    return new FoldMemberCompare(
-        sectionData.getOrderDirection(), sectionData.getContainerOrder());
-  }
-
-  private static class FoldMemberCompare
-  extends DepanFxNodeListSections.CompareMembers {
-
-    private final DepanFxFoldSectionData.ContainerOrder containerOrder;
-
-    private FoldMemberCompare(
-        OrderDirection direction,
-        DepanFxFoldSectionData.ContainerOrder containerOrder) {
-      super(direction);
-      this.containerOrder = containerOrder;
-    }
-
-    @Override
-    protected int compareMembers(
-        DepanFxNodeListMember memberOne, DepanFxNodeListMember memberTwo) {
-      switch (containerOrder) {
-      case FIRST:
-        return compareByMemberKind(memberOne, memberTwo);
-      case LAST:
-        return compareByMemberKind(memberOne, memberTwo);
-      case MIXED:
-        return compareBySortKey(memberOne, memberTwo);
-      }
-      return 0;
-    }
-
-    private int compareByMemberKind(
-        DepanFxNodeListMember memberOne, DepanFxNodeListMember memberTwo) {
-      if (memberOne instanceof FoldFork) {
-        if (memberTwo instanceof FoldFork) {
-          // Both members are forks.
-          return compareBySortKey(memberOne, memberTwo);
-        }
-        // Only memberOne is a fork.
-        return compareContainerOrder();
-      }
-      // Only memberTwo is a fork.
-      if (memberTwo instanceof FoldFork) {
-        return - compareContainerOrder();
-      }
-      // Both members are leafs.
-      return compareBySortKey(memberOne, memberTwo);
-    }
-
-    private int compareBySortKey(
-        DepanFxNodeListMember memberOne, DepanFxNodeListMember memberTwo) {
-      String oneKey = ((DepanFxNodeListGraphNode) memberOne).getSortKey();
-      String twoKey = ((DepanFxNodeListGraphNode) memberTwo).getSortKey();
-      return oneKey.compareTo(twoKey);
-    }
-
-    private int compareContainerOrder() {
-      DepanFxFoldSectionData.ContainerOrder forkOrder = containerOrder;
-      if (forkOrder.equals(DepanFxFoldSectionData.ContainerOrder.FIRST)) {
-        return -1; // Containers are before documents.
-      }
-      if (forkOrder.equals(DepanFxFoldSectionData.ContainerOrder.LAST)) {
-        return 1; // Containers are after documents
-      }
-      LOG.warn(
-          "Misuse of compareContainerOrder with bad value for fork ordering {}",
-          forkOrder);
-      return 0;
-    }
   }
 
   /////////////////////////////////////
@@ -448,7 +345,7 @@ public class DepanFxFoldSection implements DepanFxNodeListSection {
       DepanFxContextMenuBuilder builder =
           new DepanFxContextMenuBuilder(contextMenu);
 
-      appendRecursiveMulitActionItems(builder, tableAdapter, choices);
+      appendRecursiveMultiActionItems(builder, tableAdapter, choices);
     }
   }
 

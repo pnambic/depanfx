@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -74,8 +75,8 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
    *
    * May be {@code null} if no folding is used.
    */
-  private final Collection<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
-  nodeFoldRsrcs;
+  private final List<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
+      nodeFoldRsrcs;
 
   /**
    * The set of nodes that are visible in the render.
@@ -148,7 +149,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
 
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableNodeRsrc,
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc,
-      Collection<DepanFxWorkspaceResource<DepanFxNodeFoldData>> nodeFoldRsrcs,
+      List<DepanFxWorkspaceResource<DepanFxNodeFoldData>> nodeFoldRsrcs,
       DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> nodeDisplayDocRsrc,
       boolean remainerNodesVisible,
       DepanFxNodeDisplayData remainderNodesDisplay,
@@ -263,7 +264,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
   /**
    * Provide a snapshot of the current collection of foldings.
    */
-  public Collection<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
+  public List<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
   getNodeFoldResources() {
     // Protective copy
     return new ArrayList<>(nodeFoldRsrcs);
