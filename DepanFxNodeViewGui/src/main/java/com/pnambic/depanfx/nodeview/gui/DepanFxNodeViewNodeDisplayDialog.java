@@ -153,7 +153,6 @@ public class DepanFxNodeViewNodeDisplayDialog
   }
 
   @FXML
-  @SuppressWarnings("unused")
   public void initialize() {
     DepanFxTableColumnBinder<EditNodeDisplay> columnBinder =
         new DepanFxTableColumnBinder<>(nodesDisplayTable);

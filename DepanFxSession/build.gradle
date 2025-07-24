@@ -23,6 +23,4 @@ dependencies {
   implementation project(':DepanFxScene')
   implementation project(':DepanFxSessionData')
   implementation project(':DepanFxWorkspace')
-
-  testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
