@@ -74,7 +74,8 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
    *
    * May be {@code null} if no folding is used.
    */
-  private final DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc;
+  private final Collection<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
+  nodeFoldRsrcs;
 
   /**
    * The set of nodes that are visible in the render.
@@ -147,7 +148,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
 
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> availableNodeRsrc,
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc,
-      DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc,
+      Collection<DepanFxWorkspaceResource<DepanFxNodeFoldData>> nodeFoldRsrcs,
       DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> nodeDisplayDocRsrc,
       boolean remainerNodesVisible,
       DepanFxNodeDisplayData remainderNodesDisplay,
@@ -170,7 +171,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
 
     this.availableNodeRsrc = availableNodeRsrc;
     this.visibleNodeRsrc = visibleNodeRsrc;
-    this.nodeFoldRsrc = nodeFoldRsrc;
+    this.nodeFoldRsrcs = nodeFoldRsrcs;
     this.nodeDisplayDocRsrc = nodeDisplayDocRsrc;
     this.remainderNodesVisible = remainerNodesVisible;
     this.remainderNodesDisplay = remainderNodesDisplay;
@@ -259,9 +260,13 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
     return visibleNodeRsrc;
   }
 
-  public Optional<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
-  optNodeFoldResource() {
-    return Optional.ofNullable(nodeFoldRsrc);
+  /**
+   * Provide a snapshot of the current collection of foldings.
+   */
+  public Collection<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
+  getNodeFoldResources() {
+    // Protective copy
+    return new ArrayList<>(nodeFoldRsrcs);
   }
 
   public DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData>

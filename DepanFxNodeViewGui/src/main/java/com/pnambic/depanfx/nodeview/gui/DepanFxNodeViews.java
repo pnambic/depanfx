@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -130,7 +131,7 @@ public class DepanFxNodeViews {
 
         viewDoc.getAvailableNodeResource(),
         viewDoc.getVisibleNodeResource(),
-        viewDoc.optNodeFoldResource().orElse(null),
+        viewDoc.getNodeFoldResources(),
         viewDoc.getNodeDisplayDocRsrc(),
         viewDoc.getRemainderNodesVisible(),
         viewDoc.getRemainderNodesDisplay(),
@@ -165,7 +166,8 @@ public class DepanFxNodeViews {
       DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc =
           availableNodeRsrc;
       // Start with no node folding.
-      DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc = null;
+      Collection<DepanFxWorkspaceResource<DepanFxNodeFoldData>> nodeFoldRsrcs =
+          new ArrayList<>(1);
 
       // Edges
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayRsrc =
@@ -186,7 +188,7 @@ public class DepanFxNodeViews {
 
         sceneData,
 
-        availableNodeRsrc, visibleNodeRsrc, nodeFoldRsrc, nodeDisplayRsrc,
+        availableNodeRsrc, visibleNodeRsrc, nodeFoldRsrcs, nodeDisplayRsrc,
         DepanFxNodeViewData.DEFAULT_REMAINDER_NODES_VISIBLE,
         DepanFxNodeViewData.DEFAULT_REMAINDER_NODE_DISPLAY,
 

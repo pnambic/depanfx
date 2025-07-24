@@ -985,8 +985,8 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
     nodeFold = new NodeFoldController(
         workspace, joglPane, this::getNodeLocation);
-    viewData.optNodeFoldResource()
-        .ifPresent(nodeFold::installNodeFoldResource);
+    viewData.getNodeFoldResources().stream()
+        .forEach(nodeFold::installNodeFoldResource);
   }
 
   private void updateViewNodeLocation(

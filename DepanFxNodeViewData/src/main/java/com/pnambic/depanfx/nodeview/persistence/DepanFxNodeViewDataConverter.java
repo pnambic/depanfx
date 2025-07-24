@@ -59,7 +59,7 @@ public class DepanFxNodeViewDataConverter
 
   private static final String VISIBLE_NODE_RSRC = "visible-nodes-rsrc";
 
-  private static final String NODE_FOLD_RSRC = "node-fold-rsrc";
+  private static final String NODE_FOLD_RSRCS = "node-fold-rsrcs";
 
   public static final String NODE_DISPLAY_DOC = "node-display-doc";
 
@@ -101,7 +101,7 @@ public class DepanFxNodeViewDataConverter
           new PersistTagDataLoader.TagDescriptor(
               VISIBLE_NODE_RSRC, DepanFxWorkspaceResource.class),
           new PersistTagDataLoader.TagDescriptor(
-              NODE_FOLD_RSRC, DepanFxWorkspaceResource.class),
+              NODE_FOLD_RSRCS, Collection.class),
           new PersistTagDataLoader.TagDescriptor(
               NODE_DISPLAY_DOC, DepanFxWorkspaceResource.class),
           new PersistTagDataLoader.TagDescriptor(
@@ -131,7 +131,7 @@ public class DepanFxNodeViewDataConverter
       NODE_VIEW_NAME, NODE_VIEW_DESCR,
       GRAPH_DOC,
       SCENE_DATA,
-      AVAILABLE_NODE_RSRC, VISIBLE_NODE_RSRC, NODE_FOLD_RSRC, NODE_DISPLAY_DOC,
+      AVAILABLE_NODE_RSRC, VISIBLE_NODE_RSRC, NODE_FOLD_RSRCS, NODE_DISPLAY_DOC,
       REMAINDER_NODES_VISIBLE, REMAINDER_NODES_DISPLAY,
       AVAILABLE_EDGE_RSRC, VISIBLE_EDGE_RSRC, LINK_DISPLAY_DOC,
       REMAINDER_EDGES_VISIBLE, REMAINDER_EDGES_LABEL, REMAINDER_EDGES_DISPLAY
@@ -160,8 +160,8 @@ public class DepanFxNodeViewDataConverter
         viewData.getAvailableNodeResource();
     DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> visibleNodeRsrc =
         viewData.getVisibleNodeResource();
-    DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc =
-        viewData.optNodeFoldResource().orElse(null);
+    Collection<DepanFxWorkspaceResource<DepanFxNodeFoldData>> nodeFoldRsrcs =
+        viewData.getNodeFoldResources();
 
     DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableEdgeRsrc =
         viewData.getAvailableEdgeResource();
@@ -185,8 +185,8 @@ public class DepanFxNodeViewDataConverter
     if (visibleNodeRsrc != null) {
       marshalObject(dstContext, VISIBLE_NODE_RSRC, visibleNodeRsrc);
     }
-    if (nodeFoldRsrc != null) {
-      marshalObject(dstContext, NODE_FOLD_RSRC, nodeFoldRsrc);
+    if (nodeFoldRsrcs != null) {
+      marshalObject(dstContext, NODE_FOLD_RSRCS, nodeFoldRsrcs);
     }
     marshalObject(dstContext,
         NODE_DISPLAY_DOC, viewData.getNodeDisplayDocRsrc());
@@ -255,8 +255,8 @@ public class DepanFxNodeViewDataConverter
 
     @SuppressWarnings("unchecked")
     // Ok to be null.
-    DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc =
-        metaData.getObject(NODE_FOLD_RSRC, DepanFxWorkspaceResource.class);
+    Collection<DepanFxWorkspaceResource<DepanFxNodeFoldData>> nodeFoldRsrcs =
+        metaData.getObject(NODE_FOLD_RSRCS, Collection.class);
 
     @SuppressWarnings("unchecked")
     DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableEdgeRsrc =
@@ -340,7 +340,7 @@ public class DepanFxNodeViewDataConverter
     return new DepanFxNodeViewData(toolName, toolDescr,
         graphDocRsrc, viewNodes, nodeLocations, nodeDisplay, edgeDisplay,
         sceneData,
-        availableNodeRsrc, visibleNodeRsrc, nodeFoldRsrc, nodeDisplayDocRsrc,
+        availableNodeRsrc, visibleNodeRsrc, nodeFoldRsrcs, nodeDisplayDocRsrc,
         remainderNodesVisible, remainderNodeDisplay,
         availableEdgeRsrc, visibleEdgeRsrc, linkDisplayDocRsrc,
         remainderEdgesVisible, remainderEdgesLabel, remainderEdgeDisplay);

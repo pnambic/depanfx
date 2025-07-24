@@ -97,7 +97,7 @@ public class DepanFxNodeViewMerger {
 
         baseView.getAvailableNodeResource(),
         baseView.getVisibleNodeResource(),
-        baseView.optNodeFoldResource().orElse(null),
+        baseView.getNodeFoldResources(),
         baseView.getNodeDisplayDocRsrc(),
         baseView.getRemainderNodesVisible(),
         baseView.getRemainderNodesDisplay(),
