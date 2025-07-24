@@ -30,11 +30,8 @@ public class DepanFxNodeViewsMergeConfiguration {
 
   public static final String MERGE_NODE_VIEWS = "Merge Node Views";
 
-  private static final String MERGE_NODE_VIEWS_LABEL =
+  public static final String MERGE_NODE_VIEWS_LABEL =
       MERGE_NODE_VIEWS;
-
-  private static final String LINK_MATCHER_SEQUENCE_TOOL_DESCR =
-      "Merge node views.";
 
   @Bean
   public DepanFxNewResourceContribution nodeViewsMergeNewMenu(
@@ -58,7 +55,8 @@ public class DepanFxNodeViewsMergeConfiguration {
     @Override
     public MenuItem createNewResourceMenuItem() {
       return DepanFxMenuItemFactory.createActionItem(
-          MERGE_NODE_VIEWS_LABEL, e -> runCreateDialog(workspace, dialogRunner));
+          MERGE_NODE_VIEWS_LABEL,
+          e -> runCreateDialog(workspace, dialogRunner));
     }
   }
 
