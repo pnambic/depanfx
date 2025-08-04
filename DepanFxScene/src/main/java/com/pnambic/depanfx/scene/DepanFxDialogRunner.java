@@ -6,10 +6,12 @@ import net.rgielen.fxweaver.core.FxWeaver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 /**
@@ -17,6 +19,8 @@ import javafx.stage.Stage;
  */
 @Component
 public class DepanFxDialogRunner {
+
+  public static final int SCREEN_PADDING_PIXELS = 50;
 
   private final FxWeaver fxweaver;
 
@@ -37,19 +41,17 @@ public class DepanFxDialogRunner {
   }
 
   public static void runDialog(Parent dialogPane, String title) {
-    Stage dialogStage = new Stage();
+    Stage dialogStage = buildStage();
     dialogStage.initModality(Modality.APPLICATION_MODAL);
     dialogStage.setTitle(title);
-    DepanFxAppIcons.installDepanIcons(dialogStage.getIcons());
     dialogStage.setScene(new Scene(dialogPane));
     dialogStage.showAndWait();
   }
 
   public static Stage runModeless(Parent dialogPane, String title) {
-    Stage dialogStage = new Stage();
+    Stage dialogStage = buildStage();
     dialogStage.initModality(Modality.NONE);
     dialogStage.setTitle(title);
-    DepanFxAppIcons.installDepanIcons(dialogStage.getIcons());
     dialogStage.setScene(new Scene(dialogPane));
     dialogStage.show();
     return dialogStage;
@@ -78,7 +80,7 @@ public class DepanFxDialogRunner {
   }
 
   public <C> Dialog<C>createDialogAndParent(Class<C> type) {
-    return new Dialog<C>(fxweaver.load(type));
+    return new Dialog<>(fxweaver.load(type));
   }
 
   public static class Dialog <C>{
@@ -99,5 +101,19 @@ public class DepanFxDialogRunner {
     public C getController() {
       return fxLoad.getController();
     }
+  }
+
+  private static Stage buildStage() {
+    Stage result = new Stage();
+    sizeToScreen(result);
+    DepanFxAppIcons.installDepanIcons(result.getIcons());
+    result.setResizable(true);
+    return result;
+  }
+
+  private static void sizeToScreen(Stage dialogStage) {
+    Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+    dialogStage.setMaxWidth(screenBounds.getWidth() - 50);
+    dialogStage.setMaxHeight(screenBounds.getHeight() - 50);
   }
 }
