@@ -97,6 +97,14 @@ public class JoglShapes {
     }
   }
 
+  public static void clearNodeFolding(
+      JoglPane joglPane, GraphNode memberNode) {
+    if (joglPane.getShape(memberNode) instanceof NodeShape memberShape) {
+      memberShape.clearApparentShape();
+      joglPane.updateShape(memberNode, memberShape);
+    }
+  }
+
   private static void updateNodeSelection(
       NodeShape nodeShape, boolean isSelected) {
     if (isSelected) {

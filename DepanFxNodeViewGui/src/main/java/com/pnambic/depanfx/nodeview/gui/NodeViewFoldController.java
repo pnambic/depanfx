@@ -18,12 +18,14 @@ package com.pnambic.depanfx.nodeview.gui;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
+import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel.TreeMode;
 import com.pnambic.depanfx.nodeview.jogl.JoglPane;
 import com.pnambic.depanfx.nodeview.jogl.JoglShapes;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -39,6 +41,10 @@ import java.util.function.Function;
  */
 public class NodeViewFoldController extends DepanFxNodeFoldController {
 
+  public enum ExpandState {
+    OPEN, SHUT
+  }
+
   private final JoglPane joglPane;
 
   private final Function<GraphNode, DepanFxNodeLocationData> nodeLocationSrc;
@@ -52,6 +58,13 @@ public class NodeViewFoldController extends DepanFxNodeFoldController {
     this.nodeLocationSrc = nodeLocationSrc;
   }
 
+  public void expandNode(GraphNode nestNode) {
+    streamStates()
+        .map(ViewFoldingState.class::cast)
+        .filter(s -> s.getTreeMode(nestNode) == TreeMode.FORK)
+        .forEach(s -> s.expandNode(nestNode));
+  }
+
   @Override
   protected FoldingState newFoldingState(
       DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc) {
@@ -59,6 +72,9 @@ public class NodeViewFoldController extends DepanFxNodeFoldController {
   }
 
   class ViewFoldingState extends DepanFxNodeFoldController.FoldingState {
+
+    private final Map<GraphNode, ExpandState> nodeStates =
+        new HashMap<>();
 
     private final Map<GraphNode, DepanFxNodeLocationData> nodeDeltas =
         new HashMap<>();
@@ -68,21 +84,69 @@ public class NodeViewFoldController extends DepanFxNodeFoldController {
       super(nodeFoldRsrc);
     }
 
+    public ExpandState getExpandState(GraphNode node) {
+      return nodeStates.getOrDefault(node, ExpandState.SHUT);
+    }
+
+    public TreeMode getTreeMode(GraphNode node) {
+      return getTreeModel().getTreeMode(node);
+    }
+
+    public void expandNode(GraphNode nestNode) {
+      ExpandState nestState = nodeStates.get(nestNode);
+      if (nestState == null) {
+        return; // Unknown node.
+      }
+      if (nestState == ExpandState.OPEN) {
+        return; // Already expanded
+      }
+
+      Collection<GraphNode> members = getTreeModel().getMembers(nestNode);
+
+      DepanFxNodeLocationData nestPos = nodeLocationSrc.apply(nestNode);
+      if (nestPos != null) {
+        members.forEach(m -> {
+          updateMemberLocation(m, nestPos);
+          JoglShapes.clearNodeFolding(joglPane, m);
+        });
+      } else {
+        // No position for the nest node, so just clear folding.
+        members.forEach(m -> JoglShapes.clearNodeFolding(joglPane, m));
+      }
+
+      nodeStates.put(nestNode, ExpandState.OPEN);
+    }
+
     @Override
     protected void updateNodeFolding(GraphNode memberNode, GraphNode nestNode) {
       super.updateNodeFolding(memberNode, nestNode);
 
-      DepanFxNodeLocationData memberLocation =
-          nodeLocationSrc.apply(memberNode);
-      DepanFxNodeLocationData nestLocation = nodeLocationSrc.apply(nestNode);
+      DepanFxNodeLocationData memberPos = nodeLocationSrc.apply(memberNode);
+      DepanFxNodeLocationData nestPos = nodeLocationSrc.apply(nestNode);
 
-      if (memberLocation != null && nestLocation != null) {
+      if (memberPos != null && nestPos != null) {
         DepanFxNodeLocationData nodeDelta =
-            DepanFxNodeLocationData.calcDelta(nestLocation, memberLocation);
+            DepanFxNodeLocationData.calcDelta(nestPos, memberPos);
         nodeDeltas.put(memberNode, nodeDelta);
       }
 
+      nodeStates.computeIfAbsent(nestNode, n -> ExpandState.SHUT);
       JoglShapes.updateNodeFolding(joglPane, memberNode, nestNode);
+    }
+
+    private void updateMemberLocation(
+        GraphNode memberNode, DepanFxNodeLocationData nestPos) {
+
+      DepanFxNodeLocationData delta = nodeDeltas.get(memberNode);
+      if (delta == null) {
+        return; // No delta for this node.
+      }
+
+      JoglShapes.updateLocation(
+          joglPane, memberNode,
+          DepanFxNodeLocationData.applyDelta(nestPos, delta));
+
+      nodeDeltas.remove(memberNode);
     }
   }
 }

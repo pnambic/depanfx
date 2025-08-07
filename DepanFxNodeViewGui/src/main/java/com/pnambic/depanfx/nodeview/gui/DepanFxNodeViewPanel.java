@@ -130,7 +130,11 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private static final String MORE_NODE_VIBILITY = "More Node Visibility...";
 
-  private static final String NODE_FOLDING = "Node Folding...";
+  private static final String NODE_FOLDING_MENU = "Node Folding";
+
+  private static final String NODE_FOLDING_DIALOG = "Node Folding...";
+
+  private static final String EXPAND_NODE_ITEM = "Expand Node";
 
   private static final String SAVE_NODE_VIEW_ITEM = "Save Node View...";
 
@@ -375,10 +379,6 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
           .map(GraphNode.class::cast);
       nodeSelection.doSelectGraphNodesAction(process, true);
     }
-  }
-
-  public void doSelectNodeFoldingAction() {
-    DepanFxNodeFoldDialog.runEditDialog(this.nodeFold, getDialogRunner());
   }
 
   public void installNodeFoldResource(
@@ -668,9 +668,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
     builder.appendSeparator();
     builder.appendSubMenu(buildLayoutNodesMenu());
-    builder.appendActionItem(NODE_FOLDING,
-        e -> doSelectNodeFoldingAction());
-
+    builder.appendSubMenu(buildNodeFoldingMenu());
 
     builder.appendSeparator();
     builder.appendActionItem(TAKE_SCREENSHOT, e -> takeScreenshot());
@@ -858,6 +856,29 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
       DepanFxWorkspaceResource<DepanFxBaseFilterData> filterRsrc,
       boolean isVisible) {
     nodeDisplay.setFilterVisibility(filterRsrc, isVisible);
+  }
+
+  /////////////////////////////////////
+  // Node Folding Menu
+
+  private Menu buildNodeFoldingMenu() {
+    DepanFxMenuBuilder menuBuilder = new DepanFxMenuBuilder(NODE_FOLDING_MENU);
+    menuBuilder.appendActionItem(
+        EXPAND_NODE_ITEM,
+        e -> doExpandNodeFoldingAction(e));
+    menuBuilder.appendActionItem(
+        NODE_FOLDING_DIALOG,
+        e -> doSelectNodeFoldingAction());
+    return menuBuilder.build();
+  }
+
+  private void doExpandNodeFoldingAction(ActionEvent e) {
+    getNodeSelection().streamSelectedNodes()
+        .forEach(node -> nodeFold.expandNode(node));
+  }
+
+  private void doSelectNodeFoldingAction() {
+    DepanFxNodeFoldDialog.runEditDialog(this.nodeFold, getDialogRunner());
   }
 
   /////////////////////////////////////

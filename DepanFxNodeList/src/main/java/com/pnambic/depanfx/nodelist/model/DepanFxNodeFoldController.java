@@ -50,7 +50,7 @@ public abstract class DepanFxNodeFoldController {
 
   public List<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
   forUpdateNodeFoldResource() {
-    return foldStates.stream()
+    return streamStates()
         .filter(s -> s.nodeFoldRsrc.getDocument().getProject()
             != workspace.getScratchProjectTree())
         .map(s -> s.forUpdate())
@@ -62,7 +62,7 @@ public abstract class DepanFxNodeFoldController {
    */
   public Stream<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
   streamNodeFoldResources() {
-    return foldStates.stream()
+    return streamStates()
         .map(s -> s.getNodeFoldResource());
   }
 
@@ -105,6 +105,10 @@ public abstract class DepanFxNodeFoldController {
   abstract protected FoldingState newFoldingState(
       DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc);
 
+  protected Stream<FoldingState> streamStates() {
+    return foldStates.stream();
+  }
+
   private FoldingState buildFoldingState(
       DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc) {
 
@@ -119,7 +123,7 @@ public abstract class DepanFxNodeFoldController {
 
   private Optional<FoldingState> findFoldingState(
       DepanFxWorkspaceResource<DepanFxNodeFoldData> foldDataRsrc) {
-    return foldStates.stream()
+    return streamStates()
         .filter(s -> s.getNodeFoldResource().equals(foldDataRsrc))
         .findFirst();
   }
