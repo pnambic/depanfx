@@ -6,6 +6,8 @@ import com.pnambic.depanfx.jogl.JoglPickable;
 import com.pnambic.depanfx.jogl.JoglRenderer;
 import com.pnambic.depanfx.jogl.JoglShape;
 
+import java.util.List;
+
 /**
  * Basic node properties.
  *
@@ -46,6 +48,8 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
   public String labelText;
 
   public Object pickObject;
+
+  public List<NodeOverlay> overlays = NodeOverlay.EMPTY_OVERLAYS;
 
   /**
    * The nest object when this node is folded.
@@ -118,6 +122,7 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
     if (showLabel) {
       renderText(gl);
     }
+    overlays.forEach(overlay -> overlay.draw(gl, renderer, this));
   }
 
   @Override
@@ -208,6 +213,7 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
   protected void fillUpdate(NodeShape updateShape) {
     updateShape.nodeNestKey = nodeNestKey;
     updateShape.labelTexture = labelTexture;
+    updateShape.overlays = overlays;
   }
 
   protected void setShapeColor(GL2 gl) {
