@@ -41,9 +41,13 @@ public abstract class NestFoldOverlay implements NodeOverlay {
 
   private static final double OFFSET_Z = 0.0d;
 
+  private static final double INNER_RADIUS = 0.18d;
+
   private static final double OUTER_RADIUS = 0.25d;
 
-  private static final double INNER_RADIUS = 0.18d;
+  private static final float SHUT_OUTER_WIDTH = 2.0f;
+
+  private static final float OPEN_OUTER_WIDTH = 4.0f;
 
   public NestFoldOverlay() {
   }
@@ -89,6 +93,7 @@ public abstract class NestFoldOverlay implements NodeOverlay {
     @Override
     protected void drawOverlay(GL2 gl, NodeShape base) {
       updateColor(gl, base.borderColor);
+      gl.glLineWidth(OPEN_OUTER_WIDTH);
       drawBorder(gl);
     }
   }
@@ -98,7 +103,9 @@ public abstract class NestFoldOverlay implements NodeOverlay {
     @Override
     protected void drawOverlay(GL2 gl, NodeShape base) {
       updateColor(gl, base.borderColor);
+      gl.glLineWidth(SHUT_OUTER_WIDTH);
       drawBorder(gl);
+
       updateColor(gl, base.shapeColor);
       drawShape(gl);
     }

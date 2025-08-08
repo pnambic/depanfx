@@ -58,11 +58,18 @@ public class NodeViewFoldController extends DepanFxNodeFoldController {
     this.nodeLocationSrc = nodeLocationSrc;
   }
 
-  public void expandNode(GraphNode nestNode) {
+  public void openNest(GraphNode nestNode) {
     streamStates()
         .map(ViewFoldingState.class::cast)
         .filter(s -> s.getTreeMode(nestNode) == TreeMode.FORK)
-        .forEach(s -> s.expandNode(nestNode));
+        .forEach(s -> s.openNest(nestNode));
+  }
+
+  public void shutNest(GraphNode nestNode) {
+    streamStates()
+        .map(ViewFoldingState.class::cast)
+        .filter(s -> s.getTreeMode(nestNode) == TreeMode.FORK)
+        .forEach(s -> s.shutNest(nestNode));
   }
 
   @Override
@@ -92,13 +99,13 @@ public class NodeViewFoldController extends DepanFxNodeFoldController {
       return getTreeModel().getTreeMode(node);
     }
 
-    public void expandNode(GraphNode nestNode) {
+    public void openNest(GraphNode nestNode) {
       ExpandState nestState = nodeStates.get(nestNode);
       if (nestState == null) {
         return; // Unknown node.
       }
       if (nestState == ExpandState.OPEN) {
-        return; // Already expanded
+        return; // Already open.
       }
 
       Collection<GraphNode> members = getTreeModel().getMembers(nestNode);
@@ -117,25 +124,49 @@ public class NodeViewFoldController extends DepanFxNodeFoldController {
       setNestState(nestNode, ExpandState.OPEN);
     }
 
+    public void shutNest(GraphNode nestNode) {
+      ExpandState nestState = nodeStates.get(nestNode);
+      if (nestState == null) {
+        return; // Unknown node.
+      }
+      if (nestState == ExpandState.SHUT) {
+        return; // Already shut.
+      }
+
+      // Hide the members.
+      Collection<GraphNode> members = getTreeModel().getMembers(nestNode);
+      DepanFxNodeLocationData nestPos = nodeLocationSrc.apply(nestNode);
+      members.forEach(m -> shutMemberNode(m, nestNode, nestPos));
+
+      // Mark the nest as shut.
+      setNestState(nestNode, ExpandState.SHUT);
+    }
+
     @Override
     protected void updateNodeFolding(GraphNode memberNode, GraphNode nestNode) {
       super.updateNodeFolding(memberNode, nestNode);
 
-      DepanFxNodeLocationData memberPos = nodeLocationSrc.apply(memberNode);
       DepanFxNodeLocationData nestPos = nodeLocationSrc.apply(nestNode);
+      shutMemberNode(memberNode, nestNode, nestPos);
+
+      // Change nest nodes rendering to shut only the first time.
+      if (nodeStates.get(nestNode) == null) {
+        setNestState(nestNode, ExpandState.SHUT);
+      }
+    }
+
+    private void shutMemberNode(
+        GraphNode memberNode,
+        GraphNode nestNode,
+        DepanFxNodeLocationData nestPos) {
+
+      DepanFxNodeLocationData memberPos = nodeLocationSrc.apply(memberNode);
 
       if (memberPos != null && nestPos != null) {
         DepanFxNodeLocationData nodeDelta =
             DepanFxNodeLocationData.calcDelta(nestPos, memberPos);
         nodeDeltas.put(memberNode, nodeDelta);
       }
-
-      // Change nest nodes rendering to shut only the first time.
-      if (nodeStates.get(nestNode) == null) {
-        setNestState(nestNode, ExpandState.SHUT);
-      }
-
-      nodeStates.computeIfAbsent(nestNode, n -> ExpandState.SHUT);
       JoglShapes.updateNodeFolding(joglPane, memberNode, nestNode);
     }
 

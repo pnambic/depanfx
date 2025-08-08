@@ -134,7 +134,9 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private static final String NODE_FOLDING_DIALOG = "Node Folding...";
 
-  private static final String EXPAND_NODE_ITEM = "Expand Node";
+  private static final String OPEN_NEST_NODE_ITEM = "Open Node";
+
+  private static final String SHUT_NEST_NODE_ITEM = "Shut Node";
 
   private static final String SAVE_NODE_VIEW_ITEM = "Save Node View...";
 
@@ -864,17 +866,25 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   private Menu buildNodeFoldingMenu() {
     DepanFxMenuBuilder menuBuilder = new DepanFxMenuBuilder(NODE_FOLDING_MENU);
     menuBuilder.appendActionItem(
-        EXPAND_NODE_ITEM,
-        e -> doExpandNodeFoldingAction(e));
+        OPEN_NEST_NODE_ITEM,
+        e -> doOpenNestFoldingAction(e));
+    menuBuilder.appendActionItem(
+        SHUT_NEST_NODE_ITEM,
+        e -> doShutNestFoldingAction(e));
     menuBuilder.appendActionItem(
         NODE_FOLDING_DIALOG,
         e -> doSelectNodeFoldingAction());
     return menuBuilder.build();
   }
 
-  private void doExpandNodeFoldingAction(ActionEvent e) {
+  private void doOpenNestFoldingAction(ActionEvent e) {
     getNodeSelection().streamSelectedNodes()
-        .forEach(node -> nodeFold.expandNode(node));
+        .forEach(node -> nodeFold.openNest(node));
+  }
+
+  private void doShutNestFoldingAction(ActionEvent e) {
+    getNodeSelection().streamSelectedNodes()
+        .forEach(node -> nodeFold.shutNest(node));
   }
 
   private void doSelectNodeFoldingAction() {
