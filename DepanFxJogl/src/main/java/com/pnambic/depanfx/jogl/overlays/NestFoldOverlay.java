@@ -55,6 +55,7 @@ public abstract class NestFoldOverlay implements NodeOverlay {
   @Override
   public void draw(GL2 gl, JoglRenderer renderer, NodeShape base) {
     gl.glPushMatrix();
+    gl.glTranslated(OFFSET_X, OFFSET_Y, OFFSET_Z);
     drawOverlay(gl, base);
     gl.glPopMatrix();
   }
@@ -63,11 +64,11 @@ public abstract class NestFoldOverlay implements NodeOverlay {
 
   protected void drawShape(GL2 gl) {
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
-    gl.glVertex3d(OFFSET_X, OFFSET_Y, 0.0d);
+    gl.glVertex3d(0.0d, 0.0d, 0.0d);
     for (int i = 0; i <= CIRCLE_STEPS; i++) {
       double angle = 2.0d * Math.PI * i / CIRCLE_STEPS;
-      double x = OFFSET_X + INNER_RADIUS * Math.cos(angle);
-      double y = OFFSET_Y + INNER_RADIUS * Math.sin(angle);
+      double x = INNER_RADIUS * Math.cos(angle);
+      double y = INNER_RADIUS * Math.sin(angle);
       gl.glVertex3d(x, y, OFFSET_Z);
     }
     gl.glEnd();
@@ -77,8 +78,8 @@ public abstract class NestFoldOverlay implements NodeOverlay {
     gl.glBegin(GL2.GL_LINE_LOOP);
     for (int i = 0; i < CIRCLE_STEPS; i++) {
       double angle = 2.0d * Math.PI * i / CIRCLE_STEPS;
-      double x = OFFSET_X + OUTER_RADIUS * Math.cos(angle);
-      double y = OFFSET_Y + OUTER_RADIUS * Math.sin(angle);
+      double x = OUTER_RADIUS * Math.cos(angle);
+      double y = OUTER_RADIUS * Math.sin(angle);
       gl.glVertex3d(x, y, OFFSET_Z);
     }
     gl.glEnd();
