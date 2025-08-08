@@ -114,7 +114,7 @@ public class NodeViewFoldController extends DepanFxNodeFoldController {
         members.forEach(m -> JoglShapes.clearNodeFolding(joglPane, m));
       }
 
-      nodeStates.put(nestNode, ExpandState.OPEN);
+      setNestState(nestNode, ExpandState.OPEN);
     }
 
     @Override
@@ -130,8 +130,19 @@ public class NodeViewFoldController extends DepanFxNodeFoldController {
         nodeDeltas.put(memberNode, nodeDelta);
       }
 
+      // Change nest nodes rendering to shut only the first time.
+      if (nodeStates.get(nestNode) == null) {
+        setNestState(nestNode, ExpandState.SHUT);
+      }
+
       nodeStates.computeIfAbsent(nestNode, n -> ExpandState.SHUT);
       JoglShapes.updateNodeFolding(joglPane, memberNode, nestNode);
+    }
+
+    private void setNestState(GraphNode nestNode, ExpandState foldState) {
+      nodeStates.put(nestNode, foldState);
+      JoglShapes.updateNestFoldingState(
+          joglPane, nestNode, foldState == ExpandState.OPEN);
     }
 
     private void updateMemberLocation(

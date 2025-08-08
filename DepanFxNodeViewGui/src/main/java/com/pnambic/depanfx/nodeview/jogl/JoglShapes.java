@@ -5,12 +5,18 @@ import com.pnambic.depanfx.jogl.JoglColor;
 import com.pnambic.depanfx.jogl.JoglShape;
 import com.pnambic.depanfx.jogl.shapes.AwtShape;
 import com.pnambic.depanfx.jogl.shapes.NodeShape;
+import com.pnambic.depanfx.jogl.overlays.NodeOverlay;
+import com.pnambic.depanfx.jogl.overlays.NestFoldOverlay;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglShape;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 
 import java.awt.Shape;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Hold references to shape entities from the {@code Automatic-Module-Name}
@@ -90,7 +96,6 @@ public class JoglShapes {
       JoglPane joglPane, GraphNode memberNode, GraphNode nestNode) {
     if (joglPane.getShape(memberNode) instanceof NodeShape memberShape) {
       if (joglPane.getShape(nestNode) instanceof NodeShape nestShape) {
-
         memberShape.setNodeNestKey(nestNode, nestShape);
         joglPane.updateShape(memberNode, memberShape);
       }
@@ -102,6 +107,22 @@ public class JoglShapes {
     if (joglPane.getShape(memberNode) instanceof NodeShape memberShape) {
       memberShape.clearApparentShape();
       joglPane.updateShape(memberNode, memberShape);
+    }
+  }
+
+  public static void updateNestFoldingState(
+      JoglPane joglPane, GraphNode nestNode, boolean isOpen) {
+    if (joglPane.getShape(nestNode) instanceof NodeShape nestShape) {
+      nestShape.overlays = updateFoldOverlays(nestShape.overlays, isOpen);
+      joglPane.updateShape(nestNode, nestShape);
+    }
+  }
+
+  public static void clearNestFoldingState(
+      JoglPane joglPane, GraphNode nestNode, boolean isOpen) {
+    if (joglPane.getShape(nestNode) instanceof NodeShape nestShape) {
+      nestShape.overlays = clearFoldOverlays(nestShape.overlays);
+      joglPane.updateShape(nestNode, nestShape);
     }
   }
 
@@ -153,5 +174,38 @@ public class JoglShapes {
     default:
     }
     return JoglShapeKinds.SQUARE.buildAwtShape();
+  }
+
+
+  private static List<NodeOverlay> clearFoldOverlays(
+      List<NodeOverlay> overlays) {
+    List<NodeOverlay> result = removeFoldOverlays(overlays)
+        .collect(Collectors.toList());
+
+    // Minimize the space for empty overlays.
+    if (result.isEmpty()) {
+      return NodeOverlay.EMPTY_OVERLAYS;
+    }
+    return result;
+  }
+
+  private static List<NodeOverlay> updateFoldOverlays(
+      List<NodeOverlay> overlays, boolean isOpen) {
+    // Help with type inference.
+    NodeOverlay nestOverlay = isOpen
+        ? NestFoldOverlay.OPEN_NEST_OVERLAY
+        : NestFoldOverlay.SHUT_NEST_OVERLAY;
+
+    return Stream.concat(
+        removeFoldOverlays(overlays),
+        Stream.of(nestOverlay))
+        .collect(Collectors.toList());
+  }
+
+  private static Stream<NodeOverlay> removeFoldOverlays(
+      List<NodeOverlay> overlays) {
+    return overlays.stream()
+        .filter(o -> o != NestFoldOverlay.OPEN_NEST_OVERLAY)
+        .filter(o -> o != NestFoldOverlay.SHUT_NEST_OVERLAY);
   }
 }

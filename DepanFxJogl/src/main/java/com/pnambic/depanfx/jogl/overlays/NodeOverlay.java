@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.jogl.shapes;
+package com.pnambic.depanfx.jogl.overlays;
 
 import com.jogamp.opengl.GL2;
 import com.pnambic.depanfx.jogl.JoglRenderer;
+import com.pnambic.depanfx.jogl.shapes.NodeShape;
 
 import java.util.Collections;
 import java.util.List;

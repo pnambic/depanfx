@@ -5,6 +5,7 @@ import com.pnambic.depanfx.jogl.JoglColor;
 import com.pnambic.depanfx.jogl.JoglPickable;
 import com.pnambic.depanfx.jogl.JoglRenderer;
 import com.pnambic.depanfx.jogl.JoglShape;
+import com.pnambic.depanfx.jogl.overlays.NodeOverlay;
 
 import java.util.List;
 
@@ -205,7 +206,7 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
 
   abstract protected void renderShape(GL2 gl);
 
-  abstract protected void  renderBorder(GL2 gl);
+  abstract protected void renderBorder(GL2 gl);
 
   /**
    * Allow derived types to create update clones.
