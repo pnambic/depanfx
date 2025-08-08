@@ -124,10 +124,10 @@ public class LinePointsBuilder {
 
     private boolean atBoundary(
         float moveX, float lastX, float moveY, float lastY) {
-      if (Math.abs(moveX - lastX) > AwtShape.SHAPE_FLATNESS) {
+      if (Math.abs(moveX - lastX) > NodeShape.SHAPE_FLATNESS) {
         return false;
       }
-      if (Math.abs(moveY - lastY) > AwtShape.SHAPE_FLATNESS) {
+      if (Math.abs(moveY - lastY) > NodeShape.SHAPE_FLATNESS) {
         return false;
       }
       return true;

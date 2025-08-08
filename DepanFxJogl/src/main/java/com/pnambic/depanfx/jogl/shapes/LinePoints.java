@@ -20,7 +20,7 @@ public class LinePoints {
   public static final LinePoints EMPTY = new LinePoints(0, null) {
 
     @Override
-    public void glVertex(GL2 gl, int mode) {
+    public void drawPoints(GL2 gl, int mode) {
       // do nothing - avoid glBegin and glEnd calls.
     }
   };
@@ -30,17 +30,9 @@ public class LinePoints {
     this.linePoints = linePoints;
   }
 
-  public void glVertex(GL2 gl) {
-    int index = 0;  // Stride by 3
-    for (int count = 0; count < pointCount; ++count) {
-      gl.glVertex3fv(linePoints, index);
-      index += STRIDE;
-    }
-  }
-
-  public void glVertex(GL2 gl, int mode) {
+  public void drawPoints(GL2 gl, int mode) {
     gl.glBegin(mode);
-    glVertex(gl);
+    drawPoints(gl);
     gl.glEnd();
   }
 
@@ -54,5 +46,13 @@ public class LinePoints {
 
   public boolean hasPoints() {
     return pointCount > 0;
+  }
+
+  private void drawPoints(GL2 gl) {
+    int index = 0;  // Stride by 3
+    for (int count = 0; count < pointCount; ++count) {
+      gl.glVertex3fv(linePoints, index);
+      index += STRIDE;
+    }
   }
 }

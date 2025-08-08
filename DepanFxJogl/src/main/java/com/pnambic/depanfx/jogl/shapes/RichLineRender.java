@@ -125,7 +125,7 @@ public class RichLineRender implements LineRender {
   }
 
   private void drawLinePoints(GL2 gl) {
-    linePoints.glVertex(gl, GL2.GL_LINE_STRIP);
+    linePoints.drawPoints(gl, GL2.GL_LINE_STRIP);
   }
 
   private void drawHeadArrow(GL2 gl) {

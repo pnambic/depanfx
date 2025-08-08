@@ -16,6 +16,11 @@ import java.util.List;
  */
 public abstract class NodeShape implements JoglShape, JoglPickable {
 
+  /** Flatness value used when flattening curves. */
+  public static final double SHAPE_FLATNESS = 0.05d;
+
+  public static final float ZERO_FLOAT = 0.0f;
+
   public static final float SPEED = 10.0f;
 
   public static final float STEP_TOLERANCE = 10.0f;

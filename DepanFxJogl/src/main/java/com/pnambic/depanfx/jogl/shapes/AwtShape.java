@@ -21,23 +21,13 @@ package com.pnambic.depanfx.jogl.shapes;
 import com.jogamp.opengl.GL2;
 import com.pnambic.depanfx.jogl.JoglColor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.awt.Shape;
-import java.awt.geom.PathIterator;
 
 public class AwtShape extends NodeShape {
 
-  public static final float FLOAT_ZERO = 0.0f;
-
-  public static final double DOUBLE_ZERO = 0.0d;
-
-  public static final double SHAPE_FLATNESS = 0.05d;
-
-  private static final Logger LOG = LoggerFactory.getLogger(AwtShape.class);
-
   public Shape shapeAwt;
+
+  private PathIteratorRender pathRender;
 
   public AwtShape(
       Shape shapeAwt,
@@ -92,79 +82,18 @@ public class AwtShape extends NodeShape {
 
   @Override
   protected void renderShape(GL2 gl) {
-    float[] lastMoveTo = new float[6];
-    float[] currSegment = new float[6];
-
-    PathIterator it = shapeAwt.getPathIterator(null, SHAPE_FLATNESS);
-    int opened = 0;
-    int closed = 0;
-    while (!it.isDone()) {
-      int res = it.currentSegment(currSegment);
-      switch (res) {
-        case PathIterator.SEG_CLOSE:
-          // gl.glVertex3f(lastMoveTo[0], lastMoveTo[1], FLOAT_ZERO);
-          gl.glEnd();
-          closed++;
-          break;
-        case PathIterator.SEG_MOVETO:
-          gl.glBegin(GL2.GL_TRIANGLE_FAN);
-          opened++;
-          gl.glVertex3f(currSegment[0], currSegment[1], FLOAT_ZERO);
-          System.arraycopy(currSegment, 0, lastMoveTo, 0, lastMoveTo.length);
-          break;
-        case PathIterator.SEG_LINETO:
-          gl.glVertex3f(currSegment[0], currSegment[1], FLOAT_ZERO);
-          break;
-        default:
-          throw new Error("Error while drawing AWT shape. "
-              + "Path iterator setment not handled:" + res);
-      }
-      it.next();
+    if (pathRender == null) {
+      pathRender = new PathIteratorRender(shapeAwt);
     }
-    while (closed < opened) {
-      LOG.warn("missed a close on shape {}", labelText);
-      gl.glEnd();
-      closed++;
-    }
+    pathRender.drawShape(gl);
   }
 
   @Override
   protected void renderBorder(GL2 gl) {
-    float[] lastMoveTo = new float[6];
-    float[] currSegment = new float[6];
-
     gl.glLineWidth(borderWidth);
-
-    PathIterator it = shapeAwt.getPathIterator(null, SHAPE_FLATNESS);
-    int opened = 0;
-    int closed = 0;
-    while (!it.isDone()) {
-      int res = it.currentSegment(currSegment);
-      switch (res) {
-        case PathIterator.SEG_CLOSE:
-          // gl.glVertex3f(lastMoveTo[0], lastMoveTo[1], FLOAT_ZERO);
-          gl.glEnd();
-          closed++;
-          break;
-        case PathIterator.SEG_MOVETO:
-          gl.glBegin(GL2.GL_LINE_LOOP);
-          opened++;
-          gl.glVertex3f(currSegment[0], currSegment[1], FLOAT_ZERO);
-          System.arraycopy(currSegment, 0, lastMoveTo, 0, lastMoveTo.length);
-          break;
-        case PathIterator.SEG_LINETO:
-          gl.glVertex3f(currSegment[0], currSegment[1], FLOAT_ZERO);
-          break;
-        default:
-          throw new Error("Error while drawing AWT border. "
-              + "Path iterator setment not handled:" + res);
-      }
-      it.next();
+    if (pathRender == null) {
+      pathRender = new PathIteratorRender(shapeAwt);
     }
-    while (closed < opened) {
-      LOG.warn("missed a close on border {}", labelText);
-      gl.glEnd();
-      closed++;
-    }
+    pathRender.drawBorder(gl);
   }
 }

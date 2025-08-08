@@ -50,7 +50,7 @@ public class ArrowShapes {
     @Override
     public void draw(GL2 gl) {
       gl.glMultMatrixf(transformationMatrix, 0);
-      arrowPoints.glVertex(gl, mode);
+      arrowPoints.drawPoints(gl, mode);
     }
   }
 
