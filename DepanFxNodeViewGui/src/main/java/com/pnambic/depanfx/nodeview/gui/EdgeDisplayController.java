@@ -19,12 +19,14 @@ import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLink;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.graph.model.GraphEdge;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodeview.jogl.JoglLines;
 import com.pnambic.depanfx.nodeview.jogl.JoglPane;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.slf4j.Logger;
@@ -94,6 +96,12 @@ public class EdgeDisplayController {
 
   private DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleMatchersRsrc;
 
+  /**
+   * Filter resources that determine which edges are visible.
+   * These matchers are independent of the matchers associated with edge display.
+   */
+  private DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> edgeFiltersRsrc;
+
   ///////////////////////////////////
   // Edge Display
 
@@ -111,6 +119,7 @@ public class EdgeDisplayController {
       JoglPane joglPane,
       DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableMatchersRsrc,
       DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleMatchersRsrc,
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> edgeFiltersRsrc,
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc,
       Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay,
       boolean remainderVisible, String remainderLabel,
@@ -118,6 +127,7 @@ public class EdgeDisplayController {
     this.joglPane = joglPane;
     this.availableMatchersRsrc = availableMatchersRsrc;
     this.visibleMatchersRsrc = visibleMatchersRsrc;
+    this.edgeFiltersRsrc = edgeFiltersRsrc;
     this.displayRsrc = displayRsrc;
     this.edgeDisplay = edgeDisplay;
     this.remainderVisible = remainderVisible;
@@ -138,14 +148,16 @@ public class EdgeDisplayController {
         joglPane,
         viewData.getAvailableEdgeResource(),
         viewData.getVisibleEdgeResource(),
-        viewData.getLinkDisplayDocRsrc(),
+        viewData.getEdgeFiltersResource(),
+        viewData.getLinkDisplayResource(),
         viewData.getEdgeDisplay(),
         viewData.getRemainderEdgesVisible(),
         viewData.getRemainderEdgesLabel(),
         viewData.getRemainderEdgeDisplay());
   }
 
-  public DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> getLinkDisplayResource() {
+  public DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData>
+  getLinkDisplayResource() {
     return displayRsrc;
   }
 
@@ -194,7 +206,7 @@ public class EdgeDisplayController {
   public Stream<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
   streamAvailableMatchers() {
     return edgeVisibleGroup.keySet().stream()
-            .sorted(DepanFxWorkspaceResource.BY_RESOURCE_NAME);
+        .sorted(DepanFxWorkspaceResource.BY_RESOURCE_NAME);
   }
 
   /**
@@ -208,6 +220,11 @@ public class EdgeDisplayController {
   streamVisibilityMatchers() {
     return visibleMatcherRsrcs.stream()
         .sorted(DepanFxWorkspaceResource.BY_RESOURCE_NAME);
+  }
+
+  public Stream<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+  streamEdgeFilters() {
+    return edgeFiltersRsrc.getResource().streamMatchers();
   }
 
   public void setLinkDisplayResource(
@@ -313,6 +330,16 @@ public class EdgeDisplayController {
     installEdgeDisplay(edge, visibleCount > 0);
   }
 
+  public void setEdgeFilterResource(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> edgeFilterRsrc) {
+    this.edgeFiltersRsrc = edgeFilterRsrc;
+  }
+
+  private boolean checkEdgeFilter(GraphEdge edge) {
+    return edgeFiltersRsrc.getResource().streamMatchers()
+        .anyMatch(m -> m.getResource().getMatcher().match(edge).isPresent());
+  }
+
   public DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
   forUpdateAvailableMatcherSequenceDoc() {
 
@@ -334,7 +361,7 @@ public class EdgeDisplayController {
   forUpdateVisibleMatcherSequenceDoc() {
 
     List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> vizMatcherRsrcs =
-        streamVisibilityMatchers().collect(Collectors.toList());
+        streamVisibilityMatchers().toList();
 
     DepanFxLinkMatcherSequenceDocument visibleMatchersInfo =
         visibleMatchersRsrc.getResource();
@@ -345,6 +372,53 @@ public class EdgeDisplayController {
             vizMatcherRsrcs);
 
     return DepanFxWorkspaceResource.forUpdate(visibleMatchersRsrc, matcherInfo);
+  }
+
+  public DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+  forSaveEdgeFilterSequenceDoc() {
+
+    if (edgeFiltersRsrc == null) {
+      return null;
+    }
+
+    List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> edgeFiltersRsrcs =
+        streamEdgeFilters().toList();
+
+    DepanFxLinkMatcherSequenceDocument edgeFiltersInfo =
+        edgeFiltersRsrc.getResource();
+    DepanFxLinkMatcherSequenceDocument matcherInfo =
+        new DepanFxLinkMatcherSequenceDocument(
+            edgeFiltersInfo.getToolName(),
+            edgeFiltersInfo.getToolDescription(),
+            edgeFiltersRsrcs);
+
+    return DepanFxWorkspaceResource.forUpdate(edgeFiltersRsrc, matcherInfo);
+  }
+
+  public DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+  forEditEdgeFilterSequenceDoc(
+      DepanFxWorkspace workspace, GraphDocument graphDoc) {
+
+    if (edgeFiltersRsrc == null) {
+      DepanFxLinkMatcherSequenceDocument filters =
+          new DepanFxLinkMatcherSequenceDocument(
+              "Edge Filters", "Edge visibility filters",
+              Collections.emptyList());
+      return workspace.addScratchResource(filters);
+    }
+
+    List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> edgeFiltersRsrcs =
+        streamEdgeFilters().toList();
+
+    DepanFxLinkMatcherSequenceDocument edgeFiltersInfo =
+        edgeFiltersRsrc.getResource();
+    DepanFxLinkMatcherSequenceDocument matcherInfo =
+        new DepanFxLinkMatcherSequenceDocument(
+            edgeFiltersInfo.getToolName(),
+            edgeFiltersInfo.getToolDescription(),
+            edgeFiltersRsrcs);
+
+    return DepanFxWorkspaceResource.forUpdate(edgeFiltersRsrc, matcherInfo);
   }
 
   private void increaseVisible(GraphEdge edge) {

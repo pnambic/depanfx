@@ -15,8 +15,10 @@
  */
 package com.pnambic.depanfx.nodeview.gui;
 
+import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherSequenceToolDialog;
 import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.context.GraphContextKeys;
 import com.pnambic.depanfx.graph.info.GraphNodeInfo;
@@ -113,6 +115,8 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   private static final String NO_EDGES_VISIBLE = "Hide All Edges";
 
   private static final String INVERT_EDGES_VISIBLE = "Invert Visible Edges";
+
+  private static final String EDGE_FILTERS = "Edge Filters";
 
   private static final String MORE_EDGE_VIBILITY = "More Edge Visibility...";
 
@@ -720,6 +724,8 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
     itemFactory.appendSeparator();
     itemFactory.appendActionItem(
+        EDGE_FILTERS, e -> runEditNodeListEdgesFiltersDialog());
+    itemFactory.appendActionItem(
         MORE_EDGE_VIBILITY, e -> runEditVisibleEdgesDialog());
   }
 
@@ -772,6 +778,30 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
       DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc,
       boolean isVisible) {
     edgeDisplay.setMatcherVisibility(matcherRsrc, isVisible);
+  }
+
+  private void runEditNodeListEdgesFiltersDialog() {
+    DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> filterRsrc =
+        edgeDisplay.forSaveEdgeFilterSequenceDoc();
+    if (filterRsrc == null) {
+      DepanFxLinkMatcherSequenceDocument filters =
+      new DepanFxLinkMatcherSequenceDocument(
+          "Edge Filters", "Edge visibility filters",
+          Collections.emptyList());
+      filterRsrc = workspace.addScratchResource(filters);
+    }
+
+    DepanFxLinkMatcherSequenceToolDialog.runEditDialog(
+        filterRsrc, getDialogRunner())
+        .getController()
+        .getToolResource()
+        .ifPresent(this::setEdgeFilterResource);
+  }
+
+  private void setEdgeFilterResource(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> edgeFilterRsrc) {
+    edgeDisplay.setEdgeFilterResource(edgeFilterRsrc);
+    linkDisplayDirty = true;
   }
 
   private void runEditVisibleEdgesDialog() {
@@ -983,6 +1013,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
         edgeDisplay.forUpdateAvailableMatcherSequenceDoc(),
         edgeDisplay.forUpdateVisibleMatcherSequenceDoc(),
+        edgeDisplay.forSaveEdgeFilterSequenceDoc(),
         edgeDisplay.getLinkDisplayResource(),
         edgeDisplay.getRemainderVisible(),
         edgeDisplay.getRemainderLabel(),

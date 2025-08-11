@@ -155,7 +155,8 @@ public class DepanFxNodeViews {
 
         viewDoc.getAvailableEdgeResource(),
         viewDoc.getVisibleEdgeResource(),
-        viewDoc.getLinkDisplayDocRsrc(),
+        viewDoc.getEdgeFiltersResource(),
+        viewDoc.getLinkDisplayResource(),
         viewDoc.getRemainderEdgesVisible(),
         viewDoc.getRemainderEdgesLabel(),
         viewDoc.getRemainderEdgeDisplay());
@@ -193,6 +194,8 @@ public class DepanFxNodeViews {
           getContextEdgeAvailable(workspace, linkDisplayRsrc);
       DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc =
           availableEdgeRsrc;
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> edgeFilterRsrc =
+          null;
 
     Map<GraphNode, DepanFxNodeLocationData> locations =
         buildNodeLocations(layoutRegistry, graphDocRsrc, nodes, layoutRsrc);
@@ -209,7 +212,7 @@ public class DepanFxNodeViews {
         DepanFxNodeViewData.DEFAULT_REMAINDER_NODES_VISIBLE,
         DepanFxNodeViewData.DEFAULT_REMAINDER_NODE_DISPLAY,
 
-        availableEdgeRsrc, visibleEdgeRsrc, linkDisplayRsrc,
+        availableEdgeRsrc, visibleEdgeRsrc, edgeFilterRsrc, linkDisplayRsrc,
         DepanFxNodeViewData.DEFAULT_REMAINDER_EDGES_VISIBLE,
         DepanFxNodeViewData.DEFAULT_REMAINDER_EDGES_LABEL,
         DepanFxNodeViewData.DEFAULT_REMAINDER_EDGE_DISPLAY);

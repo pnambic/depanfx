@@ -20,7 +20,6 @@ import com.pnambic.depanfx.graph_doc.model.GraphModel;
 import com.pnambic.depanfx.nodefilters.model.DepanFxBaseFilter;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
-import com.pnambic.depanfx.nodelist.edgematchers.DepanFxMatcherFilter;
 import com.pnambic.depanfx.nodelist.persistence.ListFilterPersistenceContribution;
 import com.pnambic.depanfx.nodelist.persistence.MatcherFilterPersistenceContribution;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxListFilterData;

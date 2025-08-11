@@ -104,7 +104,8 @@ public class DepanFxNodeViewMerger {
 
         baseView.getAvailableEdgeResource(),
         baseView.getVisibleEdgeResource(),
-        baseView.getLinkDisplayDocRsrc(),
+        baseView.getEdgeFiltersResource(),
+        baseView.getLinkDisplayResource(),
         baseView.getRemainderEdgesVisible(),
         baseView.getRemainderEdgesLabel(),
         baseView.getRemainderEdgeDisplay()

@@ -15,39 +15,38 @@
  */
 package com.pnambic.depanfx.nodelist.persistence;
 
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListEdgeMatcherData;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
 import com.pnambic.depanfx.persistence.plugins.GraphNodePersistencePluginRegistry;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TableViewDataPersistenceContribution
+public class NodeListEdgeMatcherPersistenceContribution
     implements DocumentPersistenceContribution {
 
   public static final String EXTENSION =
-      DepanFxNodeListTableViewData.TABLE_VIEW_TOOL_EXT;
-
-  public static final String FLAT_SECTION_INFO_TAG = "table-view-info";
+      DepanFxNodeListEdgeMatcherData.NODE_LIST_EDGE_MATCHER_TOOL_EXT;
 
   private static final Class<?>[] ALLOW_TYPES = new Class[] {
-      DepanFxNodeListTableViewData.class
+      DepanFxNodeListEdgeMatcherData.class
   };
+
+  private static final String NODE_LIST_EDGE_MATCHER_INFO_TAG =
+      "node-list-edge-matcher";
 
   private final GraphNodePersistencePluginRegistry graphNodeRegistry;
 
-  @Autowired
-  public TableViewDataPersistenceContribution(
+  public NodeListEdgeMatcherPersistenceContribution(
       GraphNodePersistencePluginRegistry graphNodeRegistry) {
     this.graphNodeRegistry = graphNodeRegistry;
   }
 
   @Override
   public boolean acceptsDocument(Object document) {
-    return DepanFxNodeListTableViewData.class
+    return DepanFxNodeListEdgeMatcherData.class
         .isAssignableFrom(document.getClass());
   }
 
@@ -58,8 +57,12 @@ public class TableViewDataPersistenceContribution
 
   @Override
   public void prepareTransport(PersistDocumentTransportBuilder builder) {
+    builder.addAlias(
+        NODE_LIST_EDGE_MATCHER_INFO_TAG, DepanFxNodeListEdgeMatcherData.class);
+
     builder.addAllowedType(ALLOW_TYPES);
 
+    // Apply plugins for document elements.
     graphNodeRegistry.applyExtensions(builder, DepanFxWorkspaceResource.class);
   }
 }

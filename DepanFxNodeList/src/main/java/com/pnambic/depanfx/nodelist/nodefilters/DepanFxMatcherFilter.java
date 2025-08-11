@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.nodelist.edgematchers;
+package com.pnambic.depanfx.nodelist.nodefilters;
 
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLink;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;

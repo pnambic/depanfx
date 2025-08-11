@@ -47,7 +47,7 @@ public class DepanFxLinks {
     }
   }
 
-  static abstract class OnEdge implements DepanFxLink {
+  public static abstract class OnEdge implements DepanFxLink {
 
     protected final GraphEdge edge;
 
@@ -56,7 +56,7 @@ public class DepanFxLinks {
     }
   }
 
-  static class Forward extends OnEdge {
+  public static class Forward extends OnEdge {
 
     public Forward(GraphEdge edge) {
       super(edge);
@@ -73,7 +73,7 @@ public class DepanFxLinks {
     }
   }
 
-  static class Reverse extends OnEdge {
+  public static class Reverse extends OnEdge {
 
     public Reverse(GraphEdge edge) {
       super(edge);

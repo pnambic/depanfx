@@ -86,6 +86,8 @@ public class DepanFxNodeViewDataConverter
 
   private static final String VISIBLE_EDGE_RSRC = "visible-edges-rsrc";
 
+  private static final String EDGE_FILTER_RSRC = "edge-filter-rsrc";
+
   public static final String LINK_DISPLAY_DOC = "link-display-doc";
 
   private static final String REMAINDER_EDGES_VISIBLE = "remainder-edges-visible";
@@ -128,6 +130,8 @@ public class DepanFxNodeViewDataConverter
           new PersistTagDataLoader.TagDescriptor(
               VISIBLE_EDGE_RSRC, DepanFxWorkspaceResource.class),
           new PersistTagDataLoader.TagDescriptor(
+              EDGE_FILTER_RSRC, DepanFxWorkspaceResource.class),
+          new PersistTagDataLoader.TagDescriptor(
               LINK_DISPLAY_DOC, DepanFxWorkspaceResource.class),
           new PersistTagDataLoader.TagDescriptor(
               REMAINDER_EDGES_VISIBLE, Boolean.class),
@@ -148,7 +152,7 @@ public class DepanFxNodeViewDataConverter
       SCENE_DATA,
       AVAILABLE_NODE_RSRC, VISIBLE_NODE_RSRC, NODE_FOLD_RSRCS, NODE_DISPLAY_DOC,
       REMAINDER_NODES_VISIBLE, REMAINDER_NODES_DISPLAY,
-      AVAILABLE_EDGE_RSRC, VISIBLE_EDGE_RSRC, LINK_DISPLAY_DOC,
+      AVAILABLE_EDGE_RSRC, VISIBLE_EDGE_RSRC, EDGE_FILTER_RSRC, LINK_DISPLAY_DOC,
       REMAINDER_EDGES_VISIBLE, REMAINDER_EDGES_LABEL, REMAINDER_EDGES_DISPLAY
   };
 
@@ -182,6 +186,8 @@ public class DepanFxNodeViewDataConverter
         viewData.getAvailableEdgeResource();
     DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc =
         viewData.getVisibleEdgeResource();
+    DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> edgeFiltersRsrc =
+        viewData.getEdgeFiltersResource();
 
     marshalObject(dstContext,
         NODE_VIEW_NAME, viewData.getToolName());
@@ -194,15 +200,11 @@ public class DepanFxNodeViewDataConverter
     marshalObject(dstContext,
         SCENE_DATA, viewData.getSceneData());
 
-    if (availableNodeRsrc != null) {
-      marshalObject(dstContext, AVAILABLE_NODE_RSRC, availableNodeRsrc);
-    }
-    if (visibleNodeRsrc != null) {
-      marshalObject(dstContext, VISIBLE_NODE_RSRC, visibleNodeRsrc);
-    }
-    if (nodeFoldRsrcs != null) {
-      marshalObject(dstContext, NODE_FOLD_RSRCS, nodeFoldRsrcs);
-    }
+    marshalOptionalValue(dstContext, AVAILABLE_NODE_RSRC, availableNodeRsrc);
+    marshalOptionalValue(dstContext, VISIBLE_NODE_RSRC, visibleNodeRsrc);
+    marshalOptionalValue(dstContext, VISIBLE_NODE_RSRC, edgeFiltersRsrc);
+    marshalOptionalValue(dstContext, NODE_FOLD_RSRCS, nodeFoldRsrcs);
+
     marshalObject(dstContext,
         NODE_DISPLAY_DOC, viewData.getNodeDisplayDocRsrc());
     marshalObject(dstContext,
@@ -210,15 +212,12 @@ public class DepanFxNodeViewDataConverter
     marshalObject(dstContext,
         REMAINDER_NODES_DISPLAY, viewData.getRemainderNodesDisplay());
 
-    if (availableEdgeRsrc != null) {
-      marshalObject(dstContext, AVAILABLE_EDGE_RSRC, availableEdgeRsrc);
-    }
-    if (visibleEdgeRsrc != null) {
-      marshalObject(dstContext, VISIBLE_EDGE_RSRC, visibleEdgeRsrc);
-    }
+    marshalOptionalValue(dstContext, AVAILABLE_EDGE_RSRC, availableEdgeRsrc);
+    marshalOptionalValue(dstContext, VISIBLE_EDGE_RSRC, visibleEdgeRsrc);
+    marshalOptionalValue(dstContext, EDGE_FILTER_RSRC, edgeFiltersRsrc);
 
     marshalObject(dstContext,
-        LINK_DISPLAY_DOC, viewData.getLinkDisplayDocRsrc());
+        LINK_DISPLAY_DOC, viewData.getLinkDisplayResource());
     marshalObject(dstContext,
         REMAINDER_EDGES_VISIBLE, viewData.getRemainderEdgesVisible());
     marshalObject(dstContext,
@@ -282,6 +281,10 @@ public class DepanFxNodeViewDataConverter
     @SuppressWarnings("unchecked")
     DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc =
         metaData.getObject(VISIBLE_EDGE_RSRC, DepanFxWorkspaceResource.class);
+
+    @SuppressWarnings("unchecked")
+    DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> edgeFiltersRsrc =
+        metaData.getObject(EDGE_FILTER_RSRC, DepanFxWorkspaceResource.class);
 
     @SuppressWarnings("unchecked")
     DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayDocRsrc =
@@ -354,12 +357,13 @@ public class DepanFxNodeViewDataConverter
       visibleNodeRsrc = availableNodeRsrc;
     }
 
-    return new DepanFxNodeViewData(toolName, toolDescr,
+    return new DepanFxNodeViewData(
+        toolName, toolDescr,
         graphDocRsrc, viewNodes, nodeLocations, nodeDisplay, edgeDisplay,
         sceneData,
         availableNodeRsrc, visibleNodeRsrc, nodeFoldRsrcs, nodeDisplayDocRsrc,
         remainderNodesVisible, remainderNodeDisplay,
-        availableEdgeRsrc, visibleEdgeRsrc, linkDisplayDocRsrc,
+        availableEdgeRsrc, visibleEdgeRsrc, edgeFiltersRsrc, linkDisplayDocRsrc,
         remainderEdgesVisible, remainderEdgesLabel, remainderEdgeDisplay);
   }
 

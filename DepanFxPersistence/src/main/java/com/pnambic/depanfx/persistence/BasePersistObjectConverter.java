@@ -22,6 +22,15 @@ public abstract class BasePersistObjectConverter<T>
     dstContext.endNode();
   }
 
+  protected void marshalOptionalValue(
+      XstreamMarshalContext dstContext, String tag, Object source) {
+    if (source != null) {
+      dstContext.startNode(tag);
+      marshalValue(dstContext, source);
+      dstContext.endNode();
+    }
+  }
+
   protected void marshalProperty(
       XstreamMarshalContext dstContext, String propertyTag, Object source) {
     dstContext.startNode(propertyTag);
