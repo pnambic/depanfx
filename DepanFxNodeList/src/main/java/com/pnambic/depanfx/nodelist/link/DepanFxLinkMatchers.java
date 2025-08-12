@@ -91,21 +91,9 @@ public class DepanFxLinkMatchers {
 
     @Override
     public Optional<DepanFxLink> match(GraphEdge edge) {
-      for (DepanFxLinkMatcher matcher : matchers) {
-        Optional<DepanFxLink> optMatch = matcher.match(edge);
-        if (optMatch.isPresent()) {
-          return optMatch;
-        }
-      }
-      return Optional.empty();
-    }
-
-    public Optional<DepanFxLink> matchX(GraphEdge edge) {
       return matchers.stream()
-          .map(m -> m.match(edge))
-          .filter(Optional::isPresent)
-          .findFirst()
-          .get();
+          .flatMap(m -> m.match(edge).stream())
+          .findFirst();
     }
   }
 }
