@@ -190,8 +190,7 @@ public class JoglRenderer {
         mouseX, mouseY, selectWidth, selectHeight);
 
     // Lock down list to ensure repeatable order.
-    List<JoglPickable> pickables =
-        getPickableShapes().collect(Collectors.toList());
+    List<JoglPickable> pickables = getPickableShapes();
 
     GL2 gl = drawable.getGL().getGL2();
     GLContext glContext = drawable.getContext();
@@ -325,10 +324,11 @@ public class JoglRenderer {
   /**
    * Provide the pickable set of shapes.
    */
-  private Stream<JoglPickable> getPickableShapes() {
+  private List<JoglPickable> getPickableShapes() {
     return shapes.stream()
         .filter(s -> s instanceof JoglPickable)
-        .map(JoglPickable.class::cast);
+        .map(JoglPickable.class::cast)
+        .toList();
   }
 
   private Collection<Object> processHits(

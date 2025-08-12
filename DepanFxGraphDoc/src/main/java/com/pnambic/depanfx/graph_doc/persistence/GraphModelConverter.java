@@ -56,17 +56,16 @@ public class GraphModelConverter
     dstContext.putContextValue(GraphModel.class, graph);
 
     // Save all nodes and any info.
-    for (Node<? extends ContextNodeId> node : graph.getNodes()) {
+    graph.getNodes().forEach(node -> {
       marshalObject(dstContext, node);
       marshalNodeInfo(dstContext, graph, (GraphNode) node);
-    }
+    });
 
     // Save all edges and any info.
-    for (Edge<? extends ContextNodeId, ? extends ContextRelationId> edge
-        : graph.getEdges()) {
+    graph.getEdges().forEach(edge -> {
       marshalObject(dstContext, edge);
       marshalEdgeInfo(dstContext, graph, (GraphEdge) edge);
-    }
+    });
 
     // Save any model info.
     graph.streamModelInfo()

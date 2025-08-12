@@ -72,9 +72,7 @@ public class DepanFxDepthFirstTree {
   public void buildFromNodes(Collection<GraphNode> nodes) {
     // The starts should be in the filterSet, but this is cheap insurance.
     filterSet.addAll(nodes);
-    for (GraphNode node : nodes) {
-      nodeInfo.put(node, new NodeStatus());
-    }
+    nodes.forEach(n -> nodeInfo.put(n, new NodeStatus()));
 
     for (GraphNode node : nodes) {
       NodeStatus nodeStatus = nodeInfo.get(node);

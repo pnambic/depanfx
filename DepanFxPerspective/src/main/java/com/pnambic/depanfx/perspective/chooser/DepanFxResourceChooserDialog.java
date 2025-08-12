@@ -265,13 +265,10 @@ public class DepanFxResourceChooserDialog {
       return null;
     }
 
-    for (TreeItem<DepanFxWorkspaceMember> child : currentTree.getChildren()) {
-      TreeItem<DepanFxWorkspaceMember> found = findTreeItem(child, targetPath);
-      if (found != null) {
-        return found;
-      }
-    }
-    return null;
+    return currentTree.getChildren().stream()
+        .map(c -> findTreeItem(c, targetPath))
+        .findFirst()
+        .orElse(null);
   }
 
   private boolean startWith(Path targetPath, Path prefixPath) {

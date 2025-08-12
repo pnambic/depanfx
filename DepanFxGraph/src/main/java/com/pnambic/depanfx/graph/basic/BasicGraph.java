@@ -57,16 +57,12 @@ public class BasicGraph<N,R> implements Graph<N,R> {
   @Override
   public Edge<? extends N, ? extends R> findEdge(Relation<? extends R> relation,
       final Node<? extends N> head, final Node<? extends N> tail) {
-    for (Edge<? extends N, ? extends R> edge : edges) {
-      if ((relation == edge.getRelation()) &&
-          (head == edge.getHead()) &&
-          (tail == edge.getTail())) {
-        return edge;
-      }
-    }
-
-    // Not found
-    return null;
+    return edges.stream()
+        .filter(edge -> (relation == edge.getRelation()))
+        .filter(edge -> (head == edge.getHead()))
+        .filter(edge -> (tail == edge.getTail()))
+        .findFirst()
+        .orElse(null);
   }
 
   /////////////////////////////////////
