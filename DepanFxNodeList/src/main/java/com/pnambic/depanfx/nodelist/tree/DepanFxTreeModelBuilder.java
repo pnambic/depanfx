@@ -1,8 +1,5 @@
 package com.pnambic.depanfx.nodelist.tree;
 
-import com.pnambic.depanfx.graph.api.Edge;
-import com.pnambic.depanfx.graph.context.ContextNodeId;
-import com.pnambic.depanfx.graph.context.ContextRelationId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
@@ -47,10 +44,10 @@ public class DepanFxTreeModelBuilder {
   public DepanFxAdjacencyModel buildAdjacencyModel(GraphModel model) {
 
     DepanFxSimpleAdjacencyModel result = new DepanFxSimpleAdjacencyModel();
-    for (Edge<? extends ContextNodeId, ? extends ContextRelationId> edge : model.getEdges()) {
-      linkMatcher.match((GraphEdge) edge)
-          .ifPresent(result::addAdjacency);
-    }
+    model.getEdges().stream()
+        .flatMap(e -> linkMatcher.match((GraphEdge) e).stream())
+        .forEach(result::addAdjacency);
+
     return result;
   }
 }
