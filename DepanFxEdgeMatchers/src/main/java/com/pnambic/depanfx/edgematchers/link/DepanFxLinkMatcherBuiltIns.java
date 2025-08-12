@@ -28,21 +28,26 @@ import java.util.Collections;
 @Configuration
 public class DepanFxLinkMatcherBuiltIns {
 
-  public static final Path MEMBER_MATCHER_PATH =
-      DepanFxLinkMatcherDocument.LINK_MATCHER_TOOL_PATH.resolve("Tree Member");
-
   public static final String MATCH_ALL_MATCHER_LABEL = "All Edges";
 
-  public static final String MATCH_ALL_MATCHER_DESCR = "All Edges";
+  public static final String MATCH_ALL_MATCHER_DESCR = "All edges.";
 
   public static final String MATCH_ALL_DOC_NAME = "All Edges";
+
+  public static final String TREE_MEMBER_LABEL = "Tree Member";
+
+  public static final String TREE_MEMBER_DESCR =
+      "Synthetic tree membership";
+
+  public static final String TREE_MEMBER_DOC_NAME = "Tree Member";
 
   public static final Path MATCH_ALL_DOC_PATH =
       DepanFxLinkMatcherDocument.LINK_MATCHER_TOOL_PATH
           .resolve(MATCH_ALL_DOC_NAME);
 
-  private final DepanFxLinkMatcherDocument allEdgeMatcherDoc =
-      buildAllEdgeMatcher();
+  public static final Path MEMBER_MATCHER_PATH =
+      DepanFxLinkMatcherDocument.LINK_MATCHER_TOOL_PATH
+          .resolve(TREE_MEMBER_DOC_NAME);
 
   public DepanFxLinkMatcherBuiltIns() {
   }
@@ -53,26 +58,26 @@ public class DepanFxLinkMatcherBuiltIns {
 
     DepanFxLinkMatcherDocument finderMatcher =
         new DepanFxLinkMatcherDocument(
-            "Tree Member", "Synthetic tree membership",
-            null, DepanFxLinkMatcherGroup.MEMBER_MATCHER_GROUP, null);
+            TREE_MEMBER_LABEL, TREE_MEMBER_DESCR,
+            null,
+            DepanFxLinkMatcherGroup.MEMBER_MATCHER_GROUP,
+            null);
     return new DepanFxBuiltInContribution.Simple<>(
         MEMBER_MATCHER_PATH, finderMatcher);
   }
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxLinkMatcherDocument>
-      allEdgeMatcher() {
+  allEdgeMatcher() {
+
+    DepanFxLinkMatcherDocument allEdgeMatcherDoc =
+        new DepanFxLinkMatcherDocument(
+            MATCH_ALL_MATCHER_LABEL, MATCH_ALL_MATCHER_DESCR,
+            BaseContextDefinition.MODEL_ID,
+            Collections.emptyList(),
+            DepanFxLinkMatchers.ALL_EDGES_FORWARD);
 
     return new DepanFxBuiltInContribution.Simple<>(
         MATCH_ALL_DOC_PATH, allEdgeMatcherDoc);
-  }
-
-  private DepanFxLinkMatcherDocument buildAllEdgeMatcher() {
-    return new DepanFxLinkMatcherDocument(
-          MATCH_ALL_MATCHER_LABEL,
-          MATCH_ALL_MATCHER_DESCR,
-          BaseContextDefinition.MODEL_ID,
-          Collections.emptyList(),
-          DepanFxLinkMatchers.ALL_EDGES_FORWARD);
   }
 }

@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package com.pnambic.depanfx.nodelist.gui;
+package com.pnambic.depanfx.nodelist.gui.edgematchers;
 
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser.NodeListControl;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListEdgeMatcherData;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxProctor;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxFxmlDialog;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
+
+import net.rgielen.fxweaver.core.FxmlView;
 
 import java.io.File;
 import java.util.Optional;
@@ -39,7 +42,9 @@ import javafx.stage.FileChooser.ExtensionFilter;
 /**
  * Create and edit node list link matchers.
  */
-public class DepanFxNodeListLinkMatcherDialog
+@DepanFxFxmlDialog
+@FxmlView("node-list-edge-matcher-dialog.fxml")
+public class DepanFxNodeListEdgeMatcherDialog
     extends DepanFxBaseToolDialog<DepanFxNodeListEdgeMatcherData> {
 
   public static final ExtensionFilter NODE_LIST_EDGE_FILTER =
@@ -71,8 +76,8 @@ public class DepanFxNodeListLinkMatcherDialog
   public static Optional<DepanFxWorkspaceResource<DepanFxNodeListEdgeMatcherData>>
   runCreateDialog(
       DepanFxDialogRunner dialogRunner) {
-    Dialog<DepanFxNodeListLinkMatcherDialog> dlg =
-        dialogRunner.createDialogAndParent(DepanFxNodeListLinkMatcherDialog.class);
+    Dialog<DepanFxNodeListEdgeMatcherDialog> dlg =
+        dialogRunner.createDialogAndParent(DepanFxNodeListEdgeMatcherDialog.class);
     dlg.runDialog(NEW_NODE_LIST_LINK_MATCHER_TITLE);
     return dlg.getController().getToolResource();
   }
@@ -84,14 +89,14 @@ public class DepanFxNodeListLinkMatcherDialog
   runEditDialog(
       DepanFxDialogRunner dialogRunner,
       DepanFxWorkspaceResource<DepanFxNodeListEdgeMatcherData> matcherRsrc) {
-    Dialog<DepanFxNodeListLinkMatcherDialog> dlg =
-        dialogRunner.createDialogAndParent(DepanFxNodeListLinkMatcherDialog.class);
+    Dialog<DepanFxNodeListEdgeMatcherDialog> dlg =
+        dialogRunner.createDialogAndParent(DepanFxNodeListEdgeMatcherDialog.class);
     dlg.getController().setToolResource(matcherRsrc);
     dlg.runDialog(EDIT_NODE_LIST_LINK_MATCHER_TITLE);
     return dlg.getController().getToolResource();
   }
 
-  public DepanFxNodeListLinkMatcherDialog(
+  public DepanFxNodeListEdgeMatcherDialog(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner) {
     super(workspace, DepanFxNodeListEdgeMatcherData.class);
