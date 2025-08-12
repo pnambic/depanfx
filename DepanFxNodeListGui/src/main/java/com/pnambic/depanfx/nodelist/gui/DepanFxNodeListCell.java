@@ -87,19 +87,31 @@ public class DepanFxNodeListCell
 
     ObservableList<TreeItem<DepanFxNodeListMember>> choices =
         selected.getSelectedItems();
-    if (choices.size() == 1) {
-      TreeItem<DepanFxNodeListMember> treeItem = choices.get(0);
-      if (treeItem != null) {
-        DepanFxNodeListMember node = treeItem.getValue();
-        if (node instanceof DepanFxNodeListGraphNode graphNode) {
-          cellItem.fillNodeContextMenu(
-              contextMenu, getScene(), tableAdapter, graphNode.getGraphNode());
-          return;
-        }
-      }
+
+    DepanFxNodeListGraphNode solo = getSoloSelection(choices);
+    if (solo != null) {
+      cellItem.fillNodeContextMenu(
+          contextMenu, getScene(), tableAdapter, solo.getGraphNode());
+      return;
     }
     cellItem.fillMultiContextMenu(
         contextMenu, getScene(), tableAdapter, choices);
+  }
+
+  private DepanFxNodeListGraphNode getSoloSelection(
+      ObservableList<TreeItem<DepanFxNodeListMember>> choices) {
+    if (choices.size() != 1) {
+      return null;
+    }
+    // If there is are multiple thread, sometimes the first item is null.
+    TreeItem<DepanFxNodeListMember> item = choices.get(0);
+    if (item == null) {
+      return null;
+    }
+    if (item.getValue() instanceof DepanFxNodeListGraphNode graphNode) {
+      return graphNode;
+    }
+    return null;
   }
 
   private static class NameConverter
