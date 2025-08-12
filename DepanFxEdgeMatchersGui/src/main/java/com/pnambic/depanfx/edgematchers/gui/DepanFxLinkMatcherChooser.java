@@ -17,6 +17,7 @@ import java.util.function.BiConsumer;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableCell;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TextField;
 
 public class DepanFxLinkMatcherChooser {
@@ -101,7 +102,7 @@ public class DepanFxLinkMatcherChooser {
     private final Scene scene;
 
     private final BiConsumer<
-            T, DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+            TableRow<T>, DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
         matcherConsumer;
 
     public LinkMatcherCell(
@@ -109,7 +110,8 @@ public class DepanFxLinkMatcherChooser {
         DepanFxDialogRunner dialogRunner,
         Scene scene,
         BiConsumer<
-                T, DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+            TableRow<T>,
+            DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
             matcherConsumer) {
       this.workspace = workspace;
       this.dialogRunner = dialogRunner;
@@ -140,7 +142,7 @@ public class DepanFxLinkMatcherChooser {
     private void runLinkMatcherFinder() {
       DepanFxLinkMatcherChooser
           .runLinkMatcherFinder(workspace, dialogRunner, scene)
-          .ifPresent(r -> matcherConsumer.accept(getTableRow().getItem(), r));
+          .ifPresent(r -> matcherConsumer.accept(getTableRow(), r));
     }
   }
 

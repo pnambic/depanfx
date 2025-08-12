@@ -150,12 +150,11 @@ public class DepanFxNodeViewLinkDisplayDialog
     TableColumn<EditLinkDisplay, String> filePathColumn =
         columnBinder.bind("linkDisplayName");
 
-    // filePathColumn.setCellFactory(column -> new DisplayNameCellFactory());
     filePathColumn.setCellFactory(c ->
         new DepanFxLinkMatcherChooser.LinkMatcherCell<>(
             getWorkspace(), dialogRunner,
             linksDisplayTable.getScene(),
-            (t, r) -> updateMatcher(t, r)));
+            (t, r) -> updateMatcher(t.getItem(), r)));
 
     TableColumn<EditLinkDisplay, Number> countColumn = columnBinder.next();
     countColumn.setStyle("-fx-alignment: CENTER-RIGHT;");
