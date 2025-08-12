@@ -267,6 +267,7 @@ public class DepanFxResourceChooserDialog {
 
     return currentTree.getChildren().stream()
         .map(c -> findTreeItem(c, targetPath))
+        .filter(item -> item != null)
         .findFirst()
         .orElse(null);
   }
