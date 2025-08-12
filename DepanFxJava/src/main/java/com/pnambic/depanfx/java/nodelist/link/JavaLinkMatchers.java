@@ -217,7 +217,7 @@ public class JavaLinkMatchers {
 
   public static final DepanFxLinkMatcherDocument MODULE_USES_FORWARD_DOC =
       buildMatcherDoc("Module Uses", "Module uses service class.",
-          MODULE_REQUIRES_FORWARD);
+          MODULE_USES_FORWARD);
 
   /////////////////////////////////////
   // Aggregate matchers and documents

@@ -24,7 +24,8 @@ public class DepanFxBaseFilterData extends DepanFxBaseToolData {
 
   private static final String NODE_FILTERS_TOOL_DIR = "Filters";
 
-  public static final String NODE_VSIBILITY_CONTEXT_RESOURCE_NAME = "Node Visibility";
+  public static final String NODE_VSIBILITY_CONTEXT_RESOURCE_NAME =
+      "Node Visibility";
 
   public static final Path NODE_FILTERS_TOOL_PATH =
       DepanFxProjects.TOOLS_PATH.resolve(NODE_FILTERS_TOOL_DIR);
