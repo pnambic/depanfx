@@ -15,10 +15,10 @@
  */
 package com.pnambic.depanfx.nodeview.gui;
 
-import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLink;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
+import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.nodeview.jogl.JoglLines;
 import com.pnambic.depanfx.nodeview.jogl.JoglPane;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
@@ -325,7 +325,6 @@ public class EdgeDisplayController {
         new DepanFxLinkMatcherSequenceDocument(
             availableEdgeInfo.getToolName(),
             availableEdgeInfo.getToolDescription(),
-            availableEdgeInfo.getModelId(),
             matcherRefs);
 
     return DepanFxWorkspaceResource.forUpdate(availableMatchersRsrc, matcherInfo);
@@ -343,7 +342,6 @@ public class EdgeDisplayController {
         new DepanFxLinkMatcherSequenceDocument(
             visibleMatchersInfo.getToolName(),
             visibleMatchersInfo.getToolDescription(),
-            visibleMatchersInfo.getModelId(),
             vizMatcherRsrcs);
 
     return DepanFxWorkspaceResource.forUpdate(visibleMatchersRsrc, matcherInfo);

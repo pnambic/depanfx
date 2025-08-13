@@ -16,7 +16,6 @@
 package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxMatcherFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeKindFilterData;
 
 import javafx.beans.property.BooleanProperty;
@@ -47,6 +46,6 @@ public class DepanFxNodeFiltersNodeKindMember
   public void updateFilter(DepanFxBaseFilterData filterData) {
     super.updateFilter(filterData);
     useInverseProperty.set(
-        ((DepanFxMatcherFilterData) filterData).useInverse());
+        ((DepanFxNodeKindFilterData) filterData).isExclusionFilter());
   }
 }

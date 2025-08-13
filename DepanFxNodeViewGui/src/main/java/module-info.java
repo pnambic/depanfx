@@ -9,16 +9,17 @@ module depanfx.nodeview.gui {
   requires com.google.common;
   requires org.apache.commons.csv;
   requires org.slf4j;
-  requires spring.context;
   requires spring.beans;
+  requires spring.context;
 
   requires pnambic.modxstream;
 
-  requires depanfx.graph;
-  requires depanfx.graph_doc;
-  requires depanfx.jogl;
   requires depanfx.edgematchers;
   requires depanfx.edgematchers.gui;
+  requires depanfx.graph;
+  requires depanfx.graph_doc;
+  requires depanfx.graph.info;
+  requires depanfx.jogl;
   requires depanfx.nodefilters;
   requires depanfx.nodefilters.gui;
   requires depanfx.nodelist;
@@ -29,7 +30,6 @@ module depanfx.nodeview.gui {
   requires depanfx.scene;
   requires depanfx.session.data;
   requires depanfx.workspace;
-  requires depanfx.graph.info;
 
   opens com.pnambic.depanfx.nodeview.gui
       to javafx.fxml, net.rgielen.fxweaver.core,

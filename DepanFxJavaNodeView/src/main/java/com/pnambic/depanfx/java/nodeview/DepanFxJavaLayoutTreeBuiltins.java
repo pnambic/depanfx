@@ -16,7 +16,7 @@
 package com.pnambic.depanfx.java.nodeview;
 
 import com.pnambic.depanfx.java.context.JavaContextModelId;
-import com.pnambic.depanfx.java.nodelist.link.JavaLinkMatcherBuiltIns;
+import com.pnambic.depanfx.java.edgematchers.link.JavaLinkMatcherBuiltIns;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayoutData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayouts;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxTreeLayoutData;

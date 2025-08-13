@@ -8,22 +8,24 @@ module depanfx.nodelist.gui {
   requires com.google.common;
   requires org.apache.commons.csv;
   requires org.slf4j;
-  requires spring.context;
   requires spring.beans;
+  requires spring.context;
 
   requires pnambic.modxstream;
 
+  requires depanfx.base;
+  requires depanfx.edgematchers;
+  requires depanfx.edgematchers.gui;
   requires depanfx.graph;
   requires depanfx.graph_doc;
   requires depanfx.graph.info;
+  requires depanfx.nodefilters;
+  requires depanfx.nodefilters.gui;
   requires depanfx.nodelist;
   requires depanfx.persistence;
   requires depanfx.perspective;
   requires depanfx.scene;
   requires depanfx.workspace;
-  requires depanfx.base;
-  requires depanfx.edgematchers;
-  requires depanfx.edgematchers.gui;
 
   opens com.pnambic.depanfx.nodelist.gui
       to javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;
@@ -35,6 +37,8 @@ module depanfx.nodelist.gui {
   opens com.pnambic.depanfx.nodelist.gui.columns.infos
       to javafx.fxml, net.rgielen.fxweaver.core,
          spring.beans, spring.context, spring.core;
+  opens com.pnambic.depanfx.nodelist.gui.nodefilters
+      to spring.core;
   opens com.pnambic.depanfx.nodelist.gui.sections
       to javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;
   opens com.pnambic.depanfx.nodelist.gui.sections.folds
@@ -45,6 +49,7 @@ module depanfx.nodelist.gui {
   exports com.pnambic.depanfx.nodelist.gui.columns;
   exports com.pnambic.depanfx.nodelist.gui.columns.annos;
   exports com.pnambic.depanfx.nodelist.gui.columns.infos;
+  exports com.pnambic.depanfx.nodelist.gui.nodefilters;
   exports com.pnambic.depanfx.nodelist.gui.sections;
   exports com.pnambic.depanfx.nodelist.gui.sections.folds;
   exports com.pnambic.depanfx.nodelist.gui.tooldata;

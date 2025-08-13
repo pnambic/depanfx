@@ -17,7 +17,7 @@ package com.pnambic.depanfx.filesystem.nodeview;
 
 import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
 import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
-import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemNodeKindFilterBuiltIns;
+import com.pnambic.depanfx.filesystem.edgematchers.link.FileSystemNodeKindFilterBuiltIns;
 import com.pnambic.depanfx.graph.context.ContextNodeKindId;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;

@@ -16,7 +16,6 @@
 package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxMatcherFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxSequenceFilterData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
@@ -43,7 +42,7 @@ public class DepanFxNodeFiltersChooser {
   public static final String ANY_FILTER_TOOL_EXT = "d*fti";
 
   private static final Class<?>[] filterTypes = new Class<?>[]{
-      DepanFxMatcherFilterData.class,
+      // Use registry - DepanFxMatcherFilterData.class,
       DepanFxSequenceFilterData.class
   };
 

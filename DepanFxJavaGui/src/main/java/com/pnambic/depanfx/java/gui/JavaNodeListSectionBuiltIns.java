@@ -16,13 +16,12 @@
 package com.pnambic.depanfx.java.gui;
 
 import com.pnambic.depanfx.java.context.JavaContextModelId;
-import com.pnambic.depanfx.java.nodelist.link.JavaLinkMatcherBuiltIns;
+import com.pnambic.depanfx.java.edgematchers.link.JavaLinkMatcherBuiltIns;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxContainerOrder;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 

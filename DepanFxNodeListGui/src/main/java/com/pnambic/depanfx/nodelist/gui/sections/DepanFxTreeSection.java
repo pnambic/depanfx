@@ -1,14 +1,14 @@
 package com.pnambic.depanfx.nodelist.gui.sections;
 
+import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatcherGroup;
+import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchers;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
-import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatcherGroup;
-import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchers;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;

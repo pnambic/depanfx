@@ -11,19 +11,15 @@ javafx {
 }
 
 dependencies {
-  implementation 'org.springframework.boot:spring-boot-autoconfigure'
   implementation "net.rgielen:javafx-weaver-core:${javafxWeaverVersion}"
   implementation "org.apache.commons:commons-csv:${apacheCsv}"
+  implementation 'org.springframework.boot:spring-boot-autoconfigure'
 
   implementation project(':DepanFxBase')
   implementation project(':DepanFxGraph')
   implementation project(':DepanFxGraphDoc')
   implementation project(':DepanFxGraphInfo')
-  implementation project(':DepanFxEdgeMatchers')
-  implementation project(':DepanFxEdgeMatchersGui')
   implementation project(':DepanFxNodeFilters')
-  implementation project(':DepanFxNodeList')
-  implementation project(':DepanFxNodeListGui')
   implementation project(':DepanFxPersistence')
   implementation project(':DepanFxPerspective')
   implementation project(':DepanFxScene')

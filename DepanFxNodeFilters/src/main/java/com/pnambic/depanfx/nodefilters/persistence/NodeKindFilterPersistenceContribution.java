@@ -16,7 +16,6 @@
 package com.pnambic.depanfx.nodefilters.persistence;
 
 import com.pnambic.depanfx.graph_doc.persistence.ContextNodeKindIdConverter;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxMatcherFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeKindFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.FilterMergeMode;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
@@ -48,7 +47,8 @@ public class NodeKindFilterPersistenceContribution
 
   @Override
   public boolean acceptsDocument(Object document) {
-    return DepanFxMatcherFilterData.class.isAssignableFrom(document.getClass());
+    return DepanFxNodeKindFilterData.class.isAssignableFrom(
+        document.getClass());
   }
 
   @Override

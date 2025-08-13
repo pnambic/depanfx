@@ -16,7 +16,7 @@
 package com.pnambic.depanfx.filesystem.gui;
 
 import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
-import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemLinkMatcherBuiltIns;
+import com.pnambic.depanfx.filesystem.edgematchers.link.FileSystemLinkMatcherBuiltIns;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxContainerOrder;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;

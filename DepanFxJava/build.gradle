@@ -5,18 +5,18 @@ plugins {
 }
 
 dependencies {
-  implementation 'org.springframework.boot:spring-boot-autoconfigure'
   implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+  implementation 'org.springframework.boot:spring-boot-autoconfigure'
 
   implementation "com.pnambic.modxstream:modxstream:${modxstreamVersion}"
 
   implementation project(':DepanFxBase')
+  implementation project(':DepanFxEdgeMatchers')
   implementation project(':DepanFxFileSystem')
   implementation project(':DepanFxGraph')
   implementation project(':DepanFxGraphInfo')
   implementation project(':DepanFxGraphDoc')
   implementation project(':DepanFxNodeFilters')
-  implementation project(':DepanFxEdgeMatchers')
   implementation project(':DepanFxNodeList')
   implementation project(':DepanFxPersistence')
   implementation project(':DepanFxWorkspace')

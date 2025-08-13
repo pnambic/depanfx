@@ -15,7 +15,6 @@
  */
 package com.pnambic.depanfx.edgematchers.gui;
 
-import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherChooser;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
@@ -179,11 +178,8 @@ public class DepanFxLinkMatcherSequenceToolDialog
         new ArrayList<>(linkMatcherSequenceTableData.size());
     linkMatcherSequenceTableData.forEach(matchers::add);
 
-    DepanFxLinkMatcherSequenceDocument matchSeqInfo =
-        getToolResource().get().getResource();
     return new DepanFxLinkMatcherSequenceDocument(
-            getToolName(), getToolDescription(),
-            matchSeqInfo.getModelId(), matchers);
+            getToolName(), getToolDescription(), matchers);
   }
 
   @Override

@@ -16,7 +16,7 @@
 package com.pnambic.depanfx.filesystem.nodeview;
 
 import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
-import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemLinkMatcherBuiltIns;
+import com.pnambic.depanfx.filesystem.edgematchers.link.FileSystemLinkMatcherBuiltIns;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayoutData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayouts;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxRadialLayoutData;

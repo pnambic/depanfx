@@ -16,9 +16,9 @@
 package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatcherBuiltIns;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxContainerOrder;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;

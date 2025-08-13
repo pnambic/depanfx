@@ -15,11 +15,12 @@
  */
 package com.pnambic.depanfx.filesystem.nodeview;
 
-import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
-import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
-import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemLinkMatcherBuiltIns;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
+import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
+import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
+import com.pnambic.depanfx.filesystem.edgematchers.link.FileSystemLinkMatcherBuiltIns;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDirection;
@@ -69,7 +70,7 @@ public class DepanFxFileSystemLinkViewBuiltIns {
   public static final Path FILE_SYSTEM_EDGE_RELATION_VISIBILITY_DOC_PATH =
       DepanFxLinkMatcherSequenceDocument.LINK_MATCHER_SEQUENCE_TOOL_PATH
           .resolve(FileSystemContextModelId.FILE_SYSTEM_KEY)
-          .resolve(DepanFxLinkMatcherSequenceDocument.EDGE_VISIBILITY_CONTEXT_RESOURCE_NAME);
+          .resolve(DepanFxLinkMatcher.EDGE_VISIBILITY_CONTEXT_RESOURCE_NAME);
 
   @Autowired
   public DepanFxFileSystemLinkViewBuiltIns() {
@@ -105,7 +106,6 @@ public class DepanFxFileSystemLinkViewBuiltIns {
         return new DepanFxLinkMatcherSequenceDocument(
             FILE_SYSTEM_EDGE_RELATION_VISIBILITY_NAME,
             FILE_SYSTEM_EDGE_RELATION_VISIBILITY_DESCR,
-            FileSystemContextDefinition.MODEL_ID,
             getDisplayFilters(displayContrib));
       }
 
