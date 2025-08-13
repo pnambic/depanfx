@@ -1,7 +1,7 @@
 package com.pnambic.depanfx.nodelist.tree;
 
-import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLink;
+import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData.NodeNest;
 
 import org.slf4j.Logger;

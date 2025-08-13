@@ -196,7 +196,6 @@ public class DepanFxNodeViewEdgeVisibilityDialog
     // .. even though these should be the same if live updates are working.
     return new DepanFxLinkMatcherSequenceDocument(
             getToolName(), getToolDescription(),
-            getToolResource().get().getResource().getModelId(),
             prepareVisibleMatchers());
   }
 

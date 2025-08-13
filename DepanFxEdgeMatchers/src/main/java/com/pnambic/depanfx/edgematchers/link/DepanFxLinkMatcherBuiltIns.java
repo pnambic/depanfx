@@ -15,8 +15,8 @@
  */
 package com.pnambic.depanfx.edgematchers.link;
 
-import com.pnambic.depanfx.graph.context.BaseContextDefinition;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.graph.context.BaseContextDefinition;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 
 import org.springframework.context.annotation.Bean;

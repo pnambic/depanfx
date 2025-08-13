@@ -16,11 +16,11 @@
 package com.pnambic.depanfx.java.nodeview;
 
 import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
-import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemNodeKindFilterBuiltIns;
+import com.pnambic.depanfx.filesystem.edgematchers.link.FileSystemNodeKindFilterBuiltIns;
 import com.pnambic.depanfx.graph.context.ContextNodeKindId;
 import com.pnambic.depanfx.java.context.JavaContextDefinition;
 import com.pnambic.depanfx.java.context.JavaContextModelId;
-import com.pnambic.depanfx.java.nodelist.link.JavaNodeKindFilterBuiltIns;
+import com.pnambic.depanfx.java.nodefilters.JavaNodeKindFilterBuiltIns;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;

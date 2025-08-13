@@ -1,14 +1,16 @@
 module depanfx.java.nodeview {
-  requires com.google.common;
   requires javafx.graphics;  // For color definitions
-  requires org.slf4j;
 
-  requires spring.context;
+  requires com.google.common;
+  requires org.slf4j;
   requires spring.beans;
+  requires spring.context;
 
   requires depanfx.base;
+  requires depanfx.edgematchers;
   requires depanfx.graph;
   requires depanfx.graph.info;
+  requires depanfx.nodefilters;
   requires depanfx.nodelist;
   requires depanfx.filesystem;
   requires depanfx.graph_doc;
@@ -16,8 +18,6 @@ module depanfx.java.nodeview {
   requires depanfx.nodeview.data;
   requires depanfx.persistence;
   requires depanfx.workspace;
-  requires depanfx.nodefilters;
-  requires depanfx.edgematchers;
 
   opens com.pnambic.depanfx.java.nodeview
       to spring.beans, spring.context, spring.core;

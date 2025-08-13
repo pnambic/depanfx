@@ -7,17 +7,17 @@ module depanfx.nodeview.data {
   requires spring.context;
   requires spring.beans;
 
+  requires depanfx.base;
+  requires depanfx.edgematchers;
   requires depanfx.graph;
   requires depanfx.graph_doc;
   requires depanfx.graph.info;
+  requires pnambic.modxstream;
   requires depanfx.nodefilters;
   requires depanfx.nodelist;
-  requires depanfx.edgematchers;
   requires depanfx.persistence;
   requires depanfx.session.data;
   requires depanfx.workspace;
-  requires pnambic.modxstream;
-  requires depanfx.base;
 
   opens com.pnambic.depanfx.nodeview.builtins
       to spring.beans, spring.context, spring.core;

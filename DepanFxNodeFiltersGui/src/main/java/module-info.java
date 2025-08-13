@@ -6,23 +6,19 @@ module depanfx.nodefilters.gui {
 
   requires com.google.common;
   requires org.slf4j;
-  requires spring.context;
   requires spring.beans;
+  requires spring.context;
 
+  requires javafx.base;
   requires depanfx.base;
   requires depanfx.graph;
+  requires depanfx.graph_doc;
+  requires depanfx.graph.info;
   requires depanfx.nodefilters;
-  requires depanfx.nodelist;
-  requires depanfx.nodelist.gui;
-  requires depanfx.edgematchers;
-  requires depanfx.edgematchers.gui;
   requires depanfx.persistence;
   requires depanfx.perspective;
-  requires depanfx.workspace;
-  requires depanfx.graph_doc;
   requires depanfx.scene;
-  requires javafx.base;
-  requires depanfx.graph.info;
+  requires depanfx.workspace;
 
   opens com.pnambic.depanfx.nodefilters.gui
       to javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;

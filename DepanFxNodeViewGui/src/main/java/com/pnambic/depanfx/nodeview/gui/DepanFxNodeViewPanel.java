@@ -15,6 +15,8 @@
  */
 package com.pnambic.depanfx.nodeview.gui;
 
+import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatcherGroup;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.context.GraphContextKeys;
 import com.pnambic.depanfx.graph.info.GraphNodeInfo;
@@ -23,18 +25,16 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.graph_doc.model.GraphModel;
 import com.pnambic.depanfx.jogl.JoglMouseActionListener;
-import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeViewNodeFiltersDialog;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
+import com.pnambic.depanfx.nodelist.gui.DepanFxFilterSelectionDialog;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeFoldDialog;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
-import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodeview.jogl.JoglPane;
@@ -539,7 +539,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     DepanFxNodeList filteredNodes =
         getNodeSelection().getSelection(getNodeSelectionAsNodeList());
 
-    Stage filterSelctionDialog = DepanFxNodeViewNodeFiltersDialog.runEditDialog(
+    Stage filterSelctionDialog = DepanFxFilterSelectionDialog.runEditDialog(
         getDialogRunner(), tableViewRsrc, nodeFold, filteredNodes,
         nl -> nodeSelection.doSelectGraphNodesAction(nl.getNodes()));
 

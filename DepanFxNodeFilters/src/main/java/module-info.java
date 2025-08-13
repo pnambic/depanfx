@@ -16,18 +16,16 @@
 module depanfx.nodefilters {
   requires com.google.common;
   requires org.slf4j;
-  requires spring.context;
   requires spring.beans;
+  requires spring.context;
 
   requires pnambic.modxstream;
 
+  requires depanfx.base;
   requires depanfx.graph;
   requires depanfx.graph_doc;
-  requires depanfx.nodelist;
-  requires depanfx.edgematchers;
   requires depanfx.persistence;
   requires depanfx.workspace;
-  requires depanfx.base;
 
   opens com.pnambic.depanfx.nodefilters.model to spring.core;
   opens com.pnambic.depanfx.nodefilters.persistence to spring.beans;

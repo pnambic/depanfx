@@ -1,10 +1,25 @@
+/*
+ * Copyright 2024 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.pnambic.depanfx.nodeview.jogl;
 
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLink;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.jogl.JoglColor;
 import com.pnambic.depanfx.jogl.shapes.LineShape;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLink;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
@@ -12,8 +27,6 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineForm;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineLabel;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineStyle;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;
-
-import java.awt.Shape;
 
 /**
  * Hold references to line entities from the {@code Automatic-Module-Name}

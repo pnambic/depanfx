@@ -15,8 +15,6 @@
  */
 package com.pnambic.depanfx.edgematchers.tooldata;
 
-import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
-import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -25,34 +23,25 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class DepanFxLinkMatcherSequenceDocument extends DepanFxBaseToolData {
+public class DepanFxLinkMatcherSequenceDocument
+    extends DepanFxBaseMatcherDocument {
 
   public static final String LINK_MATCHER_SEQUENCE_TOOL_EXT = "dlmsti";
 
-  public static final String EDGE_VISIBILITY_CONTEXT_RESOURCE_NAME = "Edge Visibility";
-
   // Share persistence location with stand-alone link matchers.
   public static final String LINK_MATCHER_SEQUENCE_TOOL_DIR =
-      DepanFxLinkMatcherDocument.LINK_MATCHER_TOOL_DIR;
+      LINK_MATCHER_TOOL_DIR;
 
   public static final Path LINK_MATCHER_SEQUENCE_TOOL_PATH =
-      DepanFxLinkMatcherDocument.LINK_MATCHER_TOOL_PATH;
-
-  private final ContextModelId contextModelId;
+      LINK_MATCHER_TOOL_PATH;
 
   private final List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> matcherRefs;
 
   public DepanFxLinkMatcherSequenceDocument(
       String toolName, String toolDescription,
-      ContextModelId contextModelId,
       List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> matcherRefs) {
     super(toolName, toolDescription);
-    this.contextModelId = contextModelId;
     this.matcherRefs = matcherRefs;
-  }
-
-  public ContextModelId getModelId() {
-    return contextModelId;
   }
 
   public Stream<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
@@ -60,11 +49,13 @@ public class DepanFxLinkMatcherSequenceDocument extends DepanFxBaseToolData {
     return matcherRefs.stream();
   }
 
+  /**
+   * Provide the first matcher that matches the edge.
+   */
   public Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
       getMatcher(GraphEdge edge) {
     return streamMatchers()
         .filter(m -> m.getResource().getMatcher().match(edge).isPresent())
         .findFirst();
   }
-
 }

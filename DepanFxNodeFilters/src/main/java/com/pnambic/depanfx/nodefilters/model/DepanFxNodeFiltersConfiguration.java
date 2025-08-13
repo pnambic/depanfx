@@ -17,14 +17,10 @@ package com.pnambic.depanfx.nodefilters.model;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphModel;
-import com.pnambic.depanfx.nodefilters.persistence.ListFilterPersistenceContribution;
-import com.pnambic.depanfx.nodefilters.persistence.MatcherFilterPersistenceContribution;
 import com.pnambic.depanfx.nodefilters.persistence.NodeKindFilterPersistenceContribution;
 import com.pnambic.depanfx.nodefilters.persistence.ReferencedFilterPersistenceContribution;
 import com.pnambic.depanfx.nodefilters.persistence.SequenceFilterPersistenceContribution;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxListFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxMatcherFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeKindFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxReferencedFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxSequenceFilterData;
@@ -37,51 +33,6 @@ import java.util.Collection;
 
 @Configuration
 public class DepanFxNodeFiltersConfiguration {
-
-  @Bean
-  public DepanFxNodeFiltersRegistry.Contribution listNodeFilter() {
-    return new NodeFilterContrib(DepanFxListFilterData.class) {
-
-      @Override
-      public DepanFxBaseFilter<?> buildFilter(
-          DepanFxBaseFilterData filterData,
-          DepanFxNodeFiltersRegistry nodeFilterRegistry,
-          GraphModel graphModel,
-          Collection<GraphNode> targetNodes) {
-        return new DepanFxListFilter((DepanFxListFilterData) filterData);
-      }
-
-      @Override
-      public void prepareTransport(PersistDocumentTransportBuilder builder) {
-        prepareTransport(builder,
-            ListFilterPersistenceContribution.LIST_FILTER_INFO_TAG,
-            DepanFxListFilterData.class);
-      }
-    };
-  }
-
-  @Bean
-  public DepanFxNodeFiltersRegistry.Contribution matcherNodeFilter() {
-    return new NodeFilterContrib(DepanFxMatcherFilterData.class) {
-
-      @Override
-      public DepanFxBaseFilter<?> buildFilter(
-          DepanFxBaseFilterData filterData,
-          DepanFxNodeFiltersRegistry nodeFilterRegistry,
-          GraphModel graphModel,
-          Collection<GraphNode> targetNodes) {
-        return new DepanFxMatcherFilter(
-            (DepanFxMatcherFilterData) filterData, graphModel, targetNodes);
-      }
-
-      @Override
-      public void prepareTransport(PersistDocumentTransportBuilder builder) {
-        prepareTransport(builder,
-            MatcherFilterPersistenceContribution.MATCHER_FILTER_INFO_TAG,
-            DepanFxMatcherFilterData.class);
-      }
-    };
-  }
 
   @Bean
   public DepanFxNodeFiltersRegistry.Contribution nodeKindNodeFilter() {

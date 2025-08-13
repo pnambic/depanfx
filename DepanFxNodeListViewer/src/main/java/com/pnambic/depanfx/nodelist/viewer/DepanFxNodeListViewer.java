@@ -1,7 +1,7 @@
 package com.pnambic.depanfx.nodelist.viewer;
 
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
-import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeViewNodeFiltersDialog;
+import com.pnambic.depanfx.nodelist.gui.DepanFxFilterSelectionDialog;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableController;
@@ -132,7 +132,7 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
             DepanFxNodeListViewBuiltIns.FLAT_TABLE_VIEW_PATH).get();
 
     Stage filterSelectionDialog =
-        DepanFxNodeViewNodeFiltersDialog.runEditDialog(
+        DepanFxFilterSelectionDialog.runEditDialog(
             tableControl.getDialogRunner(),
             tableViewRsrc, tableControl.getNodeFolding(), tableControl.getSelection(),
             nl -> tableControl.doSelectGraphNodesAction(nl.getNodes()));

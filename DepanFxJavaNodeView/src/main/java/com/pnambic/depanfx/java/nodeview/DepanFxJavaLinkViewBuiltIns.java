@@ -15,12 +15,13 @@
  */
 package com.pnambic.depanfx.java.nodeview;
 
-import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemLinkMatcherBuiltIns;
-import com.pnambic.depanfx.java.context.JavaContextDefinition;
-import com.pnambic.depanfx.java.context.JavaContextModelId;
-import com.pnambic.depanfx.java.nodelist.link.JavaLinkMatcherBuiltIns;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
+import com.pnambic.depanfx.filesystem.edgematchers.link.FileSystemLinkMatcherBuiltIns;
+import com.pnambic.depanfx.java.context.JavaContextDefinition;
+import com.pnambic.depanfx.java.context.JavaContextModelId;
+import com.pnambic.depanfx.java.edgematchers.link.JavaLinkMatcherBuiltIns;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDirection;
@@ -70,7 +71,7 @@ public class DepanFxJavaLinkViewBuiltIns {
   public static final Path JAVA_EDGE_RELATION_VISIBILITY_DOC_PATH =
       DepanFxLinkMatcherSequenceDocument.LINK_MATCHER_SEQUENCE_TOOL_PATH
           .resolve(JavaContextModelId.JAVA_KEY)
-          .resolve(DepanFxLinkMatcherSequenceDocument.EDGE_VISIBILITY_CONTEXT_RESOURCE_NAME);
+          .resolve(DepanFxLinkMatcher.EDGE_VISIBILITY_CONTEXT_RESOURCE_NAME);
 
   @Autowired
   public DepanFxJavaLinkViewBuiltIns() {
@@ -107,7 +108,6 @@ public class DepanFxJavaLinkViewBuiltIns {
         return new DepanFxLinkMatcherSequenceDocument(
             JAVA_EDGE_RELATIONS_VISIBILITY_NAME,
             JAVA_EDGE_RELATIONS_VISIBILITY_DESCR,
-            JavaContextDefinition.MODEL_ID,
             getDisplayFilters(displayContrib));
       }
 

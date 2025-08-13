@@ -34,6 +34,10 @@ import java.util.Optional;
 @Component
 public class DepanFxNodeFiltersRegistry {
 
+  public interface NodeFilterFactory {
+    DepanFxBaseFilter<?> buildFilter(DepanFxBaseFilterData filterData);
+  }
+
   public interface Contribution {
 
     boolean accepts(DepanFxBaseFilterData filter);
@@ -47,8 +51,25 @@ public class DepanFxNodeFiltersRegistry {
     void prepareTransport(PersistDocumentTransportBuilder builder);
   }
 
-  public interface NodeFilterFactory {
-    DepanFxBaseFilter<?> buildFilter(DepanFxBaseFilterData filterData);
+  public static abstract class TransportableContribution implements Contribution {
+
+    private final Class<?> contribType;
+
+    public TransportableContribution(Class<?> contribType) {
+      this.contribType = contribType;
+    }
+
+    @Override
+    public boolean accepts(DepanFxBaseFilterData filter) {
+      return contribType.isAssignableFrom(filter.getClass());
+    }
+
+    protected void prepareTransport(PersistDocumentTransportBuilder builder,
+        String aliasTag, Class<?> transportType) {
+      Class<?>[] allowType = new Class<?>[] { transportType };
+      builder.addAllowedType(allowType);
+      builder.addAlias(aliasTag, transportType);
+    }
   }
 
   private static final Logger LOG =
