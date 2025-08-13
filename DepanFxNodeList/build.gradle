@@ -16,4 +16,5 @@ dependencies {
   implementation project(':DepanFxGraphInfo')
   implementation project(':DepanFxPersistence')
   implementation project(':DepanFxWorkspace')
+  implementation project(':DepanFxEdgeMatchers')
 }

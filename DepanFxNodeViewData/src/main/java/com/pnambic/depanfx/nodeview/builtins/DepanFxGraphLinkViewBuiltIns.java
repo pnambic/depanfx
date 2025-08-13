@@ -1,8 +1,8 @@
 package com.pnambic.depanfx.nodeview.builtins;
 
 import com.pnambic.depanfx.graph.context.BaseContextDefinition;
-import com.pnambic.depanfx.nodelist.link.DepanFxLinkMatcherBuiltIns;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatcherBuiltIns;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData.LinkDisplayEntry;

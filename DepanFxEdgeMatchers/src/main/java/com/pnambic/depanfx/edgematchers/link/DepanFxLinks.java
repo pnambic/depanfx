@@ -1,8 +1,8 @@
-package com.pnambic.depanfx.nodelist.link;
+package com.pnambic.depanfx.edgematchers.link;
 
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxLink;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLink;
 
 public class DepanFxLinks {
 

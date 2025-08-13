@@ -15,10 +15,10 @@
  */
 package com.pnambic.depanfx.nodeview.gui;
 
-import com.pnambic.depanfx.nodelist.gui.DepanFxLinkMatcherSequenceChooser;
-import com.pnambic.depanfx.nodelist.gui.DepanFxLinkMatcherSequenceToolDialog;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
+import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherSequenceChooser;
+import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherSequenceToolDialog;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;

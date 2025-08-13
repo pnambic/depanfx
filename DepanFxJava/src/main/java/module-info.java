@@ -11,6 +11,7 @@ module depanfx.java {
   requires depanfx.graph.info;
   requires depanfx.nodefilters;
   requires depanfx.nodelist;
+  requires depanfx.edgematchers;
   requires depanfx.graph_doc;
   requires depanfx.persistence;
   requires depanfx.workspace;

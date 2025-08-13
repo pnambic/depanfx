@@ -14,6 +14,8 @@ module depanfx.nodefilters.gui {
   requires depanfx.nodefilters;
   requires depanfx.nodelist;
   requires depanfx.nodelist.gui;
+  requires depanfx.edgematchers;
+  requires depanfx.edgematchers.gui;
   requires depanfx.persistence;
   requires depanfx.perspective;
   requires depanfx.workspace;

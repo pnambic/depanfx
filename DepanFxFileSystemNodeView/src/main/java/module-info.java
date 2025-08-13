@@ -16,6 +16,7 @@ module depanfx.filesystem.nodeview {
   requires depanfx.persistence;
   requires depanfx.workspace;
   requires depanfx.nodefilters;
+  requires depanfx.edgematchers;
 
   opens com.pnambic.depanfx.filesystem.nodeview
       to spring.beans, spring.context, spring.core;

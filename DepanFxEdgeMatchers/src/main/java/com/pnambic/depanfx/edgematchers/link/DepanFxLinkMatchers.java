@@ -1,10 +1,10 @@
-package com.pnambic.depanfx.nodelist.link;
+package com.pnambic.depanfx.edgematchers.link;
 
 import com.pnambic.depanfx.graph.api.Relation;
 import com.pnambic.depanfx.graph.context.ContextRelationId;
 import com.pnambic.depanfx.graph.model.GraphEdge;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxLink;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcher;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLink;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
 
 import java.util.List;
 import java.util.Optional;

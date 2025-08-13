@@ -1,7 +1,7 @@
 package com.pnambic.depanfx.nodeview.tooldata;
 
 import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 public class DepanFxTreeLayoutData extends DepanFxBaseToolData {

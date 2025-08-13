@@ -18,6 +18,8 @@ package com.pnambic.depanfx.nodelist.tooldata;
 
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -34,8 +36,7 @@ public class DepanFxTreeSectionData extends DepanFxBaseSectionData {
 
   public static final String BASE_SECTION_LABEL = "Tree";
 
-  private final DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>
-      linkMatcherRsrc;
+  private final DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkMatcherRsrc;
 
   private final boolean inferMissingParents;
 
@@ -60,8 +61,7 @@ public class DepanFxTreeSectionData extends DepanFxBaseSectionData {
     this.containerOrder = containerOrder;
   }
 
-  public DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>
-      getLinkMatcherRsrc() {
+  public DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> getLinkMatcherRsrc() {
     return linkMatcherRsrc;
   }
 

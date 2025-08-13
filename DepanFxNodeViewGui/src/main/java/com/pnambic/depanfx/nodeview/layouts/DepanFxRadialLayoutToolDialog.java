@@ -1,6 +1,6 @@
 package com.pnambic.depanfx.nodeview.layouts;
 
-import com.pnambic.depanfx.nodelist.gui.link.DepanFxLinkMatcherChooser;
+import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherChooser;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayoutData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxRadialLayoutData;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;

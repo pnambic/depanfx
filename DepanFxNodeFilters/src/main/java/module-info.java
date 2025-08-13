@@ -24,6 +24,7 @@ module depanfx.nodefilters {
   requires depanfx.graph;
   requires depanfx.graph_doc;
   requires depanfx.nodelist;
+  requires depanfx.edgematchers;
   requires depanfx.persistence;
   requires depanfx.workspace;
   requires depanfx.base;

@@ -19,8 +19,8 @@ import com.pnambic.depanfx.filesystem.nodelist.link.FileSystemLinkMatcherBuiltIn
 import com.pnambic.depanfx.java.context.JavaContextDefinition;
 import com.pnambic.depanfx.java.context.JavaContextModelId;
 import com.pnambic.depanfx.java.nodelist.link.JavaLinkMatcherBuiltIns;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherDocument;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxLinkMatcherSequenceDocument;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDirection;

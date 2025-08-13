@@ -1,4 +1,4 @@
-package com.pnambic.depanfx.nodelist.tooldata;
+package com.pnambic.depanfx.edgematchers.tooldata;
 
 import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
 import com.pnambic.depanfx.graph.context.ContextModelId;

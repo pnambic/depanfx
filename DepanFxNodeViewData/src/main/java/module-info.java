@@ -12,6 +12,7 @@ module depanfx.nodeview.data {
   requires depanfx.graph.info;
   requires depanfx.nodefilters;
   requires depanfx.nodelist;
+  requires depanfx.edgematchers;
   requires depanfx.persistence;
   requires depanfx.session.data;
   requires depanfx.workspace;

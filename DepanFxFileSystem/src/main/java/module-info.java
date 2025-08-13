@@ -11,6 +11,7 @@ module depanfx.filesystem {
   requires depanfx.nodefilters;
   requires depanfx.nodelist;
   requires depanfx.persistence;
+  requires depanfx.edgematchers;
   requires depanfx.workspace;
   requires pnambic.modxstream;
 

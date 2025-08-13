@@ -1,0 +1,17 @@
+plugins {
+  id 'depanfx.base'
+  id 'org.springframework.boot'
+  id 'io.spring.dependency-management'
+}
+
+dependencies {
+  implementation 'org.springframework.boot:spring-boot-autoconfigure'
+  implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+
+  implementation "com.pnambic.modxstream:modxstream:${modxstreamVersion}"
+
+  implementation project(':DepanFxBase')
+  implementation project(':DepanFxGraph')
+  implementation project(':DepanFxPersistence')
+  implementation project(':DepanFxWorkspace')
+}

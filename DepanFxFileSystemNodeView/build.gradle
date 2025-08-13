@@ -20,6 +20,7 @@ dependencies {
   implementation project(':DepanFxGraphDoc')
   implementation project(':DepanFxGraphInfo')
   implementation project(':DepanFxNodeFilters')
+  implementation project(':DepanFxEdgeMatchers')
   implementation project(':DepanFxNodeList')
   implementation project(':DepanFxNodeViewData')
   implementation project(':DepanFxPersistence')

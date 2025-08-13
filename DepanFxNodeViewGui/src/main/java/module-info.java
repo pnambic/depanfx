@@ -17,6 +17,8 @@ module depanfx.nodeview.gui {
   requires depanfx.graph;
   requires depanfx.graph_doc;
   requires depanfx.jogl;
+  requires depanfx.edgematchers;
+  requires depanfx.edgematchers.gui;
   requires depanfx.nodefilters;
   requires depanfx.nodefilters.gui;
   requires depanfx.nodelist;
