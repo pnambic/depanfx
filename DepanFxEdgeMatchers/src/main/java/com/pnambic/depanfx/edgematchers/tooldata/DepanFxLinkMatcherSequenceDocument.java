@@ -15,12 +15,10 @@
  */
 package com.pnambic.depanfx.edgematchers.tooldata;
 
-import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class DepanFxLinkMatcherSequenceDocument
@@ -35,27 +33,17 @@ public class DepanFxLinkMatcherSequenceDocument
   public static final Path LINK_MATCHER_SEQUENCE_TOOL_PATH =
       LINK_MATCHER_TOOL_PATH;
 
-  private final List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> matcherRefs;
+  private final List<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>> matcherRefs;
 
   public DepanFxLinkMatcherSequenceDocument(
       String toolName, String toolDescription,
-      List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> matcherRefs) {
+      List<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>> matcherRefs) {
     super(toolName, toolDescription);
     this.matcherRefs = matcherRefs;
   }
 
-  public Stream<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+  public Stream<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
       streamMatchers() {
     return matcherRefs.stream();
-  }
-
-  /**
-   * Provide the first matcher that matches the edge.
-   */
-  public Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
-      getMatcher(GraphEdge edge) {
-    return streamMatchers()
-        .filter(m -> m.getResource().getMatcher().match(edge).isPresent())
-        .findFirst();
   }
 }

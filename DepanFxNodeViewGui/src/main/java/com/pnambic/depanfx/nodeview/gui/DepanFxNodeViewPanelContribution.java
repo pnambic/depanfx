@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package com.pnambic.depanfx.nodeview.gui;
+import com.pnambic.depanfx.edgematchers.gui.DepanFxEdgeMatcherDialogRegistry;
+import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchersRegistry;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
 import com.pnambic.depanfx.nodeview.viewdata.DepanFxNodeViewPanelData;
@@ -46,14 +48,22 @@ public class DepanFxNodeViewPanelContribution
 
   private final DepanFxNodeFiltersRegistry filterRegistry;
 
+  private final DepanFxLinkMatchersRegistry matcherRegistry;
+
+  private final DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry;
+
   @Autowired
   private DepanFxNodeViewPanelContribution(
       DepanFxWorkspace workspace,
-    DepanFxNodeLayoutRegistry layoutRegistry,
-    DepanFxNodeFiltersRegistry filterRegistry) {
+      DepanFxNodeLayoutRegistry layoutRegistry,
+      DepanFxNodeFiltersRegistry filterRegistry,
+      DepanFxLinkMatchersRegistry matcherRegistry,
+      DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry) {
     this.workspace = workspace;
     this.layoutRegistry = layoutRegistry;
     this.filterRegistry = filterRegistry;
+    this.matcherRegistry = matcherRegistry;
+    this.matcherDialogRegistry = matcherDialogRegistry;
   }
 
   @Override
@@ -75,6 +85,7 @@ public class DepanFxNodeViewPanelContribution
     DepanFxNodeViewPanelData viewerData = (DepanFxNodeViewPanelData) baseData;
     return Optional.of(new DepanFxNodeViewPanel(
         workspace, layoutRegistry, filterRegistry,
+        matcherRegistry, matcherDialogRegistry,
         viewerData.getNodeViewRsrc()));
   }
 

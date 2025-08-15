@@ -37,6 +37,9 @@ module depanfx.nodelist.gui {
   opens com.pnambic.depanfx.nodelist.gui.columns.infos
       to javafx.fxml, net.rgielen.fxweaver.core,
          spring.beans, spring.context, spring.core;
+  opens com.pnambic.depanfx.nodelist.gui.edgematchers
+      to javafx.fxml, net.rgielen.fxweaver.core,
+         spring.beans, spring.context, spring.core;
   opens com.pnambic.depanfx.nodelist.gui.nodefilters
       to spring.core;
   opens com.pnambic.depanfx.nodelist.gui.sections
@@ -49,6 +52,7 @@ module depanfx.nodelist.gui {
   exports com.pnambic.depanfx.nodelist.gui.columns;
   exports com.pnambic.depanfx.nodelist.gui.columns.annos;
   exports com.pnambic.depanfx.nodelist.gui.columns.infos;
+  exports com.pnambic.depanfx.nodelist.gui.edgematchers;
   exports com.pnambic.depanfx.nodelist.gui.nodefilters;
   exports com.pnambic.depanfx.nodelist.gui.sections;
   exports com.pnambic.depanfx.nodelist.gui.sections.folds;

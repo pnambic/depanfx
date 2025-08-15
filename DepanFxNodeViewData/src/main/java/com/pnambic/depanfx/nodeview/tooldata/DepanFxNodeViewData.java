@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.nodeview.tooldata;
 
 import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.graph.model.GraphEdge;
 import com.pnambic.depanfx.graph.model.GraphNode;
@@ -135,9 +136,10 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
       visibleEdgeRsrc;
 
   /**
-   * Optional sequence of edge filters applied before visibility checks.
+   * Optional edge filters applied before visibility checks.
+   * Typically, this is a set of edge list link matchers.
    */
-  private final DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+  private final DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>
       edgeFilterRsrc;
 
   /**
@@ -176,7 +178,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
 
       DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> availableEdgeRsrc,
       DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc,
-      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> edgeFilterRsrc,
+      DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> edgeFilterRsrc,
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> linkDisplayDocRsrc,
       boolean remainerEdgesVisible,
       String remainderEdgesLabel,
@@ -331,7 +333,7 @@ public class DepanFxNodeViewData extends DepanFxBaseToolData {
     return visibleEdgeRsrc.getResource();
   }
 
-  public DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument>
+  public DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>
   getEdgeFiltersResource() {
     return edgeFilterRsrc;
   }

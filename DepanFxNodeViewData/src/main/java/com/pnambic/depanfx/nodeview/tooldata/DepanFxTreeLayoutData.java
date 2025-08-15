@@ -16,24 +16,24 @@
 package com.pnambic.depanfx.nodeview.tooldata;
 
 import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 public class DepanFxTreeLayoutData extends DepanFxBaseToolData {
 
   public static final String TREE_LAYOUT_TOOL_EXT = "dtlti";
 
-  private final DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>
+  private final DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>
       linkMatcherRsrc;
 
   public DepanFxTreeLayoutData(
       String toolName, String toolDescription,
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkMatcherRsrc) {
+      DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> linkMatcherRsrc) {
     super(toolName, toolDescription);
     this.linkMatcherRsrc = linkMatcherRsrc;
   }
 
-  public DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>
+  public DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>
       getHierarchyMatcherRsrc() {
 
     return linkMatcherRsrc;

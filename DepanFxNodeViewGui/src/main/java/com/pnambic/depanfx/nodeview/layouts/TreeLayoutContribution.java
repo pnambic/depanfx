@@ -1,9 +1,10 @@
 package com.pnambic.depanfx.nodeview.layouts;
 
+import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchersRegistry;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModelBuilder;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewPanel;
@@ -13,6 +14,7 @@ import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -42,6 +44,13 @@ public class TreeLayoutContribution
   public static final double TARGET_TREE_WIDTH =
       TARGET_TREE_HIEGHT / TARGET_ASPECT_RATIO;
 
+  private final DepanFxLinkMatchersRegistry matcherRegistry;
+
+  @Autowired
+  public TreeLayoutContribution(DepanFxLinkMatchersRegistry matcherRegistry) {
+    this.matcherRegistry = matcherRegistry;
+  }
+
   @Override
   public String getLabel() {
     return TREE_LAYOUT;
@@ -60,6 +69,9 @@ public class TreeLayoutContribution
     return layoutNodes(view.getGraphDocRsrc(), layoutRsrc, updateNodes);
   }
 
+  /**
+   *
+   */
   @Override
   public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
       DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
@@ -68,9 +80,9 @@ public class TreeLayoutContribution
     DepanFxTreeLayoutData treeData =
         (DepanFxTreeLayoutData) layoutRsrc.getResource();
 
-    DepanFxLinkMatcherDocument matcherDoc =
+    DepanFxBaseMatcherDocument matcherDoc =
         treeData.getHierarchyMatcherRsrc().getResource();
-    DepanFxLinkMatcher linkMatcher = matcherDoc.getMatcher();
+    DepanFxLinkMatcher linkMatcher = matcherRegistry.buildMatcher(matcherDoc);
 
     return buildNodeLocations(graphDocRsrc, updateNodes, linkMatcher);
   }

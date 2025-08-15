@@ -15,7 +15,7 @@
  */
 package com.pnambic.depanfx.edgematchers.gui;
 
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
@@ -81,21 +81,25 @@ public class DepanFxLinkMatcherSequenceToolDialog
 
   private final DepanFxDialogRunner dialogRunner;
 
+  private final DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry;
+
   @FXML
   private Label linkMatchersLabel;
 
   @FXML
-  private TableView<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+  private TableView<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
       linkMatcherSequenceTable;
 
-  private ObservableList<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+  private ObservableList<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
       linkMatcherSequenceTableData;
 
   @Autowired
   public DepanFxLinkMatcherSequenceToolDialog(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
+      DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry) {
     super(workspace, DepanFxLinkMatcherSequenceDocument.class);
     this.dialogRunner = dialogRunner;
+    this.matcherDialogRegistry = matcherDialogRegistry;
   }
 
   public static Dialog<DepanFxLinkMatcherSequenceToolDialog> runEditDialog(
@@ -128,27 +132,27 @@ public class DepanFxLinkMatcherSequenceToolDialog
     linkMatchersLabel.setContextMenu(buildLinkMatchersMenu());
     linkMatcherSequenceTable.setContextMenu(buildMatcherTableMenu());
 
-    DepanFxTableColumnBinder<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+    DepanFxTableColumnBinder<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
     columnBinder = new DepanFxTableColumnBinder<>(linkMatcherSequenceTable);
 
-    TableColumn<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>, String>
+    TableColumn<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>, String>
     resourceColumn = columnBinder.next();
     resourceColumn.setCellValueFactory(
         r -> new SimpleStringProperty(
             DepanFxProjects.asReferenceLabel(workspace, r.getValue())));
 
-    TableColumn<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>, String>
+    TableColumn<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>, String>
     filePathColumn = columnBinder.next();
     filePathColumn.setCellFactory(c ->
         new DepanFxLinkMatcherChooser.LinkMatcherCell<>(
-        getWorkspace(), dialogRunner, getScene(),
+        getWorkspace(), dialogRunner, getScene(), matcherDialogRegistry,
         (t, r) -> updateMatcher(t, r)));
 
     filePathColumn.setCellValueFactory(
         r -> new SimpleStringProperty(
             r.getValue().getResource().getToolName()));
 
-    TableColumn<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>, String>
+    TableColumn<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>, String>
     rowActionColumn = columnBinder.next();
     DepanFxActionTableCell.prepareColumn(rowActionColumn, p -> new MatcherActions());
 
@@ -161,8 +165,8 @@ public class DepanFxLinkMatcherSequenceToolDialog
   }
 
   private void updateMatcher(
-      TableRow<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> t,
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> r) {
+      TableRow<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>> t,
+      DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> r) {
   }
 
   @Override
@@ -183,7 +187,7 @@ public class DepanFxLinkMatcherSequenceToolDialog
   @Override
   protected DepanFxLinkMatcherSequenceDocument prepareResult() {
     // Ensure the use of a serializable ArrayList.
-    List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> matchers =
+    List<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>> matchers =
         new ArrayList<>(linkMatcherSequenceTableData.size());
     linkMatcherSequenceTableData.forEach(matchers::add);
 
@@ -214,7 +218,7 @@ public class DepanFxLinkMatcherSequenceToolDialog
   @FXML
   private void addLinkMatcher() {
     DepanFxLinkMatcherChooser.runLinkMatcherFinder(
-            getWorkspace(), dialogRunner, getScene())
+            getWorkspace(), dialogRunner, getScene(), matcherDialogRegistry)
         .ifPresent(linkMatcherSequenceTableData::add);
   }
 
@@ -242,7 +246,7 @@ public class DepanFxLinkMatcherSequenceToolDialog
   }
 
   private class MatcherActions
-      extends DepanFxActionTableCell<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> {
+      extends DepanFxActionTableCell<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>> {
 
     public MatcherActions() {
       super(linkMatcherSequenceTableData);
@@ -257,7 +261,7 @@ public class DepanFxLinkMatcherSequenceToolDialog
 
     private void runMatcherChooser(int index) {
       DepanFxLinkMatcherChooser.runLinkMatcherFinder(
-          getWorkspace(), dialogRunner, getScene())
+          getWorkspace(), dialogRunner, getScene(), matcherDialogRegistry)
           .ifPresent(r -> setRow(index, r));
     }
   }

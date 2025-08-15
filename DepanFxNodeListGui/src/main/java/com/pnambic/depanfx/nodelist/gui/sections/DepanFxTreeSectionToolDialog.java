@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui.sections;
 
+import com.pnambic.depanfx.edgematchers.gui.DepanFxEdgeMatcherDialogRegistry;
 import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherChooser;
 import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherChooser.LinkMatcherControl;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxContainerOrder;
@@ -45,6 +46,8 @@ public class DepanFxTreeSectionToolDialog
 
   private final DepanFxDialogRunner dialogRunner;
 
+  private final DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry;
+
   @FXML
   private TextField linkMatcherResourceField;
 
@@ -61,9 +64,11 @@ public class DepanFxTreeSectionToolDialog
 
   @Autowired
   public DepanFxTreeSectionToolDialog(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
+      DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry) {
     super(workspace, DepanFxTreeSectionData.class);
     this.dialogRunner = dialogRunner;
+    this.matcherDialogRegistry = matcherDialogRegistry;
   }
 
   public static Dialog<DepanFxTreeSectionToolDialog> runEditDialog(
@@ -97,7 +102,7 @@ public class DepanFxTreeSectionToolDialog
     super.initialize();
 
     linkMatcherControl = new DepanFxLinkMatcherChooser.LinkMatcherControl(
-        getWorkspace(), dialogRunner, linkMatcherResourceField);
+        getWorkspace(), dialogRunner, matcherDialogRegistry, linkMatcherResourceField);
 
     populateOrderBy(orderByField);
 

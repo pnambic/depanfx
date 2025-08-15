@@ -1,5 +1,10 @@
 package com.pnambic.depanfx.nodelist.gui.sections;
 
+import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatcherGroup;
+import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchers;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
+import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
@@ -19,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.TreeItem;
@@ -88,6 +94,29 @@ public abstract class DepanFxNodeTreeSection implements DepanFxNodeListSection {
 
   protected void updateSectionNodes(DepanFxNodeList sectionNodes) {
     this.sectionNodes = sectionNodes;
+  }
+
+  protected DepanFxLinkMatcher buildLinkMatcher(
+      DepanFxBaseMatcherDocument matcherInfo) {
+    Optional<DepanFxLinkMatcher> foundInfo =
+        tableAdapter.lookupMatcher(matcherInfo);
+    if (foundInfo.isPresent()) {
+      return foundInfo.get();
+    }
+
+    // Use the context model from the viewer to find a good link matcher.
+    // Should check that matcherInfo part of matcher group Members.
+    ContextModelId modelId = getGraphDoc().getContextModelId();
+    return DepanFxLinkMatcherGroup.getMemberMatcherRsrc(
+        getWorkspace(), modelId)
+        .map(r -> tableAdapter.buildLinkMatcher(r.getResource()))
+        .orElseGet(this::getEmptyLinkMatcher);
+  }
+
+  private DepanFxLinkMatcher getEmptyLinkMatcher() {
+    LOG.warn("Unable to find link matcher for {} context model",
+        getGraphDoc().getContextModelId().getContextModelKey());
+    return DepanFxLinkMatchers.EMPTY_MATCHER;
   }
 
   protected DepanFxNodeFoldController getNodeFolding() {

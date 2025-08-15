@@ -21,6 +21,7 @@ module depanfx.nodelist {
   opens com.pnambic.depanfx.nodelist.tooldata;
 
   exports com.pnambic.depanfx.nodelist.annos;
+  exports com.pnambic.depanfx.nodelist.edgematchers;
   exports com.pnambic.depanfx.nodelist.nodefilters;
   exports com.pnambic.depanfx.nodelist.model;
   exports com.pnambic.depanfx.nodelist.tooldata;

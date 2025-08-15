@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodelist.viewer;
 
+import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchersRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
@@ -49,14 +50,19 @@ public class DepanFxNodeListViewerContribution
 
   private final DepanFxInfoRegistry infoRegistry;
 
+  private final DepanFxLinkMatchersRegistry matcherRegistry;
+
   @Autowired
   private DepanFxNodeListViewerContribution(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
-      DepanFxColumnRegistry columnRegistry, DepanFxInfoRegistry infoRegistry) {
+      DepanFxColumnRegistry columnRegistry,
+      DepanFxInfoRegistry infoRegistry,
+      DepanFxLinkMatchersRegistry matcherRegistry) {
     this.workspace = workspace;
     this.columnRegistry = columnRegistry;
     this.infoRegistry = infoRegistry;
+    this.matcherRegistry = matcherRegistry;
   }
 
   @Override
@@ -81,7 +87,8 @@ public class DepanFxNodeListViewerContribution
     return Optional.of(new DepanFxNodeListViewer(
         viewerData.getViewerTitle(),
         workspace, sceneService.getDialogRunner(),
-        columnRegistry, infoRegistry, nodeFolding,
+        columnRegistry, infoRegistry,
+        matcherRegistry, nodeFolding,
         viewerData.getNodeListRsrc(),
         viewerData.getTableViewRsrc()));
   }

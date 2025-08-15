@@ -258,7 +258,8 @@ public class DepanFxNodeViewNodeDisplayDialog
   @FXML
   private void addNodeDisplayRow() {
     DepanFxNodeFiltersChooser
-        .runNodeFiltersFinder(workspace, dialogRunner, getScene(), filtersRegistry)
+        .runNodeFiltersFinder(
+            workspace, dialogRunner, getScene(), filtersRegistry)
         .map(this::buildDisplay)
         .map(d -> new EditNodeDisplay(displaySrvc, d))
         .ifPresent(nodesDisplayData::add);

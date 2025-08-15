@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodeview.layouts;
 
+import com.pnambic.depanfx.edgematchers.gui.DepanFxEdgeMatcherDialogRegistry;
 import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherChooser;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayoutData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxRadialLayoutData;
@@ -55,6 +56,8 @@ public class DepanFxRadialLayoutToolDialog
 
   private final DepanFxDialogRunner dialogRunner;
 
+  private final DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry;
+
   @FXML
   private TextField hierarchyMatcherRsrcField;
 
@@ -62,9 +65,11 @@ public class DepanFxRadialLayoutToolDialog
 
   @Autowired
   public DepanFxRadialLayoutToolDialog(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
+      DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry) {
     super(workspace, DepanFxRadialLayoutData.class);
     this.dialogRunner = dialogRunner;
+    this.matcherDialogRegistry = matcherDialogRegistry;
   }
 
   public static Dialog<DepanFxRadialLayoutToolDialog> runEditDialog(
@@ -91,7 +96,8 @@ public class DepanFxRadialLayoutToolDialog
   public void initialize() {
     hierarchyMatcherControl =
         new DepanFxLinkMatcherChooser.LinkMatcherControl(
-            getWorkspace(), dialogRunner, hierarchyMatcherRsrcField);
+            getWorkspace(), dialogRunner,
+            matcherDialogRegistry, hierarchyMatcherRsrcField);
 
   }
 

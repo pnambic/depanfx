@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.java.nodeview;
 
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
@@ -111,7 +112,7 @@ public class DepanFxJavaLinkViewBuiltIns {
             getDisplayFilters(displayContrib));
       }
 
-      private List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+      private List<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
       getDisplayFilters(
           DepanFxBuiltInContribution<DepanFxNodeViewLinkDisplayData> displayContrib) {
         if (displayContrib.getDocument() == null) {
@@ -339,10 +340,10 @@ public class DepanFxJavaLinkViewBuiltIns {
       DepanFxBuiltInProject project, Path matcherPath,
       DepanFxLineDisplayData lineDisplay) {
 
-    Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+    Optional<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
         matcherRsrc = project.getResource(matcherPath);
 
-    DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcher =
+    DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> matcher =
         matcherRsrc.orElseThrow(() ->
         new DepanFxBuiltInContribution.MissingDependencyException(
             JAVA_EDGE_RELATION_DISPLAY_DOC_PATH, matcherPath));
@@ -381,9 +382,9 @@ public class DepanFxJavaLinkViewBuiltIns {
       DepanFxBuiltInProject project, Path displayDataPath,
       String entryName, Path matcherPath, DepanFxLineDisplayData lineDisplay) {
 
-    Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+    Optional<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
         matcherRsrc = project.getResource(matcherPath);
-    DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> directoryMatcher =
+    DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> directoryMatcher =
         matcherRsrc.orElseThrow(() ->
             new DepanFxBuiltInContribution.MissingDependencyException(
                 displayDataPath, matcherPath));

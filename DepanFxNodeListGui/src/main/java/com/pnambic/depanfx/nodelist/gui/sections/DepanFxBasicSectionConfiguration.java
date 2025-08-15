@@ -16,7 +16,7 @@
 package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatcherBuiltIns;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxContainerOrder;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxFlatSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
@@ -215,13 +215,15 @@ public class DepanFxBasicSectionConfiguration {
       Optional<DepanFxProjectDocument> matcherProjPath =
           workspace.getBuiltInProjectTree().asProjectDocument(
               DepanFxLinkMatcherBuiltIns.MEMBER_MATCHER_PATH);
-      return  workspace.getWorkspaceResource(
+      return workspace.getWorkspaceResource(
           matcherProjPath.get(),
-          DepanFxLinkMatcherDocument.class)
+          DepanFxBaseMatcherDocument.class)
           .map(m -> new DepanFxTreeSectionData(
                 NEW_TREE_SECTION_NAME, NEW_TREE_SECTION_DESCR,
                 NEW_TREE_SECTION_LABEL, true, m, true,
-                OrderBy.NODE_LEAF, DepanFxContainerOrder.LAST, OrderDirection.FORWARD))
+                OrderBy.NODE_LEAF,
+                DepanFxContainerOrder.LAST,
+                OrderDirection.FORWARD))
           .get();
     }
 

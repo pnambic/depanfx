@@ -22,6 +22,7 @@ import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
@@ -194,7 +195,7 @@ public class DepanFxNodeViews {
           getContextEdgeAvailable(workspace, linkDisplayRsrc);
       DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc =
           availableEdgeRsrc;
-      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> edgeFilterRsrc =
+      DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> edgeFilterRsrc =
           null;
 
     Map<GraphNode, DepanFxNodeLocationData> locations =

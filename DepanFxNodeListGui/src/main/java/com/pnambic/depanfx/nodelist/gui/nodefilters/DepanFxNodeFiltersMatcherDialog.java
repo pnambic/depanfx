@@ -15,8 +15,9 @@
  */
 package com.pnambic.depanfx.nodelist.gui.nodefilters;
 
+import com.pnambic.depanfx.edgematchers.gui.DepanFxEdgeMatcherDialogRegistry;
 import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherChooser;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersBaseDialog;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersDialogRegistry;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxMatcherFilterData;
@@ -54,12 +55,16 @@ public class DepanFxNodeFiltersMatcherDialog
   @FXML
   private CheckBox useInverseCheckBox;
 
+  private final DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry;
+
   @Autowired
   public DepanFxNodeFiltersMatcherDialog(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
+      DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry,
       DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
     super(workspace, dialogRunner, nodeFiltersDialogRegistry,
         DepanFxMatcherFilterData.class);
+    this.matcherDialogRegistry = matcherDialogRegistry;
   }
 
   public static Optional<DepanFxWorkspaceResource<DepanFxMatcherFilterData>>
@@ -119,7 +124,8 @@ public class DepanFxNodeFiltersMatcherDialog
   @FXML
   protected void handleBrowseLinkMatcher() {
     DepanFxLinkMatcherChooser.runLinkMatcherFinder(
-            getWorkspace(), getDialogRunner(), getScene())
+            getWorkspace(), getDialogRunner(), getScene(),
+            matcherDialogRegistry)
         .ifPresent(this::setFilterResource);
   }
 
@@ -130,7 +136,7 @@ public class DepanFxNodeFiltersMatcherDialog
   protected DepanFxMatcherFilterData prepareResult() {
     return new DepanFxMatcherFilterData(
         getToolName(), getToolDescription(),
-        getMergeMode(), getFilterResource(DepanFxLinkMatcherDocument.class),
+        getMergeMode(), getFilterResource(DepanFxBaseMatcherDocument.class),
         useInverseCheckBox.isSelected(),
         useClosure());
   }

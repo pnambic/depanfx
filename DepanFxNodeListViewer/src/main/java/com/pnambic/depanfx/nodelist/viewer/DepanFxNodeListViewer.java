@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodelist.viewer;
 
+import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchersRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.nodelist.gui.DepanFxFilterSelectionDialog;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
@@ -51,6 +52,7 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
       DepanFxDialogRunner dialogRunner,
       DepanFxColumnRegistry columnRegistry,
       DepanFxInfoRegistry infoRegistry,
+      DepanFxLinkMatchersRegistry matcherRegistry,
       DepanFxNodeFoldController nodeFolding,
       DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc,
       DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc) {
@@ -62,8 +64,8 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
 
     tableControl = new DepanFxNodeListTableController(
         workspace, dialogRunner,
-        columnRegistry, infoRegistry, nodeFolding,
-        nodeList,
+        columnRegistry, infoRegistry, matcherRegistry,
+        nodeFolding, nodeList,
         DepanFxNodeListSelection.forNodes(nodeList.getNodes()),
         new TreeTableView<>());
     tableControl.setTableViewResource(tableViewRsrc);

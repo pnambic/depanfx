@@ -15,9 +15,11 @@
  */
 package com.pnambic.depanfx.nodelist.gui;
 
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoStore;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoStore;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
@@ -135,6 +137,13 @@ public interface DepanFxNodeListTableAdapter {
   Stream<DepanFxWorkspaceResource<DepanFxNodeFoldData>> streamNodeFoldResources();
 
   DepanFxNodeFoldController getNodeFolding();
+
+  // Link matcher support
+
+  DepanFxLinkMatcher buildLinkMatcher(DepanFxBaseMatcherDocument matcherInfo);
+
+  Optional<DepanFxLinkMatcher> lookupMatcher(
+      DepanFxBaseMatcherDocument matcherInfo);
 
   // Node info support.
 

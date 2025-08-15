@@ -1,8 +1,11 @@
 package com.pnambic.depanfx.nodelist.gui;
 
+import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchersRegistry;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoStore;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoStore;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
@@ -50,6 +53,8 @@ public class DepanFxNodeListTableController
 
   private final DepanFxInfoRegistry infoRegistry;
 
+  private final DepanFxLinkMatchersRegistry matcherRegistry;
+
   private final DepanFxNodeList nodeList;
 
   private final DepanFxNodeListTableState tableState;
@@ -65,6 +70,7 @@ public class DepanFxNodeListTableController
       DepanFxDialogRunner dialogRunner,
       DepanFxColumnRegistry columnRegistry,
       DepanFxInfoRegistry infoRegistry,
+      DepanFxLinkMatchersRegistry matcherRegistry,
       DepanFxNodeFoldController nodeFolding,
       DepanFxNodeList nodeList,
       DepanFxNodeListSelection selectedNodes,
@@ -73,6 +79,7 @@ public class DepanFxNodeListTableController
     this.dialogRunner = dialogRunner;
     this.columnRegistry = columnRegistry;
     this.infoRegistry = infoRegistry;
+    this.matcherRegistry = matcherRegistry;
     this.nodeList = nodeList;
 
     tableState = prepareNodeListTable(treeTable, selectedNodes, nodeFolding);
@@ -237,6 +244,18 @@ public class DepanFxNodeListTableController
   public Stream<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
   streamNodeFoldResources() {
     return tableState.streamNodeFoldResources();
+  }
+
+  @Override
+  public DepanFxLinkMatcher buildLinkMatcher(
+      DepanFxBaseMatcherDocument matcherInfo) {
+    return matcherRegistry.buildMatcher(matcherInfo);
+  }
+
+  @Override
+  public Optional<DepanFxLinkMatcher> lookupMatcher(
+      DepanFxBaseMatcherDocument matcherInfo) {
+    return matcherRegistry.lookupMatcher(matcherInfo);
   }
 
   /**

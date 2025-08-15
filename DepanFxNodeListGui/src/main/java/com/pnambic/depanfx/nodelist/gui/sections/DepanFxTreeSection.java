@@ -2,8 +2,8 @@ package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchers;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
@@ -129,13 +129,13 @@ public class DepanFxTreeSection extends DepanFxNodeTreeSection {
   }
 
   private DepanFxLinkMatcher getLinkMatcher() {
-    DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkMatcherRsrc =
+    DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> linkMatcherRsrc =
         getSectionData().getLinkMatcherRsrc();
 
     // If the section data provides a matcher, use that.
     // Otherwise, find a matcher based on the graph's context model.
     if (linkMatcherRsrc != null) {
-      DepanFxLinkMatcher matcher = linkMatcherRsrc.getResource().getMatcher();
+      DepanFxLinkMatcher matcher = buildLinkMatcher(linkMatcherRsrc.getResource());
       if (matcher != null) {
         return matcher;
       }
@@ -143,9 +143,11 @@ public class DepanFxTreeSection extends DepanFxNodeTreeSection {
 
     // Use the context model from the viewer to find a good link matcher.
     ContextModelId modelId = getGraphDoc().getContextModelId();
+    // DepanFxLinkMatchersRegistry matcherRegistry = null;
     return DepanFxLinkMatcherGroup
         .getMemberMatcherRsrc(getWorkspace(), modelId)
-        .map(r -> r.getResource().getMatcher())
+        .map(r -> r.getResource())
+        .map(this::buildLinkMatcher)
         .orElseGet(this::getEmptyLinkMatcher);
   }
 

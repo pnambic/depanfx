@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.filesystem.nodeview;
 
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
@@ -109,7 +110,7 @@ public class DepanFxFileSystemLinkViewBuiltIns {
             getDisplayFilters(displayContrib));
       }
 
-      private List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+      private List<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
       getDisplayFilters(
           DepanFxBuiltInContribution<DepanFxNodeViewLinkDisplayData> displayContrib) {
         if (displayContrib.getDocument() == null) {
@@ -178,9 +179,9 @@ public class DepanFxFileSystemLinkViewBuiltIns {
       DepanFxBuiltInProject project, Path displayDataPath,
       String entryName, Path matcherPath, DepanFxLineDisplayData lineDisplay) {
 
-    Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+    Optional<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
         matcherRsrc = project.getResource(matcherPath);
-    DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> directoryMatcher =
+    DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> directoryMatcher =
         matcherRsrc.orElseThrow(() ->
             new DepanFxBuiltInContribution.MissingDependencyException(
                 displayDataPath, matcherPath));

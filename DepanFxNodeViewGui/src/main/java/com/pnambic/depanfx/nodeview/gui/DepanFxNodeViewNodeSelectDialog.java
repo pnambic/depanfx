@@ -1,18 +1,17 @@
 package com.pnambic.depanfx.nodeview.gui;
 
+import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchersRegistry;
 import com.pnambic.depanfx.graph.info.GraphNodeInfo.Listener;
 import com.pnambic.depanfx.graph.model.GraphNode;
-import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoStore;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
+import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoStore;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeFoldNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableController;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
-import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.perspective.DepanFxWorkspaceDialog;
@@ -62,6 +61,8 @@ public class DepanFxNodeViewNodeSelectDialog
 
   private final DepanFxInfoRegistry infoRegistry;
 
+  private final DepanFxLinkMatchersRegistry matcherRegistry;
+
   /**
    * Place holder for the context menu.
    */
@@ -86,11 +87,13 @@ public class DepanFxNodeViewNodeSelectDialog
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxColumnRegistry columnRegistry,
-      DepanFxInfoRegistry infoRegistry) {
+      DepanFxInfoRegistry infoRegistry,
+      DepanFxLinkMatchersRegistry matcherRegistry) {
     super(workspace);
     this.dialogRunner = dialogRunner;
     this.columnRegistry = columnRegistry;
     this.infoRegistry = infoRegistry;
+    this.matcherRegistry = matcherRegistry;
   }
 
   /**
@@ -137,7 +140,8 @@ public class DepanFxNodeViewNodeSelectDialog
 
     tableControl = new DepanFxNodeListTableController(
         workspace, dialogRunner,
-        columnRegistry, infoRegistry, viewPanel.getNodeFolding(),
+        columnRegistry, infoRegistry, matcherRegistry,
+        viewPanel.getNodeFolding(),
         viewPanel.getViewNodesAsNodeList(),
         viewPanel.getNodeSelection(), nodeSelectTable);
     tableControl.addInfoStore(

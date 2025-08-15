@@ -16,7 +16,7 @@
 package com.pnambic.depanfx.nodeview.builtins;
 
 import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatcherBuiltIns;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.graph.context.BaseContextDefinition;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
@@ -72,11 +72,11 @@ public class DepanFxGraphLinkViewBuiltIns {
     DepanFxLineDisplayData lineDisplayData =
         DepanFxLineDisplayData.buildSimpleLineDisplayData();
 
-    Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+    Optional<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
         optMatcherRsrc =
             project.getResource(DepanFxLinkMatcherBuiltIns.MATCH_ALL_DOC_PATH);
 
-    DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> allEdgeMatcher =
+    DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> allEdgeMatcher =
         optMatcherRsrc.orElseThrow(() ->
             new DepanFxBuiltInContribution.MissingDependencyException(
                 ALL_EDGES_DISPLAY_DOC_PATH,

@@ -1,9 +1,26 @@
+/*
+ * Copyright 2024 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.pnambic.depanfx.edgematchers.gui;
 
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilterModel;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
@@ -39,7 +56,9 @@ public class DepanFxLinkMatcherChooser {
 
     private final DepanFxDialogRunner dialogRunner;
 
-    private DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>
+    private final DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry;
+
+    private DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>
         linkMatcherRsrc;
 
     private final TextField linkMatcherField;
@@ -47,20 +66,22 @@ public class DepanFxLinkMatcherChooser {
     public LinkMatcherControl(
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
+        DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry,
         TextField linkMatcherField) {
       this.workspace = workspace;
       this.dialogRunner = dialogRunner;
+      this.matcherDialogRegistry = matcherDialogRegistry;
       this.linkMatcherField = linkMatcherField;
       linkMatcherField.setContextMenu(buildContextMenu());
     }
 
     public void setLinkMatcherResource(
-        DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkMatcherRsrc) {
+        DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> linkMatcherRsrc) {
       this.linkMatcherRsrc = linkMatcherRsrc;
       linkMatcherField.setText(getLinkMatcherRsrcName());
     }
 
-    public DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>
+    public DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>
         getLinkMatcherResource() {
 
       return linkMatcherRsrc;
@@ -77,7 +98,8 @@ public class DepanFxLinkMatcherChooser {
     public void runLinkMatcherFinder() {
       DepanFxLinkMatcherChooser
           .runLinkMatcherFinder(
-                workspace, dialogRunner, linkMatcherField.getScene())
+                workspace, dialogRunner, linkMatcherField.getScene(),
+                matcherDialogRegistry)
           .ifPresent(this::setLinkMatcherResource);
     }
 
@@ -101,21 +123,25 @@ public class DepanFxLinkMatcherChooser {
 
     private final Scene scene;
 
+    private final DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry;
+
     private final BiConsumer<
-            TableRow<T>, DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+            TableRow<T>, DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
         matcherConsumer;
 
     public LinkMatcherCell(
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
         Scene scene,
+        DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry,
         BiConsumer<
             TableRow<T>,
-            DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+            DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
             matcherConsumer) {
       this.workspace = workspace;
       this.dialogRunner = dialogRunner;
       this.scene = scene;
+      this.matcherDialogRegistry = matcherDialogRegistry;
       this.matcherConsumer = matcherConsumer;
     }
 
@@ -141,7 +167,8 @@ public class DepanFxLinkMatcherChooser {
 
     private void runLinkMatcherFinder() {
       DepanFxLinkMatcherChooser
-          .runLinkMatcherFinder(workspace, dialogRunner, scene)
+          .runLinkMatcherFinder(
+              workspace, dialogRunner, scene, matcherDialogRegistry)
           .ifPresent(r -> matcherConsumer.accept(getTableRow(), r));
     }
   }
@@ -149,27 +176,35 @@ public class DepanFxLinkMatcherChooser {
   /**
    * Provide an existing link matcher.
    */
-  public static Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
-      runLinkMatcherFinder(
-            DepanFxWorkspace workspace,
-            DepanFxDialogRunner dialogRunner,
-            Scene scene) {
+  public static Optional<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
+  runLinkMatcherFinder(
+        DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner,
+        Scene scene,
+        DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry) {
 
-    DepanFxResourceChooser chooser = prepareChooser(workspace, dialogRunner);
+    DepanFxResourceChooser chooser = prepareChooser(
+        workspace, dialogRunner, matcherDialogRegistry);
     return chooser.showOpenDialog(scene)
         .map(DepanFxProjectDocument.class::cast)
         .flatMap(p -> workspace.getWorkspaceResource(
-            p, DepanFxLinkMatcherDocument.class));
+            p, DepanFxBaseMatcherDocument.class));
   }
 
   private static DepanFxResourceChooser prepareChooser(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+      DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner,
+      DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry) {
+
     DepanFxResourceChooser result =
         new DepanFxResourceChooser(workspace, dialogRunner);
     DepanFxResourcePerspectives.prepareResourceFinder(
         result, DepanFxProjects.TOOLS_PATH);
-    result.getExtensionFilters().add(LINK_MATCHER_FILTER);
-    result.setSelectedExtensionFilter(LINK_MATCHER_FILTER);
+
+    DepanFxResourceFilterModel matcherFilter =
+        matcherDialogRegistry.getResourceFilter();
+    result.getExtensionFilters().add(matcherFilter);
+    result.setSelectedExtensionFilter(matcherFilter);
     return result;
   }
 }

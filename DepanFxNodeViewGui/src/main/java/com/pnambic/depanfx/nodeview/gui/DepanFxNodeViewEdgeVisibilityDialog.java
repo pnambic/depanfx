@@ -17,7 +17,7 @@ package com.pnambic.depanfx.nodeview.gui;
 
 import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherSequenceChooser;
 import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherSequenceToolDialog;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
@@ -87,14 +87,14 @@ public class DepanFxNodeViewEdgeVisibilityDialog
   private final DepanFxDialogRunner dialogRunner;
 
   @FXML
-  private TableView<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+  private TableView<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
       matcherVisibilityTable;
 
   @SuppressWarnings("unused")
-  private ObservableList<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+  private ObservableList<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
       matcherVisibilityData;
 
-  private Map<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>, BooleanProperty>
+  private Map<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>, BooleanProperty>
       matcherVisibleProperties;
 
   private EdgeDisplayController edgeDisplay;
@@ -130,23 +130,23 @@ public class DepanFxNodeViewEdgeVisibilityDialog
 
   @FXML
   public void initialize() {
-    DepanFxTableColumnBinder<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+    DepanFxTableColumnBinder<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
     columnBinder = new DepanFxTableColumnBinder<>(matcherVisibilityTable);
 
-    TableColumn<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>, String>
+    TableColumn<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>, String>
     matcherNameColumn = columnBinder.next();
     matcherNameColumn.setCellValueFactory(
         r -> new SimpleStringProperty(
             r.getValue().getResource().getToolName()));
 
-    TableColumn<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>, Boolean>
+    TableColumn<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>, Boolean>
     isVisibleColumn = columnBinder.next();
     isVisibleColumn.setCellValueFactory(
         r -> getMatcherVisibleProperty(r.getValue()));
     isVisibleColumn.setCellFactory(
         CheckBoxTableCell.forTableColumn(isVisibleColumn));
 
-    TableColumn<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>, Number>
+    TableColumn<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>, Number>
     countColumn = columnBinder.next();
     countColumn.setStyle("-fx-alignment: CENTER-RIGHT;");
     countColumn.setCellValueFactory(
@@ -218,7 +218,7 @@ public class DepanFxNodeViewEdgeVisibilityDialog
   }
 
   private BooleanProperty getMatcherVisibleProperty(
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> value) {
+      DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> value) {
     return matcherVisibleProperties
         .getOrDefault(value, UNKNOWN_MATCHER_VISIBILITY);
   }
@@ -227,7 +227,7 @@ public class DepanFxNodeViewEdgeVisibilityDialog
   // Visibility properties and updates
 
   private void installFilterProperty(
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
+      DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> matcherRsrc) {
     BooleanProperty visibilityProp = new SimpleBooleanProperty();
     visibilityProp.addListener((e, o, n) -> updateVisibility(matcherRsrc, n));
     matcherVisibleProperties.put(matcherRsrc, visibilityProp);
@@ -249,7 +249,7 @@ public class DepanFxNodeViewEdgeVisibilityDialog
   }
 
   private void updateVisibility(
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc,
+      DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> matcherRsrc,
       Boolean visibility) {
     edgeDisplay.setMatcherVisibility(matcherRsrc, visibility);
   }
@@ -260,7 +260,7 @@ public class DepanFxNodeViewEdgeVisibilityDialog
 
     installVisibleMatchers();
 
-    ObservableList<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+    ObservableList<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
     availableMatchers = FXCollections.observableArrayList();
 
     edgeDisplay.forEachAvailableMatchers(availableMatchers::add);
@@ -338,7 +338,7 @@ public class DepanFxNodeViewEdgeVisibilityDialog
    * This ensure that consumers always see the same order,
    * regardless of set construction.
    */
-  private List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+  private List<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
       prepareVisibleMatchers() {
     return matcherVisibleProperties.entrySet().stream()
         .filter(e -> e.getValue().get())

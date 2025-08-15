@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.nodeview.tooldata;
 
 import com.pnambic.depanfx.base.tooldata.DepanFxBaseToolData;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.graph.context.ContextModelId;
@@ -34,13 +35,13 @@ public class DepanFxNodeViewLinkDisplayData extends DepanFxBaseToolData {
 
     private final String linkLabel;
 
-    private final DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkRsrc;
+    private final DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> linkRsrc;
 
     private final DepanFxLineDisplayData lineDisplay;
 
     public LinkDisplayEntry(
         String linkLabel,
-        DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkRsrc,
+        DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> linkRsrc,
         DepanFxLineDisplayData lineDisplay) {
       this.linkLabel = linkLabel;
       this.linkRsrc = linkRsrc;
@@ -51,7 +52,7 @@ public class DepanFxNodeViewLinkDisplayData extends DepanFxBaseToolData {
       return linkLabel;
     }
 
-    public DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> getLinkRsrc() {
+    public DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> getLinkRsrc() {
       return linkRsrc;
     }
 
@@ -104,7 +105,7 @@ public class DepanFxNodeViewLinkDisplayData extends DepanFxBaseToolData {
   }
 
   public DepanFxLinkMatcherSequenceDocument asLinkMatcherSequenceDoc() {
-    List<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>> matcherSeq =
+    List<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>> matcherSeq =
         new ArrayList<>(linkDisplayEntries.size());
     streamLinkDisplay()
         .map(d -> d.getLinkRsrc())
@@ -121,8 +122,12 @@ public class DepanFxNodeViewLinkDisplayData extends DepanFxBaseToolData {
   }
 
   private boolean handlesEdge(LinkDisplayEntry displayInfo, GraphEdge edge) {
-    DepanFxLinkMatcherDocument matcherDoc =
+    DepanFxBaseMatcherDocument matcherDoc =
         displayInfo.getLinkRsrc().getResource();
-    return matcherDoc.getMatcher().match(edge).isPresent();
+    if (matcherDoc instanceof DepanFxLinkMatcherDocument linkInfo) {
+      return linkInfo.getMatcher().match(edge).isPresent();
+    }
+
+    return false;
   }
 }

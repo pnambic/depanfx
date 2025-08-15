@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodeview.layouts;
 
+import com.pnambic.depanfx.edgematchers.gui.DepanFxEdgeMatcherDialogRegistry;
 import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherChooser;
 import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherChooser.LinkMatcherControl;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayoutData;
@@ -61,11 +62,16 @@ public class DepanFxTreeLayoutToolDialog
 
   private LinkMatcherControl hierarchyMatcherControl;
 
+  private final DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry;
+
   @Autowired
   public DepanFxTreeLayoutToolDialog(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+      DepanFxWorkspace workspace,
+      DepanFxDialogRunner dialogRunner,
+      DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry) {
     super(workspace, DepanFxTreeLayoutData.class);
     this.dialogRunner = dialogRunner;
+    this.matcherDialogRegistry = matcherDialogRegistry;
   }
 
   public static Dialog<DepanFxTreeLayoutToolDialog> runEditDialog(
@@ -90,8 +96,10 @@ public class DepanFxTreeLayoutToolDialog
 
   @FXML
   public void initialize() {
-    hierarchyMatcherControl = new DepanFxLinkMatcherChooser.LinkMatcherControl(
-        getWorkspace(), dialogRunner, hierarchyMatcherRsrcField);
+    hierarchyMatcherControl =
+        new DepanFxLinkMatcherChooser.LinkMatcherControl(
+            getWorkspace(), dialogRunner,
+            matcherDialogRegistry, hierarchyMatcherRsrcField);
   }
 
   @Override

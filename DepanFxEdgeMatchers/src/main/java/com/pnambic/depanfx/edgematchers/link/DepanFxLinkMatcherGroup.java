@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.edgematchers.link;
 
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLink;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
@@ -53,10 +54,10 @@ public class DepanFxLinkMatcherGroup implements DepanFxLinkMatcher {
   public static final List<DepanFxLinkMatcher> MEMBER_MATCHER_GROUP =
       Arrays.asList(new DepanFxLinkMatcher[] { DepanFxLinkMatcherGroup.MEMBER });
 
-  public static Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+  public static Optional<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
       getMemberMatcherRsrc(DepanFxWorkspace workspace, ContextModelId modelId) {
     return DepanFxProjects.getBuiltIn(
-        workspace, DepanFxLinkMatcherDocument.class,
+        workspace, DepanFxBaseMatcherDocument.class,
         c -> isContextModelMemberMatcher(modelId, c.getDocument()));
   }
 
@@ -66,29 +67,37 @@ public class DepanFxLinkMatcherGroup implements DepanFxLinkMatcher {
    */
   public static boolean isContextModelMatcherResource(
       ContextModelId modelId,
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
-    DepanFxLinkMatcherDocument matcher = matcherRsrc.getResource();
-    if (!matcher.getMatchGroups()
-        .contains(DepanFxLinkMatcherGroup.MEMBER)) {
-      return false;
+      DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> matcherRsrc) {
+    DepanFxBaseMatcherDocument matcher = matcherRsrc.getResource();
+    if (matcher instanceof DepanFxLinkMatcherDocument linkInfo) {
+      if (!linkInfo.getMatchGroups()
+          .contains(DepanFxLinkMatcherGroup.MEMBER)) {
+        return false;
+      }
+
+      // [29-Nov-2023] Kludge for matches any, actual matcher provided later.
+      if (linkInfo.getModelId() == null) {
+        return true;
+      }
+      return linkInfo.getModelId().equals(modelId);
     }
-    // [29-Nov-2023] Kludge for matches any, actual matcher provided later.
-    if (matcher.getModelId() == null) {
-      return true;
-    }
-    return matcher.getModelId().equals(modelId);
+    return false;
   }
 
   private static boolean isContextModelMemberMatcher(
-      ContextModelId modelId, DepanFxLinkMatcherDocument linkMatchDoc) {
-    if (!linkMatchDoc.getMatchGroups()
-        .contains(DepanFxLinkMatcherGroup.MEMBER)) {
-      return false;
+      ContextModelId modelId, DepanFxBaseMatcherDocument linkMatchDoc) {
+    if (linkMatchDoc instanceof DepanFxLinkMatcherDocument linkInfo) {
+      if (!linkInfo.getMatchGroups()
+          .contains(DepanFxLinkMatcherGroup.MEMBER)) {
+        return false;
+      }
+      // Avoid NPE, not what we are looking for.
+      if (linkInfo.getModelId() == null) {
+        return false;
+      }
+      return linkInfo.getModelId().equals(modelId);
     }
-    // Avoid NPE, not what we are looking for.
-    if (linkMatchDoc.getModelId() == null) {
-      return false;
-    }
-    return linkMatchDoc.getModelId().equals(modelId);
+
+    return false;
   }
 }

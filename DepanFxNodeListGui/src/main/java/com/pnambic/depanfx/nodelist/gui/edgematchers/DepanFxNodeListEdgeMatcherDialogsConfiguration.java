@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnambic.depanfx.edgematchers.gui;
+package com.pnambic.depanfx.nodelist.gui.edgematchers;
 
+import com.pnambic.depanfx.edgematchers.gui.DepanFxEdgeMatcherDialogRegistry;
+import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherSequenceToolDialog;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilterModel;
@@ -39,62 +41,62 @@ import javafx.scene.control.Cell;
 import javafx.scene.control.MenuItem;
 
 @Configuration
-public class DepanFxLinkMatcherSequenceConfiguration {
+public class DepanFxNodeListEdgeMatcherDialogsConfiguration {
 
-  public static final String SEQUENCE_MATCHER_ORDER_KEY = "Sequence Matcher";
+  public static final String NODE_LIST_MATCHER_ORDER_KEY = "Node List Matcher";
 
-  public static final String LINK_MATCHER_SEQUENCE = "Link Matcher Sequence";
+  public static final String NODE_LIST_MATCHER = "Node List Matcher";
 
-  public static final String EDIT_LINK_MATCHER_SEQUENCE_FILTER =
-      "Edit Link Matcher Sequence...";
+  public static final String EDIT_NODE_LIST_MATCHER =
+      "Edit Node List Matcher ...";
 
-  public static final String NEW_LINK_MATCHER_FILTER =
-      "New Link Matcher Sequence...";
+  public static final String NEW_NODE_LIST_MATCHER =
+      "New Node List Matcher...";
 
-  private static final String LINK_MATCHER_SEQUENCE_LABEL =
-      LINK_MATCHER_SEQUENCE;
+  private static final String NODE_LIST_MATCHER_LABEL =
+      NODE_LIST_MATCHER;
 
-  private static final String LINK_MATCHER_SEQUENCE_KEY =
-      LINK_MATCHER_SEQUENCE;
+  private static final String NODE_LIST_MATCHER_KEY =
+      NODE_LIST_MATCHER;
 
-  private static final String LINK_MATCHER_SEQUENCE_TOOL_NAME =
-      LINK_MATCHER_SEQUENCE;
+  private static final String NODE_LIST_MATCHER_TOOL_NAME =
+      NODE_LIST_MATCHER;
 
-  private static final String LINK_MATCHER_SEQUENCE_TOOL_DESCR =
+  private static final String NODE_LIST_MATCHER_TOOL_DESCR =
       "Link matcher sequence.";
 
   @Bean
-  public DepanFxResourceRegistry.Contribution linkMatcherFileOpenContrib() {
-    return new LinkMatcherSequenceFileOpenContribution();
+  public DepanFxResourceRegistry.Contribution nodeListMatcherFileOpenContrib() {
+    return new NodeListMatcherFileOpenContribution();
   }
 
   @Bean
-  public DepanFxResourcePathMenuContribution linkMatcherSequencePathMenu() {
-    return new LinkMatcherSequencePathContribution();
+  public DepanFxResourcePathMenuContribution nodeListMatcherPathMenu() {
+    return new NodeListMatcherPathContribution();
   }
 
   @Bean
-  public DepanFxNewResourceContribution linkMatcherSequenceNewMenu(
+  public DepanFxNewResourceContribution nodeListMatcherNewMenu(
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
     return new NewContribution(workspace, dialogRunner);
   }
 
   @Bean
-  public DepanFxEdgeMatcherDialogRegistry.Contribution linkMatcherSequenceContribution(
-      DepanFxWorkspace workspace,
-      DepanFxDialogRunner dialogRunner) {
-    return new LinkMatcherSequenceDialogContribution();
+  public DepanFxEdgeMatcherDialogRegistry.Contribution
+  nodeListMatcherDialogContribution(
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+    return new NodeListMatcherDialogContribution();
   }
 
-  private static class LinkMatcherSequenceFileOpenContribution extends
+  private static class NodeListMatcherFileOpenContribution extends
       DepanFxResourceRegistry.Principal<DepanFxLinkMatcherSequenceDocument> {
 
-    private LinkMatcherSequenceFileOpenContribution() {
+    private NodeListMatcherFileOpenContribution() {
       super(
-          LINK_MATCHER_SEQUENCE_LABEL,
+          NODE_LIST_MATCHER_LABEL,
           DepanFxLinkMatcherSequenceDocument.class,
           DepanFxLinkMatcherSequenceDocument.LINK_MATCHER_SEQUENCE_TOOL_EXT,
-          LINK_MATCHER_SEQUENCE_KEY);
+          NODE_LIST_MATCHER_KEY);
     }
 
     @Override
@@ -105,7 +107,7 @@ public class DepanFxLinkMatcherSequenceConfiguration {
     }
   }
 
-  private static class LinkMatcherSequencePathContribution
+  private static class NodeListMatcherPathContribution
       implements DepanFxResourcePathMenuContribution {
 
     @Override
@@ -119,13 +121,13 @@ public class DepanFxLinkMatcherSequenceConfiguration {
         DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
-      builder.appendActionItem(NEW_LINK_MATCHER_FILTER,
+      builder.appendActionItem(NEW_NODE_LIST_MATCHER,
           e -> runCreateDialog(workspace, dialogRunner));
     }
 
     @Override
     public String getOrderKey() {
-      return SEQUENCE_MATCHER_ORDER_KEY;
+      return NODE_LIST_MATCHER_ORDER_KEY;
     }
   }
 
@@ -145,7 +147,7 @@ public class DepanFxLinkMatcherSequenceConfiguration {
     @Override
     public MenuItem createNewResourceMenuItem() {
       return DepanFxMenuItemFactory.createActionItem(
-          LINK_MATCHER_SEQUENCE, e -> runCreateDialog(workspace, dialogRunner));
+          NEW_NODE_LIST_MATCHER, e -> runCreateDialog(workspace, dialogRunner));
     }
   }
 
@@ -153,14 +155,14 @@ public class DepanFxLinkMatcherSequenceConfiguration {
       DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
     DepanFxLinkMatcherSequenceDocument newMatcherSeq =
         new DepanFxLinkMatcherSequenceDocument(
-            LINK_MATCHER_SEQUENCE_TOOL_NAME, LINK_MATCHER_SEQUENCE_TOOL_DESCR,
+            NODE_LIST_MATCHER_TOOL_NAME, NODE_LIST_MATCHER_TOOL_DESCR,
             Collections.emptyList());
 
     DepanFxLinkMatcherSequenceToolDialog.runCreateDialog(
         workspace.addScratchResource(newMatcherSeq), dialogRunner);
   }
 
-  private static class LinkMatcherSequenceDialogContribution
+  private static class NodeListMatcherDialogContribution
       implements DepanFxEdgeMatcherDialogRegistry.Contribution {
 
     @Override
@@ -171,13 +173,12 @@ public class DepanFxLinkMatcherSequenceConfiguration {
 
     @Override
     public String getOrderKey() {
-      return SEQUENCE_MATCHER_ORDER_KEY;
+      return NODE_LIST_MATCHER_ORDER_KEY;
     }
 
     @Override
     public DepanFxResourceFilterModel getResourceFilter() {
-      return DepanFxLinkMatcherSequenceToolDialog
-          .LINK_MATCHER_SEQUENCE_RSRC_FILTER;
+      return DepanFxNodeListEdgeMatcherDialog.NODE_LIST_EDGE_RSRC_FILTER;
     }
   }
 }

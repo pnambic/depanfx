@@ -29,7 +29,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Encapsulate common behaviors for node filters.
+ * Provide translation and serialization/transport from filter data
+ * to filter instances.
  */
 @Component
 public class DepanFxNodeFiltersRegistry {

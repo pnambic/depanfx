@@ -15,8 +15,12 @@
  */
 package com.pnambic.depanfx.nodeview.gui;
 
+import com.pnambic.depanfx.edgematchers.gui.DepanFxEdgeMatcherDialogRegistry;
+import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherChooser;
 import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherSequenceToolDialog;
 import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatcherGroup;
+import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchersRegistry;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.graph.context.ContextModelId;
@@ -35,9 +39,11 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
+import com.pnambic.depanfx.nodelist.gui.edgematchers.DepanFxNodeListEdgeMatcherDialog;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListEdgeMatcherData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodeview.jogl.JoglPane;
 import com.pnambic.depanfx.nodeview.jogl.JoglShapes;
@@ -116,7 +122,15 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private static final String INVERT_EDGES_VISIBLE = "Invert Visible Edges";
 
-  private static final String EDGE_FILTERS = "Edge Filters";
+  private static final String EDGE_FILTERS_MENU_ITEM =
+      "Edge Filters";
+
+  private static final String ADD_NODE_LIST_EDGE_FILTER_ITEM =
+      "Add Node List Filter...";
+
+  private static final String SELECT_EDGE_FILTERS = "Select Edge Filters...";
+
+  private static final String EDIT_EDGE_FILTERS = "Edit Edge Filters...";
 
   private static final String MORE_EDGE_VIBILITY = "More Edge Visibility...";
 
@@ -169,6 +183,10 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private final DepanFxNodeFiltersRegistry filterRegistry;
 
+  private final DepanFxLinkMatchersRegistry matcherRegistry;
+
+  private final DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry;
+
   private DepanFxWorkspaceResource<DepanFxNodeViewData> nodeViewRsrc;
 
   private DepanFxNodeViewData viewData;
@@ -216,10 +234,14 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
       DepanFxWorkspace workspace,
       DepanFxNodeLayoutRegistry layoutRegistry,
       DepanFxNodeFiltersRegistry filterRegistry,
+      DepanFxLinkMatchersRegistry matcherRegistry,
+      DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry,
       DepanFxWorkspaceResource<DepanFxNodeViewData> nodeViewRsrc) {
     this.workspace = workspace;
     this.layoutRegistry = layoutRegistry;
     this.filterRegistry = filterRegistry;
+    this.matcherRegistry = matcherRegistry;
+    this.matcherDialogRegistry = matcherDialogRegistry;
     this.nodeViewRsrc = nodeViewRsrc;
 
     // Unpack the interesting parts of the view data.
@@ -306,7 +328,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     return nodeSelection.streamChosenNodes();
   }
 
-  public Optional<DepanFxWorkspaceResource<DepanFxLinkMatcherDocument>>
+  public Optional<DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>>
       getHierachyMatcherRsrc() {
     ContextModelId modelId = getGraphDoc().getContextModelId();
     return DepanFxLinkMatcherGroup.getMemberMatcherRsrc(workspace, modelId);
@@ -431,7 +453,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   }
 
   public void updateEdgeDisplayByMatcher(
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc,
+      DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> matcherRsrc,
       LinkDisplayEntry displayEntry) {
     edgeDisplay.updateEdgeDisplayByMatcher(matcherRsrc, displayEntry);
 
@@ -527,7 +549,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   }
 
   private void onSelectionChange(GraphNode node, boolean value) {
-    LOG.info("Node {} selection {}",
+    LOG.debug("Node {} selection {}",
         GraphContextKeys.toNodeKey(node.getId()), value);
     if (viewNodes.contains(node)) {
       JoglShapes.updateSelection(joglPane, node, value);
@@ -723,10 +745,47 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
         INVERT_EDGES_VISIBLE, e -> doInvertEdgesVisibleAction());
 
     itemFactory.appendSeparator();
-    itemFactory.appendActionItem(
-        EDGE_FILTERS, e -> runEditNodeListEdgesFiltersDialog());
+    itemFactory.appendSubMenu(buildEdgeFiltersItem());
     itemFactory.appendActionItem(
         MORE_EDGE_VIBILITY, e -> runEditVisibleEdgesDialog());
+  }
+
+  private Menu buildEdgeFiltersItem() {
+
+      DepanFxMenuBuilder menuBuilder =
+          new DepanFxMenuBuilder(EDGE_FILTERS_MENU_ITEM);
+      menuBuilder.appendActionItem(
+          SELECT_EDGE_FILTERS, e -> runSelectEdgesFiltersDialog());
+      menuBuilder.appendSeparator();
+      menuBuilder.appendActionItem(
+          ADD_NODE_LIST_EDGE_FILTER_ITEM,
+          e -> runAddNodeListEdgeMatcherAction());
+      menuBuilder.appendActionItem(
+        EDIT_EDGE_FILTERS, e -> runEditNodeListEdgesFiltersDialog());
+
+    return menuBuilder.build();
+  }
+
+  private void runSelectEdgesFiltersDialog() {
+    DepanFxLinkMatcherChooser.runLinkMatcherFinder(
+        workspace, dialogRunner, joglPane.getScene(), matcherDialogRegistry)
+        .ifPresent(edgeDisplay::setEdgeFilterResource);
+  }
+
+  private void runAddNodeListEdgeMatcherAction() {
+    DepanFxWorkspaceResource<DepanFxNodeList> headList = null;
+    DepanFxWorkspaceResource<DepanFxNodeList> tailList = null;
+    DepanFxWorkspaceResource<DepanFxNodeListEdgeMatcherData> matcherRsrc =
+        workspace.addScratchResource(
+            new DepanFxNodeListEdgeMatcherData(
+                "Edge Matcher", "Edge matcher for node list",
+                headList, tailList));
+
+    DepanFxNodeListEdgeMatcherDialog.runEditDialog(
+        getDialogRunner(), matcherRsrc)
+        .map(r -> DepanFxWorkspaceResource.forSource(
+              r.getDocument(), (DepanFxBaseMatcherDocument) r.getResource()))
+        .ifPresent(edgeDisplay::addEdgeMatcherResource);
   }
 
   private void doAllEdgesVisibleAction() {
@@ -751,7 +810,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   }
 
   private MenuItem buildEdgeVisibleItem(
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
+      DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> matcherRsrc) {
     String label = matcherRsrc.getResource().getToolName();
     boolean isVisible = edgeDisplay.getMatcherVisibility(matcherRsrc);
     int edgeCount = edgeDisplay.getVisiblityMatcherEdgeCount(matcherRsrc);
@@ -775,31 +834,33 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   }
 
   private void setMatcherVisible(
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc,
+      DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> matcherRsrc,
       boolean isVisible) {
     edgeDisplay.setMatcherVisibility(matcherRsrc, isVisible);
   }
 
   private void runEditNodeListEdgesFiltersDialog() {
     DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> filterRsrc =
-        edgeDisplay.forSaveEdgeFilterSequenceDoc();
-    if (filterRsrc == null) {
-      DepanFxLinkMatcherSequenceDocument filters =
-      new DepanFxLinkMatcherSequenceDocument(
-          "Edge Filters", "Edge visibility filters",
-          Collections.emptyList());
-      filterRsrc = workspace.addScratchResource(filters);
-    }
+        edgeDisplay.forEditEdgeFilterSequenceDoc(workspace);
 
     DepanFxLinkMatcherSequenceToolDialog.runEditDialog(
         filterRsrc, getDialogRunner())
         .getController()
         .getToolResource()
-        .ifPresent(this::setEdgeFilterResource);
+        .ifPresent(this::setMatcherSequenceFilterResource);
+  }
+
+  // Type agrees with DepanFxLinkMatcherSequenceToolDialog.runEditDialog()
+  private void setMatcherSequenceFilterResource(
+      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> edgeFilterRsrc) {
+    // Hornswaggle the resource into its base type.
+    setEdgeFilterResource(
+        DepanFxWorkspaceResource.forSource(
+            edgeFilterRsrc.getDocument(), edgeFilterRsrc.getResource()));
   }
 
   private void setEdgeFilterResource(
-      DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> edgeFilterRsrc) {
+      DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> edgeFilterRsrc) {
     edgeDisplay.setEdgeFilterResource(edgeFilterRsrc);
     linkDisplayDirty = true;
   }
@@ -1046,7 +1107,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
     viewNodes.forEach(this::installShape);
 
-    edgeDisplay = EdgeDisplayController.of(joglPane, viewData);
+    edgeDisplay = EdgeDisplayController.of(joglPane, matcherRegistry, viewData);
 
     linkDisplayDirty = false;
 

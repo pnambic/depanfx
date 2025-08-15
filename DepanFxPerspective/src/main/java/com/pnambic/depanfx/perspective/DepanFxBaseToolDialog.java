@@ -26,7 +26,7 @@ import javafx.scene.control.TextField;
 /*
  * Extends base tool's type to include support for a tool name
  * and a tool description field.
- * 
+ *
  * Completing the abstract methods commits the derived dialogs to
  * managing tool names and descriptions in a uniform manner.
  */

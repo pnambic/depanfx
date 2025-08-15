@@ -15,7 +15,7 @@
  */
 package com.pnambic.depanfx.nodelist.tooldata;
 
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.FilterMergeMode;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -24,7 +24,7 @@ public class DepanFxMatcherFilterData extends DepanFxBaseFilterData {
 
   public static final String MATCHER_FILTER_TOOL_EXT = "dmfti";
 
-  private final DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc;
+  private final DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> matcherRsrc;
 
   private final boolean matcherInverse;
 
@@ -33,7 +33,7 @@ public class DepanFxMatcherFilterData extends DepanFxBaseFilterData {
   public DepanFxMatcherFilterData(
       String toolName, String toolDescription,
       FilterMergeMode mergeMode,
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc,
+      DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> matcherRsrc,
       boolean matcherInverse,
       boolean matcherClosure) {
     super(toolName, toolDescription, mergeMode);
@@ -43,15 +43,15 @@ public class DepanFxMatcherFilterData extends DepanFxBaseFilterData {
   }
 
   public static DepanFxMatcherFilterData createMatcherFilterData(
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
-    DepanFxLinkMatcherDocument matcherInfo = matcherRsrc.getResource();
+      DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> matcherRsrc) {
+    DepanFxBaseMatcherDocument matcherInfo = matcherRsrc.getResource();
     return new DepanFxMatcherFilterData(
         matcherInfo.getToolName() + " filter",
         "Filter for " + matcherInfo.getToolName(),
         FilterMergeMode.REPLACE, matcherRsrc, false, false);
   }
 
-  public DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> getMatcherResource() {
+  public DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> getMatcherResource() {
     return matcherRsrc;
   }
 

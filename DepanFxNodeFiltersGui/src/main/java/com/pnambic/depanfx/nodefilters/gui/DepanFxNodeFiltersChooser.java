@@ -16,7 +16,6 @@
 package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
-import com.pnambic.depanfx.nodefilters.tooldata.DepanFxSequenceFilterData;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
@@ -26,7 +25,6 @@ import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
@@ -40,15 +38,6 @@ public class DepanFxNodeFiltersChooser {
   public static final String SELECT_NODE_FILTER = "Select Node Filter ...";
 
   public static final String ANY_FILTER_TOOL_EXT = "d*fti";
-
-  private static final Class<?>[] filterTypes = new Class<?>[]{
-      // Use registry - DepanFxMatcherFilterData.class,
-      DepanFxSequenceFilterData.class
-  };
-
-  public static final DepanFxResourceFilter X_NODE_FILTER_FILTER =
-      DepanFxResourceFilter.buildResourceFilter(
-          "Node Filter", ANY_FILTER_TOOL_EXT, Arrays.asList(filterTypes));
 
   /**
    * Bind a pop-up to text field for the resource name.

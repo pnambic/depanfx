@@ -17,9 +17,11 @@
 package com.pnambic.depanfx.nodelist.gui.edgematchers;
 
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser.NodeListControl;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListEdgeMatcherData;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxProctor;
+import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxFxmlDialog;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
@@ -47,10 +49,19 @@ import javafx.stage.FileChooser.ExtensionFilter;
 public class DepanFxNodeListEdgeMatcherDialog
     extends DepanFxBaseToolDialog<DepanFxNodeListEdgeMatcherData> {
 
+  private static final String NODE_LIST_EDGE_MATCHER_RESOURCE_FILTER =
+      "Node List Edge Matcher";
+
   public static final ExtensionFilter NODE_LIST_EDGE_FILTER =
       DepanFxSceneControls.buildExtFilter(
-          "Node List Edge Matcher",
+          NODE_LIST_EDGE_MATCHER_RESOURCE_FILTER,
           DepanFxNodeListEdgeMatcherData.NODE_LIST_EDGE_MATCHER_TOOL_EXT);
+
+  public static final DepanFxResourceFilter NODE_LIST_EDGE_RSRC_FILTER =
+      DepanFxResourceFilter.buildResourceFilter(
+          NODE_LIST_EDGE_MATCHER_RESOURCE_FILTER,
+          DepanFxNodeListEdgeMatcherData.NODE_LIST_EDGE_MATCHER_TOOL_EXT,
+          DepanFxNodeListEdgeMatcherData.class);
 
   public static final String NEW_NODE_LIST_LINK_MATCHER_TITLE =
       "Create Node List Link Matcher";
@@ -133,11 +144,18 @@ public class DepanFxNodeListEdgeMatcherDialog
     tailNodeListControl.runNodeListFinder();
   }
 
-  private void setMatcherData(DepanFxNodeListEdgeMatcherData matcherData) {
-      headNodeListControl.setNodeListResource(
-          matcherData.getHeadNodesResource());
-      tailNodeListControl.setNodeListResource(
-          matcherData.getTailNodesResource());
+  private void setMatcherData(DepanFxNodeListEdgeMatcherData matcherInfo) {
+    DepanFxWorkspaceResource<DepanFxNodeList> headRsrc =
+        matcherInfo.getHeadNodesResource();
+    if (headRsrc != null) {
+      headNodeListControl.setNodeListResource(headRsrc);
+    }
+
+    DepanFxWorkspaceResource<DepanFxNodeList> tailRsrc =
+        matcherInfo.getTailNodesResource();
+    if (tailRsrc != null) {
+      headNodeListControl.setNodeListResource(headRsrc);
+    }
   }
 
   @Override

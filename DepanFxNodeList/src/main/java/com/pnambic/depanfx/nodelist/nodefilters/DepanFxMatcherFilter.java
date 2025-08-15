@@ -15,8 +15,10 @@
  */
 package com.pnambic.depanfx.nodelist.nodefilters;
 
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLink;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphModel;
 import com.pnambic.depanfx.nodefilters.model.DepanFxBaseFilter;
@@ -52,7 +54,8 @@ public class DepanFxMatcherFilter
   @Override // DepanFxBaseFilter
   protected Collection<GraphNode> computeResult(Collection<GraphNode> nodes) {
     DepanFxLinkMatcher matcher =
-        getFilterData().getMatcherResource().getResource().getMatcher();
+        getMatcher(getFilterData().getMatcherResource().getResource());
+
     if (getFilterData().useInverse()) {
       return computeToSource(matcher, nodes);
     }
@@ -82,5 +85,13 @@ public class DepanFxMatcherFilter
   private Stream<DepanFxLink> streamMatchLinks(DepanFxLinkMatcher matcher) {
     return graphModel.streamEdges()
         .flatMap(e -> matcher.match(e).stream());
+  }
+
+  private DepanFxLinkMatcher getMatcher(
+      DepanFxBaseMatcherDocument matcherInfo) {
+    if (matcherInfo instanceof DepanFxLinkMatcherDocument linkInfo) {
+      return linkInfo.getMatcher();
+    }
+    return null;
   }
 }

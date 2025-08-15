@@ -1,5 +1,6 @@
 package com.pnambic.depanfx.nodelist.gui.nodefilters;
 
+import com.pnambic.depanfx.edgematchers.gui.DepanFxEdgeMatcherDialogRegistry;
 import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherChooser;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersDialogContribution;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersDialogRegistry;
@@ -54,8 +55,10 @@ public class DepanFxNodeFiltersMatcherConfiguration {
 
   @Bean
   public DepanFxNodeFiltersDialogContribution nodeFilterMatcherContribution(
-      DepanFxWorkspace workspace) {
-    return new DepanFxNodeFiltersMatcherContribution(workspace);
+      DepanFxWorkspace workspace,
+      DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry) {
+    return new DepanFxNodeFiltersMatcherContribution(
+        workspace, matcherDialogRegistry);
   }
 
   private static class LinkMatcherFilterFileOpenContribution
@@ -113,10 +116,15 @@ public class DepanFxNodeFiltersMatcherConfiguration {
 
     private final DepanFxWorkspace workspace;
 
-    public DepanFxNodeFiltersMatcherContribution(DepanFxWorkspace workspace) {
+    private final DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry;
+
+    public DepanFxNodeFiltersMatcherContribution(
+        DepanFxWorkspace workspace,
+        DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry) {
       super(LINK_MATCHER_KEY, ADD_MATCHER_FILTER,
           DepanFxMatcherFilterData.class);
       this.workspace = workspace;
+      this.matcherDialogRegistry = matcherDialogRegistry;
     }
 
     @Override
@@ -152,7 +160,7 @@ public class DepanFxNodeFiltersMatcherConfiguration {
         Scene scene,
         DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
       return DepanFxLinkMatcherChooser.runLinkMatcherFinder(
-                workspace, dialogRunner, scene)
+                workspace, dialogRunner, scene, matcherDialogRegistry)
             .map(DepanFxMatcherFilterData::createMatcherFilterData);
     }
   }

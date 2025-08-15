@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodeview.persistence;
 
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.graph.info.GraphNodeInfo;
 import com.pnambic.depanfx.graph.model.GraphEdge;
@@ -186,7 +187,7 @@ public class DepanFxNodeViewDataConverter
         viewData.getAvailableEdgeResource();
     DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> visibleEdgeRsrc =
         viewData.getVisibleEdgeResource();
-    DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> edgeFiltersRsrc =
+    DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> edgeFiltersRsrc =
         viewData.getEdgeFiltersResource();
 
     marshalObject(dstContext,
@@ -283,7 +284,7 @@ public class DepanFxNodeViewDataConverter
         metaData.getObject(VISIBLE_EDGE_RSRC, DepanFxWorkspaceResource.class);
 
     @SuppressWarnings("unchecked")
-    DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> edgeFiltersRsrc =
+    DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> edgeFiltersRsrc =
         metaData.getObject(EDGE_FILTER_RSRC, DepanFxWorkspaceResource.class);
 
     @SuppressWarnings("unchecked")

@@ -1,7 +1,8 @@
 package com.pnambic.depanfx.nodeview.gui;
 
+import com.pnambic.depanfx.edgematchers.gui.DepanFxEdgeMatcherDialogRegistry;
 import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherChooser;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.nodeview.jogl.JoglColors;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDirection;
@@ -83,6 +84,8 @@ public class DepanFxNodeViewLinkDisplayDialog
 
   private final DepanFxDialogRunner dialogRunner;
 
+  private final DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry;
+
   @FXML
   private TableView<EditLinkDisplay> linksDisplayTable;
 
@@ -94,9 +97,11 @@ public class DepanFxNodeViewLinkDisplayDialog
   private EdgeDisplayService displaySrvc;
 
   public DepanFxNodeViewLinkDisplayDialog(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner,
+      DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry) {
     super(workspace, DepanFxNodeViewLinkDisplayData.class);
     this.dialogRunner = dialogRunner;
+    this.matcherDialogRegistry = matcherDialogRegistry;
   }
 
   /**
@@ -154,6 +159,7 @@ public class DepanFxNodeViewLinkDisplayDialog
         new DepanFxLinkMatcherChooser.LinkMatcherCell<>(
             getWorkspace(), dialogRunner,
             linksDisplayTable.getScene(),
+            matcherDialogRegistry,
             (t, r) -> updateMatcher(t.getItem(), r)));
 
     TableColumn<EditLinkDisplay, Number> countColumn = columnBinder.next();
@@ -257,12 +263,12 @@ public class DepanFxNodeViewLinkDisplayDialog
   @FXML
   private void addLinkDisplayRow() {
     DepanFxLinkMatcherChooser.runLinkMatcherFinder(
-        workspace, dialogRunner, getScene())
+        workspace, dialogRunner, getScene(), matcherDialogRegistry)
         .ifPresent(this::addLinkDisplayRow);
   }
 
   private void addLinkDisplayRow(
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
+      DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> matcherRsrc) {
     DepanFxLineDisplayData lineDisplay =
         DepanFxLineDisplayData.buildSimpleLineDisplayData();
     LinkDisplayEntry rowDisplay = new LinkDisplayEntry(
@@ -318,7 +324,7 @@ public class DepanFxNodeViewLinkDisplayDialog
 
   private void updateMatcher(
       EditLinkDisplay editLinkDisplay,
-      DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
+      DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> matcherRsrc) {
     editLinkDisplay.setLinkDisplayRsrc(matcherRsrc);
   }
 
@@ -419,13 +425,13 @@ public class DepanFxNodeViewLinkDisplayDialog
 
     private void runMatcherChooser(int index) {
       DepanFxLinkMatcherChooser.runLinkMatcherFinder(
-          workspace, dialogRunner, getScene())
+          workspace, dialogRunner, getScene(), matcherDialogRegistry)
       .ifPresent(r -> updateRow(index, r));
     }
 
     private void updateRow(
         int index,
-        DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
+        DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> matcherRsrc) {
 
       updateMatcher(linksDiplayTableData.get(index), matcherRsrc);
     }
@@ -438,7 +444,7 @@ public class DepanFxNodeViewLinkDisplayDialog
   private static interface EdgeDisplayService {
 
     public Property<Number> getCountProperty(
-        DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc);
+        DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> matcherRsrc);
 
     public void setLinkDisplayResource(
         DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> forUpdate);
@@ -459,7 +465,7 @@ public class DepanFxNodeViewLinkDisplayDialog
 
     @Override
     public Property<Number> getCountProperty(
-        DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
+        DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> matcherRsrc) {
       return new SimpleIntegerProperty(
           displayControl.getDisplayMatcherEdgeCount(matcherRsrc));
     }
@@ -487,7 +493,7 @@ public class DepanFxNodeViewLinkDisplayDialog
 
     @Override
     public Property<Number> getCountProperty(
-        DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> matcherRsrc) {
+        DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> matcherRsrc) {
       return new SimpleIntegerProperty();
     }
 
@@ -567,7 +573,7 @@ public class DepanFxNodeViewLinkDisplayDialog
 
     public StringProperty linkDisplayNameProp;
 
-    public DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkDisplayRsrc;
+    public DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> linkDisplayRsrc;
 
     public ObjectProperty<DepanFxLineForm> lineFormProp;
 
@@ -625,7 +631,7 @@ public class DepanFxNodeViewLinkDisplayDialog
     }
 
     public void setLinkDisplayRsrc(
-        DepanFxWorkspaceResource<DepanFxLinkMatcherDocument> linkDisplayRsrc) {
+        DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> linkDisplayRsrc) {
       this.linkDisplayRsrc = linkDisplayRsrc;
       if (this.linkDisplayRsrc != null) {
         linkDisplayNameProp.setValue(

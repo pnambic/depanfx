@@ -15,8 +15,11 @@
  */
 package com.pnambic.depanfx.edgematchers.link;
 
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
+import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.graph.context.BaseContextDefinition;
+import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 
 import org.springframework.context.annotation.Bean;
@@ -54,7 +57,7 @@ public class DepanFxLinkMatcherBuiltIns {
 
   @Bean
   public DepanFxBuiltInContribution<DepanFxLinkMatcherDocument>
-      memberFinderLinkMatcher() {
+  memberFinderLinkMatcher() {
 
     DepanFxLinkMatcherDocument finderMatcher =
         new DepanFxLinkMatcherDocument(
@@ -79,5 +82,29 @@ public class DepanFxLinkMatcherBuiltIns {
 
     return new DepanFxBuiltInContribution.Simple<>(
         MATCH_ALL_DOC_PATH, allEdgeMatcherDoc);
+  }
+
+  @Bean
+  public DepanFxLinkMatchersRegistry.Contribution linkMatchers() {
+    return new DepanFxLinkMatchersRegistry.TransportableContribution(
+        DepanFxLinkMatcherDocument.class) {
+
+      @Override
+      public DepanFxLinkMatcher buildMatcher(
+          DepanFxBaseMatcherDocument filterInfo) {
+        if (filterInfo instanceof DepanFxLinkMatcherDocument linkInfo) {
+          return linkInfo.getMatcher();
+        }
+        return null;
+      }
+
+      @Override
+      public void prepareTransport(
+          PersistDocumentTransportBuilder builder) {
+        // Link matcher documents are not serializable.
+        prepareTransport(
+            builder, "link-matcher", DepanFxLinkMatcherDocument.class);
+      }
+    };
   }
 }
