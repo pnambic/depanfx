@@ -218,6 +218,8 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
    */
   private boolean linkDisplayDirty;
 
+  private boolean edgeFilterDirty;
+
   private EdgeDisplayController edgeDisplay;
 
   /**
@@ -862,7 +864,14 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   private void setEdgeFilterResource(
       DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> edgeFilterRsrc) {
     edgeDisplay.setEdgeFilterResource(edgeFilterRsrc);
-    linkDisplayDirty = true;
+    edgeFilterDirty =
+        DepanFxWorkspaceResource.isSavedResource(edgeFilterRsrc, workspace);
+  }
+
+  private void addEdgeMatcherResource(
+      DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> matcherRsrc) {
+    edgeDisplay.addEdgeMatcherResource(matcherRsrc);
+    edgeFilterDirty = true;
   }
 
   private void runEditVisibleEdgesDialog() {
@@ -871,7 +880,9 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
         getDialogRunner(), edgeDisplay)
         .getController()
         .getToolResource()
-        .ifPresent(edgeDisplay::setVisibiltyResource);
+        .map(r -> DepanFxWorkspaceResource.forSource(
+            r.getDocument(), (DepanFxBaseMatcherDocument) r.getResource()))
+        .ifPresent(this::addEdgeMatcherResource);
   }
 
   /////////////////////////////////////
@@ -1055,6 +1066,13 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
           + "  Use the Edge Display Edit window"
           + " to save the current settings.");
     }
+    if (linkDisplayDirty) {
+      proctor.addError("Unsaved edge filter",
+          "The edge filter property settings have been applied"
+          + " but they have not been saved to a resource file."
+          + "  Use the Edge Filter Edit window"
+          + " to save the current settings.");
+    }
   }
 
   private DepanFxNodeViewData buildSaveView() {
@@ -1110,6 +1128,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     edgeDisplay = EdgeDisplayController.of(joglPane, matcherRegistry, viewData);
 
     linkDisplayDirty = false;
+    edgeFilterDirty = false;
 
     getViewEdges().forEach(edgeDisplay::installEdge);
 
