@@ -20,18 +20,19 @@ import com.jogamp.opengl.GL2;
 import java.awt.Shape;
 
 /**
- * Bundles a {@link Shape} with its cached {@link PathIteratorRender} so that
+ * Bundles a {@link Shape} with a cached {@link VboShapeRender} so that
  * multiple node shapes can share the same renderable geometry.
  */
 public class RenderShape {
 
   private final Shape awtShape;
 
-  private final PathIteratorRender pathRender;
+  private final VboShapeRender pathRender;
 
   public RenderShape(Shape awtShape) {
     this.awtShape = awtShape;
-    this.pathRender = new PathIteratorRender(awtShape);
+    this.pathRender = VboShapeRender.build(
+        awtShape.getPathIterator(null, NodeShape.SHAPE_FLATNESS));
   }
 
   public Shape getAwtShape() {
