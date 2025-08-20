@@ -23,12 +23,13 @@ import com.pnambic.depanfx.jogl.JoglColor;
 
 public class AwtShape extends NodeShape {
 
-  public RenderShape renderShape;
+  private RenderShape renderShape;
 
   public AwtShape(
       RenderShape renderShape,
       boolean isVisible,
-      JoglColor fillColor, JoglColor edgeColor, JoglColor borderColor, JoglColor highlightColor,
+      JoglColor fillColor, JoglColor edgeColor,
+      JoglColor borderColor, JoglColor highlightColor,
       float borderWidth,
       double shapeX, double shapeY, double shapeZ,
       double targetX, double targetY, double targetZ,
@@ -57,6 +58,10 @@ public class AwtShape extends NodeShape {
         showLabel, labelText, pickObject);
   }
 
+  public void setRenderShape(RenderShape renderShape) {
+    this.renderShape = renderShape;
+  }
+
   @Override
   public AwtShape forUpdate() {
     AwtShape result = new AwtShape(
@@ -69,7 +74,6 @@ public class AwtShape extends NodeShape {
     super.fillUpdate(result);
     return result;
   }
-
 
   @Override
   public boolean contains(double posX, double posY) {

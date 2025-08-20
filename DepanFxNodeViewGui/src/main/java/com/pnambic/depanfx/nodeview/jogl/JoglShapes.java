@@ -24,6 +24,24 @@ import java.util.stream.Stream;
  */
 public class JoglShapes {
 
+  public static final RenderShape RENDER_SQUARE =
+      new RenderShape(JoglShapeKinds.SQUARE.buildAwtShape());
+
+  public static final RenderShape RENDER_RECTANGLE =
+      new RenderShape(JoglShapeKinds.RECTANGLE.buildAwtShape());
+
+  public static final RenderShape RENDER_ROUNDED_RECTANGLE =
+      new RenderShape(JoglShapeKinds.ROUNDED_RECTANGLE.buildAwtShape());
+
+  public static final RenderShape RENDER_CIRCLE =
+      new RenderShape(JoglShapeKinds.CIRCLE.buildAwtShape());
+
+  public static final RenderShape RENDER_ELLIPSE =
+      new RenderShape(JoglShapeKinds.ELLIPSE.buildAwtShape());
+
+  public static final RenderShape RENDER_HEXAGON =
+      new RenderShape(JoglShapeKinds.HEXAGON.buildAwtShape());
+
   public static void installShape(
       JoglPane joglPane, GraphNode node,
       DepanFxNodeLocationData location,
@@ -74,7 +92,7 @@ public class JoglShapes {
 
       // Only AWT shapes have a shape
       if (nodeShape instanceof AwtShape awtShape) {
-        awtShape.renderShape = getRenderShape(display.nodeShape);
+        awtShape.setRenderShape(getRenderShape(display.nodeShape));
       }
 
       // Do the update
@@ -166,20 +184,6 @@ public class JoglShapes {
       case SQUARE -> RENDER_SQUARE;
     };
   }
-
-  private static final RenderShape RENDER_SQUARE =
-      new RenderShape(JoglShapeKinds.SQUARE.buildAwtShape());
-  private static final RenderShape RENDER_RECTANGLE =
-      new RenderShape(JoglShapeKinds.RECTANGLE.buildAwtShape());
-  private static final RenderShape RENDER_ROUNDED_RECTANGLE =
-      new RenderShape(JoglShapeKinds.ROUNDED_RECTANGLE.buildAwtShape());
-  private static final RenderShape RENDER_CIRCLE =
-      new RenderShape(JoglShapeKinds.CIRCLE.buildAwtShape());
-  private static final RenderShape RENDER_ELLIPSE =
-      new RenderShape(JoglShapeKinds.ELLIPSE.buildAwtShape());
-  private static final RenderShape RENDER_HEXAGON =
-      new RenderShape(JoglShapeKinds.HEXAGON.buildAwtShape());
-
 
   private static List<NodeOverlay> clearFoldOverlays(
       List<NodeOverlay> overlays) {
