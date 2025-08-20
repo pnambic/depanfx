@@ -21,16 +21,12 @@ package com.pnambic.depanfx.jogl.shapes;
 import com.jogamp.opengl.GL2;
 import com.pnambic.depanfx.jogl.JoglColor;
 
-import java.awt.Shape;
-
 public class AwtShape extends NodeShape {
 
-  public Shape shapeAwt;
-
-  private PathIteratorRender pathRender;
+  public RenderShape renderShape;
 
   public AwtShape(
-      Shape shapeAwt,
+      RenderShape renderShape,
       boolean isVisible,
       JoglColor fillColor, JoglColor edgeColor, JoglColor borderColor, JoglColor highlightColor,
       float borderWidth,
@@ -43,17 +39,17 @@ public class AwtShape extends NodeShape {
         shapeX, shapeY, shapeZ, targetX, targetY, targetZ,
         showLabel, labelText, pickObject);
 
-    this.shapeAwt = shapeAwt;
+    this.renderShape = renderShape;
   }
 
   public AwtShape(
-      Shape shape,
+      RenderShape renderShape,
       boolean isVisible,
       JoglColor fillColor, JoglColor borderColor, JoglColor highlightColor,
       float borderWidth,
       double initialX, double initialY, double initialZ,
       boolean showLabel, String labelText, Object pickObject) {
-    this(shape, isVisible,
+    this(renderShape, isVisible,
         fillColor, borderColor, borderColor, highlightColor,
         borderWidth,
         initialX, initialY, initialZ,
@@ -64,7 +60,7 @@ public class AwtShape extends NodeShape {
   @Override
   public AwtShape forUpdate() {
     AwtShape result = new AwtShape(
-        shapeAwt, isVisible,
+        renderShape, isVisible,
         shapeColor, edgeColor, borderColor, highlightColor,
         borderWidth,
         shapeX, shapeY, shapeZ,
@@ -77,23 +73,17 @@ public class AwtShape extends NodeShape {
 
   @Override
   public boolean contains(double posX, double posY) {
-    return shapeAwt.contains(posX, posY);
+    return renderShape.getAwtShape().contains(posX, posY);
   }
 
   @Override
   protected void renderShape(GL2 gl) {
-    if (pathRender == null) {
-      pathRender = new PathIteratorRender(shapeAwt);
-    }
-    pathRender.drawShape(gl);
+    renderShape.drawShape(gl);
   }
 
   @Override
   protected void renderBorder(GL2 gl) {
     gl.glLineWidth(borderWidth);
-    if (pathRender == null) {
-      pathRender = new PathIteratorRender(shapeAwt);
-    }
-    pathRender.drawBorder(gl);
+    renderShape.drawBorder(gl);
   }
 }

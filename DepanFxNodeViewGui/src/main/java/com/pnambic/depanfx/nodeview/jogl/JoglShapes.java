@@ -5,13 +5,13 @@ import com.pnambic.depanfx.jogl.JoglColor;
 import com.pnambic.depanfx.jogl.JoglShape;
 import com.pnambic.depanfx.jogl.shapes.AwtShape;
 import com.pnambic.depanfx.jogl.shapes.NodeShape;
+import com.pnambic.depanfx.jogl.shapes.RenderShape;
 import com.pnambic.depanfx.jogl.overlays.NodeOverlay;
 import com.pnambic.depanfx.jogl.overlays.NestFoldOverlay;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglShape;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 
-import java.awt.Shape;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -74,7 +74,7 @@ public class JoglShapes {
 
       // Only AWT shapes have a shape
       if (nodeShape instanceof AwtShape awtShape) {
-        awtShape.shapeAwt = getShape(display.nodeShape);
+        awtShape.renderShape = getRenderShape(display.nodeShape);
       }
 
       // Do the update
@@ -146,7 +146,7 @@ public class JoglShapes {
     String nodeName = guessName(node);
 
     return Optional.of(new AwtShape(
-        getShape(display.nodeShape), isVisible,
+        getRenderShape(display.nodeShape), isVisible,
         fillColor, borderColor, highlightColor, 1.0f,
         location.xPos, location.yPos, location.zPos,
         true, nodeName, node));
@@ -156,24 +156,29 @@ public class JoglShapes {
     return node.getId().getSimpleName();
   }
 
-  private static Shape getShape(DepanFxJoglShape joglShape) {
-    switch (joglShape) {
-    case CIRCLE:
-      return JoglShapeKinds.CIRCLE.buildAwtShape();
-    case ELLIPSE:
-      return JoglShapeKinds.ELLIPSE.buildAwtShape();
-    case HEXAGON:
-      return JoglShapeKinds.HEXAGON.buildAwtShape();
-    case RECTANGLE:
-      return JoglShapeKinds.RECTANGLE.buildAwtShape();
-    case ROUNDED_RECTANGLE:
-      return JoglShapeKinds.ROUNDED_RECTANGLE.buildAwtShape();
-    case SQUARE:
-      return JoglShapeKinds.SQUARE.buildAwtShape();
-    default:
-    }
-    return JoglShapeKinds.SQUARE.buildAwtShape();
+  private static RenderShape getRenderShape(DepanFxJoglShape joglShape) {
+    return switch (joglShape) {
+      case CIRCLE -> RENDER_CIRCLE;
+      case ELLIPSE -> RENDER_ELLIPSE;
+      case HEXAGON -> RENDER_HEXAGON;
+      case RECTANGLE -> RENDER_RECTANGLE;
+      case ROUNDED_RECTANGLE -> RENDER_ROUNDED_RECTANGLE;
+      case SQUARE -> RENDER_SQUARE;
+    };
   }
+
+  private static final RenderShape RENDER_SQUARE =
+      new RenderShape(JoglShapeKinds.SQUARE.buildAwtShape());
+  private static final RenderShape RENDER_RECTANGLE =
+      new RenderShape(JoglShapeKinds.RECTANGLE.buildAwtShape());
+  private static final RenderShape RENDER_ROUNDED_RECTANGLE =
+      new RenderShape(JoglShapeKinds.ROUNDED_RECTANGLE.buildAwtShape());
+  private static final RenderShape RENDER_CIRCLE =
+      new RenderShape(JoglShapeKinds.CIRCLE.buildAwtShape());
+  private static final RenderShape RENDER_ELLIPSE =
+      new RenderShape(JoglShapeKinds.ELLIPSE.buildAwtShape());
+  private static final RenderShape RENDER_HEXAGON =
+      new RenderShape(JoglShapeKinds.HEXAGON.buildAwtShape());
 
 
   private static List<NodeOverlay> clearFoldOverlays(
