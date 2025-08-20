@@ -36,12 +36,12 @@ public class ArrowShapes {
 
     private final int mode;
 
-    private final LinePoints arrowPoints;
+    private final VboLinePoints arrowPoints;
 
     private final float[] transformationMatrix;
 
     protected LineArrow(
-        int mode, LinePoints arrowPoints, float[] transformationMatrix) {
+        int mode, VboLinePoints arrowPoints, float[] transformationMatrix) {
       this.mode = mode;
       this.arrowPoints = arrowPoints;
       this.transformationMatrix = transformationMatrix;
@@ -60,7 +60,7 @@ public class ArrowShapes {
   public static class OpenLineArrow extends LineArrow {
 
     private OpenLineArrow(
-        LinePoints arrowPoints, float[] transformationMatrix) {
+        VboLinePoints arrowPoints, float[] transformationMatrix) {
       super(GL2.GL_LINE_STRIP, arrowPoints, transformationMatrix);
     }
   }
@@ -68,7 +68,7 @@ public class ArrowShapes {
   public static class ClosedLineArrow extends LineArrow {
 
     protected ClosedLineArrow(
-        LinePoints arrowPoints, float[] transformationMatrix) {
+        VboLinePoints arrowPoints, float[] transformationMatrix) {
       super(GL2.GL_LINE_LOOP, arrowPoints, transformationMatrix);
     }
   }
@@ -76,7 +76,7 @@ public class ArrowShapes {
   public static class FilledLineArrow extends LineArrow {
 
     protected FilledLineArrow(
-        LinePoints arrowPoints, float[] transformationMatrix) {
+        VboLinePoints arrowPoints, float[] transformationMatrix) {
       super(GL2.GL_TRIANGLE_FAN, arrowPoints, transformationMatrix);
     }
   }
@@ -87,35 +87,35 @@ public class ArrowShapes {
   public static class Artistic extends FilledLineArrow {
 
     protected Artistic(float[] transformationMatrix) {
-      super(ArrowLinePoints.ARTISTIC_ARROW_POINTS, transformationMatrix);
+      super(ArrowPoints.ARTISTIC_ARROW_POINTS, transformationMatrix);
     }
   }
 
   public static class Chevron extends ClosedLineArrow {
 
     protected Chevron(float[] transformationMatrix) {
-      super(ArrowLinePoints.ARTISTIC_ARROW_POINTS, transformationMatrix);
+      super(ArrowPoints.ARTISTIC_ARROW_POINTS, transformationMatrix);
     }
   }
 
   public static class Filled extends FilledLineArrow {
 
     protected Filled(float[] transformationMatrix) {
-      super(ArrowLinePoints.TRIANGLE_ARROW_POINTS, transformationMatrix);
+      super(ArrowPoints.TRIANGLE_ARROW_POINTS, transformationMatrix);
     }
   }
 
   public static class Triangle extends ClosedLineArrow {
 
     protected Triangle(float[] transformationMatrix) {
-      super(ArrowLinePoints.TRIANGLE_ARROW_POINTS, transformationMatrix);
+      super(ArrowPoints.TRIANGLE_ARROW_POINTS, transformationMatrix);
     }
   }
 
   public static class Open extends OpenLineArrow {
 
     protected Open(float[] transformationMatrix) {
-      super(ArrowLinePoints.TRIANGLE_ARROW_POINTS, transformationMatrix);
+      super(ArrowPoints.TRIANGLE_ARROW_POINTS, transformationMatrix);
     }
   }
 
