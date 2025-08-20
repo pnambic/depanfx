@@ -19,9 +19,9 @@
 package com.pnambic.depanfx.jogl.shapes;
 
 /**
- * Define the vertexes for different line-based arrow heads.
+ * Define the vertices for different line-based arrow heads.
  *
- * Artistic arrowheads are based on a four control-point model:
+ * <p>Artistic arrowheads are based on a four control-point model:</p>
  *
  * {@snippet:
  *     1
@@ -31,16 +31,16 @@ package com.pnambic.depanfx.jogl.shapes;
  *  2  3  4   3 = middlePoint.
  * }
  *
- * This sequence points works well for closed lines and triangle fans, but
- * not for open line segments (i.e. {@code GL_LINE_STRIP}).
+ * <p>This sequence points works well for closed lines and triangle fans, but
+ * not for open line segments (i.e. {@code GL_LINE_STRIP}).</p>
  *
- * Triangular arrowheads are based on a three point control-point model that
+ * <p>Triangular arrowheads are based on a three point control-point model that
  * drops the 3/middlePoint from the artistic shape.  The remaining control
  * point vertices remain in the same location, but are rendered in a different
  * order.  In order to support open line strips, closed line loops,
- * and triangle fans, the vertices are sequenced in the order [ 2, 1, 4 ].
+ * and triangle fans, the vertices are sequenced in the order [ 2, 1, 4 ].</p>
  */
-public class ArrowLinePoints {
+public class ArrowPoints {
 
   public static final double SEMI_CIRCLE = 180.0d;
 
@@ -52,11 +52,11 @@ public class ArrowLinePoints {
 
   public static final double ARROW_TIP_Y = 0.0d;
 
-  public static final LinePoints ARTISTIC_ARROW_POINTS = buildArtisticPoints();
+  public static final VboLinePoints ARTISTIC_ARROW_POINTS = buildArtisticPoints();
 
-  public static final LinePoints TRIANGLE_ARROW_POINTS = buildTrianglePoints();
+  public static final VboLinePoints TRIANGLE_ARROW_POINTS = buildTrianglePoints();
 
-  private  ArrowLinePoints() {
+  private ArrowPoints() {
     // Prevent instantiation.
   }
 
@@ -64,7 +64,7 @@ public class ArrowLinePoints {
    * Use a different order for the points (2, 1, 4), so GL_LINE_STRIP,
    * LINE_LOOP, and GL_TRIANGLE_FAN all work.
    */
-  public static LinePoints buildTrianglePoints() {
+  public static VboLinePoints buildTrianglePoints() {
 
     double secondPointAngle = calcSecondPointAngle();
     double fourthPointAngle = calcFourthPointAngle();
@@ -82,17 +82,16 @@ public class ArrowLinePoints {
     // Push Point 4
     insert = insertPoint(arrowPoints, insert,
         Math.cos(fourthPointAngle), Math.sin(fourthPointAngle));
-    return new LinePoints(3, arrowPoints);
+    return VboLinePoints.fromLinePoints(new LinePoints(3, arrowPoints));
   }
-
 
   /**
    * Provide four vertices (1, 2, 3, 4) that work for LINE_LOOP
    * and GL_TRIANGLE_FAN.
    *
-   * This vertex sequence is not useful with GL_LINE_STRIP
+   * <p>This vertex sequence is not useful with GL_LINE_STRIP</p>
    */
-  public static LinePoints buildArtisticPoints() {
+  public static VboLinePoints buildArtisticPoints() {
 
     double secondPointAngle = calcSecondPointAngle();
     double fourthPointAngle = calcFourthPointAngle();
@@ -113,7 +112,7 @@ public class ArrowLinePoints {
     // Push Point 4
     insertPoint(arrowPoints, insert,
         Math.cos(fourthPointAngle), Math.sin(fourthPointAngle));
-    return new LinePoints(4, arrowPoints);
+    return VboLinePoints.fromLinePoints(new LinePoints(4, arrowPoints));
   }
 
   private static double calcSecondPointAngle() {
