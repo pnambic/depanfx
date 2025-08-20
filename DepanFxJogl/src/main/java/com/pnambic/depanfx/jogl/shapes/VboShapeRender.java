@@ -102,28 +102,25 @@ public class VboShapeRender {
     if (fillVboId != 0) {
       return;
     }
-    int[] ids = new int[1];
-    gl.glGenBuffers(1, ids, 0);
-    fillVboId = ids[0];
-    gl.glBindBuffer(GL.GL_ARRAY_BUFFER, fillVboId);
-    FloatBuffer buf = Buffers.newDirectFloatBuffer(fillVertices);
-    gl.glBufferData(
-        GL.GL_ARRAY_BUFFER, fillVertices.length * Float.BYTES, buf, GL.GL_STATIC_DRAW);
-    gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
+    fillVboId = allocateVbo(gl, fillVertices);
   }
 
   private void ensureBorderVbo(GL2 gl) {
     if (borderVboId != 0) {
       return;
     }
+    borderVboId = allocateVbo(gl, borderVertices);
+  }
+
+  private int allocateVbo(GL gl, float[] vertices) {
     int[] ids = new int[1];
     gl.glGenBuffers(1, ids, 0);
-    borderVboId = ids[0];
-    gl.glBindBuffer(GL.GL_ARRAY_BUFFER, borderVboId);
-    FloatBuffer buf = Buffers.newDirectFloatBuffer(borderVertices);
+    int result = ids[0];
+    gl.glBindBuffer(GL.GL_ARRAY_BUFFER, result);
+    FloatBuffer buf = Buffers.newDirectFloatBuffer(vertices);
     gl.glBufferData(
-        GL.GL_ARRAY_BUFFER, borderVertices.length * Float.BYTES, buf, GL.GL_STATIC_DRAW);
+        GL.GL_ARRAY_BUFFER, vertices.length * Float.BYTES, buf, GL.GL_STATIC_DRAW);
     gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
+    return result;
   }
 }
-

@@ -25,22 +25,22 @@ import java.util.stream.Stream;
 public class JoglShapes {
 
   public static final RenderShape RENDER_SQUARE =
-      new RenderShape(JoglShapeKinds.SQUARE.buildAwtShape());
+      RenderShape.build(JoglShapeKinds.SQUARE.buildAwtShape());
 
   public static final RenderShape RENDER_RECTANGLE =
-      new RenderShape(JoglShapeKinds.RECTANGLE.buildAwtShape());
+      RenderShape.build(JoglShapeKinds.RECTANGLE.buildAwtShape());
 
   public static final RenderShape RENDER_ROUNDED_RECTANGLE =
-      new RenderShape(JoglShapeKinds.ROUNDED_RECTANGLE.buildAwtShape());
+      RenderShape.build(JoglShapeKinds.ROUNDED_RECTANGLE.buildAwtShape());
 
   public static final RenderShape RENDER_CIRCLE =
-      new RenderShape(JoglShapeKinds.CIRCLE.buildAwtShape());
+      RenderShape.build(JoglShapeKinds.CIRCLE.buildAwtShape());
 
   public static final RenderShape RENDER_ELLIPSE =
-      new RenderShape(JoglShapeKinds.ELLIPSE.buildAwtShape());
+      RenderShape.build(JoglShapeKinds.ELLIPSE.buildAwtShape());
 
   public static final RenderShape RENDER_HEXAGON =
-      new RenderShape(JoglShapeKinds.HEXAGON.buildAwtShape());
+      RenderShape.build(JoglShapeKinds.HEXAGON.buildAwtShape());
 
   public static void installShape(
       JoglPane joglPane, GraphNode node,

@@ -27,12 +27,17 @@ public class RenderShape {
 
   private final Shape awtShape;
 
-  private final VboShapeRender pathRender;
+  private final VboShapeRender shapeRender;
 
-  public RenderShape(Shape awtShape) {
+  public RenderShape(Shape awtShape, VboShapeRender shapeRender) {
     this.awtShape = awtShape;
-    this.pathRender = VboShapeRender.build(
+    this.shapeRender = shapeRender;
+  }
+
+  public static RenderShape build(Shape awtShape) {
+    VboShapeRender shapeRender = VboShapeRender.build(
         awtShape.getPathIterator(null, NodeShape.SHAPE_FLATNESS));
+    return new RenderShape(awtShape, shapeRender);
   }
 
   public Shape getAwtShape() {
@@ -40,10 +45,10 @@ public class RenderShape {
   }
 
   public void drawShape(GL2 gl) {
-    pathRender.drawShape(gl);
+    shapeRender.drawShape(gl);
   }
 
   public void drawBorder(GL2 gl) {
-    pathRender.drawBorder(gl);
+    shapeRender.drawBorder(gl);
   }
 }
