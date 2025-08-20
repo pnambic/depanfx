@@ -69,11 +69,6 @@ public class RichLineRender implements LineRender {
       LineShape line, NodeShape sourceShape, NodeShape targetShape) {
 
     if (haveChanged(sourceShape, targetShape)) {
-      Shape lineShape = buildLineShape(
-          line, sourceShape, targetShape);
-      LinePointsBuilder builder = new LinePointsBuilder();
-      linePoints =
-          builder.prepare(lineShape, sourceShape, targetShape);
 
       // Schedule any existing VBO for disposal.
       if (vboLinePoints != null) {
@@ -81,6 +76,11 @@ public class RichLineRender implements LineRender {
         vboLinePoints = null;
       }
       stableCount = 0;
+
+      // Compute the points in the line.
+      Shape lineShape = buildLineShape(line, sourceShape, targetShape);
+      LinePointsBuilder builder = new LinePointsBuilder();
+      linePoints = builder.prepare(lineShape, sourceShape, targetShape);
 
       // Attach arrowheads if there is a line
       if (linePoints.hasEndpoints()) {
@@ -100,13 +100,10 @@ public class RichLineRender implements LineRender {
       targetPosX = targetShape.shapeX;
       targetPosY = targetShape.shapeY;
       targetPosZ = targetShape.shapeZ;
-    } else {
-      if (stableCount < STABLE_LIMIT) {
+    } else if (stableCount < STABLE_LIMIT) {
         stableCount++;
-      }
-      if (vboLinePoints == null && linePoints.hasPoints() && stableCount >= STABLE_LIMIT) {
-        vboLinePoints = VboLinePoints.fromLinePoints(linePoints);
-      }
+    } else if (vboLinePoints == null && linePoints.hasPoints()) {
+       vboLinePoints = VboLinePoints.fromLinePoints(linePoints);
     }
   }
 
@@ -154,9 +151,10 @@ public class RichLineRender implements LineRender {
   private void drawLinePoints(GL2 gl) {
     if (vboLinePoints != null) {
       vboLinePoints.drawPoints(gl, GL2.GL_LINE_STRIP);
-    } else {
-      linePoints.drawPoints(gl, GL2.GL_LINE_STRIP);
+      return;
     }
+
+    linePoints.drawPoints(gl, GL2.GL_LINE_STRIP);
   }
 
   private void drawHeadArrow(GL2 gl) {

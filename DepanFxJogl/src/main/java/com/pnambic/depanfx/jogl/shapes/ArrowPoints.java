@@ -52,9 +52,11 @@ public class ArrowPoints {
 
   public static final double ARROW_TIP_Y = 0.0d;
 
-  public static final VboLinePoints ARTISTIC_ARROW_POINTS = buildArtisticPoints();
+  public static final VboLinePoints ARTISTIC_ARROW_POINTS =
+      buildArtisticPoints();
 
-  public static final VboLinePoints TRIANGLE_ARROW_POINTS = buildTrianglePoints();
+  public static final VboLinePoints TRIANGLE_ARROW_POINTS =
+      buildTrianglePoints();
 
   private ArrowPoints() {
     // Prevent instantiation.
@@ -82,7 +84,7 @@ public class ArrowPoints {
     // Push Point 4
     insert = insertPoint(arrowPoints, insert,
         Math.cos(fourthPointAngle), Math.sin(fourthPointAngle));
-    return VboLinePoints.fromLinePoints(new LinePoints(3, arrowPoints));
+    return new VboLinePoints(3, arrowPoints);
   }
 
   /**
@@ -94,6 +96,7 @@ public class ArrowPoints {
   public static VboLinePoints buildArtisticPoints() {
 
     double secondPointAngle = calcSecondPointAngle();
+
     double fourthPointAngle = calcFourthPointAngle();
 
     float[] arrowPoints = new float[4 * 3];
@@ -112,7 +115,7 @@ public class ArrowPoints {
     // Push Point 4
     insertPoint(arrowPoints, insert,
         Math.cos(fourthPointAngle), Math.sin(fourthPointAngle));
-    return VboLinePoints.fromLinePoints(new LinePoints(4, arrowPoints));
+    return new VboLinePoints(4, arrowPoints);
   }
 
   private static double calcSecondPointAngle() {
