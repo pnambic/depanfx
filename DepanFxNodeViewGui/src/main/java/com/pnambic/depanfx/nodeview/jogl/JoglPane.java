@@ -3,10 +3,12 @@ package com.pnambic.depanfx.nodeview.jogl;
 import com.pnambic.depanfx.jogl.JoglModule;
 import com.pnambic.depanfx.jogl.JoglMouseActionListener;
 import com.pnambic.depanfx.jogl.JoglShape;
+import com.pnambic.depanfx.jogl.shapes.RenderShape;
 import com.pnambic.depanfx.nodeview.gui.CameraControl;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewStatusPanel;
 import com.pnambic.depanfx.nodeview.gui.FlightController;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglShape;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 
 import net.rgielen.fxweaver.core.FxControllerAndView;
@@ -15,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
+import java.util.EnumMap;
+import java.util.Map;
 
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
@@ -43,6 +47,9 @@ public class JoglPane extends BorderPane {
   private FxControllerAndView<DepanFxNodeViewStatusPanel, Node> statusPanel;
 
   private Pane viewport;
+
+  private final Map<DepanFxJoglShape, RenderShape> renderShapes =
+      new EnumMap<>(DepanFxJoglShape.class);
 
   public JoglPane(JoglModule jogl, DepanFxDialogRunner dialogRunner) {
     this.jogl = jogl;
@@ -100,6 +107,7 @@ public class JoglPane extends BorderPane {
   public void close() {
     release();
     jogl.destroy();
+    renderShapes.clear();
   }
 
   public void addMouseActionListener(JoglMouseActionListener listener) {
@@ -124,6 +132,13 @@ public class JoglPane extends BorderPane {
 
   public BufferedImage takeScreenshot() {
     return jogl.takeScreenshot();
+  }
+
+  public RenderShape getRenderShape(DepanFxJoglShape shape) {
+    return renderShapes.computeIfAbsent(
+        shape,
+        s -> RenderShape.build(
+            JoglShapeKinds.valueOf(s.name()).buildAwtShape()));
   }
 
   private Pane getJoglViewport() {

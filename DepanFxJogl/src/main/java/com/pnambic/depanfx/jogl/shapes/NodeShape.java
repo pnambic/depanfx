@@ -172,6 +172,14 @@ public abstract class NodeShape implements JoglShape, JoglPickable {
     shapeZ = targetZ;
   }
 
+  @Override
+  public void dispose(GL2 gl) {
+    if (labelTexture != null) {
+      labelTexture.dispose();
+      labelTexture = null;
+    }
+  }
+
   public NodeShape getApparentShape(JoglRenderer renderer) {
     JoglShape nodeNestShape = renderer.getRenderShape(nodeNestKey);
     if (nodeNestShape != this) {

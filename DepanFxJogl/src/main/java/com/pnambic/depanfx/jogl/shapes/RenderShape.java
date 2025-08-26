@@ -51,4 +51,9 @@ public class RenderShape {
   public void drawBorder(GL2 gl) {
     shapeRender.drawBorder(gl);
   }
+
+  /** Release any OpenGL buffers held by this shape. */
+  public void dispose(GL2 gl) {
+    shapeRender.dispose(gl);
+  }
 }

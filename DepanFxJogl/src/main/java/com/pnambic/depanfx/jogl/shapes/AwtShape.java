@@ -90,4 +90,10 @@ public class AwtShape extends NodeShape {
     gl.glLineWidth(borderWidth);
     renderShape.drawBorder(gl);
   }
+
+  @Override
+  public void dispose(GL2 gl) {
+    super.dispose(gl);
+    renderShape.dispose(gl);
+  }
 }

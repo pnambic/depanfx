@@ -269,4 +269,16 @@ public class RichLineRender implements LineRender {
     }
     return extent;
   }
+
+  @Override
+  public void dispose(GL2 gl) {
+    if (vboLinePoints != null) {
+      vboLinePoints.dispose(gl);
+      vboLinePoints = null;
+    }
+    if (disposeVbo != null) {
+      disposeVbo.dispose(gl);
+      disposeVbo = null;
+    }
+  }
 }

@@ -15,4 +15,10 @@ public interface JoglShape {
   void step(GL2 gl, JoglRenderer renderer);
 
   JoglShape forUpdate();
+
+  /**
+   * Release any OpenGL resources held by this shape.  Shapes that do not
+   * allocate resources can ignore this call.
+   */
+  default void dispose(GL2 gl) {}
 }

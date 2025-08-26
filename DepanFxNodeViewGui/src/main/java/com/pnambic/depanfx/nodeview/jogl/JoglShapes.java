@@ -5,7 +5,6 @@ import com.pnambic.depanfx.jogl.JoglColor;
 import com.pnambic.depanfx.jogl.JoglShape;
 import com.pnambic.depanfx.jogl.shapes.AwtShape;
 import com.pnambic.depanfx.jogl.shapes.NodeShape;
-import com.pnambic.depanfx.jogl.shapes.RenderShape;
 import com.pnambic.depanfx.jogl.overlays.NodeOverlay;
 import com.pnambic.depanfx.jogl.overlays.NestFoldOverlay;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglShape;
@@ -24,30 +23,12 @@ import java.util.stream.Stream;
  */
 public class JoglShapes {
 
-  public static final RenderShape RENDER_SQUARE =
-      RenderShape.build(JoglShapeKinds.SQUARE.buildAwtShape());
-
-  public static final RenderShape RENDER_RECTANGLE =
-      RenderShape.build(JoglShapeKinds.RECTANGLE.buildAwtShape());
-
-  public static final RenderShape RENDER_ROUNDED_RECTANGLE =
-      RenderShape.build(JoglShapeKinds.ROUNDED_RECTANGLE.buildAwtShape());
-
-  public static final RenderShape RENDER_CIRCLE =
-      RenderShape.build(JoglShapeKinds.CIRCLE.buildAwtShape());
-
-  public static final RenderShape RENDER_ELLIPSE =
-      RenderShape.build(JoglShapeKinds.ELLIPSE.buildAwtShape());
-
-  public static final RenderShape RENDER_HEXAGON =
-      RenderShape.build(JoglShapeKinds.HEXAGON.buildAwtShape());
-
   public static void installShape(
       JoglPane joglPane, GraphNode node,
       DepanFxNodeLocationData location,
       DepanFxNodeDisplayData display,
       boolean isVisible) {
-    createShape(node, location, display, isVisible)
+    createShape(joglPane, node, location, display, isVisible)
         .ifPresent(s -> joglPane.updateShape(node, s));
   }
 
@@ -92,7 +73,7 @@ public class JoglShapes {
 
       // Only AWT shapes have a shape
       if (nodeShape instanceof AwtShape awtShape) {
-        awtShape.setRenderShape(getRenderShape(display.nodeShape));
+        awtShape.setRenderShape(joglPane.getRenderShape(display.nodeShape));
       }
 
       // Do the update
@@ -155,7 +136,7 @@ public class JoglShapes {
   }
 
   private static Optional<JoglShape> createShape(
-      GraphNode node, DepanFxNodeLocationData location,
+      JoglPane joglPane, GraphNode node, DepanFxNodeLocationData location,
       DepanFxNodeDisplayData display, boolean isVisible) {
 
     JoglColor fillColor = JoglColors.toJogl(display.fillColor);
@@ -164,7 +145,7 @@ public class JoglShapes {
     String nodeName = guessName(node);
 
     return Optional.of(new AwtShape(
-        getRenderShape(display.nodeShape), isVisible,
+        joglPane.getRenderShape(display.nodeShape), isVisible,
         fillColor, borderColor, highlightColor, 1.0f,
         location.xPos, location.yPos, location.zPos,
         true, nodeName, node));
@@ -172,17 +153,6 @@ public class JoglShapes {
 
   private static String guessName(GraphNode node) {
     return node.getId().getSimpleName();
-  }
-
-  private static RenderShape getRenderShape(DepanFxJoglShape joglShape) {
-    return switch (joglShape) {
-      case CIRCLE -> RENDER_CIRCLE;
-      case ELLIPSE -> RENDER_ELLIPSE;
-      case HEXAGON -> RENDER_HEXAGON;
-      case RECTANGLE -> RENDER_RECTANGLE;
-      case ROUNDED_RECTANGLE -> RENDER_ROUNDED_RECTANGLE;
-      case SQUARE -> RENDER_SQUARE;
-    };
   }
 
   private static List<NodeOverlay> clearFoldOverlays(

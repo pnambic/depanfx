@@ -30,5 +30,6 @@ class JoglDrawListener implements GLEventListener {
 
   @Override
   public void dispose(final GLAutoDrawable drawable) {
+    renderer.dispose(drawable);
   }
 }

@@ -117,4 +117,12 @@ public class LineShape implements JoglShape {
     result.lineRender = null;
     return result;
   }
+
+  @Override
+  public void dispose(GL2 gl) {
+    if (lineRender != null) {
+      lineRender.dispose(gl);
+      lineRender = null;
+    }
+  }
 }

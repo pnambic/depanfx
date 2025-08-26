@@ -229,6 +229,18 @@ public class JoglRenderer {
 
   public void dispose(final GLAutoDrawable drawable) {
     LOG.info("disposing drawable");
+    GL2 gl = drawable.getGL().getGL2();
+    pickBuffer.dispose(gl);
+
+    // Dispose all unique shapes from both renders and pending updates.
+    Set<JoglShape> disposables = new HashSet<>();
+    disposables.addAll(renders.values());
+    disposables.addAll(updates.values());
+    disposables.forEach(s -> s.dispose(gl));
+
+    shapes.clear();
+    renders.clear();
+    updates.clear();
   }
 
   @Nullable
