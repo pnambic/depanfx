@@ -1,4 +1,4 @@
-package com.pnambic.depanfx.nodeview.jogl;
+package com.pnambic.depanfx.jogl.shapes;
 
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
@@ -6,7 +6,7 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
-public enum JoglShapeKinds {
+public enum NodeKind {
 
   SQUARE {
 

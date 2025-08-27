@@ -24,6 +24,9 @@ import com.jogamp.opengl.fixedfunc.GLLightingFunc;
 import com.pnambic.depanfx.jogl.shapes.ArrowShape;
 import com.pnambic.depanfx.jogl.shapes.ArrowShapes;
 import com.pnambic.depanfx.jogl.shapes.LineShape;
+import com.pnambic.depanfx.jogl.shapes.NodeFactory;
+import com.pnambic.depanfx.jogl.shapes.NodeKind;
+import com.pnambic.depanfx.jogl.shapes.RenderShape;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +40,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.annotation.Nullable;
 
 public class JoglRenderer {
 
@@ -66,15 +67,20 @@ public class JoglRenderer {
 
   private Map<Object, JoglShape> updates = new HashMap<>();
 
-  private ArrowShapes.ArrowFactory arrowFactory =
-      new ArrowShapes.ArrowFactory();
-
-  private Set<JoglAlloc> allocs = new HashSet<>();
-
   private int viewportWidth;
 
   private int viewportHeight;
 
+  /////////////////////////////////////
+  // Factories for shared shapes with managed resources.
+
+  private ArrowShapes.ArrowFactory arrowFactory =
+      new ArrowShapes.ArrowFactory();
+
+  private NodeFactory nodeFactory =
+      new NodeFactory();
+
+  /////////////////////////////////////
   // Object picking
   private JoglPickBuffer pickBuffer = new JoglPickBuffer();
 
@@ -82,7 +88,9 @@ public class JoglRenderer {
 
   private Color pickBackground = Color.BLACK;
 
+  /////////////////////////////////////
   // Potential user options
+
   private Color drawBackground;
 
   private Color targetHorzColor = Color.YELLOW;
@@ -236,13 +244,13 @@ public class JoglRenderer {
   public void dispose(final GLAutoDrawable drawable) {
     LOG.info("disposing drawable");
     GL2 gl = drawable.getGL().getGL2();
-    pickBuffer.dispose(gl);
 
     // Dispose other resource allocations
+    pickBuffer.dispose(gl);
     arrowFactory.dispose(gl);
-    allocs.forEach(a -> a.dispose(gl));
+    nodeFactory.dispose(gl);
 
-    // Dispose all unique shapes.
+    // Dispose resources owned by individual shapes.
     shapes.forEach(s -> s.dispose(gl));
 
     shapes.clear();
@@ -250,7 +258,6 @@ public class JoglRenderer {
     updates.clear();
   }
 
-  @Nullable
   public JoglShape getShape(Object key) {
     JoglShape update = updates.get(key);
     if (update != null) {
@@ -267,12 +274,28 @@ public class JoglRenderer {
     return renders.get(renderKey);
   }
 
-  public ArrowShape buildArrow(LineShape.Arrow sourceArrow, float[] transform) {
-    return arrowFactory.buildArrow(sourceArrow, transform);
+  public JoglShape buildShape(
+      NodeKind shape,
+      boolean isVisible,
+      JoglColor fillColor, JoglColor borderColor, JoglColor highlightColor,
+      double xPos, double yPos, double zPos,
+      String nodeName, Object pickNode) {
+
+    return nodeFactory.buildShape(
+        shape,
+        isVisible,
+        fillColor, borderColor, highlightColor,
+        1.0f,
+        xPos, yPos, zPos,
+        true, nodeName, pickNode);
   }
 
-  public void registerAlloc(JoglAlloc alloc) {
-    allocs.add(alloc);
+  public RenderShape getNodeShape(NodeKind renderKey) {
+    return nodeFactory.getRenderShape(renderKey);
+  }
+
+  public ArrowShape buildArrow(LineShape.Arrow sourceArrow, float[] transform) {
+    return arrowFactory.buildArrow(sourceArrow, transform);
   }
 
   @SuppressWarnings("unused")

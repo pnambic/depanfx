@@ -17,7 +17,6 @@ package com.pnambic.depanfx.jogl.shapes;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.math.Matrix4;
-import com.pnambic.depanfx.jogl.JoglAlloc;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -90,7 +89,7 @@ public class ArrowShapes {
   /////////////////////////////////////
   // Concrete Arrow Shapes
 
-  public static class ArrowFactory implements JoglAlloc {
+  public static class ArrowFactory {
 
     private final Map<ArrowPoints.Style, VboLinePoints> arrowPts =
         new HashMap<>();
@@ -118,9 +117,9 @@ public class ArrowShapes {
       };
     }
 
-    @Override
     public void dispose(GL2 gl) {
       arrowPts.values().forEach(pts -> pts.dispose(gl));
+      arrowPts.clear();
     }
 
     private VboLinePoints getArrowPoints(ArrowPoints.Style style) {
