@@ -1,11 +1,16 @@
 package com.pnambic.depanfx.nodeview.jogl;
 
+import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.jogl.JoglColor;
 import com.pnambic.depanfx.jogl.JoglModule;
 import com.pnambic.depanfx.jogl.JoglMouseActionListener;
 import com.pnambic.depanfx.jogl.JoglShape;
+import com.pnambic.depanfx.jogl.shapes.NodeKind;
+import com.pnambic.depanfx.jogl.shapes.RenderShape;
 import com.pnambic.depanfx.nodeview.gui.CameraControl;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewStatusPanel;
 import com.pnambic.depanfx.nodeview.gui.FlightController;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewCameraData;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 
@@ -108,6 +113,25 @@ public class JoglPane extends BorderPane {
 
   public JoglShape getShape(Object key) {
     return jogl.getShape(key);
+  }
+
+  public JoglShape buildShape(
+      NodeKind shape,
+      boolean isVisible,
+      JoglColor fillColor,
+      JoglColor borderColor,
+      JoglColor highlightColor,
+      DepanFxNodeLocationData location,
+      String nodeName, GraphNode pickNode) {
+    return jogl.buildShape(
+        shape, isVisible,
+        fillColor, borderColor, highlightColor,
+        location.xPos, location.yPos, location.zPos,
+        nodeName, pickNode);
+  }
+
+  public RenderShape getNodeShape(NodeKind shape) {
+    return jogl.getNodeShape(shape);
   }
 
   public void updateShape(Object key, JoglShape shape) {

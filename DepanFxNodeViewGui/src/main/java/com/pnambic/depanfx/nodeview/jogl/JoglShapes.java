@@ -3,11 +3,12 @@ package com.pnambic.depanfx.nodeview.jogl;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.jogl.JoglColor;
 import com.pnambic.depanfx.jogl.JoglShape;
+import com.pnambic.depanfx.jogl.overlays.NestFoldOverlay;
+import com.pnambic.depanfx.jogl.overlays.NodeOverlay;
 import com.pnambic.depanfx.jogl.shapes.AwtShape;
+import com.pnambic.depanfx.jogl.shapes.NodeKind;
 import com.pnambic.depanfx.jogl.shapes.NodeShape;
 import com.pnambic.depanfx.jogl.shapes.RenderShape;
-import com.pnambic.depanfx.jogl.overlays.NodeOverlay;
-import com.pnambic.depanfx.jogl.overlays.NestFoldOverlay;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglShape;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
@@ -24,31 +25,24 @@ import java.util.stream.Stream;
  */
 public class JoglShapes {
 
-  public static final RenderShape RENDER_SQUARE =
-      new RenderShape(JoglShapeKinds.SQUARE.buildAwtShape());
-
-  public static final RenderShape RENDER_RECTANGLE =
-      new RenderShape(JoglShapeKinds.RECTANGLE.buildAwtShape());
-
-  public static final RenderShape RENDER_ROUNDED_RECTANGLE =
-      new RenderShape(JoglShapeKinds.ROUNDED_RECTANGLE.buildAwtShape());
-
-  public static final RenderShape RENDER_CIRCLE =
-      new RenderShape(JoglShapeKinds.CIRCLE.buildAwtShape());
-
-  public static final RenderShape RENDER_ELLIPSE =
-      new RenderShape(JoglShapeKinds.ELLIPSE.buildAwtShape());
-
-  public static final RenderShape RENDER_HEXAGON =
-      new RenderShape(JoglShapeKinds.HEXAGON.buildAwtShape());
-
   public static void installShape(
       JoglPane joglPane, GraphNode node,
       DepanFxNodeLocationData location,
       DepanFxNodeDisplayData display,
       boolean isVisible) {
-    createShape(node, location, display, isVisible)
+    createShape(joglPane, node, location, display, isVisible)
         .ifPresent(s -> joglPane.updateShape(node, s));
+  }
+
+  public static NodeKind getNodeShape(DepanFxJoglShape joglShape) {
+    return switch (joglShape) {
+      case CIRCLE -> NodeKind.CIRCLE;
+      case ELLIPSE -> NodeKind.ELLIPSE;
+      case HEXAGON -> NodeKind.HEXAGON;
+      case RECTANGLE -> NodeKind.RECTANGLE;
+      case ROUNDED_RECTANGLE -> NodeKind.ROUNDED_RECTANGLE;
+      case SQUARE -> NodeKind.SQUARE;
+    };
   }
 
   public static void updateLocation(
@@ -92,7 +86,8 @@ public class JoglShapes {
 
       // Only AWT shapes have a shape
       if (nodeShape instanceof AwtShape awtShape) {
-        awtShape.setRenderShape(getRenderShape(display.nodeShape));
+        awtShape.setRenderShape(
+            joglPane.getNodeShape(getNodeShape(display.nodeShape)));
       }
 
       // Do the update
@@ -155,34 +150,22 @@ public class JoglShapes {
   }
 
   private static Optional<JoglShape> createShape(
-      GraphNode node, DepanFxNodeLocationData location,
+      JoglPane joglPane, GraphNode node, DepanFxNodeLocationData location,
       DepanFxNodeDisplayData display, boolean isVisible) {
 
+    NodeKind nodeShape = getNodeShape(display.nodeShape);
     JoglColor fillColor = JoglColors.toJogl(display.fillColor);
     JoglColor borderColor = JoglColors.toJogl(display.borderColor);
     JoglColor highlightColor = JoglColors.toJogl(display.highlightColor);
     String nodeName = guessName(node);
 
-    return Optional.of(new AwtShape(
-        getRenderShape(display.nodeShape), isVisible,
-        fillColor, borderColor, highlightColor, 1.0f,
-        location.xPos, location.yPos, location.zPos,
-        true, nodeName, node));
+    return Optional.of(joglPane.buildShape(
+        nodeShape, isVisible, fillColor, borderColor, highlightColor,
+        location, nodeName, node));
   }
 
   private static String guessName(GraphNode node) {
     return node.getId().getSimpleName();
-  }
-
-  private static RenderShape getRenderShape(DepanFxJoglShape joglShape) {
-    return switch (joglShape) {
-      case CIRCLE -> RENDER_CIRCLE;
-      case ELLIPSE -> RENDER_ELLIPSE;
-      case HEXAGON -> RENDER_HEXAGON;
-      case RECTANGLE -> RENDER_RECTANGLE;
-      case ROUNDED_RECTANGLE -> RENDER_ROUNDED_RECTANGLE;
-      case SQUARE -> RENDER_SQUARE;
-    };
   }
 
   private static List<NodeOverlay> clearFoldOverlays(

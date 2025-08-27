@@ -18,6 +18,9 @@ package com.pnambic.depanfx.jogl.shapes;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.math.Matrix4;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ArrowShapes {
 
   private ArrowShapes() {
@@ -36,12 +39,14 @@ public class ArrowShapes {
 
     private final int mode;
 
-    private final LinePoints arrowPoints;
+    // Arrow points are shared within a graphic context
+    // and are not disposed of by this class.
+    private final VboLinePoints arrowPoints;
 
     private final float[] transformationMatrix;
 
     protected LineArrow(
-        int mode, LinePoints arrowPoints, float[] transformationMatrix) {
+        int mode, VboLinePoints arrowPoints, float[] transformationMatrix) {
       this.mode = mode;
       this.arrowPoints = arrowPoints;
       this.transformationMatrix = transformationMatrix;
@@ -60,7 +65,7 @@ public class ArrowShapes {
   public static class OpenLineArrow extends LineArrow {
 
     private OpenLineArrow(
-        LinePoints arrowPoints, float[] transformationMatrix) {
+        VboLinePoints arrowPoints, float[] transformationMatrix) {
       super(GL2.GL_LINE_STRIP, arrowPoints, transformationMatrix);
     }
   }
@@ -68,7 +73,7 @@ public class ArrowShapes {
   public static class ClosedLineArrow extends LineArrow {
 
     protected ClosedLineArrow(
-        LinePoints arrowPoints, float[] transformationMatrix) {
+        VboLinePoints arrowPoints, float[] transformationMatrix) {
       super(GL2.GL_LINE_LOOP, arrowPoints, transformationMatrix);
     }
   }
@@ -76,7 +81,7 @@ public class ArrowShapes {
   public static class FilledLineArrow extends LineArrow {
 
     protected FilledLineArrow(
-        LinePoints arrowPoints, float[] transformationMatrix) {
+        VboLinePoints arrowPoints, float[] transformationMatrix) {
       super(GL2.GL_TRIANGLE_FAN, arrowPoints, transformationMatrix);
     }
   }
@@ -84,38 +89,41 @@ public class ArrowShapes {
   /////////////////////////////////////
   // Concrete Arrow Shapes
 
-  public static class Artistic extends FilledLineArrow {
+  public static class ArrowFactory {
 
-    protected Artistic(float[] transformationMatrix) {
-      super(ArrowLinePoints.ARTISTIC_ARROW_POINTS, transformationMatrix);
+    private final Map<ArrowPoints.Style, VboLinePoints> arrowPts =
+        new HashMap<>();
+
+    public ArrowShape buildArrow(
+        LineShape.Arrow style, float[] transformationMatrix) {
+      return switch (style) {
+      case ARTISTIC ->
+        new FilledLineArrow(
+            getArrowPoints(ArrowPoints.Style.ARTISTIC), transformationMatrix);
+      case CHEVRON ->
+        new ClosedLineArrow(
+            getArrowPoints(ArrowPoints.Style.ARTISTIC), transformationMatrix);
+      case FILLED ->
+        new FilledLineArrow(
+            getArrowPoints(ArrowPoints.Style.TRIANGLE), transformationMatrix);
+      case OPEN ->
+        new OpenLineArrow(
+            getArrowPoints(ArrowPoints.Style.TRIANGLE), transformationMatrix);
+      case TRIANGLE ->
+        new ClosedLineArrow(
+            getArrowPoints(ArrowPoints.Style.TRIANGLE), transformationMatrix);
+      case NONE -> ArrowShapes.NONE;
+      default -> ArrowShapes.NONE;
+      };
     }
-  }
 
-  public static class Chevron extends ClosedLineArrow {
-
-    protected Chevron(float[] transformationMatrix) {
-      super(ArrowLinePoints.ARTISTIC_ARROW_POINTS, transformationMatrix);
+    public void dispose(GL2 gl) {
+      arrowPts.values().forEach(pts -> pts.dispose(gl));
+      arrowPts.clear();
     }
-  }
 
-  public static class Filled extends FilledLineArrow {
-
-    protected Filled(float[] transformationMatrix) {
-      super(ArrowLinePoints.TRIANGLE_ARROW_POINTS, transformationMatrix);
-    }
-  }
-
-  public static class Triangle extends ClosedLineArrow {
-
-    protected Triangle(float[] transformationMatrix) {
-      super(ArrowLinePoints.TRIANGLE_ARROW_POINTS, transformationMatrix);
-    }
-  }
-
-  public static class Open extends OpenLineArrow {
-
-    protected Open(float[] transformationMatrix) {
-      super(ArrowLinePoints.TRIANGLE_ARROW_POINTS, transformationMatrix);
+    private VboLinePoints getArrowPoints(ArrowPoints.Style style) {
+      return arrowPts.computeIfAbsent(style, s -> s.buildPoints());
     }
   }
 

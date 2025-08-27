@@ -15,4 +15,9 @@ public interface JoglShape {
   void step(GL2 gl, JoglRenderer renderer);
 
   JoglShape forUpdate();
+
+  /**
+   * Release any OpenGL resources held by this shape.
+   */
+  void dispose(GL2 gl);
 }

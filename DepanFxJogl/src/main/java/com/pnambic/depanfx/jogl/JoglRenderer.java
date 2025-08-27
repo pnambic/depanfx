@@ -21,6 +21,12 @@ import com.jogamp.opengl.GL2ES1;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLContext;
 import com.jogamp.opengl.fixedfunc.GLLightingFunc;
+import com.pnambic.depanfx.jogl.shapes.ArrowShape;
+import com.pnambic.depanfx.jogl.shapes.ArrowShapes;
+import com.pnambic.depanfx.jogl.shapes.LineShape;
+import com.pnambic.depanfx.jogl.shapes.NodeFactory;
+import com.pnambic.depanfx.jogl.shapes.NodeKind;
+import com.pnambic.depanfx.jogl.shapes.RenderShape;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,10 +40,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.annotation.Nullable;
 
 public class JoglRenderer {
 
@@ -69,6 +71,16 @@ public class JoglRenderer {
 
   private int viewportHeight;
 
+  /////////////////////////////////////
+  // Factories for shared shapes with managed resources.
+
+  private ArrowShapes.ArrowFactory arrowFactory =
+      new ArrowShapes.ArrowFactory();
+
+  private NodeFactory nodeFactory =
+      new NodeFactory();
+
+  /////////////////////////////////////
   // Object picking
   private JoglPickBuffer pickBuffer = new JoglPickBuffer();
 
@@ -76,7 +88,9 @@ public class JoglRenderer {
 
   private Color pickBackground = Color.BLACK;
 
+  /////////////////////////////////////
   // Potential user options
+
   private Color drawBackground;
 
   private Color targetHorzColor = Color.YELLOW;
@@ -229,9 +243,21 @@ public class JoglRenderer {
 
   public void dispose(final GLAutoDrawable drawable) {
     LOG.info("disposing drawable");
+    GL2 gl = drawable.getGL().getGL2();
+
+    // Dispose other resource allocations
+    pickBuffer.dispose(gl);
+    arrowFactory.dispose(gl);
+    nodeFactory.dispose(gl);
+
+    // Dispose resources owned by individual shapes.
+    shapes.forEach(s -> s.dispose(gl));
+
+    shapes.clear();
+    renders.clear();
+    updates.clear();
   }
 
-  @Nullable
   public JoglShape getShape(Object key) {
     JoglShape update = updates.get(key);
     if (update != null) {
@@ -246,6 +272,30 @@ public class JoglRenderer {
 
   public JoglShape getRenderShape(Object renderKey) {
     return renders.get(renderKey);
+  }
+
+  public JoglShape buildShape(
+      NodeKind shape,
+      boolean isVisible,
+      JoglColor fillColor, JoglColor borderColor, JoglColor highlightColor,
+      double xPos, double yPos, double zPos,
+      String nodeName, Object pickNode) {
+
+    return nodeFactory.buildShape(
+        shape,
+        isVisible,
+        fillColor, borderColor, highlightColor,
+        1.0f,
+        xPos, yPos, zPos,
+        true, nodeName, pickNode);
+  }
+
+  public RenderShape getNodeShape(NodeKind renderKey) {
+    return nodeFactory.getRenderShape(renderKey);
+  }
+
+  public ArrowShape buildArrow(LineShape.Arrow sourceArrow, float[] transform) {
+    return arrowFactory.buildArrow(sourceArrow, transform);
   }
 
   @SuppressWarnings("unused")

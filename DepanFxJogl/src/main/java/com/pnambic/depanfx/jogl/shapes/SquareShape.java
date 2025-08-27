@@ -37,7 +37,11 @@ public class SquareShape implements JoglShape {
 
   @Override
   public NodeShape forUpdate() {
-    // TODO Auto-generated method stub
     return null;
+  }
+
+  @Override
+  public void dispose(GL2 gl) {
+    // No disposable resources.
   }
 }

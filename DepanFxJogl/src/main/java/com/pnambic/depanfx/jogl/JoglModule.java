@@ -3,6 +3,8 @@ package com.pnambic.depanfx.jogl;
 import com.jogamp.opengl.FPSCounter;
 import com.pnambic.depanfx.jogl.JoglCamera.CameraData;
 import com.pnambic.depanfx.jogl.shapes.DemoShape;
+import com.pnambic.depanfx.jogl.shapes.NodeKind;
+import com.pnambic.depanfx.jogl.shapes.RenderShape;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +79,25 @@ public class JoglModule {
 
   public JoglShape getShape(Object key) {
     return renderer.getShape(key);
+  }
+
+  public RenderShape getNodeShape(NodeKind shape) {
+    return renderer.getNodeShape(shape);
+  }
+
+  public JoglShape buildShape(
+      NodeKind shape,
+      boolean isVisible,
+      JoglColor fillColor,
+      JoglColor borderColor,
+      JoglColor highlightColor,
+      double xPos, double yPos, double zPos,
+      String nodeName, Object pickNode) {
+    return renderer.buildShape(
+        shape, isVisible,
+        fillColor, borderColor, highlightColor,
+        xPos, yPos, zPos,
+        nodeName, pickNode);
   }
 
   public void updateShape(Object key, JoglShape shape) {

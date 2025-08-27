@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.jogl.shapes;
 
 import com.jogamp.opengl.GL2;
+import com.pnambic.depanfx.jogl.JoglRenderer;
 import com.pnambic.depanfx.jogl.shapes.LineShape.Arrow;
 
 import java.awt.Shape;
@@ -52,27 +53,47 @@ public class RichLineRender implements LineRender {
    */
   private LinePoints linePoints = LinePoints.EMPTY;
 
+  private VboLinePoints vboLinePoints;
+
+  private VboLinePoints disposeVbo;
+
+  private int stableCount;
+
+  private static final int STABLE_LIMIT = 5;
+
   private ArrowShape sourceArrow;
 
   private ArrowShape targetArrow;
 
   @Override
   public void prepare(
-      LineShape line, NodeShape sourceShape, NodeShape targetShape) {
+      LineShape line,
+      NodeShape sourceShape,
+      NodeShape targetShape,
+      JoglRenderer renderer) {
 
     if (haveChanged(sourceShape, targetShape)) {
-      Shape lineShape = buildLineShape(
-          line, sourceShape, targetShape);
+
+      // Schedule any existing VBO for disposal.
+      if (vboLinePoints != null) {
+        disposeVbo = vboLinePoints;
+        vboLinePoints = null;
+      }
+      stableCount = 0;
+
+      // Compute the points in the line.
+      Shape lineShape = buildLineShape(line, sourceShape, targetShape);
       LinePointsBuilder builder = new LinePointsBuilder();
-      linePoints =
-          builder.prepare(lineShape, sourceShape, targetShape);
+      linePoints = builder.prepare(lineShape, sourceShape, targetShape);
 
       // Attach arrowheads if there is a line
       if (linePoints.hasEndpoints()) {
-        sourceArrow = buildArrow(line.sourceArrow, 1, 0);
+        sourceArrow = buildArrow(line.sourceArrow,
+            1, 0, renderer);
 
         int targetIndex = linePoints.pointCount - 1;
-        targetArrow = buildArrow(line.targetArrow, targetIndex - 1, targetIndex);
+        targetArrow = buildArrow(line.targetArrow,
+            targetIndex - 1, targetIndex, renderer);
       } else {
         sourceArrow = ArrowShapes.NONE;
         targetArrow = ArrowShapes.NONE;
@@ -85,11 +106,20 @@ public class RichLineRender implements LineRender {
       targetPosX = targetShape.shapeX;
       targetPosY = targetShape.shapeY;
       targetPosZ = targetShape.shapeZ;
+    } else if (stableCount < STABLE_LIMIT) {
+        stableCount++;
+    } else if (vboLinePoints == null && linePoints.hasPoints()) {
+       vboLinePoints = VboLinePoints.fromLinePoints(linePoints);
     }
   }
 
   @Override
   public void draw(GL2 gl, LineShape line) {
+
+    if (disposeVbo != null) {
+      disposeVbo.dispose(gl);
+      disposeVbo = null;
+    }
 
     // Skip it all if there are no vertices to draw.
     if (linePoints.hasPoints()) {
@@ -125,6 +155,11 @@ public class RichLineRender implements LineRender {
   }
 
   private void drawLinePoints(GL2 gl) {
+    if (vboLinePoints != null) {
+      vboLinePoints.drawPoints(gl, GL2.GL_LINE_STRIP);
+      return;
+    }
+
     linePoints.drawPoints(gl, GL2.GL_LINE_STRIP);
   }
 
@@ -141,7 +176,10 @@ public class RichLineRender implements LineRender {
   }
 
   private ArrowShape buildArrow(
-      Arrow sourceArrow, int sourceIndex, int targetIndex) {
+      Arrow sourceArrow,
+      int sourceIndex,
+      int targetIndex,
+      JoglRenderer renderer) {
     // Short-circuit transform computation if not used.
     if (sourceArrow == Arrow.NONE) {
       return ArrowShapes.NONE;
@@ -160,21 +198,7 @@ public class RichLineRender implements LineRender {
     float[] transform = ArrowShapes.buildTransform(
         sourceX, sourceY, sourceZ, targetX, targetY, targetZ);
 
-    switch (sourceArrow) {
-    case ARTISTIC:
-      return new ArrowShapes.Artistic(transform);
-    case CHEVRON:
-      return new ArrowShapes.Chevron(transform);
-    case FILLED:
-      return new ArrowShapes.Filled(transform);
-    case OPEN:
-      return new ArrowShapes.Open(transform);
-    case TRIANGLE:
-      return new ArrowShapes.Triangle(transform);
-    default: // mostly Arrow.NONE
-      break;
-    }
-    return ArrowShapes.NONE;
+    return renderer.buildArrow(sourceArrow, transform);
   }
 
   private Shape buildLineShape(
@@ -239,5 +263,17 @@ public class RichLineRender implements LineRender {
       return 360 + extent;
     }
     return extent;
+  }
+
+  @Override
+  public void dispose(GL2 gl) {
+    if (vboLinePoints != null) {
+      vboLinePoints.dispose(gl);
+      vboLinePoints = null;
+    }
+    if (disposeVbo != null) {
+      disposeVbo.dispose(gl);
+      disposeVbo = null;
+    }
   }
 }

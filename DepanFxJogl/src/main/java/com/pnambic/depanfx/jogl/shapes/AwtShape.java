@@ -23,6 +23,8 @@ import com.pnambic.depanfx.jogl.JoglColor;
 
 public class AwtShape extends NodeShape {
 
+  // The render shape is typically shared, and should not disposed
+  // by the AWT shape.
   private RenderShape renderShape;
 
   public AwtShape(
@@ -89,5 +91,10 @@ public class AwtShape extends NodeShape {
   protected void renderBorder(GL2 gl) {
     gl.glLineWidth(borderWidth);
     renderShape.drawBorder(gl);
+  }
+
+  @Override
+  public void dispose(GL2 gl) {
+    super.dispose(gl);
   }
 }

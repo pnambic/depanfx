@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.jogl.shapes;
 
 import com.jogamp.opengl.GL2;
+import com.pnambic.depanfx.jogl.JoglRenderer;
 
 public class StraightLineRender implements LineRender {
 
@@ -10,7 +11,10 @@ public class StraightLineRender implements LineRender {
 
   @Override
   public void prepare(
-      LineShape line, NodeShape sourceShape, NodeShape targetShape) {
+      LineShape line,
+      NodeShape sourceShape,
+      NodeShape targetShape,
+      JoglRenderer renderer) {
     this.sourceShape = sourceShape;
     this.targetShape = targetShape;
   }
@@ -26,5 +30,10 @@ public class StraightLineRender implements LineRender {
     gl.glVertex3d(sourceShape.shapeX, sourceShape.shapeY, sourceShape.shapeZ);
     gl.glVertex3d(targetShape.shapeX, targetShape.shapeY, targetShape.shapeZ);
     gl.glEnd();
+  }
+
+  @Override
+  public void dispose(GL2 gl) {
+    // No disposable resources.
   }
 }

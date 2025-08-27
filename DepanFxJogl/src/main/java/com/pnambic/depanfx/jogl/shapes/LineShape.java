@@ -71,7 +71,7 @@ public class LineShape implements JoglShape {
     if (lineRender == null) {
       lineRender = buildRenderer();
     }
-    lineRender.prepare(this, sourceShape, targetShape);
+    lineRender.prepare(this, sourceShape, targetShape, renderer);
     lineRender.draw(gl, this);
   }
 
@@ -116,5 +116,13 @@ public class LineShape implements JoglShape {
     // Expect to regenerate renderer after an update.
     result.lineRender = null;
     return result;
+  }
+
+  @Override
+  public void dispose(GL2 gl) {
+    if (lineRender != null) {
+      lineRender.dispose(gl);
+      lineRender = null;
+    }
   }
 }
