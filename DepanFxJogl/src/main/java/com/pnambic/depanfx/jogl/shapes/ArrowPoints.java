@@ -69,12 +69,6 @@ public class ArrowPoints {
 
   public static final double ARROW_TIP_Y = 0.0d;
 
-  public static final VboLinePoints X_ARTISTIC_ARROW_POINTS =
-      buildArtisticPoints();
-
-  public static final VboLinePoints X_TRIANGLE_ARROW_POINTS =
-      buildTrianglePoints();
-
   private ArrowPoints() {
     // Prevent instantiation.
   }
