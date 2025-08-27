@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.jogl.shapes;
 
 import com.jogamp.opengl.GL2;
+import com.pnambic.depanfx.jogl.JoglAlloc;
 
 import java.awt.Shape;
 
@@ -23,7 +24,7 @@ import java.awt.Shape;
  * Bundles a {@link Shape} with a cached {@link VboShapeRender} so that
  * multiple node shapes can share the same renderable geometry.
  */
-public class RenderShape {
+public class RenderShape implements JoglAlloc {
 
   private final Shape awtShape;
 
@@ -53,6 +54,7 @@ public class RenderShape {
   }
 
   /** Release any OpenGL buffers held by this shape. */
+  @Override
   public void dispose(GL2 gl) {
     shapeRender.dispose(gl);
   }

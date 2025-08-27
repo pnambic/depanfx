@@ -71,7 +71,7 @@ public class LineShape implements JoglShape {
     if (lineRender == null) {
       lineRender = buildRenderer();
     }
-    lineRender.prepare(this, sourceShape, targetShape);
+    lineRender.prepare(this, sourceShape, targetShape, renderer);
     lineRender.draw(gl, this);
   }
 

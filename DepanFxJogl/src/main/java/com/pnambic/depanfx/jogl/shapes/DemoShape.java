@@ -32,4 +32,9 @@ public class DemoShape implements JoglShape {
   public JoglShape forUpdate() {
     return this;
   }
+
+  @Override
+  public void dispose(GL2 gl) {
+    // No disposable resources.
+  }
 }

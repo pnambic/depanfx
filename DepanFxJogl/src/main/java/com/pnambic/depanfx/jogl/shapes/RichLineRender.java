@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.jogl.shapes;
 
 import com.jogamp.opengl.GL2;
+import com.pnambic.depanfx.jogl.JoglRenderer;
 import com.pnambic.depanfx.jogl.shapes.LineShape.Arrow;
 
 import java.awt.Shape;
@@ -66,7 +67,10 @@ public class RichLineRender implements LineRender {
 
   @Override
   public void prepare(
-      LineShape line, NodeShape sourceShape, NodeShape targetShape) {
+      LineShape line,
+      NodeShape sourceShape,
+      NodeShape targetShape,
+      JoglRenderer renderer) {
 
     if (haveChanged(sourceShape, targetShape)) {
 
@@ -84,10 +88,12 @@ public class RichLineRender implements LineRender {
 
       // Attach arrowheads if there is a line
       if (linePoints.hasEndpoints()) {
-        sourceArrow = buildArrow(line.sourceArrow, 1, 0);
+        sourceArrow = buildArrow(line.sourceArrow,
+            1, 0, renderer);
 
         int targetIndex = linePoints.pointCount - 1;
-        targetArrow = buildArrow(line.targetArrow, targetIndex - 1, targetIndex);
+        targetArrow = buildArrow(line.targetArrow,
+            targetIndex - 1, targetIndex, renderer);
       } else {
         sourceArrow = ArrowShapes.NONE;
         targetArrow = ArrowShapes.NONE;
@@ -170,7 +176,10 @@ public class RichLineRender implements LineRender {
   }
 
   private ArrowShape buildArrow(
-      Arrow sourceArrow, int sourceIndex, int targetIndex) {
+      Arrow sourceArrow,
+      int sourceIndex,
+      int targetIndex,
+      JoglRenderer renderer) {
     // Short-circuit transform computation if not used.
     if (sourceArrow == Arrow.NONE) {
       return ArrowShapes.NONE;
@@ -189,21 +198,7 @@ public class RichLineRender implements LineRender {
     float[] transform = ArrowShapes.buildTransform(
         sourceX, sourceY, sourceZ, targetX, targetY, targetZ);
 
-    switch (sourceArrow) {
-    case ARTISTIC:
-      return new ArrowShapes.Artistic(transform);
-    case CHEVRON:
-      return new ArrowShapes.Chevron(transform);
-    case FILLED:
-      return new ArrowShapes.Filled(transform);
-    case OPEN:
-      return new ArrowShapes.Open(transform);
-    case TRIANGLE:
-      return new ArrowShapes.Triangle(transform);
-    default: // mostly Arrow.NONE
-      break;
-    }
-    return ArrowShapes.NONE;
+    return renderer.buildArrow(sourceArrow, transform);
   }
 
   private Shape buildLineShape(

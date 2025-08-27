@@ -94,6 +94,7 @@ public class JoglPane extends BorderPane {
 
   public void release() {
     LOG.info("JoglPane release");
+    renderShapes.values().forEach(jogl::registerAlloc);
     jogl.stop();
 
     flightControl.stop();
@@ -137,8 +138,7 @@ public class JoglPane extends BorderPane {
   public RenderShape getRenderShape(DepanFxJoglShape shape) {
     return renderShapes.computeIfAbsent(
         shape,
-        s -> RenderShape.build(
-            JoglShapeKinds.valueOf(s.name()).buildAwtShape()));
+        s -> RenderShape.build(JoglShapes.getAwtShape(s)));
   }
 
   private Pane getJoglViewport() {

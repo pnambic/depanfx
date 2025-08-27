@@ -21,6 +21,9 @@ import com.jogamp.opengl.GL2ES1;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLContext;
 import com.jogamp.opengl.fixedfunc.GLLightingFunc;
+import com.pnambic.depanfx.jogl.shapes.ArrowShape;
+import com.pnambic.depanfx.jogl.shapes.ArrowShapes;
+import com.pnambic.depanfx.jogl.shapes.LineShape;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +37,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
@@ -64,6 +65,11 @@ public class JoglRenderer {
   private final Map<Object, JoglShape> renders = new HashMap<>();
 
   private Map<Object, JoglShape> updates = new HashMap<>();
+
+  private ArrowShapes.ArrowFactory arrowFactory =
+      new ArrowShapes.ArrowFactory();
+
+  private Set<JoglAlloc> allocs = new HashSet<>();
 
   private int viewportWidth;
 
@@ -232,11 +238,12 @@ public class JoglRenderer {
     GL2 gl = drawable.getGL().getGL2();
     pickBuffer.dispose(gl);
 
-    // Dispose all unique shapes from both renders and pending updates.
-    Set<JoglShape> disposables = new HashSet<>();
-    disposables.addAll(renders.values());
-    disposables.addAll(updates.values());
-    disposables.forEach(s -> s.dispose(gl));
+    // Dispose other resource allocations
+    arrowFactory.dispose(gl);
+    allocs.forEach(a -> a.dispose(gl));
+
+    // Dispose all unique shapes.
+    shapes.forEach(s -> s.dispose(gl));
 
     shapes.clear();
     renders.clear();
@@ -258,6 +265,14 @@ public class JoglRenderer {
 
   public JoglShape getRenderShape(Object renderKey) {
     return renders.get(renderKey);
+  }
+
+  public ArrowShape buildArrow(LineShape.Arrow sourceArrow, float[] transform) {
+    return arrowFactory.buildArrow(sourceArrow, transform);
+  }
+
+  public void registerAlloc(JoglAlloc alloc) {
+    allocs.add(alloc);
   }
 
   @SuppressWarnings("unused")

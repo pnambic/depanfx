@@ -3,14 +3,16 @@ package com.pnambic.depanfx.nodeview.jogl;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.jogl.JoglColor;
 import com.pnambic.depanfx.jogl.JoglShape;
+import com.pnambic.depanfx.jogl.overlays.NestFoldOverlay;
+import com.pnambic.depanfx.jogl.overlays.NodeOverlay;
 import com.pnambic.depanfx.jogl.shapes.AwtShape;
 import com.pnambic.depanfx.jogl.shapes.NodeShape;
-import com.pnambic.depanfx.jogl.overlays.NodeOverlay;
-import com.pnambic.depanfx.jogl.overlays.NestFoldOverlay;
+import com.pnambic.depanfx.jogl.shapes.RenderShape;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglShape;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 
+import java.awt.Shape;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,6 +25,24 @@ import java.util.stream.Stream;
  */
 public class JoglShapes {
 
+  public static final Shape SQUARE_SHAPE =
+      JoglShapeKinds.SQUARE.buildAwtShape();
+
+  public static final Shape RECTANGLE_SHAPE =
+      JoglShapeKinds.RECTANGLE.buildAwtShape();
+
+  public static final Shape ROUNDED_RECTANGLE_SHAPE =
+      JoglShapeKinds.ROUNDED_RECTANGLE.buildAwtShape();
+
+  public static final Shape CIRCLE_SHAPE =
+      JoglShapeKinds.CIRCLE.buildAwtShape();
+
+  public static final Shape ELLIPSE_SHAPE =
+      JoglShapeKinds.ELLIPSE.buildAwtShape();
+
+  public static final Shape HEXAGON_SHAPE =
+      JoglShapeKinds.HEXAGON.buildAwtShape();
+
   public static void installShape(
       JoglPane joglPane, GraphNode node,
       DepanFxNodeLocationData location,
@@ -30,6 +50,17 @@ public class JoglShapes {
       boolean isVisible) {
     createShape(joglPane, node, location, display, isVisible)
         .ifPresent(s -> joglPane.updateShape(node, s));
+  }
+
+  public static Shape getAwtShape(DepanFxJoglShape joglShape) {
+    return switch (joglShape) {
+      case CIRCLE -> CIRCLE_SHAPE;
+      case ELLIPSE -> ELLIPSE_SHAPE;
+      case HEXAGON -> HEXAGON_SHAPE;
+      case RECTANGLE -> RECTANGLE_SHAPE;
+      case ROUNDED_RECTANGLE -> ROUNDED_RECTANGLE_SHAPE;
+      case SQUARE -> SQUARE_SHAPE;
+    };
   }
 
   public static void updateLocation(

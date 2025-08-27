@@ -17,8 +17,7 @@ public interface JoglShape {
   JoglShape forUpdate();
 
   /**
-   * Release any OpenGL resources held by this shape.  Shapes that do not
-   * allocate resources can ignore this call.
+   * Release any OpenGL resources held by this shape.
    */
-  default void dispose(GL2 gl) {}
+  void dispose(GL2 gl);
 }

@@ -42,6 +42,23 @@ package com.pnambic.depanfx.jogl.shapes;
  */
 public class ArrowPoints {
 
+  public enum Style {
+    TRIANGLE {
+      @Override
+      public VboLinePoints buildPoints() {
+        return buildTrianglePoints();
+      }
+    },
+    ARTISTIC {
+      @Override
+      public VboLinePoints buildPoints() {
+        return buildArtisticPoints();
+      }
+    };
+
+    public abstract VboLinePoints buildPoints();
+  }
+
   public static final double SEMI_CIRCLE = 180.0d;
 
   public static final double NOSE_ANGLE = 20.0d;
@@ -52,10 +69,10 @@ public class ArrowPoints {
 
   public static final double ARROW_TIP_Y = 0.0d;
 
-  public static final VboLinePoints ARTISTIC_ARROW_POINTS =
+  public static final VboLinePoints X_ARTISTIC_ARROW_POINTS =
       buildArtisticPoints();
 
-  public static final VboLinePoints TRIANGLE_ARROW_POINTS =
+  public static final VboLinePoints X_TRIANGLE_ARROW_POINTS =
       buildTrianglePoints();
 
   private ArrowPoints() {

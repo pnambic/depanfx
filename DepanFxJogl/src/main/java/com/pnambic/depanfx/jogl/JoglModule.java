@@ -79,6 +79,10 @@ public class JoglModule {
     return renderer.getShape(key);
   }
 
+  public void registerAlloc(JoglAlloc alloc) {
+    renderer.registerAlloc(alloc);
+  }
+
   public void updateShape(Object key, JoglShape shape) {
     renderer.updateShape(key, shape);
   }
