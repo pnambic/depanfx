@@ -20,6 +20,7 @@ import com.pnambic.depanfx.scene.DepanFxSceneControls;
 import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -393,7 +394,7 @@ public class DepanFxCategoryColumnToolDialog
     private void updateNodeNameProp() {
       if (nodeListRsrc != null) {
         nodeListNameProp.setValue(
-            nodeListRsrc.getDocument().getMemberPath().toString());
+            DepanFxProjects.getResourceLabel(nodeListRsrc));
         return;
       }
       nodeListNameProp.setValue("");
