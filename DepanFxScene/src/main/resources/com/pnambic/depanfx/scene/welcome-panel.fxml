@@ -5,6 +5,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.text.TextFlow?>
@@ -18,18 +19,21 @@
         <VBox spacing="10" layoutX="10" layoutY="10" alignment="CENTER">
             <Label text="Welcome to DepanFX!" />
 
-            <ImageView fx:id="welcomeImage"
-                fitHeight="256" fitWidth="256">
-            </ImageView>
+            <HBox spacing="30">
 
-            <HBox alignment="CENTER">
-                <TextFlow fx:id="welcomeTextFlow">
+                <ImageView fx:id="welcomeImage"
+                    fitHeight="256" fitWidth="256">
+                </ImageView>
+
+                <TextFlow fx:id="welcomeTextFlow"
+                        textAlignment="LEFT"
+                        HBox.hgrow="ALWAYS">
                     <Text text="If you are new to DepanFX,"/>
-                    <Text text="head to the Workspace panel and create a new project."/>
+                    <Text text=" head to the Workspace panel and create a new project."/>
                     <Text text="&#xA;&#xA;"/>
                     <Text text="Within the new project," />
-                    <Text text="you can create a new dependency graph"/>
-                    <Text text="with one of the Graph creation tools." />
+                    <Text text=" you can create a new dependency graph"/>
+                    <Text text=" with one of the Graph creation tools." />
                     <Text text="&#xA;&#xA;"/>
                     <Text text="For more information, please consult the" />
                     <Hyperlink text="Getting Started Guide"
@@ -38,7 +42,12 @@
                     <Hyperlink text="DepanFX User Guide"
                         onAction="#openUserGuide"/><Text text="." />
                 </TextFlow>
+
             </HBox>
+
+            <!-- Push everything to the top -->
+            <Region VBox.vgrow="ALWAYS" />
+
         </VBox>
 
     </content>

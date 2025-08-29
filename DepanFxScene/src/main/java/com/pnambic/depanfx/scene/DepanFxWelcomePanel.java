@@ -28,7 +28,6 @@ import java.net.URI;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Region;
 import javafx.scene.text.TextFlow;
 
 @DepanFxFxmlDialog
@@ -54,10 +53,6 @@ public class DepanFxWelcomePanel {
   public void initialize() {
     DepanFxAppIcons.loadDepanIcon(IconSize.ICON_256x256)
        .ifPresent(welcomeImage::setImage);
-
-    Region parentRegion = (Region) welcomeTextFlow.getParent();
-    welcomeTextFlow.prefWidthProperty().bind(
-        parentRegion.widthProperty().multiply(0.7));
   }
 
   @FXML
