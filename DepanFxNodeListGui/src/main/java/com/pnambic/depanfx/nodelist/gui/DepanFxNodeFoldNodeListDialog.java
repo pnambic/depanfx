@@ -121,8 +121,6 @@ public class DepanFxNodeFoldNodeListDialog extends DepanFxBaseDialog {
     DepanFxActionTableCell.prepareColumn(
         rowActionColumn, p -> new DisplayActions());
 
-    populateFoldCombo();
-
     // Size filePath to remaining room
     keyColumn.prefWidthProperty().bind(
         nodeListTable.widthProperty()
@@ -136,6 +134,7 @@ public class DepanFxNodeFoldNodeListDialog extends DepanFxBaseDialog {
 
   public void setTable(DepanFxNodeListTableAdapter tableAdapter) {
     this.tableAdapter = tableAdapter;
+    populateFoldCombo();
   }
 
   public void setNodeList(DepanFxNodeList nodeList) {
