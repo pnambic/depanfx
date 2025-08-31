@@ -17,12 +17,11 @@ package com.pnambic.depanfx.java.nodeview;
 
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.filesystem.edgematchers.link.FileSystemLinkMatcherBuiltIns;
-import com.pnambic.depanfx.java.context.JavaContextDefinition;
 import com.pnambic.depanfx.java.context.JavaContextModelId;
 import com.pnambic.depanfx.java.edgematchers.link.JavaLinkMatcherBuiltIns;
+import com.pnambic.depanfx.java.graph.JavaModelDefinition;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDirection;
@@ -165,7 +164,7 @@ public class DepanFxJavaLinkViewBuiltIns {
         new DepanFxNodeViewLinkDisplayData(
             JAVA_EDGE_RELATIONS_DISPLAY_NAME,
             JAVA_EDGE_RELATIONS_DISPLAY_DESCR,
-            JavaContextDefinition.MODEL_ID,
+            JavaModelDefinition.MODEL.getId(),
             displayInfo);
     return result;
   }

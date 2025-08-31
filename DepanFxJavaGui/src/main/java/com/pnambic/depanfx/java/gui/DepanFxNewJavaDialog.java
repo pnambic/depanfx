@@ -9,7 +9,7 @@ import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.graph_doc.model.GraphModel;
-import com.pnambic.depanfx.java.context.JavaContextDefinition;
+import com.pnambic.depanfx.java.graph.JavaModelDefinition;
 import com.pnambic.depanfx.perspective.DepanFxDialogChecks;
 import com.pnambic.depanfx.perspective.DepanFxProctor;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
@@ -205,7 +205,7 @@ public class DepanFxNewJavaDialog {
     String graphDescr = graphDescriptionField.getText();
 
     return new GraphDocument(graphName, graphDescr,
-        JavaContextDefinition.MODEL_ID, graphModel);
+        JavaModelDefinition.MODEL.getId(), graphModel);
   }
 
   /**

@@ -21,7 +21,6 @@ import com.pnambic.depanfx.graph.model.GraphContextModel;
 import com.pnambic.depanfx.graph_doc.model.GraphContextDocument;
 import com.pnambic.depanfx.graph_doc.model.GraphContextlModelDefinition;
 import com.pnambic.depanfx.java.context.JavaContextDefinition;
-import com.pnambic.depanfx.java.context.JavaContextModelId;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 
 import org.springframework.context.annotation.Bean;
@@ -61,7 +60,7 @@ public class JavaModelDefinition {
   /** Goes into BuiltIn project under key, not label. */
   public static final Path BUILTIN_PATH =
       GraphContextDocument.CONTEXT_MODEL_PATH.resolve(
-          JavaContextModelId.JAVA_KEY);
+          JavaModelDefinition.MODEL.getId().getContextModelPath());
 
   public static final DepanFxBuiltInContribution.Simple<GraphContextDocument> CONTRIBUTION =
       new DepanFxBuiltInContribution.Simple<>(BUILTIN_PATH, DOCUMENT);

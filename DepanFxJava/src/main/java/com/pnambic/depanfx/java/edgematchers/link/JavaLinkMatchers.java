@@ -15,12 +15,12 @@
  */
 package com.pnambic.depanfx.java.edgematchers.link;
 
-import com.pnambic.depanfx.java.context.JavaContextDefinition;
-import com.pnambic.depanfx.java.graph.JavaRelation;
 import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchers.Composite;
 import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchers.ForwardRelation;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.java.graph.JavaModelDefinition;
+import com.pnambic.depanfx.java.graph.JavaRelation;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -282,7 +282,7 @@ public class JavaLinkMatchers {
       new DepanFxLinkMatcherDocument(
           "Java Package Members",
           "Java package membership (packages, top-level classes).",
-          JavaContextDefinition.MODEL_ID,
+          JavaModelDefinition.MODEL.getId(),
           Collections.emptyList(), JAVA_PACKAGE_MEMBER_MATCH);
 
   // Java package and class members
@@ -320,7 +320,7 @@ public class JavaLinkMatchers {
       String matcherName, String matcherDescr, DepanFxLinkMatcher matcher) {
     return new DepanFxLinkMatcherDocument(
         matcherName, matcherDescr,
-        JavaContextDefinition.MODEL_ID,
+        JavaModelDefinition.MODEL.getId(),
         Collections.emptyList(), matcher);
   }
 }

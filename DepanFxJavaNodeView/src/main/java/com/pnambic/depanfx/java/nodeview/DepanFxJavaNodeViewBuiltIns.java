@@ -20,6 +20,7 @@ import com.pnambic.depanfx.filesystem.edgematchers.link.FileSystemNodeKindFilter
 import com.pnambic.depanfx.graph.context.ContextNodeKindId;
 import com.pnambic.depanfx.java.context.JavaContextDefinition;
 import com.pnambic.depanfx.java.context.JavaContextModelId;
+import com.pnambic.depanfx.java.graph.JavaModelDefinition;
 import com.pnambic.depanfx.java.nodefilters.JavaNodeKindFilterBuiltIns;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
@@ -90,7 +91,7 @@ public class DepanFxJavaNodeViewBuiltIns {
 
         return new DepanFxNodeViewNodeDisplayData(
             JAVA_NODE_KINDS_DISPLAY_NAME, JAVA_NODE_KINDS_DISPLAY_DESCR,
-            JavaContextDefinition.MODEL_ID,
+            JavaModelDefinition.MODEL.getId(),
             kindDisplay);
       }
     };
@@ -111,7 +112,7 @@ public class DepanFxJavaNodeViewBuiltIns {
             return new DepanFxNodeFilterSequenceData(
                 JAVA_NODE_KINDS_VISIBILTY_NAME,
                 JAVA_NODE_KINDS_VISIBILTY_DESCR,
-                JavaContextDefinition.MODEL_ID,
+                JavaModelDefinition.MODEL.getId(),
                 getDisplayFilters(displayContrib));
           }
 

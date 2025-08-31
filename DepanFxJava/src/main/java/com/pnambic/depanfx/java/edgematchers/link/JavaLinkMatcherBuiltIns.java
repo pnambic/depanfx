@@ -5,7 +5,7 @@ import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchers.Composite;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.filesystem.edgematchers.link.FileSystemLinkMatchers;
-import com.pnambic.depanfx.java.context.JavaContextDefinition;
+import com.pnambic.depanfx.java.graph.JavaModelDefinition;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 
 import org.springframework.context.annotation.Bean;
@@ -18,11 +18,9 @@ import java.util.List;
 @Configuration
 public class JavaLinkMatcherBuiltIns {
 
-  public static final String JAVA_LINK_MATCHER_DIR = "Java";
-
   public static final Path JAVA_LINK_MATCHER_PATH =
       DepanFxLinkMatcherDocument.LINK_MATCHER_TOOL_PATH
-          .resolve(JAVA_LINK_MATCHER_DIR);
+          .resolve(JavaModelDefinition.MODEL.getId().getContextModelPath());
 
   private static final String MEMBER_NAME = "Member";
 
@@ -46,7 +44,7 @@ public class JavaLinkMatcherBuiltIns {
   public static final DepanFxLinkMatcherDocument MEMBER_DOC =
       new DepanFxLinkMatcherDocument(
           "Java Membership Hierachy", "Java hierarchy relationships.",
-          JavaContextDefinition.MODEL_ID,
+          JavaModelDefinition.MODEL.getId(),
           DepanFxLinkMatcherGroup.MEMBER_MATCHER_GROUP, MEMBER);
 
   /////////////////////////////////////
