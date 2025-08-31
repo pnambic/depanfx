@@ -275,10 +275,10 @@ public class DepanFxNodeListViewerConfiguration {
       DepanFxWorkspace workspace,
       DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
 
-    String modelContextKey = nodeListRsrc.getResource().getGraphDocResource()
-        .getResource().getContextModelId().getContextModelKey();
+    String modelContextPath = nodeListRsrc.getResource().getGraphDocResource()
+        .getResource().getContextModelId().getContextModelPath();
     Path contextViewPath = DepanFxNodeListTableViewData.TABLE_VIEW_TOOL_PATH
-        .resolve(modelContextKey)
+        .resolve(modelContextPath)
         .resolve(DepanFxNodeListTableViewData.TABLE_VIEW_CONTEXT_RESOURCE_NAME);
 
     // If the context view path does not provide a valid resource,

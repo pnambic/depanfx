@@ -16,8 +16,8 @@
 package com.pnambic.depanfx.filesystem.nodeview;
 
 import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
-import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
 import com.pnambic.depanfx.filesystem.edgematchers.link.FileSystemNodeKindFilterBuiltIns;
+import com.pnambic.depanfx.filesystem.graph.FileSystemModelDefinition;
 import com.pnambic.depanfx.graph.context.ContextNodeKindId;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
@@ -54,7 +54,7 @@ public class DepanFxFileSystemNodeViewBuiltIns {
 
   public static final Path FILE_SYSTEM_NODE_KIND_DISPLAY_DOC_PATH =
       DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_TOOL_PATH
-          .resolve(FileSystemContextModelId.FILE_SYSTEM_KEY)
+          .resolve(FileSystemModelDefinition.MODEL.getId().getContextModelPath())
           .resolve(DepanFxNodeViewNodeDisplayData.NODE_DISPLAY_CONTEXT_RESOURCE_NAME);
 
   private static final String FILE_SYSTEM_NODE_KINDS_VISIBILITY_NAME =
@@ -65,7 +65,7 @@ public class DepanFxFileSystemNodeViewBuiltIns {
 
   public static final Path FILE_SYSTEM_NODE_KIND_VISIBILITY_DOC_PATH =
       DepanFxBaseFilterData.NODE_FILTERS_TOOL_PATH
-          .resolve(FileSystemContextModelId.FILE_SYSTEM_KEY)
+          .resolve(FileSystemModelDefinition.MODEL.getId().getContextModelPath())
           .resolve(DepanFxBaseFilterData.NODE_VSIBILITY_CONTEXT_RESOURCE_NAME);
 
   @Autowired
@@ -88,7 +88,7 @@ public class DepanFxFileSystemNodeViewBuiltIns {
         return new DepanFxNodeViewNodeDisplayData(
             FILE_SYSTEM_NODE_KINDS_DISPLAY_NAME,
             FILE_SYSTEM_NODE_KINDS_DISPLAY_DESCR,
-            FileSystemContextDefinition.MODEL_ID,
+            FileSystemModelDefinition.MODEL.getId(),
             kindDisplay);
       }
     };
@@ -109,7 +109,7 @@ public class DepanFxFileSystemNodeViewBuiltIns {
             return new DepanFxNodeFilterSequenceData(
                 FILE_SYSTEM_NODE_KINDS_VISIBILITY_NAME,
                 FILE_SYSTEM_NODE_KINDS_VISIBILITY_DESCR,
-                FileSystemContextDefinition.MODEL_ID,
+                FileSystemModelDefinition.MODEL.getId(),
                 getDisplayFilters(displayContrib));
           }
 

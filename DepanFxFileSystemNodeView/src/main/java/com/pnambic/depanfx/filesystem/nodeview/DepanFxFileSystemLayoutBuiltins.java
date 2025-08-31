@@ -15,8 +15,8 @@
  */
 package com.pnambic.depanfx.filesystem.nodeview;
 
-import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
 import com.pnambic.depanfx.filesystem.edgematchers.link.FileSystemLinkMatcherBuiltIns;
+import com.pnambic.depanfx.filesystem.graph.FileSystemModelDefinition;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayoutData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayouts;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxRadialLayoutData;
@@ -32,8 +32,8 @@ import java.nio.file.Path;
 public class DepanFxFileSystemLayoutBuiltins {
 
   public static final Path FILE_SYSTEM_LAYOUT_PATH =
-      DepanFxNodeViewLayoutData.LAYOUT_TOOL_PATH.resolve(
-          FileSystemContextModelId.FILE_SYSTEM_KEY);
+      DepanFxNodeViewLayoutData.LAYOUT_TOOL_PATH
+          .resolve(FileSystemModelDefinition.MODEL.getId().getContextModelPath());
 
   public static final Path FILE_SYSTEM_MEMBER_LAYOUT_PATH =
       FILE_SYSTEM_LAYOUT_PATH.resolve(

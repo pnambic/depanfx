@@ -5,11 +5,18 @@ package com.pnambic.depanfx.graph.context;
  */
 public class BaseContextModelId implements ContextModelId {
 
-  public static final String BASE_CONTEXT_KEY = "Base Context";
+  public static final String BASE_CONTEXT_KEY = "BaseContext";
+
+  public static final String BASE_CONTEXT_PATH = "Base Context";
 
   @Override
   public String getContextModelKey() {
     return BASE_CONTEXT_KEY;
+  }
+
+  @Override
+  public String getContextModelPath() {
+    return BASE_CONTEXT_PATH;
   }
 
   /**

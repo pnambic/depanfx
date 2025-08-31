@@ -322,7 +322,7 @@ public class DepanFxNodeViews {
         Class<T> resourceType, Path contextBasePath, String rsrcName) {
 
     Path contextPath = contextBasePath
-        .resolve(contextModelId.getContextModelKey())
+        .resolve(contextModelId.getContextModelPath())
         .resolve(rsrcName);
 
     return DepanFxProjects.getBuiltIn(workspace, resourceType, contextPath);

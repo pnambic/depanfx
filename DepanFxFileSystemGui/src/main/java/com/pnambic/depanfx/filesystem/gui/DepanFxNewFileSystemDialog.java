@@ -3,6 +3,7 @@ package com.pnambic.depanfx.filesystem.gui;
 import com.google.common.base.Strings;
 import com.pnambic.depanfx.filesystem.builder.FileSystemDirectoryLoader;
 import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
+import com.pnambic.depanfx.filesystem.graph.FileSystemModelDefinition;
 import com.pnambic.depanfx.graph_doc.builder.DepanFxGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.builder.SimpleGraphModelBuilder;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
@@ -171,7 +172,7 @@ public class DepanFxNewFileSystemDialog {
     String graphDescr = graphDescriptionField.getText();
 
     return new GraphDocument(graphName, graphDescr,
-        FileSystemContextDefinition.MODEL_ID, graphModel);
+        FileSystemModelDefinition.MODEL.getId(), graphModel);
   }
 
   /**

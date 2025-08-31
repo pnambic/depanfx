@@ -1,7 +1,6 @@
 package com.pnambic.depanfx.filesystem.graph;
 
 import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
-import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
 import com.pnambic.depanfx.graph.model.BasicGraphContextModel;
 import com.pnambic.depanfx.graph.model.GraphContextModel;
 import com.pnambic.depanfx.graph_doc.model.GraphContextDocument;
@@ -39,10 +38,9 @@ public class FileSystemModelDefinition {
   public static final GraphContextModel[] FILE_SYSTEM_DEPENDENCY =
       { GraphContextlModelDefinition.MODEL, MODEL };
 
-  /** Goes into BuiltIn project under key, not label. */
   public static final Path BUILTIN_PATH =
       GraphContextDocument.CONTEXT_MODEL_PATH.resolve(
-          FileSystemContextModelId.FILE_SYSTEM_KEY);
+          FileSystemModelDefinition.MODEL.getId().getContextModelPath());
 
   public static final DepanFxBuiltInContribution.Simple<GraphContextDocument> CONTRIBUTION =
       new DepanFxBuiltInContribution.Simple<>(BUILTIN_PATH, DOCUMENT);

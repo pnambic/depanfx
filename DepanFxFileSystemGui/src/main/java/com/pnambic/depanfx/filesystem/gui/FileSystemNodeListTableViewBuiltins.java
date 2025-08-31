@@ -15,7 +15,7 @@
  */
 package com.pnambic.depanfx.filesystem.gui;
 
-import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
+import com.pnambic.depanfx.filesystem.graph.FileSystemModelDefinition;
 import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeKeyColumnBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSectionBuiltIns;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
@@ -37,7 +37,7 @@ public class FileSystemNodeListTableViewBuiltins {
 
   public static final Path FILE_SYSTEM_TABLE_VIEW_PATH =
       DepanFxNodeListTableViewData.TABLE_VIEW_TOOL_PATH
-          .resolve(FileSystemContextModelId.FILE_SYSTEM_KEY);
+          .resolve(FileSystemModelDefinition.MODEL.getId().getContextModelKey());
 
   public static final String FILE_SYSTEM_HIERARY_TABLE_VIEW_NAME =
       "File System Hierarchy";

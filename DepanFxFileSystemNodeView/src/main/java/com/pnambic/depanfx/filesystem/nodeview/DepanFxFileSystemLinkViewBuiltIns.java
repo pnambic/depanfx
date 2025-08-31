@@ -17,11 +17,9 @@ package com.pnambic.depanfx.filesystem.nodeview;
 
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
-import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
-import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
 import com.pnambic.depanfx.filesystem.edgematchers.link.FileSystemLinkMatcherBuiltIns;
+import com.pnambic.depanfx.filesystem.graph.FileSystemModelDefinition;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxJoglColor;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineArrow;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxLineDirection;
@@ -59,7 +57,7 @@ public class DepanFxFileSystemLinkViewBuiltIns {
 
   public static final Path FILE_SYSTEM_EDGE_RELATION_DISPLAY_DOC_PATH =
       DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_TOOL_PATH
-          .resolve(FileSystemContextModelId.FILE_SYSTEM_KEY)
+          .resolve(FileSystemModelDefinition.MODEL.getId().getContextModelPath())
           .resolve(DepanFxNodeViewLinkDisplayData.EDGE_DISPLAY_CONTEXT_RESOURCE_NAME);
 
   private static final String FILE_SYSTEM_EDGE_RELATION_VISIBILITY_NAME =
@@ -70,7 +68,7 @@ public class DepanFxFileSystemLinkViewBuiltIns {
 
   public static final Path FILE_SYSTEM_EDGE_RELATION_VISIBILITY_DOC_PATH =
       DepanFxLinkMatcherSequenceDocument.LINK_MATCHER_SEQUENCE_TOOL_PATH
-          .resolve(FileSystemContextModelId.FILE_SYSTEM_KEY)
+          .resolve(FileSystemModelDefinition.MODEL.getId().getContextModelPath())
           .resolve(DepanFxLinkMatcher.EDGE_VISIBILITY_CONTEXT_RESOURCE_NAME);
 
   @Autowired
@@ -171,7 +169,7 @@ public class DepanFxFileSystemLinkViewBuiltIns {
         new DepanFxNodeViewLinkDisplayData(
             FILE_SYSTEM_EDGE_RELATION_DISPLAY_NAME,
             FILE_SYSTEM_EDGE_RELATION_DISPLAY_DESCR,
-            FileSystemContextDefinition.MODEL_ID, displayInfo);
+            FileSystemModelDefinition.MODEL.getId(), displayInfo);
     return result;
   };
 

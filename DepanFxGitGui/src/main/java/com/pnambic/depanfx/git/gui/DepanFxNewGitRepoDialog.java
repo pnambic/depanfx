@@ -1,7 +1,7 @@
 package com.pnambic.depanfx.git.gui;
 
 import com.google.common.base.Strings;
-import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
+import com.pnambic.depanfx.filesystem.graph.FileSystemModelDefinition;
 import com.pnambic.depanfx.git.builder.GitCommandRunner;
 import com.pnambic.depanfx.git.builder.GitLsFileLoader;
 import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
@@ -127,7 +127,7 @@ public class DepanFxNewGitRepoDialog
     String graphDescr = graphDescriptionField.getText();
 
     return new GraphDocument(graphName, graphDescr,
-        FileSystemContextDefinition.MODEL_ID, graphModel);
+        FileSystemModelDefinition.MODEL.getId(), graphModel);
   }
 
   /**

@@ -24,9 +24,16 @@ public class JavaContextModelId implements ContextModelId {
 
   public static final String JAVA_KEY = "Java";
 
+  public static final String JAVA_PATH = "Java";
+
   @Override
   public String getContextModelKey() {
     return JAVA_KEY;
+  }
+
+  @Override
+  public String getContextModelPath() {
+    return JAVA_PATH;
   }
 
   /**

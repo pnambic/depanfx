@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.filesystem.edgematchers.link;
 
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
+import com.pnambic.depanfx.filesystem.graph.FileSystemModelDefinition;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 
 import org.springframework.context.annotation.Bean;
@@ -26,8 +27,6 @@ import java.nio.file.Path;
 @Configuration
 public class FileSystemLinkMatcherBuiltIns {
 
-  public static final String FILE_SYSTEM_LINK_MATCHER_DIR = "File System";
-
   public static final String MEMBER_NAME = "Member";
 
   public static final String DIRECTORY_NAME = "Directory";
@@ -36,7 +35,7 @@ public class FileSystemLinkMatcherBuiltIns {
 
   public static final Path FILE_SYSTEM_LINK_MATCHER_PATH =
       DepanFxLinkMatcherDocument.LINK_MATCHER_TOOL_PATH
-          .resolve(FILE_SYSTEM_LINK_MATCHER_DIR);
+      .resolve(FileSystemModelDefinition.MODEL.getId().getContextModelPath());
 
   public static final Path FILE_SYSTEM_MEMBER_MATCHER_PATH =
       FILE_SYSTEM_LINK_MATCHER_PATH.resolve(MEMBER_NAME);

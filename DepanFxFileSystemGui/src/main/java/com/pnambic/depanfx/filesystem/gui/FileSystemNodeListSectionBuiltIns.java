@@ -15,8 +15,8 @@
  */
 package com.pnambic.depanfx.filesystem.gui;
 
-import com.pnambic.depanfx.filesystem.context.FileSystemContextModelId;
 import com.pnambic.depanfx.filesystem.edgematchers.link.FileSystemLinkMatcherBuiltIns;
+import com.pnambic.depanfx.filesystem.graph.FileSystemModelDefinition;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxContainerOrder;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
@@ -34,8 +34,8 @@ import java.nio.file.Path;
 public class FileSystemNodeListSectionBuiltIns {
 
   public static final Path FILE_SYSTEM_SECTION_PATH =
-      DepanFxNodeListSectionData.SECTIONS_TOOL_PATH
-          .resolve(FileSystemContextModelId.FILE_SYSTEM_KEY);
+      DepanFxNodeListSectionData.SECTIONS_TOOL_PATH.resolve(
+          FileSystemModelDefinition.MODEL.getId().getContextModelPath());
 
   public static final String FILE_SYSTEM_HIERARCHY_SECTION_NAME =
       "File System Hierarchy";

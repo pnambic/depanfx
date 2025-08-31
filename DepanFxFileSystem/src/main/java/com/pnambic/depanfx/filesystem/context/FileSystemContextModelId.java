@@ -9,9 +9,16 @@ public class FileSystemContextModelId implements ContextModelId {
 
   public static final String FILE_SYSTEM_KEY = "FileSystem";
 
+  public static final String FILE_SYSTEM_PATH = "File System";
+
   @Override
   public String getContextModelKey() {
     return FILE_SYSTEM_KEY;
+  }
+
+  @Override
+  public String getContextModelPath() {
+    return FILE_SYSTEM_PATH;
   }
 
   /**

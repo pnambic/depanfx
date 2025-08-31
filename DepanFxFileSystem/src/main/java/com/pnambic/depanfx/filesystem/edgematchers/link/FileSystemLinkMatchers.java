@@ -21,6 +21,7 @@ import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchers.ForwardRelation
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
+import com.pnambic.depanfx.filesystem.graph.FileSystemModelDefinition;
 import com.pnambic.depanfx.filesystem.graph.FileSystemRelation;
 
 import java.util.Arrays;
@@ -52,18 +53,18 @@ public class FileSystemLinkMatchers {
   public static final DepanFxLinkMatcherDocument MEMBER_DOC =
       new DepanFxLinkMatcherDocument(
           "File System Relationship", "File system relationship.",
-          FileSystemContextDefinition.MODEL_ID,
+          FileSystemModelDefinition.MODEL.getId(),
           DepanFxLinkMatcherGroup.MEMBER_MATCHER_GROUP, MEMBER);
 
   public static final DepanFxLinkMatcherDocument DIRECTORY_DOC =
       new DepanFxLinkMatcherDocument(
           "Directory Matcher", "Matches directories.",
-          FileSystemContextDefinition.MODEL_ID,
+          FileSystemModelDefinition.MODEL.getId(),
           Collections.emptyList(), DIRECTORY_FORWARD);
 
   public static final DepanFxLinkMatcherDocument FILE_DOC =
       new DepanFxLinkMatcherDocument(
           "File Matcher", "Matches files.",
-          FileSystemContextDefinition.MODEL_ID,
+          FileSystemModelDefinition.MODEL.getId(),
           Collections.emptyList(), FILE_FORWARD);
 }
