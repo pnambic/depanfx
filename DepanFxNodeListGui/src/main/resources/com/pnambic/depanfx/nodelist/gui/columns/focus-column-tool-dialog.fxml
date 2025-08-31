@@ -36,7 +36,7 @@
          <HBox spacing="10">
             <Label text="Focus List"/>
             <Region HBox.hgrow="ALWAYS" />
-            <Label text="New Node Folding..."
+            <Label text="New Node List..."
                 onMouseClicked="#handleNewNodeList" />
          </HBox>
 

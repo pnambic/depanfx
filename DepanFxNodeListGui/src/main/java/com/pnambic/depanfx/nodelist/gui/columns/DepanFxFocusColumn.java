@@ -22,9 +22,14 @@ import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -46,7 +51,13 @@ public class DepanFxFocusColumn
       "Select Focus Column...";
 
   public static final String SAVE_NODE_LIST =
-      "Save Node List...";
+      "Save Node List";
+
+  public static final String SAVE_TO_NODE_LIST =
+      "Save to Node List...";
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(DepanFxFocusColumn.class);
 
   private DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc;
 
@@ -55,9 +66,12 @@ public class DepanFxFocusColumn
   // Synthetic Category entry for this column
   private CategoryEntry focusEntry;
 
+  // Enable/disable these actions based on node list edits.
   private SeparatorMenuItem saveSeparator;
 
   private MenuItem saveAction;
+
+  private MenuItem saveToAction;
 
   public DepanFxFocusColumn(
       DepanFxNodeListTableAdapter tableAdapter,
@@ -84,11 +98,15 @@ public class DepanFxFocusColumn
     // These actions are hidden if the node list is unchanged.
     saveSeparator = builder.appendSeparator();
     saveAction = builder.appendActionItem(
-        SAVE_NODE_LIST, e -> runSaveNodeList());
+        SAVE_NODE_LIST, e -> runUpdateNodeListResource());
+    saveToAction = builder.appendActionItem(
+        SAVE_TO_NODE_LIST, e -> runSaveToNodeList());
 
     // Ensure initial visibility is correct.
-    updateActions();
-    return builder.build();
+    // updateSaveItems();
+    ContextMenu result = builder.build();
+    result.setOnShowing(e -> onColumnMenuShowing());
+    return result;
   }
 
   public static void addNewColumnAction(
@@ -106,7 +124,6 @@ public class DepanFxFocusColumn
     } else {
       categories.setListMembership(graphNode, Collections.emptyList());
     }
-    updateActions();
   }
 
   @Override
@@ -163,21 +180,38 @@ public class DepanFxFocusColumn
     tableAdapter.refreshTableView();
   }
 
-  private void updateActions() {
+  @Override
+  protected void updateColumnDataRsrc(
+      DepanFxWorkspaceResource<DepanFxFocusColumnData> columnDataRsrc) {
+    updateNodeListRsrc(getColumnData().getNodeListRsrc());
+    super.updateColumnDataRsrc(columnDataRsrc);
+  }
+
+  private void onColumnMenuShowing() {
+    updateSaveItems();
+  }
+
+  private void updateSaveItems() {
     boolean hasEdits = hasNodeListEdits();
     saveSeparator.setVisible(hasEdits);
     saveAction.setVisible(hasEdits);
+    saveToAction.setVisible(hasEdits);
   }
 
   private boolean hasNodeListEdits() {
     return categories.hasEdits();
   }
 
-  private void runSaveNodeList() {
-    DepanFxNodeList nodeList = nodeListRsrc.getResource();
-    Collection<GraphNode> editNodes = categories.getCurrentNodes(focusEntry);
-    DepanFxNodeList saveList =
-        DepanFxNodeLists.buildRelatedNodeList(nodeList, editNodes);
+  private void runUpdateNodeListResource() {
+    saveUpdateNodeListResource()
+        // Same resource, with the changes committed.
+        .ifPresent(this::updateNodeListRsrc);
+
+    refreshColumn();
+  }
+
+  private void runSaveToNodeList() {
+    DepanFxNodeList saveList = buildUpdateNodeList();
     DepanFxWorkspaceResource<DepanFxNodeList> saveListRsrc =
         tableAdapter.getWorkspace().addScratchResource(saveList);
 
@@ -190,14 +224,30 @@ public class DepanFxFocusColumn
       });
   }
 
-  private static void openColumnCreate(
-      DepanFxDialogRunner dialogRunner,
-      DepanFxNodeListTableAdapter tableAdapter) {
-    DepanFxFocusColumnData initialData =
-        DepanFxFocusColumnData.buildInitialFocusColumnData(null);
-    DepanFxWorkspaceResource<DepanFxFocusColumnData> columnRsrc =
-        tableAdapter.getWorkspace().addScratchResource(initialData);
-    DepanFxFocusColumnToolDialog.runCreateDialog(columnRsrc, dialogRunner);
+  private Optional<DepanFxWorkspaceResource<DepanFxNodeList>>
+  saveUpdateNodeListResource() {
+    DepanFxNodeList saveList = buildUpdateNodeList();
+
+    try {
+      return saveNodeListResource(saveList);
+    } catch (IOException errIo) {
+      LOG.error("Unable to save updated node list for {}",
+          errIo);
+    }
+    return Optional.empty();
+  }
+
+  private Optional<DepanFxWorkspaceResource<DepanFxNodeList>>
+  saveNodeListResource(
+      DepanFxNodeList saveList) throws IOException {
+    return tableAdapter.getWorkspace().saveDocument(
+            nodeListRsrc.getDocument(), saveList);
+  }
+
+  private DepanFxNodeList buildUpdateNodeList() {
+    DepanFxNodeList nodeList = nodeListRsrc.getResource();
+    Collection<GraphNode> editNodes = categories.getCurrentNodes(focusEntry);
+    return DepanFxNodeLists.buildRelatedNodeList(nodeList, editNodes);
   }
 
   private void openColumnEditor(DepanFxDialogRunner dialogRunner) {
@@ -231,13 +281,6 @@ public class DepanFxFocusColumn
         .ifPresent(this::updateColumnDataRsrc);
   }
 
-  @Override
-  protected void updateColumnDataRsrc(
-      DepanFxWorkspaceResource<DepanFxFocusColumnData> columnDataRsrc) {
-    updateNodeListRsrc(getColumnData().getNodeListRsrc());
-    super.updateColumnDataRsrc(columnDataRsrc);
-  }
-
   private void updateNodeListRsrc(
       DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
     this.nodeListRsrc = nodeListRsrc;
@@ -249,6 +292,16 @@ public class DepanFxFocusColumn
         getColumnData().getFocusLabel(), nodeListRsrc);
     this.categories = new CategoryEditor(
         Collections.singletonList(focusEntry));
+  }
+
+  private static void openColumnCreate(
+      DepanFxDialogRunner dialogRunner,
+      DepanFxNodeListTableAdapter tableAdapter) {
+    DepanFxFocusColumnData initialData =
+        DepanFxFocusColumnData.buildInitialFocusColumnData(null);
+    DepanFxWorkspaceResource<DepanFxFocusColumnData> columnRsrc =
+        tableAdapter.getWorkspace().addScratchResource(initialData);
+    DepanFxFocusColumnToolDialog.runCreateDialog(columnRsrc, dialogRunner);
   }
 
   private static DepanFxResourceChooser prepareChooser(
