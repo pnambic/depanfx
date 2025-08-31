@@ -37,15 +37,14 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TextField;
 
+/**
+ * User selection of a link matcher resources.
+ *
+ * In general, any link matcher is acceptable.
+ */
 public class DepanFxLinkMatcherChooser {
 
   public static final String SELECT_LINK_MATCHER = "Select Link Matcher...";
-
-  public static final DepanFxResourceFilter LINK_MATCHER_FILTER =
-      DepanFxResourceFilter.buildResourceFilter(
-          "Link Matcher",
-          DepanFxLinkMatcherDocument.LINK_MATCHER_TOOL_EXT,
-          DepanFxLinkMatcherDocument.class);
 
   /**
    * Bind a pop-up to text field for the resource name.
@@ -89,7 +88,7 @@ public class DepanFxLinkMatcherChooser {
 
     public String getLinkMatcherRsrcName() {
       if (linkMatcherRsrc != null) {
-        return linkMatcherRsrc.getDocument().getMemberPath().toString();
+        return DepanFxProjects.asReferenceLabel(workspace, linkMatcherRsrc);
       }
       // Let the text input field show a prompt text.
       return null;

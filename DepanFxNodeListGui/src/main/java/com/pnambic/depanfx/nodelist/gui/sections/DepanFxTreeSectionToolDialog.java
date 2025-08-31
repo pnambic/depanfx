@@ -51,6 +51,8 @@ public class DepanFxTreeSectionToolDialog
   @FXML
   private TextField linkMatcherResourceField;
 
+  private LinkMatcherControl linkMatcherControl;
+
   @FXML
   private CheckBox inferMissingParentsField;
 
@@ -59,8 +61,6 @@ public class DepanFxTreeSectionToolDialog
 
   @FXML
   private ComboBox<DepanFxContainerOrder> containerOrderField;
-
-  private LinkMatcherControl linkMatcherControl;
 
   @Autowired
   public DepanFxTreeSectionToolDialog(
@@ -102,7 +102,8 @@ public class DepanFxTreeSectionToolDialog
     super.initialize();
 
     linkMatcherControl = new DepanFxLinkMatcherChooser.LinkMatcherControl(
-        getWorkspace(), dialogRunner, matcherDialogRegistry, linkMatcherResourceField);
+        getWorkspace(), dialogRunner, matcherDialogRegistry,
+        linkMatcherResourceField);
 
     populateOrderBy(orderByField);
 
@@ -123,6 +124,11 @@ public class DepanFxTreeSectionToolDialog
 
     orderByField.setValue(sectionData.getOrderBy());
     containerOrderField.setValue(sectionData.getContainerOrder());
+  }
+
+  @FXML
+  public void handleBrowseMatcher() {
+    linkMatcherControl.runLinkMatcherFinder();
   }
 
   /////////////////////////////////////

@@ -34,9 +34,11 @@
             <TextField fx:id="linkMatcherResourceField" editable="false"
                   promptText="No link matcher selected"
                   HBox.hgrow="ALWAYS"/>
-            <CheckBox fx:id="inferMissingParentsField"
-                  text="Infer missing parents"/>
+            <Button text="Browse" onAction="#handleBrowseMatcher"/>
          </HBox>
+
+         <CheckBox fx:id="inferMissingParentsField"
+               text="Infer missing parents"/>
 
          <Label text="Node ordering"/>
 
@@ -76,8 +78,7 @@
          <HBox spacing="10">
             <TextField fx:id="destinationField" editable="false" promptText="No file selected"
                   HBox.hgrow="ALWAYS"/>
-            <Button text="Browse" onAction="#openDestinationChooser"
-                  HBox.hgrow="ALWAYS"/>
+            <Button text="Browse" onAction="#openDestinationChooser"/>
          </HBox>
 
          <Region VBox.vgrow="ALWAYS" />

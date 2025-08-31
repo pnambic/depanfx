@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 @Component
 public class DepanFxEdgeMatcherDialogRegistry {
 
-  public static final String EDEGE_MATCHERS_RSRC_FILTER = "Edge Matchers";
+  public static final String EDGE_MATCHERS_RSRC_FILTER = "Edge Matchers";
 
   public interface Contribution {
 
@@ -55,7 +55,7 @@ public class DepanFxEdgeMatcherDialogRegistry {
         .collect(Collectors.toList());
 
     return new DepanFxResourceFilterModel.Composite(
-        EDEGE_MATCHERS_RSRC_FILTER, rsrcFilters);
+        EDGE_MATCHERS_RSRC_FILTER, rsrcFilters);
   }
 
   private Stream<Contribution> orderedContribs() {
