@@ -70,7 +70,7 @@ public class DepanFxNodeListColumns {
     menuBuilder.appendSeparator();
 
     tableAdapter.streamColumnChoices()
-        .map(c -> buildColumnItem(null, tableAdapter, c))
+        .map(c -> buildColumnItem(after, tableAdapter, c))
         .forEach(menuBuilder::appendMenuItem);
   }
 
