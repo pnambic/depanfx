@@ -149,7 +149,7 @@ public abstract class DepanFxBaseFilter<T extends DepanFxBaseFilterData> {
     Set<GraphNode> shortSet = (shortNodes instanceof Set<GraphNode> asSet)
         ? asSet : new HashSet<>(shortNodes);
     return longNodes.stream()
-        .filter(n -> !shortSet.contains(n))
+        .filter(n -> shortSet.contains(n))
         .collect(Collectors.toSet());
   }
 }
