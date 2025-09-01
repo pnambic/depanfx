@@ -20,6 +20,7 @@ import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.graph_doc.persistence.GraphDocPersistenceContribution;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewBuiltIns;
+import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
@@ -170,8 +171,8 @@ public class DepanFxNodeListViewerConfiguration {
     @Override
     protected void runDialog(
         DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxNodeList> wkspRsrc) {
-      throw new DepanFxResourceRegistry.UseOpenPanelException(this);
+        DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
+      DepanFxSaveNodeListDialog.runSaveNodeList(dialogRunner, nodeListRsrc);
     }
 
     @Override
