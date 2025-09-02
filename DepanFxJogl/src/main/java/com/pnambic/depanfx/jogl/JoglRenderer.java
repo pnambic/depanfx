@@ -200,7 +200,7 @@ public class JoglRenderer {
 
   public Collection<Object> getHits(GLAutoDrawable drawable,
       float mouseX, float mouseY, float selectWidth, float selectHeight) {
-    LOG.info("hit test x:{}, y:{}, w:{}, h:{}",
+    LOG.debug("hit test x:{}, y:{}, w:{}, h:{}",
         mouseX, mouseY, selectWidth, selectHeight);
 
     // Lock down list to ensure repeatable order.

@@ -21,7 +21,6 @@ import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherSequenceToolDialog
 import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatcherGroup;
 import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchersRegistry;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.graph.context.ContextModelId;
 import com.pnambic.depanfx.graph.context.GraphContextKeys;
@@ -443,13 +442,13 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   public void updateNodeLocation(
       GraphNode node, DepanFxNodeLocationData location) {
-    LOG.info("Updating location of node {}", node);
+    LOG.debug("Updating location of node {}", node);
     updateViewNodeLocation(node, location);
   }
 
   public void updateNodeLocations(
       Map<GraphNode, DepanFxNodeLocationData> locations) {
-    LOG.info("Updating location of {} nodes", locations.size());
+    LOG.debug("Updating location of {} nodes", locations.size());
     locations.entrySet().stream()
         .forEach(e -> updateViewNodeLocation(e.getKey(), e.getValue()));
   }
@@ -1197,7 +1196,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     @Override
     public void moveSelection(double deltaX, double deltaY, double deltaZ) {
       long selectCount = streamChosenNodes().count();
-      LOG.info("Selection move {} nodes: x:{}, y:{}, z:{}",
+      LOG.debug("Selection move {} nodes: x:{}, y:{}, z:{}",
           selectCount, deltaX, deltaY, deltaZ);
       DepanFxNodeViewCameraData cameraInfo = joglPane.getCameraData();
       double viewScale = cameraInfo.zoom * cameraInfo.cameraZ * 2;
