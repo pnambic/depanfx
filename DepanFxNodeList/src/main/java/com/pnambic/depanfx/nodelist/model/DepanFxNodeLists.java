@@ -69,12 +69,13 @@ public class DepanFxNodeLists {
   public static DepanFxNodeList buildEmptyNodeList(DepanFxNodeList baseNodes) {
 
     String baseName = guessName(baseNodes);
-    String resultName = MessageFormat.format("{0} emptied", baseName);
+
     String resultDescr = MessageFormat.format(
-        "List {0} with all item removed.", baseName);
+        "From graph {0} (empty).",
+        baseNodes.getGraphDocResource().getResource().getGraphName());
 
     return buildNodeList(
-        resultName, resultDescr,
+        baseName, resultDescr,
         baseNodes.getGraphDocResource(), Collections.emptyList());
   }
 

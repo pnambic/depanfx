@@ -183,7 +183,7 @@ public class DepanFxFocusColumn
   @Override
   protected void updateColumnDataRsrc(
       DepanFxWorkspaceResource<DepanFxFocusColumnData> columnDataRsrc) {
-    updateNodeListRsrc(getColumnData().getNodeListRsrc());
+    updateNodeListRsrc(columnDataRsrc.getResource().getNodeListRsrc());
     super.updateColumnDataRsrc(columnDataRsrc);
   }
 
