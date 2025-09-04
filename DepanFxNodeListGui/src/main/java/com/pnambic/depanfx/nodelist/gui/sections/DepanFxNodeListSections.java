@@ -165,8 +165,9 @@ public class DepanFxNodeListSections {
   }
 
   private static Optional<DepanFxWorkspaceResource<DepanFxTreeSectionData>>
-      getInitialTreeSectionResource(
+  getInitialTreeSectionResource(
           DepanFxNodeListTableAdapter tableAdapter) {
+
     ContextModelId modelId = tableAdapter.getGraphDoc().getContextModelId();
 
     return DepanFxProjects.getBuiltIn(
