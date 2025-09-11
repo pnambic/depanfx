@@ -20,6 +20,7 @@ nav:
   - Reference:
     - Node Lists:
       - Edge Matchers: reference/nodelist/EdgeMatchers.md
+      - Node Annotations: reference/nodelist/NodeAnnotations.md
     - Node Views:
       - Keyboard Commands: reference/nodeview/keyboard_cmnds/KeyboardCommands.md
     - Resources:
