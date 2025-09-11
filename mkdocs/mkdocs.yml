@@ -17,6 +17,9 @@ nav:
       - Node View Panel: introduction/lists_and_views/NodeViewPanel.md
       - Congratulations: introduction/lists_and_views/Summary.md
     - Congratulations: introduction/Summary.md
+  - Using Depan:
+    - Concepts:
+      - Graphs: using/concepts/Graphs.md
   - Reference:
     - Node Lists:
       - Edge Matchers: reference/nodelist/EdgeMatchers.md
