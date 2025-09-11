@@ -18,6 +18,8 @@ nav:
       - Congratulations: introduction/lists_and_views/Summary.md
     - Congratulations: introduction/Summary.md
   - Reference:
+    - Node Lists:
+      - Edge Matchers: reference/nodelist/EdgeMatchers.md
     - Node Views:
       - Keyboard Commands: reference/nodeview/keyboard_cmnds/KeyboardCommands.md
     - Resources:
