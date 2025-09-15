@@ -289,6 +289,24 @@ public class FlightController {
     moveMoveToOnAxis(UNIT_MOVE_D, getMoveUpAxis(camera));
   }
 
+  public void dolly(double dollyX, double dollyY, double dollyZ) {
+    JoglCamera.CameraData camera = jogl.getCurrentCamera();
+    float[] moveFwdAxis = getMoveForwardAxis(camera);
+    float[] moveUpAxis = getMoveUpAxis(camera);
+    float[] moveRightAxis = JoglTransforms.crossV3(moveFwdAxis, moveUpAxis);
+
+    float[] moveFwd = JoglTransforms.scaleV3(moveFwdAxis, (float) dollyZ);
+    float[] moveRight = JoglTransforms.scaleV3(moveRightAxis, (float) dollyX);
+    float[] moveUp = JoglTransforms.scaleV3(moveUpAxis, (float) dollyY);
+
+    float[] dollyTo = JoglTransforms.addV3(moveRight, moveUp);
+    dollyTo = JoglTransforms.addV3(dollyTo, moveFwd);
+
+    LOG.debug("dolly {} on ({}, {}, {})",
+        dollyTo[0], dollyTo[1], dollyTo[2]);
+    cameraControl.dolly(dollyTo[0], dollyTo[1], dollyTo[2]);
+  }
+
   /////////////////////////////////////
   // Throttle controls
 

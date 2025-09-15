@@ -22,7 +22,8 @@ nav:
       - Edge Matchers: reference/nodelist/EdgeMatchers.md
       - Node Annotations: reference/nodelist/NodeAnnotations.md
     - Node Views:
-      - Keyboard Commands: reference/nodeview/keyboard_cmnds/KeyboardCommands.md
+      - Flight Controls: reference/nodeview/keyboard_cmnds/KeyboardCommands.md
+      - Mouse Commands: reference/nodeview/keyboard_cmnds/MouseCommands.md
       - Edge Filters: reference/nodeview/ViewPanelEdgeFilters.md
     - Resources:
       - Resource Kinds: reference/resources/resource_kinds/ResourceKinds.md

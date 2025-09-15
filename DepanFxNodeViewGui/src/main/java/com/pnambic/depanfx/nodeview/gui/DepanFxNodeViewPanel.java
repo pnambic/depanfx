@@ -1190,7 +1190,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
       DepanFxNodeViewCameraData cameraInfo = joglPane.getCameraData();
       double viewScale = cameraInfo.zoom * cameraInfo.cameraZ * 2;
       LOG.debug("view scale {}", viewScale);
-      joglPane.dolly(viewScale * deltaX, viewScale * deltaY, deltaZ);
+      joglPane.dollyMouse(viewScale * deltaX, viewScale * deltaY, deltaZ);
     }
 
     @Override

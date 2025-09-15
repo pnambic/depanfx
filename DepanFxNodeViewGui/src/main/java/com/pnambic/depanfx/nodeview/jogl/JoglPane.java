@@ -142,6 +142,10 @@ public class JoglPane extends BorderPane {
     return JoglCameras.of(jogl.getCurrentCamera());
   }
 
+  public void dollyMouse(double dollyX, double dollyY, double dollyZ ) {
+    flightControl.dolly(dollyX, dollyY, dollyZ);
+  }
+
   public void dolly(double dollyX, double dollyY, double dollyZ ) {
     cameraControl.dolly(dollyX, dollyY, dollyZ);
   }
