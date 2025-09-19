@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.nodelist.model;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.nodelist.tree.DepanFxNodeParentsToTreeModelBuilder;
 import com.pnambic.depanfx.nodelist.tree.DepanFxSimpleTreeModel;
@@ -32,6 +33,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Base controller for node folding state.
+ */
 public abstract class DepanFxNodeFoldController {
 
   protected static final Logger LOG =
@@ -39,26 +43,49 @@ public abstract class DepanFxNodeFoldController {
 
   private final DepanFxWorkspace workspace;
 
-  /**
-   * Source, or last saved version, of the node fold data..
-   */
-  private List<FoldingState> foldStates = new ArrayList<>();
+  // Folding state for capture resources.
+  private List<FoldingState> captureStates = new ArrayList<>();
 
-  public DepanFxNodeFoldController(DepanFxWorkspace workspace) {
+  private final DepanFxWorkspaceResource<GraphDocument> graphDocRsrc;
+
+  public DepanFxNodeFoldController(
+      DepanFxWorkspace workspace,
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc) {
     this.workspace = workspace;
+    this.graphDocRsrc = graphDocRsrc;
   }
 
-  public List<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
-  forUpdateNodeFoldResource() {
+  public DepanFxWorkspaceResource<DepanFxNodeFoldData>
+  createFoldResource(
+      DepanFxWorkspace workspace) {
+
+    return workspace.addScratchResource(
+            DepanFxNodeFoldData.emptyNodeFoldData(graphDocRsrc));
+  }
+
+  public Stream<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
+  streamUpdateNodeFoldResource() {
     return streamStates()
         .filter(s -> s.nodeFoldRsrc.getDocument().getProject()
             != workspace.getScratchProjectTree())
-        .map(s -> s.forUpdate())
-        .collect(Collectors.toList());
+        .map(s -> s.forUpdate());
   }
 
+  public DepanFxWorkspaceResource<GraphDocument> getGraphDocResource() {
+    return graphDocRsrc;
+  }
+
+  /////////////////////////////////////
+  // Unified foldings
+  //
+  // Unified foldings are primarily in support of UX with
+  // all installed node foldings available for user selection.
+  //
+  // Derived classes should ensure that their streamStates() method
+  // returns the union of their own states and any parent classes.
+
   /**
-   * Provide a stream for the current node fold resources.
+   * Provide a stream for all node fold resources.
    */
   public Stream<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
   streamNodeFoldResources() {
@@ -66,50 +93,66 @@ public abstract class DepanFxNodeFoldController {
         .map(s -> s.getNodeFoldResource());
   }
 
-  public void installNodeFoldResourceAt(
-      int foldIndex,
-      DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc) {
-
-    foldStates.add(foldIndex, buildFoldingState(nodeFoldRsrc));
-  }
-
-  public void appendNodeFoldResource(
-      DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc) {
-
-    foldStates.add(buildFoldingState(nodeFoldRsrc));
-  }
-
-  public Optional<DepanFxTreeModel> getTreeModel(
-      DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc) {
-    return findFoldingState(nodeFoldRsrc)
-        .map(s -> s.getTreeModel());
-  }
-
-  public void updateTreeModel(
-      DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc,
-      DepanFxTreeModel treeModel) {
-
-    findFoldingState(nodeFoldRsrc)
-        .ifPresent(s -> s.setTreeModel(treeModel));
-  }
-
+  /**
+   * Supports add to menu item which lists all node foldings,
+   * whether section or capture.
+   */
   public boolean addTreeModel(
       DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc,
       DepanFxTreeModel subModel) {
 
-    return findFoldingState(nodeFoldRsrc)
+    return findNodeFoldingState(nodeFoldRsrc)
         .map(f -> f.addSubTree(subModel))
         .orElse(false);
   }
 
+  protected Stream<FoldingState> streamStates() {
+    return captureStates.stream();
+  }
+
+  private Optional<FoldingState> findNodeFoldingState(
+      DepanFxWorkspaceResource<DepanFxNodeFoldData> foldDataRsrc) {
+    return streamStates()
+        .filter(s -> s.getNodeFoldResource().equals(foldDataRsrc))
+        .findFirst();
+  }
+
+  /////////////////////////////////////
+  // Capture foldings
+
+  public void installCaptureFoldResourceAt(
+      int foldIndex,
+      DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc) {
+
+    captureStates.set(foldIndex, buildFoldingState(nodeFoldRsrc));
+  }
+
+  public void appendCaptureFoldResource(
+      DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc) {
+
+    captureStates.add(buildFoldingState(nodeFoldRsrc));
+  }
+
+  public DepanFxWorkspaceResource<DepanFxNodeFoldData>
+  forUpdateCaptureFoldResourceAt(
+      int index) {
+
+    return captureStates.get(index).forUpdate();
+  }
+
+  public Stream<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
+  streamCaptureFoldResources() {
+    return captureStates.stream()
+        .map(s -> s.getNodeFoldResource());
+  }
+
+  /////////////////////////////////////
+  // Other
+
   abstract protected FoldingState newFoldingState(
       DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc);
 
-  protected Stream<FoldingState> streamStates() {
-    return foldStates.stream();
-  }
-
-  private FoldingState buildFoldingState(
+  protected FoldingState buildFoldingState(
       DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc) {
 
     FoldingState result = newFoldingState(nodeFoldRsrc);
@@ -121,12 +164,7 @@ public abstract class DepanFxNodeFoldController {
     return result;
   }
 
-  private Optional<FoldingState> findFoldingState(
-      DepanFxWorkspaceResource<DepanFxNodeFoldData> foldDataRsrc) {
-    return streamStates()
-        .filter(s -> s.getNodeFoldResource().equals(foldDataRsrc))
-        .findFirst();
-  }
+  // Unified stream
 
   public static class FoldingState {
 
@@ -199,11 +237,12 @@ public abstract class DepanFxNodeFoldController {
     }
 
     private List<DepanFxNodeFoldData.NodeNest> forUpdateNodeNests() {
-        return nodeFoldRsrc.getResource().streamNodeNests()
-            .collect(Collectors.toList());
+      return treeModel.streamNodeParent()
+          .collect(Collectors.toList());
     }
 
-    private static DepanFxTreeModel buildTreeModel(DepanFxNodeFoldData foldInfo) {
+    private static DepanFxTreeModel buildTreeModel(
+        DepanFxNodeFoldData foldInfo) {
       DepanFxNodeParentsToTreeModelBuilder builder =
           new DepanFxNodeParentsToTreeModelBuilder(
               foldInfo.getGraphDocResource());

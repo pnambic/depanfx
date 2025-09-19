@@ -9,6 +9,7 @@ import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSectionBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxSectionRegistry;
 import com.pnambic.depanfx.nodelist.gui.sections.folds.DepanFxFoldSection;
+import com.pnambic.depanfx.nodelist.gui.sections.folds.NodeListFoldController;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
@@ -236,13 +237,20 @@ public class DepanFxNodeListTableState {
     int sectionIndex = sections.indexOf(section);
     if (sectionIndex >= 0) {
       sectionResources.set(sectionIndex, dataRsrc);
+
+      if (dataRsrc.getResource() instanceof DepanFxFoldSectionData foldData) {
+        ((NodeListFoldController) nodeFoldings).installSectionFoldingResourceAt(
+            sectionIndex, foldData.getNodeFoldResource());
+      }
+
       if (DepanFxSectionRegistry.updateSection(section, dataRsrc)) {
         resetTableView();
       }
       return;
     }
     LOG.warn("Failed update for unknown section {} with resource {}",
-        section.getDisplayName(), dataRsrc.getDocument().toString());
+        section.getDisplayName(),
+        DepanFxProjects.getDocumentLabel(dataRsrc.getDocument()));
   }
 
   public Stream<DepanFxNodeListSection> streamSections() {
@@ -404,9 +412,10 @@ public class DepanFxNodeListTableState {
     case DepanFxNodeListGraphNode node:
       return selectedNodes.getSelected(node);
     default:
-      LOG.warn("Unexpected list member {} for getCheckBoxObservable",
-          member.getClass().getSimpleName());
     }
+
+    LOG.warn("Unexpected list member {} for getCheckBoxObservable",
+        member.getClass().getSimpleName());
     return null;
   }
 
@@ -440,18 +449,21 @@ public class DepanFxNodeListTableState {
       int sectionIndex, DepanFxBaseSectionData sectionInfo) {
     switch (sectionInfo) {
     case DepanFxFoldSectionData foldData:
-      nodeFoldings.installNodeFoldResourceAt(
+      ((NodeListFoldController) nodeFoldings).installSectionFoldingResourceAt(
           getFoldIndex(sectionIndex), foldData.getNodeFoldResource());
       return;
     default:
       // Fall through
+
     }
-  }
+    LOG.warn("Unexpected section {} for section {}",
+        sectionInfo.getToolName(), sectionIndex);
+}
 
   private void appendSectionResource(DepanFxBaseSectionData sectionInfo) {
     switch (sectionInfo) {
     case DepanFxFoldSectionData foldData:
-      nodeFoldings.appendNodeFoldResource(foldData.getNodeFoldResource());
+      nodeFoldings.appendCaptureFoldResource(foldData.getNodeFoldResource());
       return;
     default:
       // Fall through

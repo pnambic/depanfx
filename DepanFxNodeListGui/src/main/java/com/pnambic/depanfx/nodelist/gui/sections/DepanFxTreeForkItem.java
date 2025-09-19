@@ -6,10 +6,12 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
 import com.pnambic.depanfx.nodelist.gui.sections.folds.DepanFxFoldSection;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,11 +78,10 @@ public class DepanFxTreeForkItem extends DepanFxNodeListForkItem {
       DepanFxNodeListTableAdapter tableAdapter) {
 
     DepanFxMenuBuilder menuBuilder = new DepanFxMenuBuilder(FOLD_TREE_INTO);
-    tableAdapter.streamSections()
-        .filter(DepanFxFoldSection.class::isInstance)
-        .map(DepanFxFoldSection.class::cast)
+    tableAdapter.getNodeFolding().streamNodeFoldResources()
         .forEach(f -> menuBuilder.appendMenuItem(
-            buildFoldTreeIntoItem(f, getFork())));
+            buildFoldTreeIntoItem(tableAdapter, f, getFork())));
+
     if (menuBuilder.isEmpty()) {
       return;
     }
@@ -122,10 +123,12 @@ public class DepanFxTreeForkItem extends DepanFxNodeListForkItem {
   }
 
   private MenuItem buildFoldTreeIntoItem(
-      DepanFxFoldSection foldSection, DepanFxNodeListGraphNode node) {
-    String label = foldSection.getDisplayName();
+      DepanFxNodeListTableAdapter tableAdapter,
+      DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc,
+      DepanFxNodeListGraphNode node) {
     return DepanFxMenuItemFactory.createActionItem(
-        label, e -> runFoldTreeInto(foldSection, node));
+        nodeFoldRsrc.getResource().getToolName(),
+        e -> runFoldTreeInto(tableAdapter, nodeFoldRsrc, node));
   }
 
   private MenuItem buildFoldTreeIntoMultiItem(
@@ -137,13 +140,17 @@ public class DepanFxTreeForkItem extends DepanFxNodeListForkItem {
   }
 
   private void runFoldTreeInto(
-      DepanFxFoldSection foldSection,
+      DepanFxNodeListTableAdapter tableAdapter,
+      DepanFxWorkspaceResource<DepanFxNodeFoldData> nodeFoldRsrc,
       DepanFxNodeListGraphNode node) {
     DepanFxTreeSection srcSection = (DepanFxTreeSection) node.getSection();
     DepanFxTreeModel srcTree = srcSection.getTreeModel();
     DepanFxTreeModel subModel = srcTree.subTreeModel(node.getGraphNode());
 
-    foldSection.addTreeModel(subModel);
+    //  DepanFxFoldSection foldSection
+    //    foldSection.addTreeModel(subModel);
+    tableAdapter.getNodeFolding()
+        .addTreeModel(nodeFoldRsrc, subModel);
   }
 
   private void runFoldTreeIntoMulti(

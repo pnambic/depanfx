@@ -294,7 +294,7 @@ public class DepanFxNodeViewEdgeVisibilityDialog
   @FXML
   private void handleClearSelection() {
     matcherVisibleProperties.values().stream()
-    .forEach(p -> p.set(false));
+        .forEach(p -> p.set(false));
   }
 
   @FXML

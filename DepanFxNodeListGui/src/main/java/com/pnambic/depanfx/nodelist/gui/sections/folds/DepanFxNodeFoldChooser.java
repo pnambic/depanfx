@@ -147,6 +147,7 @@ public class DepanFxNodeFoldChooser {
       super.updateItem(displayName, empty);
 
       if (empty) {
+        setText(null);
         setGraphic(null);
         setContextMenu(null);
         return;

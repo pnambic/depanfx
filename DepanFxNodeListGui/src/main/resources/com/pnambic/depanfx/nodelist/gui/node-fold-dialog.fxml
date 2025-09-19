@@ -23,22 +23,14 @@
          AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"
          AnchorPane.topAnchor="10" AnchorPane.bottomAnchor="10">
 
-         <Label text="Node folds...">
-            <contextMenu>
-                <ContextMenu>
-                    <items>
-                        <MenuItem text="Select All"
-                            onAction="#handleSelectAll"/>
-                        <MenuItem text="Clear Selection"
-                            onAction="#handleClearSelection"/>
-                        <MenuItem text="Invert Selection"
-                            onAction="#handleInvertSelection"/>
-                    </items>
-                </ContextMenu>
-            </contextMenu>
-         </Label>
+         <HBox spacing="10">
+            <Label text="Node foldings" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label text="New Node Folding..."
+                onMouseClicked="#onNewNodeFolding" />
+         </HBox>
 
-         <TableView fx:id="nodeFoldTable" editable="true"
+         <TableView fx:id="captureFoldTable" editable="true"
             VBox.vgrow="ALWAYS">
             <columns>
                 <TableColumn text="Node Fold Name"
@@ -58,13 +50,14 @@
 
          <HBox>
             <Button text="Add Row" onAction="#addNodeFoldRow" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button text="Save All" onAction="#saveAllFoldings" />
          </HBox>
 
+         <Region VBox.vgrow="ALWAYS" />
+
          <HBox spacing="10">
-            <Button text="Cancel" onAction="#handleCancel"/>
-            <Region HBox.hgrow="ALWAYS" />
-            <Button text="Apply" onAction="#handleApply"/>
-            <Button text="Confirm" onAction="#handleConfirm"/>
+            <Button text="Close" onAction="#handleCancel"/>
          </HBox>
 
    </VBox>

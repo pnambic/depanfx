@@ -22,6 +22,7 @@ import com.pnambic.depanfx.graph_doc.persistence.GraphDocPersistenceContribution
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
+import com.pnambic.depanfx.nodelist.gui.sections.folds.NodeListFoldController;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
@@ -191,7 +192,9 @@ public class DepanFxNodeListViewerConfiguration {
         DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
 
       DepanFxNodeFoldController nodeFolding =
-          new NodeListFoldController(workspace);
+          new NodeListFoldController(
+              workspace, nodeListRsrc.getResource().getGraphDocResource());
+
       DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(
           DepanFxWorkspaceFactory.buildDocTitle(nodeListRsrc.getDocument()),
           workspace,
@@ -260,7 +263,7 @@ public class DepanFxNodeListViewerConfiguration {
           graphRsrc.getDocument()) + " nodes";
 
       DepanFxNodeFoldController nodeFolding =
-          new NodeListFoldController(workspace);
+          new NodeListFoldController(workspace, graphRsrc);
 
       DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(
           viewerTitle, workspace, sceneSrvc.getDialogRunner(),

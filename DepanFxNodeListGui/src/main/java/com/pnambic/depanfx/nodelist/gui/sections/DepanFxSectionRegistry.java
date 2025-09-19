@@ -30,6 +30,10 @@ public class DepanFxSectionRegistry {
       tree.setSectionDataRsrc(
           (DepanFxWorkspaceResource<DepanFxTreeSectionData>) dataRsrc);
       return true;
+    case DepanFxFoldSection fold:
+      fold.setSectionDataResource(
+          (DepanFxWorkspaceResource<DepanFxFoldSectionData>) dataRsrc);
+      return true;
     case DepanFxFlatSection flat:
       flat.setSectionDataRsrc(
           (DepanFxWorkspaceResource<DepanFxFlatSectionData>) dataRsrc);

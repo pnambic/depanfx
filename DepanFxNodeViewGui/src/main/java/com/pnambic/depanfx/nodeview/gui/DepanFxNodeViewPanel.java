@@ -410,9 +410,9 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     }
   }
 
-  public void installNodeFoldResource(
+  public void installCaptureFoldResource(
       DepanFxWorkspaceResource<DepanFxNodeFoldData> foldRsrc) {
-    nodeFold.appendNodeFoldResource(foldRsrc);
+    nodeFold.appendCaptureFoldResource(foldRsrc);
   }
 
   public Map<GraphNode, DepanFxNodeLocationData> getNodeLocations(
@@ -1084,7 +1084,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
         nodeDisplay.forUpdateAvailableFilterResource(),
         nodeDisplay.forUpdateVisibleFilterResource(),
-        nodeFold.forUpdateNodeFoldResource(),
+        forUpdateNodeFoldResource(),
         nodeDisplay.getNodeDisplayResource(),
         nodeDisplay.getRemainderVisibility(),
         nodeDisplay.getRemainderDisplay(),
@@ -1097,6 +1097,12 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
         edgeDisplay.getRemainderLabel(),
         edgeDisplay.getRemainderDisplay());
     return result;
+  }
+
+  private List<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
+  forUpdateNodeFoldResource() {
+    return nodeFold.streamUpdateNodeFoldResource()
+        .collect(Collectors.toList());
   }
 
   private DepanFxNodeViewSceneData buildSceneData() {
@@ -1132,9 +1138,9 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     getViewEdges().forEach(edgeDisplay::installEdge);
 
     nodeFold = new NodeViewFoldController(
-        workspace, joglPane, this::getNodeLocation);
+        workspace, getGraphDocRsrc(), joglPane, this::getNodeLocation);
     viewData.getNodeFoldResources().stream()
-        .forEach(nodeFold::appendNodeFoldResource);
+        .forEach(nodeFold::appendCaptureFoldResource);
   }
 
   private void updateViewNodeLocation(

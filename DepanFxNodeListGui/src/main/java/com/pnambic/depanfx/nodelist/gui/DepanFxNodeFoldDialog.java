@@ -16,10 +16,10 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.nodelist.gui.sections.folds.DepanFxNodeFoldChooser;
+import com.pnambic.depanfx.nodelist.gui.sections.folds.DepanFxNodeFoldToolDialog;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
-import com.pnambic.depanfx.perspective.DepanFxBaseDialog;
-import com.pnambic.depanfx.perspective.DepanFxProctor;
+import com.pnambic.depanfx.perspective.DepanFxWorkspaceDialog;
 import com.pnambic.depanfx.scene.DepanFxActionTableCell;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -35,6 +35,9 @@ import net.rgielen.fxweaver.core.FxmlView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.Optional;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -43,11 +46,17 @@ import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
+/**
+ * All changes are live on the attached DepanFxNodeFoldController.
+ * No cancel, apply, or confirm actions are useful.
+ *
+ * A close button is available as a visual cue for closing the dialog.
+ */
 @DepanFxFxmlDialog
 @FxmlView("node-fold-dialog.fxml")
-public class DepanFxNodeFoldDialog extends DepanFxBaseDialog {
+public class DepanFxNodeFoldDialog extends DepanFxWorkspaceDialog {
 
-  @SuppressWarnings("unused")
+  // @SuppressWarnings("unused")
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeFoldDialog.class);
 
@@ -55,16 +64,19 @@ public class DepanFxNodeFoldDialog extends DepanFxBaseDialog {
 
   public static final String NODE_FOLDING_TITLE = "Node Folding";
 
-  private static final String SELECT_NODE_FOLDER_ITEM = "Select Node Folder...";
+  public static final String SELECT_NODE_FOLDING_ITEM =
+      "Select Node Folding...";
+
+  public static final String SAVE_NODE_FOLDER_ITEM = "Save Node Folding";
 
   private final DepanFxDialogRunner dialogRunner;
 
   @FXML
   private TableView<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
-  nodeFoldTable;
+  captureFoldTable;
 
   private ObservableList<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
-  nodeFoldData;
+  captureFoldData;
 
   // Where the changes happen.
   private DepanFxNodeFoldController nodeFoldings;
@@ -87,23 +99,19 @@ public class DepanFxNodeFoldDialog extends DepanFxBaseDialog {
 
   public void setNodeFoldings(DepanFxNodeFoldController nodeFoldings) {
     this.nodeFoldings = nodeFoldings;
-    nodeFoldings.streamNodeFoldResources()
-        .forEach(nodeFoldData::add);
+    nodeFoldings.streamCaptureFoldResources()
+        .forEach(captureFoldData::add);
   }
 
   @Override
   public Scene getScene() {
-    return nodeFoldTable.getScene();
-  }
-
-  @Override
-  protected void checkInput(DepanFxProctor proctor) {
+    return captureFoldTable.getScene();
   }
 
   @FXML
   public void initialize() {
     DepanFxTableColumnBinder<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
-    columnBinder = new DepanFxTableColumnBinder<>(nodeFoldTable);
+    columnBinder = new DepanFxTableColumnBinder<>(captureFoldTable);
 
     TableColumn<DepanFxWorkspaceResource<DepanFxNodeFoldData>, String>
     labelColumn = columnBinder.next();
@@ -128,13 +136,37 @@ public class DepanFxNodeFoldDialog extends DepanFxBaseDialog {
 
     // Size filePath to remaining room
     rsrcColumn.prefWidthProperty().bind(
-        nodeFoldTable.widthProperty()
+        captureFoldTable.widthProperty()
             .subtract(labelColumn.widthProperty())
             .subtract(rowActionColumn.widthProperty())
             .subtract(1));
 
-    nodeFoldData = FXCollections.observableArrayList();
-    nodeFoldTable.setItems(nodeFoldData);
+    captureFoldData = FXCollections.observableArrayList();
+    captureFoldTable.setItems(captureFoldData);
+  }
+
+  @FXML
+  public void onNewNodeFolding() {
+    DepanFxWorkspaceResource<DepanFxNodeFoldData> foldInfo =
+        nodeFoldings.createFoldResource(workspace);
+
+    DepanFxNodeFoldToolDialog.runCreateDialog(
+        workspace, dialogRunner, foldInfo)
+        .getController()
+        .getToolResource()
+        .ifPresent(this::addNodeFoldRow);
+  }
+
+  @FXML
+  public void saveAllFoldings() {
+    nodeFoldings.streamCaptureFoldResources()
+        .flatMap(r -> saveNodeFolding(r).stream())
+        .forEach(r -> {
+          int index = findFoldingResourceIndex(r);
+          if (index >= 0) {
+            updateRow(index, r);
+          }
+        });
   }
 
   @FXML
@@ -146,46 +178,45 @@ public class DepanFxNodeFoldDialog extends DepanFxBaseDialog {
 
   private void addNodeFoldRow(
       DepanFxWorkspaceResource<DepanFxNodeFoldData> foldRsrc) {
-    nodeFoldData.add(foldRsrc);
-    nodeFoldings.appendNodeFoldResource(foldRsrc);
-  }
-
-  /////////////////////////////////////
-  // Tool Dialog protected overrides
-
-  @Override
-  protected String getInputCheckFailureText() {
-    return  "Node Fold Save Confirmation Error";
-  }
-
-  /////////////////////////////////////
-  // FXML handlers.
-
-  @FXML
-  protected void handleApply() {
-  }
-
-  @FXML
-  protected void handleConfirm() {
-  }
-
-  @FXML
-  protected void handleSelectAll() {
-  }
-
-  @FXML
-  protected void handleClearSelection() {
-  }
-
-  @FXML
-  protected void handleInvertSelection() {
+    captureFoldData.add(foldRsrc);
+    nodeFoldings.appendCaptureFoldResource(foldRsrc);
   }
 
   private void updateRow(
       int index,
       DepanFxWorkspaceResource<DepanFxNodeFoldData> foldRsrc) {
 
-    nodeFoldData.add(index, foldRsrc);
+    captureFoldData.set(index, foldRsrc);
+    nodeFoldings.installCaptureFoldResourceAt(index, foldRsrc);
+  }
+
+  private void saveIndexedFolding(int index) {
+    saveNodeFolding(nodeFoldings.forUpdateCaptureFoldResourceAt(index))
+        .ifPresent(r -> updateRow(index, r));
+  }
+
+  private Optional<DepanFxWorkspaceResource<DepanFxNodeFoldData>>
+  saveNodeFolding(
+      DepanFxWorkspaceResource<DepanFxNodeFoldData> foldUpdateRsrc) {
+
+    try {
+      return getWorkspace().saveDocument(
+          foldUpdateRsrc.getDocument(), foldUpdateRsrc.getResource());
+    } catch (IOException err) {
+      LOG.error("Unable to update fold info for document {}",
+          DepanFxProjects.getDocumentLabel(foldUpdateRsrc.getDocument()),err);
+    }
+    return Optional.empty();
+  }
+
+  private int findFoldingResourceIndex(
+      DepanFxWorkspaceResource<DepanFxNodeFoldData> foldDataRsrc) {
+    for (int i = 0; i < captureFoldData.size(); ++i) {
+      if (captureFoldData.get(i).getDocument().equals(foldDataRsrc.getDocument())) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   /////////////////////////////////////
@@ -195,13 +226,15 @@ public class DepanFxNodeFoldDialog extends DepanFxBaseDialog {
       extends DepanFxActionTableCell<DepanFxWorkspaceResource<DepanFxNodeFoldData>> {
 
     public DisplayActions() {
-      super(nodeFoldData);
+      super(captureFoldData);
     }
 
     @Override
     protected void populateContextMenu(DepanFxContextMenuBuilder builder) {
-      builder.appendActionItem(SELECT_NODE_FOLDER_ITEM,
+      builder.appendActionItem(SELECT_NODE_FOLDING_ITEM,
           e -> runNodeFoldChooser(getIndex()));
+      builder.appendActionItem(SAVE_NODE_FOLDER_ITEM,
+          e -> saveIndexedFolding(getIndex()));
     }
 
     private void runNodeFoldChooser(int index) {

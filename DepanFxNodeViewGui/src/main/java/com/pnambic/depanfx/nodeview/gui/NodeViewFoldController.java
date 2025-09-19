@@ -16,6 +16,7 @@
 package com.pnambic.depanfx.nodeview.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel.TreeMode;
@@ -51,9 +52,10 @@ public class NodeViewFoldController extends DepanFxNodeFoldController {
 
   public NodeViewFoldController(
       DepanFxWorkspace workspace,
+      DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
       JoglPane joglPane,
       Function<GraphNode, DepanFxNodeLocationData> nodeLocationSrc) {
-    super(workspace);
+    super(workspace, graphDocRsrc);
     this.joglPane = joglPane;
     this.nodeLocationSrc = nodeLocationSrc;
   }

@@ -21,10 +21,12 @@ nav:
     - Node Lists:
       - Edge Matchers: reference/nodelist/EdgeMatchers.md
       - Node Annotations: reference/nodelist/NodeAnnotations.md
+      - Node Foldings: reference/nodelist/NodeFoldings.md
     - Node Views:
       - Flight Controls: reference/nodeview/keyboard_cmnds/KeyboardCommands.md
       - Mouse Commands: reference/nodeview/keyboard_cmnds/MouseCommands.md
       - Edge Filters: reference/nodeview/ViewPanelEdgeFilters.md
+      - Node Folds: reference/nodeview/ViewPanelNodeFolds.md
     - Resources:
       - Resource Kinds: reference/resources/resource_kinds/ResourceKinds.md
   - Release Notes:

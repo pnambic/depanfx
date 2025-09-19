@@ -135,7 +135,7 @@ public class DepanFxFoldSection extends DepanFxNodeTreeSection {
 
   @Override
   public DepanFxTreeModel getTreeModel() {
-    return getNodeFolding().getTreeModel(getNodeFoldResource()).get();
+    return getSectionFolding().getSectionTreeModel(getNodeFoldResource()).get();
   }
 
   @Override
@@ -143,18 +143,8 @@ public class DepanFxFoldSection extends DepanFxNodeTreeSection {
       DepanFxTreeModel treeModel, DepanFxNodeList sectionNodes) {
     DepanFxWorkspaceResource<DepanFxNodeFoldData> foldRsrc =
         getNodeFoldResource();
-    getNodeFolding().updateTreeModel(foldRsrc, treeModel);
+    getSectionFolding().updateSectionTreeModel(foldRsrc, treeModel);
     super.updateSectionNodes(sectionNodes);
-  }
-
-  private DepanFxFoldSectionData getSectionData() {
-    return sectionDataRsrc.getResource();
-  }
-
-  private void updateCompare() {
-    DepanFxFoldSectionData sectionData = sectionDataRsrc.getResource();
-    updateTreeCompare(
-        sectionData.getOrderDirection(), sectionData.getContainerOrder());
   }
 
   public void addTreeModel(DepanFxTreeModel subModel) {
@@ -201,6 +191,20 @@ public class DepanFxFoldSection extends DepanFxNodeTreeSection {
           getSectionLabel(), err);
     }
     return Optional.empty();
+  }
+
+  private NodeListFoldController getSectionFolding() {
+    return (NodeListFoldController) getNodeFolding();
+  }
+
+  private DepanFxFoldSectionData getSectionData() {
+    return sectionDataRsrc.getResource();
+  }
+
+  private void updateCompare() {
+    DepanFxFoldSectionData sectionData = sectionDataRsrc.getResource();
+    updateTreeCompare(
+        sectionData.getOrderDirection(), sectionData.getContainerOrder());
   }
 
   private DepanFxWorkspaceResource<DepanFxNodeFoldData> getNodeFoldResource() {

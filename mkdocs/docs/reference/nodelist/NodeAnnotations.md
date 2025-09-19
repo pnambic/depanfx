@@ -21,7 +21,7 @@ For presentation, simply show the entire contents of the blob.
 
 The presentation for other blobs can be more nuanced.
 For example, a Position blob carries the x, y, and location of a node.
-Presentation of a Posistion blob requires choosing which internal
+Presentation of a Position blob requires choosing which internal
 element should displayed and changed.
 
 ## Annotation Index
@@ -52,11 +52,11 @@ The Annotation options defines a text based annotation.
 Other choices for annotation info (Node Id, Position) support access
 to internally managed data properties.
 
-After defining the annotation to capture in an info stor,
+After defining the annotation to capture in an info store,
 the annotation index can be saved.
 Annotation index are saved with the same tool aware
 interface that capture the name for the annotation,
-a longer description for addtional detail,
+a longer description for additional detail,
 and the specification of a destination file.
 
 Once the annotation index is created,
@@ -141,9 +141,4 @@ Press the <Enter> key to complete the data entry.
 Updated values are not saved automatically to the info store.
 To avoid losing data, take advantage of the column's context
 menu and `Save Node Infos ..` often.
-
-
-
-
-
 

@@ -18,7 +18,9 @@ package com.pnambic.depanfx.nodelist.viewer;
 import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchersRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
+import com.pnambic.depanfx.nodelist.gui.sections.folds.NodeListFoldController;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.viewdata.DepanFxNodeListViewerData;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -27,6 +29,7 @@ import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.session.plugins.DepanFxSceneViewerRegistry;
 import com.pnambic.depanfx.session.viewdata.DepanFxBaseViewerData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
+import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -82,15 +85,17 @@ public class DepanFxNodeListViewerContribution
       DepanFxSceneService sceneService, DepanFxBaseViewerData baseData) {
 
     DepanFxNodeListViewerData viewerData = (DepanFxNodeListViewerData) baseData;
+    DepanFxWorkspaceResource<DepanFxNodeList> viewListRsrc =
+        viewerData.getNodeListRsrc();
     DepanFxNodeFoldController nodeFolding =
-        new NodeListFoldController(workspace);
+        new NodeListFoldController(
+            workspace, viewListRsrc.getResource().getGraphDocResource());
     return Optional.of(new DepanFxNodeListViewer(
         viewerData.getViewerTitle(),
         workspace, sceneService.getDialogRunner(),
         columnRegistry, infoRegistry,
         matcherRegistry, nodeFolding,
-        viewerData.getNodeListRsrc(),
-        viewerData.getTableViewRsrc()));
+        viewListRsrc, viewerData.getTableViewRsrc()));
   }
 
   @Override

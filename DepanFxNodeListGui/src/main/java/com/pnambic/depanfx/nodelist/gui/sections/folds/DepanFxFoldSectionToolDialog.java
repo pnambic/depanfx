@@ -137,6 +137,7 @@ public class DepanFxFoldSectionToolDialog
     DepanFxFoldSectionData sectionData = sectionRsrc.getResource();
     foldNestControl.setNodeFoldResource(sectionData.getNodeFoldResource());
 
+    // orderDirectionField is set by super.setToolResource()
     orderByField.setValue(sectionData.getOrderBy());
     containerOrderField.setValue(sectionData.getContainerOrder());
   }

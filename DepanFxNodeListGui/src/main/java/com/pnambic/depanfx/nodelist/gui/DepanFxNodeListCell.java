@@ -103,7 +103,7 @@ public class DepanFxNodeListCell
     if (choices.size() != 1) {
       return null;
     }
-    // If there is are multiple thread, sometimes the first item is null.
+    // If there are multiple threads, sometimes the first item is null.
     TreeItem<DepanFxNodeListMember> item = choices.get(0);
     if (item == null) {
       return null;
