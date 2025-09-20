@@ -29,6 +29,7 @@ nav:
       - Node Foldings: reference/nodeview/ViewPanelNodeFoldings.md
     - Resources:
       - Resource Kinds: reference/resources/resource_kinds/ResourceKinds.md
+    - Limitations: reference/Limitations.md
   - Release Notes:
     - Release v.0.0.0-i: release_notes/v0.0.0-i.md
 
