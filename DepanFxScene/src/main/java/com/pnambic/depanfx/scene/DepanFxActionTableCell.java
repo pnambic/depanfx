@@ -34,6 +34,8 @@ import javafx.util.Callback;
 public abstract class DepanFxActionTableCell<T> extends
     TableCell<T, String> {
 
+  public static final String DELETE_ACTION_ITEM = "Delete";
+
   private static final String HAMBURGER_MENU = "\u2261";
 
   private static final Logger LOG = LoggerFactory.getLogger(DepanFxActionTableCell.class);
@@ -105,7 +107,7 @@ public abstract class DepanFxActionTableCell<T> extends
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
     populateContextMenu(builder);
     builder.appendConditionalSeparator();
-    builder.appendActionItem("Delete", e -> deleteRow(getIndex()));
+    builder.appendActionItem(DELETE_ACTION_ITEM, e -> deleteRow(getIndex()));
     setContextMenu(builder.build());
   }
 

@@ -17,7 +17,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            prefWidth="440" prefHeight="1100"
+            prefWidth="440" prefHeight="400"
             fx:controller="com.pnambic.depanfx.nodelist.gui.DepanFxNodeFoldNodeListDialog">
    <VBox spacing="10" layoutX="10" layoutY="10"
          AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"
@@ -25,8 +25,8 @@
 
          <Label text="Node folding"/>
 
-         <HBox spacing="10">
-            <Label text="Nest Node"/>
+         <HBox spacing="10" fx:id="nestNodeHbox">
+            <Label text="Nest Node" fx:id="nestNodeLabel"/>
             <TextField fx:id="nestNameField" editable="false"
                   promptText="Select from available nodes."
                   HBox.hgrow="ALWAYS"/>
@@ -54,7 +54,7 @@
          <HBox spacing="10">
             <Label text="Fold Into"/>
             <ComboBox fx:id="foldIntoCombo" editable="false"
-                  promptText="Select from available nodes."
+                  promptText="Select from available node foldings."
                   HBox.hgrow="ALWAYS"/>
          </HBox>
 

@@ -177,39 +177,28 @@ saved to a persisted resource.
 Changes to a node folding that is associated with a node folding section are
 reflected in the node list immediately.
 
-## Adding a Node Fold to a Node Folding
+## Adding a Explicit Node Folding to a Node Folding Resource
 
 If any node foldings are active,
 either directly attached or attached via a node folding section,
-the context menu for all container nodes is enhanced with a `Fold Tree Into` item.
+the context menu for all container nodes is enhanced
+with a `Fold Tree Into` item.
+This feature allows the explicit creation of a group of nodes
+between a nest node and a collection of member nodes.
 
+Activating this menu item will bring up the fold selected nodes dialog.
+The table is filled with the nodes selected (checked) from the node list table.
 
+Select one of the candidate member nodes as the nest node
+for this node folding.
+Use the context menu in the edit column to choose a nest node.
 
+Chose the target node folding to receive the new node folding.
+This is chosen from the drop-down list of
+node foldings associated with the node list table.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+When these changes are confirmed,
+the node nestings for nest node and its members are added
+to the node folding resource.
+Don't forget to save the node folding resource after important changes.
 

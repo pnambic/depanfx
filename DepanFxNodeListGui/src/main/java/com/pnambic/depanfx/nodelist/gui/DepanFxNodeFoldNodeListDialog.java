@@ -16,16 +16,20 @@
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
+import com.pnambic.depanfx.nodelist.tree.DepanFxAdjacencyModel;
+import com.pnambic.depanfx.nodelist.tree.DepanFxSimpleAdjacencyModel;
+import com.pnambic.depanfx.nodelist.tree.DepanFxSimpleTreeModel;
 import com.pnambic.depanfx.perspective.DepanFxBaseDialog;
 import com.pnambic.depanfx.perspective.DepanFxProctor;
 import com.pnambic.depanfx.scene.DepanFxActionTableCell;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxFxmlDialog;
 import com.pnambic.depanfx.scene.DepanFxTableColumnBinder;
-import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -33,6 +37,12 @@ import net.rgielen.fxweaver.core.FxmlView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -40,9 +50,14 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
 
 @DepanFxFxmlDialog
@@ -51,7 +66,13 @@ public class DepanFxNodeFoldNodeListDialog extends DepanFxBaseDialog {
 
   public static final String FOLD_SELECTED_NODES_TITLE = "Fold Selected Nodes";
 
-  private final DepanFxDialogRunner dialogRunner;
+  public static final String USE_AS_NEST_NODE = "Use as nest node";
+
+  @FXML
+  private HBox nestNodeHbox;
+
+  @FXML
+  private Label nestNodeLabel;
 
   @FXML
   private TextField nestNameField;
@@ -76,10 +97,18 @@ public class DepanFxNodeFoldNodeListDialog extends DepanFxBaseDialog {
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeFoldNodeListDialog.class);
 
-  public DepanFxNodeFoldNodeListDialog(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
+  @Autowired
+  public DepanFxNodeFoldNodeListDialog(DepanFxWorkspace workspace) {
     super(workspace);
-    this.dialogRunner = dialogRunner;
+  }
+
+  public static void runNodeFoldDialog(
+      DepanFxNodeListTableAdapter tableAdapter) {
+
+    runNodeFoldDialog(
+        tableAdapter.getDialogRunner(),
+        tableAdapter,
+        tableAdapter.getSelection());
   }
 
   public static void runNodeFoldDialog(
@@ -90,6 +119,7 @@ public class DepanFxNodeFoldNodeListDialog extends DepanFxBaseDialog {
     Dialog<DepanFxNodeFoldNodeListDialog> editDlg =
         dialogRunner.createDialogAndParent(DepanFxNodeFoldNodeListDialog.class);
     editDlg.getController().setTable(tableAdapter);
+    editDlg.getController().setNodeList(depanFxNodeList);
     editDlg.runDialog(FOLD_SELECTED_NODES_TITLE);
   }
 
@@ -100,19 +130,40 @@ public class DepanFxNodeFoldNodeListDialog extends DepanFxBaseDialog {
 
   @Override
   protected void checkInput(DepanFxProctor proctor) {
+    if (nestNode == null) {
+      proctor.addError(
+          "No nest node selected",
+          "A node must be selected as the nest for these members.");
+    }
+    if (foldIntoCombo.getValue() == null) {
+      proctor.addError(
+          "No nede folding selected",
+          "A node folding must be selected as the container for this node folding.");
+    }
   }
 
   @FXML
   public void initialize() {
+    // Adjust node name and key fields sizes for the dialog.
+    setNodeNameField();
+    nestNodeHbox.widthProperty().addListener((v, o, n) -> {
+      setNodeNameField();
+    });
+    nestNodeLabel.widthProperty().addListener((v, o, n) -> {
+      setNodeNameField();
+    });
+
     DepanFxTableColumnBinder<GraphNode> columnBinder =
         new DepanFxTableColumnBinder<>(nodeListTable);
 
     TableColumn<GraphNode, String> nameColumn = columnBinder.next();
+    nameColumn.setCellFactory(c -> new NestNodeTableCell());
     nameColumn.setCellValueFactory(
         r -> new SimpleStringProperty(
             r.getValue().getId().getSimpleName()));
 
     TableColumn<GraphNode, String> keyColumn = columnBinder.next();
+    keyColumn.setCellFactory(c -> new NestNodeTableCell());
     keyColumn.setCellValueFactory(
         r -> new SimpleStringProperty(
             r.getValue().getId().getNodeKey()));
@@ -130,6 +181,15 @@ public class DepanFxNodeFoldNodeListDialog extends DepanFxBaseDialog {
 
     nodeListData = FXCollections.observableArrayList();
     nodeListTable.setItems(nodeListData);
+  }
+
+  private void setNodeNameField() {
+    double w = nestNodeHbox.getWidth()
+        - nestNodeLabel.getWidth()
+        - nestNodeHbox.getSpacing() * 2
+        - 20; // Fudge - outer vbox layout or anchor offsets?
+    nestNameField.setPrefWidth(w * 0.3);
+    nestKeyField.setPrefWidth(w * 0.7);
   }
 
   public void setTable(DepanFxNodeListTableAdapter tableAdapter) {
@@ -155,6 +215,27 @@ public class DepanFxNodeFoldNodeListDialog extends DepanFxBaseDialog {
 
   @FXML
   protected void handleConfirm() {
+    if (hasInputErrors()) {
+      return;
+    }
+    closeDialog();
+
+    DepanFxWorkspaceResource<GraphDocument> graphDocRsrc =
+        tableAdapter.getGraphDocResource();
+
+    Map<GraphNode, Collection<GraphNode>> adjMap = new HashMap<>();
+    Collection<GraphNode> memberNodes = new ArrayList<>(nodeListData);
+    adjMap.put(nestNode, memberNodes);
+    DepanFxAdjacencyModel adjModel = new DepanFxSimpleAdjacencyModel(adjMap);
+
+    Collection<GraphNode> roots = new ArrayList<>();
+    roots.add(nestNode);
+
+    DepanFxSimpleTreeModel foldModel =
+        new DepanFxSimpleTreeModel(graphDocRsrc, adjModel, roots);
+    tableAdapter.getNodeFolding().addTreeModel(
+        foldIntoCombo.getValue(), foldModel);
+    tableAdapter.resetTableView();
   }
 
   /////////////////////////////////////
@@ -163,7 +244,7 @@ public class DepanFxNodeFoldNodeListDialog extends DepanFxBaseDialog {
   private class DisplayActions
       extends DepanFxActionTableCell<GraphNode> {
 
-    private static final String USE_AS_NEST = null;
+    private static final String USE_AS_NEST = "Use as nest node";
 
     public DisplayActions() {
       super(nodeListData);
@@ -177,14 +258,13 @@ public class DepanFxNodeFoldNodeListDialog extends DepanFxBaseDialog {
   }
 
   private void selectNest(int nestIndex) {
-    GraphNode originalNest = nestNode;
     if (nestIndex >= nodeListData.size()) {
       return;
     }
     GraphNode chosenNest = nodeListData.get(nestIndex);
     nodeListData.remove(nestIndex);
-    if (originalNest != null) {
-      nodeListData.add(originalNest);
+    if (nestNode != null) {
+      nodeListData.add(nestNode);
     }
     setNodeFoldNest(chosenNest);
   }
@@ -193,6 +273,7 @@ public class DepanFxNodeFoldNodeListDialog extends DepanFxBaseDialog {
     nestNode = chosenNest;
     nestNameField.setText(chosenNest.getId().getSimpleName());
     nestKeyField.setText(chosenNest.getId().getNodeKey());
+    nodeListData.remove(chosenNest);
   }
 
   public void clearNodeFoldNest() {
@@ -223,6 +304,39 @@ public class DepanFxNodeFoldNodeListDialog extends DepanFxBaseDialog {
     public DepanFxWorkspaceResource<DepanFxNodeFoldData> fromString(
         String string) {
       throw new UnsupportedOperationException();
+    }
+  }
+
+  private class NestNodeTableCell extends TableCell<GraphNode, String> {
+
+    @Override
+    protected void updateItem(String item, boolean empty) {
+      super.updateItem(item, empty);
+
+      if (!empty) {
+        setText(item);
+        setContextMenu(buildContextMenu());
+        setOnMouseClicked(this::onMouseClicked);
+        return;
+      }
+      setContextMenu(null);
+      setText(null);
+      setOnMouseClicked(null);
+    }
+
+    private void onMouseClicked(MouseEvent event) {
+      if (event.getClickCount() == 2) {
+        selectNest(getIndex());
+      }
+    }
+
+    private ContextMenu buildContextMenu() {
+      DepanFxContextMenuBuilder result = new DepanFxContextMenuBuilder();
+      result.appendActionItem(USE_AS_NEST_NODE,
+          e -> selectNest(getIndex()));
+      result.appendActionItem(DepanFxActionTableCell.DELETE_ACTION_ITEM,
+          e -> nodeListData.remove(getIndex()));
+      return result.build();
     }
   }
 }

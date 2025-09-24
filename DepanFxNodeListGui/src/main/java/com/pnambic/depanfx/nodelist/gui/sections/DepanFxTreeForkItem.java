@@ -1,6 +1,7 @@
 package com.pnambic.depanfx.nodelist.gui.sections;
 
 import com.pnambic.depanfx.graph.model.GraphNode;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeFoldNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListGraphNode;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableAdapter;
@@ -9,6 +10,7 @@ import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -73,6 +75,10 @@ public class DepanFxTreeForkItem extends DepanFxNodeListForkItem {
     appendFoldIntoMultiMenu(builder, tableAdapter, choices);
   }
 
+  public void runFoldSelectionInto(DepanFxNodeListTableAdapter tableAdapter) {
+    DepanFxNodeFoldNodeListDialog.runNodeFoldDialog(tableAdapter);
+  }
+
   private void appendFoldIntoMenu(
       DepanFxContextMenuBuilder builder,
       DepanFxNodeListTableAdapter tableAdapter) {
@@ -92,12 +98,8 @@ public class DepanFxTreeForkItem extends DepanFxNodeListForkItem {
     builder.appendSubMenu(menuBuilder.build());
     if (selectNodes.getNodes().size() >= 2) {
       builder.appendActionItem(FOLD_SELECTION_INTO,
-          e -> runFoldSelectionInto());
+          e -> runFoldSelectionInto(tableAdapter));
     };
-  }
-
-  private void runFoldSelectionInto() {
-    LOG.warn("Fold selection into not implemented yet");
   }
 
   private void appendFoldIntoMultiMenu(
