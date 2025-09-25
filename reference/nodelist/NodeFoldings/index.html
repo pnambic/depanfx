@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../../img/favicon.ico">
+        <title>Node Foldings - DepanFX User Documentation</title>
+        <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../../css/brands.min.css" rel="stylesheet">
+        <link href="../../../css/solid.min.css" rel="stylesheet">
+        <link href="../../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../../..">DepanFX User Documentation</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Introduction</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../../introduction/Welcome/" class="dropdown-item">Welcome</a>
+</li>
+                                    
+<li>
+    <a href="../../../introduction/installation/Installation/" class="dropdown-item">Installation</a>
+</li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Initial Project</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="../../../introduction/initial_project/GettingStarted/" class="dropdown-item">Getting Started</a>
+</li>
+            
+<li>
+    <a href="../../../introduction/initial_project/CreateProject/" class="dropdown-item">Create A Project</a>
+</li>
+            
+<li>
+    <a href="../../../introduction/initial_project/FirstDependencyGraph/" class="dropdown-item">Create A Dependency Graph</a>
+</li>
+            
+<li>
+    <a href="../../../introduction/initial_project/SaveTheSession/" class="dropdown-item">Save The Session</a>
+</li>
+            
+<li>
+    <a href="../../../introduction/initial_project/Summary/" class="dropdown-item">Summary</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Lists And Views</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="../../../introduction/lists_and_views/Introduction/" class="dropdown-item">Node Lists and Views Panel</a>
+</li>
+            
+<li>
+    <a href="../../../introduction/lists_and_views/NodeListPanel/" class="dropdown-item">Node List Panel</a>
+</li>
+            
+<li>
+    <a href="../../../introduction/lists_and_views/NodeViewPanel/" class="dropdown-item">Node View Panel</a>
+</li>
+            
+<li>
+    <a href="../../../introduction/lists_and_views/Summary/" class="dropdown-item">Congratulations</a>
+</li>
+    </ul>
+  </li>
+                                    
+<li>
+    <a href="../../../introduction/Summary/" class="dropdown-item">Congratulations</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Reference</a>
+                                <ul class="dropdown-menu">
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Node Lists</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="../EdgeMatchers/" class="dropdown-item">Edge Matchers</a>
+</li>
+            
+<li>
+    <a href="../NodeAnnotations/" class="dropdown-item">Node Annotations</a>
+</li>
+            
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">Node Foldings</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Node Views</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="../../nodeview/keyboard_cmnds/KeyboardCommands/" class="dropdown-item">Flight Controls</a>
+</li>
+            
+<li>
+    <a href="../../nodeview/keyboard_cmnds/MouseCommands/" class="dropdown-item">Mouse Commands</a>
+</li>
+            
+<li>
+    <a href="../../nodeview/ViewPanelEdgeFilters/" class="dropdown-item">Edge Filters</a>
+</li>
+            
+<li>
+    <a href="../../nodeview/ViewPanelNodeFolds/" class="dropdown-item">Node Folds</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Resources</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="../../resources/resource_kinds/ResourceKinds/" class="dropdown-item">Resource Kinds</a>
+</li>
+    </ul>
+  </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Release Notes</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../../release_notes/v0.0.0-i/" class="dropdown-item">Release v.0.0.0-i</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../NodeAnnotations/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../../nodeview/keyboard_cmnds/KeyboardCommands/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#node-foldings" class="nav-link">Node Foldings</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#node-folding-behavior" class="nav-link">Node Folding Behavior</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#creating-a-node-folding" class="nav-link">Creating a Node Folding</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#attaching-a-node-folding-to-a-node-list" class="nav-link">Attaching a Node Folding to a Node List</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#capturing-a-node-hierarchy-as-a-node-folding" class="nav-link">Capturing a Node Hierarchy as a Node Folding</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#node-fold-sections" class="nav-link">Node Fold Sections</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#adding-a-node-folding-section-to-a-node-list-view" class="nav-link">Adding a Node Folding Section to a Node List View</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#adding-a-node-fold-to-a-node-folding" class="nav-link">Adding a Node Fold to a Node Folding</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="node-foldings">Node Foldings</h1>
+<p>Node foldings capture a membership relation between
+a nest node and a group of member nodes.</p>
+<p>This captured relation can be based on existing relations,
+such as the Java package membership hierarchy,
+or it can be created individual from lists of nodes.
+It can be used to persist the transient hierarchy displayed
+by a tree section for other analysis tools.</p>
+<p>One common application of node foldings are with the node view panel.
+Node foldings can be used in
+the <a href="../../nodeview/ViewPanelNodeFolds/">node view panel</a>
+to concentrate the display, with a focus on the higher-scale members.</p>
+<h2 id="node-folding-behavior">Node Folding Behavior</h2>
+<p>The behavior of folded nodes is similar to a tree or nesting dolls.</p>
+<p>One node acts as a nest, with a group of nodes as its members.
+This can be applied recursively,
+with each member of one nest node being the nest node for its
+own group of nodes.</p>
+<p>The relation between a nest node and each of its members is captured
+as a node nesting.
+The node nesting identifies a single member node and a single nest node.</p>
+<p>A node folding is a collection of node nestings.
+Representing a large membership hierarchy as a node folding
+creates a large number of node nestings.</p>
+<p>Conceptually, a node folding represents a new relation
+and a new set of edges over the nodes of the underlying graph.
+This new, user-defined relation effectively extends the graph model
+for the referenced graph.
+The new relation is implicitly defined by the
+persistent document that contains the node folding.</p>
+<p>As long as a node folding can be treated as an acyclic graph,
+a node folding can be used in many tree based tools.
+These supported tools include node folding sections
+and node view panels.
+If the node folding includes cycles,
+it should not be used with tools that require acyclic graphs.</p>
+<p>An individual node may be part of multiple node foldings.
+Since each node folding is tracked as separate resource,
+any node's inclusion in a specific folding can be checked through
+the that folding's resource.</p>
+<p>Both node lists and node views allow for multiple node foldings.
+Multiple node foldings are processed in order,
+with any filtering applied on a first-recognized basis.</p>
+<p>Since a node folding defines relations between nodes of a specific graph,
+a node folding is always associated with that graph.
+A newly created node folding is empty.
+Both the node list panel and the node view panel provide
+actions to modify an attached node folding.
+New nestings can be added, existing foldings can be modified or deleted,
+and their display state can be changed.</p>
+<h2 id="creating-a-node-folding">Creating a Node Folding</h2>
+<p>A node folding is always associated with a specific graph.
+In order to create a node folding for a graph,
+activate the context menu for a graph (right mouse)
+and select the <code>Create Node Folding...</code> item.</p>
+<p>As with other tools, enter the name for the node folding,
+a longer description for additional detail,
+and the specification of a destination file.</p>
+<p>The newly created node folding is created empty.</p>
+<p>The editors for capture folds and fold sections also
+have convenience links to create a new node folding.</p>
+<h2 id="attaching-a-node-folding-to-a-node-list">Attaching a Node Folding to a Node List</h2>
+<p>A node folding can be attached directly to a node list.
+Although the editing options are limited,
+this can be a quick process to capture a membership hierarchy
+or other discovered relation
+as a reusable node folding.</p>
+<p>From the node list panel's context menu,
+select the <code>Node Folding...</code> item.
+Selecting this item will bring up the node list's
+node folding table editor.</p>
+<p>The node folding table editor manages only the directly attached
+capture foldings.
+Node foldings associated with fold sections are controlled
+directly by the fold section.</p>
+<p>Multiple node foldings for the current graph can be added or removed
+from the node list.
+Each available folding will be shown as an option
+for the <code>Fold Into</code> UX actions.</p>
+<p>Node foldings that are attached directly to a node list
+can only be extended.
+This can be very efficient for the construction of routine
+node foldings, such as captured membership hierarchies.
+The node folding table editor provides a context menu
+<code>Save Node Folding</code> action to save individual node folding.
+It also provides an <code>Save All</code> action to save all of the capture node folding
+associated with the node list.</p>
+<p>In order to delete relations or otherwise modify a node folding,
+it should be added to the node list as a section.</p>
+<h2 id="capturing-a-node-hierarchy-as-a-node-folding">Capturing a Node Hierarchy as a Node Folding</h2>
+<p>If a node list is associated with one or more node foldings,
+the <code>Fold Tree Into</code> pop up menu item is included with
+the context menu for all tree items in the tree section.</p>
+<p>The <code>Fold Tree Into</code> pop up menu item shows a list of the
+attached node folding resources.
+After selecting the target folding, the node folding is
+extended with new node nestings that capture the nest and members relation.</p>
+<p>The additional node nestings are not immediately saved.
+Use the save actions from the node list table editor to ensure
+that the node nestings from the captured hierarchy are persisted
+and available to other tools.</p>
+<h2 id="node-fold-sections">Node Fold Sections</h2>
+<p>A node fold section is very similar to a tree section.
+Both sections present a hierarchy over some set of relations between the nodes.
+For a tree section, the related nodes are defined by an edge matcher.
+For a node fold section, the related nodes are directly
+defined in the node fold document.</p>
+<h2 id="adding-a-node-folding-section-to-a-node-list-view">Adding a Node Folding Section to a Node List View</h2>
+<p>Node fold sections present the relations of the node folding
+as a hierarchy over its collection of node nestings.</p>
+<p>Node fold sections provide a number of actions to modify individual
+node folds.</p>
+<p>To create a node fold section, use the node node list table context menu
+to create a new fold section.
+From the node list table's tab, activate the context menu and
+select the items <code>Table View</code> &gt; <code>Insert Section</code> &gt; <code>Insert Fold Section</code> &gt; ``.
+This adds a new fold section to the node list.</p>
+<p>The newly created fold section should be configured immediately after
+it is created.
+Newly created fold sections have a scratch node folding document,
+and changes can easily be lost.</p>
+<p>Activate the section's context menu, and select the <code>Edit Fold Section...</code>
+item.
+This will bring up the fold section editor.</p>
+<p>The node folding resource for the fold section will be blank.
+Use the <code>Browse</code> action or the <code>New Node Folding...</code> action
+to associated the fold section with a persisted node folding resource.</p>
+<p>As with other section definitions, fill in the section label,
+select the display options, and set the node ordering options as desired.
+As with other tools, enter the name for the folding section,
+a longer description for additional detail,
+select a destination file.
+Upon commit, the fold section will update for the changes.</p>
+<p>This configuration ensure that changes to the node foldings can be
+saved to a persisted resource.</p>
+<p>Changes to a node folding that is associated with a node folding section are
+reflected in the node list immediately.</p>
+<h2 id="adding-a-node-fold-to-a-node-folding">Adding a Node Fold to a Node Folding</h2>
+<p>If any node foldings are active,
+either directly attached or attached via a node folding section,
+the context menu for all container nodes is enhanced with a <code>Fold Tree Into</code> item.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../../js/base.js"></script>
+        <script src="../../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

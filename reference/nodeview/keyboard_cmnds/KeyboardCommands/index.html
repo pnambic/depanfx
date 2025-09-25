@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../../../../img/favicon.ico">
-        <title>Keyboard Commands - DepanFX User Documentation</title>
+        <title>Flight Controls - DepanFX User Documentation</title>
         <link href="../../../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../../../css/brands.min.css" rel="stylesheet">
@@ -107,11 +107,41 @@
                                 <ul class="dropdown-menu">
                                     
   <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Node Lists</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="../../../nodelist/EdgeMatchers/" class="dropdown-item">Edge Matchers</a>
+</li>
+            
+<li>
+    <a href="../../../nodelist/NodeAnnotations/" class="dropdown-item">Node Annotations</a>
+</li>
+            
+<li>
+    <a href="../../../nodelist/NodeFoldings/" class="dropdown-item">Node Foldings</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
     <a href="#" class="dropdown-item">Node Views</a>
     <ul class="dropdown-menu">
             
 <li>
-    <a href="./" class="dropdown-item active" aria-current="page">Keyboard Commands</a>
+    <a href="./" class="dropdown-item active" aria-current="page">Flight Controls</a>
+</li>
+            
+<li>
+    <a href="../MouseCommands/" class="dropdown-item">Mouse Commands</a>
+</li>
+            
+<li>
+    <a href="../../ViewPanelEdgeFilters/" class="dropdown-item">Edge Filters</a>
+</li>
+            
+<li>
+    <a href="../../ViewPanelNodeFolds/" class="dropdown-item">Node Folds</a>
 </li>
     </ul>
   </li>
@@ -145,12 +175,12 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../../../../introduction/Summary/" class="nav-link">
+                                <a rel="prev" href="../../../nodelist/NodeFoldings/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../../../resources/resource_kinds/ResourceKinds/" class="nav-link">
+                                <a rel="next" href="../MouseCommands/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -172,20 +202,22 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-bs-level="1"><a href="#node-view-panel-commands" class="nav-link">Node View Panel Commands</a>
+            <li class="nav-item" data-bs-level="1"><a href="#node-view-flight-controls" class="nav-link">Node View Flight Controls</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#node-view-motion" class="nav-link">Node View Motion</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#keyboard-commands" class="nav-link">Keyboard Commands</a>
+            <li class="nav-item" data-bs-level="2"><a href="#line-of-travel" class="nav-link">Line Of Travel</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#mouse-commands" class="nav-link">Mouse Commands</a>
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-bs-level="1"><a href="#line-of-sight" class="nav-link">Line of Sight</a>
               <ul class="nav flex-column">
               </ul>
             </li>
+            
+            <li class="nav-item" data-bs-level="1"><a href="#field-of-view" class="nav-link">Field of View</a>
+              <ul class="nav flex-column">
               </ul>
             </li>
         </ul>
@@ -193,187 +225,323 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="node-view-panel-commands">Node View Panel Commands</h1>
-<p>The node view panel provides a number of actions that may be triggered
-by user actions within the view rendering panel.</p>
-<h2 id="node-view-motion">Node View Motion</h2>
-<p>DepanFX provides a number of ways to change the view of node graph.
-Many of the view changing commands act on the viewpoint, or camera.
-The actions of these commands can be broken done into a number of categories.</p>
-<ul>
-<li>dolly: move the camera on the indicated direction,
-typically one of the three standard axes.</li>
-<li>rotate: rotate the camera on the indicated axis.</li>
-<li>forward: move the camera in the direction it is looking.</li>
-<li>reverse: move the camera in the away from the direction it is looking.</li>
-</ul>
-<p>Note that forward or reverse have effects that resemble zooming in or out.
-Zooming in changes the cameras field of view,
-effectively magnifying the included items.
-Moving forward brings the camera closer,
-which also magnifies the included items.</p>
-<h2 id="keyboard-commands">Keyboard Commands</h2>
-<p>The node view panel provides a number of keyboard commands.</p>
+<h1 id="node-view-flight-controls">Node View Flight Controls</h1>
+<p>The node view panel gives you several ways to change the perspective
+on the graph, altering how it is displayed.
+Conceptually, Depan controls a camera that is looking at the graph.
+There are several ways to control what the camera is looking at
+and how the camera moves through the code space.</p>
+<p><img alt="Gonzo Aflight" src="../Gonzo%20Flight%20184x120.png"
+  title="Inspector Gonzo examining the code space"
+  style="float:left; margin-right: 30px;" />
+Camera motion as modeled as flight controls.
+We can imagine Inspector Gonzo zooming through the code space
+in his little code ship checking for interesting structures.</p>
+<p><br clear="both"></p>
+<h2 id="line-of-travel">Line Of Travel</h2>
+<p>Motion through the code space is based on a line of travel.
+The target location for the line of travel
+is indicated by the yellow-orange cross-hairs.</p>
+<h3 id="motion">Motion</h3>
+<p>DepanFX provides forward and backward movement of the camera
+along the line of travel.
+The throttle commands provide for continuous movement through the code space.</p>
+<p>These actions do not change the line of travel.</p>
 <table>
 <thead>
 <tr>
 <th>Key</th>
-<th>Ctrl</th>
+<th>Modifier</th>
+<th>Group</th>
 <th>Action</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td>r</td>
+<td>none</td>
+<td>throttle</td>
+<td>throttle up</td>
+</tr>
+<tr>
+<td>f</td>
+<td>none</td>
+<td>throttle</td>
+<td>throttle down</td>
+</tr>
+<tr>
+<td>x</td>
+<td>none</td>
+<td>throttle</td>
+<td>cut throttle (stop)</td>
+</tr>
+<tr>
+<td>PgUp</td>
+<td>none</td>
+<td>motion</td>
+<td>move forward</td>
+</tr>
+<tr>
+<td>PgDn</td>
+<td>none</td>
+<td>motion</td>
+<td>move backward</td>
+</tr>
+<tr>
+<td>Scroll Fwd</td>
+<td>none</td>
+<td>motion</td>
+<td>move forward</td>
+</tr>
+<tr>
+<td>Scroll Rev</td>
+<td>none</td>
+<td>motion</td>
+<td>move backward</td>
+</tr>
+<tr>
 <td>Home</td>
-<td>no</td>
-<td>home</td>
-</tr>
-<tr>
-<td>Up</td>
-<td>no</td>
-<td>dolly y one unit positive</td>
-</tr>
-<tr>
-<td></td>
-<td>yes</td>
-<td>rotate about x 10° negative</td>
-</tr>
-<tr>
-<td>Down</td>
-<td>no</td>
-<td>dolly y one unit negative</td>
-</tr>
-<tr>
-<td></td>
-<td>yes</td>
-<td>rotate about x 10° positive</td>
-</tr>
-<tr>
-<td>Left</td>
-<td>no</td>
-<td>dolly x one unit positive</td>
-</tr>
-<tr>
-<td></td>
-<td>yes</td>
-<td>rotate about y 10° negative</td>
-</tr>
-<tr>
-<td>Right</td>
-<td>no</td>
-<td>dolly x one unit negative</td>
-</tr>
-<tr>
-<td></td>
-<td>yes</td>
-<td>rotate about y 10° positive</td>
-</tr>
-<tr>
-<td>Page Up</td>
-<td>no</td>
-<td>dolly z one unit positive</td>
-</tr>
-<tr>
-<td></td>
-<td>yes</td>
-<td>forward one unit</td>
-</tr>
-<tr>
-<td>Page Down</td>
-<td>no</td>
-<td>dolly z one unit negative</td>
-</tr>
-<tr>
-<td></td>
-<td>yes</td>
-<td>reverse one unit</td>
-</tr>
-<tr>
-<td>Plus ("+")</td>
-<td>no</td>
-<td>zoom in (90%)</td>
-</tr>
-<tr>
-<td>Minus ("-")</td>
-<td>no</td>
-<td>zoom out (110%)</td>
+<td>none</td>
+<td>motion</td>
+<td>move to home</td>
 </tr>
 </tbody>
 </table>
-<h2 id="mouse-commands">Mouse Commands</h2>
+<p>In addition to camera motion along the line of travel,
+the camera can be dollied perpendicular to the line
+of travel.</p>
+<p>These actions change both the camera position and
+the target location for the line of travel.</p>
 <table>
 <thead>
 <tr>
-<th>Gesture</th>
-<th>Shift</th>
-<th>Ctrl</th>
-<th>Alt</th>
+<th>Key</th>
+<th>Modifier</th>
+<th>Group</th>
 <th>Action</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Mouse Drag</td>
-<td>no</td>
-<td>no</td>
-<td>no</td>
-<td>Dolly camera</td>
+<td>Up Arrow</td>
+<td>none</td>
+<td>shift</td>
+<td>dolly down</td>
 </tr>
 <tr>
-<td>Mouse Drag</td>
-<td></td>
-<td></td>
-<td></td>
-<td>Move selection</td>
+<td>Down Arrow</td>
+<td>none</td>
+<td>shift</td>
+<td>dolly up</td>
 </tr>
 <tr>
-<td>Mouse Drag</td>
-<td>yes</td>
-<td>no</td>
-<td>no</td>
-<td>Selection rectangle</td>
+<td>Left Arrow</td>
+<td>none</td>
+<td>shift</td>
+<td>dolly left</td>
 </tr>
 <tr>
-<td>Mouse Click</td>
-<td>no</td>
-<td>no</td>
-<td>no</td>
-<td>Select node</td>
+<td>Right Arrow</td>
+<td>none</td>
+<td>shift</td>
+<td>dolly right</td>
+</tr>
+</tbody>
+</table>
+<h3 id="direction">Direction</h3>
+<p>The directional flight controls correspond to pitch, yaw, and roll
+changes in a three dimensional code space.
+These directional flight controls change the line of travel.</p>
+<p>The directional flight controls mate naturally with a joystick.
+On a keyboard, DepanFX uses the <code>qwe</code>|<code>asd</code> keys to
+provide similar features.</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Modifier</th>
+<th>Group</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>w</td>
+<td>none</td>
+<td>pitch</td>
+<td>nose down</td>
 </tr>
 <tr>
-<td>Mouse Click</td>
-<td>no</td>
-<td>yes</td>
-<td>no</td>
-<td>Add selected node</td>
+<td>s</td>
+<td>none</td>
+<td>pitch</td>
+<td>nose up</td>
 </tr>
 <tr>
-<td>Mouse Click</td>
-<td>no</td>
-<td>no</td>
-<td>yes</td>
-<td>Remove selected node</td>
+<td>q</td>
+<td>none</td>
+<td>yaw</td>
+<td>turn right</td>
 </tr>
 <tr>
-<td>Mouse Release</td>
-<td>X - drag option</td>
-<td>no</td>
-<td>no</td>
-<td>Select nodes</td>
+<td>e</td>
+<td>none</td>
+<td>yaw</td>
+<td>turn left</td>
 </tr>
 <tr>
-<td>Mouse Release</td>
-<td>X - drag option</td>
-<td>yes</td>
-<td>no</td>
-<td>Add selected nodes</td>
+<td>a</td>
+<td>none</td>
+<td>roll</td>
+<td>roll clockwise</td>
 </tr>
 <tr>
-<td>Mouse Release</td>
-<td>X - drag option</td>
-<td>no</td>
-<td>yes</td>
-<td>Remove selected nodes</td>
+<td>d</td>
+<td>none</td>
+<td>roll</td>
+<td>roll counter-clockwise</td>
+</tr>
+</tbody>
+</table>
+<p>The numeric keypad also provides these actions with a <code>Ctrl</code> modfier</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Modifier</th>
+<th>Group</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Up Arrow</td>
+<td>Ctrl</td>
+<td>pitch</td>
+<td>nose down</td>
+</tr>
+<tr>
+<td>Down Arrow</td>
+<td>Ctrl</td>
+<td>pitch</td>
+<td>nose up</td>
+</tr>
+<tr>
+<td>Left Arrow</td>
+<td>Ctrl</td>
+<td>yaw</td>
+<td>turn right</td>
+</tr>
+<tr>
+<td>Right Arrow</td>
+<td>Ctrl</td>
+<td>yaw</td>
+<td>turn left</td>
+</tr>
+<tr>
+<td>PgUp</td>
+<td>Ctrl</td>
+<td>roll</td>
+<td>roll clockwise</td>
+</tr>
+<tr>
+<td>PgDn</td>
+<td>Ctrl</td>
+<td>roll</td>
+<td>roll counter-clockwise</td>
+</tr>
+</tbody>
+</table>
+<h1 id="line-of-sight">Line of Sight</h1>
+<p>Normally, the line if sight is the same as the line of travel.
+However, sometimes its useful to be looking left
+as our code ship moves along.</p>
+<p>The line of sight controls follow the same pitch, yaw, and roll
+abstraction used by the line of travel controls.
+The <code>qwe</code>|<code>asd</code> keys map to joy-stick operations,
+but include a control key modifier</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Modifier</th>
+<th>Group</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>w</td>
+<td>Ctrl</td>
+<td>pitch</td>
+<td>nose down</td>
+</tr>
+<tr>
+<td>s</td>
+<td>Ctrl</td>
+<td>pitch</td>
+<td>nose up</td>
+</tr>
+<tr>
+<td>q</td>
+<td>Ctrl</td>
+<td>yaw</td>
+<td>turn right</td>
+</tr>
+<tr>
+<td>e</td>
+<td>Ctrl</td>
+<td>yaw</td>
+<td>turn left</td>
+</tr>
+<tr>
+<td>a</td>
+<td>Ctrl</td>
+<td>roll</td>
+<td>roll clockwise</td>
+</tr>
+<tr>
+<td>d</td>
+<td>Ctrl</td>
+<td>roll</td>
+<td>roll counter-clockwise</td>
+</tr>
+<tr>
+<td>Home</td>
+<td>Ctrl</td>
+<td>look</td>
+<td>look at line of travel</td>
+</tr>
+</tbody>
+</table>
+<p>There are no movement actions associated with the line of sight operations.</p>
+<h1 id="field-of-view">Field of View</h1>
+<p>The most common way to resolve more details about a graph's structure
+is to move the camera close enough for the interesting details
+to show themselves.</p>
+<p>In some siuations, it is approriate to zoom in or zoom out on a detail
+without changing the cameras location.</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Modifier</th>
+<th>Group</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- (minus)</td>
+<td>none</td>
+<td>zoom</td>
+<td>zoom out</td>
+</tr>
+<tr>
+<td>+ (plus)</td>
+<td>none</td>
+<td>zoom</td>
+<td>zoom in</td>
 </tr>
 </tbody>
 </table></div>
