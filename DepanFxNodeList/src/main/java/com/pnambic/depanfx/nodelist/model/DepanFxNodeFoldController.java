@@ -117,6 +117,13 @@ public abstract class DepanFxNodeFoldController {
         .findFirst();
   }
 
+  public boolean hasNode(GraphNode node) {
+    return streamStates()
+        .filter(s -> s.getTreeModel().hasNode(node))
+        .findAny()
+        .isPresent();
+  }
+
   /////////////////////////////////////
   // Capture foldings
 

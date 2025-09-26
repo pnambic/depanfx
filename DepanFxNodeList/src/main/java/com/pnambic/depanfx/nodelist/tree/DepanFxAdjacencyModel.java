@@ -14,4 +14,6 @@ public interface DepanFxAdjacencyModel {
   Collection<GraphNode> getAdjacentNodes(GraphNode node);
 
   Stream<NodeNest> streamNodeParent();
+
+  boolean hasNode(GraphNode node);
 }

@@ -12,6 +12,14 @@ public interface JoglMouseActionListener {
   void rotateCamera(double f, double g, double h);
 
   /**
+   *Action gestures.
+   *
+   * @param hits The objects under the mouse pointer
+   * at the time of the double click, may be empty.
+   */
+  void handleDoubleClick(Collection<Object> hits);
+
+  /**
    * Move the nodes of the current selection by the indicated amounts.
    */
   void moveSelection(double deltaX, double deltaY, double deltaZ);

@@ -44,6 +44,20 @@ public class DepanFxSimpleAdjacencyModel
   }
 
   @Override
+  public boolean hasNode(GraphNode node) {
+    // Parents are easiest, so check them first.
+    boolean result = adjacencyData.containsKey(node);
+    if (result) {
+      return true;
+    }
+    return adjacencyData.values().stream()
+        .flatMap(Collection::stream)
+        .filter(n -> n.equals(node))
+        .findAny()
+        .isPresent();
+  }
+
+  @Override
   public Stream<NodeNest> streamNodeParent() {
     return adjacencyData.entrySet().stream()
         .flatMap(e -> streamNodeParent(e.getKey(), e.getValue()));

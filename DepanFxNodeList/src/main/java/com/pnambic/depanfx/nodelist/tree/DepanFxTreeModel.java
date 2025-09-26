@@ -27,6 +27,11 @@ public interface DepanFxTreeModel {
   TreeMode getTreeMode(GraphNode node);
 
   /**
+   * Indicate if the {@link GraphNode} is part of this tree.
+   */
+  boolean hasNode(GraphNode node);
+
+  /**
    * Provides the collection of graph nodes that have no containers.
    * 
    * These graph nodes may not have any members.

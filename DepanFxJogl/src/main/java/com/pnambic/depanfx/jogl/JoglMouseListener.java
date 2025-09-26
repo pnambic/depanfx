@@ -81,6 +81,12 @@ public class JoglMouseListener implements MouseListener {
 
   @Override
   public void mouseClicked(MouseEvent event) {
+    if (event.getButton() == PRIMARY_BUTTON) {
+      if (event.getClickCount() == 2) {
+        Collection<Object> hits = getMouseHits(event.getX(), event.getY());
+        actionListener.handleDoubleClick(hits);
+      }
+    }
     LOG.debug("mouse clicked {} type {}",
         event.getClass().getName(), event.getEventType());
   }

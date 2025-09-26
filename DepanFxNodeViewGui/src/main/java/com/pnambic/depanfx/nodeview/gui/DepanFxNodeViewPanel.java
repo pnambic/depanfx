@@ -226,6 +226,11 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
    */
   private List<Stage> sideViews = new ArrayList<Stage>();
 
+  // UX Controls
+  private MenuItem openNestNodeItem;
+
+  private MenuItem shutNestNodeItem;
+
   // Only need to do this once.
   private DepanFxNodeList viewNodesAsNodeList;
 
@@ -713,6 +718,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     result.setOnShowing(e -> {
       populateEdgeVisibilityMenu(edgeVizMenu);
       populateNodeVisibilityMenu(nodeVizMenu);
+      configureNodeFoldingMenu();
     });
     return result;
   }
@@ -966,16 +972,29 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private Menu buildNodeFoldingMenu() {
     DepanFxMenuBuilder menuBuilder = new DepanFxMenuBuilder(NODE_FOLDING_MENU);
-    menuBuilder.appendActionItem(
+    // Only available if the node selection includes a nested node.
+    openNestNodeItem = menuBuilder.appendActionItem(
         OPEN_NEST_NODE_ITEM,
         e -> doOpenNestFoldingAction(e));
-    menuBuilder.appendActionItem(
+    shutNestNodeItem = menuBuilder.appendActionItem(
         SHUT_NEST_NODE_ITEM,
         e -> doShutNestFoldingAction(e));
+
+    // The node folding dialog is always available.
     menuBuilder.appendActionItem(
         NODE_FOLDING_DIALOG,
         e -> doSelectNodeFoldingAction());
     return menuBuilder.build();
+  }
+
+  private void configureNodeFoldingMenu() {
+    boolean disableNestActions = nodeSelection.streamSelectedNodes()
+        .filter(nodeFold::hasNode)
+        .findAny()
+        .isEmpty();
+
+    openNestNodeItem.setDisable(disableNestActions);
+    shutNestNodeItem.setDisable(disableNestActions);
   }
 
   private void doOpenNestFoldingAction(ActionEvent e) {
@@ -1220,6 +1239,13 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
     @Override
     public void rotateCamera(double f, double g, double h) {
+    }
+
+    @Override
+    public void handleDoubleClick(Collection<Object> hits) {
+      // Ignore provided hits; use current selection.
+      nodeSelection.streamSelectedNodes()
+          .forEach(nodeFold::toggleNest);
     }
 
     @Override

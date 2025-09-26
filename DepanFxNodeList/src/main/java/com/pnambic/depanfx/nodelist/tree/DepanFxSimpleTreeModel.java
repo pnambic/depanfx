@@ -76,6 +76,11 @@ public class DepanFxSimpleTreeModel
     return getMembers(node);
   }
 
+  @Override // DepanFxAdjacencyModel
+  public boolean hasNode(GraphNode node) {
+    return nodeMembers.hasNode(node);
+  }
+
   @Override // DepanFxTreeModel
   public DepanFxTreeModel subTreeModel(GraphNode subRoot) {
     DepanFxSimpleAdjacencyModel subModel = new DepanFxSimpleAdjacencyModel();
