@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>Release v.0.0.0-i - DepanFX User Documentation</title>
+        <title>Release v.0.0.0-j - DepanFX User Documentation</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../css/brands.min.css" rel="stylesheet">
@@ -166,11 +166,11 @@
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="../v0.0.0-j/" class="dropdown-item">Release v.0.0.0-j</a>
+    <a href="./" class="dropdown-item active" aria-current="page">Release v.0.0.0-j</a>
 </li>
                                     
 <li>
-    <a href="./" class="dropdown-item active" aria-current="page">Release v.0.0.0-i</a>
+    <a href="../v0.0.0-i/" class="dropdown-item">Release v.0.0.0-i</a>
 </li>
                                 </ul>
                             </li>
@@ -183,12 +183,12 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../v0.0.0-j/" class="nav-link">
+                                <a rel="prev" href="../../reference/Limitations/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" class="nav-link disabled">
+                                <a rel="next" href="../v0.0.0-i/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -210,25 +210,27 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-bs-level="1"><a href="#release-v000-i" class="nav-link">Release v0.0.0-i</a>
-              <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#improved-startup-and-shutdown" class="nav-link">Improved startup and shutdown</a>
+            <li class="nav-item" data-bs-level="1"><a href="#release-v000-j" class="nav-link">Release v0.0.0-j</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#info-columns" class="nav-link">Info Columns</a>
+            
+            <li class="nav-item" data-bs-level="1"><a href="#user-targeted-changes" class="nav-link">User Targeted Changes</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#node-view-node-selection-table" class="nav-link">Node View Node Selection Table</a>
+            
+            <li class="nav-item" data-bs-level="1"><a href="#internal-changes" class="nav-link">Internal Changes</a>
               <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#ux-improvements" class="nav-link">UX Improvements</a>
+            <li class="nav-item" data-bs-level="2"><a href="#hit-testing-now-works" class="nav-link">Hit Testing Now Works</a>
               <ul class="nav flex-column">
               </ul>
             </li>
             <li class="nav-item" data-bs-level="2"><a href="#version-updates" class="nav-link">Version Updates</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#performance-improvements" class="nav-link">Performance Improvements</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -243,98 +245,103 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="release-v000-i">Release <code>v0.0.0-i</code></h1>
-<p><strong><em>18-Apr-2025</em></strong></p>
-<p>Release v0.0.0-i is a significant release,
-with several important new features.
-There have been numerous improvements since
-the release of version <code>v0.0.0-i</code> on 20-Jan-2025 .</p>
-<p>These new features include improved startup and shutdown, info columns,
-and a new node selection list table for node view that shows the x, y, and z
-position of rendered nodes.</p>
-<h2 id="improved-startup-and-shutdown">Improved startup and shutdown</h2>
-<p>The startup code has been reworked to create internal resources in a more
-uniform fashion.
-In particular, Spring initialization was moved from the <code>Applications</code>'s
-<code>init()</code> methods to its <code>start()</code> method.
-This helps ensure entities are available on the correct threads.</p>
-<p>The changes to the startup code should eliminate the problem where MacOS
-could not open certain dialogs and panel.
-The fix has not been confirmed,
-but DepanFX continues to work fine on Windows 10.</p>
-<p>Session loading is deferred to slightly later in startup,
-so the main window should appear more promptly.
-If the session startup loads a large model,
-the main panel area may remain blank for a while.
-This is still no "busy" service for DepanFX.</p>
-<p>Shutdown from the <code>File</code> &gt; <code>Exit</code> menu is robust, and terminates the program.
-However, if a node view panel is active, the log output may show
-a stack trace from JOGL.
-Although this is undesirable, it should not cause any alarm or data loss.</p>
-<h2 id="info-columns">Info Columns</h2>
-<p>Info columns use DepanFX's notion of node info blocks
-that may be attached to node.</p>
-<p>Conceptually, a node info a defines a set of properties
-that may be associated with a node.
-Info columns allow you to select the info and the property that is
-displayed in the column.</p>
-<p>At present, two kinds of node info available:</p>
-<ol>
-<li>
-<p>Node Key Info:  Allows access to various elements of a node key.
-This replaces the previously available node key columns.</p>
-</li>
-<li>
-<p>Node Location Info:  Provides access to the x, y and z position of a node
-in a node view.
-The values are live and updatable.</p>
-</li>
-</ol>
-<h2 id="node-view-node-selection-table">Node View Node Selection Table</h2>
-<p>The node selection table for the node view panel now opens
-with a table definition that includes columns for the x, y, and z positions
-of each node.</p>
-<p>These position columns and the node name column are all implement as
-built-in info columns.
-Additionally, the selection table's table view is a predefined built-in.
-Although these built-in tool configurations cannot be changed,
-their settings can be used to create editable user-defined tools.</p>
-<h2 id="ux-improvements">UX Improvements</h2>
-<p>DepanFX's main menu bar is more responsive,
-with updates for action availability depending on panel context.
-For example, the Selection menu's actions (e.g. Clear Selection)
-are only available if selection is possible.</p>
-<p>Many of the tables in various tool editors now include an action cell
-indicated with a "hamburger" (&equiv;).
-The action cell provides convenient access to table commands that
-load resources, reorder table rows, or delete a table row.</p>
-<p>The welcome page now includes more suggestions
-about getting started with DepanFX.
-For example, it encourages a new user to create a project.</p>
-<p>If you close the welcome or workspace panel,
-you can reopen those panels through the new <code>View</code> &gt; <code>Panels</code> menu.</p>
-<p>This website, the DepanFX's Project Pages, is restructured.
-The Introduction is now broken down into multiple short steps.
-The Reference section now contains a few pages</p>
-<h2 id="version-updates">Version Updates</h2>
-<p>DepanFX now assumes that it running on a Java 21 compliance JVM.
-Other upgrades include:</p>
+<h1 id="release-v000-j">Release <code>v0.0.0-j</code></h1>
+<p><strong><em>Sep-2025</em></strong></p>
+<p>Release v0.0.0-j advances DepanFX with broad improvements across
+the entire application.</p>
+<h1 id="user-targeted-changes">User Targeted Changes</h1>
+<p>The major areas of user visible improvement include:</p>
 <ul>
-<li>JavaFX: 23.0.2</li>
-<li>Guava: 33.4.0-jre</li>
-<li>Spring: 3.4.2</li>
+<li>
+<p>Node info annotations: In an extension of the node info behavior,
+nodes can be associated with multiple text annotations.
+The <a href="../../reference/nodelist/NodeAnnotations/">Node Annotations</a> page
+provides details on these capabilities.</p>
+</li>
+<li>
+<p>View panel edge matchers: The view panel adds edge filters,
+providing a more precise mechanism to indicate the edges of interest.
+The <a href="../../reference/nodeview/ViewPanelEdgeFilters/">View Panel Edge Filters</a>
+page provides details on these capabilities.</p>
+</li>
+<li>
+<p>Node list edge matcher: This new kind edge matcher
+allows selection of edges based on head or tail nodes.
+This pairs wonderfully with the view panel's new edge filters,
+allowing one focus one the edges related to specific components.
+The <a href="../../reference/nodelist/EdgeMatchers/">Edge Filters</a> page
+provides details on these capabilities.</p>
+</li>
+<li>
+<p>View Panel flight controls: The viewpoint for rending the nodes
+in the graph is now base on "flight controls".
+Instead of moving along the absolute x, y, and z axis,
+the viewpoint is based on a line of travel and a line of sight.
+The provides a more natural way to focus on areas that appear interesting.
+You fly there.
+The <a href="../../reference/nodeview/keyboard_cmnds/KeyboardCommands/">Flight Controls</a>
+page describes the actions for various keys.</p>
+</li>
+<li>
+<p>Node folding:  Node folding allows the definion of explicit
+nest and member relations for nodes [<a href="../../reference/nodelist/NodeFoldings/">reference</a>].
+Hierarchies from derived trees in node list views can be saved
+as node foldings and reused with the view panel
+to expose interdependencies at higher levels of composition.</p>
+</li>
+<li>
+<p>Node foldings with node view:
+When a node folding is attached to a node view,
+many of the member nodes are hidden, with edges promoted to the visible nodes
+[<a href="../../reference/nodeview/ViewPanelNodeFoldings/">reference</a>].
+This can expose unexpected interdependencies among components
+at a higher level of composition.</p>
+</li>
+<li>
+<p>View panel hit testing:  Mouse selection of nodes within the view panel
+should be much more reliable.  Area selections (shift+drag) in particular
+should do the right thing.</p>
+</li>
+<li>
+<p>Node view merge:  Multiple view panel definitions files
+can be merged into a single view panel definition.
+Node traits, such as location,
+are merged into the resulting view definition file.
+This can help when a large system is layed out in sections
+for separate analysis work.</p>
+</li>
+<li>
+<p>User interface improvements:  In addition to a much friendly
+and more helpful Welcome panel, there are a number of smaller
+user interface improvements throughout DepanFx.
+These include better sizing of dialog box, better choices for implicit
+names, and menu system refinements for multi-choice operations.</p>
+</li>
 </ul>
-<p>More details on other component dependencies and their versions
-are available in the source code.</p>
-<p>The project's direct internal use XStream as been refactored
-to eliminate Java modularity problems in development.
-The non-modular XStream is now accessed via a <code>modxstream</code> wrapper
-that is its own "automatic" module.</p>
+<p>Full detail should be available in the reference sections for these features. </p>
+<h1 id="internal-changes">Internal Changes</h1>
+<p>Mostly smaller tweaks or user interface changes, these are included
+in the interests of completeness.</p>
+<h2 id="hit-testing-now-works">Hit Testing Now Works</h2>
+<p>A new scheme for hit testing has been implemented,
+and it is much more reliable.
+Individual mouse clicks tended to work,
+but the items selected in a drag selection could be very random.</p>
+<p>The new color-coding mechanism for hit testing is fast and consistent.
+Note that if a node is completely obstructed by neighbors
+and is underneath them all, that node is hard to select with the mouse.</p>
+<h2 id="version-updates">Version Updates</h2>
+<p>DepanFX targets Java 21 with JavaFX 23 and the latest Spring and Guava releases.</p>
+<p>DepanFX should work on any platform with a Java 21 JVM.
+The OpenGL and JavaFX libraries include modules for
+Windows, MacOs, and Linux.</p>
+<h2 id="performance-improvements">Performance Improvements</h2>
+<p>Various upgrades to the rendering layer (VBOs, etc)
+provide approximate 30% more frames per second (fps).</p>
 <h2 id="release-testing">Release Testing</h2>
-<p>Due to limited time and equipment, this release has only been tested on an
-Intel Window 10 laptop.
-Due to Java's "run anywhere" marketing,
-I have good faith that it will run well on your Java 21 compliant system.</p></div>
+<p>Testing focused on Windows 10 with Java 21.
+Functionality appears stable,
+but broader platform coverage is encouraged before wider distribution.</p></div>
             </div>
         </div>
 
