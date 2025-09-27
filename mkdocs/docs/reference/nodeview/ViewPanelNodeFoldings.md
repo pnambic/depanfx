@@ -1,6 +1,6 @@
 # Node Foldings in a Node View
 
-Node views are often consumers of [node foldings](../NodeFoldings.md).
+Node views are often consumers of [node foldings](../nodelist/NodeFoldings.md).
 When a node folding is attached to a node view,
 member nodes in the node folding move into their nest node,
 focusing the display on connections between the

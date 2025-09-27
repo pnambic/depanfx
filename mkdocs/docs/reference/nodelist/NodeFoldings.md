@@ -11,7 +11,7 @@ by a tree section for other analysis tools.
 
 One common application of node foldings are with the node view panel.
 Node foldings can be used in
-the [node view panel](../nodeview/ViewPanelNodeFolds.md)
+the [node view panel](../nodeview/ViewPanelNodeFoldings.md)
 to concentrate the display, with a focus on the higher-scale members.
 
 ## Node Folding Behavior
