@@ -61,11 +61,11 @@ public class DepanFxNodeListSections {
 
   public static final String SELECT_SECTION = "Select Section...";
 
-  private static final String INSERT_ABOVE_FOLD_SECTION =
-      "Insert Fold Section";
+  private static final String NEW_FOLD_ABOVE_SECTION =
+      "New Fold Section...";
 
-  private static final String INSERT_ABOVE_MEMBER_TREE_SECTION =
-      "Insert Member Tree Section";
+  private static final String NEW_TREE_ABOVE_SECTION =
+      "New Tree Section...";
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeListSections.class);
@@ -101,10 +101,10 @@ public class DepanFxNodeListSections {
     // Could be driven by a registry of section types.
     menuBuilder.appendSeparator();
     menuBuilder.appendActionItem(
-        INSERT_ABOVE_MEMBER_TREE_SECTION,
-        e -> runInsertMemberTreeSectionAction(tableAdapter, before));
+        NEW_TREE_ABOVE_SECTION,
+        e -> runInsertTreeSectionAction(tableAdapter, before));
     menuBuilder.appendActionItem(
-        INSERT_ABOVE_FOLD_SECTION,
+        NEW_FOLD_ABOVE_SECTION,
         e -> runInsertFoldSectionAction(tableAdapter, before));
 
     return menuBuilder.build();
@@ -149,10 +149,13 @@ public class DepanFxNodeListSections {
     return result;
   }
 
-  private static void runInsertMemberTreeSectionAction(
+  private static void runInsertTreeSectionAction(
       DepanFxNodeListTableAdapter tableAdapter,
       DepanFxNodeListSection before) {
     getInitialTreeSectionResource(tableAdapter)
+        .map(r -> DepanFxTreeSectionToolDialog.runCreateDialog(
+            r, tableAdapter.getDialogRunner()))
+        .flatMap(d -> d.getController().getToolResource())
         .ifPresent(r -> tableAdapter.insertSection(before, r));
   }
 
@@ -161,6 +164,9 @@ public class DepanFxNodeListSections {
       DepanFxNodeListTableAdapter tableAdapter,
       DepanFxNodeListSection before) {
     getInitialFoldSectionResource(tableAdapter)
+        .map(r -> DepanFxFoldSectionToolDialog.runEditDialog(
+            r, tableAdapter.getDialogRunner()))
+        .flatMap(d -> d.getController().getToolResource())
         .ifPresent(r -> tableAdapter.insertSection(before, r));
   }
 
