@@ -141,7 +141,7 @@
 </li>
             
 <li>
-    <a href="../../nodeview/ViewPanelNodeFolds/" class="dropdown-item">Node Folds</a>
+    <a href="../../nodeview/ViewPanelNodeFoldings/" class="dropdown-item">Node Foldings</a>
 </li>
     </ul>
   </li>
@@ -155,6 +155,10 @@
 </li>
     </ul>
   </li>
+                                    
+<li>
+    <a href="../../Limitations/" class="dropdown-item">Limitations</a>
+</li>
                                 </ul>
                             </li>
                             <li class="nav-item dropdown">
@@ -228,7 +232,7 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#adding-a-node-fold-to-a-node-folding" class="nav-link">Adding a Node Fold to a Node Folding</a>
+            <li class="nav-item" data-bs-level="2"><a href="#adding-a-explicit-node-folding-to-a-node-folding-resource" class="nav-link">Adding a Explicit Node Folding to a Node Folding Resource</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -249,7 +253,7 @@ It can be used to persist the transient hierarchy displayed
 by a tree section for other analysis tools.</p>
 <p>One common application of node foldings are with the node view panel.
 Node foldings can be used in
-the <a href="../../nodeview/ViewPanelNodeFolds/">node view panel</a>
+the <a href="../nodeview/ViewPanelNodeFolds.md">node view panel</a>
 to concentrate the display, with a focus on the higher-scale members.</p>
 <h2 id="node-folding-behavior">Node Folding Behavior</h2>
 <p>The behavior of folded nodes is similar to a tree or nesting dolls.</p>
@@ -376,10 +380,25 @@ Upon commit, the fold section will update for the changes.</p>
 saved to a persisted resource.</p>
 <p>Changes to a node folding that is associated with a node folding section are
 reflected in the node list immediately.</p>
-<h2 id="adding-a-node-fold-to-a-node-folding">Adding a Node Fold to a Node Folding</h2>
+<h2 id="adding-a-explicit-node-folding-to-a-node-folding-resource">Adding a Explicit Node Folding to a Node Folding Resource</h2>
 <p>If any node foldings are active,
 either directly attached or attached via a node folding section,
-the context menu for all container nodes is enhanced with a <code>Fold Tree Into</code> item.</p></div>
+the context menu for all container nodes is enhanced
+with a <code>Fold Tree Into</code> item.
+This feature allows the explicit creation of a group of nodes
+between a nest node and a collection of member nodes.</p>
+<p>Activating this menu item will bring up the fold selected nodes dialog.
+The table is filled with the nodes selected (checked) from the node list table.</p>
+<p>Select one of the candidate member nodes as the nest node
+for this node folding.
+Use the context menu in the edit column to choose a nest node.</p>
+<p>Chose the target node folding to receive the new node folding.
+This is chosen from the drop-down list of
+node foldings associated with the node list table.</p>
+<p>When these changes are confirmed,
+the node nestings for nest node and its members are added
+to the node folding resource.
+Don't forget to save the node folding resource after important changes.</p></div>
             </div>
         </div>
 
