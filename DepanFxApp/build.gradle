@@ -14,6 +14,33 @@ javafx {
   modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
+def supportedTargets = [
+  linux  : [classifier: 'linux', installerType: 'deb', installerOpts: ['--linux-shortcut'], imageOpts: []],
+  mac    : [classifier: 'mac', installerType: 'pkg', installerOpts: ['--mac-package-identifier', 'com.pnambic.depanfx'], imageOpts: []],
+  windows: [classifier: 'win', installerType: 'msi', installerOpts: ['--win-dir-chooser', '--win-menu', '--win-shortcut'], imageOpts: []]
+]
+
+def detectTargetOs() {
+  def current = org.gradle.internal.os.OperatingSystem.current()
+  if (project.hasProperty('targetOs')) {
+    def requested = (project.property('targetOs') as String).toLowerCase()
+    if (!supportedTargets.containsKey(requested)) {
+      throw new GradleException("Unsupported targetOs '${requested}'. Supported values are: ${supportedTargets.keySet().join(', ')}")
+    }
+    return requested
+  }
+  if (current.isWindows()) {
+    return 'windows'
+  }
+  if (current.isMacOsX()) {
+    return 'mac'
+  }
+  return 'linux'
+}
+
+def targetOs = detectTargetOs()
+def targetConfig = supportedTargets[targetOs]
+
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter'
   implementation 'org.springframework.boot:spring-boot-autoconfigure'
@@ -41,19 +68,11 @@ dependencies {
   implementation project(':DepanFxWorkspace')
   implementation project(':DepanFxWorkspaceGui')
 
-  // Cross platform "fat" jar
-  runtimeOnly "org.openjfx:javafx-base:$javafx.version:win"
-  runtimeOnly "org.openjfx:javafx-base:$javafx.version:linux"
-  runtimeOnly "org.openjfx:javafx-base:$javafx.version:mac"
-  runtimeOnly "org.openjfx:javafx-controls:$javafx.version:win"
-  runtimeOnly "org.openjfx:javafx-controls:$javafx.version:linux"
-  runtimeOnly "org.openjfx:javafx-controls:$javafx.version:mac"
-  runtimeOnly "org.openjfx:javafx-fxml:$javafx.version:win"
-  runtimeOnly "org.openjfx:javafx-fxml:$javafx.version:linux"
-  runtimeOnly "org.openjfx:javafx-fxml:$javafx.version:mac"
-  runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:win"
-  runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:linux"
-  runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:mac"
+  // Platform specific JavaFX runtime for the jlink image
+  runtimeOnly "org.openjfx:javafx-base:$javafx.version:${targetConfig.classifier}"
+  runtimeOnly "org.openjfx:javafx-controls:$javafx.version:${targetConfig.classifier}"
+  runtimeOnly "org.openjfx:javafx-fxml:$javafx.version:${targetConfig.classifier}"
+  runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:${targetConfig.classifier}"
 }
 
 application {
@@ -114,5 +133,20 @@ jlink {
   options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
   launcher {
     name = 'depanfx'
+    noConsole = targetOs != 'windows'
+    if (targetOs == 'windows') {
+      windowsScriptTemplate = project.layout.projectDirectory.file('gradle/windowsLauncherTemplate.txt').asFile
+    }
+  }
+  addExtraDependencies('javafx')
+
+  jpackage {
+    imageName = 'DepanFx'
+    appVersion = project.version.toString()
+    installerName = "DepanFx-${project.version}-${targetOs}"
+    installerType = targetConfig.installerType
+    skipInstaller = false
+    imageOptions += targetConfig.imageOpts
+    installerOptions += targetConfig.installerOpts
   }
 }

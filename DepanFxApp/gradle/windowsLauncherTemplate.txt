@@ -1,0 +1,21 @@
+@echo off
+setlocal ENABLEDELAYEDEXPANSION
+set DIR="%~dp0"
+set JAVA_EXEC="%DIR:"=%\java"
+set APP_HOME=%DIR:"=%\..\app
+set ARG_FILE=%APP_HOME%\depanfx-launcher.args
+
+del "%ARG_FILE%" >nul 2>nul
+
+:: Build a launcher argument file to prevent Windows command length issues
+>>"%ARG_FILE%" echo --module-path
+>>"%ARG_FILE%" echo "%APP_HOME%"
+>>"%ARG_FILE%" echo -m
+>>"%ARG_FILE%" echo ${moduleName}/${mainClassName}
+
+pushd %DIR%
+start "${moduleName}" %JAVA_EXEC% ${jvmArgs} @"%ARG_FILE%" ${args} %*
+set EXIT_CODE=%ERRORLEVEL%
+popd
+
+endlocal & exit /B %EXIT_CODE%
