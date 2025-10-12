@@ -1,4 +1,5 @@
 import java.text.SimpleDateFormat
+import org.gradle.jvm.application.tasks.CreateStartScripts
 
 plugins {
   id 'depanfx.base'
@@ -41,6 +42,8 @@ dependencies {
   implementation project(':DepanFxWorkspace')
   implementation project(':DepanFxWorkspaceGui')
 
+  runtimeOnly project(':DepanFxLauncher')
+
   // Cross platform "fat" jar
   runtimeOnly "org.openjfx:javafx-base:$javafx.version:win"
   runtimeOnly "org.openjfx:javafx-base:$javafx.version:linux"
@@ -70,6 +73,11 @@ application {
   ]
 }
 
+tasks.named("startScripts") {
+  windowsStartScriptGenerator.template =
+     resources.text.fromFile('gradle\\depanWindowsStartScript.txt')
+}
+
 // Create a build info file
 task buildInfo {
     doLast {
@@ -78,7 +86,7 @@ task buildInfo {
         def dateFormat = new SimpleDateFormat('yyyy-MM-dd HH:mm Z')
         def buildDate = dateFormat.format(currentDate)
 
-        // Get the release number (assuming you're using a versioning scheme like SemVer)
+        // Get the release number
         def releaseTag = System.getenv('BUILD_REF') ?: '-dev-'
         def releaseNumber = project.version
 
@@ -115,4 +123,5 @@ jlink {
   launcher {
     name = 'depanfx'
   }
+  addExtraDependencies('javafx')
 }

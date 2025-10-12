@@ -1,0 +1,16 @@
+plugins {
+  id 'depanfx.base'
+  id 'application'
+  id 'org.beryx.jlink' version "${beryxJlinkVersion}"
+}
+
+application {
+  mainClass = 'com.pnambic.depanfx.launcher.DepanFxArgFile'
+}
+
+jlink {
+  options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+  launcher {
+    name = 'depanfx_launcher'
+  }
+}
