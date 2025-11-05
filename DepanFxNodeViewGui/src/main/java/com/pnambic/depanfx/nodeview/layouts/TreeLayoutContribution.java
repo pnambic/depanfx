@@ -31,10 +31,10 @@ public class TreeLayoutContribution
   public static final String TREE_LAYOUT = "Tree Layout...";
 
   public static final double MIN_SPACE_PER_LEAF =
-      5 * RadialLayoutRunner.UNIT;
+      5 * DirectLayoutRunner.UNIT;
 
   public static final double MIN_SPACE_PER_LEVEL =
-      3 * RadialLayoutRunner.UNIT;
+      3 * DirectLayoutRunner.UNIT;
 
   public static final double TARGET_ASPECT_RATIO = 3.0d;
 
@@ -130,12 +130,12 @@ public class TreeLayoutContribution
     // The tree runner assigns leafs from the bottom left heading upward
     // and to the right.
     double xBase =
-        RadialLayoutRunner.X_ORIGIN - spacePerLevel * ((levels / 2.0d) - 0.5d);
+        DirectLayoutRunner.X_ORIGIN - spacePerLevel * ((levels / 2.0d) - 0.5d);
     double yBase =
-        RadialLayoutRunner.Y_ORIGIN - spacePerLeaf * ((leafs / 2.0d) - 0.5d);
+        DirectLayoutRunner.Y_ORIGIN - spacePerLeaf * ((leafs / 2.0d) - 0.5d);
 
     TreeLayoutRunner treeLayout = new TreeLayoutRunner(
-        treeModel, xBase, yBase, RadialLayoutRunner.Z_ORIGIN,
+        treeModel, xBase, yBase, DirectLayoutRunner.Z_ORIGIN,
         spacePerLevel, spacePerLeaf);
     treeLayout.layoutNodes(updateNodes);
 

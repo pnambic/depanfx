@@ -20,8 +20,10 @@ import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -38,9 +40,28 @@ public abstract class HierarchicalLayoutRunner extends DirectLayoutRunner {
 
   private int maxLevel = 0;
 
-  /** Protection from loops */
-  private Set<GraphNode> allreadyDone = new HashSet<>();
+  // Shape information for each node.
+  private static class TreeData {
 
+    public int level;
+
+    public boolean placed = false;
+
+    public TreeData(int level) {
+      this.level = level;
+    }
+  }
+
+  // Detect cycles
+  private List<GraphNode> pathNodes = new ArrayList<>();
+
+  // Shape information for every visited node.
+  private Map<GraphNode, TreeData> treeInfo = new HashMap<>();
+
+  // Report cycles
+  private List<List<GraphNode>> pathCycles = new ArrayList<>();
+
+  // The treeModel may contain non-visible nodes.
   private Set<GraphNode> visibleNodes;
 
   public HierarchicalLayoutRunner(DepanFxTreeModel treeModel) {
@@ -50,10 +71,13 @@ public abstract class HierarchicalLayoutRunner extends DirectLayoutRunner {
   @Override
   public void layoutNodes(Collection<GraphNode> layoutNodes) {
     visibleNodes = new HashSet<>(layoutNodes);
-    Collection<GraphNode> roots = treeModel.getRoots();
+    Collection<GraphNode> roots = orderNodes(treeModel.getRoots());
     int level = setLevel(getRootLevel(roots));
     roots.stream()
-        .forEach(r -> assignChildren(r, level));
+        .forEach(r -> assignLevel(r, level));
+
+    roots.stream()
+        .forEach(r -> assignOffset(r));
     setDone();
   }
 
@@ -105,46 +129,118 @@ public abstract class HierarchicalLayoutRunner extends DirectLayoutRunner {
   }
 
   /**
-   * Recursively assign the position for the given node and all of
-   * it's descendants.  Through the use of an alreadyDone lookup set,
-   * loops and joins in the tree data are prevented.
+   * Recursively assign the level for the given node and all of
+   * its descendants.
    *
    * @param node GraphNode to position, along with its descendants.
    * @param level hierarchical level ("depth") to place node.
    */
-  private void assignChildren(GraphNode root, int level) {
-    // treeModel may contain non-visible nodes.
-    if (!visibleNodes.contains(root)) {
+  private void assignLevel(GraphNode root, int level) {
+    TreeData treeData = new TreeData(level);
+    treeInfo.put(root, treeData);
+
+    if (isLeaf(root)) {
       return;
     }
-    // Don't try to place an already located node.
-    if (allreadyDone.contains(root)) {
+
+    pathNodes.add(root);
+    int nextLevel = setLevel(level + 1);
+    for (GraphNode childNode : orderChildren(root)) {
+      TreeData childInfo = treeInfo.get(childNode);
+      if (childInfo == null) {
+        assignLevel(childNode, nextLevel);
+        continue;
+      }
+      List<GraphNode> cycles = checkCycle(childNode);
+      if (cycles != null) {
+        assignLevel(childNode, nextLevel);
+        reportCycle(cycles, childNode);
+        continue;
+      }
+      if (childInfo.level < nextLevel) {
+        lowerChild(childNode, nextLevel);
+        continue;  // For symmetry with the other cases.
+      }
+      // Other children are already at next level or lower.
+    }
+    pathNodes.removeLast();
+  }
+
+  private void lowerChild(GraphNode node, int level) {
+    TreeData treeData = treeInfo.get(node);
+    treeData.level = level;
+
+    if (isLeaf(node)) {
       return;
     }
-    allreadyDone.add(root);
 
     int nextLevel = setLevel(level + 1);
+    for (GraphNode childNode : orderChildren(node)) {
+      TreeData childInfo = treeInfo.get(childNode);
+      int wasLevel = childInfo.level;
+      childInfo.level = Math.max(childInfo.level, nextLevel);
+      if (childInfo.level > wasLevel) {
+        lowerChild(childNode, nextLevel);
+      }
+    }
+  }
+
+  private void assignOffset(GraphNode node) {
+    TreeData treeData = treeInfo.get(node);
+    int nodeLevel = treeData.level;
+
+    if (isLeaf(node)) {
+      assignNode(node, nodeLevel, getCurrOffset(nodeLevel));
+      treeInfo.get(node).placed = true;
+      incrCurrOffset(nodeLevel);
+      return;
+    }
+
+    int nextLevel = setLevel(nodeLevel + 1);
     int childLeft = getCurrOffset(nextLevel);
-    for (GraphNode node : orderChildren(root)) {
-      assignChildren(node, nextLevel);
-    }
 
-    // If there were any children, try to center this node above them
+    for (GraphNode childNode : orderChildren(node)) {
+      if (!treeInfo.get(childNode).placed) {
+        assignOffset(childNode);
+      }
+    }
     int childRight = getCurrOffset(nextLevel);
-    if (childLeft != childRight) {
-      assignNode(root, level, (childLeft + childRight) / 2);
+
+    // No placed children for node, treat as leaf.
+    if (childRight == childLeft) {
+      assignNode(node, nodeLevel, getCurrOffset(nodeLevel));
+      treeInfo.get(node).placed = true;
+      incrCurrOffset(nodeLevel);
+      return;
     }
 
-    // With no children, assign to next leaf location, and bump it.
-    else {
-      assignNode(root, level, getCurrOffset(level));
-      incrCurrOffset(level);
-    }
+    // Center this node above its children
+    assignNode(node, nodeLevel, (childLeft + childRight) / 2);
+    treeInfo.get(node).placed = true;
   }
 
   private int setLevel(int newLevel) {
     maxLevel = Math.max(newLevel, maxLevel);
     return newLevel;
+  }
+
+  private List<GraphNode> checkCycle(GraphNode childNode) {
+    int childIndex = pathNodes.indexOf(childNode);
+    if (childIndex < 0) {
+      return null;
+    }
+    return pathNodes.subList(childIndex, pathNodes.size());
+  }
+
+  private void reportCycle(List<GraphNode> loopPrefix, GraphNode loopNode) {
+    List<GraphNode> cycleNodes = new ArrayList<>(loopPrefix.size() + 1);
+    cycleNodes.addAll(loopPrefix);
+    cycleNodes.add(loopNode);
+    pathCycles.add(cycleNodes);
+  }
+
+  private Collection<GraphNode> orderChildren(GraphNode root) {
+    return orderNodes(treeModel.getMembers(root));
   }
 
   /**
@@ -162,17 +258,17 @@ public abstract class HierarchicalLayoutRunner extends DirectLayoutRunner {
    * @param root node with children
    * @return Collection of children in desired processing order
    */
-  private Collection<GraphNode> orderChildren(GraphNode root) {
+  private Collection<GraphNode> orderNodes(Collection<GraphNode> nodes) {
     List<GraphNode> leafs = new ArrayList<>();
     List<GraphNode> inners = new ArrayList<>();
-    for (GraphNode node : treeModel.getMembers(root)) {
+    for (GraphNode node : nodes) {
 
-      // Don't include nodes that are already placed.
-      if (allreadyDone.contains(node)) {
+      // Only include visible nodes.
+      if (!visibleNodes.contains(node)) {
         continue;
       }
 
-      if (treeModel.getMembers(node).isEmpty()) {
+      if (isLeaf(node)) {
         leafs.add(node);
       }
       else {
@@ -193,5 +289,9 @@ public abstract class HierarchicalLayoutRunner extends DirectLayoutRunner {
     String keyOne = nodeOne.getId().getNodeKey();
     String keyTwo = nodeTwo.getId().getNodeKey();
     return keyOne.compareTo(keyTwo);
+  }
+
+  private boolean isLeaf(GraphNode root) {
+    return treeModel.getMembers(root).isEmpty();
   }
 }
