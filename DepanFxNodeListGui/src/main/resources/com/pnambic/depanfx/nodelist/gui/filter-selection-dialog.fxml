@@ -24,7 +24,7 @@
          AnchorPane.topAnchor="10" AnchorPane.bottomAnchor="10">
 
       <SplitPane fx:id="splitPane"
-                 dividerPositions="0.5" orientation="VERTICAL"
+                 dividerPositions="0.3" orientation="VERTICAL"
                  HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
          <items>
             <!-- View of Filters -->
@@ -63,6 +63,7 @@
                   </TreeTableView>
 
                   <HBox spacing="10">
+                     <Label text="Add Filter..." fx:id="addFilterLabel"/>
                      <Region HBox.hgrow="ALWAYS" />
                      <Button text="Save Filters..." onAction="#handleSaveFilters"/>
                   </HBox>

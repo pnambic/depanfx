@@ -122,6 +122,13 @@ public class DepanFxFilterSelectionDialog extends DepanFxWorkspaceDialog {
 
   private DepanFxNodeFiltersRootMember nodeFilterRoot;
 
+
+  /**
+   * Place holder for add filter prompt label.
+   */
+  @FXML
+  private Label addFilterLabel;
+
   /**
    * Let FXML place the table.  Other behavior is implemented by the
    * {@link DepanFxFilterSelectionDialog}.
@@ -191,7 +198,10 @@ public class DepanFxFilterSelectionDialog extends DepanFxWorkspaceDialog {
   @FXML
   public void initialize() {
     filtersCommands.setContextMenu(buildFiltersCommandMenu());
-    nodeFilterTable.setContextMenu(buildFilterTableMenu());
+
+    ContextMenu filterTableContextMenu = buildFilterTableMenu();
+    nodeFilterTable.setContextMenu(filterTableContextMenu);
+    addFilterLabel.setContextMenu(filterTableContextMenu);
 
     nodeFilterRoot = new DepanFxNodeFiltersRootMember(workspace);
     nodeFilterTable.setRoot(
