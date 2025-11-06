@@ -142,7 +142,7 @@ public abstract class DepanFxBaseFilter<T extends DepanFxBaseFilterData> {
       Collection<GraphNode> shortNodes, Collection<GraphNode> longNodes) {
     if (longNodes instanceof Set<GraphNode>) {
       return shortNodes.stream()
-          .filter(n -> !longNodes.contains(n))
+          .filter(n -> longNodes.contains(n))
           .collect(Collectors.toSet());
     }
     // If the long list is not a set, only go through it once.
