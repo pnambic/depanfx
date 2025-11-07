@@ -2,6 +2,7 @@ package com.pnambic.depanfx.nodelist.gui;
 
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumns;
+import com.pnambic.depanfx.nodelist.gui.nodefilters.FilterMenu;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSections;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
@@ -14,6 +15,8 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.Menu;
 
 public class DepanFxNodeListTableCommands {
@@ -27,6 +30,8 @@ public class DepanFxNodeListTableCommands {
   public static final String CLEAR_SELECTION_ITEM = "Clear Selection";
 
   public static final String INVERT_SELECTION_ITEM = "Invert Selection";
+
+  public static final String FILTER_SELECTION_ITEM = "Filter Selection...";
 
   public static final String SELECT_NODE_LIST = "Select Node List...";
 
@@ -92,6 +97,17 @@ public class DepanFxNodeListTableCommands {
         CLEAR_SELECTION_ITEM, e -> tableState.doClearSelectionAction());
     builder.appendActionItem(
         INVERT_SELECTION_ITEM, e -> tableState.doInvertSelectionAction());
+  }
+
+  public Menu buildFilterMenu(
+      FilterMenu filterMenu, EventHandler<ActionEvent> onEdit) {
+    DepanFxMenuBuilder menuBuilder =
+        new DepanFxMenuBuilder(FILTER_SELECTION_ITEM);
+    filterMenu.addSelectFilterAction(menuBuilder);
+    filterMenu.addMergeModeMenu(menuBuilder);
+
+    menuBuilder.appendActionItem(FILTER_SELECTION_ITEM, onEdit);
+    return menuBuilder.build();
   }
 
   public void updateOnShowing() {

@@ -20,6 +20,7 @@ import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchersRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.graph_doc.persistence.GraphDocPersistenceContribution;
+import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersDialogRegistry;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
@@ -73,10 +74,11 @@ public class DepanFxNodeViewPanelConfiguration {
   nodeViewAsViewResourceContribution(
       DepanFxNodeLayoutRegistry layoutRegistry,
       DepanFxNodeFiltersRegistry filterRegistry,
+      DepanFxNodeFiltersDialogRegistry filterDialogRegistry,
       DepanFxLinkMatchersRegistry matcherRegistry,
       DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry) {
     return new NodeViewAsViewResourceContribution(
-        layoutRegistry, filterRegistry,
+        layoutRegistry, filterRegistry, filterDialogRegistry,
         matcherRegistry, matcherDialogRegistry);
   }
 
@@ -85,11 +87,12 @@ public class DepanFxNodeViewPanelConfiguration {
   nodeListAsViewResourceContribution(
       DepanFxNodeLayoutRegistry layoutRegistry,
       DepanFxNodeFiltersRegistry filterRegistry,
+      DepanFxNodeFiltersDialogRegistry filterDialogRegistry,
       DepanFxLinkMatchersRegistry matcherRegistry,
       DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry,
       DepanFxInfoRegistry infoRegistry) {
     return new NodeListAsViewResourceContribution(
-        layoutRegistry, filterRegistry,
+        layoutRegistry, filterRegistry, filterDialogRegistry,
         matcherRegistry, matcherDialogRegistry, infoRegistry);
   }
 
@@ -98,11 +101,12 @@ public class DepanFxNodeViewPanelConfiguration {
   graphDocAsViewResourceContribution(
       DepanFxNodeLayoutRegistry layoutRegistry,
       DepanFxNodeFiltersRegistry filterRegistry,
+      DepanFxNodeFiltersDialogRegistry filterDialogRegistry,
       DepanFxLinkMatchersRegistry matcherRegistry,
       DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry,
       DepanFxInfoRegistry infoRegistry) {
     return new GraphDocAsViewResourceContribution(
-        layoutRegistry, filterRegistry,
+        layoutRegistry, filterRegistry, filterDialogRegistry,
         matcherRegistry, matcherDialogRegistry, infoRegistry);
   }
 
@@ -201,6 +205,8 @@ public class DepanFxNodeViewPanelConfiguration {
 
     private final DepanFxNodeFiltersRegistry filterRegistry;
 
+    private final DepanFxNodeFiltersDialogRegistry filterDialogRegistry;
+
     private final DepanFxLinkMatchersRegistry matcherRegistry;
 
     private final DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry;
@@ -208,6 +214,7 @@ public class DepanFxNodeViewPanelConfiguration {
     public NodeViewAsViewResourceContribution(
         DepanFxNodeLayoutRegistry layoutRegistry,
         DepanFxNodeFiltersRegistry filterRegistry,
+        DepanFxNodeFiltersDialogRegistry filterDialogRegistry,
         DepanFxLinkMatchersRegistry matcherRegistry,
         DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry) {
       super(NODE_VIEW_LABEL,
@@ -216,6 +223,7 @@ public class DepanFxNodeViewPanelConfiguration {
           NODE_VIEW_KEY);
       this.layoutRegistry = layoutRegistry;
       this.filterRegistry = filterRegistry;
+      this.filterDialogRegistry = filterDialogRegistry;
       this.matcherRegistry = matcherRegistry;
       this.matcherDialogRegistry = matcherDialogRegistry;
     }
@@ -227,7 +235,7 @@ public class DepanFxNodeViewPanelConfiguration {
           .ifPresent(r ->
               addNodeViewPanelToScene(
                   workspace, sceneSrcv, r,
-                  layoutRegistry, filterRegistry,
+                  layoutRegistry, filterRegistry, filterDialogRegistry,
                   matcherRegistry, matcherDialogRegistry));
     }
 
@@ -247,6 +255,8 @@ public class DepanFxNodeViewPanelConfiguration {
 
     private final DepanFxNodeFiltersRegistry filterRegistry;
 
+    private final DepanFxNodeFiltersDialogRegistry filterDialogRegistry;
+
     private final DepanFxLinkMatchersRegistry matcherRegistry;
 
     private final DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry;
@@ -258,11 +268,13 @@ public class DepanFxNodeViewPanelConfiguration {
         String orderKey,
         DepanFxNodeLayoutRegistry layoutRegistry,
         DepanFxNodeFiltersRegistry filterRegistry,
+        DepanFxNodeFiltersDialogRegistry filterDialogRegistry,
         DepanFxLinkMatchersRegistry matcherRegistry,
         DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry) {
       super(resourceLabel, dataType, fileExt, orderKey);
       this.layoutRegistry = layoutRegistry;
       this.filterRegistry = filterRegistry;
+      this.filterDialogRegistry = filterDialogRegistry;
       this.matcherRegistry = matcherRegistry;
       this.matcherDialogRegistry = matcherDialogRegistry;
     }
@@ -278,7 +290,8 @@ public class DepanFxNodeViewPanelConfiguration {
           .ifPresent(r ->
               addNodeViewPanelToScene(
                   workspace, sceneSrcv, r,
-                  layoutRegistry, filterRegistry,
+                  layoutRegistry,
+                  filterRegistry, filterDialogRegistry,
                   matcherRegistry, matcherDialogRegistry));
     }
 
@@ -301,6 +314,7 @@ public class DepanFxNodeViewPanelConfiguration {
     private NodeListAsViewResourceContribution(
         DepanFxNodeLayoutRegistry layoutRegistry,
         DepanFxNodeFiltersRegistry filterRegistry,
+        DepanFxNodeFiltersDialogRegistry filterDialogRegistry,
         DepanFxLinkMatchersRegistry matcherRegistry,
         DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry,
         DepanFxInfoRegistry infoRegistry) {
@@ -311,6 +325,7 @@ public class DepanFxNodeViewPanelConfiguration {
           OPEN_NODE_LIST_AS_VIEW_KEY,
           layoutRegistry,
           filterRegistry,
+          filterDialogRegistry,
           matcherRegistry,
           matcherDialogRegistry);
     }
@@ -335,6 +350,7 @@ public class DepanFxNodeViewPanelConfiguration {
     private GraphDocAsViewResourceContribution(
         DepanFxNodeLayoutRegistry layoutRegistry,
         DepanFxNodeFiltersRegistry filterRegistry,
+        DepanFxNodeFiltersDialogRegistry filterDialogRegistry,
         DepanFxLinkMatchersRegistry matcherRegistry,
         DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry,
         DepanFxInfoRegistry infoRegistry) {
@@ -345,6 +361,7 @@ public class DepanFxNodeViewPanelConfiguration {
           OPEN_GRAPH_DOC_AS_VIEW_KEY,
           layoutRegistry,
           filterRegistry,
+          filterDialogRegistry,
           matcherRegistry,
           matcherDialogRegistry);
     }
@@ -369,10 +386,11 @@ public class DepanFxNodeViewPanelConfiguration {
       DepanFxWorkspaceResource<DepanFxNodeViewData> nodeViewRsrc,
       DepanFxNodeLayoutRegistry layoutRegistry,
       DepanFxNodeFiltersRegistry filterRegistry,
+      DepanFxNodeFiltersDialogRegistry filterDialogRegistry,
       DepanFxLinkMatchersRegistry matcherRegistry,
       DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry) {
     DepanFxNodeViewPanel viewPanel = new DepanFxNodeViewPanel(
-        workspace, layoutRegistry, filterRegistry,
+        workspace, layoutRegistry, filterRegistry, filterDialogRegistry,
         matcherRegistry, matcherDialogRegistry, nodeViewRsrc);
     sceneSrvc.addViewer(viewPanel);
   }

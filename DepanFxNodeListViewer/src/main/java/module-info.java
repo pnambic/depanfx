@@ -26,6 +26,7 @@ module depanfx.nodelist.viewer {
   requires depanfx.workspace;
   requires depanfx.graph_doc;
   requires depanfx.scene;
+  requires depanfx.nodefilters;
 
   opens com.pnambic.depanfx.nodelist.viewdata;
   opens com.pnambic.depanfx.nodelist.viewer

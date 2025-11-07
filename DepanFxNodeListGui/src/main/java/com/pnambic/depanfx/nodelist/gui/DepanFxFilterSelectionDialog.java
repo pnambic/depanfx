@@ -95,9 +95,9 @@ public class DepanFxFilterSelectionDialog extends DepanFxWorkspaceDialog {
 
   private final DepanFxColumnRegistry columnRegistry;
 
-  private final DepanFxNodeFiltersRegistry nodeFiltersRegistry;
+  private final DepanFxNodeFiltersRegistry filterRegistry;
 
-  private final DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry;
+  private final DepanFxNodeFiltersDialogRegistry filterDialogRegistry;
 
   private final DepanFxLinkMatchersRegistry matcherRegistry;
 
@@ -150,16 +150,16 @@ public class DepanFxFilterSelectionDialog extends DepanFxWorkspaceDialog {
       DepanFxDialogRunner dialogRunner,
       DepanFxInfoRegistry infoRegistry,
       DepanFxColumnRegistry columnRegistry,
-      DepanFxNodeFiltersRegistry nodeFiltersRegistry,
-      DepanFxLinkMatchersRegistry matcherRegistry,
-      DepanFxNodeFiltersDialogRegistry nodeFiltersDialogRegistry) {
+      DepanFxNodeFiltersRegistry filterRegistry,
+      DepanFxNodeFiltersDialogRegistry filterDialogRegistry,
+      DepanFxLinkMatchersRegistry matcherRegistry) {
     super(workspace);
     this.dialogRunner = dialogRunner;
     this.infoRegistry = infoRegistry;
     this.columnRegistry = columnRegistry;
-    this.nodeFiltersRegistry = nodeFiltersRegistry;
+    this.filterRegistry = filterRegistry;
+    this.filterDialogRegistry = filterDialogRegistry;
     this.matcherRegistry = matcherRegistry;
-    this.nodeFiltersDialogRegistry = nodeFiltersDialogRegistry;
   }
 
   /**
@@ -205,7 +205,7 @@ public class DepanFxFilterSelectionDialog extends DepanFxWorkspaceDialog {
 
     nodeFilterRoot = new DepanFxNodeFiltersRootMember(workspace);
     nodeFilterTable.setRoot(
-        new DepanFxNodeFiltersRootItem(nodeFilterRoot, nodeFiltersDialogRegistry));
+        new DepanFxNodeFiltersRootItem(nodeFilterRoot, filterDialogRegistry));
 
     DepanFxTreeColumnBinder<DepanFxNodeFiltersTableMember> columnBinder =
         new DepanFxTreeColumnBinder<>(nodeFilterTable);
@@ -216,7 +216,7 @@ public class DepanFxFilterSelectionDialog extends DepanFxWorkspaceDialog {
         f -> getColumnInfo(f.getValue()).getToolNameProperty());
     labelColumn.setCellFactory(
         l -> new DepanFxNodeFiltersTreeCell(
-                getWorkspace(), dialogRunner, nodeFiltersDialogRegistry));
+                getWorkspace(), dialogRunner, filterDialogRegistry));
 
     TreeTableColumn<DepanFxNodeFiltersTableMember, Boolean> closureColumn =
         columnBinder.next();
@@ -304,7 +304,7 @@ public class DepanFxFilterSelectionDialog extends DepanFxWorkspaceDialog {
   @FXML
   public void handleSaveFilters() {
     DepanFxBaseFilterData saveFilter = prepareResult();
-    nodeFiltersDialogRegistry.runSaveFilters(dialogRunner, saveFilter);
+    filterDialogRegistry.runSaveFilters(dialogRunner, saveFilter);
   }
 
   @FXML
@@ -315,7 +315,7 @@ public class DepanFxFilterSelectionDialog extends DepanFxWorkspaceDialog {
     Collection<GraphNode> targetNodes = graphModel.getGraphNodes();
 
     DepanFxBaseFilter<?> filter =
-        nodeFiltersRegistry.buildFilter(filterData, graphModel, targetNodes);
+        filterRegistry.buildFilter(filterData, graphModel, targetNodes);
 
     Collection<GraphNode> resultNodes =
         filter.computeNodes(sourceNodes.getNodes());
@@ -332,7 +332,7 @@ public class DepanFxFilterSelectionDialog extends DepanFxWorkspaceDialog {
       nodeFilterChooser() {
 
     return DepanFxNodeFiltersChooser.runNodeFiltersFinder(
-        workspace, dialogRunner, getScene(), nodeFiltersDialogRegistry);
+        workspace, dialogRunner, getScene(), filterDialogRegistry);
   }
 
   private ContextMenu buildFiltersCommandMenu() {
@@ -348,15 +348,17 @@ public class DepanFxFilterSelectionDialog extends DepanFxWorkspaceDialog {
   private DepanFxNodeListTableController buildTable(
       DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc,
       DepanFxNodeList tableNodes) {
-    DepanFxNodeListSelection nodeSelection =
-        DepanFxNodeListSelection.forNodes(tableNodes.getNodes());
+    DepanFxNodeListCheckBoxSelection nodeSelection =
+        DepanFxNodeListCheckBoxSelection.forNodes(tableNodes.getNodes());
     nodeSelection.doSelectAllAction();
 
     DepanFxNodeListTableController result =
         new DepanFxNodeListTableController(
             workspace, dialogRunner,
             columnRegistry, infoRegistry,
-            matcherRegistry, nodeFolding,
+            matcherRegistry,
+            filterRegistry, filterDialogRegistry,
+            nodeFolding,
             tableNodes, nodeSelection, nodeSelectTable);
     result.setTableViewResource(tableViewRsrc);
     return result;
@@ -373,7 +375,7 @@ public class DepanFxFilterSelectionDialog extends DepanFxWorkspaceDialog {
   private ContextMenu buildFilterTableMenu() {
     DepanFxContextMenuBuilder builder = new DepanFxContextMenuBuilder();
     Scene scene = getScene();
-    nodeFiltersDialogRegistry.appendAddFilters(
+    filterDialogRegistry.appendAddFilters(
         builder, workspace, dialogRunner, scene, this::onAddFilter);
 
     return builder.build();
@@ -458,7 +460,7 @@ public class DepanFxFilterSelectionDialog extends DepanFxWorkspaceDialog {
       DepanFxNodeFiltersTableMember rowInfo = getRowData(index);
       if (rowInfo instanceof DepanFxNodeFiltersDataProvider src) {
         DepanFxBaseFilterData filterInfo = src.prepareFilterData();
-        nodeFiltersDialogRegistry.runUpdateFilters(dialogRunner, filterInfo)
+        filterDialogRegistry.runUpdateFilters(dialogRunner, filterInfo)
             .ifPresent(f -> updateFilter(rowInfo, f));
       }
     }

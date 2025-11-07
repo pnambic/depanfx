@@ -17,6 +17,8 @@ package com.pnambic.depanfx.nodelist.viewer;
 
 import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchersRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
+import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersDialogRegistry;
+import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.sections.folds.NodeListFoldController;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
@@ -55,17 +57,25 @@ public class DepanFxNodeListViewerContribution
 
   private final DepanFxLinkMatchersRegistry matcherRegistry;
 
+  private final DepanFxNodeFiltersRegistry filterRegistry;
+
+  private final DepanFxNodeFiltersDialogRegistry filterDialogRegistry;
+
   @Autowired
   private DepanFxNodeListViewerContribution(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxColumnRegistry columnRegistry,
       DepanFxInfoRegistry infoRegistry,
-      DepanFxLinkMatchersRegistry matcherRegistry) {
+      DepanFxLinkMatchersRegistry matcherRegistry,
+      DepanFxNodeFiltersRegistry filterRegistry,
+      DepanFxNodeFiltersDialogRegistry filterDialogRegistry) {
     this.workspace = workspace;
     this.columnRegistry = columnRegistry;
     this.infoRegistry = infoRegistry;
     this.matcherRegistry = matcherRegistry;
+    this.filterRegistry = filterRegistry;
+    this.filterDialogRegistry = filterDialogRegistry;
   }
 
   @Override
@@ -93,8 +103,8 @@ public class DepanFxNodeListViewerContribution
     return Optional.of(new DepanFxNodeListViewer(
         viewerData.getViewerTitle(),
         workspace, sceneService.getDialogRunner(),
-        columnRegistry, infoRegistry,
-        matcherRegistry, nodeFolding,
+        columnRegistry, infoRegistry, matcherRegistry,
+        filterRegistry, filterDialogRegistry, nodeFolding,
         viewListRsrc, viewerData.getTableViewRsrc()));
   }
 

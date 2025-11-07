@@ -5,6 +5,8 @@ import com.pnambic.depanfx.graph.info.GraphNodeInfo.Listener;
 import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxNodeInfoStore;
+import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersDialogRegistry;
+import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeFoldNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListMember;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
@@ -63,6 +65,10 @@ public class DepanFxNodeViewNodeSelectDialog
 
   private final DepanFxLinkMatchersRegistry matcherRegistry;
 
+  private final DepanFxNodeFiltersRegistry filterRegistry;
+
+  private final DepanFxNodeFiltersDialogRegistry filterDialogRegistry;
+
   /**
    * Place holder for the context menu.
    */
@@ -88,12 +94,16 @@ public class DepanFxNodeViewNodeSelectDialog
       DepanFxDialogRunner dialogRunner,
       DepanFxColumnRegistry columnRegistry,
       DepanFxInfoRegistry infoRegistry,
-      DepanFxLinkMatchersRegistry matcherRegistry) {
+      DepanFxLinkMatchersRegistry matcherRegistry,
+      DepanFxNodeFiltersRegistry filterRegistry,
+      DepanFxNodeFiltersDialogRegistry filterDialogRegistry) {
     super(workspace);
     this.dialogRunner = dialogRunner;
     this.columnRegistry = columnRegistry;
     this.infoRegistry = infoRegistry;
     this.matcherRegistry = matcherRegistry;
+    this.filterRegistry = filterRegistry;
+    this.filterDialogRegistry = filterDialogRegistry;
   }
 
   /**
@@ -141,6 +151,7 @@ public class DepanFxNodeViewNodeSelectDialog
     tableControl = new DepanFxNodeListTableController(
         workspace, dialogRunner,
         columnRegistry, infoRegistry, matcherRegistry,
+        filterRegistry, filterDialogRegistry,
         viewPanel.getNodeFolding(),
         viewPanel.getViewNodesAsNodeList(),
         viewPanel.getNodeSelection(), nodeSelectTable);

@@ -30,15 +30,18 @@ import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.graph_doc.model.GraphModel;
 import com.pnambic.depanfx.jogl.JoglMouseActionListener;
+import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersChooser;
+import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersDialogRegistry;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodelist.gui.DepanFxFilterSelectionDialog;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeFoldDialog;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListSelection;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListCheckBoxSelection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.edgematchers.DepanFxNodeListEdgeMatcherDialog;
+import com.pnambic.depanfx.nodelist.gui.nodefilters.FilterMenu;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
@@ -98,7 +101,9 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Tab;
+import javafx.scene.control.ToggleGroup;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -106,8 +111,6 @@ import javafx.stage.Stage;
 public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private static final String NODE_SELECTION_ITEM = "Node Selection...";
-
-  private static final String FILTER_SELECTION_ITEM = "Filter Selection...";
 
   private static final String EDGE_DISPLAY = "Edge Display";
 
@@ -182,6 +185,8 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private final DepanFxNodeFiltersRegistry filterRegistry;
 
+  private final DepanFxNodeFiltersDialogRegistry filterDialogRegistry;
+
   private final DepanFxLinkMatchersRegistry matcherRegistry;
 
   private final DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry;
@@ -199,7 +204,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
 
   private JoglPane joglPane;
 
-  private DepanFxNodeListSelection nodeSelection;
+  private DepanFxNodeListCheckBoxSelection nodeSelection;
 
   /////////////////////////////////////
   // Node display state
@@ -240,12 +245,14 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
       DepanFxWorkspace workspace,
       DepanFxNodeLayoutRegistry layoutRegistry,
       DepanFxNodeFiltersRegistry filterRegistry,
+      DepanFxNodeFiltersDialogRegistry filterDialogRegistry,
       DepanFxLinkMatchersRegistry matcherRegistry,
       DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry,
       DepanFxWorkspaceResource<DepanFxNodeViewData> nodeViewRsrc) {
     this.workspace = workspace;
     this.layoutRegistry = layoutRegistry;
     this.filterRegistry = filterRegistry;
+    this.filterDialogRegistry = filterDialogRegistry;
     this.matcherRegistry = matcherRegistry;
     this.matcherDialogRegistry = matcherDialogRegistry;
     this.nodeViewRsrc = nodeViewRsrc;
@@ -256,7 +263,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     this.nodeLocations = viewData.getNodeLocations();
 
     // Handle node selections.
-    this.nodeSelection = DepanFxNodeListSelection.forNodes(viewNodes);
+    this.nodeSelection = DepanFxNodeListCheckBoxSelection.forNodes(viewNodes);
     nodeSelection.setOnSelectionChange(
         (n, b) -> onSelectionChange(n, b));
 
@@ -367,7 +374,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
   /////////////////////////////////////
   // For NodeListTable integration
 
-  public DepanFxNodeListSelection getNodeSelection() {
+  public DepanFxNodeListCheckBoxSelection getNodeSelection() {
     return nodeSelection;
   }
 
@@ -599,6 +606,19 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     sideViews.forEach(e -> e.close());
   }
 
+  private Menu buildFilterSelectionMenu(FilterMenu filterMenu) {
+    DepanFxMenuBuilder menuBuilder =
+        new DepanFxMenuBuilder(DepanFxNodeListTableCommands.FILTER_SELECTION_ITEM);
+    filterMenu.addSelectFilterAction(menuBuilder);
+    filterMenu.addMergeModeMenu(menuBuilder);
+
+    menuBuilder.appendActionItem(
+        DepanFxNodeListTableCommands.FILTER_SELECTION_ITEM,
+        e -> runFilterSelectionDialog());
+
+    return menuBuilder.build();
+  }
+
   private Menu buildEdgeDisplayMenu() {
 
     DepanFxMenuBuilder menuBuilder = new DepanFxMenuBuilder(EDGE_DISPLAY);
@@ -686,9 +706,12 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
     builder.appendActionItem(
         NODE_SELECTION_ITEM,
         e -> runNodeSelectionDialog());
-    builder.appendActionItem(
-        FILTER_SELECTION_ITEM,
-        e -> runFilterSelectionDialog());
+
+    FilterMenu filterMenu = new FilterMenu(
+        workspace, getDialogRunner(), joglPane.getScene(),
+        filterRegistry, filterDialogRegistry,
+        getGraphDoc().getGraph(), nodeSelection);
+    builder.appendSubMenu(buildFilterSelectionMenu(filterMenu));
 
     builder.appendSeparator();
     builder.appendSubMenu(buildEdgeDisplayMenu());

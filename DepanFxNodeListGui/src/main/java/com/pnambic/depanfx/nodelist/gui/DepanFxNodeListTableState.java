@@ -1,3 +1,18 @@
+/*
+ * Copyright 2024 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.pnambic.depanfx.nodelist.gui;
 
 import com.google.common.collect.ImmutableList;
@@ -48,7 +63,7 @@ import javafx.scene.control.TreeTableView;
 /**
  * Handles the rendering of a node list in a table of sections and columns.
  */
-public class DepanFxNodeListTableState {
+public class DepanFxNodeListTableState implements DepanFxNodeListSelection {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxNodeListTableState.class);
@@ -57,7 +72,7 @@ public class DepanFxNodeListTableState {
 
   private final DepanFxNodeList nodeList;
 
-  private final DepanFxNodeListSelection selectedNodes;
+  private final DepanFxNodeListCheckBoxSelection selectedNodes;
 
   private final TreeTableView<DepanFxNodeListMember> nodeListTable;
 
@@ -86,7 +101,7 @@ public class DepanFxNodeListTableState {
   public DepanFxNodeListTableState(
       DepanFxWorkspace workspace,
       DepanFxNodeList nodeList,
-      DepanFxNodeListSelection selectedNodes,
+      DepanFxNodeListCheckBoxSelection selectedNodes,
       TreeTableView<DepanFxNodeListMember> nodeListTable,
       DepanFxNodeListTableFactory tableFactory,
       DepanFxNodeFoldController nodeFoldings) {
@@ -135,14 +150,27 @@ public class DepanFxNodeListTableState {
     return nodeListTable.getScene();
   }
 
+  @Override // DepanFxNodeListSelection
+  public Stream<GraphNode> streamSelectedNodes() {
+    return selectedNodes.streamSelectedNodes();
+  }
+
+  @Override // DepanFxNodeListSelection
+  public Stream<GraphNode> streamChosenNodes() {
+    return selectedNodes.streamChosenNodes();
+  }
+
+  @Override // DepanFxNodeListSelection
   public void doSelectAllAction() {
     selectedNodes.doSelectAllAction();
   }
 
+  @Override // DepanFxNodeListSelection
   public void doClearSelectionAction() {
     selectedNodes.doClearSelectionAction();
   }
 
+  @Override // DepanFxNodeListSelection
   public void doInvertSelectionAction() {
     selectedNodes.doInvertSelectionAction();
   }
@@ -150,8 +178,24 @@ public class DepanFxNodeListTableState {
   /**
    * For performance, a {@code HashSet<GraphNode>} is preferred.
    */
+  @Override // DepanFxNodeListSelection
   public void doSelectGraphNodesAction(Collection<GraphNode> nodes) {
     selectedNodes.doSelectGraphNodesAction(nodes);
+  }
+
+  @Override // DepanFxNodeListSelection
+  public boolean isSelected(GraphNode node) {
+    return selectedNodes.isSelected(node);
+  }
+
+  @Override // DepanFxNodeListSelection
+  public void setSelectGraphNode(GraphNode node, boolean value) {
+    selectedNodes.setSelectGraphNode(node, value);
+  }
+
+  @Override // DepanFxNodeListSelection
+  public boolean invertSelectGraphNode(GraphNode node) {
+    return selectedNodes.invertSelectGraphNode(node);
   }
 
   public void doSelectGraphNodesAction(Stream<GraphNode> nodes, boolean value) {
@@ -165,7 +209,7 @@ public class DepanFxNodeListTableState {
   }
 
   /**
-   * True if the selection is none-empty.
+   * True if the selection is non-empty.
    */
   public boolean someSelection() {
     return selectedNodes.streamSelectedNodes().findAny().isPresent();
@@ -177,14 +221,6 @@ public class DepanFxNodeListTableState {
 
   public DepanFxNodeList buildEmptyList() {
     return DepanFxNodeLists.buildEmptyNodeList(nodeList);
-  }
-
-  /**
-   * Since the previous state may have been unknown, provide the final
-   * state for interested parties.
-   */
-  public boolean doInvertGraphNodeAction(GraphNode node) {
-    return selectedNodes.invertSelectGraphNode(node);
   }
 
   /////////////////////////////////////
@@ -417,10 +453,6 @@ public class DepanFxNodeListTableState {
     LOG.warn("Unexpected list member {} for getCheckBoxObservable",
         member.getClass().getSimpleName());
     return null;
-  }
-
-  private BooleanProperty setSelectGraphNode(GraphNode node, boolean value) {
-    return selectedNodes.setSelectGraphNode(node, value);
   }
 
   private void installSection(
