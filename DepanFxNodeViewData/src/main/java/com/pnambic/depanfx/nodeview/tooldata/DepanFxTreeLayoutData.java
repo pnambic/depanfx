@@ -23,13 +23,24 @@ public class DepanFxTreeLayoutData extends DepanFxBaseToolData {
 
   public static final String TREE_LAYOUT_TOOL_EXT = "dtlti";
 
+  public static enum Direction {
+    RIGHT,
+    LEFT,
+    UP,
+    DOWN
+  }
+
+  private final Direction direction;;
+
   private final DepanFxWorkspaceResource<DepanFxBaseMatcherDocument>
       linkMatcherRsrc;
 
   public DepanFxTreeLayoutData(
       String toolName, String toolDescription,
+      Direction direction,
       DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> linkMatcherRsrc) {
     super(toolName, toolDescription);
+    this.direction = direction;
     this.linkMatcherRsrc = linkMatcherRsrc;
   }
 
@@ -37,5 +48,9 @@ public class DepanFxTreeLayoutData extends DepanFxBaseToolData {
       getHierarchyMatcherRsrc() {
 
     return linkMatcherRsrc;
+  }
+
+  public Direction getDirection() {
+    return direction;
   }
 }

@@ -62,6 +62,12 @@ public class DepanFxJavaLayoutRadialBuiltins {
   public static final Path DERIVED_CLASS_RADIAL_LAYOUT_PATH =
       JAVA_LAYOUT_PATH.resolve(DERIVED_CLASS_RADIAL_LAYOUT_NAME);
 
+  public static final String MODULE_REQUIRES_RADIAL_LAYOUT_NAME =
+      "Module Requires Radial Layout";
+
+  public static final Path MODULE_REQUIRES_RADIAL_LAYOUT_PATH =
+      JAVA_LAYOUT_PATH.resolve(MODULE_REQUIRES_RADIAL_LAYOUT_NAME);
+
   public static final String MODULE_USES_RADIAL_LAYOUT_NAME =
       "Module Uses Radial Layout";
 
@@ -116,6 +122,16 @@ public class DepanFxJavaLayoutRadialBuiltins {
         "Java Derived Class Radial Layout",
         "Layout selected nodes based on their Java class derivation relations",
         JavaLinkMatcherBuiltIns.JAVA_CLASS_DERIVED_MATCHER_PATH);
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxRadialLayoutData>
+  buildModuleRequiresRadialLayout() {
+    return DepanFxNodeViewLayouts.buildRadialLayoutContrib(
+        MODULE_REQUIRES_RADIAL_LAYOUT_PATH,
+        "Java Module Requires Radial Layout",
+        "Layout selected nodes based on their Java module requires relations",
+        JavaLinkMatcherBuiltIns.MODULE_REQUIRES_MATCHER_PATH);
   }
 
   @Bean

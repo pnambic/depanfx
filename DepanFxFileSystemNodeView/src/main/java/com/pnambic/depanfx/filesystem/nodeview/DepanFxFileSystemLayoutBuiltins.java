@@ -59,6 +59,7 @@ public class DepanFxFileSystemLayoutBuiltins {
         FILE_SYSTEM_MEMBER_LAYOUT_PATH,
         "File System Member Tree Layout",
         "Layout selected nodes based on their Java package member relations",
+        DepanFxTreeLayoutData.Direction.RIGHT,
         FileSystemLinkMatcherBuiltIns.FILE_SYSTEM_MEMBER_MATCHER_PATH);
   }
 
@@ -79,6 +80,7 @@ public class DepanFxFileSystemLayoutBuiltins {
         FILE_SYSTEM_MEMBERSHIP_TREE_LAYOUT_PATH,
         "File System Member Tree Layout",
         "Layout selected nodes based on their Java package member relations",
+        DepanFxTreeLayoutData.Direction.RIGHT,
         FileSystemLinkMatcherBuiltIns.FILE_SYSTEM_MEMBER_MATCHER_PATH);
   }
 }

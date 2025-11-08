@@ -10,6 +10,7 @@ import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModelBuilder;
 import com.pnambic.depanfx.nodeview.gui.DepanFxNodeViewPanel;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxTreeLayoutData;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxTreeLayoutData.Direction;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -69,9 +70,7 @@ public class TreeLayoutContribution
     return layoutNodes(view.getGraphDocRsrc(), layoutRsrc, updateNodes);
   }
 
-  /**
-   *
-   */
+
   @Override
   public Map<GraphNode, DepanFxNodeLocationData> layoutNodes(
       DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
@@ -84,7 +83,8 @@ public class TreeLayoutContribution
         treeData.getHierarchyMatcherRsrc().getResource();
     DepanFxLinkMatcher linkMatcher = matcherRegistry.buildMatcher(matcherDoc);
 
-    return buildNodeLocations(graphDocRsrc, updateNodes, linkMatcher);
+    return buildNodeLocations(
+        graphDocRsrc, updateNodes, treeData.getDirection(), linkMatcher);
   }
 
   @Override
@@ -92,6 +92,7 @@ public class TreeLayoutContribution
     DepanFxTreeLayoutData initialData =
         new DepanFxTreeLayoutData(
             "Tree layout", "Tree layout by membership hierarchy.",
+            DepanFxTreeLayoutData.Direction.RIGHT,
             view.getHierachyMatcherRsrc().get());
     DepanFxWorkspaceResource<DepanFxTreeLayoutData> layoutRsrc =
         view.getWorkspace().addScratchResource(initialData);
@@ -104,13 +105,14 @@ public class TreeLayoutContribution
         view.streamChosenNodes().collect(Collectors.toList());
 
     layoutDlg.getController().getToolResource()
-        .ifPresent(r -> view.updateNodeLocations(
-            layoutNodes(view, r, updateNodes)));
+        .ifPresent(r ->
+            view.updateNodeLocations(layoutNodes(view, r, updateNodes)));
   }
 
   private Map<GraphNode, DepanFxNodeLocationData> buildNodeLocations(
       DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
       Collection<GraphNode> updateNodes,
+      Direction direction,
       DepanFxLinkMatcher linkMatcher) {
     DepanFxTreeModelBuilder builder = new DepanFxTreeModelBuilder(linkMatcher);
     DepanFxTreeModel treeModel =
@@ -121,6 +123,34 @@ public class TreeLayoutContribution
     int leafs = dryRunLayout.getLeafCount();
     int levels = dryRunLayout.getMaxLevel();
 
+    TreeLayoutRunner treeLayout =
+        calcDirectionRunner(direction, treeModel, leafs, levels);
+    treeLayout.layoutNodes(updateNodes);
+
+    // TODO:  center the tree, cluster the orphans.
+    return treeLayout.getPositions(updateNodes);
+  }
+
+  private TreeLayoutRunner calcDirectionRunner(
+      DepanFxTreeLayoutData.Direction direction,
+      DepanFxTreeModel treeModel,
+      int leafs, int levels) {
+    switch (direction) {
+      case RIGHT:
+        return calcBaseRight(treeModel, leafs, levels);
+      case LEFT:
+        return calcBaseLeft(treeModel, leafs, levels);
+      case UP:
+        return calcBaseUp(treeModel, leafs, levels);
+      case DOWN:
+        return calcBaseDown(treeModel, leafs, levels);
+    }
+    return null;
+  }
+
+  protected TreeLayoutRunner calcBaseRight(
+      DepanFxTreeModel treeModel, int leafs, int levels) {
+
     double spacePerLeaf =
         Math.max(MIN_SPACE_PER_LEAF, TARGET_TREE_HIEGHT / leafs);
 
@@ -129,17 +159,73 @@ public class TreeLayoutContribution
 
     // The tree runner assigns leafs from the bottom left heading upward
     // and to the right.
-    double xBase =
-        DirectLayoutRunner.X_ORIGIN - spacePerLevel * ((levels / 2.0d) - 0.5d);
-    double yBase =
-        DirectLayoutRunner.Y_ORIGIN - spacePerLeaf * ((leafs / 2.0d) - 0.5d);
+    double xBase = DirectLayoutRunner.X_ORIGIN -
+        spacePerLevel * ((levels / 2.0d) - 0.5d);
+    double yBase = DirectLayoutRunner.Y_ORIGIN -
+        spacePerLeaf * ((leafs / 2.0d) - 0.5d);
 
-    TreeLayoutRunner treeLayout = new TreeLayoutRunner(
+    return new TreeLayoutRunner.Horizontal(
         treeModel, xBase, yBase, DirectLayoutRunner.Z_ORIGIN,
         spacePerLevel, spacePerLeaf);
-    treeLayout.layoutNodes(updateNodes);
+  }
 
-    // TODO:  center the tree, cluster the orphans.
-    return treeLayout.getPositions(updateNodes);
+  protected TreeLayoutRunner calcBaseLeft(DepanFxTreeModel treeModel, int leafs, int levels) {
+
+    double spacePerLeaf =
+        Math.max(MIN_SPACE_PER_LEAF, TARGET_TREE_HIEGHT / leafs);
+
+    double spacePerLevel =
+        Math.max(MIN_SPACE_PER_LEVEL, TARGET_TREE_WIDTH / levels);
+
+    // The tree runner assigns leafs from the bottom left heading upward
+    // and to the right.
+    double xBase = DirectLayoutRunner.X_ORIGIN +
+        spacePerLevel * ((levels / 2.0d) - 0.5d);
+    double yBase = DirectLayoutRunner.Y_ORIGIN -
+        spacePerLeaf * ((leafs / 2.0d) - 0.5d);
+
+    return new TreeLayoutRunner.Horizontal(
+        treeModel, xBase, yBase, DirectLayoutRunner.Z_ORIGIN,
+        -spacePerLevel, spacePerLeaf);
+  }
+
+  protected TreeLayoutRunner calcBaseUp(DepanFxTreeModel treeModel, int leafs, int levels) {
+
+    double spacePerLeaf =
+        Math.max(MIN_SPACE_PER_LEAF, TARGET_TREE_HIEGHT / leafs);
+
+    double spacePerLevel =
+        Math.max(MIN_SPACE_PER_LEVEL, TARGET_TREE_WIDTH / levels);
+
+    // The tree runner assigns leafs from the bottom left heading upward
+    // and to the right.
+    double xBase = DirectLayoutRunner.X_ORIGIN -
+        spacePerLevel * ((leafs / 2.0d) - 0.5d);
+    double yBase = DirectLayoutRunner.Y_ORIGIN -
+        spacePerLeaf * ((levels / 2.0d) - 0.5d);
+
+    return new TreeLayoutRunner.Vertical(
+        treeModel, xBase, yBase, DirectLayoutRunner.Z_ORIGIN,
+        spacePerLevel, spacePerLeaf);
+  }
+
+  protected TreeLayoutRunner calcBaseDown(DepanFxTreeModel treeModel, int leafs, int levels) {
+
+    double spacePerLeaf =
+        Math.max(MIN_SPACE_PER_LEAF, TARGET_TREE_HIEGHT / leafs);
+
+    double spacePerLevel =
+        Math.max(MIN_SPACE_PER_LEVEL, TARGET_TREE_WIDTH / levels);
+
+    // The tree runner assigns leafs from the bottom left heading upward
+    // and to the right.
+    double xBase = DirectLayoutRunner.X_ORIGIN -
+        spacePerLevel * ((leafs / 2.0d) - 0.5d);
+    double yBase = DirectLayoutRunner.Y_ORIGIN +
+        spacePerLeaf * ((levels / 2.0d) - 0.5d);
+
+    return new TreeLayoutRunner.Vertical(
+        treeModel, xBase, yBase, DirectLayoutRunner.Z_ORIGIN,
+        spacePerLevel, -spacePerLeaf);
   }
 }

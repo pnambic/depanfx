@@ -24,18 +24,21 @@ import java.util.Collection;
 /**
  * Layouts the elements of a hierarchy as a planar tree on the
  * supplied {@link #zBase} coordinate.
+ *
+ * By cleverly configuring the base coordinates and spacing,
+ * the runner can produce trees that grow in different directions.
  */
-public class TreeLayoutRunner extends HierarchicalLayoutRunner {
+public abstract class TreeLayoutRunner extends HierarchicalLayoutRunner {
 
-  private final double xBase;
+  protected final double xBase;
 
-  private final double yBase;
+  protected final double yBase;
 
-  private final double zBase;
+  protected final double zBase;
 
-  private final double horizontalSpace;
+  protected final double horizontalSpace;
 
-  private final double verticalSpace;
+  protected final double verticalSpace;
 
   protected TreeLayoutRunner(
       DepanFxTreeModel treeModel,
@@ -50,15 +53,43 @@ public class TreeLayoutRunner extends HierarchicalLayoutRunner {
   }
 
   @Override
-  protected void assignNode(GraphNode node, int level, int offset) {
-    assignPosition(node,
-        xBase + (level * horizontalSpace),
-        yBase + (offset * verticalSpace),
-        zBase);
-  }
-
-  @Override
   protected int getRootLevel(Collection<GraphNode> roots) {
     return 0;
+  }
+
+  public static class Horizontal extends TreeLayoutRunner {
+
+    public Horizontal(
+        DepanFxTreeModel treeModel,
+        double xBase, double yBase, double zBase,
+        double horizontalSpace, double verticalSpace) {
+      super(treeModel, xBase, yBase, zBase, horizontalSpace, verticalSpace);
+    }
+
+    @Override
+    protected void assignNode(GraphNode node, int level, int offset) {
+      assignPosition(node,
+          xBase + (level * horizontalSpace),
+          yBase + (offset * verticalSpace),
+          zBase);
+    }
+  }
+
+  public static class Vertical extends TreeLayoutRunner {
+
+    public Vertical(
+        DepanFxTreeModel treeModel,
+        double xBase, double yBase, double zBase,
+        double horizontalSpace, double verticalSpace) {
+      super(treeModel, xBase, yBase, zBase, horizontalSpace, verticalSpace);
+    }
+
+    @Override
+    protected void assignNode(GraphNode node, int level, int offset) {
+      assignPosition(node,
+          xBase + (offset * horizontalSpace),
+          yBase + (level * verticalSpace),
+          zBase);
+    }
   }
 }

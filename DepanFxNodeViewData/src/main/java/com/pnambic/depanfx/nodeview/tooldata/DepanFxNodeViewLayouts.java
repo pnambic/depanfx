@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.nodeview.tooldata;
 
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxTreeLayoutData.Direction;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
 
@@ -50,6 +51,7 @@ public class DepanFxNodeViewLayouts {
       Path layoutInfoPath,
       String layoutName,
       String layoutDescr,
+      Direction direction,
       Path layoutMatcherPath) {
 
     return new DepanFxBuiltInContribution.Dependent<DepanFxTreeLayoutData>(
@@ -60,7 +62,8 @@ public class DepanFxNodeViewLayouts {
           DepanFxBuiltInProject project) {
 
         return new DepanFxTreeLayoutData(
-            layoutName, layoutDescr, getResource(project, layoutMatcherPath)) ;
+            layoutName, layoutDescr,
+            direction, getResource(project, layoutMatcherPath));
       }
     };
   }

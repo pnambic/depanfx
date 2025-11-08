@@ -58,6 +58,12 @@ public class DepanFxJavaLayoutTreeBuiltins {
   public static final Path DERIVED_CLASS_TREE_LAYOUT_PATH =
       JAVA_LAYOUT_PATH.resolve(DERIVED_CLASS_TREE_LAYOUT_NAME);
 
+  public static final String MODULE_REQUIRES_TREE_LAYOUT_NAME =
+      "Module Requires Tree Layout";
+
+  public static final Path MODULE_REQUIRES_TREE_LAYOUT_PATH =
+      JAVA_LAYOUT_PATH.resolve(MODULE_REQUIRES_TREE_LAYOUT_NAME);
+
   public static final String MODULE_USES_TREE_LAYOUT_NAME =
       "Module Uses Tree Layout";
 
@@ -71,6 +77,7 @@ public class DepanFxJavaLayoutTreeBuiltins {
         TREE_MEMBERSHIP_TREE_LAYOUT_PATH,
         "Java Tree Membership Tree Layout",
         "Layout selected nodes based on their Java tree membership relations",
+        DepanFxTreeLayoutData.Direction.RIGHT,
         JavaLinkMatcherBuiltIns.JAVA_TREE_MEMBER_MATCHER_PATH);
   }
 
@@ -81,6 +88,7 @@ public class DepanFxJavaLayoutTreeBuiltins {
         PACKAGE_MEMBERSHIP_TREE_LAYOUT_PATH,
         "Java Package Membership Tree Layout",
         "Layout selected nodes based on their Java package membership relations",
+        DepanFxTreeLayoutData.Direction.RIGHT,
         JavaLinkMatcherBuiltIns.JAVA_PACKAGE_MEMBER_PATH);
   }
 
@@ -91,6 +99,7 @@ public class DepanFxJavaLayoutTreeBuiltins {
         CLASS_MEMBERSHIP_TREE_LAYOUT_PATH,
         "Java Class Membership Tree Layout",
         "Layout selected nodes based on their Java class membership relations",
+        DepanFxTreeLayoutData.Direction.RIGHT,
         JavaLinkMatcherBuiltIns.JAVA_CLASS_MEMBER_MATCHER_PATH);
   }
 
@@ -101,7 +110,19 @@ public class DepanFxJavaLayoutTreeBuiltins {
         DERIVED_CLASS_TREE_LAYOUT_PATH,
         "Java Derived Class Tree Layout",
         "Layout selected nodes based on their Java class derivation relations",
+        DepanFxTreeLayoutData.Direction.RIGHT,
         JavaLinkMatcherBuiltIns.JAVA_CLASS_DERIVED_MATCHER_PATH);
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxTreeLayoutData>
+  buildModuleRequiresTreeLayout() {
+    return DepanFxNodeViewLayouts.buildTreeLayoutContrib(
+        MODULE_REQUIRES_TREE_LAYOUT_PATH,
+        "Java Module Requires Tree Layout",
+        "Layout selected nodes based on their Java module requires relations",
+        DepanFxTreeLayoutData.Direction.RIGHT,
+        JavaLinkMatcherBuiltIns.MODULE_REQUIRES_MATCHER_PATH);
   }
 
   @Bean
@@ -111,6 +132,7 @@ public class DepanFxJavaLayoutTreeBuiltins {
         MODULE_USES_TREE_LAYOUT_PATH,
         "Java Module Uses Tree Layout",
         "Layout selected nodes based on their Java module use relations",
+        DepanFxTreeLayoutData.Direction.RIGHT,
         JavaLinkMatcherBuiltIns.MODULE_USES_MATCHER_PATH);
   }
 }

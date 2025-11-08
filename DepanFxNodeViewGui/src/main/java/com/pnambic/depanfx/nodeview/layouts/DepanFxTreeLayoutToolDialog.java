@@ -17,7 +17,6 @@ package com.pnambic.depanfx.nodeview.layouts;
 
 import com.pnambic.depanfx.edgematchers.gui.DepanFxEdgeMatcherDialogRegistry;
 import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherChooser;
-import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherChooser.LinkMatcherControl;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayoutData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxTreeLayoutData;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
@@ -37,14 +36,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.StringConverter;
 
 @DepanFxFxmlDialog
 @FxmlView("tree-layout-tool-dialog.fxml")
 public class DepanFxTreeLayoutToolDialog
     extends DepanFxBaseToolDialog<DepanFxTreeLayoutData> {
+
+  // Translatable labels for directions in the UX.
+  public static final String DIRECTION_DOWN_LABEL = "Down";
+
+  public static final String DIRECTION_UP_LABEL = "Up";
+
+  public static final String DIRECTION_LEFT_LABEL = "Left";
+
+  public static final String DIRECTION_RIGHT_LABEL = "Right";
 
   public static final ExtensionFilter TREE_LAYOUT_FILTER =
       DepanFxSceneControls.buildExtFilter(
@@ -57,12 +67,15 @@ public class DepanFxTreeLayoutToolDialog
 
   private final DepanFxDialogRunner dialogRunner;
 
+  private final DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry;
+
   @FXML
   private TextField hierarchyMatcherRsrcField;
 
-  private LinkMatcherControl hierarchyMatcherControl;
+  private DepanFxLinkMatcherChooser.LinkMatcherControl hierarchyMatcherControl;
 
-  private final DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry;
+  @FXML
+  private ChoiceBox<DepanFxTreeLayoutData.Direction> treeDirectionChoiceBox;
 
   @Autowired
   public DepanFxTreeLayoutToolDialog(
@@ -100,6 +113,10 @@ public class DepanFxTreeLayoutToolDialog
         new DepanFxLinkMatcherChooser.LinkMatcherControl(
             getWorkspace(), dialogRunner,
             matcherDialogRegistry, hierarchyMatcherRsrcField);
+
+    treeDirectionChoiceBox.getItems().addAll(
+        DepanFxTreeLayoutData.Direction.values());
+    treeDirectionChoiceBox.setConverter(new DirectionConverter());
   }
 
   @Override
@@ -107,6 +124,7 @@ public class DepanFxTreeLayoutToolDialog
       DepanFxWorkspaceResource<DepanFxTreeLayoutData> toolRsrc) {
     super.setToolResource(toolRsrc);
 
+    treeDirectionChoiceBox.setValue(toolRsrc.getResource().getDirection());
     hierarchyMatcherControl.setLinkMatcherResource(
         toolRsrc.getResource().getHierarchyMatcherRsrc());
   }
@@ -123,6 +141,7 @@ public class DepanFxTreeLayoutToolDialog
   protected DepanFxTreeLayoutData prepareResult() {
     return new DepanFxTreeLayoutData(
         getToolName(), getToolDescription(),
+        treeDirectionChoiceBox.getValue(),
         hierarchyMatcherControl.getLinkMatcherResource());
   }
 
@@ -142,5 +161,25 @@ public class DepanFxTreeLayoutToolDialog
   @Override
   protected String getInputCheckFailureText() {
     return  "Tree Layout Save Confirmation Error";
+  }
+
+  private static class DirectionConverter
+      extends StringConverter<DepanFxTreeLayoutData.Direction> {
+
+    @Override
+    public String toString(DepanFxTreeLayoutData.Direction direction) {
+      switch (direction) {
+        case RIGHT: return DIRECTION_RIGHT_LABEL;
+        case LEFT: return DIRECTION_LEFT_LABEL;
+        case UP: return DIRECTION_UP_LABEL;
+        case DOWN: return DIRECTION_DOWN_LABEL;
+      }
+      return null;
+    }
+
+    @Override
+    public DepanFxTreeLayoutData.Direction fromString(String text) {
+      return DepanFxTreeLayoutData.Direction.valueOf(text.toUpperCase());
+    }
   }
 }
