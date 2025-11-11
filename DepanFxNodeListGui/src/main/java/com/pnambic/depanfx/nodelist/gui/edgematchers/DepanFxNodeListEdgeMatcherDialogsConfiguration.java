@@ -16,9 +16,8 @@
 package com.pnambic.depanfx.nodelist.gui.edgematchers;
 
 import com.pnambic.depanfx.edgematchers.gui.DepanFxEdgeMatcherDialogRegistry;
-import com.pnambic.depanfx.edgematchers.gui.DepanFxLinkMatcherSequenceToolDialog;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListEdgeMatcherData;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilterModel;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
@@ -35,7 +34,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
-import java.util.Collections;
 
 import javafx.scene.control.Cell;
 import javafx.scene.control.MenuItem;
@@ -63,7 +61,7 @@ public class DepanFxNodeListEdgeMatcherDialogsConfiguration {
       NODE_LIST_MATCHER;
 
   private static final String NODE_LIST_MATCHER_TOOL_DESCR =
-      "Link matcher sequence.";
+      "Node list edge matcher.";
 
   @Bean
   public DepanFxResourceRegistry.Contribution nodeListMatcherFileOpenContrib() {
@@ -77,8 +75,8 @@ public class DepanFxNodeListEdgeMatcherDialogsConfiguration {
 
   @Bean
   public DepanFxNewResourceContribution nodeListMatcherNewMenu(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
-    return new NewContribution(workspace, dialogRunner);
+      DepanFxDialogRunner dialogRunner) {
+    return new NewContribution(dialogRunner);
   }
 
   @Bean
@@ -89,21 +87,20 @@ public class DepanFxNodeListEdgeMatcherDialogsConfiguration {
   }
 
   private static class NodeListMatcherFileOpenContribution extends
-      DepanFxResourceRegistry.Principal<DepanFxLinkMatcherSequenceDocument> {
+      DepanFxResourceRegistry.Principal<DepanFxNodeListEdgeMatcherData> {
 
     private NodeListMatcherFileOpenContribution() {
       super(
           NODE_LIST_MATCHER_LABEL,
-          DepanFxLinkMatcherSequenceDocument.class,
-          DepanFxLinkMatcherSequenceDocument.LINK_MATCHER_SEQUENCE_TOOL_EXT,
+          DepanFxNodeListEdgeMatcherData.class,
+          DepanFxNodeListEdgeMatcherData.NODE_LIST_EDGE_MATCHER_TOOL_EXT,
           NODE_LIST_MATCHER_KEY);
     }
 
     @Override
     protected void runDialog(DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> wkspRsrc) {
-      DepanFxLinkMatcherSequenceToolDialog.runEditDialog(
-          wkspRsrc, dialogRunner);
+        DepanFxWorkspaceResource<DepanFxNodeListEdgeMatcherData> wkspRsrc) {
+      DepanFxNodeListEdgeMatcherDialog.runEditDialog(dialogRunner, wkspRsrc);
     }
   }
 
@@ -112,7 +109,7 @@ public class DepanFxNodeListEdgeMatcherDialogsConfiguration {
 
     @Override
     public boolean acceptsPath(Path rsrcPath) {
-      return DepanFxLinkMatcherSequenceDocument.LINK_MATCHER_SEQUENCE_TOOL_PATH
+      return DepanFxNodeListEdgeMatcherData.LINK_MATCHER_TOOL_PATH
           .equals(rsrcPath);
     }
 
@@ -122,7 +119,7 @@ public class DepanFxNodeListEdgeMatcherDialogsConfiguration {
         Cell<DepanFxWorkspaceMember> cell,
         DepanFxProjectMember member, DepanFxContextMenuBuilder builder) {
       builder.appendActionItem(NEW_NODE_LIST_MATCHER,
-          e -> runCreateDialog(workspace, dialogRunner));
+          e -> runCreateDialog(dialogRunner));
     }
 
     @Override
@@ -134,32 +131,21 @@ public class DepanFxNodeListEdgeMatcherDialogsConfiguration {
   private static class NewContribution
     implements DepanFxNewResourceContribution {
 
-    private final DepanFxWorkspace workspace;
-
     private final DepanFxDialogRunner dialogRunner;
 
-    public NewContribution(
-        DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
-      this.workspace = workspace;
+    public NewContribution(DepanFxDialogRunner dialogRunner) {
       this.dialogRunner = dialogRunner;
     }
 
     @Override
     public MenuItem createNewResourceMenuItem() {
       return DepanFxMenuItemFactory.createActionItem(
-          NEW_NODE_LIST_MATCHER, e -> runCreateDialog(workspace, dialogRunner));
+          NEW_NODE_LIST_MATCHER, e -> runCreateDialog(dialogRunner));
     }
   }
 
-  private static void runCreateDialog(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
-    DepanFxLinkMatcherSequenceDocument newMatcherSeq =
-        new DepanFxLinkMatcherSequenceDocument(
-            NODE_LIST_MATCHER_TOOL_NAME, NODE_LIST_MATCHER_TOOL_DESCR,
-            Collections.emptyList());
-
-    DepanFxLinkMatcherSequenceToolDialog.runCreateDialog(
-        workspace.addScratchResource(newMatcherSeq), dialogRunner);
+  private static void runCreateDialog(DepanFxDialogRunner dialogRunner) {
+    DepanFxNodeListEdgeMatcherDialog.runCreateDialog(dialogRunner);
   }
 
   private static class NodeListMatcherDialogContribution
@@ -167,7 +153,7 @@ public class DepanFxNodeListEdgeMatcherDialogsConfiguration {
 
     @Override
     public boolean accepts(DepanFxBaseMatcherDocument matcherInfo) {
-      return DepanFxLinkMatcherSequenceDocument.class
+      return DepanFxNodeListEdgeMatcherData.class
           .isAssignableFrom(matcherInfo.getClass());
     }
 
