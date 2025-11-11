@@ -49,6 +49,12 @@ public class JavaNodeListSectionBuiltIns {
   public static final Path DERIVED_CLASS_TREE_SECTION_PATH =
       JAVA_SECTION_PATH.resolve(DERIVED_CLASS_TREE_SECTION_NAME);
 
+  public static final String MODULE_REQUIRES_TREE_SECTION_NAME =
+      "Module Requires Tree Section";
+
+  public static final Path MODULE_REQUIRES_TREE_SECTION_PATH =
+      JAVA_SECTION_PATH.resolve(MODULE_REQUIRES_TREE_SECTION_NAME);
+
   @Bean
   public DepanFxBuiltInContribution<DepanFxTreeSectionData>
       javaTreeMemberTreeSection() {
@@ -91,6 +97,31 @@ public class JavaNodeListSectionBuiltIns {
             "Derived Class Tree",
             true,
             getResource(project, JavaLinkMatcherBuiltIns.JAVA_CLASS_DERIVED_MATCHER_PATH),
+            false,
+            OrderBy.NODE_LEAF,
+            DepanFxContainerOrder.LAST,
+            OrderDirection.FORWARD);
+      }
+    };
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxTreeSectionData>
+      javaModuleRequiresTreeSection() {
+
+    return new DepanFxBuiltInContribution.Dependent<DepanFxTreeSectionData>(
+        MODULE_REQUIRES_TREE_SECTION_PATH) {
+
+      @Override
+      protected DepanFxTreeSectionData buildDocument(
+          DepanFxBuiltInProject project) {
+
+        return new DepanFxTreeSectionData(
+            "Module Requires Section",
+            "Tree section based on Java module requires relations.",
+            "Module Requires Tree",
+            true,
+            getResource(project, JavaLinkMatcherBuiltIns.MODULE_REQUIRES_MATCHER_PATH),
             false,
             OrderBy.NODE_LEAF,
             DepanFxContainerOrder.LAST,

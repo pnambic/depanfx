@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.java.gui;
 
+import com.pnambic.depanfx.filesystem.gui.FileSystemNodeListSectionBuiltIns;
 import com.pnambic.depanfx.java.context.JavaContextModelId;
 import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeKeyColumnBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSectionBuiltIns;
@@ -55,6 +56,18 @@ public class JavaNodeListTableViewBuiltins {
       JAVA_TABLE_VIEW_PATH.resolve(
           DepanFxNodeListTableViewData.TABLE_VIEW_CONTEXT_RESOURCE_NAME);
 
+  public static final String JAVA_COMPONENTS_TABLE_VIEW_NAME =
+      "Java Components Node List View";
+
+  public static final Path JAVA_COMPONENTS_TABLE_VIEW_PATH =
+      JAVA_TABLE_VIEW_PATH.resolve(JAVA_COMPONENTS_TABLE_VIEW_NAME);
+
+  public static final String MODULE_REQUIRES_TABLE_VIEW_NAME =
+      "Module Requires Node List View";
+
+  public static final Path MODULE_REQUIRES_TABLE_VIEW_PATH =
+      JAVA_TABLE_VIEW_PATH.resolve(MODULE_REQUIRES_TABLE_VIEW_NAME);
+
   @Bean
   public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
   treeMembershipTableView() {
@@ -94,6 +107,76 @@ public class JavaNodeListTableViewBuiltins {
 
         return new DepanFxNodeListTableViewData(
             "Class Hierarchy View", "Table view based on class derivation heirarchy",
+            sectionRsrcs, columnRsrcs);
+      }
+    };
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
+  moduleRequiresTableView() {
+
+    return new DepanFxBuiltInContribution.Dependent<DepanFxNodeListTableViewData>(
+        MODULE_REQUIRES_TABLE_VIEW_PATH) {
+
+      @Override
+      protected DepanFxNodeListTableViewData buildDocument(
+          DepanFxBuiltInProject project) {
+
+        // Flat and Members Sections
+        List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
+            sectionRsrcs = new ArrayList<>();
+        sectionRsrcs.add(getResource(project,
+            JavaNodeListSectionBuiltIns.MODULE_REQUIRES_TREE_SECTION_PATH));
+        sectionRsrcs.add(getResource(project,
+            DepanFxNodeListSectionBuiltIns.SIMPLE_SECTION_TOOL_PATH));
+
+        // Node Kind Column
+        List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
+            columnRsrcs = new ArrayList<>();
+        columnRsrcs.add(getResource(project,
+            DepanFxNodeKeyColumnBuiltIns.KIND_KEY_COLUMN_TOOL_PATH));
+
+        return new DepanFxNodeListTableViewData(
+            "Module Requires Hierarchy View",
+            "Table view based on module requires heirarchy",
+            sectionRsrcs, columnRsrcs);
+      }
+    };
+  }
+
+  @Bean
+  public DepanFxBuiltInContribution<DepanFxNodeListTableViewData>
+  javaComponentsTableView() {
+
+    return new DepanFxBuiltInContribution.Dependent<DepanFxNodeListTableViewData>(
+        JAVA_COMPONENTS_TABLE_VIEW_PATH) {
+
+      @Override
+      protected DepanFxNodeListTableViewData buildDocument(
+          DepanFxBuiltInProject project) {
+
+        // Flat and Members Sections
+        List<DepanFxWorkspaceResource<? extends DepanFxBaseSectionData>>
+            sectionRsrcs = new ArrayList<>();
+        sectionRsrcs.add(getResource(project,
+            JavaNodeListSectionBuiltIns.TREE_MEMBERSHIP_TREE_SECTION_PATH));
+        sectionRsrcs.add(getResource(project,
+            JavaNodeListSectionBuiltIns.MODULE_REQUIRES_TREE_SECTION_PATH));
+        sectionRsrcs.add(getResource(project,
+            FileSystemNodeListSectionBuiltIns.FILE_SYSTEM_HIERARCHY_SECTION_PATH));
+        sectionRsrcs.add(getResource(project,
+            DepanFxNodeListSectionBuiltIns.SIMPLE_SECTION_TOOL_PATH));
+
+        // Node Kind Column
+        List<DepanFxWorkspaceResource<? extends DepanFxBaseColumnData>>
+            columnRsrcs = new ArrayList<>();
+        columnRsrcs.add(getResource(project,
+            DepanFxNodeKeyColumnBuiltIns.KIND_KEY_COLUMN_TOOL_PATH));
+
+        return new DepanFxNodeListTableViewData(
+            "Java Components Hierarchy View",
+            "Table view based on member heirarchy for Java components.",
             sectionRsrcs, columnRsrcs);
       }
     };

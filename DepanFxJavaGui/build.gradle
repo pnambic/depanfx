@@ -19,6 +19,7 @@ dependencies {
   implementation project(':DepanFxEdgeMatchers')
   implementation project(':DepanFxEdgeMatchersGui')
   implementation project(':DepanFxFileSystem')
+  implementation project(':DepanFxFileSystemGui')
   implementation project(':DepanFxGraph')
   implementation project(':DepanFxGraphDoc')
   implementation project(':DepanFxJava')

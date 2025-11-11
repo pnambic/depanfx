@@ -12,6 +12,7 @@ module depanfx.java.gui {
   requires depanfx.edgematchers;
   requires depanfx.edgematchers.gui;
   requires depanfx.filesystem;
+  requires depanfx.filesystem.gui;
   requires depanfx.graph;
   requires depanfx.graph_doc;
   requires depanfx.java;
