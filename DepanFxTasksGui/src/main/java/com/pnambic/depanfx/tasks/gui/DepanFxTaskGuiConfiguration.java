@@ -15,8 +15,47 @@
  */
 package com.pnambic.depanfx.tasks.gui;
 
+import com.pnambic.depanfx.scene.DepanFxSceneService;
+import com.pnambic.depanfx.scene.DepanFxSceneViewer;
+import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuContribution;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javafx.event.ActionEvent;
 
 @Configuration
 public class DepanFxTaskGuiConfiguration {
+
+  @Bean
+  public DepanFxSceneMenuContribution viewActiveTasksItem(
+      TaskMonitorDialogService dialogService) {
+    return new TaskMonitorSceneMenuContribution(dialogService);
+  }
+
+  private class TaskMonitorSceneMenuContribution
+      extends DepanFxSceneMenuContribution.Simple {
+
+    public static final String MENU_ITEM_KEY = "viewActiveTasksItem";
+
+    private final TaskMonitorDialogService dialogService;
+
+    @Autowired
+    public TaskMonitorSceneMenuContribution(
+        TaskMonitorDialogService dialogService) {
+      super(MENU_ITEM_KEY);
+      this.dialogService = dialogService;
+    }
+
+    @Override
+    public boolean forViewer(DepanFxSceneViewer viewer) {
+      return true;
+    }
+
+    @Override
+    public void handleEvent(DepanFxSceneService sceneSrvc, ActionEvent event) {
+      dialogService.showTaskMonitor();
+    }
+  }
 }

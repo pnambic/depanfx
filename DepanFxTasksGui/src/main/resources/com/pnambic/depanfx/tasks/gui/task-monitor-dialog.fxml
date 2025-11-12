@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.BorderPane?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="com.pnambic.depanfx.tasks.gui.TaskMonitorDialogController"
+    fx:controller="com.pnambic.depanfx.tasks.gui.TaskMonitorDialog"
     prefWidth="460.0" prefHeight="320.0">
   <top>
     <Label text="Background Tasks"
@@ -16,7 +16,4 @@
   <center>
     <ListView fx:id="activeTasksView" focusTraversable="false" />
   </center>
-  <padding>
-    <Insets top="12.0" right="12.0" bottom="12.0" left="12.0" />
-  </padding>
 </BorderPane>
