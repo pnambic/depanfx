@@ -15,9 +15,6 @@ module depanfx.tasks.gui {
 
     opens com.pnambic.depanfx.tasks.gui
         to javafx.fxml, net.rgielen.fxweaver.core, spring.beans, spring.core;
-    opens com.pnambic.depanfx.tasks.gui.config
-        to spring.beans, spring.core;
 
     exports com.pnambic.depanfx.tasks.gui;
-    exports com.pnambic.depanfx.tasks.gui.config;
 }

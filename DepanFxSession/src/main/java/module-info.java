@@ -11,13 +11,15 @@ module depanfx.session {
 
     requires org.slf4j;
 
-    requires depanfx.perspective;
-    requires depanfx.persistence;
-    requires depanfx.session.data;
-    requires depanfx.scene;
-    requires depanfx.workspace;
-    requires pnambic.modxstream;
     requires depanfx.base;
+    requires depanfx.persistence;
+    requires depanfx.perspective;
+    requires depanfx.scene;
+    requires depanfx.session.data;
+    requires depanfx.tasks.gui;
+    requires depanfx.workspace;
+
+    // requires pnambic.modxstream;
 
     opens com.pnambic.depanfx.session.core to
         spring.core, spring.beans;

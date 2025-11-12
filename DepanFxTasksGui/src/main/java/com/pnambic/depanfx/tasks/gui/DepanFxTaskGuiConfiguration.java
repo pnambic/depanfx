@@ -15,12 +15,8 @@
  */
 package com.pnambic.depanfx.tasks.gui;
 
-/**
- * Marker type for the task GUI module exports.
- */
-public final class DepanFxTaskGuiMarker {
+import org.springframework.context.annotation.Configuration;
 
-  private DepanFxTaskGuiMarker() {
-    // Prevent instantiation.
-  }
+@Configuration
+public class DepanFxTaskGuiConfiguration {
 }
