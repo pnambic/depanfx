@@ -79,7 +79,7 @@ public class DepanFxDialogRunner {
     return runModeless(view, title);
   }
 
-  public <C> Dialog<C>createDialogAndParent(Class<C> type) {
+  public <C> Dialog<C> createDialogAndParent(Class<C> type) {
     return new Dialog<>(fxweaver.load(type));
   }
 

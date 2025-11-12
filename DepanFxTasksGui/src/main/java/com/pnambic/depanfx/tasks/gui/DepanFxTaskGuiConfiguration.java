@@ -15,9 +15,11 @@
  */
 package com.pnambic.depanfx.tasks.gui;
 
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuContribution;
+import com.pnambic.depanfx.scene.plugins.DepanFxSceneViewPanelRegistry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +34,12 @@ public class DepanFxTaskGuiConfiguration {
   public DepanFxSceneMenuContribution viewActiveTasksItem(
       TaskMonitorDialogService dialogService) {
     return new TaskMonitorSceneMenuContribution(dialogService);
+  }
+
+  @Bean
+  public DepanFxSceneViewPanelRegistry.Contribution taskMonitorPanel(
+      DepanFxDialogRunner dialogRunner) {
+    return new TaskMonitorViewPanelContribution(dialogRunner);
   }
 
   private class TaskMonitorSceneMenuContribution
@@ -56,6 +64,31 @@ public class DepanFxTaskGuiConfiguration {
     @Override
     public void handleEvent(DepanFxSceneService sceneSrvc, ActionEvent event) {
       dialogService.showTaskMonitor();
+    }
+  }
+
+  private static class TaskMonitorViewPanelContribution
+      implements DepanFxSceneViewPanelRegistry.Contribution {
+
+    private final DepanFxDialogRunner dialogRunner;
+
+    public TaskMonitorViewPanelContribution(DepanFxDialogRunner dialogRunner) {
+      this.dialogRunner = dialogRunner;
+    }
+
+    @Override
+    public String getLabel() {
+      return TaskMonitorViewer.TAB_TITLE;
+    }
+
+    @Override
+    public String getOrderKey() {
+      return TaskMonitorViewer.TAB_TITLE;
+    }
+
+    @Override
+    public DepanFxSceneViewer getSceneViewer(DepanFxSceneService sceneSrvc) {
+      return new TaskMonitorViewer(dialogRunner);
     }
   }
 }
