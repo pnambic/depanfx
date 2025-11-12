@@ -98,7 +98,7 @@
                      <items>
                         <Menu fx:id="viewPanelsItem" text="Panels"/>
                         <MenuItem id="viewActiveTasksItem"
-                            text="Background Tasks"
+                            text="Background Tasks..."
                             onAction="#handleByRegistry"/>
                       </items>
                 </Menu>
