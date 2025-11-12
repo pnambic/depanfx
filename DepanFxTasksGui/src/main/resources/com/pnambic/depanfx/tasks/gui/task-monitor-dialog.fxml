@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.pnambic.depanfx.tasks.gui.TaskMonitorDialogController"
+    prefWidth="460.0" prefHeight="320.0">
+  <top>
+    <Label text="Background Tasks"
+        BorderPane.alignment="CENTER_LEFT"
+        styleClass="dialog-header" />
+  </top>
+  <center>
+    <ListView fx:id="activeTasksView" focusTraversable="false" />
+  </center>
+  <padding>
+    <Insets top="12.0" right="12.0" bottom="12.0" left="12.0" />
+  </padding>
+</BorderPane>
