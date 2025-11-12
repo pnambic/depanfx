@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.pnambic.depanfx.tasks.gui.TaskMonitorSceneViewerController">
+  <padding>
+    <Insets top="12.0" right="12.0" bottom="12.0" left="12.0" />
+  </padding>
+  <center>
+    <SplitPane dividerPositions="0.6" orientation="VERTICAL">
+      <items>
+        <VBox spacing="8.0">
+          <children>
+            <Label text="Active Tasks" />
+            <TreeTableView fx:id="activeTree" showRoot="false" VBox.vgrow="ALWAYS">
+              <columns>
+                <TreeTableColumn fx:id="activeTitleColumn" text="Task" />
+                <TreeTableColumn fx:id="activeStatusColumn" prefWidth="120.0" text="Status" />
+                <TreeTableColumn fx:id="activeRemainingColumn" prefWidth="120.0" text="Remaining" />
+              </columns>
+            </TreeTableView>
+          </children>
+        </VBox>
+        <VBox spacing="8.0">
+          <children>
+            <Label text="Completed Tasks" />
+            <TreeTableView fx:id="completedTree" showRoot="false" VBox.vgrow="ALWAYS">
+              <columns>
+                <TreeTableColumn fx:id="completedTitleColumn" text="Task" />
+                <TreeTableColumn fx:id="completedStatusColumn" prefWidth="120.0" text="Status" />
+                <TreeTableColumn fx:id="completedRemainingColumn" prefWidth="120.0" text="Remaining" />
+              </columns>
+            </TreeTableView>
+            <HBox alignment="CENTER_RIGHT" spacing="8.0">
+              <children>
+                <Button fx:id="openResultButton" mnemonicParsing="false" onAction="#handleOpenResult"
+                        text="Open Result" />
+                <Button fx:id="clearCompletedButton" mnemonicParsing="false" onAction="#handleClearCompleted"
+                        text="Clear Completed" />
+              </children>
+            </HBox>
+          </children>
+        </VBox>
+      </items>
+    </SplitPane>
+  </center>
+</BorderPane>
