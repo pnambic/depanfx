@@ -1,12 +1,22 @@
+/*
+ * Copyright 2025 The Depan Project Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.pnambic.depanfx.tasks;
 
-import java.util.concurrent.CancellationException;
-
 /**
- * A simple callback contract that long running tasks use to report their
- * progress back to the task executor. Implementations are responsible for
- * forwarding the updates to interested listeners (for example, GUI panels or
- * logging services).
+ * Mechanism tasks to report their progress.
  */
 public interface ProgressMonitor {
 
@@ -16,38 +26,11 @@ public interface ProgressMonitor {
   int UNKNOWN_TOTAL = -1;
 
   /**
-   * Signals the start of the task and provides (or updates) the total number of
-   * expected steps.
-   */
-  void begin(int totalSteps);
-
-  /**
-   * Advances the completed step count by {@code stepDelta}.
-   */
-  default void advance(int stepDelta) {
-    advance(stepDelta, null);
-  }
-
-  /**
    * Advances the completed step count by {@code stepDelta} and publishes the
    * supplied message.
    */
   void advance(int stepDelta, String message);
 
-  /**
-   * Convenience method that advances the progress by a single step and sets the
-   * supplied message.
-   */
-  default void advance(String message) {
-    advance(1, message);
-  }
-
-  /**
-   * Convenience method that advances the progress by a single step.
-   */
-  default void advance() {
-    advance(1, null);
-  }
 
   /**
    * Updates the current message without changing the progress counters.
@@ -65,15 +48,4 @@ public interface ProgressMonitor {
    * task.
    */
   boolean isCancelled();
-
-  /**
-   * Throws a {@link CancellationException} when cancellation has been
-   * requested. Tasks can use this helper to abort their execution without
-   * manually inspecting {@link #isCancelled()}.
-   */
-  default void checkCancelled() {
-    if (isCancelled()) {
-      throw new CancellationException("Task cancelled");
-    }
-  }
 }
