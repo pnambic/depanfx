@@ -23,6 +23,9 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxMemoryProject;
+import com.pnambic.depanfx.workspace.tasks.DepanFxWorkspaceTaskService;
+
+import javafx.application.Platform;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,8 +156,12 @@ public class DepanFxResourceRegistry {
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
         DepanFxProjectDocument document) {
-      loadResource(workspace, document)
-          .ifPresent(r -> runDialog(dialogRunner, r));
+      openWithTasks(
+          workspace,
+          document,
+          r -> Platform.runLater(() -> runDialog(dialogRunner, r)),
+          () -> loadResource(workspace, document)
+              .ifPresent(r -> runDialog(dialogRunner, r)));
     }
 
     @Override
@@ -177,6 +184,51 @@ public class DepanFxResourceRegistry {
             document.getMemberPath().toUri(), errCaught);
       }
       return Optional.empty();
+    }
+
+    protected Class<T> getResourceType() {
+      return dataType;
+    }
+
+    protected DepanFxWorkspaceTaskService getTaskService() {
+      return DepanFxResourceRegistry.getWorkspaceTaskService();
+    }
+
+    protected void openWithTasks(
+        DepanFxWorkspace workspace,
+        DepanFxProjectDocument document,
+        java.util.function.Consumer<DepanFxWorkspaceResource<T>> openOperation,
+        Runnable fallback) {
+
+      DepanFxWorkspaceTaskService taskService = getWorkspaceTaskService();
+      if (taskService == null) {
+        fallback.run();
+        return;
+      }
+
+      taskService.loadAndOpenResource(
+          workspace,
+          document,
+          dataType,
+          buildLoadTaskTitle(document),
+          buildOpenTaskTitle(document),
+          openOperation,
+          err -> logOpenError(document, err));
+    }
+
+    protected String buildLoadTaskTitle(DepanFxProjectDocument document) {
+      return String.format(
+          "Load %s", DepanFxWorkspaceFactory.buildDocTitle(document));
+    }
+
+    protected String buildOpenTaskTitle(DepanFxProjectDocument document) {
+      return String.format("Open %s", resourceLabel);
+    }
+
+    protected void logOpenError(
+        DepanFxProjectDocument document, Throwable error) {
+      LOG.error(
+          "Unable to open {} for {}", resourceLabel, document.getMemberPath(), error);
     }
   }
 
@@ -256,11 +308,20 @@ public class DepanFxResourceRegistry {
             workspace, dialogRunner, document));
   }
 
+  private static DepanFxWorkspaceTaskService workspaceTaskService;
+
   private final Collection<Contribution> contribs;
 
   @Autowired
-  public DepanFxResourceRegistry(Collection<Contribution> contribs) {
+  public DepanFxResourceRegistry(
+      Collection<Contribution> contribs,
+      DepanFxWorkspaceTaskService workspaceTaskService) {
     this.contribs = contribs;
+    DepanFxResourceRegistry.workspaceTaskService = workspaceTaskService;
+  }
+
+  static DepanFxWorkspaceTaskService getWorkspaceTaskService() {
+    return workspaceTaskService;
   }
 
   /**

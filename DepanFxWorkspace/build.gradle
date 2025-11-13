@@ -12,4 +12,5 @@ dependencies {
 
   implementation project(':DepanFxBase')
   implementation project(':DepanFxPersistence')
+  implementation project(':DepanFxTasks')
 }
