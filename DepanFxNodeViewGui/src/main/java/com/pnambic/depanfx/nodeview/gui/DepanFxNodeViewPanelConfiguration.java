@@ -35,9 +35,12 @@ import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuItems;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
+import com.pnambic.depanfx.workspace.tasks.DepanFxWorkspaceTaskService;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javafx.application.Platform;
 
 @Configuration
 public class DepanFxNodeViewPanelConfiguration {
@@ -231,12 +234,27 @@ public class DepanFxNodeViewPanelConfiguration {
     @Override
     public void openPanel(DepanFxWorkspace workspace,
         DepanFxSceneService sceneSrcv, DepanFxProjectDocument document) {
-      workspace.getWorkspaceResource(document, DepanFxNodeViewData.class)
-          .ifPresent(r ->
-              addNodeViewPanelToScene(
-                  workspace, sceneSrcv, r,
-                  layoutRegistry, filterRegistry, filterDialogRegistry,
-                  matcherRegistry, matcherDialogRegistry));
+      DepanFxWorkspaceTaskService taskService = getTaskService();
+      if (taskService == null) {
+        workspace.getWorkspaceResource(document, DepanFxNodeViewData.class)
+            .ifPresent(r -> addNodeViewPanelToScene(
+                workspace, sceneSrcv, r,
+                layoutRegistry, filterRegistry, filterDialogRegistry,
+                matcherRegistry, matcherDialogRegistry));
+        return;
+      }
+
+      taskService.loadAndOpenResource(
+          workspace,
+          document,
+          DepanFxNodeViewData.class,
+          buildLoadTaskTitle(document),
+          buildOpenTaskTitle(document),
+          r -> Platform.runLater(() -> addNodeViewPanelToScene(
+              workspace, sceneSrcv, r,
+              layoutRegistry, filterRegistry, filterDialogRegistry,
+              matcherRegistry, matcherDialogRegistry)),
+          err -> logOpenError(document, err));
     }
 
     @Override
@@ -284,15 +302,13 @@ public class DepanFxNodeViewPanelConfiguration {
         DepanFxWorkspace workspace,
         DepanFxSceneService sceneSrcv,
         DepanFxProjectDocument document) {
-      loadResource(workspace, document)
-          .map(r -> getNodeViewData(workspace, r, layoutRegistry))
-          .map(d -> workspace.addScratchResource(d))
-          .ifPresent(r ->
-              addNodeViewPanelToScene(
-                  workspace, sceneSrcv, r,
-                  layoutRegistry,
-                  filterRegistry, filterDialogRegistry,
-                  matcherRegistry, matcherDialogRegistry));
+      openWithTasks(
+          workspace,
+          document,
+          r -> Platform.runLater(() ->
+              openPanelFromResource(workspace, sceneSrcv, r)),
+          () -> loadResource(workspace, document)
+              .ifPresent(r -> openPanelFromResource(workspace, sceneSrcv, r)));
     }
 
     @Override
@@ -306,6 +322,26 @@ public class DepanFxNodeViewPanelConfiguration {
         DepanFxWorkspace workspace,
         DepanFxWorkspaceResource<?> rsrc,
         DepanFxNodeLayoutRegistry layoutRegistry);
+
+    private void openPanelFromResource(
+        DepanFxWorkspace workspace,
+        DepanFxSceneService sceneSrcv,
+        DepanFxWorkspaceResource<T> resource) {
+
+      DepanFxNodeViewData nodeViewData =
+          getNodeViewData(workspace, resource, layoutRegistry);
+      DepanFxWorkspaceResource<DepanFxNodeViewData> nodeViewRsrc =
+          workspace.addScratchResource(nodeViewData);
+      addNodeViewPanelToScene(
+          workspace,
+          sceneSrcv,
+          nodeViewRsrc,
+          layoutRegistry,
+          filterRegistry,
+          filterDialogRegistry,
+          matcherRegistry,
+          matcherDialogRegistry);
+    }
   }
 
   private static class NodeListAsViewResourceContribution

@@ -48,6 +48,8 @@ import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
 
+import javafx.application.Platform;
+
 @Configuration
 public class DepanFxNodeListViewerConfiguration {
 
@@ -196,10 +198,14 @@ public class DepanFxNodeListViewerConfiguration {
     public void openPanel(DepanFxWorkspace workspace,
         DepanFxSceneService sceneSrvc,
         DepanFxProjectDocument document) {
-
-      workspace.getWorkspaceResource(document, DepanFxNodeList.class)
-          .ifPresent(r -> addNodeListPanelToScene(
-              workspace, sceneSrvc, r));
+      openWithTasks(
+          workspace,
+          document,
+          r -> Platform.runLater(() ->
+              addNodeListPanelToScene(workspace, sceneSrvc, r)),
+          () -> loadResource(workspace, document)
+              .ifPresent(r -> addNodeListPanelToScene(
+                  workspace, sceneSrvc, r)));
     }
 
     private void addNodeListPanelToScene(
@@ -266,9 +272,14 @@ public class DepanFxNodeListViewerConfiguration {
     public void openPanel(DepanFxWorkspace workspace,
         DepanFxSceneService sceneSrvc,
         DepanFxProjectDocument document) {
-
-      workspace.getWorkspaceResource(document, GraphDocument.class)
-          .ifPresent(r -> addGraphDocViewToScene( workspace, sceneSrvc, r));
+      openWithTasks(
+          workspace,
+          document,
+          r -> Platform.runLater(() ->
+              addGraphDocViewToScene(workspace, sceneSrvc, r)),
+          () -> loadResource(workspace, document)
+              .ifPresent(r -> addGraphDocViewToScene(
+                  workspace, sceneSrvc, r)));
     }
 
     private void addGraphDocViewToScene(

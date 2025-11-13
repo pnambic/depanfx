@@ -6,15 +6,18 @@ module depanfx.workspace {
 
   requires depanfx.base;
   requires depanfx.persistence;
+  requires depanfx.tasks;
   requires pnambic.modxstream;
 
   // Instantiate a workspace
   opens com.pnambic.depanfx.workspace.basic to spring.beans;
   opens com.pnambic.depanfx.workspace.persistence to spring.core;
   opens com.pnambic.depanfx.workspace.projects to spring.core;
+  opens com.pnambic.depanfx.workspace.tasks to spring.beans;
 
   exports com.pnambic.depanfx.workspace;
   exports com.pnambic.depanfx.workspace.documents;
   exports com.pnambic.depanfx.workspace.persistence;
   exports com.pnambic.depanfx.workspace.projects;
+  exports com.pnambic.depanfx.workspace.tasks;
 }
