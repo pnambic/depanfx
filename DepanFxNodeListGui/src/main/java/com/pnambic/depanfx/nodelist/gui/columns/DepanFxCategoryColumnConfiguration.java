@@ -7,8 +7,8 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
 import com.pnambic.depanfx.persistence.plugins.GraphNodePersistencePluginRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
@@ -45,7 +45,7 @@ public class DepanFxCategoryColumnConfiguration {
   }
 
   @Bean
-  public DepanFxResourceRegistry.Contribution
+  public DepanFxResourceRegistryContribution<DepanFxCategoryColumnData>
       categoryColumnFileOpenContribution() {
 
     return new CategoryColumnFileOpenContribution();
@@ -104,7 +104,8 @@ public class DepanFxCategoryColumnConfiguration {
   }
 
   private static class CategoryColumnFileOpenContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxCategoryColumnData> {
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxCategoryColumnData>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxCategoryColumnData> {
 
     private CategoryColumnFileOpenContribution() {
       super(
@@ -115,7 +116,7 @@ public class DepanFxCategoryColumnConfiguration {
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
         DepanFxWorkspaceResource<DepanFxCategoryColumnData> columnRsrc) {
 

@@ -22,7 +22,7 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
 import com.pnambic.depanfx.persistence.plugins.GraphNodePersistencePluginRegistry;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -34,9 +34,9 @@ import org.springframework.context.annotation.Configuration;
 public class DepanFxNodeFoldConfiguration {
 
   @Bean
-  public DepanFxResourceRegistry.Contribution newNodeFold(
-      DepanFxWorkspace workspace) {
-    return new NodeFoldResourceContribution(workspace);
+  public DepanFxResourceRegistryContribution<GraphDocument>
+  newNodeFold() {
+    return new NodeFoldResourceContribution();
   }
 
   @Bean
@@ -49,7 +49,8 @@ public class DepanFxNodeFoldConfiguration {
   // Implementation Classes
 
   private static class NodeFoldResourceContribution
-      extends DepanFxResourceRegistry.Additional<GraphDocument> {
+      extends DepanFxResourceRegistryContribution.Additional<GraphDocument>
+      implements DepanFxResourceRegistryContribution.Dialog<GraphDocument> {
 
     private static final String CREATE_NODE_FOLDING_LABEL =
         "Create Node Folding...";
@@ -57,23 +58,20 @@ public class DepanFxNodeFoldConfiguration {
     private static final String CREATE_NODE_FOLDING_LABEL_KEY =
         "Node Folding";
 
-    private final DepanFxWorkspace workspace;
-
-    public NodeFoldResourceContribution(DepanFxWorkspace workspace) {
+    public NodeFoldResourceContribution() {
       super(
           CREATE_NODE_FOLDING_LABEL,
           GraphDocument.class,
           GraphDocPersistenceContribution.EXTENSION,
           CREATE_NODE_FOLDING_LABEL_KEY);
-      this.workspace = workspace;
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<GraphDocument> wkspRsrc) {
+        DepanFxWorkspaceResource<GraphDocument> foldRsrc) {
       DepanFxNodeFoldData foldInfo =
-          DepanFxNodeFoldData.emptyNodeFoldData(wkspRsrc);
+          DepanFxNodeFoldData.emptyNodeFoldData(foldRsrc);
       DepanFxNodeFoldToolDialog.runCreateDialog(
           workspace, dialogRunner, workspace.addScratchResource(foldInfo));
     }

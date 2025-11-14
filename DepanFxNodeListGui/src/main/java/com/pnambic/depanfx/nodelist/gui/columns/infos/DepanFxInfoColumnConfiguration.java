@@ -27,8 +27,8 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
 import com.pnambic.depanfx.persistence.plugins.GraphNodePersistencePluginRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
@@ -65,7 +65,8 @@ public class DepanFxInfoColumnConfiguration {
   }
 
   @Bean
-  public DepanFxResourceRegistry.Contribution infoColumnFileOpenMenu() {
+  public DepanFxResourceRegistryContribution<DepanFxNodeInfoColumnData>
+  infoColumnFileOpenMenu() {
     return new InfoColumnFileOpenContribution();
   }
 
@@ -137,7 +138,9 @@ public class DepanFxInfoColumnConfiguration {
   }
 
   private static class InfoColumnFileOpenContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxNodeInfoColumnData> {
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxNodeInfoColumnData>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxNodeInfoColumnData> {
+
 
     public InfoColumnFileOpenContribution() {
       super(
@@ -148,10 +151,10 @@ public class DepanFxInfoColumnConfiguration {
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> wkspRsrc) {
-      DepanFxInfoColumnToolDialog.runEditDialog(wkspRsrc, dialogRunner);
+        DepanFxWorkspaceResource<DepanFxNodeInfoColumnData> columnRsrc) {
+      DepanFxInfoColumnToolDialog.runEditDialog(columnRsrc, dialogRunner);
     }
   }
 

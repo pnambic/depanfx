@@ -17,8 +17,8 @@ package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeFilterSequenceData;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
@@ -61,7 +61,7 @@ public class DepanFxNodeFilterSequenceConfiguration {
       "Node filter sequence.";
 
   @Bean
-  public DepanFxResourceRegistry.Contribution
+  public DepanFxResourceRegistryContribution<DepanFxNodeFilterSequenceData>
       nodeFilterFileOpenContribution() {
     return new NodeFileSequenceFileOpenContribution();
   }
@@ -78,7 +78,8 @@ public class DepanFxNodeFilterSequenceConfiguration {
   }
 
   private static class NodeFileSequenceFileOpenContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxNodeFilterSequenceData> {
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxNodeFilterSequenceData>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxNodeFilterSequenceData> {
 
     public NodeFileSequenceFileOpenContribution() {
       super(
@@ -89,11 +90,11 @@ public class DepanFxNodeFilterSequenceConfiguration {
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> wkspRsrc) {
+        DepanFxWorkspaceResource<DepanFxNodeFilterSequenceData> filterRsrc) {
       DepanFxNodeFilterSequenceToolDialog.runEditDialog(
-          wkspRsrc, dialogRunner);
+          filterRsrc, dialogRunner);
     }
   }
 

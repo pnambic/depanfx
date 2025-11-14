@@ -37,15 +37,15 @@ public class DepanFxFileOpenMenuContribution
 
   private final DepanFxWorkspace workspace;
 
-  private final DepanFxResourceRegistry openRegistry;
+  private final DepanFxResourceRegistry resourceRegistry;
 
   @Autowired
   public DepanFxFileOpenMenuContribution(
       DepanFxWorkspace workspace,
-      DepanFxResourceRegistry openRegistry) {
+      DepanFxResourceRegistry resourceRegistry) {
     super(DepanFxSceneMenuItems.FILE_OPEN_ITEM, DepanFxWorkspaceViewer.class);
     this.workspace = workspace;
-    this.openRegistry = openRegistry;
+    this.resourceRegistry = resourceRegistry;
   }
 
   @Override
@@ -55,7 +55,7 @@ public class DepanFxFileOpenMenuContribution
       return false;
     }
     return getDocument(sceneSrvc)
-        .map(d -> openRegistry.opensDocument(workspace, d))
+        .map(d -> resourceRegistry.opensDocument(workspace, d))
         .orElse(false);
   }
 
@@ -73,7 +73,7 @@ public class DepanFxFileOpenMenuContribution
   public void handleEvent(
       DepanFxSceneService sceneSrvc, ActionEvent event) {
     getDocument(sceneSrvc)
-        .ifPresent(d -> openRegistry.openDocument(
+        .ifPresent(d -> resourceRegistry.openDocument(
             workspace, sceneSrvc, d));
   }
 

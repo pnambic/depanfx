@@ -8,8 +8,8 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListColumnData;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.persistence.plugins.DocumentPersistenceContribution;
 import com.pnambic.depanfx.persistence.plugins.GraphNodePersistencePluginRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
@@ -47,7 +47,7 @@ public class DepanFxFocusColumnConfiguration {
   }
 
   @Bean
-  public DepanFxResourceRegistry.Contribution
+  public DepanFxResourceRegistryContribution<DepanFxFocusColumnData>
       focusColumnFileOpenContribution() {
     return new FocusColumnFileOpenContribution();
   }
@@ -106,7 +106,8 @@ public class DepanFxFocusColumnConfiguration {
   }
 
   private static class FocusColumnFileOpenContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxFocusColumnData> {
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxFocusColumnData>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxFocusColumnData> {
 
     public FocusColumnFileOpenContribution() {
       super(
@@ -117,7 +118,7 @@ public class DepanFxFocusColumnConfiguration {
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
         DepanFxWorkspaceResource<DepanFxFocusColumnData> columnRsrc) {
       DepanFxFocusColumnToolDialog.runEditDialog(

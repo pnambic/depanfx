@@ -29,12 +29,11 @@ import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuContribution;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuItems;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -69,12 +68,13 @@ public class DepanFxNodeListViewerConfiguration {
   }
 
   @Bean
-  public DepanFxResourceRegistry.Contribution TableViewContribution() {
+  public DepanFxResourceRegistryContribution<DepanFxNodeListTableViewData>
+  TableViewContribution() {
     return new TableViewResourceContribution();
   }
 
   @Bean
-  public DepanFxResourceRegistry.Contribution
+  public DepanFxResourceRegistryContribution<DepanFxNodeList>
   nodeListAsListResourceContribution(
       DepanFxColumnRegistry columnRegistry,
       DepanFxInfoRegistry infoRegistry,
@@ -87,7 +87,7 @@ public class DepanFxNodeListViewerConfiguration {
   }
 
   @Bean
-  public DepanFxResourceRegistry.Contribution
+  public DepanFxResourceRegistryContribution<GraphDocument>
   graphDocAsListResourceContribution(
       DepanFxColumnRegistry columnRegistry,
       DepanFxInfoRegistry infoRegistry,
@@ -127,7 +127,8 @@ public class DepanFxNodeListViewerConfiguration {
   }
 
   private static class TableViewResourceContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxNodeListTableViewData> {
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxNodeListTableViewData>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxNodeListTableViewData> {
 
     private static final Logger LOG =
         LoggerFactory.getLogger(TableViewResourceContribution.class);
@@ -141,9 +142,9 @@ public class DepanFxNodeListViewerConfiguration {
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxNodeListTableViewData> wkspRsrc) {
+        DepanFxWorkspaceResource<DepanFxNodeListTableViewData> dialogRsrc) {
 
       LOG.info("No editor for DepanFxNodeListTableViewData");
       // DepanFxNodeListTableViewDialog.runEditDialog(dialogRunner, tableRsrc);
@@ -154,8 +155,9 @@ public class DepanFxNodeListViewerConfiguration {
   }
 
   private static class NodeListResourceContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxNodeList>
-      implements DepanFxResourceRegistry.Panel {
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxNodeList>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxNodeList>,
+          DepanFxResourceRegistryContribution.Panel<DepanFxNodeList> {
 
     private final DepanFxColumnRegistry columnRegistry;
 
@@ -186,20 +188,19 @@ public class DepanFxNodeListViewerConfiguration {
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(
+        DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
         DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
       DepanFxSaveNodeListDialog.runSaveNodeList(dialogRunner, nodeListRsrc);
     }
 
     @Override
-    public void openPanel(DepanFxWorkspace workspace,
-        DepanFxSceneService sceneSrvc,
-        DepanFxProjectDocument document) {
-
-      workspace.getWorkspaceResource(document, DepanFxNodeList.class)
-          .ifPresent(r -> addNodeListPanelToScene(
-              workspace, sceneSrvc, r));
+    public void openPanel(
+        DepanFxWorkspace workspace,
+        DepanFxSceneService sceneSrcv,
+        DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
+      addNodeListPanelToScene(workspace, sceneSrcv, nodeListRsrc);
     }
 
     private void addNodeListPanelToScene(
@@ -224,8 +225,8 @@ public class DepanFxNodeListViewerConfiguration {
   }
 
   private static class GraphDocResourceContribution
-      extends DepanFxResourceRegistry.Principal<GraphDocument>
-      implements DepanFxResourceRegistry.Panel {
+      extends DepanFxResourceRegistryContribution.Principal<GraphDocument>
+      implements DepanFxResourceRegistryContribution.Panel<GraphDocument> {
 
     private final DepanFxColumnRegistry columnRegistry;
 
@@ -257,18 +258,10 @@ public class DepanFxNodeListViewerConfiguration {
     }
 
     @Override
-    protected void runDialog(DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<GraphDocument> wkspRsrc) {
-      throw new DepanFxResourceRegistry.UseOpenPanelException(this);
-    }
-
-    @Override
     public void openPanel(DepanFxWorkspace workspace,
         DepanFxSceneService sceneSrvc,
-        DepanFxProjectDocument document) {
-
-      workspace.getWorkspaceResource(document, GraphDocument.class)
-          .ifPresent(r -> addGraphDocViewToScene( workspace, sceneSrvc, r));
+        DepanFxWorkspaceResource<GraphDocument> graphRsrc) {
+      addGraphDocViewToScene( workspace, sceneSrvc, graphRsrc);
     }
 
     private void addGraphDocViewToScene(

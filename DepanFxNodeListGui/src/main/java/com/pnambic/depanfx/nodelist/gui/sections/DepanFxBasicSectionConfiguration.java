@@ -23,8 +23,8 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderBy;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListSectionData.OrderDirection;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxTreeSectionData;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
@@ -60,7 +60,8 @@ public class DepanFxBasicSectionConfiguration {
   }
 
   @Bean
-  public DepanFxResourceRegistry.Contribution flatSectionFileOpenContribution() {
+  public DepanFxResourceRegistryContribution<DepanFxFlatSectionData>
+  flatSectionFileOpenContribution() {
     return new FlatSectionFileOpenContribution();
   }
 
@@ -70,7 +71,8 @@ public class DepanFxBasicSectionConfiguration {
   }
 
   @Bean
-  public DepanFxResourceRegistry.Contribution treeSectionFileOpenContribution() {
+  public DepanFxResourceRegistryContribution<DepanFxTreeSectionData>
+  treeSectionFileOpenContribution() {
     return new TreeSectionFileOpenContribution();
   }
 
@@ -83,7 +85,8 @@ public class DepanFxBasicSectionConfiguration {
   // Flat section contributions
 
   private static class FlatSectionFileOpenContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxFlatSectionData> {
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxFlatSectionData>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxFlatSectionData> {
 
     public FlatSectionFileOpenContribution() {
       super(
@@ -94,10 +97,10 @@ public class DepanFxBasicSectionConfiguration {
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxFlatSectionData> wkspRsrc) {
-      DepanFxFlatSectionToolDialog.runEditDialog(wkspRsrc, dialogRunner);
+        DepanFxWorkspaceResource<DepanFxFlatSectionData> sectionRsrc) {
+      DepanFxFlatSectionToolDialog.runEditDialog(sectionRsrc, dialogRunner);
     }
   }
 
@@ -154,7 +157,8 @@ public class DepanFxBasicSectionConfiguration {
   // Tree section GUI contributions
 
   private static class TreeSectionFileOpenContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxTreeSectionData> {
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxTreeSectionData>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxTreeSectionData> {
 
     public TreeSectionFileOpenContribution() {
       super(
@@ -165,10 +169,10 @@ public class DepanFxBasicSectionConfiguration {
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxTreeSectionData> wkspRsrc) {
-      DepanFxTreeSectionToolDialog.runEditDialog(wkspRsrc, dialogRunner);
+        DepanFxWorkspaceResource<DepanFxTreeSectionData> sectionRsrc) {
+      DepanFxTreeSectionToolDialog.runEditDialog(sectionRsrc, dialogRunner);
     }
   }
 

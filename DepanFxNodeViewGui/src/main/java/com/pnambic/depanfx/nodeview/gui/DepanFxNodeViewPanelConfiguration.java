@@ -27,12 +27,11 @@ import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuContribution;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuItems;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -70,7 +69,7 @@ public class DepanFxNodeViewPanelConfiguration {
   // Open various resources as node views
 
   @Bean
-  public DepanFxResourceRegistry.Contribution
+  public DepanFxResourceRegistryContribution<DepanFxNodeViewData>
   nodeViewAsViewResourceContribution(
       DepanFxNodeLayoutRegistry layoutRegistry,
       DepanFxNodeFiltersRegistry filterRegistry,
@@ -83,7 +82,7 @@ public class DepanFxNodeViewPanelConfiguration {
   }
 
   @Bean
-  public DepanFxResourceRegistry.Contribution
+  public DepanFxResourceRegistryContribution<DepanFxNodeList>
   nodeListAsViewResourceContribution(
       DepanFxNodeLayoutRegistry layoutRegistry,
       DepanFxNodeFiltersRegistry filterRegistry,
@@ -97,7 +96,7 @@ public class DepanFxNodeViewPanelConfiguration {
   }
 
   @Bean
-  public DepanFxResourceRegistry.Contribution
+  public DepanFxResourceRegistryContribution<GraphDocument>
   graphDocAsViewResourceContribution(
       DepanFxNodeLayoutRegistry layoutRegistry,
       DepanFxNodeFiltersRegistry filterRegistry,
@@ -114,13 +113,13 @@ public class DepanFxNodeViewPanelConfiguration {
   // Open view rendering resources
 
   @Bean
-  public DepanFxResourceRegistry.Contribution
+  public DepanFxResourceRegistryContribution<DepanFxNodeViewLinkDisplayData>
   linkDisplayResourceContribution() {
     return new LinkDisplayResourceContribution();
   }
 
   @Bean
-  public DepanFxResourceRegistry.Contribution
+  public DepanFxResourceRegistryContribution<DepanFxNodeViewNodeDisplayData>
   nodeDisplayResourceContribution() {
     return new NodeDisplayResourceContribution();
   }
@@ -159,7 +158,8 @@ public class DepanFxNodeViewPanelConfiguration {
   // Node View internal display resources
 
   private static class LinkDisplayResourceContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxNodeViewLinkDisplayData> {
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxNodeViewLinkDisplayData>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxNodeViewLinkDisplayData> {
 
     public LinkDisplayResourceContribution() {
       super(LINK_DISPLAY_LABEL,
@@ -169,15 +169,17 @@ public class DepanFxNodeViewPanelConfiguration {
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(
+        DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> wkspRsrc) {
-      DepanFxNodeViewLinkDisplayDialog.runEditDialog(wkspRsrc, dialogRunner);
+        DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc) {
+      DepanFxNodeViewLinkDisplayDialog.runEditDialog(displayRsrc, dialogRunner);
     }
   }
 
   private static class NodeDisplayResourceContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxNodeViewNodeDisplayData> {
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxNodeViewNodeDisplayData>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxNodeViewNodeDisplayData> {
 
     public NodeDisplayResourceContribution() {
       super(NODE_DISPLAY_LABEL,
@@ -187,10 +189,10 @@ public class DepanFxNodeViewPanelConfiguration {
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> wkspRsrc) {
-      DepanFxNodeViewNodeDisplayDialog.runEditDialog(wkspRsrc, dialogRunner);
+        DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> displayRsrc) {
+      DepanFxNodeViewNodeDisplayDialog.runEditDialog(displayRsrc, dialogRunner);
     }
   }
 
@@ -198,8 +200,8 @@ public class DepanFxNodeViewPanelConfiguration {
   // Supported Node View resources
 
   private static class NodeViewAsViewResourceContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxNodeViewPanel>
-      implements DepanFxResourceRegistry.Panel {
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxNodeViewData>
+      implements DepanFxResourceRegistryContribution.Panel<DepanFxNodeViewData> {
 
     private final DepanFxNodeLayoutRegistry layoutRegistry;
 
@@ -218,7 +220,7 @@ public class DepanFxNodeViewPanelConfiguration {
         DepanFxLinkMatchersRegistry matcherRegistry,
         DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry) {
       super(NODE_VIEW_LABEL,
-          DepanFxNodeViewPanel.class,
+          DepanFxNodeViewData.class,
           DepanFxNodeViewData.NODE_VIEW_TOOL_EXT,
           NODE_VIEW_KEY);
       this.layoutRegistry = layoutRegistry;
@@ -229,27 +231,20 @@ public class DepanFxNodeViewPanelConfiguration {
     }
 
     @Override
-    public void openPanel(DepanFxWorkspace workspace,
-        DepanFxSceneService sceneSrcv, DepanFxProjectDocument document) {
-      workspace.getWorkspaceResource(document, DepanFxNodeViewData.class)
-          .ifPresent(r ->
-              addNodeViewPanelToScene(
-                  workspace, sceneSrcv, r,
-                  layoutRegistry, filterRegistry, filterDialogRegistry,
-                  matcherRegistry, matcherDialogRegistry));
-    }
-
-    @Override
-    protected void runDialog(
-        DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxNodeViewPanel> wkspRsrc) {
-      throw new DepanFxResourceRegistry.UseOpenPanelException(this);
+    public void openPanel(
+        DepanFxWorkspace workspace,
+        DepanFxSceneService sceneSrcv,
+        DepanFxWorkspaceResource<DepanFxNodeViewData> panelRsrc) {
+      addNodeViewPanelToScene(
+          workspace, sceneSrcv, panelRsrc,
+          layoutRegistry, filterRegistry, filterDialogRegistry,
+          matcherRegistry, matcherDialogRegistry);
     }
   }
 
   private static abstract class AdditionalAsViewResourceContribution<T>
-      extends DepanFxResourceRegistry.Additional<T>
-      implements DepanFxResourceRegistry.Panel {
+      extends DepanFxResourceRegistryContribution.Additional<T>
+      implements DepanFxResourceRegistryContribution.Panel<T> {
 
     private final DepanFxNodeLayoutRegistry layoutRegistry;
 
@@ -280,26 +275,19 @@ public class DepanFxNodeViewPanelConfiguration {
     }
 
     @Override
-    public void openPanel(
-        DepanFxWorkspace workspace,
+    public void openPanel(DepanFxWorkspace workspace,
         DepanFxSceneService sceneSrcv,
-        DepanFxProjectDocument document) {
-      loadResource(workspace, document)
-          .map(r -> getNodeViewData(workspace, r, layoutRegistry))
-          .map(d -> workspace.addScratchResource(d))
-          .ifPresent(r ->
-              addNodeViewPanelToScene(
-                  workspace, sceneSrcv, r,
-                  layoutRegistry,
-                  filterRegistry, filterDialogRegistry,
-                  matcherRegistry, matcherDialogRegistry));
-    }
+        DepanFxWorkspaceResource<T> panelRsrc) {
+      DepanFxNodeViewData viewInfo =
+          getNodeViewData(workspace, panelRsrc, layoutRegistry);
+      DepanFxWorkspaceResource<DepanFxNodeViewData> viewRsrc =
+          workspace.addScratchResource(viewInfo);
 
-    @Override
-    protected void runDialog(
-        DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<T> wkspRsrc) {
-      throw new DepanFxResourceRegistry.UseOpenPanelException(this);
+      addNodeViewPanelToScene(
+          workspace, sceneSrcv, viewRsrc,
+          layoutRegistry,
+          filterRegistry, filterDialogRegistry,
+          matcherRegistry, matcherDialogRegistry);
     }
 
     protected abstract DepanFxNodeViewData getNodeViewData(

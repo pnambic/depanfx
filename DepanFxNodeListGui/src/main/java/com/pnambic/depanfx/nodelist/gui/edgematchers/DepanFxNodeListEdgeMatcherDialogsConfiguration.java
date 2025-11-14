@@ -20,7 +20,7 @@ import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListEdgeMatcherData;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilterModel;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
@@ -64,7 +64,8 @@ public class DepanFxNodeListEdgeMatcherDialogsConfiguration {
       "Node list edge matcher.";
 
   @Bean
-  public DepanFxResourceRegistry.Contribution nodeListMatcherFileOpenContrib() {
+  public DepanFxResourceRegistryContribution<DepanFxNodeListEdgeMatcherData>
+  nodeListMatcherFileOpenContrib() {
     return new NodeListMatcherFileOpenContribution();
   }
 
@@ -86,8 +87,9 @@ public class DepanFxNodeListEdgeMatcherDialogsConfiguration {
     return new NodeListMatcherDialogContribution();
   }
 
-  private static class NodeListMatcherFileOpenContribution extends
-      DepanFxResourceRegistry.Principal<DepanFxNodeListEdgeMatcherData> {
+  private static class NodeListMatcherFileOpenContribution
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxNodeListEdgeMatcherData>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxNodeListEdgeMatcherData> {
 
     private NodeListMatcherFileOpenContribution() {
       super(
@@ -98,9 +100,10 @@ public class DepanFxNodeListEdgeMatcherDialogsConfiguration {
     }
 
     @Override
-    protected void runDialog(DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxNodeListEdgeMatcherData> wkspRsrc) {
-      DepanFxNodeListEdgeMatcherDialog.runEditDialog(dialogRunner, wkspRsrc);
+    public void runDialog(DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner,
+        DepanFxWorkspaceResource<DepanFxNodeListEdgeMatcherData> matcherRsrc) {
+      DepanFxNodeListEdgeMatcherDialog.runEditDialog(dialogRunner, matcherRsrc);
     }
   }
 

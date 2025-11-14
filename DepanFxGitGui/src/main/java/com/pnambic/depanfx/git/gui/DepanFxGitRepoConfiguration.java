@@ -16,8 +16,8 @@
 package com.pnambic.depanfx.git.gui;
 
 import com.pnambic.depanfx.git.tooldata.DepanFxGitRepoData;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
@@ -49,7 +49,7 @@ public class DepanFxGitRepoConfiguration {
       LoggerFactory.getLogger(DepanFxGitRepoConfiguration.class);
 
   @Bean
-  public DepanFxResourceRegistry.Contribution
+  public DepanFxResourceRegistryContribution<DepanFxGitRepoData>
       gitRepoFileOpenContribution() {
 
     return new GitRepoDataFileOpenContribution();
@@ -61,7 +61,8 @@ public class DepanFxGitRepoConfiguration {
   }
 
   private static class GitRepoDataFileOpenContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxGitRepoData> {
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxGitRepoData>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxGitRepoData> {
 
     public GitRepoDataFileOpenContribution() {
       super(
@@ -72,10 +73,10 @@ public class DepanFxGitRepoConfiguration {
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxGitRepoData> wkspRsrc) {
-      DepanFxGitRepoToolDialog.runEditDialog(wkspRsrc, dialogRunner);
+        DepanFxWorkspaceResource<DepanFxGitRepoData> repoRsrc) {
+      DepanFxGitRepoToolDialog.runEditDialog(repoRsrc, dialogRunner);
     }
   }
 

@@ -2,8 +2,9 @@ package com.pnambic.depanfx.nodeview.layouts;
 
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLayoutData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxShiftLayoutData;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 
@@ -38,9 +39,9 @@ public class DepanFxShiftLayoutConfiguration {
   public static final Path SHIFT_LAYOUT_PATH =
       DepanFxNodeViewLayoutData.LAYOUT_TOOL_PATH.resolve("Shift");
 
-
   @Bean
-  public DepanFxResourceRegistry.Contribution shiftLayoutResourceContribution() {
+  public DepanFxResourceRegistryContribution<DepanFxShiftLayoutData>
+  shiftLayoutResourceContribution() {
     return new ShiftLayoutResourceContribution();
   }
 
@@ -167,7 +168,8 @@ public class DepanFxShiftLayoutConfiguration {
   }
 
   private class ShiftLayoutResourceContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxShiftLayoutData>{
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxShiftLayoutData>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxShiftLayoutData> {
 
     public ShiftLayoutResourceContribution() {
       super(
@@ -178,10 +180,11 @@ public class DepanFxShiftLayoutConfiguration {
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(
+        DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxShiftLayoutData> wkspRsrc) {
-      DepanFxShiftLayoutToolDialog.runEditDialog(wkspRsrc, dialogRunner);
+        DepanFxWorkspaceResource<DepanFxShiftLayoutData> dialogRsrc) {
+      DepanFxShiftLayoutToolDialog.runEditDialog(dialogRsrc, dialogRunner);
     }
   }
 }

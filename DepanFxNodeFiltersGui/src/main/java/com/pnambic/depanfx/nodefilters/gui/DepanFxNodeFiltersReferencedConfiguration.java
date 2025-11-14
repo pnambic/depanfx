@@ -2,8 +2,8 @@ package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxReferencedFilterData;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
@@ -37,7 +37,8 @@ public class DepanFxNodeFiltersReferencedConfiguration {
   private static final String REFERENCED_MATCHER_KEY = "Referenced";
 
   @Bean
-  public DepanFxResourceRegistry.Contribution referencedFilterFileOpenMenu() {
+  public DepanFxResourceRegistryContribution<DepanFxReferencedFilterData>
+  referencedFilterFileOpenMenu() {
     return new ReferencedFilterFileOpenContribution();
   }
 
@@ -53,7 +54,8 @@ public class DepanFxNodeFiltersReferencedConfiguration {
   }
 
   private static class ReferencedFilterFileOpenContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxReferencedFilterData> {
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxReferencedFilterData>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxReferencedFilterData> {
 
     public ReferencedFilterFileOpenContribution() {
       super(
@@ -64,10 +66,10 @@ public class DepanFxNodeFiltersReferencedConfiguration {
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxReferencedFilterData> wkspRsrc) {
-      DepanFxNodeFiltersReferencedDialog.runEditFilter(dialogRunner, wkspRsrc);
+        DepanFxWorkspaceResource<DepanFxReferencedFilterData> filterRsrc) {
+      DepanFxNodeFiltersReferencedDialog.runEditFilter(dialogRunner, filterRsrc);
     }
   }
 

@@ -7,8 +7,8 @@ import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersDialogRegistry;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersTableMember;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxMatcherFilterData;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
@@ -44,7 +44,8 @@ public class DepanFxNodeFiltersMatcherConfiguration {
   private static final String LINK_MATCHER_KEY = "Link Matcher";
 
   @Bean
-  public DepanFxResourceRegistry.Contribution linkMatcherFilterFileOpenMenu() {
+  public DepanFxResourceRegistryContribution<DepanFxMatcherFilterData>
+  linkMatcherFilterFileOpenMenu() {
     return new LinkMatcherFilterFileOpenContribution();
   }
 
@@ -62,7 +63,8 @@ public class DepanFxNodeFiltersMatcherConfiguration {
   }
 
   private static class LinkMatcherFilterFileOpenContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxMatcherFilterData> {
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxMatcherFilterData>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxMatcherFilterData> {
 
     public LinkMatcherFilterFileOpenContribution() {
       super(
@@ -73,10 +75,10 @@ public class DepanFxNodeFiltersMatcherConfiguration {
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxMatcherFilterData> wkspRsrc) {
-      DepanFxNodeFiltersMatcherDialog.runEditDialog(dialogRunner, wkspRsrc);
+        DepanFxWorkspaceResource<DepanFxMatcherFilterData> filterRsrc) {
+      DepanFxNodeFiltersMatcherDialog.runEditDialog(dialogRunner, filterRsrc);
     }
   }
 

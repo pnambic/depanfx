@@ -17,12 +17,11 @@ package com.pnambic.depanfx.perspective.workspace.controls;
 
 import com.pnambic.depanfx.base.DepanFxOrderableContribution;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceMenuRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry.Contribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
-import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
@@ -47,68 +46,14 @@ import javafx.scene.text.FontWeight;
  */
 public class DepanFxWorkspaceMemberCells {
 
-  public static interface DocumentDispatch {
-
-    void dispatchContribution(
-        Contribution contrib,
-        DepanFxWorkspace workspace,
-        DepanFxProjectDocument document);
-
-    DepanFxDialogRunner getDialogRunner();
-  }
-
-  public static class DialogDispatch implements DocumentDispatch {
-
-    private final DepanFxDialogRunner dialogRunner;
-
-    public DialogDispatch(DepanFxDialogRunner dialogRunner) {
-      this.dialogRunner = dialogRunner;
-    }
-
-    @Override
-    public void dispatchContribution(
-        Contribution contrib,
-        DepanFxWorkspace workspace,
-        DepanFxProjectDocument document) {
-      DepanFxResourceRegistry.dispatchContribution(
-          contrib, workspace, dialogRunner, document);
-    }
-
-    @Override
-    public DepanFxDialogRunner getDialogRunner() {
-      return dialogRunner;
-    }
-  }
-
-  public static class ScreenDispatch implements DocumentDispatch {
-
-    private final DepanFxSceneService sceneSrvc;
-
-    public ScreenDispatch(DepanFxSceneService sceneSrvc) {
-      this.sceneSrvc = sceneSrvc;
-    }
-
-    @Override
-    public void dispatchContribution(
-        Contribution contrib,
-        DepanFxWorkspace workspace,
-        DepanFxProjectDocument document) {
-      DepanFxResourceRegistry.dispatchContribution(
-          contrib, workspace, sceneSrvc, document);
-    }
-
-    @Override
-    public DepanFxDialogRunner getDialogRunner() {
-      return sceneSrvc.getDialogRunner();
-    }
-  }
-
+  @SuppressWarnings("unused") // Comment out when used.
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxWorkspaceMemberCells.class);
 
   // Menu texts
   private static final String DELETE_DOCUMENT = "Delete Document";
 
+  @SuppressWarnings("unused") // Something to get to
   private static final String DELETE_CONTAINER = "Delete Container";
 
   private static final String SET_AS_CURRENT_PROJECT = "Set As Current Project";
@@ -116,7 +61,7 @@ public class DepanFxWorkspaceMemberCells {
   // Our state
   private final DepanFxWorkspace workspace;
 
-  private final DocumentDispatch dispatch;
+  private final DepanFxDialogRunner dialogRunner;
 
   private final DepanFxResourceRegistry rsrcRegistry;
 
@@ -129,12 +74,12 @@ public class DepanFxWorkspaceMemberCells {
 
   public DepanFxWorkspaceMemberCells(
       DepanFxWorkspace workspace,
-      DocumentDispatch dispatch,
+      DepanFxDialogRunner dialogRunner,
       DepanFxResourceRegistry rsrcRegistry,
       DepanFxResourceMenuRegistry rsrcMenuRegistry,
       Function<DepanFxWorkspaceMember, ImageView> rsrcImageSrc) {
     this.workspace = workspace;
-    this.dispatch = dispatch;
+    this.dialogRunner = dialogRunner;
     this.rsrcRegistry = rsrcRegistry;
     this.rsrcMenuRegistry = rsrcMenuRegistry;
     this.rsrcImageSrc = rsrcImageSrc;
@@ -239,18 +184,19 @@ public class DepanFxWorkspaceMemberCells {
     }
 
     rsrcMenuRegistry.prepareMemberMenu(
-        dispatch.getDialogRunner(), workspace, cell, project, builder);
+        dialogRunner, workspace, cell, project, builder);
   }
 
-  private void prepareDocumentCell(
+  private <T> void prepareDocumentCell(
       DepanFxWorkspace workspace,
       Cell<DepanFxWorkspaceMember> cell,
-      DepanFxResourceRegistry.Contribution contrib,
+      DepanFxResourceRegistryContribution<T> contrib,
       DepanFxProjectDocument document,
       DepanFxContextMenuBuilder builder) {
 
-    if (contrib instanceof DepanFxResourceRegistry.Principal<?>) {
-      DepanFxResourcePerspectives.installOnOpen(cell, document.getMemberPath(),
+    if (contrib instanceof DepanFxResourceRegistryContribution.Principal<?>) {
+      DepanFxResourcePerspectives.installOnOpen(
+          cell, document.getMemberPath(),
           p -> dispatchContribution(contrib, document));
     }
     builder.appendActionItem(
@@ -258,10 +204,10 @@ public class DepanFxWorkspaceMemberCells {
         e -> dispatchContribution(contrib, document));
   }
 
-  protected void dispatchContribution(
-      Contribution contrib,
+  protected <T> void dispatchContribution(
+      DepanFxResourceRegistryContribution<T> contrib,
       DepanFxProjectDocument document) {
-    dispatch.dispatchContribution(contrib, workspace, document);
+    rsrcRegistry.openDialog(workspace, dialogRunner, document);
   }
 
   private void appendProjectContextMenu(
@@ -290,9 +236,9 @@ public class DepanFxWorkspaceMemberCells {
     return false;
   }
 
-  private String fmtEditAction(
-      DepanFxResourceRegistry.Contribution contrib) {
-    if (contrib instanceof DepanFxResourceRegistry.Panel) {
+  private <T> String fmtEditAction(
+      DepanFxResourceRegistryContribution<T> contrib) {
+    if (contrib instanceof DepanFxResourceRegistryContribution.Panel) {
       return MessageFormat.format("Open {0}...", contrib.getResourceLabel());
     }
     return MessageFormat.format("Edit {0}...", contrib.getResourceLabel());

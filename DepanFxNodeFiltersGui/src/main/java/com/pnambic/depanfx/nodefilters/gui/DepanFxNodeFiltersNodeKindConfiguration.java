@@ -2,8 +2,8 @@ package com.pnambic.depanfx.nodefilters.gui;
 
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxNodeKindFilterData;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
@@ -39,7 +39,7 @@ public class DepanFxNodeFiltersNodeKindConfiguration {
   private static final String NODE_KIND_KEY = "Node Kind";
 
   @Bean
-  public DepanFxResourceRegistry.Contribution
+  public DepanFxResourceRegistryContribution<DepanFxNodeKindFilterData>
       nodeKindFilterFileOpenContribution() {
 
     return new NodeKindFilterFileOpenContribution();
@@ -56,7 +56,8 @@ public class DepanFxNodeFiltersNodeKindConfiguration {
   }
 
   private static class NodeKindFilterFileOpenContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxNodeKindFilterData> {
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxNodeKindFilterData>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxNodeKindFilterData> {
 
     private static final Logger LOG =
         LoggerFactory.getLogger(NodeKindFilterFileOpenContribution.class);
@@ -70,9 +71,9 @@ public class DepanFxNodeFiltersNodeKindConfiguration {
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxNodeKindFilterData> wkspRsrc) {
+        DepanFxWorkspaceResource<DepanFxNodeKindFilterData> dialogRsrc) {
       LOG.info("No editor for NodeKindFilterFileOpenContribution");
       // DepanFxNodeFiltersMatcherDialog.runEditDialog(dialogRunner, wkspRsrc);
     }

@@ -16,7 +16,6 @@ import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
-import com.pnambic.depanfx.scene.DepanFxMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -27,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Menu;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TreeTableView;
 import javafx.stage.Stage;

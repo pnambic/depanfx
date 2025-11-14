@@ -18,8 +18,8 @@ package com.pnambic.depanfx.edgematchers.gui;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherSequenceDocument;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilterModel;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
@@ -64,7 +64,8 @@ public class DepanFxLinkMatcherSequenceConfiguration {
       "Link matcher sequence.";
 
   @Bean
-  public DepanFxResourceRegistry.Contribution linkMatcherFileOpenContrib() {
+  public DepanFxResourceRegistryContribution<DepanFxLinkMatcherSequenceDocument>
+  linkMatcherFileOpenContrib() {
     return new LinkMatcherSequenceFileOpenContribution();
   }
 
@@ -80,14 +81,16 @@ public class DepanFxLinkMatcherSequenceConfiguration {
   }
 
   @Bean
-  public DepanFxEdgeMatcherDialogRegistry.Contribution linkMatcherSequenceContribution(
+  public DepanFxEdgeMatcherDialogRegistry.Contribution
+  linkMatcherSequenceContribution(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner) {
     return new LinkMatcherSequenceDialogContribution();
   }
 
-  private static class LinkMatcherSequenceFileOpenContribution extends
-      DepanFxResourceRegistry.Principal<DepanFxLinkMatcherSequenceDocument> {
+  private static class LinkMatcherSequenceFileOpenContribution
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxLinkMatcherSequenceDocument>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxLinkMatcherSequenceDocument> {
 
     private LinkMatcherSequenceFileOpenContribution() {
       super(
@@ -98,10 +101,11 @@ public class DepanFxLinkMatcherSequenceConfiguration {
     }
 
     @Override
-    protected void runDialog(DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> wkspRsrc) {
+    public void runDialog(DepanFxWorkspace workspace,
+        DepanFxDialogRunner dialogRunner,
+        DepanFxWorkspaceResource<DepanFxLinkMatcherSequenceDocument> matcherRsrc) {
       DepanFxLinkMatcherSequenceToolDialog.runEditDialog(
-          wkspRsrc, dialogRunner);
+          matcherRsrc, dialogRunner);
     }
   }
 

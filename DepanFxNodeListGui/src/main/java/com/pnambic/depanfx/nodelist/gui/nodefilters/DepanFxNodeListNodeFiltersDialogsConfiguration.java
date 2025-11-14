@@ -3,11 +3,11 @@ package com.pnambic.depanfx.nodelist.gui.nodefilters;
 import com.pnambic.depanfx.nodefilters.tooldata.DepanFxBaseFilterData;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListChooser;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxListFilterData;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourcePathMenuContribution;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersDialogContribution;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersTableMember;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersDialogRegistry;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectMember;
@@ -40,7 +40,7 @@ public class DepanFxNodeListNodeFiltersDialogsConfiguration {
   private static final String NODE_LIST_KEY = "Node List";
 
   @Bean
-  public DepanFxResourceRegistry.Contribution
+  public DepanFxResourceRegistryContribution<DepanFxListFilterData>
       nodeListFilterFileOpenContribution() {
     return new NodeListFilterFileOpenContribution();
   }
@@ -57,7 +57,8 @@ public class DepanFxNodeListNodeFiltersDialogsConfiguration {
   }
 
   private static class NodeListFilterFileOpenContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxListFilterData> {
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxListFilterData>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxListFilterData> {
 
     public NodeListFilterFileOpenContribution() {
       super(
@@ -68,10 +69,10 @@ public class DepanFxNodeListNodeFiltersDialogsConfiguration {
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxListFilterData> wkspRsrc) {
-      DepanFxNodeFiltersListDialog.runEditDialog(dialogRunner, wkspRsrc);
+        DepanFxWorkspaceResource<DepanFxListFilterData> filterRsrc) {
+      DepanFxNodeFiltersListDialog.runEditDialog(dialogRunner, filterRsrc);
     }
   }
 

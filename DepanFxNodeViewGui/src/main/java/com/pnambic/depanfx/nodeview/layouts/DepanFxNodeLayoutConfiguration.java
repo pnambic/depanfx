@@ -8,7 +8,10 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxRadialLayoutData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxTreeLayoutData;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,12 +94,12 @@ public class DepanFxNodeLayoutConfiguration {
   }
 
   @Bean
-  public DepanFxResourceRegistry.Contribution radialLayoutResourceContribution() {
+  public DepanFxResourceRegistryContribution radialLayoutResourceContribution() {
     return new RadialLayoutResourceContribution();
   }
 
   @Bean
-  public DepanFxResourceRegistry.Contribution treeLayoutResourceContribution() {
+  public DepanFxResourceRegistryContribution treeLayoutResourceContribution() {
     return new TreeLayoutResourceContribution();
   }
 
@@ -231,7 +234,8 @@ public class DepanFxNodeLayoutConfiguration {
   }
 
   private class RadialLayoutResourceContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxRadialLayoutData>{
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxRadialLayoutData>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxRadialLayoutData> {
 
     public RadialLayoutResourceContribution() {
       super(
@@ -242,15 +246,17 @@ public class DepanFxNodeLayoutConfiguration {
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(
+        DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
-        DepanFxWorkspaceResource<DepanFxRadialLayoutData> wkspRsrc) {
-      DepanFxRadialLayoutToolDialog.runEditDialog(wkspRsrc, dialogRunner);
+        DepanFxWorkspaceResource<DepanFxRadialLayoutData> layoutRsrc) {
+      DepanFxRadialLayoutToolDialog.runEditDialog(layoutRsrc, dialogRunner);
     }
   }
 
   private class TreeLayoutResourceContribution
-      extends DepanFxResourceRegistry.Principal<DepanFxTreeLayoutData>{
+      extends DepanFxResourceRegistryContribution.Principal<DepanFxTreeLayoutData>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxTreeLayoutData> {
 
     public TreeLayoutResourceContribution() {
       super(
@@ -261,7 +267,8 @@ public class DepanFxNodeLayoutConfiguration {
     }
 
     @Override
-    protected void runDialog(
+    public void runDialog(
+        DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
         DepanFxWorkspaceResource<DepanFxTreeLayoutData> wkspRsrc) {
       DepanFxTreeLayoutToolDialog.runEditDialog(wkspRsrc, dialogRunner);

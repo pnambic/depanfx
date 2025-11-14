@@ -4,7 +4,6 @@ import com.pnambic.depanfx.perspective.plugins.DepanFxResourceMenuRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.workspace.controls.DepanFxProjectTreeCell;
 import com.pnambic.depanfx.perspective.workspace.controls.DepanFxWorkspaceItem;
-import com.pnambic.depanfx.perspective.workspace.controls.DepanFxWorkspaceMemberCells;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.workspace.DepanFxProjectTree;
@@ -106,15 +105,14 @@ public class DepanFxProjectListViewer {
   }
 
   private TreeView<DepanFxWorkspaceMember> createView() {
-    DepanFxWorkspaceMemberCells.DocumentDispatch dispatch =
-        new DepanFxWorkspaceMemberCells.ScreenDispatch(sceneSrvc);
-
     TreeView<DepanFxWorkspaceMember> result =
         new TreeView<>(buildWorkspaceRoot());
     result.setShowRoot(false);
     result.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    result.setCellFactory(p -> new DepanFxProjectTreeCell(
-        workspace, dispatch, rsrcRegistry, rsrcMenuRegistry));
+    result.setCellFactory(
+        p -> new DepanFxProjectTreeCell(
+            workspace, sceneSrvc.getDialogRunner(),
+            rsrcRegistry, rsrcMenuRegistry));
     result.setContextMenu(buildWorkspaceMenu());
     return result;
   }
