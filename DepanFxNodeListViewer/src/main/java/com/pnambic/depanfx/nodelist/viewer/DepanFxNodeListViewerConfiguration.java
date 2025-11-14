@@ -24,10 +24,7 @@ import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
-import com.pnambic.depanfx.nodelist.gui.sections.folds.NodeListFoldController;
-import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
-import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -208,19 +205,19 @@ public class DepanFxNodeListViewerConfiguration {
         DepanFxSceneService sceneSrvc,
         DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
 
-      DepanFxNodeFoldController nodeFolding =
-          new NodeListFoldController(
-              workspace, nodeListRsrc.getResource().getGraphDocResource());
-
       DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(
           DepanFxWorkspaceFactory.buildDocTitle(nodeListRsrc.getDocument()),
           workspace, sceneSrvc.getDialogRunner(),
           columnRegistry, infoRegistry, matcherRegistry,
-          filterRegistry, filterDialogRegistry,
-          nodeFolding, nodeListRsrc,
-          getTableViewResource(workspace, nodeListRsrc));
+          filterRegistry, filterDialogRegistry);
 
       sceneSrvc.addViewer(viewer);
+
+      viewer.initFromNodeListResource(
+          nodeListRsrc,
+          getTableViewResource(
+              workspace,
+              nodeListRsrc.getResource().getGraphDocResource()));
     }
   }
 
@@ -269,34 +266,29 @@ public class DepanFxNodeListViewerConfiguration {
         DepanFxSceneService sceneSrvc,
         DepanFxWorkspaceResource<GraphDocument> graphRsrc) {
 
-      DepanFxNodeList nodeList = DepanFxNodeLists.buildNodeList(graphRsrc);
-      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc =
-          workspace.addScratchResource(nodeList);
-
       String viewerTitle = DepanFxWorkspaceFactory.buildDocTitle(
           graphRsrc.getDocument()) + " nodes";
-
-      DepanFxNodeFoldController nodeFolding =
-          new NodeListFoldController(workspace, graphRsrc);
 
       DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(
           viewerTitle, workspace, sceneSrvc.getDialogRunner(),
           columnRegistry, infoRegistry, matcherRegistry,
-          filterRegistry, filterDialogRegistry,
-          nodeFolding,
-          nodeListRsrc, getTableViewResource(workspace, nodeListRsrc));
+          filterRegistry, filterDialogRegistry);
 
       sceneSrvc.addViewer(viewer);
+      viewer.initFromGraphResource(
+          graphRsrc,
+          DepanFxNodeListViewBuiltIns.guessTableViewResource(
+              workspace, graphRsrc));
     }
   }
 
   private static DepanFxWorkspaceResource<DepanFxNodeListTableViewData>
   getTableViewResource(
       DepanFxWorkspace workspace,
-      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
+      DepanFxWorkspaceResource<GraphDocument> graphRsrc) {
 
-    String modelContextPath = nodeListRsrc.getResource().getGraphDocResource()
-        .getResource().getContextModelId().getContextModelPath();
+    String modelContextPath =
+        graphRsrc.getResource().getContextModelId().getContextModelPath();
     Path contextViewPath = DepanFxNodeListTableViewData.TABLE_VIEW_TOOL_PATH
         .resolve(modelContextPath)
         .resolve(DepanFxNodeListTableViewData.TABLE_VIEW_CONTEXT_RESOURCE_NAME);

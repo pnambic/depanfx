@@ -13,6 +13,7 @@ import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxNodeListColumn;
 import com.pnambic.depanfx.nodelist.gui.nodefilters.FilterMenu;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSection;
+import com.pnambic.depanfx.nodelist.gui.sections.folds.NodeListFoldController;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
@@ -21,7 +22,6 @@ import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
-import com.pnambic.depanfx.scene.DepanFxMenuBuilder;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -63,9 +63,12 @@ public class DepanFxNodeListTableController
 
   private final DepanFxNodeFiltersDialogRegistry filterDialogRegistry;
 
-  private final DepanFxNodeList nodeList;
+  private final TreeTableView<DepanFxNodeListMember> treeTable;
 
-  private final DepanFxNodeListTableState tableState;
+  // Established after the document contents are obtained.
+  private DepanFxNodeList nodeList;
+
+  private DepanFxNodeListTableState tableState;
 
   /**
    * Some keys might be classes, some keys might by instance-unique strings.
@@ -81,9 +84,6 @@ public class DepanFxNodeListTableController
       DepanFxLinkMatchersRegistry matcherRegistry,
       DepanFxNodeFiltersRegistry filterRegistry,
       DepanFxNodeFiltersDialogRegistry filterDialogRegistry,
-      DepanFxNodeFoldController nodeFolding,
-      DepanFxNodeList nodeList,
-      DepanFxNodeListCheckBoxSelection selectedNodes,
       TreeTableView<DepanFxNodeListMember> treeTable) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
@@ -92,9 +92,35 @@ public class DepanFxNodeListTableController
     this.matcherRegistry = matcherRegistry;
     this.filterRegistry = filterRegistry;
     this.filterDialogRegistry = filterDialogRegistry;
-    this.nodeList = nodeList;
+    this.treeTable = treeTable;
+  }
 
-    tableState = prepareNodeListTable(treeTable, selectedNodes, nodeFolding);
+  public void initFromGraphResource(
+      DepanFxWorkspaceResource<GraphDocument> graphRsrc) {
+    prepareTableState(DepanFxNodeLists.buildNodeList(graphRsrc));
+  }
+
+  public void initFromNodeListResource(
+      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
+    initFromNodeList(nodeListRsrc.getResource());
+  }
+
+  public void initFromNodeList(DepanFxNodeList nodeList) {
+    prepareTableState(nodeList);
+  }
+
+  private void prepareTableState(DepanFxNodeList nodeList) {
+    initLinkedNodeList(nodeList,
+        new NodeListFoldController(workspace, nodeList.getGraphDocResource()),
+        DepanFxNodeListCheckBoxSelection.forNodes(nodeList.getNodes()));
+  }
+
+  public void initLinkedNodeList(
+      DepanFxNodeList nodeList,
+      DepanFxNodeFoldController nodeFolding,
+      DepanFxNodeListCheckBoxSelection nodeSelection) {
+    this.nodeList = nodeList;
+    tableState = prepareNodeListTable(treeTable, nodeSelection, nodeFolding);
   }
 
   @Override // DepanFxNodeListTableAdapter

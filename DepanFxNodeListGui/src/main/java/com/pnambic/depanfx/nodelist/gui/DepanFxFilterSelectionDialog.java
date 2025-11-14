@@ -348,9 +348,6 @@ public class DepanFxFilterSelectionDialog extends DepanFxWorkspaceDialog {
   private DepanFxNodeListTableController buildTable(
       DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc,
       DepanFxNodeList tableNodes) {
-    DepanFxNodeListCheckBoxSelection nodeSelection =
-        DepanFxNodeListCheckBoxSelection.forNodes(tableNodes.getNodes());
-    nodeSelection.doSelectAllAction();
 
     DepanFxNodeListTableController result =
         new DepanFxNodeListTableController(
@@ -358,9 +355,9 @@ public class DepanFxFilterSelectionDialog extends DepanFxWorkspaceDialog {
             columnRegistry, infoRegistry,
             matcherRegistry,
             filterRegistry, filterDialogRegistry,
-            nodeFolding,
-            tableNodes, nodeSelection, nodeSelectTable);
-    result.setTableViewResource(tableViewRsrc);
+            nodeSelectTable);
+    result.initFromNodeList(tableNodes);
+    result.doSelectAllAction();
     return result;
   }
 

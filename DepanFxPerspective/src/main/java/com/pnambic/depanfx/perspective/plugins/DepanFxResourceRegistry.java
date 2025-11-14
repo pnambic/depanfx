@@ -40,20 +40,6 @@ public class DepanFxResourceRegistry {
   private static Logger LOG =
       LoggerFactory.getLogger(DepanFxResourceRegistry.class);
 
-  /**
-   * Resources that open to a panel may not open to a separate dialog window.
-   */
-  @SuppressWarnings("serial")
-  public static class UseOpenPanelException
-      extends UnsupportedOperationException {
-
-    public UseOpenPanelException(
-        DepanFxResourceRegistryContribution<?> contrib) {
-      super("Use openPanel() for this contribution "
-            + contrib.getClass().getName());
-    }
-  }
-
   private final Collection<DepanFxResourceRegistryContribution<?>> contribs;
 
   @Autowired

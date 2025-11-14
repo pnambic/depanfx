@@ -151,10 +151,13 @@ public class DepanFxNodeViewNodeSelectDialog
     tableControl = new DepanFxNodeListTableController(
         workspace, dialogRunner,
         columnRegistry, infoRegistry, matcherRegistry,
-        filterRegistry, filterDialogRegistry,
-        viewPanel.getNodeFolding(),
+        filterRegistry, filterDialogRegistry, nodeSelectTable);
+
+    tableControl.initLinkedNodeList(
         viewPanel.getViewNodesAsNodeList(),
-        viewPanel.getNodeSelection(), nodeSelectTable);
+        viewPanel.getNodeFolding(),
+        viewPanel.getNodeSelection());
+
     tableControl.addInfoStore(
         DepanFxNodeLocationData.class,
         new PanelLocationStore(viewPanel));

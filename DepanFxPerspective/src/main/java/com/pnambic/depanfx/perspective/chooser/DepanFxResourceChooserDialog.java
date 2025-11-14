@@ -145,7 +145,8 @@ public class DepanFxResourceChooserDialog {
     directoryTreeView.setShowRoot(false);
     directoryTreeView.setCellFactory(
         p -> new DepanFxProjectTreeCell(
-            workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry));
+            workspace, dialogRunner, rsrcRegistry, rsrcMenuRegistry,
+            d -> rsrcRegistry.openDialog(workspace, dialogRunner, d)));
 
     directoryTreeView.getSelectionModel().selectedItemProperty()
         .addListener((observable, oldValue, newValue) -> {

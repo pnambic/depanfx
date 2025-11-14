@@ -2,17 +2,17 @@ package com.pnambic.depanfx.nodelist.viewer;
 
 import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchersRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersDialogRegistry;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodelist.gui.DepanFxFilterSelectionDialog;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListCheckBoxSelection;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableCommands;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListTableController;
 import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.gui.nodefilters.FilterMenu;
-import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -35,11 +35,7 @@ import javafx.stage.Stage;
  */
 public class DepanFxNodeListViewer implements DepanFxSceneViewer {
 
-  private static final String FILTER_SELECTION_ITEM = "Filter Selection...";
-
-  private final String viewerTitle;
-
-  private final DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc;
+  private final Tab viewerTab;
 
   // Created in the constructor
   private final DepanFxNodeListTableController tableControl;
@@ -49,6 +45,8 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
    */
   private List<Stage> sideViews = new ArrayList<Stage>();
 
+  private DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc;
+
   public DepanFxNodeListViewer(
       String viewerTitle,
       DepanFxWorkspace workspace,
@@ -57,31 +55,40 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
       DepanFxInfoRegistry infoRegistry,
       DepanFxLinkMatchersRegistry matcherRegistry,
       DepanFxNodeFiltersRegistry filterRegistry,
-      DepanFxNodeFiltersDialogRegistry filterDialogRegistry,
-      DepanFxNodeFoldController nodeFolding,
-      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc,
-      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc) {
+      DepanFxNodeFiltersDialogRegistry filterDialogRegistry) {
 
-    this.viewerTitle = viewerTitle;
-    this.nodeListRsrc = nodeListRsrc;
-
-    DepanFxNodeList nodeList = nodeListRsrc.getResource();
+    viewerTab = new Tab(viewerTitle);
 
     tableControl = new DepanFxNodeListTableController(
         workspace, dialogRunner,
         columnRegistry, infoRegistry, matcherRegistry,
         filterRegistry, filterDialogRegistry,
-        nodeFolding, nodeList,
-        DepanFxNodeListCheckBoxSelection.forNodes(nodeList.getNodes()),
         new TreeTableView<>());
+  }
+
+  public void initFromGraphResource(
+      DepanFxWorkspaceResource<GraphDocument> graphRsrc,
+      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc) {
+    initFromNodeListResource(
+        tableControl.getWorkspace().addScratchResource(
+            DepanFxNodeLists.buildNodeList(graphRsrc)),
+        tableViewRsrc);
+  }
+
+  public void initFromNodeListResource(
+      DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc,
+      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc) {
+    this.nodeListRsrc = nodeListRsrc;
+    tableControl.initFromNodeListResource(nodeListRsrc);
     tableControl.setTableViewResource(tableViewRsrc);
+
+    viewerTab.setContent(tableControl.getNodeListTable());
+    viewerTab.setContextMenu(buildContextMenu());
   }
 
   @Override
   public Tab getSceneTab(DepanFxSceneService sceneSrvc) {
-    Tab result = new Tab(viewerTitle, tableControl.getNodeListTable());
-    result.setContextMenu(buildContextMenu());
-    return result;
+    return viewerTab;
   }
 
   @Override // DepanFxSceneViewer
@@ -90,7 +97,7 @@ public class DepanFxNodeListViewer implements DepanFxSceneViewer {
   }
 
   public String getViewerTitle() {
-    return viewerTitle;
+    return viewerTab.getText();
   }
 
   public DepanFxWorkspaceResource<DepanFxNodeList> getNodeListResource() {

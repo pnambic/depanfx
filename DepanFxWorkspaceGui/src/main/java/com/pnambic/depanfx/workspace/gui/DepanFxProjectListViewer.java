@@ -112,7 +112,8 @@ public class DepanFxProjectListViewer {
     result.setCellFactory(
         p -> new DepanFxProjectTreeCell(
             workspace, sceneSrvc.getDialogRunner(),
-            rsrcRegistry, rsrcMenuRegistry));
+            rsrcRegistry, rsrcMenuRegistry,
+            r -> rsrcRegistry.openDocument(workspace, sceneSrvc, r)));
     result.setContextMenu(buildWorkspaceMenu());
     return result;
   }

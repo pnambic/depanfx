@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javafx.scene.control.Cell;
@@ -67,6 +68,8 @@ public class DepanFxWorkspaceMemberCells {
 
   private final DepanFxResourceMenuRegistry rsrcMenuRegistry;
 
+  private final Consumer<DepanFxProjectDocument> dispatcher;
+
   private final Function<DepanFxWorkspaceMember, ImageView> rsrcImageSrc;
 
   // Manage Font tweeks (e.g. embolden).
@@ -77,11 +80,13 @@ public class DepanFxWorkspaceMemberCells {
       DepanFxDialogRunner dialogRunner,
       DepanFxResourceRegistry rsrcRegistry,
       DepanFxResourceMenuRegistry rsrcMenuRegistry,
+      Consumer<DepanFxProjectDocument> dispatcher,
       Function<DepanFxWorkspaceMember, ImageView> rsrcImageSrc) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
     this.rsrcRegistry = rsrcRegistry;
     this.rsrcMenuRegistry = rsrcMenuRegistry;
+    this.dispatcher = dispatcher;
     this.rsrcImageSrc = rsrcImageSrc;
   }
 
@@ -207,7 +212,7 @@ public class DepanFxWorkspaceMemberCells {
   protected <T> void dispatchContribution(
       DepanFxResourceRegistryContribution<T> contrib,
       DepanFxProjectDocument document) {
-    rsrcRegistry.openDialog(workspace, dialogRunner, document);
+    dispatcher.accept(document);
   }
 
   private void appendProjectContextMenu(

@@ -19,10 +19,10 @@ import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchersRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersDialogRegistry;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
+import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
-import com.pnambic.depanfx.nodelist.gui.sections.folds.NodeListFoldController;
-import com.pnambic.depanfx.nodelist.model.DepanFxNodeFoldController;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.viewdata.DepanFxNodeListViewerData;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -95,17 +95,21 @@ public class DepanFxNodeListViewerContribution
       DepanFxSceneService sceneService, DepanFxBaseViewerData baseData) {
 
     DepanFxNodeListViewerData viewerData = (DepanFxNodeListViewerData) baseData;
-    DepanFxWorkspaceResource<DepanFxNodeList> viewListRsrc =
-        viewerData.getNodeListRsrc();
-    DepanFxNodeFoldController nodeFolding =
-        new NodeListFoldController(
-            workspace, viewListRsrc.getResource().getGraphDocResource());
-    return Optional.of(new DepanFxNodeListViewer(
+
+    DepanFxNodeListViewer result = new DepanFxNodeListViewer(
         viewerData.getViewerTitle(),
         workspace, sceneService.getDialogRunner(),
         columnRegistry, infoRegistry, matcherRegistry,
-        filterRegistry, filterDialogRegistry, nodeFolding,
-        viewListRsrc, viewerData.getTableViewRsrc()));
+        filterRegistry, filterDialogRegistry);
+
+    DepanFxWorkspaceResource<DepanFxNodeList> viewListRsrc =
+        viewerData.getNodeListRsrc();
+    DepanFxWorkspaceResource<DepanFxNodeListTableViewData> viewInfo =
+        DepanFxNodeListViewBuiltIns.guessTableViewResource(
+            workspace, viewListRsrc.getResource().getGraphDocResource());
+
+    result.initFromNodeListResource(viewListRsrc, viewInfo);
+    return Optional.of(result);
   }
 
   @Override

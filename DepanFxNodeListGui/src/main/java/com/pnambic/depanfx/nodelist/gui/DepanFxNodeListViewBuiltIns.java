@@ -15,14 +15,17 @@
  */
 package com.pnambic.depanfx.nodelist.gui;
 
+import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.nodelist.gui.columns.infos.DepanFxNodeKeyColumnBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.sections.DepanFxNodeListSectionBuiltIns;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseColumnData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxBaseSectionData;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
+import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInContribution;
 import com.pnambic.depanfx.workspace.projects.DepanFxBuiltInProject;
+import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -45,6 +48,28 @@ public class DepanFxNodeListViewBuiltIns {
 
   @Autowired
   public DepanFxNodeListViewBuiltIns() {
+  }
+
+  public static DepanFxWorkspaceResource<DepanFxNodeListTableViewData>
+  guessTableViewResource(
+      DepanFxWorkspace workspace,
+      DepanFxWorkspaceResource<GraphDocument> graphRsrc) {
+
+    String modelContextPath =
+        graphRsrc.getResource().getContextModelId().getContextModelPath();
+    Path contextViewPath = DepanFxNodeListTableViewData.TABLE_VIEW_TOOL_PATH
+        .resolve(modelContextPath)
+        .resolve(DepanFxNodeListTableViewData.TABLE_VIEW_CONTEXT_RESOURCE_NAME);
+
+    // If the context view path does not provide a valid resource,
+    // use the member view.
+    return
+        DepanFxProjects.getBuiltIn(
+            workspace,  DepanFxNodeListTableViewData.class, contextViewPath)
+        .orElseGet(() ->
+            DepanFxProjects.getBuiltIn(
+                workspace,  DepanFxNodeListTableViewData.class,
+                DepanFxNodeListViewBuiltIns.MEMBER_TABLE_VIEW_PATH).get());
   }
 
   @Bean
