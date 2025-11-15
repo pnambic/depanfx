@@ -17,10 +17,12 @@ package com.pnambic.depanfx.perspective.plugins;
 
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
+import com.pnambic.depanfx.tasks.TaskSubmission;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxMemoryProject;
+import com.pnambic.depanfx.workspace.tasks.WorkspaceTaskService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +31,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.CancellationException;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+
+import javafx.application.Platform;
 
 /**
  * A registry of resources.
@@ -38,15 +43,19 @@ import java.util.stream.Stream;
 @Component
 public class DepanFxResourceRegistry {
 
-  private static Logger LOG =
+  private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxResourceRegistry.class);
 
   private final Collection<DepanFxResourceRegistryContribution<?>> contribs;
 
+  private final WorkspaceTaskService workspaceTaskService;
+
   @Autowired
   public DepanFxResourceRegistry(
-      Collection<DepanFxResourceRegistryContribution<?>> contribs) {
+      Collection<DepanFxResourceRegistryContribution<?>> contribs,
+      WorkspaceTaskService workspaceTaskService) {
     this.contribs = contribs;
+    this.workspaceTaskService = workspaceTaskService;
   }
 
   /**
@@ -87,7 +96,7 @@ public class DepanFxResourceRegistry {
       DepanFxWorkspace workspace,
       DepanFxProjectDocument document) {
     return selectContributions(contribs.stream(), workspace, document);
-    }
+  }
 
   /**
    * Use the principal contribution to open the supplied document.
@@ -100,20 +109,31 @@ public class DepanFxResourceRegistry {
         .flatMap(c -> c.loadResource(workspace, document));
   }
 
-  public Optional<?> fetchResource(
+  public TaskSubmission<Optional<DepanFxWorkspaceResource<?>>> fetchResource(
       DepanFxWorkspace workspace,
       DepanFxProjectDocument document,
       DepanFxResourceRegistryContribution<?> c,
       Consumer<DepanFxWorkspaceResource<?>> onResourceLoad) {
-    c.loadResource(workspace, document)
-        .ifPresentOrElse(
-            onResourceLoad::accept,
-            () -> LOG.warn("Unable to load document: {}", document));
+    TaskSubmission<Optional<DepanFxWorkspaceResource<?>>> submission =
+        workspaceTaskService.submitResourceLoad(workspace, document, c);
 
-    return Optional.empty();
+    submission.resultFuture().whenComplete((resource, error) -> {
+      if (error != null) {
+        if (error instanceof CancellationException) {
+          return;
+        }
+        LOG.warn("Unable to load document: {}", document, error);
+        return;
+      }
+      resource.ifPresentOrElse(
+          r -> runOnFxThread(() -> onResourceLoad.accept(r)),
+          () -> LOG.warn("Unable to load document: {}", document));
+    });
+
+    return submission;
   }
 
-  public void openDocument(
+  public Optional<TaskSubmission<Optional<DepanFxWorkspaceResource<?>>>> openDocument(
       DepanFxWorkspace workspace,
       DepanFxSceneService sceneSrvc,
       DepanFxProjectDocument document) {
@@ -123,17 +143,19 @@ public class DepanFxResourceRegistry {
 
     if (optContrib.isEmpty()) {
       LOG.warn("No contribution to open document: {}", document);
-      return;
+      return Optional.empty();
     }
 
     DepanFxResourceRegistryContribution<?> contrib = optContrib.get();
-    fetchResource(
-        workspace, document, contrib,
-        r -> DepanFxResourceRegistryContribution.dispatchResource(
-            workspace, sceneSrvc, contrib, r));
+    TaskSubmission<Optional<DepanFxWorkspaceResource<?>>> submission =
+        fetchResource(
+            workspace, document, contrib,
+            r -> DepanFxResourceRegistryContribution.dispatchResource(
+                workspace, sceneSrvc, contrib, r));
+    return Optional.of(submission);
   }
 
-  public void openDialog(
+  public Optional<TaskSubmission<Optional<DepanFxWorkspaceResource<?>>>> openDialog(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
       DepanFxProjectDocument document) {
@@ -143,7 +165,7 @@ public class DepanFxResourceRegistry {
 
     if (optContrib.isEmpty()) {
       LOG.warn("No contribution to open document: {}", document);
-      return;
+      return Optional.empty();
     }
 
     DepanFxResourceRegistryContribution<?> contrib = optContrib.get();
@@ -151,13 +173,23 @@ public class DepanFxResourceRegistry {
       LOG.warn("Principal contribution {} requires a panel."
           + "  Unable to render document {} with dialog.",
           contrib.getResourceLabel(), document);
-      return;
+      return Optional.empty();
     }
 
-    fetchResource(
-        workspace, document, contrib,
-        r -> DepanFxResourceRegistryContribution.dispatchDialog(
-            workspace, dialogRunner, contrib, r));
+    TaskSubmission<Optional<DepanFxWorkspaceResource<?>>> submission =
+        fetchResource(
+            workspace, document, contrib,
+            r -> DepanFxResourceRegistryContribution.dispatchDialog(
+                workspace, dialogRunner, contrib, r));
+    return Optional.of(submission);
+  }
+
+  private void runOnFxThread(Runnable action) {
+    if (Platform.isFxApplicationThread()) {
+      action.run();
+    } else {
+      Platform.runLater(action);
+    }
   }
 
   private Optional<DepanFxResourceRegistryContribution<?>>
