@@ -18,8 +18,7 @@ module depanfx.session {
     requires depanfx.session.data;
     requires depanfx.tasks.gui;
     requires depanfx.workspace;
-
-    // requires pnambic.modxstream;
+    requires depanfx.tasks;
 
     opens com.pnambic.depanfx.session.core to
         spring.core, spring.beans;
@@ -31,4 +30,5 @@ module depanfx.session {
     exports com.pnambic.depanfx.session.core;
     exports com.pnambic.depanfx.session.gui;
     exports com.pnambic.depanfx.session.tooldata;
+    exports com.pnambic.depanfx.session.tasks;
 }

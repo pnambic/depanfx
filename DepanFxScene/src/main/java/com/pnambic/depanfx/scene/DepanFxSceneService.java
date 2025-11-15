@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import javafx.geometry.Rectangle2D;
+import javafx.stage.Stage;
 
 /**
  * Encapsulate access to the containing scene
@@ -53,4 +54,9 @@ public interface DepanFxSceneService {
    * Close the screen and all panels.
    */
   void closeScene();
+
+  /**
+   * Provides {@code true} is the scene runs the supplied {@code checkStages}.
+   */
+  boolean isStage(Stage sessionStage);
 }

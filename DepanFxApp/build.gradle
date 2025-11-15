@@ -40,6 +40,7 @@ dependencies {
   implementation project(':DepanFxSessionData')
   implementation project(':DepanFxWorkspace')
   implementation project(':DepanFxWorkspaceGui')
+  implementation project(':DepanFxTasks')
 
   runtimeOnly project(':DepanFxLauncher')
 

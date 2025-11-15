@@ -62,6 +62,12 @@ public class TaskMonitorDialogService {
     });
   }
 
+  public void showActiveTasks() {
+    if (!activeTasks.isEmpty()) {
+      showTaskMonitor();
+    }
+  }
+
   /**
    * Hide the dialog if it is currently visible.
    */

@@ -41,6 +41,8 @@ public class DepanFxSceneController {
 
     void closeScene(DepanFxSceneService sceneSrvc)
         throws IOException;
+
+    boolean isStage(Stage sessionStage);
   }
 
   private static final Logger LOG =
@@ -110,6 +112,7 @@ public class DepanFxSceneController {
     LOG.info("Close scene invoked");
     // Clear UX resources first (tabs), then map-list of viewers.
     // Leads to DepanFxSceneViewer.closeTab(), which release any resources.
+    sceneSrvc.streamViewers().forEach(v ->v.closeTab());
     viewRoot.getTabs().clear();
     sceneTabs.clear();
   }
@@ -220,7 +223,7 @@ public class DepanFxSceneController {
 
     private final DepanFxDialogRunner dialogRunner;
 
-    private SceneService(DepanFxDialogRunner dialogRunner) {
+    public SceneService(DepanFxDialogRunner dialogRunner) {
       this.dialogRunner = dialogRunner;
     }
 
@@ -277,6 +280,11 @@ public class DepanFxSceneController {
     @Override
     public Stream<DepanFxSceneViewer> streamViewers() {
       return sceneTabs.values().stream();
+    }
+
+    @Override
+    public boolean isStage(Stage sessionStage) {
+      return owner.isStage(sessionStage);
     }
   }
 }

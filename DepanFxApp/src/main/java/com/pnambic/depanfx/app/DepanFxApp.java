@@ -20,6 +20,7 @@ import com.pnambic.depanfx.session.core.DepanFxSession;
 import com.pnambic.depanfx.session.core.DepanFxSessionCliArgs;
 import com.pnambic.depanfx.session.core.DepanFxSessionConfig;
 import com.pnambic.depanfx.session.core.DepanFxSessionDataTransport;
+import com.pnambic.depanfx.session.tasks.SessionTaskService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -78,17 +80,13 @@ public class DepanFxApp extends Application {
 
     // Configure and run the session.
     this.session = applicationContext.getBean(DepanFxSession.class);
-
-    DepanFxSessionDataTransport transport =
-        applicationContext.getBean(DepanFxSessionDataTransport.class);
-    session.setOnClose(applicationContext::close);
-
-    DepanFxSessionCliArgs sessionArgs =
-        applicationContext.getBean(DepanFxSessionCliArgs.class);
-
-    configSession(transport, sessionArgs);
+    configSession();
 
     session.startSession(stage);
+
+    SessionTaskService taskSrvc =
+        applicationContext.getBean(SessionTaskService.class);
+    taskSrvc.showActiveTasks();
   }
 
   @Override
@@ -98,29 +96,46 @@ public class DepanFxApp extends Application {
     // Stop is called by Platform.exit();
   }
 
-  private void configSession(
-      DepanFxSessionDataTransport transport,
-      DepanFxSessionCliArgs sessionArgs) {
-    sessionArgs.getSessionSource()
-        .map(Path::of)
-        .ifPresentOrElse(p -> {
-          session.setSessionPath(p);
-          session.setSessionConfig(loadConfig(transport, p));
-        },
-          () -> session.setSessionConfig(transport.defaultSessionConfig())
-        );
+  private void configSession() {
+
+    this.session = applicationContext.getBean(DepanFxSession.class);
+    session.setOnClose(applicationContext::close);
+    session.setSessionConfig(DepanFxSessionConfig.EMPTY_SESSION_DATA);
+
+    DepanFxSessionCliArgs sessionArgs =
+        applicationContext.getBean(DepanFxSessionCliArgs.class);
+    Optional<Path> optSessionPath = getSessionPath(sessionArgs);
+
+    DepanFxSessionDataTransport transport =
+        applicationContext.getBean(DepanFxSessionDataTransport.class);
+
+    if (optSessionPath.isEmpty()) {
+      session.setSessionConfig(transport.defaultSessionConfig());
+      return;
+    }
+    Path sessionPath = optSessionPath.get();
+
+    SessionTaskService taskSrvc =
+        applicationContext.getBean(SessionTaskService.class);
+
+    // Launch config load in a race to start the session.
+    taskSrvc.submitLoadSession(
+        sessionPath, transport,
+        c -> updateSessionConfig(sessionPath, c));
   }
 
-  private DepanFxSessionConfig loadConfig(
-      DepanFxSessionDataTransport transport, Path sessionPath) {
-
+  private void updateSessionConfig(
+      Path sessionPath, DepanFxSessionConfig sessionConfig) {
     try {
-      return transport.loadSessionConfig(sessionPath);
-    } catch (RuntimeException errAny) {
-      LOG.error("Unable to load session data at {}",
-          sessionPath.toString(), errAny);
-    // Fall through to default.
+      session.updateSessionConfig(sessionPath, sessionConfig);
+    } catch (Exception err) {
+      LOG.warn("Unable to starte the session loaded from {}",
+          sessionPath, err);
     }
-    return transport.defaultSessionConfig();
+  }
+
+  private Optional<Path> getSessionPath(DepanFxSessionCliArgs sessionArgs) {
+    return sessionArgs.getSessionSource()
+        .map(Path::of);
   }
 }

@@ -35,11 +35,10 @@ import org.springframework.stereotype.Component;
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import javafx.stage.Stage;
@@ -50,6 +49,10 @@ import javafx.stage.Stage;
  */
 @Component
 public class DepanFxSession implements DepanFxSceneController.SceneOwner {
+
+  private record StageInfo(Stage stage, DepanFxSceneService sceneSrvc) {
+
+  }
 
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxSession.class);
@@ -62,9 +65,12 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
 
   private final DepanFxSceneStarterRegistry starterRegistry;
 
-  private final Set<DepanFxSceneService> scenes = new HashSet<>();
+  // Unlikely to be a big number of windows;
+  private final List<StageInfo> stages = new ArrayList<>(2);
 
   private Closeable onClose;
+
+  private Stage sessionStage;
 
   private Path sessionPath;
 
@@ -87,6 +93,11 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
     this.starterRegistry = starterRegistry;
   }
 
+  @Override // SceneOwner
+  public boolean isStage(Stage sessionStage) {
+    return this.sessionStage.equals(sessionStage);
+  }
+
   public void setOnClose(Closeable onClose) {
     this.onClose = onClose;
   }
@@ -104,7 +115,7 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
     setCurrentProject(sessionConfig.getCurrentProjectName());
 
     // Populate sceneMap when session is started.
-    scenes.clear();
+    stages.clear();
   }
 
   public DepanFxWorkspace getWorkspace() {
@@ -112,7 +123,7 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
   }
 
   public Stream<DepanFxSceneService> streamScenes() {
-    return scenes.stream();
+    return stages.stream().map(i -> i.sceneSrvc());
   }
 
   /**
@@ -121,33 +132,49 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
    * scenes, they are created as needed.
    */
   public void startSession(Stage stage) throws Exception {
+    sessionStage = stage;
 
     if (sessionConfig.getSceneConfigs() == null) {
       startStarterSession(stage);
       return;
     }
 
-    Iterator<DepanFxSceneData> sceneSeq =
-        sessionConfig.getSceneConfigs().iterator();
+    initConfigSession();
+  }
 
-    if (!sceneSeq.hasNext()) {
-      addScene(stage, DepanFxSceneData.EMPTY_SESSION_SCENE);
-      return;
-    }
+  public void updateSessionConfig(
+      Path sessionPath,
+      DepanFxSessionConfig sessionConfig) throws Exception {
+    clearSession();
+    stages.clear();
 
-    // Start the first scene on the initial stage.
-    DepanFxSceneData baseScene = sceneSeq.next();
-    addScene(stage, baseScene);
+    this.sessionPath = sessionPath;
+    this.sessionConfig = sessionConfig;
+    setCurrentProject(sessionConfig.getCurrentProjectName());
 
-    // Start additional scenes on secondary stages.
-    while (sceneSeq.hasNext()) {
-      DepanFxSceneData sceneInfo = sceneSeq.next();
-      addScene(sceneInfo);
-    }
+    initConfigSession();
   }
 
   public void stopSession() {
-    streamScenes().forEach(c -> c.closeScene());
+    streamScenes()
+        .forEach(c -> c.closeScene());
+  }
+
+  /**
+   * Close all scenes except the primary stage,
+   * and close all viewers in the primary stage.
+   */
+  private void clearSession() {
+    streamScenes()
+        // Don't close the primary stage
+        .filter(s -> !s.isStage(sessionStage))
+        .forEach(c -> c.closeScene());
+
+    // clear all viewers on the primary scene
+    streamScenes()
+        .filter(s -> s.isStage(sessionStage))
+        .forEach(s -> s.streamViewers().close());
+
   }
 
   public void addScene(DepanFxSceneData sceneInfo)
@@ -159,8 +186,8 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
   @Override // DepanFxSceneController.SceneOwner
   public void closeScene(DepanFxSceneService sceneSrvc) {
     sceneSrvc.closeScene();
-    scenes.remove(sceneSrvc);
-    if (scenes.isEmpty()) {
+    stages.removeIf(i -> i.sceneSrvc.equals(sceneSrvc));
+    if (stages.isEmpty()) {
       closeParent();
     }
   }
@@ -176,6 +203,27 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
       onClose.close();
     } catch (Exception errAny) {
       LOG.warn("Trouble closing down the session", errAny);
+    }
+  }
+
+  private void initConfigSession() throws Exception {
+
+    Iterator<DepanFxSceneData> sceneSeq =
+        sessionConfig.getSceneConfigs().iterator();
+
+    if (!sceneSeq.hasNext()) {
+      addScene(sessionStage, DepanFxSceneData.EMPTY_SESSION_SCENE);
+      return;
+    }
+
+    // Start the first scene on the initial stage.
+    DepanFxSceneData baseScene = sceneSeq.next();
+    addScene(sessionStage, baseScene);
+
+    // Start additional scenes on secondary stages.
+    while (sceneSeq.hasNext()) {
+      DepanFxSceneData sceneInfo = sceneSeq.next();
+      addScene(sceneInfo);
     }
   }
 
@@ -222,7 +270,7 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
 
     DepanFxSceneService result = scene.getSceneService();
 
-    scenes.add(result);
+    stages.add(new StageInfo(stage, result));
     return result;
   }
 

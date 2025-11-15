@@ -20,6 +20,7 @@ module depanfx.app {
     requires depanfx.nodeview.gui;
     requires depanfx.persistence;
     requires depanfx.workspace.gui;
+    requires depanfx.tasks;
 
     opens com.pnambic.depanfx to spring.core;
     opens com.pnambic.depanfx.app to spring.core;
