@@ -17,10 +17,12 @@ package com.pnambic.depanfx.perspective.plugins;
 
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
+import com.pnambic.depanfx.tasks.TaskSubmission;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 import com.pnambic.depanfx.workspace.projects.DepanFxMemoryProject;
+import com.pnambic.depanfx.workspace.tasks.WorkspaceTaskService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,15 +40,19 @@ import java.util.stream.Stream;
 @Component
 public class DepanFxResourceRegistry {
 
-  private static Logger LOG =
+  private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxResourceRegistry.class);
 
   private final Collection<DepanFxResourceRegistryContribution<?>> contribs;
 
+  private final WorkspaceTaskService workspaceTaskService;
+
   @Autowired
   public DepanFxResourceRegistry(
-      Collection<DepanFxResourceRegistryContribution<?>> contribs) {
+      Collection<DepanFxResourceRegistryContribution<?>> contribs,
+      WorkspaceTaskService workspaceTaskService) {
     this.contribs = contribs;
+    this.workspaceTaskService = workspaceTaskService;
   }
 
   /**
@@ -87,7 +93,7 @@ public class DepanFxResourceRegistry {
       DepanFxWorkspace workspace,
       DepanFxProjectDocument document) {
     return selectContributions(contribs.stream(), workspace, document);
-    }
+  }
 
   /**
    * Use the principal contribution to open the supplied document.
@@ -100,17 +106,17 @@ public class DepanFxResourceRegistry {
         .flatMap(c -> c.loadResource(workspace, document));
   }
 
-  public Optional<?> fetchResource(
+  public TaskSubmission<Optional<DepanFxWorkspaceResource<?>>> fetchResource(
       DepanFxWorkspace workspace,
       DepanFxProjectDocument document,
       DepanFxResourceRegistryContribution<?> c,
       Consumer<DepanFxWorkspaceResource<?>> onResourceLoad) {
-    c.loadResource(workspace, document)
-        .ifPresentOrElse(
-            onResourceLoad::accept,
-            () -> LOG.warn("Unable to load document: {}", document));
 
-    return Optional.empty();
+    TaskSubmission<Optional<DepanFxWorkspaceResource<?>>> submission =
+        workspaceTaskService.submitFetchResource(
+            workspace, document, c, onResourceLoad);
+
+    return submission;
   }
 
   public void openDocument(
