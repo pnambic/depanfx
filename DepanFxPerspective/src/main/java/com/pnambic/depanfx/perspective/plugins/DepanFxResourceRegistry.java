@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
@@ -99,6 +100,19 @@ public class DepanFxResourceRegistry {
         .flatMap(c -> c.loadResource(workspace, document));
   }
 
+  public Optional<?> fetchResource(
+      DepanFxWorkspace workspace,
+      DepanFxProjectDocument document,
+      DepanFxResourceRegistryContribution<?> c,
+      Consumer<DepanFxWorkspaceResource<?>> onResourceLoad) {
+    c.loadResource(workspace, document)
+        .ifPresentOrElse(
+            onResourceLoad::accept,
+            () -> LOG.warn("Unable to load document: {}", document));
+
+    return Optional.empty();
+  }
+
   public void openDocument(
       DepanFxWorkspace workspace,
       DepanFxSceneService sceneSrvc,
@@ -112,18 +126,11 @@ public class DepanFxResourceRegistry {
       return;
     }
 
-    // Bound scope of the type conversions
-    @SuppressWarnings("rawtypes")
-    DepanFxResourceRegistryContribution contrib = optContrib.get();
-
-    @SuppressWarnings("unchecked")
-    Optional<DepanFxWorkspaceResource<?>> optOpenRsrc =
-        contrib.loadResource(workspace, document);
-
-    optOpenRsrc.ifPresentOrElse(
+    DepanFxResourceRegistryContribution<?> contrib = optContrib.get();
+    fetchResource(
+        workspace, document, contrib,
         r -> DepanFxResourceRegistryContribution.dispatchResource(
-            workspace, sceneSrvc, contrib, r),
-        () -> LOG.warn("Unable to load document: {}", document));
+            workspace, sceneSrvc, contrib, r));
   }
 
   public void openDialog(
@@ -139,23 +146,18 @@ public class DepanFxResourceRegistry {
       return;
     }
 
-    // Bound scope of the type conversions
-    @SuppressWarnings("rawtypes")
-    DepanFxResourceRegistryContribution contrib = optContrib.get();
+    DepanFxResourceRegistryContribution<?> contrib = optContrib.get();
     if (!(contrib instanceof DepanFxResourceRegistryContribution.Dialog)) {
-      LOG.warn("Principal contribution {} requires a panel: {}",
+      LOG.warn("Principal contribution {} requires a panel."
+          + "  Unable to render document {} with dialog.",
           contrib.getResourceLabel(), document);
       return;
     }
 
-    @SuppressWarnings("unchecked")
-    Optional<DepanFxWorkspaceResource<?>> optOpenRsrc =
-        contrib.loadResource(workspace, document);
-
-    optOpenRsrc.ifPresentOrElse(
+    fetchResource(
+        workspace, document, contrib,
         r -> DepanFxResourceRegistryContribution.dispatchDialog(
-            workspace, dialogRunner, contrib, r),
-        () -> LOG.warn("Unable to load document: {}", document));
+            workspace, dialogRunner, contrib, r));
   }
 
   private Optional<DepanFxResourceRegistryContribution<?>>
