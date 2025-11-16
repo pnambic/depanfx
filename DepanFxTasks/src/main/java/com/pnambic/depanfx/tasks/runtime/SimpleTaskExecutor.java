@@ -85,6 +85,24 @@ public class SimpleTaskExecutor implements TaskExecutorService {
   }
 
   @Override
+  public boolean awaitTask(DeferredTask<?> task) {
+    SimpleTaskController<?> controller = controllers.get(task);
+    if (controller == null) {
+      return false;
+    }
+    return controller.await();
+  }
+
+  @Override
+  public boolean awaitTask(DeferredTask<?> task, int waitMs) {
+    SimpleTaskController<?> controller = controllers.get(task);
+    if (controller == null) {
+      return false;
+    }
+    return controller.await(waitMs);
+  }
+
+  @Override
   public boolean cancelTask(DeferredTask<?> task) {
     SimpleTaskController<?> controller = controllers.get(task);
     if (controller == null) {

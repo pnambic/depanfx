@@ -79,14 +79,7 @@ public class DepanFxApp extends Application {
         .run(args);
 
     // Configure and run the session.
-    this.session = applicationContext.getBean(DepanFxSession.class);
-    configSession();
-
-    session.startSession(stage);
-
-    SessionTaskService taskSrvc =
-        applicationContext.getBean(SessionTaskService.class);
-    taskSrvc.showActiveTasks();
+    launchSession(stage);
   }
 
   @Override
@@ -96,7 +89,7 @@ public class DepanFxApp extends Application {
     // Stop is called by Platform.exit();
   }
 
-  private void configSession() {
+  private void launchSession(Stage stage) throws Exception {
 
     this.session = applicationContext.getBean(DepanFxSession.class);
     session.setOnClose(applicationContext::close);
@@ -122,6 +115,11 @@ public class DepanFxApp extends Application {
     taskSrvc.submitLoadSession(
         sessionPath, transport,
         c -> updateSessionConfig(sessionPath, c));
+
+    session.startSession(stage);
+
+    // Force load monitor to front
+    taskSrvc.showActiveTasks();
   }
 
   private void updateSessionConfig(

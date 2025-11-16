@@ -20,14 +20,25 @@ import com.pnambic.depanfx.tasks.ProgressMonitor;
 import com.pnambic.depanfx.tasks.TaskSnapshot;
 import com.pnambic.depanfx.tasks.TaskStatus;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SimpleTaskController<T> {
+
+  private static final int NANOS_PER_MILLIS = 1_000_000;
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(SimpleTaskController.class);
 
   private final SimpleTaskExecutor executor;
 
@@ -98,6 +109,53 @@ public class SimpleTaskController<T> {
     this.executorFuture = executorFuture;
   }
 
+  /**
+   * Waits for the result, returning {@code true} if the result became available.
+   *
+   * A {@code false} value indicates some other outcome.
+   */
+  public boolean await() {
+    long start = System.nanoTime();
+    try {
+      getResultFuture().get();
+      long avail = System.nanoTime();
+      LOG.info("Task {} result available after {}ms",
+          task.getTaskTitle(), reportMs(start, avail));
+      return true;
+    } catch (InterruptedException e) {
+      LOG.info("Task interrupted, continueing");
+    } catch (ExecutionException e) {
+      LOG.info("Error during wait, continueing");
+    }
+    return false;
+  }
+
+  /**
+   * Waits the provided number of milliseconds for the result,
+   * returning {@code true} if the result became available.
+   *
+   * A {@code false} value indicates some other outcome.
+   */
+  public boolean await(int waitMs) {
+    long start = System.nanoTime();
+    try {
+      getResultFuture().get(waitMs, TimeUnit.MILLISECONDS);
+      long avail = System.nanoTime();
+      LOG.info("Task {} result available after {}ms",
+          task.getTaskTitle(), reportMs(start, avail));
+      return true;
+    } catch (TimeoutException e) {
+      long timeout = System.nanoTime();
+      LOG.info("Task {} wait for {} milliseconds expired after {}ms, continueing",
+          task.getTaskTitle(), waitMs, reportMs(start, timeout));
+    } catch (InterruptedException e) {
+      LOG.info("Task {} interrupted, continueing", task.getTaskTitle());
+    } catch (ExecutionException e) {
+      LOG.info("Error during wait for task {}, continueing", task.getTaskTitle());
+    }
+    return false;
+  }
+
   public boolean requestCancel() {
     return cancelRequested.compareAndSet(false, true);
   }
@@ -161,6 +219,10 @@ public class SimpleTaskController<T> {
 
   private void notifyProgress() {
     executor.notifyProgress(takeSnapshot());
+  }
+
+  private long reportMs(long start, long timed) {
+    return (timed - start) / NANOS_PER_MILLIS;
   }
 
   private void advance(int stepDelta, String progressMessage) {
