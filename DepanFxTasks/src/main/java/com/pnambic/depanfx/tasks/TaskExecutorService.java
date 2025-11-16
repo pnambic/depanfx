@@ -36,4 +36,8 @@ public interface TaskExecutorService {
   void addListener(TaskListener listener);
 
   void removeListener(TaskListener listener);
+
+  boolean awaitTask(DeferredTask<?> task);
+
+  boolean awaitTask(DeferredTask<?> task, int waitMs);
 }

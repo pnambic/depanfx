@@ -34,6 +34,9 @@ import javafx.application.Platform;
 @Service
 public class SessionTaskService {
 
+  // Interval to stall so the load can complete first. 
+  public static final int LOAD_STALL_MS = 300;
+
   private static final Logger LOG =
       LoggerFactory.getLogger(SessionTaskService.class);
 
@@ -64,7 +67,7 @@ public class SessionTaskService {
 
     result.resultFuture().whenComplete((config, error) -> {
       if (error != null) {
-        if (sessionPath instanceof CancellationException) {
+        if (error instanceof CancellationException) {
           return;
         }
         LOG.warn("Unable to load session: {}", sessionPath.getFileName(), error);
@@ -77,6 +80,8 @@ public class SessionTaskService {
       LOG.warn("Unable to load document: {}", sessionPath.getFileName());
     });
 
+    // Give the session load task a brief head start on its consumers.
+    taskExecutorService.awaitTask(loadTask, LOAD_STALL_MS);
     return result;
   }
 

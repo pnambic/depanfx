@@ -16,13 +16,13 @@
 package com.pnambic.depanfx.tasks.gui;
 
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import com.pnambic.depanfx.tasks.DeferredTask;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.stage.Stage;
 
 /**
@@ -33,7 +33,7 @@ public class TaskMonitorDialogService {
 
   private final DepanFxDialogRunner dialogRunner;
 
-  private final ObservableList<TaskMonitorItem> activeTasks;
+  private final TaskMonitorService monitorService;
 
   private Stage dialogStage;
 
@@ -42,8 +42,10 @@ public class TaskMonitorDialogService {
       DepanFxDialogRunner dialogRunner,
       TaskMonitorService monitorService) {
     this.dialogRunner = dialogRunner;
-    this.activeTasks = monitorService.getActiveTasks();
-    this.activeTasks.addListener(this::handleActiveTaskChange);
+    this.monitorService = monitorService;
+
+    this.monitorService.getActiveTasks()
+        .addListener(this::handleActiveTaskChange);
   }
 
   /**
@@ -63,7 +65,7 @@ public class TaskMonitorDialogService {
   }
 
   public void showActiveTasks() {
-    if (!activeTasks.isEmpty()) {
+    if (!monitorService.getActiveTasks().isEmpty()) {
       showTaskMonitor();
     }
   }
@@ -95,15 +97,56 @@ public class TaskMonitorDialogService {
 
   private void handleActiveTaskChange(
       ListChangeListener.Change<? extends TaskMonitorItem> change) {
-    runOnFxThread(() -> {
-      if (activeTasks.isEmpty()) {
-        if (dialogStage != null && dialogStage.isShowing()) {
-          dialogStage.hide();
-        }
-      } else if (dialogStage == null || !dialogStage.isShowing()) {
-        showTaskMonitor();
+   runOnFxThread(() -> {
+     if (monitorService.getActiveTasks().isEmpty()) {
+       if (dialogStage != null && dialogStage.isShowing()) {
+         dialogStage.hide();
+       }
+     } else if (dialogStage == null || !dialogStage.isShowing()) {
+       showTaskMonitor();
+     }
+   });
+ }
+
+  private void XhandleActiveTaskChange(
+      ListChangeListener.Change<? extends TaskMonitorItem> change) {
+    runOnFxThread(() -> handleMonitorPopup());
+  }
+
+  private void handleMonitorPopup() {
+    // Nothing active, hide the monitor window, exit early.
+    if (hideIfNoActive()) {
+      return;
+    }
+
+    // A brief pause for the task to maybe complete.
+    TaskMonitorItem taskItem = monitorService.getActiveTasks().getFirst();
+    DeferredTask<?> activeTask = taskItem.getTask();
+    if (monitorService.awaitTaskMs(activeTask, 300)) {
+      return;
+    }
+
+    // After the pause, confirm no reason to show monitor
+    if (hideIfNoActive()) {
+      return;
+    }
+
+    // No choice but to show the pask monitor
+    if (dialogStage == null || !dialogStage.isShowing()) {
+      showTaskMonitor();
+    }
+  }
+
+  private boolean hideIfNoActive() {
+    if (monitorService.getActiveTasks().isEmpty()) {
+      if (dialogStage != null && dialogStage.isShowing()) {
+        dialogStage.hide();
       }
-    });
+      return true;
+    }
+
+    // Some task is active
+    return false;
   }
 
   private void runOnFxThread(Runnable action) {

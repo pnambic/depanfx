@@ -86,7 +86,7 @@ public class DepanFxApp extends Application {
 
     SessionTaskService taskSrvc =
         applicationContext.getBean(SessionTaskService.class);
-    taskSrvc.showActiveTasks();
+    // taskSrvc.showActiveTasks();
   }
 
   @Override

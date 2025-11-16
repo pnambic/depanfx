@@ -21,9 +21,6 @@ import com.pnambic.depanfx.tasks.TaskExecutorService;
 import com.pnambic.depanfx.tasks.TaskListener;
 import com.pnambic.depanfx.tasks.TaskSnapshot;
 
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +30,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
+
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 @Service
 public class TaskMonitorService implements DisposableBean {
@@ -80,6 +81,14 @@ public class TaskMonitorService implements DisposableBean {
       }
       completedRoots.clear();
     });
+  }
+
+  public boolean awaitTask(DeferredTask<?> task) {
+    return executorService.awaitTask(task);
+  }
+
+  public boolean awaitTaskMs(DeferredTask<?> task, int waitMs) {
+    return executorService.awaitTask(task, waitMs);
   }
 
   private void bootstrapSnapshots() {
