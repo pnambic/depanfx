@@ -15,15 +15,15 @@
  */
 package com.pnambic.depanfx.tasks.gui;
 
-import com.pnambic.depanfx.scene.DepanFxDialogRunner;
-import com.pnambic.depanfx.tasks.DeferredTask;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.stage.Stage;
 
 /**
@@ -32,13 +32,14 @@ import javafx.stage.Stage;
 @Service
 public class TaskMonitorDialogService {
 
-  private static final int MONITOR_STALL_MS = 300;
+  public static final int MONITOR_STALL_MS = 300;
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(TaskMonitorDialogService.class);
 
   private final DepanFxDialogRunner dialogRunner;
 
   private final TaskMonitorService monitorService;
-
-  private final ObservableList<TaskMonitorItem> activeTasks;
 
   private Stage dialogStage = null;
 
@@ -49,9 +50,7 @@ public class TaskMonitorDialogService {
     this.dialogRunner = dialogRunner;
     this.monitorService = monitorService;
 
-    // Hold on to listeners
-    this.activeTasks = monitorService.getActiveTasks();
-    activeTasks.addListener(this::handleActiveTaskChange);
+    monitorService.addActiveListener(this::handleActiveTaskChange);
   }
 
   /**
@@ -71,7 +70,7 @@ public class TaskMonitorDialogService {
   }
 
   public void showActiveTasks() {
-    if (!activeTasks.isEmpty()) {
+    if (monitorService.hasActiveTask()) {
       showTaskMonitor();
     }
   }
@@ -103,42 +102,50 @@ public class TaskMonitorDialogService {
 
   private void handleActiveTaskChange(
       ListChangeListener.Change<? extends TaskMonitorItem> change) {
+    LOG.debug("Monitor service notified of change");
     runOnFxThread(() -> handleMonitorPopup());
   }
 
   private void handleMonitorPopup() {
     // Nothing active, hide the monitor window, exit early.
-    if (hideIfNoActive()) {
+    if (!hasACtiveElseHidden()) {
+      LOG.debug("Hid monitor, nothing active");
       return;
     }
 
     // A brief pause for the task to maybe complete.
-    TaskMonitorItem taskItem = activeTasks.getFirst();
-    DeferredTask<?> activeTask = taskItem.getTask();
-    if (monitorService.awaitTaskMs(activeTask, MONITOR_STALL_MS)) {
-      return;
-    }
+    LOG.debug("preparing stall");
+    monitorService.getFirstActive()
+        .ifPresent(
+            i -> monitorService.awaitTaskMs(i.getTask(), MONITOR_STALL_MS));
 
     // After the pause, confirm no reason to show monitor
-    if (hideIfNoActive()) {
+    if (!hasACtiveElseHidden()) {
+      LOG.info("Hid monitor, nothing active now");
       return;
     }
 
     // No choice but to show the pask monitor
     if (dialogStage == null || !dialogStage.isShowing()) {
+      LOG.debug("Active task, show task monitor");
       showTaskMonitor();
     }
   }
 
-  private boolean hideIfNoActive() {
-    if (activeTasks.isEmpty()) {
-      if (dialogStage != null && dialogStage.isShowing()) {
-        dialogStage.hide();
-      }
+  /**
+   * Hide the monitor if there is no active task
+   * and the monitor currently showing.
+   *
+   * @return {@code true} if there is an active task.
+   */
+  private boolean hasACtiveElseHidden() {
+    if (monitorService.hasActiveTask()) {
       return true;
     }
 
-    // Some task is active
+    if (dialogStage != null && dialogStage.isShowing()) {
+      dialogStage.hide();
+    }
     return false;
   }
 

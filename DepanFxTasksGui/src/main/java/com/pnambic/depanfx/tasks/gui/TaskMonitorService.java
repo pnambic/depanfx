@@ -29,10 +29,12 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 @Service
@@ -48,17 +50,17 @@ public class TaskMonitorService implements DisposableBean {
   private final ObservableList<TaskMonitorItem> completedRoots =
       FXCollections.observableArrayList();
 
-  private final TaskListener listener = new FxTaskListener();
+  private final TaskListener execListener = new FxTaskListener();
 
   public TaskMonitorService(TaskExecutorService executorService) {
     this.executorService = executorService;
-    executorService.addListener(listener);
+    executorService.addListener(execListener);
     bootstrapSnapshots();
   }
 
   @Override // DisposableBean
   public void destroy() {
-    executorService.removeListener(listener);
+    executorService.removeListener(execListener);
   }
 
   public ObservableList<TaskMonitorItem> getActiveTasks() {
@@ -67,6 +69,24 @@ public class TaskMonitorService implements DisposableBean {
 
   public ObservableList<TaskMonitorItem> getCompletedTasks() {
     return FXCollections.unmodifiableObservableList(completedRoots);
+  }
+
+  public void addActiveListener(
+      ListChangeListener<? super TaskMonitorItem> listener) {
+    activeRoots.addListener(listener);
+  }
+
+  public boolean hasActiveTask() {
+    return !activeRoots.isEmpty();
+  }
+
+  public Optional<TaskMonitorItem> getFirstActive() {
+    if (activeRoots.isEmpty()) {
+      return Optional.empty();
+    }
+
+    // Sometimes the active task is empty by the time we grab it.
+    return Optional.ofNullable(activeRoots.getFirst());
   }
 
   public boolean cancelTask(TaskMonitorItem taskItem) {
