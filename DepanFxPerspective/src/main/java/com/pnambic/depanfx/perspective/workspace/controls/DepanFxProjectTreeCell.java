@@ -2,12 +2,13 @@ package com.pnambic.depanfx.perspective.workspace.controls;
 
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceMenuRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceMember;
 
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import javafx.scene.control.TreeCell;
 
@@ -24,7 +25,8 @@ public class DepanFxProjectTreeCell extends TreeCell<DepanFxWorkspaceMember> {
       DepanFxDialogRunner dialogRunner,
       DepanFxResourceRegistry rsrcRegistry,
       DepanFxResourceMenuRegistry rsrcMenuRegistry,
-      Consumer<DepanFxProjectDocument> dispatcher) {
+      BiConsumer<DepanFxResourceRegistryContribution<?>, DepanFxProjectDocument>
+          dispatcher) {
     this.memberCells = new DepanFxWorkspaceMemberCells(
         workspace, dialogRunner,
         rsrcRegistry, rsrcMenuRegistry,

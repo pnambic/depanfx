@@ -95,64 +95,33 @@ public class DepanFxResourceRegistry {
     return selectContributions(contribs.stream(), workspace, document);
   }
 
-  /**
-   * Use the principal contribution to open the supplied document.
-   * @return 
-   */
-  public Optional<DepanFxWorkspaceResource<?>> loadResource(
-      DepanFxWorkspace workspace, DepanFxProjectDocument document) {
-
-    return getPrincipalContribution(workspace, document)
-        .flatMap(c -> c.loadResource(workspace, document));
-  }
-
-  public TaskSubmission<Optional<DepanFxWorkspaceResource<?>>> fetchResource(
-      DepanFxWorkspace workspace,
-      DepanFxProjectDocument document,
-      DepanFxResourceRegistryContribution<?> c,
-      Consumer<DepanFxWorkspaceResource<?>> onResourceLoad) {
-
-    TaskSubmission<Optional<DepanFxWorkspaceResource<?>>> submission =
-        workspaceTaskService.submitFetchResource(
-            workspace, document, c, onResourceLoad);
-
-    return submission;
-  }
-
   public void openDocument(
       DepanFxWorkspace workspace,
       DepanFxSceneService sceneSrvc,
       DepanFxProjectDocument document) {
 
-    Optional<DepanFxResourceRegistryContribution<?>> optContrib =
-        getPrincipalContribution(workspace, document);
+    getPrincipalContribution(workspace, document)
+        .ifPresent(c -> acceptDocument(workspace, sceneSrvc, c, document));
+  }
 
-    if (optContrib.isEmpty()) {
-      LOG.warn("No contribution to open document: {}", document);
-      return;
-    }
+  public void acceptDocument(
+      DepanFxWorkspace workspace,
+      DepanFxSceneService sceneSrvc,
+      DepanFxResourceRegistryContribution<?> contrib,
+      DepanFxProjectDocument document) {
 
-    DepanFxResourceRegistryContribution<?> contrib = optContrib.get();
     fetchResource(
         workspace, document, contrib,
         r -> DepanFxResourceRegistryContribution.dispatchResource(
             workspace, sceneSrvc, contrib, r));
   }
 
-  public void openDialog(
+  public void acceptDialog(
       DepanFxWorkspace workspace,
       DepanFxDialogRunner dialogRunner,
+      DepanFxResourceRegistryContribution<?> contrib,
       DepanFxProjectDocument document) {
 
-    Optional<DepanFxResourceRegistryContribution<?>> optContrib =
-        getPrincipalContribution(workspace, document);
-
-    if (optContrib.isEmpty()) {
-      LOG.warn("No contribution to open document: {}", document);
-      return;
-    }
-
-    DepanFxResourceRegistryContribution<?> contrib = optContrib.get();
     if (!(contrib instanceof DepanFxResourceRegistryContribution.Dialog)) {
       LOG.warn("Principal contribution {} requires a panel."
           + "  Unable to render document {} with dialog.",
@@ -166,10 +135,24 @@ public class DepanFxResourceRegistry {
             workspace, dialogRunner, contrib, r));
   }
 
+  private TaskSubmission<Optional<DepanFxWorkspaceResource<?>>> fetchResource(
+      DepanFxWorkspace workspace,
+      DepanFxProjectDocument document,
+      DepanFxResourceRegistryContribution<?> c,
+      Consumer<DepanFxWorkspaceResource<?>> onResourceLoad) {
+
+    TaskSubmission<Optional<DepanFxWorkspaceResource<?>>> submission =
+        workspaceTaskService.submitFetchResource(
+            workspace, document, c, onResourceLoad);
+
+    return submission;
+  }
+
   private Optional<DepanFxResourceRegistryContribution<?>>
   getPrincipalContribution(
       DepanFxWorkspace workspace, DepanFxProjectDocument document) {
-    return selectContributions(streamPrincipalContributions(), workspace, document)
+    return selectContributions(
+        streamPrincipalContributions(), workspace, document)
         .findFirst();
   }
 

@@ -29,7 +29,7 @@ public class DepanFxProjectListCell extends ListCell<DepanFxWorkspaceMember> {
     this.memberCells = new DepanFxWorkspaceMemberCells(
             workspace, dialogRunner,
             rsrcRegistry, rsrcMenuRegistry,
-            r -> rsrcRegistry.openDialog(workspace, dialogRunner, r),
+            (c, r) -> rsrcRegistry.acceptDialog(workspace, dialogRunner, c, r),
             this::getCellIcon);
   }
 

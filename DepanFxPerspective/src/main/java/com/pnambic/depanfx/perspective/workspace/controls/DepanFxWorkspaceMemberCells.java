@@ -17,9 +17,9 @@ package com.pnambic.depanfx.perspective.workspace.controls;
 
 import com.pnambic.depanfx.base.DepanFxOrderableContribution;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceMenuRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
+import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import javafx.scene.control.Cell;
@@ -68,7 +68,9 @@ public class DepanFxWorkspaceMemberCells {
 
   private final DepanFxResourceMenuRegistry rsrcMenuRegistry;
 
-  private final Consumer<DepanFxProjectDocument> dispatcher;
+  private final BiConsumer<
+      DepanFxResourceRegistryContribution<?>, DepanFxProjectDocument>
+      dispatcher;
 
   private final Function<DepanFxWorkspaceMember, ImageView> rsrcImageSrc;
 
@@ -80,7 +82,8 @@ public class DepanFxWorkspaceMemberCells {
       DepanFxDialogRunner dialogRunner,
       DepanFxResourceRegistry rsrcRegistry,
       DepanFxResourceMenuRegistry rsrcMenuRegistry,
-      Consumer<DepanFxProjectDocument> dispatcher,
+      BiConsumer<DepanFxResourceRegistryContribution<?>, DepanFxProjectDocument>
+          dispatcher,
       Function<DepanFxWorkspaceMember, ImageView> rsrcImageSrc) {
     this.workspace = workspace;
     this.dialogRunner = dialogRunner;
@@ -212,7 +215,7 @@ public class DepanFxWorkspaceMemberCells {
   protected <T> void dispatchContribution(
       DepanFxResourceRegistryContribution<T> contrib,
       DepanFxProjectDocument document) {
-    dispatcher.accept(document);
+    dispatcher.accept(contrib, document);
   }
 
   private void appendProjectContextMenu(
