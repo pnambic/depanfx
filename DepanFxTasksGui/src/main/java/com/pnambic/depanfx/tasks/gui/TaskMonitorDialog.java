@@ -16,12 +16,15 @@
 package com.pnambic.depanfx.tasks.gui;
 
 import com.pnambic.depanfx.scene.DepanFxFxmlDialog;
+import com.pnambic.depanfx.tasks.TaskStatus;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javafx.beans.binding.Bindings;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -30,12 +33,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.util.Callback;
-
-import com.pnambic.depanfx.tasks.TaskStatus;
-
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
+import javafx.scene.text.Text;
 
 /**
  * Controller for the background task monitor dialog.
@@ -57,15 +55,11 @@ public class TaskMonitorDialog {
   @FXML
   public void initialize() {
     activeTasksView.setItems(monitorService.getActiveTasks());
-    activeTasksView.setCellFactory(createCellFactory());
+    activeTasksView.setCellFactory(list -> new TaskMonitorCell(monitorService));
 
     Label placeholder = new Label("No active tasks.");
     placeholder.getStyleClass().add("placeholder-text");
     activeTasksView.setPlaceholder(placeholder);
-  }
-
-  private Callback<ListView<TaskMonitorItem>, ListCell<TaskMonitorItem>> createCellFactory() {
-    return list -> new TaskMonitorCell(monitorService);
   }
 
   private static class TaskMonitorCell extends ListCell<TaskMonitorItem> {
@@ -78,7 +72,7 @@ public class TaskMonitorDialog {
 
     private final ProgressBar progressBar = new ProgressBar();
 
-    private final Label messageLabel = new Label();
+    private final Text messageLabel = new Text();
 
     private final Button cancelButton = new Button("Cancel");
 
@@ -92,8 +86,7 @@ public class TaskMonitorDialog {
       titleLabel.getStyleClass().add("task-monitor-title");
       statusLabel.getStyleClass().add("task-monitor-status");
       messageLabel.getStyleClass().add("task-monitor-message");
-
-      progressBar.setPrefWidth(Double.MAX_VALUE);
+      messageLabel.setWrappingWidth(500);
 
       Region spacer = new Region();
       HBox.setHgrow(spacer, Priority.ALWAYS);

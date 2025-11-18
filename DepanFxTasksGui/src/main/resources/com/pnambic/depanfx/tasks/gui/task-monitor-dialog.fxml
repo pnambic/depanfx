@@ -7,7 +7,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
     fx:controller="com.pnambic.depanfx.tasks.gui.TaskMonitorDialog"
-    prefWidth="460.0" prefHeight="320.0">
+    prefWidth="400.0" prefHeight="320.0">
   <top>
     <Label text="Background Tasks"
         BorderPane.alignment="CENTER_LEFT"

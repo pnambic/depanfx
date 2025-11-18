@@ -15,12 +15,18 @@
  */
 package com.pnambic.depanfx.tasks.gui;
 
+import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.pnambic.depanfx.scene.DepanFxDialogRunner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
@@ -30,9 +36,9 @@ import javafx.stage.Stage;
  * Service that presents a modeless dialog listing active background tasks.
  */
 @Service
-public class TaskMonitorDialogService {
+public class TaskMonitorDialogService implements DisposableBean {
 
-  public static final int MONITOR_STALL_MS = 300;
+  public static final int MONITOR_STALL_MS = 1500;
 
   private static final Logger LOG =
       LoggerFactory.getLogger(TaskMonitorDialogService.class);
@@ -43,6 +49,18 @@ public class TaskMonitorDialogService {
 
   private Stage dialogStage = null;
 
+  // Delayed pop-up task monitor
+  private final ScheduledExecutorService dialogDelayExecutor =
+      Executors.newSingleThreadScheduledExecutor(r -> {
+        Thread thread = new Thread(r, "task-monitor-dialog-delay");
+        thread.setDaemon(true);
+        return thread;
+      });
+
+  private ScheduledFuture<?> pendingPopup;
+
+  private final Object pendingLock = new Object();
+
   @Autowired
   public TaskMonitorDialogService(
       DepanFxDialogRunner dialogRunner,
@@ -51,6 +69,11 @@ public class TaskMonitorDialogService {
     this.monitorService = monitorService;
 
     monitorService.addActiveListener(this::handleActiveTaskChange);
+  }
+
+  @Override
+  public void destroy() {
+    dialogDelayExecutor.shutdownNow();
   }
 
   /**
@@ -103,33 +126,18 @@ public class TaskMonitorDialogService {
   private void handleActiveTaskChange(
       ListChangeListener.Change<? extends TaskMonitorItem> change) {
     LOG.debug("Monitor service notified of change");
-    runOnFxThread(() -> handleMonitorPopup());
-  }
 
-  private void handleMonitorPopup() {
     // Nothing active, hide the monitor window, exit early.
-    if (!hasACtiveElseHidden()) {
+    if (!hasActiveElseHidden()) {
       LOG.debug("Hid monitor, nothing active");
       return;
     }
-
-    // A brief pause for the task to maybe complete.
-    LOG.debug("preparing stall");
-    monitorService.getFirstActive()
-        .ifPresent(
-            i -> monitorService.awaitTaskMs(i.getTask(), MONITOR_STALL_MS));
-
-    // After the pause, confirm no reason to show monitor
-    if (!hasACtiveElseHidden()) {
-      LOG.info("Hid monitor, nothing active now");
+    if (dialogStage != null && dialogStage.isShowing()) {
+      LOG.debug("Dialog already visible, no delay scheduling");
       return;
     }
 
-    // No choice but to show the pask monitor
-    if (dialogStage == null || !dialogStage.isShowing()) {
-      LOG.debug("Active task, show task monitor");
-      showTaskMonitor();
-    }
+    scheduleDelayedPopup();
   }
 
   /**
@@ -138,15 +146,52 @@ public class TaskMonitorDialogService {
    *
    * @return {@code true} if there is an active task.
    */
-  private boolean hasACtiveElseHidden() {
+  private boolean hasActiveElseHidden() {
     if (monitorService.hasActiveTask()) {
       return true;
     }
 
+    cancelPendingPopup();
     if (dialogStage != null && dialogStage.isShowing()) {
-      dialogStage.hide();
+      runOnFxThread(() -> dialogStage.hide());
     }
     return false;
+  }
+
+  private void scheduleDelayedPopup() {
+    synchronized (pendingLock ) {
+      if (pendingPopup != null && !pendingPopup.isDone()) {
+        return;
+      }
+      pendingPopup = dialogDelayExecutor.schedule(
+          this::runDelayedPopup,
+          MONITOR_STALL_MS,
+          TimeUnit.MILLISECONDS);
+    }
+  }
+
+  private void runDelayedPopup() {
+    clearPendingPopup();
+    if (!hasActiveElseHidden()) {
+      return;
+    }
+    LOG.debug("Active task after delay, show dialog");
+    runOnFxThread(() -> showTaskMonitor());
+  }
+
+  private void cancelPendingPopup() {
+    synchronized (pendingLock) {
+      if (pendingPopup != null) {
+        pendingPopup.cancel(true);
+        pendingPopup = null;
+      }
+    }
+  }
+
+  private void clearPendingPopup() {
+    synchronized (pendingLock) {
+      pendingPopup = null;
+    }
   }
 
   private void runOnFxThread(Runnable action) {

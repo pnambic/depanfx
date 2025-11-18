@@ -50,10 +50,6 @@ import javafx.stage.Stage;
 @Component
 public class DepanFxSession implements DepanFxSceneController.SceneOwner {
 
-  private record StageInfo(Stage stage, DepanFxSceneService sceneSrvc) {
-
-  }
-
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxSession.class);
 
@@ -66,6 +62,9 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
   private final DepanFxSceneStarterRegistry starterRegistry;
 
   // Unlikely to be a big number of windows;
+  private record StageInfo(Stage stage, DepanFxSceneService sceneSrvc) {
+  }
+
   private final List<StageInfo> stages = new ArrayList<>(2);
 
   private Closeable onClose;
@@ -76,10 +75,7 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
 
   private DepanFxSessionConfig sessionConfig;
 
-  public static void startSession(Stage stage, DepanFxSession session)
-      throws Exception {
-    session.startSession(stage);
-  }
+  private DepanFxSessionConfig activeConfig;
 
   @Autowired
   public DepanFxSession(
@@ -112,10 +108,6 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
 
   public void setSessionConfig(DepanFxSessionConfig sessionConfig) {
     this.sessionConfig = sessionConfig;
-    setCurrentProject(sessionConfig.getCurrentProjectName());
-
-    // Populate sceneMap when session is started.
-    stages.clear();
   }
 
   public DepanFxWorkspace getWorkspace() {
@@ -142,39 +134,36 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
     initConfigSession();
   }
 
-  public void updateSessionConfig(
-      Path sessionPath,
-      DepanFxSessionConfig sessionConfig) throws Exception {
-    clearSession();
-    stages.clear();
-
+  public void resetSessionConfig(
+      Path sessionPath, DepanFxSessionConfig sessionConfig) {
     this.sessionPath = sessionPath;
     this.sessionConfig = sessionConfig;
-    setCurrentProject(sessionConfig.getCurrentProjectName());
+  }
+
+  public void activateConfig() throws Exception {
+    if (sessionStage == null) {
+      return;
+    }
+    // Some other launcher beat us to the punch
+
+    if (activeConfig == sessionConfig) {
+      return;
+    }
+    clearSession();
 
     initConfigSession();
+  }
+
+
+  @Override // DepanFxSceneController.SceneOwner
+  public void saveSession() throws IOException {
+    DepanFxSessionSaveDialog.runSaveSessionDialog(dialogRunner);
   }
 
   public void stopSession() {
     streamScenes()
         .forEach(c -> c.closeScene());
-  }
-
-  /**
-   * Close all scenes except the primary stage,
-   * and close all viewers in the primary stage.
-   */
-  private void clearSession() {
-    streamScenes()
-        // Don't close the primary stage
-        .filter(s -> !s.isStage(sessionStage))
-        .forEach(c -> c.closeScene());
-
-    // clear all viewers on the primary scene
-    streamScenes()
-        .filter(s -> s.isStage(sessionStage))
-        .forEach(s -> s.streamViewers().close());
-
+    activeConfig = null;
   }
 
   public void addScene(DepanFxSceneData sceneInfo)
@@ -192,11 +181,6 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
     }
   }
 
-  @Override // DepanFxSceneController.SceneOwner
-  public void saveSession() throws IOException {
-    DepanFxSessionSaveDialog.runSaveSessionDialog(dialogRunner);
-  }
-
   private void closeParent() {
     try {
       // Shutting down the application context that started this session.
@@ -206,7 +190,31 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
     }
   }
 
+  /**
+   * Close all scenes except the primary stage,
+   * and close all viewers in the primary stage.
+   */
+  private void clearSession() {
+    LOG.info("Clearing session with {} stages", stages.size());
+    streamScenes()
+        // Don't close the primary stage
+        .filter(s -> !s.isStage(sessionStage))
+        .forEach(c -> c.closeScene());
+
+    // clear all viewers on the primary scene
+    streamScenes()
+        .filter(s -> s.isStage(sessionStage))
+        .forEach(s -> s.streamViewers().close());
+
+    stages.clear();
+  }
+
   private void initConfigSession() throws Exception {
+    LOG.info("Initializing config {}",
+        sessionPath == null ? "blank" : sessionPath.toString());
+
+    activeConfig = sessionConfig;
+    setCurrentProject(sessionConfig.getCurrentProjectName());
 
     Iterator<DepanFxSceneData> sceneSeq =
         sessionConfig.getSceneConfigs().iterator();
@@ -250,6 +258,7 @@ public class DepanFxSession implements DepanFxSceneController.SceneOwner {
   }
 
   private void startStarterSession(Stage stage) throws Exception {
+    LOG.info("Launching starter session");
     DepanFxSceneController scene =
         DepanFxSceneController.createDepanScene(dialogRunner, this);
 

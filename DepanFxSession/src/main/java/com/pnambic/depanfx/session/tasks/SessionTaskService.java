@@ -15,6 +15,7 @@
  */
 package com.pnambic.depanfx.session.tasks;
 
+import com.pnambic.depanfx.session.core.DepanFxSession;
 import com.pnambic.depanfx.session.core.DepanFxSessionConfig;
 import com.pnambic.depanfx.session.core.DepanFxSessionDataTransport;
 import com.pnambic.depanfx.tasks.TaskExecutorService;
@@ -27,16 +28,13 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
 import java.util.concurrent.CancellationException;
-import java.util.function.Consumer;
-
-import javafx.application.Platform;
 
 @Service
 public class SessionTaskService {
 
   // Interval to stall so the load can complete first.
-  // Just a half second head start before starting the session.
-  public static final int LOAD_STALL_MS = 500;
+  // Just a one second head start for the load before starting the session.
+  public static final int LOAD_STALL_MS = 1000;
 
   private static final Logger LOG =
       LoggerFactory.getLogger(SessionTaskService.class);
@@ -57,14 +55,15 @@ public class SessionTaskService {
   }
 
   public TaskSubmission<DepanFxSessionConfig>
-  submitLoadSession(
+  submitPrepareSession(
+      DepanFxSession session,
       Path sessionPath,
-      DepanFxSessionDataTransport transport,
-      Consumer<DepanFxSessionConfig> onResourceLoad) {
+      DepanFxSessionDataTransport transport) {
 
-    SessionLoadTask loadTask = new SessionLoadTask(sessionPath, transport);
+    PrepareSessionTask prepareTask =
+        new PrepareSessionTask(session, sessionPath, transport);
     TaskSubmission<DepanFxSessionConfig> result =
-        taskExecutorService.submitTask(loadTask);
+        taskExecutorService.submitTask(prepareTask);
 
     result.resultFuture().whenComplete((config, error) -> {
       if (error != null) {
@@ -74,23 +73,11 @@ public class SessionTaskService {
         LOG.warn("Unable to load session: {}", sessionPath.getFileName(), error);
         return;
       }
-      if (config != null) {
-        runOnFxThread(() -> onResourceLoad.accept(config));
-        return;
-      }
-      LOG.warn("Unable to load document: {}", sessionPath.getFileName());
     });
 
     // Give the session load task a brief head start on its consumers.
-    taskExecutorService.awaitTask(loadTask, LOAD_STALL_MS);
+    LOG.info("load stall {}", LOAD_STALL_MS);
+    taskExecutorService.awaitTask(prepareTask, LOAD_STALL_MS);
     return result;
-  }
-
-  private void runOnFxThread(Runnable action) {
-    if (Platform.isFxApplicationThread()) {
-      action.run();
-    } else {
-      Platform.runLater(action);
-    }
   }
 }

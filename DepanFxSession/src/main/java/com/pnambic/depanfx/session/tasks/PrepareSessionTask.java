@@ -15,23 +15,48 @@
  */
 package com.pnambic.depanfx.session.tasks;
 
+import com.pnambic.depanfx.session.core.DepanFxSession;
 import com.pnambic.depanfx.session.core.DepanFxSessionConfig;
 import com.pnambic.depanfx.session.core.DepanFxSessionDataTransport;
 import com.pnambic.depanfx.tasks.DeferredTask;
 import com.pnambic.depanfx.tasks.ProgressMonitor;
 import com.pnambic.depanfx.tasks.TaskStatus;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class SessionLoadTask
+import javafx.application.Platform;
+
+/**
+ * Prepare the session with the user defined configuration.
+ * The task writes the configuration to the session before completion.
+ * This allows an waiting action to be sure the results are included
+ * in the session before continuing.
+ *
+ * This task does not activate a configuration this is already running
+ * in the session.  If the session has started the loaded configuration,
+ * that is left unchanged.
+ *
+ * It is not intended as a general switch-session task, although its
+ * behavior is close.  Outside of the startup case, a new session config
+ * should always finish with a session restart.
+ */
+public class PrepareSessionTask
     implements DeferredTask<DepanFxSessionConfig> {
 
-  private final DepanFxSessionDataTransport transport;
+  private static final Logger LOG =
+      LoggerFactory.getLogger(PrepareSessionTask.class);
 
-  private final Path sessionPath;
+  private final DepanFxSession session;
+
+  private final Path configPath;
+
+  private final DepanFxSessionDataTransport transport;
 
   /** Convenience for logging and reporting */
   private final String loadLabel;
@@ -46,12 +71,14 @@ public class SessionLoadTask
 
   private volatile String message = "";
 
-  public SessionLoadTask(
-      Path sessionPath,
+  public PrepareSessionTask(
+      DepanFxSession session,
+      Path configPath,
       DepanFxSessionDataTransport transport) {
-    this.sessionPath = sessionPath;
+    this.session = session;
+    this.configPath = configPath;
     this.transport = transport;
-    loadLabel = sessionPath.getFileName().toString();
+    loadLabel = configPath.getFileName().toString();
   }
 
   @Override
@@ -61,7 +88,9 @@ public class SessionLoadTask
 
   @Override
   public int getTotalSteps() {
-    return 1;
+    // 1) Load the session config
+    // 2) Push session config into session
+    return 2;
   }
 
   @Override
@@ -78,10 +107,16 @@ public class SessionLoadTask
     try {
       checkCancelled(monitor);
 
-      DepanFxSessionConfig config = transport.loadSessionConfig(sessionPath);
+      DepanFxSessionConfig config = transport.loadSessionConfig(configPath);
 
       checkCancelled(monitor);
 
+      monitor.advance(1, "Configuring session");
+      LOG.info("reset session to {}", configPath.toString());
+      session.resetSessionConfig(configPath, config);
+      runOnFxThread(() -> activateConfig());
+
+      // Nobody uses, but we complete the future.
       result.set(config);
       String successMessage = MessageFormat.format("Loaded {0}", loadLabel);
       monitor.advance(1, successMessage);
@@ -97,6 +132,17 @@ public class SessionLoadTask
       updateStatus(monitor, TaskStatus.FAILED, errorMessage);
       failure.set(error);
       throw error;
+    }
+  }
+
+  private void activateConfig() {
+    // By the time this runs, the session may have already started with
+    // the configuration that was previously loaded.
+    try {
+      session.activateConfig();
+    } catch (Exception err) {
+      LOG.warn("Unable to start the session loaded from {}",
+          configPath, err);
     }
   }
 
@@ -162,5 +208,13 @@ public class SessionLoadTask
   private void updateMessage(ProgressMonitor monitor, String message) {
     this.message = message;
     monitor.updateMessage(message);
+  }
+
+  private void runOnFxThread(Runnable action) {
+    if (Platform.isFxApplicationThread()) {
+      action.run();
+    } else {
+      Platform.runLater(action);
+    }
   }
 }

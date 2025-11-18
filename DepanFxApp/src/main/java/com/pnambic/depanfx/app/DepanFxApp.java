@@ -104,6 +104,7 @@ public class DepanFxApp extends Application {
 
     if (optSessionPath.isEmpty()) {
       session.setSessionConfig(transport.defaultSessionConfig());
+      session.startSession(stage);
       return;
     }
     Path sessionPath = optSessionPath.get();
@@ -112,24 +113,12 @@ public class DepanFxApp extends Application {
         applicationContext.getBean(SessionTaskService.class);
 
     // Launch config load in a race to start the session.
-    taskSrvc.submitLoadSession(
-        sessionPath, transport,
-        c -> updateSessionConfig(sessionPath, c));
+    taskSrvc.submitPrepareSession(session, sessionPath, transport);
 
     session.startSession(stage);
 
     // Force load monitor to front
     taskSrvc.showActiveTasks();
-  }
-
-  private void updateSessionConfig(
-      Path sessionPath, DepanFxSessionConfig sessionConfig) {
-    try {
-      session.updateSessionConfig(sessionPath, sessionConfig);
-    } catch (Exception err) {
-      LOG.warn("Unable to starte the session loaded from {}",
-          sessionPath, err);
-    }
   }
 
   private Optional<Path> getSessionPath(DepanFxSessionCliArgs sessionArgs) {
