@@ -11,6 +11,8 @@ module depanfx.session {
 
     requires org.slf4j;
 
+    requires pnambic.modxstream;
+
     requires depanfx.base;
     requires depanfx.persistence;
     requires depanfx.perspective;

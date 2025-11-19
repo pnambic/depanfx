@@ -159,7 +159,8 @@ public class TaskMonitorController {
       TreeTableColumn<TaskMonitorItem, Number> remainingColumn,
       String placeholderText) {
 
-    tree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY);
+    tree.setColumnResizePolicy(
+        TreeTableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
     tree.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
     titleColumn.setCellValueFactory(param -> {

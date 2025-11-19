@@ -16,10 +16,8 @@
 package com.pnambic.depanfx.edgematchers.gui;
 
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxBaseMatcherDocument;
-import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
-import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilterModel;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;

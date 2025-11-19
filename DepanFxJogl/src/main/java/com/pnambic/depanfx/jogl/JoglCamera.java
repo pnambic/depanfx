@@ -56,6 +56,7 @@ public class JoglCamera {
 
   public static final double HOME_Z_FAR = 3000.0d;
 
+  @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(JoglCamera.class);
 
   public static class CameraData {

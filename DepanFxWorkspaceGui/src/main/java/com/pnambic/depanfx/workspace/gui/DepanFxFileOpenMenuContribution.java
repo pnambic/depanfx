@@ -16,7 +16,6 @@
 package com.pnambic.depanfx.workspace.gui;
 
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
 import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuContribution;

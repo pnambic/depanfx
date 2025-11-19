@@ -10,7 +10,6 @@ import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeFoldData;
 import com.pnambic.depanfx.nodelist.tree.DepanFxTreeModel;
 import com.pnambic.depanfx.scene.DepanFxContextMenuBuilder;
-import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxMenuBuilder;
 import com.pnambic.depanfx.scene.DepanFxMenuItemFactory;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
@@ -34,6 +33,7 @@ public class DepanFxTreeForkItem extends DepanFxNodeListForkItem {
 
   public static final String FOLD_SELECTION_INTO = "Fold Selection Into...";
 
+  @SuppressWarnings("unused")
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxTreeForkItem.class);
 

@@ -20,7 +20,6 @@ import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchers.Composite;
 import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchers.ForwardRelation;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcher;
 import com.pnambic.depanfx.edgematchers.tooldata.DepanFxLinkMatcherDocument;
-import com.pnambic.depanfx.filesystem.context.FileSystemContextDefinition;
 import com.pnambic.depanfx.filesystem.graph.FileSystemModelDefinition;
 import com.pnambic.depanfx.filesystem.graph.FileSystemRelation;
 

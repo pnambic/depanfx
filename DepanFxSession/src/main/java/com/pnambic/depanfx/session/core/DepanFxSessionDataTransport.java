@@ -59,6 +59,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 @Component
 public class DepanFxSessionDataTransport {
 
+  @SuppressWarnings("unused")
   private static final Logger LOG =
       LoggerFactory.getLogger(DepanFxSessionDataTransport.class);
 
