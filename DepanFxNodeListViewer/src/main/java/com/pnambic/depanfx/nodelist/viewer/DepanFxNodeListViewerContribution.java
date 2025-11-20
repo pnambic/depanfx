@@ -19,10 +19,7 @@ import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchersRegistry;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersDialogRegistry;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
-import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
-import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
-import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.nodelist.viewdata.DepanFxNodeListViewerData;
 import com.pnambic.depanfx.persistence.PersistDocumentTransportBuilder;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
@@ -31,7 +28,6 @@ import com.pnambic.depanfx.scene.DepanFxSceneViewer;
 import com.pnambic.depanfx.session.plugins.DepanFxSceneViewerRegistry;
 import com.pnambic.depanfx.session.viewdata.DepanFxBaseViewerData;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
-import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -102,13 +98,9 @@ public class DepanFxNodeListViewerContribution
         columnRegistry, infoRegistry, matcherRegistry,
         filterRegistry, filterDialogRegistry);
 
-    DepanFxWorkspaceResource<DepanFxNodeList> viewListRsrc =
-        viewerData.getNodeListRsrc();
-    DepanFxWorkspaceResource<DepanFxNodeListTableViewData> viewInfo =
-        DepanFxNodeListViewBuiltIns.guessTableViewResource(
-            workspace, viewListRsrc.getResource().getGraphDocResource());
-
-    result.initFromNodeListResource(viewListRsrc, viewInfo);
+    result.initFromNodeListResource(
+        viewerData.getNodeListRsrc(),
+        viewerData.getTableViewRsrc());
     return Optional.of(result);
   }
 
