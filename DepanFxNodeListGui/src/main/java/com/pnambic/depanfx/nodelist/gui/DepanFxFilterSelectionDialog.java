@@ -357,6 +357,7 @@ public class DepanFxFilterSelectionDialog extends DepanFxWorkspaceDialog {
             filterRegistry, filterDialogRegistry,
             nodeSelectTable);
     result.initFromNodeList(tableNodes);
+    result.setTableViewResource(tableViewRsrc);
     result.doSelectAllAction();
     return result;
   }
