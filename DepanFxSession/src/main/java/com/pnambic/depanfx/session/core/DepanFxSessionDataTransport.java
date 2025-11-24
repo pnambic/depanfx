@@ -77,6 +77,26 @@ public class DepanFxSessionDataTransport {
     DepanFxSessionData.class,
     DepanFxProjectData.class, DepanFxSceneData.class };
 
+  @SuppressWarnings("serial")
+  public static class SessionNotFoundException extends RuntimeException {
+
+    private final Path sessionPath;
+
+    public SessionNotFoundException(Path sessionPath, Throwable cause) {
+      super(cause);
+      this.sessionPath = sessionPath;
+    }
+
+    @Override
+    public String getMessage() {
+      return "Unable to load session data at " + sessionPath.toString();
+    }
+
+    public Path getSessionPath() {
+      return sessionPath;
+    }
+ }
+
   private final DepanFxWorkspace workspace;
 
   private final GraphNodePersistencePluginRegistry graphNodeRegistry;
@@ -139,6 +159,8 @@ public class DepanFxSessionDataTransport {
 
     try (Reader importer = openForLoad(sessionPath)) {
       return (DepanFxSessionData) transport.load(importer);
+    } catch (FileNotFoundException errNotFound) {
+      throw new SessionNotFoundException(sessionPath, errNotFound);
     } catch (IOException errIo) {
       throw new RuntimeException(
           "Unable to load session data at " + sessionPath.toString(), errIo);

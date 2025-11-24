@@ -70,8 +70,13 @@ public class SessionTaskService {
         if (error instanceof CancellationException) {
           return;
         }
+        if (error instanceof
+            DepanFxSessionDataTransport.SessionNotFoundException errNotFound) {
+          LOG.warn(errNotFound.getMessage());
+          return;
+        }
+        // Something unexpected
         LOG.warn("Unable to load session: {}", sessionPath.getFileName(), error);
-        return;
       }
     });
 
