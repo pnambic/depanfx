@@ -7,4 +7,6 @@ public interface DepanFxNodeFiltersTableContainer {
   void addFilter(DepanFxBaseFilterData filterData);
 
   void deleteFilter(DepanFxBaseFilterData filterData);
+
+  void updateFilter(int rowIndex, DepanFxBaseFilterData updInfo);
 }

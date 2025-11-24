@@ -26,6 +26,7 @@ import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersDisplayMember;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersRootItem;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersRootMember;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersTableColumns;
+import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersTableContainer;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersTableMember;
 import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersTreeCell;
 import com.pnambic.depanfx.nodefilters.model.DepanFxBaseFilter;
@@ -138,6 +139,7 @@ public class DepanFxFilterSelectionDialog extends DepanFxWorkspaceDialog {
 
   private DepanFxNodeListTableController tableControl;
 
+  @SuppressWarnings("unused") // Soon enough, no doubt
   private DepanFxNodeFoldController nodeFolding;
 
   private Consumer<DepanFxNodeList> onUpdate;
@@ -450,25 +452,31 @@ public class DepanFxFilterSelectionDialog extends DepanFxWorkspaceDialog {
     protected void populateContextMenu(DepanFxContextMenuBuilder builder) {
       builder.appendActionItem(""
           + "Edit Filter...",
-          e -> runFilterEditor(getIndex()));
+          e -> runFilterEditor());
       // appendMoveOps(builder);
     }
 
-    private void runFilterEditor(int index) {
-      DepanFxNodeFiltersTableMember rowInfo = getRowData(index);
-      if (rowInfo instanceof DepanFxNodeFiltersDataProvider src) {
+    private void runFilterEditor() {
+      if (getTableRow().getItem()
+          instanceof DepanFxNodeFiltersDataProvider src) {
         DepanFxBaseFilterData filterInfo = src.prepareFilterData();
         filterDialogRegistry.runUpdateFilters(dialogRunner, filterInfo)
-            .ifPresent(f -> updateFilter(rowInfo, f));
+            .ifPresent(f -> updateFilter(getTableRow().getItem(), f));
       }
     }
 
     private void updateFilter(
-        DepanFxNodeFiltersTableMember rowInfo,
-        DepanFxBaseFilterData filterInfo) {
+        DepanFxNodeFiltersTableMember srcMember,
+        DepanFxBaseFilterData updInfo) {
 
-      if (rowInfo instanceof DepanFxNodeFiltersDisplayMember display) {
-        display.updateFilter(filterInfo);
+      if (srcMember.getParent()
+          instanceof DepanFxNodeFiltersTableContainer container) {
+        int rowIndex = getTableRow().getIndex();
+        container.updateFilter(rowIndex, updInfo);
+      }
+
+      if (srcMember instanceof DepanFxNodeFiltersDisplayMember display) {
+        display.updateFilter(updInfo);
       }
     }
   }

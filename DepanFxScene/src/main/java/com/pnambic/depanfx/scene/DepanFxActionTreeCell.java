@@ -117,14 +117,12 @@ public abstract class DepanFxActionTreeCell<T> extends
     setContextMenu(builder.build());
   }
 
+  @SuppressWarnings("unchecked")
   private void deleteRow(int index) {
     TreeItem<T> item = tableView.getTreeItem(index);
-    T parentInfo = item.getParent().getValue();
-    // By construction, every shown item has a parent.
-    // Note that the root item is not shown.
-    @SuppressWarnings("unchecked")
-    ItemContainer<T> container = (ItemContainer<T>) parentInfo;
-    container.deleteItem(item.getValue());
+    if (item.getParent().getValue() instanceof ItemContainer container) {
+      container.deleteItem(item.getValue());
+    }
   }
 
   private void moveRows(int srcIndex, int moveBy) {

@@ -115,7 +115,19 @@ public class DepanFxNodeFiltersTreeCell
       DepanFxNodeFiltersDisplayMember<?> filterMember) {
     DepanFxBaseFilterData filterData = filterMember.prepareFilterData();
     nodeFiltersDialogRegistry.runUpdateFilters(dialogRunner, filterData)
-        .ifPresent(filterMember::updateFilter);
+        .ifPresent(i -> updateContainer(filterMember, i));
+  }
+
+  private void updateContainer(
+      DepanFxNodeFiltersDisplayMember<?> srcMember,
+      DepanFxBaseFilterData updInfo) {
+    if (srcMember.getParent()
+        instanceof DepanFxNodeFiltersTableContainer container) {
+      int rowIndex = getTableRow().getIndex();
+      container.updateFilter(rowIndex, updInfo);
+    }
+
+    srcMember.updateFilter(updInfo);
   }
 
   private void runDeleteFilter(

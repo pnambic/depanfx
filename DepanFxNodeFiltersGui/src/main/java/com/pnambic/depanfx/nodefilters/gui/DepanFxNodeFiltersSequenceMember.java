@@ -63,6 +63,11 @@ public class DepanFxNodeFiltersSequenceMember
   }
 
   @Override
+  public void updateFilter(int rowIndex, DepanFxBaseFilterData updInfo) {
+    filterItems.set(rowIndex, updInfo);
+  }
+
+  @Override
   public void addFilter(DepanFxBaseFilterData filterData) {
     filterItems.add(filterData);
   }

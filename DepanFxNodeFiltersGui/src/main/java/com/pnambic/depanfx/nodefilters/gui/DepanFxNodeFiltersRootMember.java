@@ -83,6 +83,11 @@ public class DepanFxNodeFiltersRootMember
     filterItems.remove(filterMember);
   }
 
+  @Override
+  public void updateFilter(int rowIndex, DepanFxBaseFilterData updInfo) {
+    filterItems.set(rowIndex, updInfo);
+  }
+
   public void clear() {
     filterItems.clear();
   }
