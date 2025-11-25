@@ -40,12 +40,17 @@ public abstract class HierarchicalLayoutRunner extends DirectLayoutRunner {
 
   private int maxLevel = 0;
 
+  /////////////////////////////////////
   // Shape information for each node.
+
+  private static enum OffsetState {
+    OPEN, ACTIVE, DONE;
+  }
   private static class TreeData {
 
     public int level;
 
-    public boolean placed = false;
+    public OffsetState placed = OffsetState.OPEN;
 
     public TreeData(int level) {
       this.level = level;
@@ -153,7 +158,6 @@ public abstract class HierarchicalLayoutRunner extends DirectLayoutRunner {
       }
       List<GraphNode> cycles = checkCycle(childNode);
       if (cycles != null) {
-        assignLevel(childNode, nextLevel);
         reportCycle(cycles, childNode);
         continue;
       }
@@ -185,38 +189,40 @@ public abstract class HierarchicalLayoutRunner extends DirectLayoutRunner {
     }
   }
 
-  private void assignOffset(GraphNode node) {
-    TreeData treeData = treeInfo.get(node);
-    int nodeLevel = treeData.level;
+  private void assignOffset(GraphNode offsetNode) {
+    TreeData nodeInfo = treeInfo.get(offsetNode);
+    int nodeLevel = nodeInfo.level;
 
-    if (isLeaf(node)) {
-      assignNode(node, nodeLevel, getCurrOffset(nodeLevel));
-      treeInfo.get(node).placed = true;
+    if (isLeaf(offsetNode)) {
+      assignNode(offsetNode, nodeLevel, getCurrOffset(nodeLevel));
+      nodeInfo.placed = OffsetState.DONE;
       incrCurrOffset(nodeLevel);
       return;
     }
 
     int nextLevel = setLevel(nodeLevel + 1);
     int childLeft = getCurrOffset(nextLevel);
+    nodeInfo.placed = OffsetState.ACTIVE;
 
-    for (GraphNode childNode : orderChildren(node)) {
-      if (!treeInfo.get(childNode).placed) {
+    for (GraphNode childNode : orderChildren(offsetNode)) {
+      if (OffsetState.OPEN == treeInfo.get(childNode).placed) {
         assignOffset(childNode);
       }
     }
+
     int childRight = getCurrOffset(nextLevel);
 
     // No placed children for node, treat as leaf.
     if (childRight == childLeft) {
-      assignNode(node, nodeLevel, getCurrOffset(nodeLevel));
-      treeInfo.get(node).placed = true;
+      assignNode(offsetNode, nodeLevel, getCurrOffset(nodeLevel));
+      nodeInfo.placed = OffsetState.DONE;
       incrCurrOffset(nodeLevel);
       return;
     }
 
     // Center this node above its children
-    assignNode(node, nodeLevel, (childLeft + childRight) / 2);
-    treeInfo.get(node).placed = true;
+    assignNode(offsetNode, nodeLevel, (childLeft + childRight) / 2);
+    nodeInfo.placed = OffsetState.DONE;
   }
 
   private int setLevel(int newLevel) {
