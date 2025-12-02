@@ -116,6 +116,7 @@ task buildInfo {
 buildInfo.dependsOn classes
 
 // Prepare the build info resouce before any further progress
+run.dependsOn buildInfo
 jar.dependsOn buildInfo
 
 jlink {
