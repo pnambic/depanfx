@@ -154,7 +154,7 @@ public class DepanFxNodeListTableCommands {
 
     menuBuilder.appendSeparator();
     menuBuilder.appendActionItem(
-        DepanFxNodeListTableViewSaveDialog.SELECT_TABLE_VIEW,
+        DepanFxNodeListTableViewChooser.SELECT_TABLE_VIEW,
         e -> runNodeListTableViewChooser());
     menuBuilder.appendActionItem(
         DepanFxNodeListTableViewSaveDialog.SAVE_TABLE_VIEW,
@@ -164,7 +164,7 @@ public class DepanFxNodeListTableCommands {
   }
 
   private void runNodeListTableViewChooser() {
-    DepanFxNodeListTableViewSaveDialog
+    DepanFxNodeListTableViewChooser
         .runTableViewChooser(workspace, dialogRunner, tableState.getScene())
         .ifPresent(tableState::setTableViewResource);
   }

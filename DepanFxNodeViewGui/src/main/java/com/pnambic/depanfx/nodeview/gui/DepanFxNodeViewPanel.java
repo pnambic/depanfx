@@ -365,7 +365,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
       DepanFxWorkspaceResource<DepanFxNodeViewLinkDisplayData> displayRsrc) {
     edgeDisplay.setLinkDisplayResource(displayRsrc);
     linkDisplayDirty =
-        DepanFxWorkspaceResource.isSavedResource(displayRsrc, workspace);
+        DepanFxWorkspaceResource.isUnsavedResource(displayRsrc, workspace);
   }
 
   /////////////////////////////////////
@@ -890,7 +890,7 @@ public class DepanFxNodeViewPanel implements DepanFxSceneViewer {
       DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> edgeFilterRsrc) {
     edgeDisplay.setEdgeFilterResource(edgeFilterRsrc);
     edgeFilterDirty =
-        DepanFxWorkspaceResource.isSavedResource(edgeFilterRsrc, workspace);
+        DepanFxWorkspaceResource.isUnsavedResource(edgeFilterRsrc, workspace);
   }
 
   private void addEdgeMatcherResource(

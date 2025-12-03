@@ -43,8 +43,11 @@ public interface DepanFxWorkspaceResource<T> {
    *
    * For update resources are not yet saved, and the scratch project
    * is not a conserved project.
+   *
+   * @return {@code true} if the resource's document is an unsaved location
+   *   (e.g. in a scratch project or is marked for updated).
    */
-  public static boolean isSavedResource(
+  public static boolean isUnsavedResource(
       DepanFxWorkspaceResource<?> resource, DepanFxWorkspace workspace) {
     // For update resource have not be saved.
     if (resource instanceof ForUpdateWorkspaceResource) {

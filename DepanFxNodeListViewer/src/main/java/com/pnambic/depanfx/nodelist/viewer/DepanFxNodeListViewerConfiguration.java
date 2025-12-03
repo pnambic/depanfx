@@ -25,7 +25,9 @@ import com.pnambic.depanfx.nodelist.gui.DepanFxNodeListViewBuiltIns;
 import com.pnambic.depanfx.nodelist.gui.DepanFxSaveNodeListDialog;
 import com.pnambic.depanfx.nodelist.gui.columns.DepanFxColumnRegistry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
+import com.pnambic.depanfx.nodelist.model.DepanFxNodeLists;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
+import com.pnambic.depanfx.nodelist.viewdata.DepanFxNodeListViewerData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
@@ -151,10 +153,12 @@ public class DepanFxNodeListViewerConfiguration {
     }
   }
 
-  private static class NodeListResourceContribution
-      extends DepanFxResourceRegistryContribution.Principal<DepanFxNodeList>
-      implements DepanFxResourceRegistryContribution.Dialog<DepanFxNodeList>,
-          DepanFxResourceRegistryContribution.Panel<DepanFxNodeList> {
+  /**
+   * Base contribution for node lists and graph docs into node list viewers.
+   */
+  private static abstract class NodeViewerContribution<T>
+      extends DepanFxResourceRegistryContribution.Principal<T>
+      implements DepanFxResourceRegistryContribution.Panel<T> {
 
     private final DepanFxColumnRegistry columnRegistry;
 
@@ -165,6 +169,65 @@ public class DepanFxNodeListViewerConfiguration {
     private final DepanFxNodeFiltersRegistry filterRegistry;
 
     private final DepanFxNodeFiltersDialogRegistry filterDialogRegistry;
+
+    public NodeViewerContribution(
+        String resourceLabel,
+        Class<T> dataType,
+        String fileExt,
+        String orderKey,
+        DepanFxColumnRegistry columnRegistry,
+        DepanFxInfoRegistry infoRegistry,
+        DepanFxLinkMatchersRegistry matcherRegistry,
+        DepanFxNodeFiltersRegistry filterRegistry,
+        DepanFxNodeFiltersDialogRegistry filterDialogRegistry) {
+      super(resourceLabel, dataType, fileExt, orderKey);
+      this.columnRegistry = columnRegistry;
+      this.infoRegistry = infoRegistry;
+      this.matcherRegistry = matcherRegistry;
+      this.filterRegistry = filterRegistry;
+      this.filterDialogRegistry = filterDialogRegistry;
+    }
+
+    @Override
+    public void openPanel(
+        DepanFxWorkspace workspace,
+        DepanFxSceneService sceneSrcv,
+        DepanFxWorkspaceResource<T> panelRsrc) {
+
+      DepanFxNodeListViewerData viewInfo =
+          prepareNodeListViewer(workspace, panelRsrc);
+
+      // Confirm with user and start view
+      DepanFxNodeListViewerDialog.runEditDialog(
+          workspace, sceneSrcv.getDialogRunner(), viewInfo)
+          .ifPresent(v -> startNodeListViewer(workspace, sceneSrcv, v));
+    }
+
+    protected abstract DepanFxNodeListViewerData prepareNodeListViewer(
+        DepanFxWorkspace workspace,
+        DepanFxWorkspaceResource<T> viewRsrc);
+
+    private void startNodeListViewer(
+        DepanFxWorkspace workspace,
+        DepanFxSceneService sceneSrvc,
+        DepanFxNodeListViewerData viewInfo) {
+
+      DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(
+          viewInfo.getViewerTitle(),
+          workspace, sceneSrvc.getDialogRunner(),
+          columnRegistry, infoRegistry, matcherRegistry,
+          filterRegistry, filterDialogRegistry);
+
+      sceneSrvc.addViewer(viewer);
+      viewer.initFromNodeListResource(
+          viewInfo.getNodeListRsrc(),
+          viewInfo.getTableViewRsrc());
+    }
+  }
+
+  private static class NodeListResourceContribution
+      extends NodeViewerContribution<DepanFxNodeList>
+      implements DepanFxResourceRegistryContribution.Dialog<DepanFxNodeList> {
 
     public NodeListResourceContribution(
         DepanFxColumnRegistry columnRegistry,
@@ -176,15 +239,12 @@ public class DepanFxNodeListViewerConfiguration {
           OPEN_AS_LIST_LABEL,
           DepanFxNodeList.class,
           DepanFxNodeList.NODE_LIST_EXT,
-          OPEN_AS_LIST_ORDER_KEY);
-      this.columnRegistry = columnRegistry;
-      this.infoRegistry = infoRegistry;
-      this.matcherRegistry = matcherRegistry;
-      this.filterRegistry = filterRegistry;
-      this.filterDialogRegistry = filterDialogRegistry;
+          OPEN_AS_LIST_ORDER_KEY,
+          columnRegistry, infoRegistry, matcherRegistry,
+          filterRegistry, filterDialogRegistry);
     }
 
-    @Override
+    @Override // DepanFxResourceRegistryContribution.Dialog
     public void runDialog(
         DepanFxWorkspace workspace,
         DepanFxDialogRunner dialogRunner,
@@ -192,48 +252,26 @@ public class DepanFxNodeListViewerConfiguration {
       DepanFxSaveNodeListDialog.runSaveNodeList(dialogRunner, nodeListRsrc);
     }
 
-    @Override
-    public void openPanel(
+    @Override // NodeViewerContribution
+    protected DepanFxNodeListViewerData prepareNodeListViewer(
         DepanFxWorkspace workspace,
-        DepanFxSceneService sceneSrcv,
-        DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
-      addNodeListPanelToScene(workspace, sceneSrcv, nodeListRsrc);
-    }
-
-    private void addNodeListPanelToScene(
-        DepanFxWorkspace workspace,
-        DepanFxSceneService sceneSrvc,
         DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
 
-      DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(
-          DepanFxWorkspaceFactory.buildDocTitle(nodeListRsrc.getDocument()),
-          workspace, sceneSrvc.getDialogRunner(),
-          columnRegistry, infoRegistry, matcherRegistry,
-          filterRegistry, filterDialogRegistry);
+      // Infer missing view properties from node list
+      String viewTitle =
+          DepanFxWorkspaceFactory.buildDocTitle(nodeListRsrc.getDocument());
 
-      sceneSrvc.addViewer(viewer);
-
-      viewer.initFromNodeListResource(
-          nodeListRsrc,
+      DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc =
           getTableViewResource(
-              workspace,
-              nodeListRsrc.getResource().getGraphDocResource()));
+              workspace, nodeListRsrc.getResource().getGraphDocResource());
+
+      return new DepanFxNodeListViewerData(
+          viewTitle, nodeListRsrc, tableViewRsrc);
     }
   }
 
   private static class GraphDocResourceContribution
-      extends DepanFxResourceRegistryContribution.Principal<GraphDocument>
-      implements DepanFxResourceRegistryContribution.Panel<GraphDocument> {
-
-    private final DepanFxColumnRegistry columnRegistry;
-
-    private final DepanFxInfoRegistry infoRegistry;
-
-    private final DepanFxLinkMatchersRegistry matcherRegistry;
-
-    private final DepanFxNodeFiltersRegistry filterRegistry;
-
-    private final DepanFxNodeFiltersDialogRegistry filterDialogRegistry;
+      extends NodeViewerContribution<GraphDocument> {
 
     public GraphDocResourceContribution(
         DepanFxColumnRegistry columnRegistry,
@@ -245,40 +283,29 @@ public class DepanFxNodeListViewerConfiguration {
           OPEN_GRAPH_AS_LIST_LABEL,
           GraphDocument.class,
           GraphDocPersistenceContribution.EXTENSION,
-          OPEN_GRAPH_AS_LIST_ORDER_KEY);
-
-      this.columnRegistry = columnRegistry;
-      this.infoRegistry = infoRegistry;
-      this.matcherRegistry = matcherRegistry;
-      this.filterRegistry = filterRegistry;
-      this.filterDialogRegistry = filterDialogRegistry;
-    }
-
-    @Override
-    public void openPanel(DepanFxWorkspace workspace,
-        DepanFxSceneService sceneSrvc,
-        DepanFxWorkspaceResource<GraphDocument> graphRsrc) {
-      addGraphDocViewToScene( workspace, sceneSrvc, graphRsrc);
-    }
-
-    private void addGraphDocViewToScene(
-        DepanFxWorkspace workspace,
-        DepanFxSceneService sceneSrvc,
-        DepanFxWorkspaceResource<GraphDocument> graphRsrc) {
-
-      String viewerTitle = DepanFxWorkspaceFactory.buildDocTitle(
-          graphRsrc.getDocument()) + " nodes";
-
-      DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(
-          viewerTitle, workspace, sceneSrvc.getDialogRunner(),
+          OPEN_GRAPH_AS_LIST_ORDER_KEY,
           columnRegistry, infoRegistry, matcherRegistry,
           filterRegistry, filterDialogRegistry);
+    }
 
-      sceneSrvc.addViewer(viewer);
-      viewer.initFromGraphResource(
-          graphRsrc,
-          DepanFxNodeListViewBuiltIns.guessTableViewResource(
-              workspace, graphRsrc));
+    @Override // NodeViewerContribution
+    protected DepanFxNodeListViewerData prepareNodeListViewer(
+        DepanFxWorkspace workspace,
+        DepanFxWorkspaceResource<GraphDocument> graphDocRsrc) {
+
+    // Infer missing view properties from node list
+    String viewTitle = DepanFxWorkspaceFactory.buildDocTitle(
+        graphDocRsrc.getDocument()) + " nodes";
+
+    DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc =
+        workspace.addScratchResource(
+            DepanFxNodeLists.buildNodeList(graphDocRsrc));
+
+    DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc =
+        getTableViewResource(workspace, graphDocRsrc);
+
+    return new DepanFxNodeListViewerData(
+        viewTitle, nodeListRsrc, tableViewRsrc);
     }
   }
 

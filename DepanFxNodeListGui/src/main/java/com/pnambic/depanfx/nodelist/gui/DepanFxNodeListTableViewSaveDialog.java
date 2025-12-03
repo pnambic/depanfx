@@ -3,16 +3,13 @@ package com.pnambic.depanfx.nodelist.gui;
 import com.pnambic.depanfx.nodelist.tooldata.DepanFxNodeListTableViewData;
 import com.pnambic.depanfx.perspective.DepanFxBaseToolDialog;
 import com.pnambic.depanfx.perspective.DepanFxResourcePerspectives;
-import com.pnambic.depanfx.perspective.chooser.DepanFxResourceChooser;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner.Dialog;
 import com.pnambic.depanfx.scene.DepanFxFxmlDialog;
 import com.pnambic.depanfx.scene.DepanFxSceneControls;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
-import com.pnambic.depanfx.workspace.projects.DepanFxProjects;
 
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -24,7 +21,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -70,22 +66,6 @@ public class DepanFxNodeListTableViewSaveDialog
     return saveDlg.getController().getToolResource();
   }
 
-  /**
-   * Obtain an existing node list with a file chooser.
-   */
-  public static Optional<DepanFxWorkspaceResource<DepanFxNodeListTableViewData>>
-      runTableViewChooser(
-            DepanFxWorkspace workspace,
-            DepanFxDialogRunner dialogRunner,
-            Scene scene) {
-
-    DepanFxResourceChooser chooser = prepareChooser(workspace, dialogRunner);
-    return chooser.showOpenDialog(scene)
-        .map(DepanFxProjectDocument.class::cast)
-        .flatMap(p -> workspace.getWorkspaceResource(
-            p, DepanFxNodeListTableViewData.class));
-  }
-
   @Override
   public void setToolResource(
       DepanFxWorkspaceResource<DepanFxNodeListTableViewData> tableViewRsrc) {
@@ -124,17 +104,6 @@ public class DepanFxNodeListTableViewSaveDialog
   @Override
   protected String getInputCheckFailureText() {
     return "Node List Table View Save Confirmation Error";
-  }
-
-  private static DepanFxResourceChooser prepareChooser(
-      DepanFxWorkspace workspace, DepanFxDialogRunner dialogRunner) {
-    DepanFxResourceChooser result =
-        new DepanFxResourceChooser(workspace, dialogRunner);
-    DepanFxResourcePerspectives.prepareResourceFinder(
-        result, DepanFxProjects.TOOLS_PATH);
-    result.getExtensionFilters().add(TABLE_VIEW_RSRC_FILTER);
-    result.setSelectedExtensionFilter(TABLE_VIEW_RSRC_FILTER);
-    return result;
   }
 
   private String buildDetailsLabel(DepanFxNodeListTableViewData tableView) {
