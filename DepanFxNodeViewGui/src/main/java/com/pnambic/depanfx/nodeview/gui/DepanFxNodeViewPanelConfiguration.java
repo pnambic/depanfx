@@ -17,6 +17,8 @@ package com.pnambic.depanfx.nodeview.gui;
 
 import com.pnambic.depanfx.edgematchers.gui.DepanFxEdgeMatcherDialogRegistry;
 import com.pnambic.depanfx.edgematchers.link.DepanFxLinkMatchersRegistry;
+import com.pnambic.depanfx.graph.context.ContextModelId;
+import com.pnambic.depanfx.graph.model.GraphNode;
 import com.pnambic.depanfx.graph.nodeinfo.DepanFxInfoRegistry;
 import com.pnambic.depanfx.graph_doc.model.GraphDocument;
 import com.pnambic.depanfx.graph_doc.persistence.GraphDocPersistenceContribution;
@@ -24,9 +26,11 @@ import com.pnambic.depanfx.nodefilters.gui.DepanFxNodeFiltersDialogRegistry;
 import com.pnambic.depanfx.nodefilters.model.DepanFxNodeFiltersRegistry;
 import com.pnambic.depanfx.nodelist.model.DepanFxNodeList;
 import com.pnambic.depanfx.nodeview.layouts.DepanFxNodeLayoutRegistry;
+import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewLinkDisplayData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeViewNodeDisplayData;
+import com.pnambic.depanfx.nodeview.viewdata.DepanFxNodeViewPanelInitData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
@@ -37,6 +41,9 @@ import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.Collection;
+import java.util.Map;
 
 @Configuration
 public class DepanFxNodeViewPanelConfiguration {
@@ -233,12 +240,14 @@ public class DepanFxNodeViewPanelConfiguration {
     @Override
     public void openPanel(
         DepanFxWorkspace workspace,
-        DepanFxSceneService sceneSrcv,
+        DepanFxSceneService sceneSrvc,
         DepanFxWorkspaceResource<DepanFxNodeViewData> panelRsrc) {
-      addNodeViewPanelToScene(
-          workspace, sceneSrcv, panelRsrc,
-          layoutRegistry, filterRegistry, filterDialogRegistry,
-          matcherRegistry, matcherDialogRegistry);
+
+      DepanFxNodeViewPanel viewPanel = new DepanFxNodeViewPanel(
+          workspace, layoutRegistry, filterRegistry, filterDialogRegistry,
+          matcherRegistry, matcherDialogRegistry, panelRsrc);
+
+      sceneSrvc.addViewer(viewPanel);
     }
   }
 
@@ -278,22 +287,56 @@ public class DepanFxNodeViewPanelConfiguration {
     public void openPanel(DepanFxWorkspace workspace,
         DepanFxSceneService sceneSrcv,
         DepanFxWorkspaceResource<T> panelRsrc) {
-      DepanFxNodeViewData viewInfo =
-          getNodeViewData(workspace, panelRsrc, layoutRegistry);
-      DepanFxWorkspaceResource<DepanFxNodeViewData> viewRsrc =
-          workspace.addScratchResource(viewInfo);
 
-      addNodeViewPanelToScene(
-          workspace, sceneSrcv, viewRsrc,
-          layoutRegistry,
-          filterRegistry, filterDialogRegistry,
-          matcherRegistry, matcherDialogRegistry);
+      ContextModelId modelId =
+          getGraphDocResource(panelRsrc).getResource().getContextModelId();
+      DepanFxWorkspaceResource<Object> layoutRsrc =
+          DepanFxNodeViews.getContextLayout(workspace, modelId).orElse(null);
+
+      DepanFxNodeViewPanelInitData initInfo =
+          new DepanFxNodeViewPanelInitData(layoutRsrc);
+
+      DepanFxNodeViewInitDialog.runEditDialog(
+          sceneSrcv.getDialogRunner(), initInfo)
+          .ifPresent(i -> startNodeViewPanel(workspace, sceneSrcv, panelRsrc, i));
     }
 
     protected abstract DepanFxNodeViewData getNodeViewData(
         DepanFxWorkspace workspace,
-        DepanFxWorkspaceResource<?> rsrc,
-        DepanFxNodeLayoutRegistry layoutRegistry);
+        DepanFxWorkspaceResource<T> rsrc,
+        Map<GraphNode, DepanFxNodeLocationData> locations);
+
+    protected abstract DepanFxWorkspaceResource<GraphDocument>
+    getGraphDocResource(
+        DepanFxWorkspaceResource<T> rsrc);
+
+    protected abstract Collection<GraphNode> getNodes(
+        DepanFxWorkspaceResource<T> rsrc);
+
+    private void startNodeViewPanel(
+        DepanFxWorkspace workspace,
+        DepanFxSceneService sceneSrvc,
+        DepanFxWorkspaceResource<T> panelRsrc,
+        DepanFxNodeViewPanelInitData initInfo) {
+
+      Map<GraphNode, DepanFxNodeLocationData> locations =
+      DepanFxNodeViews.buildNodeLocations(
+          layoutRegistry,
+          getGraphDocResource(panelRsrc),
+          getNodes(panelRsrc),
+          initInfo.getLayoutRsrc());
+
+      DepanFxNodeViewData nodeViewInfo =
+          getNodeViewData(workspace, panelRsrc, locations);
+      DepanFxWorkspaceResource<DepanFxNodeViewData> nodeViewRsrc =
+          workspace.addScratchResource(nodeViewInfo);
+
+      DepanFxNodeViewPanel viewPanel = new DepanFxNodeViewPanel(
+          workspace, layoutRegistry, filterRegistry, filterDialogRegistry,
+          matcherRegistry, matcherDialogRegistry, nodeViewRsrc);
+
+      sceneSrvc.addViewer(viewPanel);
+    }
   }
 
   private static class NodeListAsViewResourceContribution
@@ -321,14 +364,23 @@ public class DepanFxNodeViewPanelConfiguration {
     @Override
     protected DepanFxNodeViewData getNodeViewData(
         DepanFxWorkspace workspace,
-        DepanFxWorkspaceResource<?> rsrc,
-        DepanFxNodeLayoutRegistry layoutRegistry) {
-      @SuppressWarnings("unchecked")
-      DepanFxWorkspaceResource<DepanFxNodeList> nodeListResource =
-          (DepanFxWorkspaceResource<DepanFxNodeList>) rsrc;
+        DepanFxWorkspaceResource<DepanFxNodeList> nodeListResource,
+        Map<GraphNode, DepanFxNodeLocationData> locations) {
 
       return DepanFxNodeViews.fromNodeList(
-          nodeListResource, workspace, layoutRegistry);
+          workspace, nodeListResource, locations);
+    }
+
+    @Override
+    protected DepanFxWorkspaceResource<GraphDocument> getGraphDocResource(
+        DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
+      return nodeListRsrc.getResource().getGraphDocResource();
+    }
+
+    @Override
+    protected Collection<GraphNode> getNodes(
+        DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc) {
+      return nodeListRsrc.getResource().getNodes();
     }
   }
 
@@ -357,29 +409,23 @@ public class DepanFxNodeViewPanelConfiguration {
     @Override
     protected DepanFxNodeViewData getNodeViewData(
         DepanFxWorkspace workspace,
-        DepanFxWorkspaceResource<?> rsrc,
-        DepanFxNodeLayoutRegistry layoutRegistry) {
-      @SuppressWarnings("unchecked")
-      DepanFxWorkspaceResource<GraphDocument> graphDocResource =
-          (DepanFxWorkspaceResource<GraphDocument>) rsrc;
+        DepanFxWorkspaceResource<GraphDocument> graphDocResource,
+        Map<GraphNode, DepanFxNodeLocationData> locations) {
 
       return DepanFxNodeViews.fromGraphDocument(
-          graphDocResource, workspace, layoutRegistry);
+          workspace, graphDocResource, locations);
     }
-  }
 
-  private static void addNodeViewPanelToScene(
-      DepanFxWorkspace workspace,
-      DepanFxSceneService sceneSrvc,
-      DepanFxWorkspaceResource<DepanFxNodeViewData> nodeViewRsrc,
-      DepanFxNodeLayoutRegistry layoutRegistry,
-      DepanFxNodeFiltersRegistry filterRegistry,
-      DepanFxNodeFiltersDialogRegistry filterDialogRegistry,
-      DepanFxLinkMatchersRegistry matcherRegistry,
-      DepanFxEdgeMatcherDialogRegistry matcherDialogRegistry) {
-    DepanFxNodeViewPanel viewPanel = new DepanFxNodeViewPanel(
-        workspace, layoutRegistry, filterRegistry, filterDialogRegistry,
-        matcherRegistry, matcherDialogRegistry, nodeViewRsrc);
-    sceneSrvc.addViewer(viewPanel);
+    @Override
+    protected DepanFxWorkspaceResource<GraphDocument> getGraphDocResource(
+        DepanFxWorkspaceResource<GraphDocument> graphDocRsrc) {
+      return graphDocRsrc;
+    }
+
+    @Override
+    protected Collection<GraphNode> getNodes(
+        DepanFxWorkspaceResource<GraphDocument> graphDocRsrc) {
+      return graphDocRsrc.getResource().getGraph().getGraphNodes();
+    }
   }
 }

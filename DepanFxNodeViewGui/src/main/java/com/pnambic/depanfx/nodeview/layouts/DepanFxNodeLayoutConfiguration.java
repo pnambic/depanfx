@@ -7,10 +7,8 @@ import com.pnambic.depanfx.nodeview.tooldata.DepanFxNodeLocationData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxRadialLayoutData;
 import com.pnambic.depanfx.nodeview.tooldata.DepanFxTreeLayoutData;
 import com.pnambic.depanfx.perspective.chooser.DepanFxResourceFilter;
-import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistry;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
-import com.pnambic.depanfx.workspace.DepanFxProjectDocument;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
 import com.pnambic.depanfx.workspace.DepanFxWorkspaceResource;
 
@@ -94,12 +92,14 @@ public class DepanFxNodeLayoutConfiguration {
   }
 
   @Bean
-  public DepanFxResourceRegistryContribution radialLayoutResourceContribution() {
+  public DepanFxResourceRegistryContribution<DepanFxRadialLayoutData>
+  radialLayoutResourceContribution() {
     return new RadialLayoutResourceContribution();
   }
 
   @Bean
-  public DepanFxResourceRegistryContribution treeLayoutResourceContribution() {
+  public DepanFxResourceRegistryContribution<DepanFxTreeLayoutData>
+  treeLayoutResourceContribution() {
     return new TreeLayoutResourceContribution();
   }
 

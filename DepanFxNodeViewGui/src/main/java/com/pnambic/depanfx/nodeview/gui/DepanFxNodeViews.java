@@ -97,8 +97,9 @@ public class DepanFxNodeViews {
   }
 
   public static DepanFxNodeViewData fromNodeList(
+      DepanFxWorkspace workspace,
       DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc,
-      DepanFxWorkspace workspace, DepanFxNodeLayoutRegistry layoutRegistry) {
+      Map<GraphNode, DepanFxNodeLocationData> locations) {
 
     DepanFxNodeList nodeList = nodeListRsrc.getResource();
     Collection<GraphNode> nodes = nodeList.getNodes().stream()
@@ -111,14 +112,18 @@ public class DepanFxNodeViews {
     String resultDescr = MessageFormat.format(
         "From node list {0} ({1} nodes).", baseName, nodes.size());
 
+    DepanFxWorkspaceResource<GraphDocument> graphDocRsrc =
+        nodeList.getGraphDocResource();
+
     return buildNodeView(
         resultName, resultDescr,
-        nodeList.getGraphDocResource(), nodes, workspace, layoutRegistry);
+        graphDocRsrc, nodes, workspace, locations);
   }
 
   public static DepanFxNodeViewData fromGraphDocument(
+      DepanFxWorkspace workspace,
       DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
-      DepanFxWorkspace workspace, DepanFxNodeLayoutRegistry layoutRegistry) {
+      Map<GraphNode, DepanFxNodeLocationData> locations) {
 
     GraphDocument graphDoc = graphDocRsrc.getResource();
 
@@ -132,7 +137,7 @@ public class DepanFxNodeViews {
 
     return buildNodeView(
         resultName, resultDescr,
-        graphDocRsrc, nodes, workspace, layoutRegistry);
+        graphDocRsrc, nodes, workspace, locations);
   }
 
   public static DepanFxNodeViewData updateNameDescr(
@@ -167,15 +172,13 @@ public class DepanFxNodeViews {
       String viewName, String viewDescr,
       DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
       Collection<GraphNode> nodes, DepanFxWorkspace workspace,
-      DepanFxNodeLayoutRegistry layoutRegistry) {
+      Map<GraphNode, DepanFxNodeLocationData> locations) {
     DepanFxNodeViewCameraData cameraData = JoglCameras.getHome();
     DepanFxNodeViewSceneData sceneData =
         new DepanFxNodeViewSceneData(
             JoglColors.of(DEFAULT_BACKGROUND_COLOR), cameraData);
 
       ContextModelId modelId = graphDocRsrc.getResource().getContextModelId();
-      DepanFxWorkspaceResource<DepanFxNodeViewLayoutData> layoutRsrc =
-          getContextLayout(workspace, modelId).orElse(null);
 
       // Nodes
       DepanFxWorkspaceResource<DepanFxNodeViewNodeDisplayData> nodeDisplayRsrc =
@@ -198,12 +201,11 @@ public class DepanFxNodeViews {
       DepanFxWorkspaceResource<DepanFxBaseMatcherDocument> edgeFilterRsrc =
           null;
 
-    Map<GraphNode, DepanFxNodeLocationData> locations =
-        buildNodeLocations(layoutRegistry, graphDocRsrc, nodes, layoutRsrc);
     Map<GraphNode, DepanFxNodeDisplayData> nodeDisplay =
         buildNodeDisplay(nodes);
     Map<GraphEdge, DepanFxLineDisplayData> edgeDisplay =
         buildEdgeDisplay();
+
     return new DepanFxNodeViewData(viewName, viewDescr,
         graphDocRsrc, nodes, locations, nodeDisplay, edgeDisplay,
 
@@ -228,11 +230,11 @@ public class DepanFxNodeViews {
     return Collections.emptyMap();
   }
 
-  private static Map<GraphNode, DepanFxNodeLocationData> buildNodeLocations(
+  public static Map<GraphNode, DepanFxNodeLocationData> buildNodeLocations(
       DepanFxNodeLayoutRegistry layoutRegistry,
       DepanFxWorkspaceResource<GraphDocument> graphDocRsrc,
       Collection<GraphNode> nodes,
-      DepanFxWorkspaceResource<DepanFxNodeViewLayoutData> layoutRsrc) {
+      DepanFxWorkspaceResource<Object> layoutRsrc) {
 
     Map<GraphNode, DepanFxNodeLocationData> result =
         layoutRegistry.layoutNodes(graphDocRsrc, layoutRsrc, nodes);
@@ -247,11 +249,11 @@ public class DepanFxNodeViews {
 
   }
 
-  private static Optional<DepanFxWorkspaceResource<DepanFxNodeViewLayoutData>>
+  public static Optional<DepanFxWorkspaceResource<Object>>
   getContextLayout(
       DepanFxWorkspace workspace, ContextModelId contextModelId) {
     return getContextBuiltIn(workspace, contextModelId,
-        DepanFxNodeViewLayoutData.class,
+        Object.class,
         DepanFxNodeViewLayoutData.LAYOUT_TOOL_PATH,
         DepanFxNodeViewLayoutData.MEMBER_LAYOUT_RESOURCE_NAME);
   }

@@ -61,9 +61,9 @@ public class DepanFxNodeListChooser {
 
     private final DepanFxDialogRunner dialogRunner;
 
-    private DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc;
-
     private final TextField nodeListField;
+
+    private DepanFxWorkspaceResource<DepanFxNodeList> nodeListRsrc;
 
     public NodeListControl(
         DepanFxWorkspace workspace,
