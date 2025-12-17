@@ -31,6 +31,7 @@ import com.pnambic.depanfx.nodelist.viewdata.DepanFxNodeListViewerData;
 import com.pnambic.depanfx.perspective.plugins.DepanFxResourceRegistryContribution;
 import com.pnambic.depanfx.scene.DepanFxDialogRunner;
 import com.pnambic.depanfx.scene.DepanFxSceneService;
+import com.pnambic.depanfx.scene.plugins.DepanFxNewAnalysisContribution;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuContribution;
 import com.pnambic.depanfx.scene.plugins.DepanFxSceneMenuItems;
 import com.pnambic.depanfx.workspace.DepanFxWorkspace;
@@ -45,6 +46,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
+
+import javafx.scene.control.MenuItem;
 
 @Configuration
 public class DepanFxNodeListViewerConfiguration {
@@ -94,6 +97,23 @@ public class DepanFxNodeListViewerConfiguration {
       DepanFxNodeFiltersRegistry filterRegistry,
       DepanFxNodeFiltersDialogRegistry filterDialogRegistry) {
     return new GraphDocResourceContribution(
+        columnRegistry, infoRegistry, matcherRegistry,
+        filterRegistry, filterDialogRegistry);
+  }
+
+  @Bean
+  public DepanFxNewAnalysisContribution nodeListViewerEditor(
+      DepanFxWorkspace workspace,
+      DepanFxSceneService sceneSrvc,
+      DepanFxDialogRunner dialogRunner,
+      DepanFxColumnRegistry columnRegistry,
+      DepanFxInfoRegistry infoRegistry,
+      DepanFxLinkMatchersRegistry matcherRegistry,
+      DepanFxNodeFiltersRegistry filterRegistry,
+      DepanFxNodeFiltersDialogRegistry filterDialogRegistry) {
+
+    return new NodeListViewerEditorContribution(
+        workspace, sceneSrvc, dialogRunner,
         columnRegistry, infoRegistry, matcherRegistry,
         filterRegistry, filterDialogRegistry);
   }
@@ -306,6 +326,69 @@ public class DepanFxNodeListViewerConfiguration {
 
     return new DepanFxNodeListViewerData(
         viewTitle, nodeListRsrc, tableViewRsrc);
+    }
+  }
+
+  private static class NodeListViewerEditorContribution
+      implements DepanFxNewAnalysisContribution {
+
+    private final DepanFxWorkspace workspace;
+
+    private final DepanFxSceneService sceneSrvc;
+
+    private final DepanFxDialogRunner dialogRunner;
+
+    private final DepanFxColumnRegistry columnRegistry;
+
+    private final DepanFxInfoRegistry infoRegistry;
+
+    private final DepanFxLinkMatchersRegistry matcherRegistry;
+
+    private final DepanFxNodeFiltersRegistry filterRegistry;
+
+    private final DepanFxNodeFiltersDialogRegistry filterDialogRegistry;
+
+    public NodeListViewerEditorContribution(
+        DepanFxWorkspace workspace,
+        DepanFxSceneService sceneSrvc,
+        DepanFxDialogRunner dialogRunner,
+        DepanFxColumnRegistry columnRegistry,
+        DepanFxInfoRegistry infoRegistry,
+        DepanFxLinkMatchersRegistry matcherRegistry,
+        DepanFxNodeFiltersRegistry filterRegistry,
+        DepanFxNodeFiltersDialogRegistry filterDialogRegistry) {
+
+      this.workspace = workspace;
+      this.sceneSrvc = sceneSrvc;
+      this.dialogRunner = dialogRunner;
+      this.columnRegistry = columnRegistry;
+      this.infoRegistry = infoRegistry;
+      this.matcherRegistry = matcherRegistry;
+      this.filterRegistry = filterRegistry;
+      this.filterDialogRegistry = filterDialogRegistry;
+    }
+
+    @Override
+    public MenuItem createNewResourceMenuItem() {
+      MenuItem result = new MenuItem(OPEN_LIST_VIEW_LABEL);
+      result.setOnAction(e -> runEditorDialog());
+      return result;
+    }
+
+    private void runEditorDialog() {
+      DepanFxNodeListViewerDataDialog.runEditDialog(workspace, dialogRunner)
+          .ifPresent(this::addViewerFromData);
+    }
+
+    private void addViewerFromData(DepanFxNodeListViewerData viewerData) {
+      DepanFxNodeListViewer viewer = new DepanFxNodeListViewer(
+          viewerData.getViewerTitle(), workspace, dialogRunner,
+          columnRegistry, infoRegistry, matcherRegistry,
+          filterRegistry, filterDialogRegistry);
+
+      sceneSrvc.addViewer(viewer);
+      viewer.initFromNodeListResource(
+          viewerData.getNodeListRsrc(), viewerData.getTableViewRsrc());
     }
   }
 
